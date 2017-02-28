@@ -12,7 +12,7 @@ class EventEmitter[Ev <: Event](val eventProp: EventProp[EventCallback[Ev]]) ext
   }
 
   def sendTo(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev]] = {
-    new EventPropSetter[EventCallback[Ev]](eventProp, addEventToStream(stream))
+    new EventPropSetter[EventCallback[Ev]](eventProp, addEventToStream(stream) _)
   }
 
   @inline def -->(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev]] = {

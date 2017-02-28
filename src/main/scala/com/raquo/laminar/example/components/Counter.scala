@@ -20,7 +20,7 @@ object Counter {
     val $count = XStream
       .merge($incClick.mapTo(1), $decClick.mapTo(-1))
       .fold((a: Int, b: Int) => a + b, seed = 0)
-      .debug("$count")
+      .debugWithLabel("$count")
 
     val vNode = div(
       cls := "Counter",
