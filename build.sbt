@@ -18,6 +18,7 @@ homepage := Some(url("https://github.com/raquo/laminar"))
 
 licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.md"))
 
+
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
 //  "org.scala-js" %% "scalajs-env-selenium" % "0.1.3",
@@ -27,10 +28,6 @@ libraryDependencies ++= Seq(
 )
 
 persistLauncher in Test := false
-
-//npmDependencies in Compile ++= Seq(
-//  "snabbdom" -> "0.6.3"
-//)
 
 //jsEnv := new org.scalajs.jsenv.selenium.SeleniumJSEnv(org.scalajs.jsenv.selenium.Firefox()).withKeepAlive()
 

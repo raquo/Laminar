@@ -1,7 +1,7 @@
 package com.raquo.laminar.example
 
 import com.raquo.laminar._
-import com.raquo.laminar.example.components.Table
+import com.raquo.laminar.example.components.{Counter, Table}
 import com.raquo.laminar.example.pseudotests.{MultiSetters, MultiStyleProp, NestedStyleProp, NodeTypeChange}
 import org.scalajs.dom
 import org.scalajs.dom.document
@@ -15,6 +15,8 @@ object App extends js.JSApp {
     document.addEventListener("DOMContentLoaded", (e: Event) => {
       dom.console.log("=== DOMContentLoaded ===")
 
-      render(document.getElementById("entry"), Table())
+      render(document.getElementById("laminar-container"), MultiSetters())
+
+//      ManualTest()
     })
   }}

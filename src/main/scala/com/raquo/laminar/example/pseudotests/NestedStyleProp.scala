@@ -3,23 +3,23 @@ package com.raquo.laminar.example.pseudotests
 import com.raquo.laminar._
 //import com.raquo.laminar.StyleStream
 import com.raquo.laminar.example.components.Toggle
-import com.raquo.snabbdom.VNode
-import com.raquo.snabbdom.tags._
-import com.raquo.snabbdom.props._
-import com.raquo.snabbdom.styles._
+
+import com.raquo.laminar.tags._
+import com.raquo.laminar.props._
+import com.raquo.laminar.styles._
 import com.raquo.xstream.XStream
 
 object NestedStyleProp {
 
-  def render($color: XStream[String]): VNode = {
+  def render($color: XStream[String]): RNode = {
     div(
       color <-- $color,
       span("HELLO"),
-      $color.map(color => span(color))
+      child <-- $color.map(color => span(color))
     )
   }
 
-  def apply(): VNode = {
+  def apply(): RNode = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")
@@ -37,7 +37,7 @@ object NestedStyleProp {
       className := "yolo",
       h1("MultiStyleProp"),
 //      toggle.vnode,
-      toggle2.vnode,
+      toggle2.node,
       div(
 //        color <-- $fontColor,
 //        fontSize <-- $fontSize,

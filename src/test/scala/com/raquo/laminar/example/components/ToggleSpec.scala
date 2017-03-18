@@ -12,12 +12,12 @@ class ToggleSpec extends UnitSpec {
 
     val toggle = Toggle(caption)
 
-    mount(toggle.vnode)
+    mount(toggle.node)
 
-    mountedElement().getAttribute("class") shouldBe "Toggle"
+    mountedElement.getAttribute("class") shouldBe "Toggle"
 
-    val input = mountedElement().querySelector("input").asInstanceOf[HTMLInputElement]
-    val label = mountedElement().querySelector("label")
+    val input = mountedElement.querySelector("input").asInstanceOf[HTMLInputElement]
+    val label = mountedElement.querySelector("label")
 
     label.textContent shouldBe caption
     input.checked shouldBe false

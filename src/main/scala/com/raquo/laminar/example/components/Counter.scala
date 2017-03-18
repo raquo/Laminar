@@ -1,16 +1,15 @@
 package com.raquo.laminar.example.components
 
 import com.raquo.laminar._
-import com.raquo.snabbdom.VNode
-import com.raquo.snabbdom.attrs.cls
-import com.raquo.snabbdom.events.onClick
-import com.raquo.snabbdom.tags.{button, div, span}
+import com.raquo.laminar.attrs.cls
+import com.raquo.laminar.events.onClick
+import com.raquo.laminar.tags.{button, div, span}
 import com.raquo.xstream.{MemoryStream, XStream}
 import org.scalajs.dom.raw.MouseEvent
 
 class Counter private (
   val $count: MemoryStream[Int, Nothing],
-  val vNode: VNode
+  val node: RNode
 )
 
 object Counter {
@@ -22,13 +21,14 @@ object Counter {
       .fold((a: Int, b: Int) => a + b, seed = 0)
       .debugWithLabel("$count")
 
-    val vNode = div(
-      cls := "Counter",
+    val node = div(
+      cls := "Counter"
+    )(
       button(onClick --> $decClick, "–"),
-      $count.map(count => span(s" :: $count :: ")),
+      child <-- $count.map(count => span(s" :: $count :: ")),
       button(onClick --> $incClick, "+")
     )
 
-    new Counter($count, vNode)
+    new Counter($count, node)
   }
 }

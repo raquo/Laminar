@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
-import com.raquo.snabbdom.nodes.{Hooks, VNode}
-import com.raquo.snabbdom.tags.div
+import com.raquo.snabbdom.nodes.Hooks
+import com.raquo.laminar.tags.div
 import com.raquo.snabbdom.utils.HookLogger
 import com.raquo.xstream.{Listener, Subscription, XStream}
 import org.scalajs.dom
@@ -10,17 +10,17 @@ import scala.util.Random
 
 object ChildReceiver {
 
-  def <--($node: XStream[VNode]): VNode = {
+  def <--($node: XStream[RNode]): RNode = {
 
     val commonPrefix = Random.nextInt(99).toString
 
     // @TODO add .key here (and copy it into newly returned nodes to ensure node is destroyed?
     var currentNode = div()
-    var subscription: Subscription[VNode, Nothing] = null
+    var subscription: Subscription[RNode, Nothing] = null
     // @TODO do we need to patch this node's parent node when we update it?
 
-    def addChildHooks(hooks: Hooks): Hooks = {
-      hooks.addCreateHook { (emptyNode: VNode, vnode: VNode) =>
+    def addChildHooks(hooks: Hooks[RNode]): Hooks[RNode] = {
+      hooks.addCreateHook { (emptyNode: RNode, vnode: RNode) =>
         //      hooks.addInsertHook { vnode =>
 
         dom.console.log(commonPrefix + ": ++CHILD SUB++ ")
@@ -45,7 +45,7 @@ object ChildReceiver {
             currentNode = patch(currentNode, vnode)
 //          }
         }))
-      }.addPostPatchHook { (oldNode: VNode, node: VNode) =>
+      }.addPostPatchHook { (oldNode: RNode, node: RNode) =>
         // We need this in case some other StreamModifier updates the vnode (we will get this event)
         dom.console.warn(commonPrefix + ": CHILD PREPATCH")
         dom.console.log("text:", oldNode.text, node.text)

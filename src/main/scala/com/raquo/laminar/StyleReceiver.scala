@@ -1,23 +1,24 @@
 package com.raquo.laminar
 
-import com.raquo.snabbdom.{Modifier, VNode}
-import com.raquo.snabbdom.nodes.{Hooks, VNodeOps}
+import com.raquo.laminar
+import com.raquo.snabbdom.Modifier
+import com.raquo.snabbdom.nodes.Hooks
 import com.raquo.snabbdom.setters.{Style, StyleSetter}
 import com.raquo.xstream.{Listener, Subscription, XStream}
 import org.scalajs.dom
 
 import scala.util.Random
 
-class StyleReceiver[V](val style: Style[V]) extends AnyVal {
+class StyleReceiver[V](val style: Style[V, RNode]) extends AnyVal {
 
-  def <--($value: XStream[V]): Modifier = {
+  def <--($value: XStream[V]): Modifier[RNode] = {
     val commonPrefix = Random.nextInt(99).toString
 
-    var currentNode: VNode = null
+    var currentNode: RNode = null
     var subscription: Subscription[V, Nothing] = null
 
-    new Modifier {
-      override def applyTo(vnode: VNode): Unit = {
+    new Modifier[RNode] {
+      override def applyTo(vnode: RNode): Unit = {
         dom.console.log(s"$commonPrefix: APPLY STYLE ${style.name} VALUE TO")
         dom.console.log(vnode)
         dom.console.log(vnode.elm)
@@ -25,7 +26,7 @@ class StyleReceiver[V](val style: Style[V]) extends AnyVal {
 
         val hooks = vnode.data.hooks.getOrElse(new Hooks)
 
-        hooks.addCreateHook { (emptyVNode: VNode, vnode: VNode) =>
+        hooks.addCreateHook { (emptyVNode: RNode, vnode: RNode) =>
           //          hooks.addInsertHook { vnode: VNode =>
           currentNode = vnode
           dom.console.log(s"$commonPrefix: +++STYLE SUB+++")
@@ -36,15 +37,15 @@ class StyleReceiver[V](val style: Style[V]) extends AnyVal {
             ////                js.debugger()
             //              } else {
             dom.console.log(s"$commonPrefix NEW STYLE VALUE: " + value.toString)
-            val newNode = VNodeOps.copy(currentNode)
-            new StyleSetter[V](style, value).applyTo(newNode)
+            val newNode = currentNode.copy(laminar.builders)
+            new StyleSetter[V, RNode](style, value).applyTo(newNode)
 
             //              js.debugger()
 
             currentNode = patch(currentNode, newNode)
             //              }
           }))
-        }.addPostPatchHook { (oldNode: VNode, node: VNode) =>
+        }.addPostPatchHook { (oldNode: RNode, node: RNode) =>
           // We need this in case some other StreamModifier updates the vnode (we will get this event)
           dom.console.warn(commonPrefix + ": STYLE PREPATCH")
           dom.console.log("text:", oldNode.text, node.text)

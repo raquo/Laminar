@@ -1,10 +1,10 @@
 package com.raquo.laminar.example.components
 
 import com.raquo.laminar._
-import com.raquo.snabbdom.VNode
-import com.raquo.snabbdom.attrs._
-import com.raquo.snabbdom.events._
-import com.raquo.snabbdom.tags._
+import com.raquo.laminar.RNode
+import com.raquo.laminar.attrs._
+import com.raquo.laminar.events._
+import com.raquo.laminar.tags._
 import com.raquo.xstream.XStream
 import org.scalajs.dom.raw.{HTMLInputElement, MouseEvent}
 
@@ -12,7 +12,7 @@ import scala.util.Random
 
 class Toggle private (
   val $checked: XStream[Boolean],
-  val vnode: VNode
+  val node: RNode
 )
 
 object Toggle {
@@ -23,7 +23,7 @@ object Toggle {
 
     val rand = Random.nextInt(99)
 
-    val checkbox = input(
+    val checkbox = input.apply(
       id := "toggle" + rand,
       cls := "red",
       `type` := "checkbox",
@@ -32,14 +32,14 @@ object Toggle {
 
     val $captionNode = $checked.map(checked => span(if (checked) "ON" else "off"))
 
-    val vnode = div(
+    val node = div(
       cls := "Toggle",
       checkbox,
       label(forId := "toggle" + rand, caption),
       " — ",
-      $captionNode
+      child <-- $captionNode
     )
 
-    new Toggle($checked, vnode)
+    new Toggle($checked, node)
   }
 }

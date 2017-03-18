@@ -2,15 +2,14 @@ package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar._
 import com.raquo.laminar.example.components.Toggle
-import com.raquo.snabbdom.VNode
-import com.raquo.snabbdom.tags._
-import com.raquo.snabbdom.attrs.href
-import com.raquo.snabbdom.props.className
-import com.raquo.snabbdom.styles._
+import com.raquo.laminar.tags._
+import com.raquo.laminar.attrs.href
+import com.raquo.laminar.props.className
+import com.raquo.laminar.styles._
 
 object MultiSetters {
 
-  def apply(): VNode = {
+  def apply(): RNode = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("/about")
@@ -21,8 +20,8 @@ object MultiSetters {
     div(
       className := "yolo",
       h1("MultiStyleProp"),
-      toggle.vnode,
-      toggle2.vnode,
+      toggle.node,
+      toggle2.node,
       a(
         href <-- $href,
         fontSize <-- $fontSize,

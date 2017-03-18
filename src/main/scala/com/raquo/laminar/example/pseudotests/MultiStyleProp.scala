@@ -2,14 +2,13 @@ package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar._
 import com.raquo.laminar.example.components.Toggle
-import com.raquo.snabbdom.VNode
-import com.raquo.snabbdom.tags._
-import com.raquo.snabbdom.props._
-import com.raquo.snabbdom.styles._
+import com.raquo.laminar.tags._
+import com.raquo.laminar.props._
+import com.raquo.laminar.styles._
 
 object MultiStyleProp {
 
-  def apply(): VNode = {
+  def apply(): RNode = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")
@@ -20,8 +19,8 @@ object MultiStyleProp {
     div(
       className := "yolo",
       h1("MultiStyleProp"),
-      toggle.vnode,
-      toggle2.vnode,
+      toggle.node,
+      toggle2.node,
       div(
         color <-- $fontColor,
         fontSize <-- $fontSize,

@@ -2,15 +2,14 @@ package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar.example.components.Toggle
 import com.raquo.laminar._
-import com.raquo.snabbdom.VNode
-import com.raquo.snabbdom.tags._
-import com.raquo.snabbdom.styles._
+import com.raquo.laminar.tags._
+import com.raquo.laminar.styles._
 import com.raquo.xstream.XStream
 import org.scalajs.dom
 
 object NodeTypeChange {
 
-  def boldOrItalic($useB: XStream[Boolean], $bigFont: XStream[Boolean]): XStream[VNode] = {
+  def boldOrItalic($useB: XStream[Boolean], $bigFont: XStream[Boolean]): XStream[RNode] = {
     val $fontSize = fontSizeStream($bigFont) // @TODO use remember()?
     $useB.map { useB =>
       dom.console.warn("useB: " + useB)
@@ -36,7 +35,7 @@ object NodeTypeChange {
     })
   }
 
-  def apply(): VNode = {
+  def apply(): RNode = {
 
     val toggle = Toggle("Bold")
     val toggle2 = Toggle("Big")
@@ -44,8 +43,8 @@ object NodeTypeChange {
     div(
       "APP",
       div(
-        toggle.vnode,
-        toggle2.vnode,
+        toggle.node,
+        toggle2.node,
         child <-- boldOrItalic($useB = toggle.$checked, $bigFont = toggle2.$checked.remember())
         //        div(
         //          color <-- myColor(toggle.$checked),
