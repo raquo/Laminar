@@ -13,7 +13,12 @@ import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
 import scala.util.Try
 
-object ManualTest extends MountOps[RNode] with RuleImplicits[RNode] with ReactiveBuilders with UtilSpec {
+object ManualTest
+  extends MountOps[RNode, RNodeData]
+  with RuleImplicits[RNode, RNodeData]
+  with ReactiveBuilders
+  with UtilSpec
+{
 
   override def doAssert(condition: Boolean, message: String): Unit = {
     if (!condition) {

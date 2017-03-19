@@ -1,12 +1,12 @@
 package com.raquo.laminar.exceptions
 
-import com.raquo.laminar.RNode
+import com.raquo.laminar.{RNode, RNodeData}
 import com.raquo.snabbdom.setters.Attr
-import com.raquo.xstream.{Subscription, XStream}
+import com.raquo.xstream.Subscription
 
 case class AttrSubscriptionException[V](
   rnode: RNode,
-  attr: Attr[V, RNode],
+  attr: Attr[V, RNode, RNodeData],
   existingSubscription: Subscription[V, Nothing],
   attemptedSubscription: Subscription[V, Nothing]
 )

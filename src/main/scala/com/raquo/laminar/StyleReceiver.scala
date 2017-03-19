@@ -9,15 +9,15 @@ import org.scalajs.dom
 
 import scala.util.Random
 
-class StyleReceiver[V](val style: Style[V, RNode]) extends AnyVal {
+class StyleReceiver[V](val style: Style[V, RNode, RNodeData]) extends AnyVal {
 
-  def <--($value: XStream[V]): Modifier[RNode] = {
+  def <--($value: XStream[V]): Modifier[RNode, RNodeData] = {
     val commonPrefix = Random.nextInt(99).toString
 
     var currentNode: RNode = null
     var subscription: Subscription[V, Nothing] = null
 
-    new Modifier[RNode] {
+    new Modifier[RNode, RNodeData] {
       override def applyTo(vnode: RNode): Unit = {
         dom.console.log(s"$commonPrefix: APPLY STYLE ${style.name} VALUE TO")
         dom.console.log(vnode)
@@ -37,8 +37,8 @@ class StyleReceiver[V](val style: Style[V, RNode]) extends AnyVal {
             ////                js.debugger()
             //              } else {
             dom.console.log(s"$commonPrefix NEW STYLE VALUE: " + value.toString)
-            val newNode = currentNode.copy(laminar.builders)
-            new StyleSetter[V, RNode](style, value).applyTo(newNode)
+            val newNode = currentNode.copy()
+            new StyleSetter[V, RNode, RNodeData](style, value).applyTo(newNode)
 
             //              js.debugger()
 

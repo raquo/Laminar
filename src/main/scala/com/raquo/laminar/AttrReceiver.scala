@@ -9,15 +9,15 @@ import org.scalajs.dom
 
 import scala.util.Random
 
-class AttrReceiver[V](val attr: Attr[V, RNode]) extends AnyVal {
+class AttrReceiver[V](val attr: Attr[V, RNode, RNodeData]) extends AnyVal {
 
-  def <--($value: XStream[V]): Modifier[RNode] = {
+  def <--($value: XStream[V]): Modifier[RNode, RNodeData] = {
     val commonPrefix = Random.nextInt(99).toString
 
     var currentNode: RNode = null
     var subscription: Subscription[V, Nothing] = null
 
-    new Modifier[RNode] {
+    new Modifier[RNode, RNodeData] {
       override def applyTo(vnode: RNode): Unit = {
 
         // >>>
@@ -70,9 +70,9 @@ class AttrReceiver[V](val attr: Attr[V, RNode]) extends AnyVal {
             //              } else {
             dom.console.log(s"$commonPrefix NEW ATTR VALUE: " + value.toString)
 
-            val newNode = currentNode.copy(laminar.builders)
+            val newNode = currentNode.copy()
 
-            new AttrSetter[V, RNode](attr, value).applyTo(newNode)
+            new AttrSetter[V, RNode, RNodeData](attr, value).applyTo(newNode)
 
             //              js.debugger()
 

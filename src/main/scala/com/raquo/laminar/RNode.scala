@@ -9,14 +9,12 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.ScalaJSDefined
 
 
-// @TODO consider using a builder pattern for snabbdom vnodes?
-
 /** Reactive Node */
 @ScalaJSDefined
-class RNode(tagName: js.UndefOr[String]) extends Node[RNode](tagName) {
+class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName) {
 
-  override def copy(builders: Builders[RNode]): RNode = {
-    val newNode = super.copy(builders)
+  override def copy(): RNode = {
+    val newNode = super.copy()
     this.data.subscriptions.foreach { subscriptions =>
       newNode.data.subscriptions = copySubscriptions(subscriptions)
     }

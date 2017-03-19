@@ -18,42 +18,55 @@ package object laminar {
 
   private val modules = js.Array(AttrsModule, PropsModule, EventsModule, StyleModule)
 
-  val patch: Snabbdom.PatchFn[RNode] = Snabbdom.init(modules)
+  val patch: Snabbdom.PatchFn[RNode, RNodeData] = Snabbdom.init(modules)
 
-  object tags extends Tags[RNode] with ReactiveBuilders
+  object tags
+    extends Tags[RNode, RNodeData]
+    with ReactiveBuilders
 
-  object allTags extends Tags[RNode] with Tags2[RNode] with ReactiveBuilders
+  object allTags
+    extends Tags[RNode, RNodeData]
+    with Tags2[RNode, RNodeData]
+    with ReactiveBuilders
 
-  object attrs extends Attrs[RNode] with InputAttrs[RNode] with GlobalAttrs[RNode] with ReactiveBuilders
+  object attrs
+    extends Attrs[RNode, RNodeData]
+    with InputAttrs[RNode, RNodeData]
+    with GlobalAttrs[RNode, RNodeData]
+    with ReactiveBuilders
 
-  object props extends Props[RNode] with ReactiveBuilders // @TODO add more `with`?
+  object props extends Props[RNode, RNodeData] with ReactiveBuilders // @TODO add more `with`?
 
-  object events extends MouseEventProps[RNode] with KeyboardEventProps[RNode] with ClipboardEventProps[RNode] with ReactiveBuilders
+  object events
+    extends MouseEventProps[RNode, RNodeData]
+    with KeyboardEventProps[RNode, RNodeData]
+    with ClipboardEventProps[RNode, RNodeData]
+    with ReactiveBuilders
 
-  object styles extends Styles[RNode] with ReactiveBuilders
+  object styles extends Styles[RNode, RNodeData] with ReactiveBuilders
 
   def render(entryPoint: dom.Element, rootNode: RNode): Unit = {
     patch(entryPoint, rootNode)
   }
 
 
-  // @TODO[API,Elegance] - ADD TYPE PARAM TO NODE INSTEAD !!!
-  implicit def toRichData(data: NodeData[RNode]): RichRNodeData = {
-    data.asInstanceOf[RichRNodeData]
-  }
-
-
   val child = ChildReceiver
 
-  implicit def toAttrReceiver[V](attr: Attr[V, RNode]): AttrReceiver[V] = {
+  implicit def toAttrReceiver[V](
+    attr: Attr[V, RNode, RNodeData]
+  ): AttrReceiver[V] = {
     new AttrReceiver(attr)
   }
 
-  implicit def toStyleReceiver[V](style: Style[V, RNode]): StyleReceiver[V] = {
+  implicit def toStyleReceiver[V](
+    style: Style[V, RNode, RNodeData]
+  ): StyleReceiver[V] = {
     new StyleReceiver(style)
   }
 
-  implicit def toEventEmitter[Ev <: Event](eventProp: EventProp[EventCallback[Ev], RNode]): EventEmitter[Ev] = {
+  implicit def toEventEmitter[Ev <: Event](
+    eventProp: EventProp[EventCallback[Ev], RNode, RNodeData]
+  ): EventEmitter[Ev] = {
     new EventEmitter(eventProp)
   }
 
@@ -61,20 +74,29 @@ package object laminar {
 
   implicit val builders = new ReactiveBuilders {}
 
-  @inline implicit def textToChildNode(text: String): ChildNode[RNode] = {
+  @inline implicit def textToChildNode(
+    text: String
+  ): ChildNode[RNode, RNodeData] = {
     Conversions.textToChildNode(text)
   }
 
-  @inline implicit def nodeToChildNode(node: RNode): ChildNode[RNode] = {
+  @inline implicit def nodeToChildNode(
+    node: RNode
+  ): ChildNode[RNode, RNodeData] = {
     Conversions.nodeToChildNode(node)
   }
 
-  @inline implicit def toIterableNode(modifiers: Iterable[Modifier[RNode]]): IterableNode[RNode] = {
+  @inline implicit def toIterableNode(
+    modifiers: Iterable[Modifier[RNode, RNodeData]]
+  ): IterableNode[RNode, RNodeData] = {
     Conversions.toIterableNode(modifiers)
   }
 
-  @inline implicit def optionToModifier[T](maybeModifier: Option[T])(implicit toModifier: T => Modifier[RNode]): Modifier[RNode] = {
+  @inline implicit def optionToModifier[T](
+    maybeModifier: Option[T]
+  )(
+    implicit toModifier: T => Modifier[RNode, RNodeData]
+  ): Modifier[RNode, RNodeData] = {
     Conversions.optionToModifier(maybeModifier)
   }
-
 }

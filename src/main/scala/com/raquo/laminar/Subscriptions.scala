@@ -16,7 +16,7 @@ class Subscriptions(val node: RNode) extends js.Object {
   var styles: js.UndefOr[js.Dictionary[Subscription[_, Nothing]]] = js.undefined
 
   def addAttrSubscription[V](
-    attr: Attr[V, RNode],
+    attr: Attr[V, RNode, RNodeData],
     subscription: Subscription[V, Nothing]
   ): Unit = {
     if (attrs.isEmpty) {
