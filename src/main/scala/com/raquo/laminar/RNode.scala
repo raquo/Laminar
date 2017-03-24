@@ -27,20 +27,45 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
 
   def createSubscriptions(): Unit = {
     dom.console.log(s"#${_debugNodeNumber}: createSubscriptions")
-    val newSubscriptions = latestNode.data.subscriptionRequests.map { request =>
-      // @TODO[XStream] Add a .subscribe method to XStream that does not need to explicitly specify Error Type
-      val onNext = (value: Any) => {
-        val newNode = latestNode.copy()
-        newNode._debugNodeNumber = _debugNodeNumber + "."
-        dom.console.log(s"#${_debugNodeNumber}: sub:onNext (next node: #${newNode._debugNodeNumber})")
 
-        request.onNext(value, newNode)
-        latestNode = patch(latestNode, newNode)
-      }
-      request.$value.subscribe[Any, Nothing](Listener(onNext = onNext))
+    // On subscription, XStream's Memory stream immediately (synchronously) emits
+    // its latest value to the new listener, which would have normally triggered
+    // an unwanted patch() call while subscriptionRequests have not been fully
+    // processed yet.
+    // However, we avoid this by processing such patches in a batch.
+    var isMemoryStreamInitialValue = true
+    val memoryStreamPatches: js.Array[RNode => Unit] = js.Array()
+
+    val newSubscriptions = latestNode.data.subscriptionRequests.map { request =>
+      val listener = Listener(onNext = (value: Any) => {
+        if (isMemoryStreamInitialValue) {
+          memoryStreamPatches.push(nodeToPatch => request.onNext(value, nodeToPatch))
+        } else {
+          val newNode = latestNode.copy()
+          newNode._debugNodeNumber = _debugNodeNumber + "."
+          dom.console.log(s"#${_debugNodeNumber}: sub:onNext - $value - (next node: #${newNode._debugNodeNumber})")
+
+          request.onNext(value, newNode)
+          latestNode = patch(latestNode, newNode)
+        }
+      })
+      // @TODO[XStream] Add a .subscribe method to XStream that does not need to explicitly specify Error Type
+      request.$value.subscribe[Any, Nothing](listener)
     }
-    latestNode.data.subscriptions.push(newSubscriptions: _*) // @TODO[Performance] Check that generated code is optimal
+
+    isMemoryStreamInitialValue = false
+
     latestNode.data.subscriptionRequests = js.Array()
+    latestNode.data.subscriptions = latestNode.data.subscriptions.concat(newSubscriptions)
+
+    if (memoryStreamPatches.nonEmpty) {
+      val newNode = latestNode.copy()
+      newNode._debugNodeNumber = _debugNodeNumber + "."
+      dom.console.log(s"#${_debugNodeNumber}: batchPatch - (next node: #${newNode._debugNodeNumber})")
+
+      memoryStreamPatches.foreach(patch => patch(newNode))
+      latestNode = patch(latestNode, newNode)
+    }
   }
 
   def createHook(emptyNode: RNode, newNode: RNode): Unit = {

@@ -1,4 +1,4 @@
-//package com.raquo.laminar
+package com.raquo.laminar
 
 import com.raquo.laminar._
 import com.raquo.laminar.utils.AsyncUnitSpec
@@ -62,18 +62,11 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
 
     patchMounted(div(rel := "unmounted"))
 
-    withClue("foo") {
-      expectElement(div like (title isEmpty, rel is "unmounted"))
-    }
-
-    // @TODO so that patchMounted thing doesn't work!!!!!!!!
-
-    // @TODO ^^^ Is it possible that we're patching a stale node?
-    // @TODO Maybe we should be patching the container instead... or adding a hook or something...
+    expectElement(div like (title isEmpty, rel is "unmounted"))
 
     val promise = Promise[Assertion]()
 
-    js.timers.setTimeout(10) {
+    js.timers.setTimeout(1) {
       promise.complete(Try{
         $writeableTitle.shamefullySendNext(title3)
         expectElement(div like (title isEmpty, rel is "unmounted"))
