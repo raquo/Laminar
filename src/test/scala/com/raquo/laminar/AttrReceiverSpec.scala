@@ -36,10 +36,6 @@ class AttrReceiverSpec extends UnitSpec {
     expectElement(div like (cls is "unrelated"))
   }
 
-//  it("updates attr with multiple streams on same attr") {
-//    // @TODO This isn't really a published feature, should we really test for it?
-//  }
-
   it("updates attr with memory stream") {
     val title1 = randomString("title1_")
     val title2 = randomString("title2_")

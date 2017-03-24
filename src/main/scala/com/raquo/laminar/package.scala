@@ -1,22 +1,28 @@
 package com.raquo
 
-import com.raquo.snabbdom.EventCallback
 import com.raquo.snabbdom._
 import com.raquo.snabbdom.collections.attrs.{Attrs, GlobalAttrs, InputAttrs}
 import com.raquo.snabbdom.collections.eventProps.{ClipboardEventProps, KeyboardEventProps, MouseEventProps}
 import com.raquo.snabbdom.collections.props.Props
 import com.raquo.snabbdom.collections.styles.Styles
 import com.raquo.snabbdom.collections.tags.{Tags, Tags2}
-import com.raquo.snabbdom.nodes.{ChildNode, Conversions, IterableNode, NodeData}
+import com.raquo.snabbdom.hooks.ModuleHooks
+import com.raquo.snabbdom.nodes.{ChildNode, Conversions, IterableNode}
 import com.raquo.snabbdom.setters.{Attr, EventProp, Style}
 import org.scalajs.dom
 import org.scalajs.dom.raw.Event
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 package object laminar {
 
-  private val modules = js.Array(AttrsModule, PropsModule, EventsModule, StyleModule)
+  private val modules: js.Array[NativeModule | ModuleHooks[RNode, RNodeData]] = js.Array(
+    AttrsModule,
+    PropsModule,
+    EventsModule,
+    StyleModule
+  )
 
   val patch: Snabbdom.PatchFn[RNode, RNodeData] = Snabbdom.init(modules)
 

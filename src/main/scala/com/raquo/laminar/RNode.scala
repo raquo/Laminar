@@ -1,7 +1,8 @@
 package com.raquo.laminar
 
 import com.raquo.laminar.utils.GlobalCounter
-import com.raquo.snabbdom.nodes.{Hooks, Node}
+import com.raquo.snabbdom.hooks.NodeHooks
+import com.raquo.snabbdom.nodes.Node
 import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
@@ -15,7 +16,7 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
 
   // @TODO[Docs] explain this concept in more detail for our collective sanity.
   /** "Last RNode that is sameAs this one that has been added to the DOM" */
-  private var latestNode: RNode = _
+  final private[laminar] var latestNode: RNode = _
 
 
   // @TODO[API] Remove this – only used for debug.
@@ -51,7 +52,7 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
   }
 
   if (data.hooks.isEmpty) {
-    data.hooks = new Hooks[RNode]()
+    data.hooks = new NodeHooks[RNode, RNodeData]()
   }
 
   data.hooks.get

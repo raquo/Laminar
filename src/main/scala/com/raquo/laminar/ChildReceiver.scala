@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
-import com.raquo.snabbdom.nodes.Hooks
 import com.raquo.laminar.tags.div
+import com.raquo.snabbdom.hooks.NodeHooks
 import com.raquo.snabbdom.utils.HookLogger
 import com.raquo.xstream.{Listener, Subscription, XStream}
 import org.scalajs.dom
@@ -19,7 +19,7 @@ object ChildReceiver {
     var subscription: Subscription[RNode, Nothing] = null
     // @TODO do we need to patch this node's parent node when we update it?
 
-    def addChildHooks(hooks: Hooks[RNode]): Hooks[RNode] = {
+    def addChildHooks(hooks: NodeHooks[RNode, RNodeData]): NodeHooks[RNode, RNodeData] = {
       hooks.addCreateHook { (emptyNode: RNode, vnode: RNode) =>
         //      hooks.addInsertHook { vnode =>
 
