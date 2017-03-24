@@ -25,7 +25,7 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
     data.subscriptionRequests.push(SubscriptionRequest($value, onNext))
   }
 
-  def createSubscriptions(): Unit = {
+  def createSubscriptions(modifyExistingNode: Boolean): Unit = {
     dom.console.log(s"#${_debugNodeNumber}: createSubscriptions")
 
     // On subscription, XStream's Memory stream immediately (synchronously) emits
@@ -63,16 +63,21 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
       newNode._debugNodeNumber = _debugNodeNumber + "."
       dom.console.log(s"#${_debugNodeNumber}: batchPatch - (next node: #${newNode._debugNodeNumber})")
 
-      memoryStreamPatches.foreach(patch => patch(newNode))
-      latestNode = patch(latestNode, newNode)
+      if (modifyExistingNode) {
+        memoryStreamPatches.foreach(patch => patch(latestNode))
+      } else {
+        memoryStreamPatches.foreach(patch => patch(newNode))
+        latestNode = patch(latestNode, newNode)
+      }
     }
   }
 
-  def createHook(emptyNode: RNode, newNode: RNode): Unit = {
+  def initHook(newNode: RNode): Unit = {
+    // @TODO[Performance] Should we run this only on non-text nodes?
     _debugNodeNumber = GlobalCounter.next().toString
     dom.console.log(s"#${_debugNodeNumber}: hook:create")
     latestNode = newNode
-    createSubscriptions()
+    createSubscriptions(modifyExistingNode = true)
   }
 
   def destroyHook(node: RNode): Unit = {
@@ -83,7 +88,7 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
   def prePatchHook(oldNode: RNode, newNode: RNode): Unit = {
     dom.console.log(s"#${_debugNodeNumber}: hook:patch")
     latestNode = newNode
-    createSubscriptions()
+    createSubscriptions(modifyExistingNode = false)
 
     // @TODO[Performance] Can we reuse subscriptions
     val removedSubscriptions = oldNode.data.subscriptions.filter { oldSubscription =>
@@ -97,7 +102,7 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
   }
 
   data.hooks.get
-    .addCreateHook(createHook)
+    .addInitHook(initHook)
     .addPrePatchHook(prePatchHook)
     .addDestroyHook(destroyHook)
 }
