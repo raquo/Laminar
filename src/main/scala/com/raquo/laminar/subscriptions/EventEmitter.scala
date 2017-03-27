@@ -1,7 +1,8 @@
-package com.raquo.laminar
+package com.raquo.laminar.subscriptions
 
-import com.raquo.snabbdom.setters.{EventProp, EventPropSetter}
+import com.raquo.laminar.{RNode, RNodeData}
 import com.raquo.snabbdom.EventCallback
+import com.raquo.snabbdom.setters.{EventProp, EventPropSetter}
 import com.raquo.xstream.{ShamefulStream, XStream}
 import org.scalajs.dom.raw.Event
 

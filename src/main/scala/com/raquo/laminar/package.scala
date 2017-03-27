@@ -1,5 +1,7 @@
 package com.raquo
 
+import com.raquo.laminar.receivers.{AttrReceiver, ChildReceiver, StyleReceiver}
+import com.raquo.laminar.subscriptions.EventEmitter
 import com.raquo.snabbdom._
 import com.raquo.snabbdom.collections.attrs.{Attrs, GlobalAttrs, InputAttrs}
 import com.raquo.snabbdom.collections.eventProps.{ClipboardEventProps, KeyboardEventProps, MouseEventProps}

@@ -1,6 +1,7 @@
-package com.raquo.laminar
+package com.raquo.laminar.receivers
 
 import com.raquo.laminar.tags.div
+import com.raquo.laminar.{RNode, RNodeData, patch}
 import com.raquo.snabbdom.hooks.NodeHooks
 import com.raquo.snabbdom.utils.HookLogger
 import com.raquo.xstream.{Listener, Subscription, XStream}
