@@ -1,17 +1,17 @@
 package com.raquo.laminar
 
+import com.raquo.laminar
 import com.raquo.laminar.attrs.{rel, title}
 import com.raquo.laminar.tags.div
+import com.raquo.snabbdom.NativeModule
+import com.raquo.snabbdom.hooks.ModuleHooks
 import com.raquo.snabbdom.utils.testing.UtilSpec
 import com.raquo.snabbdom.utils.testing.matching.{MountOps, RuleImplicits}
 import com.raquo.xstream.{ShamefulStream, XStream}
 import org.scalajs.dom
-import org.scalatest.Assertion
 
-import scala.concurrent.Promise
 import scala.scalajs.js
-import scala.scalajs.js.JavaScriptException
-import scala.util.Try
+import scala.scalajs.js.{Array, JavaScriptException, |}
 
 object ManualTest
   extends MountOps[RNode, RNodeData]
@@ -19,6 +19,7 @@ object ManualTest
   with ReactiveBuilders
   with UtilSpec
 {
+  override val snabbdomModules: Array[NativeModule | ModuleHooks[RNode, RNodeData]] = laminar.modules
 
   override def doAssert(condition: Boolean, message: String): Unit = {
     if (!condition) {

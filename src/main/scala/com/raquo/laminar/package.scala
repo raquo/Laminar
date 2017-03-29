@@ -19,11 +19,12 @@ import scala.scalajs.js.|
 
 package object laminar {
 
-  private val modules: js.Array[NativeModule | ModuleHooks[RNode, RNodeData]] = js.Array(
+  val modules: js.Array[NativeModule | ModuleHooks[RNode, RNodeData]] = js.Array(
     AttrsModule,
     PropsModule,
     EventsModule,
-    StyleModule
+    StyleModule,
+    ReactiveModule()
   )
 
   val patch: Snabbdom.PatchFn[RNode, RNodeData] = Snabbdom.init(modules)

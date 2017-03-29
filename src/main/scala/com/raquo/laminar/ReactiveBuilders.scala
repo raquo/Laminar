@@ -6,7 +6,7 @@ import scala.scalajs.js
 
 trait ReactiveBuilders extends Builders[RNode, RNodeData] {
 
-  override def vnode(tagName: js.UndefOr[String]): RNode = {
+  override def node(tagName: js.UndefOr[String]): RNode = {
     new RNode(tagName)
   }
 
@@ -16,7 +16,7 @@ trait ReactiveBuilders extends Builders[RNode, RNodeData] {
     node
   }
 
-  override def vnodeData(): RNodeData = {
+  override def nodeData(): RNodeData = {
     new RNodeData
   }
 }

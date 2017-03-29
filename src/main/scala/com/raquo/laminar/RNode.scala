@@ -20,44 +20,6 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
   // @TODO[API] Remove this – only used for debug.
   var _debugNodeNumber: String = ""
 
-  def createHook(emptyNode: RNode, newNode: RNode): Unit = {
-    isMounted = true
-    // @TODO[Performance] this can be in createHook (can be shared!)
-    // @TODO[Performance] Should we run this only on non-text nodes?
-    newNode._debugNodeNumber = GlobalCounter.next().toString
-    dom.console.log(s"#${newNode._debugNodeNumber}: hook:create")
-  }
-
-  def destroyHook(node: RNode): Unit = {
-    isMounted = false
-    dom.console.log(s"#${node._debugNodeNumber}: hook:destroy")
-    node.data.subscriptions.foreach(_.unsubscribe())
-  }
-
-  def prePatchHook(oldNode: RNode, newNode: RNode): Unit = {
-
-    newNode.isMounted = true
-
-    dom.console.log(s"#${newNode._debugNodeNumber}: hook:patch")
-
-    // @TODO[Performance] We could reuse subscriptions if we could compare them by stream+attr equality
-    val removedSubscriptions = oldNode.data.subscriptions.filter { oldSubscription =>
-      !newNode.data.subscriptions.contains(oldSubscription)
-    }
-
-    removedSubscriptions.foreach(_.unsubscribe())
-
-    newNode.data.subscriptions.foreach { subscription =>
-      val listener = new DynamicEventSubscription[Any](subscription).dynamicListener
-      listener.setActiveNode(newNode)
-    }
-  }
-
-  data.hooks = new NodeHooks[RNode, RNodeData]()
-    .addCreateHook(createHook)
-    .addPrePatchHook(prePatchHook)
-    .addDestroyHook(destroyHook)
-
   def onNextEvent[T](
     onNext: (T, RNode) => Unit
   )(
