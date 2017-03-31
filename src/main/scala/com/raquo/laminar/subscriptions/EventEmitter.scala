@@ -10,16 +10,40 @@ class EventEmitter[Ev <: Event](
   val eventProp: EventProp[EventCallback[Ev], RNode, RNodeData]
 ) extends AnyVal {
 
-  def addEventToStream(stream: XStream[Ev])(event: Ev): Unit = {
-    new ShamefulStream(stream).shamefullySendNext(event)
-  }
-
-  def sendTo(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
-    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](eventProp, addEventToStream(stream) _)
-  }
+  // @TODO[Test] verify new fancy methods
 
   @inline def -->(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
     sendTo(stream)
+  }
+
+  @inline def -->[V](processor: Ev => V, sendTo: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+    send(processor, sendTo)
+  }
+
+  @inline def -->[V](value: V, sendTo: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+    this.send(value, sendTo)
+  }
+
+  def sendTo(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](eventProp, pushToStream(stream) _)
+  }
+
+  def send[V](value: V, to: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](
+      key = eventProp,
+      value = (event: Ev) => pushToStream(to)(value)
+    )
+  }
+
+  def send[V](processor: Ev => V, to: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](
+      key = eventProp,
+      value = (event: Ev) => pushToStream(to)(processor(event))
+    )
+  }
+
+  @inline private def pushToStream[T](stream: XStream[T])(value: T): Unit = {
+    new ShamefulStream(stream).shamefullySendNext(value)
   }
 }
 
