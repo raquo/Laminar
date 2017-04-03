@@ -15,35 +15,47 @@ import scala.scalajs.js.annotation.ScalaJSDefined
 @ScalaJSDefined
 class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName) {
 
-  var isMounted = false
+  // @TODO[API] Should this live here, or in DynamicEventListener?
+  var activeParentNode: js.UndefOr[RNode] = js.undefined
 
   // @TODO[API] Remove this – only used for debug.
   var _debugNodeNumber: String = ""
 
-  def onNextEvent[T](
-    onNext: (T, RNode) => Unit
+  @inline def isMounted: Boolean = elm.isDefined
+
+  def onNextEvent[V](
+    onNext: (V, RNode) => RNode
   )(
-    value: T,
+    value: V,
     activeNode: RNode,
-    thisListener: DynamicEventListener[T]
+    thisListener: DynamicEventListener[V]
   ): Unit = {
+    val newNode = onNext(value, activeNode)
+
     if (!activeNode.isMounted) {
-      onNext(value, activeNode)
+      thisListener.setActiveNode(newNode)
     } else {
-      val newNode = activeNode.copy()
       newNode._debugNodeNumber = activeNode._debugNodeNumber + "."
       dom.console.log(s"#${activeNode._debugNodeNumber}: sub:onNext - $value - (next node: #${newNode._debugNodeNumber})")
 
-      onNext(value, newNode)
-      thisListener.setActiveNode(patch(activeNode, newNode))
+      // Snabbdom will only do the patching if it has two difference nodes to compare.
+      // If `onNext` returns the same node that was provided to it AND that node is already mounted,
+      // we assume that `onNext` does not want to make any changes this time, or makes the changes
+      // itself.
+      if (activeNode != newNode) {
+        patch(activeNode, newNode)
+        thisListener.setActiveNode(newNode)
+      }
     }
   }
 
+  // @TODO[Docs] Document what the onNext needs to do (check isMounted, etc.)
+  // @TODO[Docs] Document what those RNodes are / should be (activeNode and newNode if xxx)
   // @TODO[Integrity] Improve types. Use shapeless?
-  def addSubscription[T](
+  def subscribe[T](
     $value: XStream[T],
-    onNext: (T, RNode) => Unit
-  ): Unit = {
+    onNext: (T, RNode) => RNode
+  ): DynamicEventSubscription[T] = {
     dom.console.log(s"#${_debugNodeNumber}: addSubscription")
 
     val listener = new DynamicEventListener[T](
@@ -51,7 +63,26 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
       onNext = onNextEvent(onNext)
     )
     // @TODO[XStream] Add a .subscribe method to XStream that does not need to explicitly specify Error Type
-    val newSubscription = $value.subscribe[T, Nothing](listener).asInstanceOf[Subscription[Any, Nothing]]
-    data.subscriptions.push(newSubscription)
+    val newSubscription = $value.subscribe[T, Nothing](listener)
+    data.subscriptions.push(newSubscription.asInstanceOf[Subscription[Any, Nothing]])
+    new DynamicEventSubscription(newSubscription)
+  }
+
+  def hasSubscription[T](
+    subscription: DynamicEventSubscription[T]
+  ): Boolean = {
+    // @TODO[Performance] use a native JS method
+    data.subscriptions.contains(subscription.subscription)
+  }
+
+  override def addChild(child: RNode): Unit = {
+    super.addChild(child)
+    // @TODO[Integrity] Add safeguards against updating activeParentNode at inappropriate times (which are..?)
+    child.activeParentNode = this
+  }
+
+  override def copyInto(node: RNode): Unit = {
+    super.copyInto(node)
+    node.activeParentNode = activeParentNode
   }
 }

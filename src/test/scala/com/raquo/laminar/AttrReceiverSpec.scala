@@ -21,19 +21,19 @@ class AttrReceiverSpec extends UnitSpec {
     val $writeableTitle = new ShamefulStream($title)
 
     mount(div(title <-- $title, "Hello"))
-    expectElement(div like (title isEmpty, "Hello"))
+    expectNode(div like (title isEmpty, "Hello"))
 
     $writeableTitle.shamefullySendNext(title1)
-    expectElement(div like (title is title1, "Hello"))
+    expectNode(div like (title is title1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title2)
-    expectElement(div like (title is title2, "Hello"))
+    expectNode(div like (title is title2, "Hello"))
 
     patchMounted(div(cls := "unrelated"))
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title3)
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
   }
 
   it("updates attr with memory stream") {
@@ -45,19 +45,19 @@ class AttrReceiverSpec extends UnitSpec {
     val $writeableTitle = new ShamefulStream($title)
 
     mount(div(title <-- $title, "Hello"))
-    expectElement(div like (title is title1, "Hello"))
+    expectNode(div like (title is title1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title2)
-    expectElement(div like (title is title2, "Hello"))
+    expectNode(div like (title is title2, "Hello"))
 
     $writeableTitle.shamefullySendNext(title3)
-    expectElement(div like (title is title3, "Hello"))
+    expectNode(div like (title is title3, "Hello"))
 
     patchMounted(div(cls := "unrelated"))
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title4)
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
   }
 
   it("supports multiple attr receivers on same node") {
@@ -79,43 +79,43 @@ class AttrReceiverSpec extends UnitSpec {
     val $writeableRel = new ShamefulStream($rel)
 
     mount(div(title <-- $title, rel <-- $rel, "Hello"))
-    expectElement(div like "Hello")
+    expectNode(div like "Hello")
 
     $writeableTitle.shamefullySendNext(title1)
-    expectElement(div like (title is title1, "Hello"))
+    expectNode(div like (title is title1, "Hello"))
 
     $writeableRel.shamefullySendNext(rel1)
-    expectElement(div like (title is title1, rel is rel1, "Hello"))
+    expectNode(div like (title is title1, rel is rel1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title2)
-    expectElement(div like (title is title2, rel is rel1, "Hello"))
+    expectNode(div like (title is title2, rel is rel1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title3)
-    expectElement(div like (title is title3, rel is rel1, "Hello"))
+    expectNode(div like (title is title3, rel is rel1, "Hello"))
 
     $writeableRel.shamefullySendNext(rel2)
-    expectElement(div like (title is title3, rel is rel2, "Hello"))
+    expectNode(div like (title is title3, rel is rel2, "Hello"))
 
     $writeableTitle.shamefullySendNext(title4)
-    expectElement(div like (title is title4, rel is rel2, "Hello"))
+    expectNode(div like (title is title4, rel is rel2, "Hello"))
 
     $writeableRel.shamefullySendNext(rel3)
-    expectElement(div like (title is title4, rel is rel3, "Hello"))
+    expectNode(div like (title is title4, rel is rel3, "Hello"))
 
     $writeableRel.shamefullySendNext(rel4)
-    expectElement(div like (title is title4, rel is rel4, "Hello"))
+    expectNode(div like (title is title4, rel is rel4, "Hello"))
 
     $writeableTitle.shamefullySendNext(title5)
-    expectElement(div like (title is title5, rel is rel4, "Hello"))
+    expectNode(div like (title is title5, rel is rel4, "Hello"))
 
     patchMounted(div(cls := "unrelated"))
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title6)
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
 
     $writeableRel.shamefullySendNext(rel5)
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
   }
 
   it("supports multiple memory streams") {
@@ -137,37 +137,37 @@ class AttrReceiverSpec extends UnitSpec {
     val $writeableRel = new ShamefulStream($rel)
 
     mount(div(title <-- $title, rel <-- $rel, "Hello"))
-    expectElement(div like (title is title1, rel is rel1, "Hello"))
+    expectNode(div like (title is title1, rel is rel1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title2)
-    expectElement(div like (title is title2, rel is rel1, "Hello"))
+    expectNode(div like (title is title2, rel is rel1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title3)
-    expectElement(div like (title is title3, rel is rel1, "Hello"))
+    expectNode(div like (title is title3, rel is rel1, "Hello"))
 
     $writeableRel.shamefullySendNext(rel2)
-    expectElement(div like (title is title3, rel is rel2, "Hello"))
+    expectNode(div like (title is title3, rel is rel2, "Hello"))
 
     $writeableTitle.shamefullySendNext(title4)
-    expectElement(div like (title is title4, rel is rel2, "Hello"))
+    expectNode(div like (title is title4, rel is rel2, "Hello"))
 
     $writeableRel.shamefullySendNext(rel3)
-    expectElement(div like (title is title4, rel is rel3, "Hello"))
+    expectNode(div like (title is title4, rel is rel3, "Hello"))
 
     $writeableRel.shamefullySendNext(rel4)
-    expectElement(div like (title is title4, rel is rel4, "Hello"))
+    expectNode(div like (title is title4, rel is rel4, "Hello"))
 
     $writeableTitle.shamefullySendNext(title5)
-    expectElement(div like (title is title5, rel is rel4, "Hello"))
+    expectNode(div like (title is title5, rel is rel4, "Hello"))
 
     patchMounted(div(cls := "unrelated"))
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title6)
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
 
     $writeableRel.shamefullySendNext(rel5)
-    expectElement(div like (cls is "unrelated"))
+    expectNode(div like (cls is "unrelated"))
   }
 
   it("works with child receiver on same node") {

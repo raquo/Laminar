@@ -1,69 +1,66 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.laminar.tags.div
-import com.raquo.laminar.{RNode, RNodeData, patch}
-import com.raquo.snabbdom.hooks.NodeHooks
-import com.raquo.snabbdom.utils.HookLogger
-import com.raquo.xstream.{Listener, Subscription, XStream}
-import org.scalajs.dom
+import com.raquo.laminar.allTags.comment
+import com.raquo.laminar.subscriptions.DynamicEventSubscription
+import com.raquo.laminar.utils.GlobalCounter
+import com.raquo.laminar.RNode
+import com.raquo.xstream.XStream
 
-import scala.util.Random
+import scala.scalajs.js
 
 object ChildReceiver {
 
   def <--($node: XStream[RNode]): RNode = {
+    // @TODO[Performance] Is there a better default for this? Some kind of generic empty node?
+    val initialChildNode = comment()
+    var childNode = initialChildNode
+    var maybeSubscription: js.UndefOr[DynamicEventSubscription[RNode]] = js.undefined
 
-    val commonPrefix = Random.nextInt(99).toString
+    // About memory streams
+    //
+    // When a memory stream is subscribed to, it fires onNext synchronously, immediately.
+    // This happens in `childNode.subscribe`, BEFORE we have a chance to return the newly
+    // created subscription from that call and record it in `maybeSubscription`.
+    //
+    // So manually work around this in two ways:
+    // - We update `childNode` in `onNext`
+    // - We rewire the subscription AFTER we have a reference to it if childNode was updated
+    // - We return the new, properly patched up `childNode` from `<--`
 
-    // @TODO add .key here (and copy it into newly returned nodes to ensure node is destroyed?
-    var currentNode = div()
-    var subscription: Subscription[RNode, Nothing] = null
-    // @TODO do we need to patch this node's parent node when we update it?
 
-    def addChildHooks(hooks: NodeHooks[RNode, RNodeData]): NodeHooks[RNode, RNodeData] = {
-      hooks.addCreateHook { (emptyNode: RNode, vnode: RNode) =>
-        //      hooks.addInsertHook { vnode =>
+    def onNext(newChildNode: RNode, activeChildNode: RNode): RNode = {
+      // We are updating the parent silently, in-place, without triggering any snabbdom events
+      // because this does not represent a change in the parent node. This is a change in the
+      // child node, and we deal with it ourselves by patch()-ing the child node directly in
+      // `RNode.onNextEvent`
 
-        dom.console.log(commonPrefix + ": ++CHILD SUB++ ")
-        subscription = $node.subscribe(Listener(onNext = vnode => {
-//          if (false && subscription == null) {
-//            dom.console.log(commonPrefix + ": xx IGNORING xx NEW CHILD EVENT – " + vnode.text)
-////            js.debugger()
-//          } else {
-            dom.console.log(commonPrefix + ": NEW CHILD EVENT – " + vnode.text)
-//            if (vnode.text == "P") {
-//              js.debugger()
-//            }
-
-            val newHooks = addChildHooks(vnode.data.hooks.getOrElse(HookLogger(
-              prefix = commonPrefix + "-" + Random.nextInt(99).toString,
-              callRemoveNode = true
-            )))
-            vnode.data.hooks = newHooks
-//            if (currentNode == vnode) {
-//              js.debugger()
-//            }
-            currentNode = patch(currentNode, vnode)
-//          }
-        }))
-      }.addPostPatchHook { (oldNode: RNode, node: RNode) =>
-        // We need this in case some other StreamModifier updates the vnode (we will get this event)
-        dom.console.warn(commonPrefix + ": CHILD PREPATCH")
-        dom.console.log("text:", oldNode.text, node.text)
-        dom.console.log("styles:", oldNode.data.styles, node.data.styles)
-//        js.debugger()
-
-        currentNode = node
-      }.addDestroyHook { vnode =>
-          dom.console.log(commonPrefix + ": --CHILD UNSUB-- ")
-          subscription.unsubscribe() // @TODO this needs to be tested! Especially in nested destroys
+      if (maybeSubscription.isEmpty) {
+        childNode = newChildNode // See notice about memory streams above
+      } else {
+        maybeSubscription.get.transfer(fromNode = activeChildNode, toNode = newChildNode)
       }
+
+      newChildNode.activeParentNode = activeChildNode.activeParentNode
+      newChildNode.activeParentNode.foreach { parentNode =>
+        parentNode.maybeChildren.foreach { children =>
+          // replace the old activeChildNode in parent's children with newChildNode
+          val activeChildIndex = children.indexOf(activeChildNode)
+          if (activeChildIndex != -1) {
+            children.splice(activeChildIndex, 1, newChildNode)
+          }
+        }
+      }
+
+      newChildNode
     }
 
-    val hooks = addChildHooks(HookLogger(prefix = commonPrefix, callRemoveNode = true))
+    childNode._debugNodeNumber = GlobalCounter.next().toString // because create hook is not called for comment nodes!
 
-    currentNode.data.hooks = hooks
+    maybeSubscription = childNode.subscribe[RNode]($node, onNext)
+    if (childNode != initialChildNode) {
+      maybeSubscription.get.transfer(initialChildNode, childNode) // See notice about memory streams above
+    }
 
-    currentNode
+    childNode
   }
 }

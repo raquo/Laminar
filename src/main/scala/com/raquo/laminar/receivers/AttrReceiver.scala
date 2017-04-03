@@ -10,10 +10,18 @@ class AttrReceiver[V](val attr: Attr[V, RNode, RNodeData]) extends AnyVal {
   def <--($value: XStream[V]): Modifier[RNode, RNodeData] = {
     new Modifier[RNode, RNodeData] {
       override def applyTo(node: RNode): Unit = {
-        node.addSubscription(
+        node.subscribe(
           $value,
-          onNext = (value: V, newNode: RNode) => {
-            new AttrSetter(attr, value).applyTo(newNode)
+          onNext = (value: V, activeNode: RNode) => {
+            val attrSetter = new AttrSetter(attr, value)
+            if (!activeNode.isMounted) {
+              attrSetter.applyTo(activeNode)
+              activeNode
+            } else {
+              val newNode = activeNode.copy()
+              attrSetter.applyTo(newNode)
+              newNode
+            }
           }
         )
       }

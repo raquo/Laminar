@@ -45,7 +45,7 @@ object ManualTest
     })
     mount(div(title <-- $titleWithDebugger, "Hello"))
 
-    expectElement(div like(title isEmpty, "Hello"))
+    expectNode(div like(title isEmpty, "Hello"))
 
     val $writeableTitle = new ShamefulStream($title)
 
@@ -57,16 +57,16 @@ object ManualTest
     doAssert(titleCounter == 0, "titleCounter should be 0")
 
 //    $writeableTitle.shamefullySendNext(title1)
-//    expectElement(div like(title is title1, "Hello"))
+//    expectNode(div like(title is title1, "Hello"))
 //    doAssert(titleCounter == 1, "titleCounter should be 1")
 //
 //    $writeableTitle.shamefullySendNext(title2)
-//    expectElement(div like(title is title2, "Hello"))
+//    expectNode(div like(title is title2, "Hello"))
 //    doAssert(titleCounter == 2, "titleCounter should be 2")
 
     patchMounted(div(rel := "unmounted", "UNMOUNTED"))
 
-    expectElement(div like(title isEmpty, rel is "unmounted", "UNMOUNTED"))
+    expectNode(div like(title isEmpty, rel is "unmounted", "UNMOUNTED"))
 
     // @TODO so that patchMounted thing doesn't work!!!!!!!!
 
@@ -77,7 +77,7 @@ object ManualTest
 
     js.timers.setTimeout(10) {
       $writeableTitle.shamefullySendNext(title3)
-      expectElement(div like(title isEmpty, rel is "unmounted", "UNMOUNTED"))
+      expectNode(div like(title isEmpty, rel is "unmounted", "UNMOUNTED"))
       doAssert(titleCounter == 0, "titleCounter should be 0")
     }
 
