@@ -1,6 +1,6 @@
 package com.raquo
 
-import com.raquo.laminar.receivers.{AttrReceiver, ChildReceiver, StyleReceiver}
+import com.raquo.laminar.receivers.{AttrReceiver, ChildReceiver, ChildrenReceiver, StyleReceiver}
 import com.raquo.laminar.subscriptions.EventEmitter
 import com.raquo.snabbdom._
 import com.raquo.snabbdom.collections.attrs.{Attrs, GlobalAttrs, InputAttrs}
@@ -60,6 +60,10 @@ package object laminar {
 
 
   val child = ChildReceiver
+
+  def children(groupKey: String): ChildrenReceiver = {
+    new ChildrenReceiver(groupKey)
+  }
 
   implicit def toAttrReceiver[V](
     attr: Attr[V, RNode, RNodeData]
