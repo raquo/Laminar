@@ -26,7 +26,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     val $diff = XStream.create[DynamicNodeList.Diff]()
     val $varDiff = new ShamefulStream($diff)
 
-    mount(div("Hello", children("foo") <-- DynamicNodeList($diff), div("World")))
+    mount(div("Hello", children <-- DynamicNodeList($diff), div("World")))
     expectChildren("none")
 
     $varDiff.shamefullySendNext(Append(span(laminar.key := "0", text0)))
@@ -62,10 +62,17 @@ class ChildrenReceiverSpec extends UnitSpec {
     def expectChildren(clue: String, childRules: Rule[RNode, RNodeData]*) = {
       withClue(clue) {
         val first: Rule[RNode, RNodeData] = "Hello"
-        val openingBound: Rule[RNode, RNodeData] = comment likeEmpty
-        val closingBound: Rule[RNode, RNodeData] = comment likeEmpty
         val last: Rule[RNode, RNodeData] = div like "World"
-        val rules: Seq[Rule[RNode, RNodeData]] = first +: openingBound +: childRules :+ closingBound :+ last
+        val maybeSentinel: Option[Rule[RNode, RNodeData]] = if (childRules.isEmpty) {
+          Some(comment likeEmpty)
+        } else {
+          None
+        }
+        val rules: Seq[Rule[RNode, RNodeData]] = maybeSentinel.map(sentinelNode =>
+          Seq(first, sentinelNode, last)
+        ).getOrElse(
+          first +: childRules :+ last
+        )
 
         expectNode(div like(rules: _*))
       }

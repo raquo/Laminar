@@ -58,13 +58,11 @@ package object laminar {
     patch(entryPoint, rootNode)
   }
 
-  val key = new KeyKey[RNode, RNodeData]
+  val key: KeyKey[RNode, RNodeData] = new KeyKey[RNode, RNodeData]
 
-  val child = ChildReceiver
+  val child: ChildReceiver.type = ChildReceiver
 
-  def children(groupKey: String): ChildrenReceiver = {
-    new ChildrenReceiver(groupKey)
-  }
+  val children: ChildrenReceiver.type = ChildrenReceiver
 
   implicit def toAttrReceiver[V](
     attr: Attr[V, RNode, RNodeData]
@@ -86,7 +84,7 @@ package object laminar {
 
 
 
-  implicit val builders = new ReactiveBuilders {}
+  implicit val builders: ReactiveBuilders = new ReactiveBuilders {}
 
   @inline implicit def textToChildNode(
     text: String
