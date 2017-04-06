@@ -46,7 +46,7 @@ object ChildReceiver {
           // replace the old activeChildNode in parent's children with newChildNode
           val activeChildIndex = children.indexOf(activeChildNode)
           if (activeChildIndex != -1) {
-            children.splice(activeChildIndex, 1, newChildNode)
+            children.update(activeChildIndex, newChildNode)
           }
         }
       }

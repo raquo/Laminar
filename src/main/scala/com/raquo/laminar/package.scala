@@ -10,7 +10,7 @@ import com.raquo.snabbdom.collections.styles.Styles
 import com.raquo.snabbdom.collections.tags.{Tags, Tags2}
 import com.raquo.snabbdom.hooks.ModuleHooks
 import com.raquo.snabbdom.nodes.{ChildNode, Conversions, IterableNode}
-import com.raquo.snabbdom.setters.{Attr, EventProp, Style}
+import com.raquo.snabbdom.setters.{Attr, EventProp, KeyKey, Style}
 import org.scalajs.dom
 import org.scalajs.dom.raw.Event
 
@@ -58,6 +58,7 @@ package object laminar {
     patch(entryPoint, rootNode)
   }
 
+  val key = new KeyKey[RNode, RNodeData]
 
   val child = ChildReceiver
 

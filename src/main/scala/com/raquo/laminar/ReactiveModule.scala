@@ -5,6 +5,8 @@ import com.raquo.laminar.utils.GlobalCounter
 import com.raquo.snabbdom.hooks.ModuleHooks
 import org.scalajs.dom
 
+import scala.scalajs.js
+
 object ReactiveModule {
 
   def apply(): ModuleHooks[RNode, RNodeData] = {
@@ -14,9 +16,10 @@ object ReactiveModule {
       .addDestroyHook(destroyHook)
   }
 
-  def createHook(emptyNode: RNode, newNode: RNode): Unit = {
+  def createHook(emptyNode: js.Object, newNode: RNode): Unit = {
     // @TODO[Performance] Should we run this only on non-text nodes?
     newNode._debugNodeNumber = GlobalCounter.next().toString
+    newNode.maybeNodeList.foreach(nodeList => nodeList.onNodeUpdate(newNode))
     dom.console.log(s"#${newNode._debugNodeNumber}: hook:create")
   }
 
@@ -32,7 +35,9 @@ object ReactiveModule {
   def updateHook(oldNode: RNode, newNode: RNode): Unit = {
     dom.console.log(s"#${newNode._debugNodeNumber}: hook:patch")
 
-    // @TODO[Performance] We could reuse subscriptions if we could compare them by stream+attr equality
+    newNode.maybeNodeList.foreach(nodeList => nodeList.onNodeUpdate(newNode))
+
+    // @TODO[Performance] We could reuse subscriptions in some cases...
     val removedSubscriptions = oldNode.data.subscriptions.filter { oldSubscription =>
       !newNode.data.subscriptions.contains(oldSubscription)
     }

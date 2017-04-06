@@ -1,8 +1,6 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.subscriptions.{DynamicEventListener, DynamicEventSubscription}
-import com.raquo.laminar.utils.GlobalCounter
-import com.raquo.snabbdom.hooks.NodeHooks
+import com.raquo.laminar.subscriptions.{DynamicNodeList, DynamicEventListener, DynamicEventSubscription}
 import com.raquo.snabbdom.nodes.Node
 import com.raquo.xstream.{Subscription, XStream}
 import org.scalajs.dom
@@ -17,6 +15,9 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
 
   // @TODO[API] Should this live here, or in DynamicEventListener?
   var activeParentNode: js.UndefOr[RNode] = js.undefined
+
+  /** If this field is defined, this node is part of this [[DynamicNodeList]] list */
+  var maybeNodeList: js.UndefOr[DynamicNodeList] = js.undefined
 
   // @TODO[API] Remove this – only used for debug.
   var _debugNodeNumber: String = ""
@@ -84,5 +85,6 @@ class RNode(tagName: js.UndefOr[String]) extends Node[RNode, RNodeData](tagName)
   override def copyInto(node: RNode): Unit = {
     super.copyInto(node)
     node.activeParentNode = activeParentNode
+    node.maybeNodeList = maybeNodeList
   }
 }

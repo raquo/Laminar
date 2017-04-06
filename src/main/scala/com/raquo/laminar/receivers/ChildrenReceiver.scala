@@ -1,22 +1,34 @@
 package com.raquo.laminar.receivers
 
+import com.raquo.laminar.subscriptions.DynamicNodeList
 import com.raquo.laminar.{GroupBoundaryNode, RNode, RNodeData}
 import com.raquo.snabbdom.Modifier
 import com.raquo.xstream.XStream
 
+import scala.scalajs.js
 import scala.scalajs.js.JavaScriptException
 
 class ChildrenReceiver(groupKey: String) {
 
-  def <--($children: XStream[Iterable[RNode]]): Modifier[RNode, RNodeData] = {
+  def <--($diff: XStream[DynamicNodeList.Diff]): Modifier[RNode, RNodeData] = {
+    val nodeList = DynamicNodeList($diff)
+    <--(nodeList)
+  }
+
+  def <--(nodeList: DynamicNodeList): Modifier[RNode, RNodeData] = {
     new Modifier[RNode, RNodeData] {
       override def applyTo(node: RNode): Unit = {
+        // @TODO[Performance] This opening/closing bounds is not needed at this point.
+        // Now that we have a reference to DynamicNodeList in each node that is part of it
+        // We could go through parent's children finding the index of the first and the last
+        // node with this refeence, and then just splice the array like we do now. The benefit
+        // of this would be that we won't need groupKey any more.
         val openingBound = new GroupBoundaryNode(groupKey, isOpening = true)
         val closingBound = new GroupBoundaryNode(groupKey, isOpening = false)
         node.addChild(openingBound)
         node.addChild(closingBound)
 
-        def next(newChildren: Iterable[RNode], newNode: RNode): RNode = {
+        def next(newChildren: js.Array[RNode], newNode: RNode): RNode = {
           // Children should not be empty because they at the very least contain the bounds nodes
           newNode.maybeChildren.foreach { allChildren =>
             // Kinda ugly, for the sake of performance
@@ -56,19 +68,19 @@ class ChildrenReceiver(groupKey: String) {
 
             // @TODO prepend key with groupKey?
 
-            // @TODO[Performance] This .toSeq is probably no good
+            // @TODO[Performance] This _* is probably no good...
             allChildren.splice(
               openingBoundIndex + 1,
               deleteCount,
-              newChildren.toSeq: _*
+              newChildren: _*
             )
           }
           newNode
         }
 
         node.subscribe(
-          $children,
-          onNext = (newChildren: Iterable[RNode], activeNode: RNode) => {
+          nodeList.$nodes,
+          onNext = (newChildren: js.Array[RNode], activeNode: RNode) => {
             if (!activeNode.isMounted) {
               next(newChildren, activeNode)
             } else {
