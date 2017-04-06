@@ -16,7 +16,7 @@ scalaVersion := "2.11.8"
 
 homepage := Some(url("https://github.com/raquo/laminar"))
 
-licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.md"))
+licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.txt"))
 
 
 libraryDependencies ++= Seq(
