@@ -22,6 +22,7 @@ libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
 //  "org.scala-js" %% "scalajs-env-selenium" % "0.1.3",
   "com.raquo.xstream" %%% "xstream" % "0.1.1",
+  "com.raquo.dombuilder" %%% "dombuilder" % "0.1-SNAPSHOT",
   "com.raquo" %%% "snabbdom" % "0.1-SNAPSHOT",
   "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
 )

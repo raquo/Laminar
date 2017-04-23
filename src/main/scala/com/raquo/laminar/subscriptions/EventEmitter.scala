@@ -1,44 +1,49 @@
 package com.raquo.laminar.subscriptions
 
-import com.raquo.laminar.{RNode, RNodeData}
-import com.raquo.snabbdom.EventCallback
-import com.raquo.snabbdom.setters.{EventProp, EventPropSetter}
+import com.raquo.dombuilder.keys.EventProp
+import com.raquo.dombuilder.modifiers.EventPropSetter
+import com.raquo.laminar
+import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.xstream.{ShamefulStream, XStream}
-import org.scalajs.dom.raw.Event
+import org.scalajs.dom
 
-class EventEmitter[Ev <: Event](
-  val eventProp: EventProp[EventCallback[Ev], RNode, RNodeData]
+import scala.scalajs.js
+
+class EventEmitter[Ev <: dom.Event](
+  val eventProp: EventProp[Ev, ReactiveNode, dom.Event, js.Function1]
 ) extends AnyVal {
 
   // @TODO[Test] verify new fancy methods
 
-  @inline def -->(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+  @inline def -->(stream: XStream[Ev]): EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1] = {
     sendTo(stream)
   }
 
-  @inline def -->[V](processor: Ev => V, sendTo: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+  @inline def -->[V](processor: Ev => V, sendTo: XStream[V]): EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1] = {
     send(processor, sendTo)
   }
 
-  @inline def -->[V](value: V, sendTo: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
+  @inline def -->[V](value: V, sendTo: XStream[V]): EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1] = {
     this.send(value, sendTo)
   }
 
-  def sendTo(stream: XStream[Ev]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
-    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](eventProp, pushToStream(stream) _)
+  def sendTo(stream: XStream[Ev]): EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1] = {
+    new EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1](eventProp, pushToStream(stream), laminar.eventApi)
   }
 
-  def send[V](value: V, to: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
-    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](
+  def send[V](value: V, to: XStream[V]): EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1] = {
+    new EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1](
       key = eventProp,
-      value = (event: Ev) => pushToStream(to)(value)
+      value = (event: Ev) => pushToStream(to)(value),
+      laminar.eventApi
     )
   }
 
-  def send[V](processor: Ev => V, to: XStream[V]): EventPropSetter[EventCallback[Ev], RNode, RNodeData] = {
-    new EventPropSetter[EventCallback[Ev], RNode, RNodeData](
+  def send[V](processor: Ev => V, to: XStream[V]): EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1] = {
+    new EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1](
       key = eventProp,
-      value = (event: Ev) => pushToStream(to)(processor(event))
+      value = (event: Ev) => pushToStream(to)(processor(event)),
+      laminar.eventApi
     )
   }
 

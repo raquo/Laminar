@@ -1,9 +1,8 @@
 package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar._
-//import com.raquo.laminar.StyleStream
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.example.components.Toggle
-
 import com.raquo.laminar.tags._
 import com.raquo.laminar.props._
 import com.raquo.laminar.styles._
@@ -11,7 +10,7 @@ import com.raquo.xstream.XStream
 
 object NestedStyleProp {
 
-  def render($color: XStream[String]): RNode = {
+  def render($color: XStream[String]): ReactiveElement = {
     div(
       color <-- $color,
       span("HELLO"),
@@ -19,7 +18,7 @@ object NestedStyleProp {
     )
   }
 
-  def apply(): RNode = {
+  def apply(): ReactiveElement = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")

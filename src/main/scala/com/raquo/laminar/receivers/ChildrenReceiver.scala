@@ -1,89 +1,121 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.laminar.allTags.comment
-import com.raquo.laminar.subscriptions.DynamicNodeList
-import com.raquo.laminar.{RNode, RNodeData}
-import com.raquo.snabbdom.Modifier
+import com.raquo.dombuilder.modifiers.Modifier
+import com.raquo.laminar
+import com.raquo.laminar.ChildNode
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.xstream.XStream
+import com.raquo.laminar.subscriptions.ListDiff
 
+import scala.collection.mutable
 import scala.scalajs.js
-import scala.scalajs.js.JavaScriptException
+
+class ChildrenReceiver(
+  $diff: XStream[ChildrenReceiver.Diff]
+) extends Modifier[ReactiveElement] {
+
+  override def applyTo(parentNode: ReactiveElement): Unit = {
+    var nodeCount = 0
+
+    val sentinelNode = laminar.commentBuilder.createNode()
+    parentNode.appendChild(sentinelNode)
+
+    parentNode.subscribe(
+      $diff,
+      onNext = (diff: ChildrenReceiver.Diff) => {
+        val nodeCountDiff = updateList(
+          diff,
+          parentNode = parentNode,
+          sentinelNode = sentinelNode,
+          nodeCount
+        )
+        nodeCount += nodeCountDiff
+      }
+    )
+  }
+
+  def updateList(
+    diff: ChildrenReceiver.Diff,
+    parentNode: ReactiveElement,
+    sentinelNode: ChildNode,
+    nodeCount: Int
+  ): Int = {
+    var nodeCountDiff = 0
+    diff match {
+      case ListDiff.Append(node) =>
+        parentNode.appendChild(node)
+        nodeCountDiff = 1
+      case ListDiff.Prepend(node) =>
+        if (parentNode.insertChild(node, atIndex = 0)) {
+          nodeCountDiff = 1
+        }
+      case ListDiff.Insert(node, atIndex) =>
+        if (parentNode.insertChild(node, atIndex)) {
+          nodeCountDiff = 1
+        }
+      case ListDiff.Remove(node) =>
+        if (parentNode.removeChild(node)) {
+          nodeCountDiff = -1
+        }
+      case ListDiff.Replace(node, withNode) =>
+        parentNode.replaceChild(oldChild = node, newChild = withNode)
+      case ListDiff.ReplaceAll(newNodes) =>
+        val sentinelIndex = parentNode.indexOfChild(sentinelNode)
+        if (nodeCount == 0) {
+          var numInsertedNodes = 0
+          newNodes.foreach { newChild =>
+            if (parentNode.insertChild(newChild, atIndex = sentinelIndex + 1 + numInsertedNodes)) {
+              numInsertedNodes += 1
+            }
+          }
+          nodeCountDiff = numInsertedNodes
+        } else {
+          val oldNodeCount = nodeCount
+          val replaced = parentNode.replaceChildren(
+            fromIndex = sentinelIndex + 1,
+            toIndex = sentinelIndex + nodeCount - 1,
+            js.Array(newNodes: _*)
+          )
+          if (replaced) {
+            nodeCountDiff = newNodes.length - oldNodeCount
+          }
+        }
+    }
+    nodeCountDiff
+  }
+}
 
 object ChildrenReceiver {
 
-  def <--($diff: XStream[DynamicNodeList.Diff]): Modifier[RNode, RNodeData] = {
-    val nodeList = DynamicNodeList($diff)
-    <--(nodeList)
+  type Diff = ListDiff[ChildNode, mutable.Buffer]
+
+  def <--($diff: XStream[Diff]): ChildrenReceiver = {
+    new ChildrenReceiver($diff)
   }
 
-  def <--(nodeList: DynamicNodeList): Modifier[RNode, RNodeData] = {
-    new Modifier[RNode, RNodeData] {
-      override def applyTo(node: RNode): Unit = {
-        node.addChild(makeSentinelNode(nodeList))
-        node.subscribe(
-          nodeList.$nodes,
-          onNext = (newChildren: js.Array[RNode], activeNode: RNode) => {
-            if (!activeNode.isMounted) {
-              next(newChildren, activeNode, nodeList)
-            } else {
-              val newNode = activeNode.copy()
-              next(newChildren, newNode, nodeList)
-            }
-          }
-        )
-      }
-    }
+  // These helpers are solely there to help type inference
+
+  @inline def append(node: ChildNode): ListDiff.Append[ChildNode, mutable.Buffer] = {
+    ListDiff.Append(node)
   }
 
-  private def next(
-    newChildren: js.Array[RNode],
-    newNode: RNode,
-    currentNodeList: DynamicNodeList
-  ): RNode = {
-    // Children should not be empty because they at the very least contain the bounds nodes
-    newNode.maybeChildren.foreach { allChildren =>
-      // Kinda ugly, for the sake of performance
-      var currentIndex = 0
-      var firstOldChildIndex = -1
-      var lastOldChildIndex = -1
-      allChildren.foreach { child =>
-        child.maybeNodeList.foreach { nodeList =>
-          if (nodeList == currentNodeList) {
-            if (firstOldChildIndex == -1) {
-              firstOldChildIndex = currentIndex
-            }
-            lastOldChildIndex = currentIndex
-          }
-        }
-        currentIndex += 1
-      }
-
-      // @TODO[Performance] Should these checks run in FullOptJS?
-      if (firstOldChildIndex < 0) {
-        throw JavaScriptException(s"ChildrenReceiver did not find previous dynamic children")
-      }
-
-      val deleteCount = lastOldChildIndex - firstOldChildIndex + 1
-      val newChildrenOrSentinel = if (newChildren.length > 0) {
-        newChildren
-      } else {
-        js.Array(makeSentinelNode(currentNodeList))
-      }
-
-      // @TODO[Performance] This _* is probably no good...
-      allChildren.splice(
-        firstOldChildIndex,
-        deleteCount,
-        newChildrenOrSentinel: _*
-      )
-    }
-    newNode
+  @inline def prepend(node: ChildNode): ListDiff.Prepend[ChildNode, mutable.Buffer] = {
+    ListDiff.Prepend(node)
   }
 
-  /** Use a sentinel node to reserve a spot in the children array when there are no dynamic children */
-  private def makeSentinelNode(nodeList: DynamicNodeList): RNode = {
-    val node = comment()
-    node.maybeNodeList = nodeList
-    node
+  @inline def insert(node: ChildNode, atIndex: Int): ListDiff.Insert[ChildNode, mutable.Buffer] = {
+    ListDiff.Insert(node, atIndex)
+  }
+
+  @inline def remove(node: ChildNode): ListDiff.Remove[ChildNode, mutable.Buffer] = {
+    ListDiff.Remove(node)
+  }
+
+  @inline def replace(node: ChildNode, withNode: ChildNode): ListDiff.Replace[ChildNode, mutable.Buffer] = {
+    ListDiff.Replace(item = node, withItem = withNode)
+  }
+
+  @inline def replaceAll(newNodes: mutable.Buffer[ChildNode]): ListDiff.ReplaceAll[ChildNode, mutable.Buffer] = {
+    ListDiff.ReplaceAll(newNodes)
   }
 }

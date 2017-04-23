@@ -1,9 +1,9 @@
 package com.raquo.laminar.example.components
 
 import com.raquo.laminar._
-import com.raquo.laminar.RNode
 import com.raquo.laminar.attrs._
 import com.raquo.laminar.events._
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.tags._
 import com.raquo.xstream.XStream
 import org.scalajs.dom.raw.{HTMLInputElement, MouseEvent}
@@ -12,7 +12,7 @@ import scala.util.Random
 
 class Toggle private (
   val $checked: XStream[Boolean],
-  val node: RNode
+  val node: ReactiveElement
 )
 
 object Toggle {
@@ -21,6 +21,7 @@ object Toggle {
     val $click = XStream.create[MouseEvent]()
     val $checked = $click.map(ev => ev.target.asInstanceOf[HTMLInputElement].checked)//.debug("$checked")
 
+    // This will only be evaluated once
     val rand = Random.nextInt(99)
 
     val checkbox = input.apply(

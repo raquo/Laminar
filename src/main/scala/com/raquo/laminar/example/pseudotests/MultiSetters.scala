@@ -4,12 +4,13 @@ import com.raquo.laminar._
 import com.raquo.laminar.example.components.Toggle
 import com.raquo.laminar.tags._
 import com.raquo.laminar.attrs.href
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.props.className
 import com.raquo.laminar.styles._
 
 object MultiSetters {
 
-  def apply(): RNode = {
+  def apply(): ReactiveElement = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("/about")

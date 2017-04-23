@@ -2,13 +2,14 @@ package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar._
 import com.raquo.laminar.example.components.Toggle
+import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.laminar.tags._
 import com.raquo.laminar.props._
 import com.raquo.laminar.styles._
 
 object MultiStyleProp {
 
-  def apply(): RNode = {
+  def apply(): ReactiveNode = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")

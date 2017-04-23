@@ -1,29 +1,20 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.laminar.{RNode, RNodeData}
-import com.raquo.snabbdom.Modifier
-import com.raquo.snabbdom.setters.{Style, StyleSetter}
+import com.raquo.dombuilder.keys.Style
+import com.raquo.dombuilder.modifiers.Modifier
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
 import com.raquo.xstream.XStream
 
-class StyleReceiver[V](val style: Style[V, RNode, RNodeData]) extends AnyVal {
+class StyleReceiver[V](val style: Style[V, ReactiveNode]) extends AnyVal {
 
-  def <--($value: XStream[V]): Modifier[RNode, RNodeData] = {
-    new Modifier[RNode, RNodeData] {
-      override def applyTo(node: RNode): Unit = {
-        node.subscribe(
-          $value,
-          onNext = (value: V, activeNode: RNode) => {
-            val styleSetter = new StyleSetter(style, value)
-            if (!activeNode.isMounted) {
-              styleSetter.applyTo(activeNode)
-              activeNode
-            } else {
-              val newNode = activeNode.copy()
-              styleSetter.applyTo(newNode)
-              newNode
-            }
-          }
-        )
+  def <--($value: XStream[V]): Modifier[ReactiveElement] = {
+    new Modifier[ReactiveElement] {
+      override def applyTo(element: ReactiveElement): Unit = {
+        element.subscribe($value, onNext)
+
+        @inline def onNext(value: V): Unit = {
+          element.elementApi.setStyle(element.ref, style.name, value)
+        }
       }
     }
   }

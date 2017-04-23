@@ -2,6 +2,7 @@ package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar.example.components.Toggle
 import com.raquo.laminar._
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.tags._
 import com.raquo.laminar.styles._
 import com.raquo.xstream.XStream
@@ -9,7 +10,7 @@ import org.scalajs.dom
 
 object NodeTypeChange {
 
-  def boldOrItalic($useB: XStream[Boolean], $bigFont: XStream[Boolean]): XStream[RNode] = {
+  def boldOrItalic($useB: XStream[Boolean], $bigFont: XStream[Boolean]): XStream[ReactiveElement] = {
     val $fontSize = fontSizeStream($bigFont) // @TODO use remember()?
     $useB.map { useB =>
       dom.console.warn("useB: " + useB)
@@ -35,7 +36,7 @@ object NodeTypeChange {
     })
   }
 
-  def apply(): RNode = {
+  def apply(): ReactiveElement = {
 
     val toggle = Toggle("Bold")
     val toggle2 = Toggle("Big")
