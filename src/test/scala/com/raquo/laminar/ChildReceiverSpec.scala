@@ -1,8 +1,10 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.allTags.{comment, div, span}
+import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.snabbdom.utils.testing.matching.ExpectedNode
+import com.raquo.dombuilder.utils.testing.matching.ExpectedNode
+import com.raquo.laminar
+import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.xstream.{ShamefulStream, XStream}
 
 class ChildReceiverSpec extends UnitSpec {
@@ -19,7 +21,7 @@ class ChildReceiverSpec extends UnitSpec {
 
   it("updates one child") {
     withClue("Regular stream:") {
-      test($child = XStream.create[RNode]())
+      test($child = XStream.create[ChildNode]())
     }
 
     withClue("Memory stream:") {
@@ -30,8 +32,8 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     def test(
-      $child: XStream[RNode],
-      initialChild: ExpectedNode[RNode, RNodeData] = comment likeEmpty
+      $child: XStream[ChildNode],
+      initialChild: ExpectedNode[ReactiveNode] = laminar.commentBuilder likeWhatever
     ): Unit = {
       val $varChild = new ShamefulStream($child)
 
@@ -60,8 +62,8 @@ class ChildReceiverSpec extends UnitSpec {
   it("updates two children") {
     withClue("Regular stream:") {
       test(
-        $fooChild = XStream.create[RNode](),
-        $barChild = XStream.create[RNode]()
+        $fooChild = XStream.create[ChildNode](),
+        $barChild = XStream.create[ChildNode]()
       )
     }
 
@@ -75,10 +77,10 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     def test(
-      $fooChild: XStream[RNode],
-      $barChild: XStream[RNode],
-      initialFooChild: ExpectedNode[RNode, RNodeData] = comment likeEmpty,
-      initialBarChild: ExpectedNode[RNode, RNodeData] = comment likeEmpty
+      $fooChild: XStream[ChildNode],
+      $barChild: XStream[ChildNode],
+      initialFooChild: ExpectedNode[ReactiveNode] = laminar.commentBuilder likeWhatever,
+      initialBarChild: ExpectedNode[ReactiveNode] = laminar.commentBuilder likeWhatever
     ): Unit = {
       val $varFooChild = new ShamefulStream($fooChild)
       val $varBarChild = new ShamefulStream($barChild)

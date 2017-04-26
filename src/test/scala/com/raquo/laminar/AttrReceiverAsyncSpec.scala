@@ -39,7 +39,9 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
       titleCounter += 1
       title
     })
-    mount(div(title <-- $titleWithDebugger, "Hello"))
+
+    val element = div(title <-- $titleWithDebugger, "Hello")
+    mount(element)
 
     expectNode(div like (title isEmpty, "Hello"))
 
@@ -60,7 +62,8 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
     expectNode(div like (title is title2, "Hello"))
     titleCounter shouldBe 2
 
-    patchMounted(div(rel := "unmounted"))
+    unmount()
+    mount(div(rel := "unmounted"))
 
     expectNode(div like (title isEmpty, rel is "unmounted"))
 
@@ -70,6 +73,7 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
       promise.complete(Try{
         $writeableTitle.shamefullySendNext(title3)
         expectNode(div like (title isEmpty, rel is "unmounted"))
+        (div like (title is title2, "Hello")).checkNode(element.ref, "")
         titleCounter shouldBe 2
       })
     }

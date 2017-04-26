@@ -3,13 +3,7 @@ package com.raquo.laminar
 import com.raquo.laminar.utils.UnitSpec
 import com.raquo.laminar.attrs._
 import com.raquo.laminar.tags._
-import com.raquo.xstream.{MemoryStream, ShamefulStream, XStream}
-import org.scalajs.dom
-
-import scala.collection.mutable
-import scala.concurrent.Promise
-import scala.scalajs.js
-import scala.scalajs.js.|
+import com.raquo.xstream.{ShamefulStream, XStream}
 
 class AttrReceiverSpec extends UnitSpec {
 
@@ -29,7 +23,8 @@ class AttrReceiverSpec extends UnitSpec {
     $writeableTitle.shamefullySendNext(title2)
     expectNode(div like (title is title2, "Hello"))
 
-    patchMounted(div(cls := "unrelated"))
+    unmount()
+    mount(div(cls := "unrelated"))
     expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title3)
@@ -53,7 +48,8 @@ class AttrReceiverSpec extends UnitSpec {
     $writeableTitle.shamefullySendNext(title3)
     expectNode(div like (title is title3, "Hello"))
 
-    patchMounted(div(cls := "unrelated"))
+    root.unmount()
+    mount(div(cls := "unrelated"))
     expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title4)
@@ -108,7 +104,8 @@ class AttrReceiverSpec extends UnitSpec {
     $writeableTitle.shamefullySendNext(title5)
     expectNode(div like (title is title5, rel is rel4, "Hello"))
 
-    patchMounted(div(cls := "unrelated"))
+    root.unmount()
+    mount(div(cls := "unrelated"))
     expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title6)
@@ -160,7 +157,8 @@ class AttrReceiverSpec extends UnitSpec {
     $writeableTitle.shamefullySendNext(title5)
     expectNode(div like (title is title5, rel is rel4, "Hello"))
 
-    patchMounted(div(cls := "unrelated"))
+    unmount()
+    mount(div(cls := "unrelated"))
     expectNode(div like (cls is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title6)

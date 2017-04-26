@@ -20,6 +20,8 @@ import scala.scalajs.js
 
 package object laminar {
 
+  // @TODO[Naming] ChildNode and ParentNode collide with Scala DOM Builder's names – inconvenient
+
   type ChildNode = dombuilder.nodes.ChildNode[ReactiveNode, dom.Node, dom.Node]
 
   type ParentNode = dombuilder.nodes.ParentNode[ReactiveNode, dom.Element, dom.Node]

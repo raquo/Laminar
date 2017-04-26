@@ -43,14 +43,19 @@ class ChildrenReceiver(
     var nodeCountDiff = 0
     diff match {
       case ListDiff.Append(node) =>
-        parentNode.appendChild(node)
+        val sentinelIndex = parentNode.indexOfChild(sentinelNode)
+        if (parentNode.insertChild(node, atIndex = sentinelIndex + nodeCount + 1)) {
+          nodeCountDiff = 1
+        }
         nodeCountDiff = 1
       case ListDiff.Prepend(node) =>
-        if (parentNode.insertChild(node, atIndex = 0)) {
+        val sentinelIndex = parentNode.indexOfChild(sentinelNode)
+        if (parentNode.insertChild(node, atIndex = sentinelIndex + 1)) {
           nodeCountDiff = 1
         }
       case ListDiff.Insert(node, atIndex) =>
-        if (parentNode.insertChild(node, atIndex)) {
+        val sentinelIndex = parentNode.indexOfChild(sentinelNode)
+        if (parentNode.insertChild(node, sentinelIndex + atIndex + 1)) {
           nodeCountDiff = 1
         }
       case ListDiff.Remove(node) =>
@@ -73,7 +78,7 @@ class ChildrenReceiver(
           val oldNodeCount = nodeCount
           val replaced = parentNode.replaceChildren(
             fromIndex = sentinelIndex + 1,
-            toIndex = sentinelIndex + nodeCount - 1,
+            toIndex = sentinelIndex + nodeCount,
             js.Array(newNodes: _*)
           )
           if (replaced) {
@@ -115,6 +120,7 @@ object ChildrenReceiver {
     ListDiff.Replace(item = node, withItem = withNode)
   }
 
+  // @TODO[API] we really shouldn't be expecting a mutable buffer here.
   @inline def replaceAll(newNodes: mutable.Buffer[ChildNode]): ListDiff.ReplaceAll[ChildNode, mutable.Buffer] = {
     ListDiff.ReplaceAll(newNodes)
   }
