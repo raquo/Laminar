@@ -9,7 +9,7 @@ import com.raquo.xstream.{MemoryStream, XStream}
 import org.scalajs.dom
 
 class Counter private (
-  val $count: MemoryStream[Int, Nothing],
+  val $count: MemoryStream[Int],
   val node: ReactiveNode
 )
 

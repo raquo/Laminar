@@ -7,13 +7,13 @@ import scala.collection.mutable
 trait ReactiveNode {
 
   // @TODO[API] Find a better data structure for this
-  var maybeSubscriptions: Option[mutable.Buffer[Subscription[_, Nothing]]] = None
+  var maybeSubscriptions: Option[mutable.Buffer[Subscription[_]]] = None
 
   def subscribe[V](
     $value: XStream[V],
     onNext: V => Unit
   ): Unit = {
-    val subscription = $value.subscribe[V, Nothing](Listener(onNext))
+    val subscription = $value.subscribe[V](Listener(onNext))
     maybeSubscriptions match {
       case Some(subscriptions) =>
         subscriptions += subscription
