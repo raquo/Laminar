@@ -42,7 +42,7 @@ object Counter {
 }
 ```
 
-Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however Laminar is implemented rather differently, and supports more flexible use cases. For example Laminar is more accommodating when you need to render a dynamically updated list of children (yes, I know, not shown in the example above). Laminar also uses my much more type-safe interface to Snabbdom.
+Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however Laminar is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a better foundation for the kind of API that we provide. Laminar also supports more flexible use cases. For example Laminar is more accommodating when you need to render a dynamically updated list of children.
 
 I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why Laminar exists.
 
