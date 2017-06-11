@@ -168,11 +168,31 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (cls is "unrelated"))
   }
 
-  it("works with child receiver on same node") {
+  it("updates two attrs subscribed to the same stream") {
+    val value1 = randomString("title1_")
+    val value2 = randomString("title2_")
+    val value3 = randomString("title3_")
+    val $value = XStream.create[String]()
+    val $writeableValue = new ShamefulStream($value)
 
+    mount(div(title <-- $value, rel <-- $value, "Hello"))
+    expectNode(div like (title isEmpty, rel isEmpty, "Hello"))
+
+    $writeableValue.shamefullySendNext(value1)
+    expectNode(div like (title is value1, rel is value1, "Hello"))
+
+    $writeableValue.shamefullySendNext(value2)
+    expectNode(div like (title is value2, rel is value2, "Hello"))
+
+    unmount()
+    mount(div(cls := "unrelated"))
+    expectNode(div like (cls is "unrelated"))
+
+    $writeableValue.shamefullySendNext(value3)
+    expectNode(div like (cls is "unrelated"))
   }
 
-  it("works with changing vnode") {
+  it("works with child receiver on same node") {
 
   }
 }
