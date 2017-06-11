@@ -31,8 +31,12 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
 //    promise.future
 //  }
 
-  it("unsubscribes from the stream after node was destroyed") {
+  val title1 = randomString("title1_")
+  val title2 = randomString("title2_")
+  val title3 = randomString("title3_")
+  val title4 = randomString("title4_")
 
+  it("unsubscribes from the stream after unmounting") {
     var titleCounter = 0
     val $title = XStream.create[String]()
     val $titleWithDebugger = $title.map(title => {
@@ -46,11 +50,6 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
     expectNode(div like (title isEmpty, "Hello"))
 
     val $writeableTitle = new ShamefulStream($title)
-
-    val title1 = randomString("title1_")
-    val title2 = randomString("title2_")
-    val title3 = randomString("title3_")
-    val title4 = randomString("title4_")
 
     titleCounter shouldBe 0
 
@@ -68,16 +67,56 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
     expectNode(div like (title isEmpty, rel is "unmounted"))
 
     val promise = Promise[Assertion]()
-
     js.timers.setTimeout(1) {
       promise.complete(Try{
         $writeableTitle.shamefullySendNext(title3)
         expectNode(div like (title isEmpty, rel is "unmounted"))
-        (div like (title is title2, "Hello")).checkNode(element.ref, "")
         titleCounter shouldBe 2
       })
     }
+    promise.future
+  }
 
+  it("unsubscribes from the stream after node is removed using replaceChild") {
+    var titleCounter = 0
+    val $title = XStream.create[String]()
+    val $titleWithDebugger = $title.map(title => {
+      titleCounter += 1
+      title
+    })
+
+    val subscribedElement = span(title <-- $titleWithDebugger)
+
+    val parentElement = div(subscribedElement, "Hello")
+    mount(parentElement)
+
+    expectNode(div like (span like (title isEmpty), "Hello"))
+
+    val $writeableTitle = new ShamefulStream($title)
+
+    titleCounter shouldBe 0
+
+    $writeableTitle.shamefullySendNext(title1)
+    expectNode(div like (span like (title is title1), "Hello"))
+    titleCounter shouldBe 1
+
+    $writeableTitle.shamefullySendNext(title2)
+    expectNode(div like (span like (title is title2), "Hello"))
+    titleCounter shouldBe 2
+
+    // This should unsubscribe `subscribedElement` from all its subscriptions
+    parentElement.replaceChild(subscribedElement, span(rel := "newChild"))
+
+    expectNode(div like (span like (rel is "newChild"), "Hello"))
+
+    val promise = Promise[Assertion]()
+    js.timers.setTimeout(1) {
+      promise.complete(Try{
+        $writeableTitle.shamefullySendNext(title3)
+        expectNode(div like (span like (title isEmpty, rel is "newChild"), "Hello"))
+        titleCounter shouldBe 2
+      })
+    }
     promise.future
   }
 }
