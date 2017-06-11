@@ -21,4 +21,11 @@ trait ReactiveNode {
         maybeSubscriptions = Some(mutable.Buffer(subscription))
     }
   }
+
+  def unsubscribeFromAll(): Unit = {
+    maybeSubscriptions.foreach {
+      subscriptions => subscriptions.foreach(_.unsubscribe())
+    }
+    maybeSubscriptions = None
+  }
 }

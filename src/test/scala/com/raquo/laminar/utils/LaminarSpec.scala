@@ -10,8 +10,9 @@ import org.scalatest.Suite
 
 trait LaminarSpec
   extends MountSpec[ReactiveElement, ReactiveNode]
-    with RuleImplicits[ReactiveNode]
-    with DomEventSimulatorSpec {
+  with RuleImplicits[ReactiveNode]
+  with DomEventSimulatorSpec
+{
   this: Suite =>
 
   override val textNodeBuilder: ReactiveTextBuilder = laminar.textBuilder

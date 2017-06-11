@@ -10,7 +10,7 @@ import com.raquo.dombuilder.definitions.tags.{Tags, Tags2}
 import com.raquo.dombuilder.jsdom.domapi.{JsCommentApi, JsElementApi, JsEventApi, JsNodeApi, JsTextApi, JsTreeApi}
 import com.raquo.dombuilder.keys.{Attr, EventProp, Style}
 import com.raquo.laminar.builders.{ReactiveCommentBuilder, ReactiveTagBuilder, ReactiveTextBuilder}
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode, ReactiveText}
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveElement, ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, ChildReceiver, ChildrenReceiver, MaybeChildReceiver, StyleReceiver}
 import com.raquo.laminar.subscriptions.EventEmitter
 import org.scalajs.dom
@@ -22,7 +22,7 @@ package object laminar {
 
   // @TODO[Naming] ChildNode and ParentNode collide with Scala DOM Builder's names – inconvenient
 
-  type ChildNode = dombuilder.nodes.ChildNode[ReactiveNode, dom.Node, dom.Node]
+  type ChildNode = ReactiveChildNode[dom.Node, dom.Node]
 
   type ParentNode = dombuilder.nodes.ParentNode[ReactiveNode, dom.Element, dom.Node]
 
