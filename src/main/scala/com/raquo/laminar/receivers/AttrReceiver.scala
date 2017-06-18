@@ -1,20 +1,20 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.dombuilder.keys.Attr
-import com.raquo.dombuilder.modifiers.Modifier
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
+import com.raquo.dombuilder.generic.keys.Attr
+import com.raquo.dombuilder.generic.modifiers.Modifier
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.xstream.XStream
 import org.scalajs.dom
 
-class AttrReceiver[V](val attr: Attr[V, ReactiveNode, dom.Element, dom.Node]) extends AnyVal {
+class AttrReceiver[V](val attr: Attr[V]) extends AnyVal {
 
-  def <--($value: XStream[V]): Modifier[ReactiveElement] = {
-    new Modifier[ReactiveElement] {
-      override def applyTo(element: ReactiveElement): Unit = {
+  def <--($value: XStream[V]): Modifier[ReactiveElement[dom.Element]] = {
+    new Modifier[ReactiveElement[dom.Element]] {
+      override def applyTo(element: ReactiveElement[dom.Element]): Unit = {
         element.subscribe($value, onNext)
 
         @inline def onNext(value: V): Unit ={
-          element.elementApi.setAttribute(element.ref, attr.name, value)
+          element.setAttribute(attr.name, value)
         }
       }
     }

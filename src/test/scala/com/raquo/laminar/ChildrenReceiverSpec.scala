@@ -60,7 +60,7 @@ class ChildrenReceiverSpec extends UnitSpec {
       withClue(clue) {
         val first: Rule[ReactiveNode] = "Hello"
         val last: Rule[ReactiveNode] = div like "World"
-        val sentinelNode: Rule[ReactiveNode] = laminar.commentBuilder likeWhatever
+        val sentinelNode: Rule[ReactiveNode] = comment likeWhatever
         val rules: Seq[Rule[ReactiveNode]] = first +: sentinelNode +: childRules :+ last
 
         expectNode(div like(rules: _*))

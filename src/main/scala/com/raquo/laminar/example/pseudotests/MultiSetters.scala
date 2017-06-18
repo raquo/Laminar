@@ -7,10 +7,11 @@ import com.raquo.laminar.attrs.href
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.props.className
 import com.raquo.laminar.styles._
+import org.scalajs.dom
 
 object MultiSetters {
 
-  def apply(): ReactiveElement = {
+  def apply(): ReactiveElement[dom.Element] = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("/about")

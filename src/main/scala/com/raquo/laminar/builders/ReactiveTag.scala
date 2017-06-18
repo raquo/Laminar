@@ -1,12 +1,15 @@
 package com.raquo.laminar.builders
 
-import com.raquo.dombuilder.builders.Tag
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
+import com.raquo.dombuilder.generic
+import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
-class ReactiveTag(val tagName: String) extends Tag[ReactiveElement, ReactiveNode, dom.Element, dom.Node] {
+class ReactiveTag[+Ref <: dom.Element] (
+  override val tagName: String,
+  override val void: Boolean = false
+) extends generic.builders.Tag[ReactiveElement[Ref]] {
 
-  override def createNode(): ReactiveElement = {
-    new ReactiveElement(tagName)
+  override def build(): ReactiveElement[Ref] = {
+    new ReactiveElement[Ref](tagName, void)
   }
 }

@@ -1,19 +1,20 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.dombuilder.keys.Style
-import com.raquo.dombuilder.modifiers.Modifier
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
+import com.raquo.dombuilder.generic.keys.Style
+import com.raquo.dombuilder.generic.modifiers.Modifier
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.xstream.XStream
+import org.scalajs.dom
 
-class StyleReceiver[V](val style: Style[V, ReactiveNode]) extends AnyVal {
+class StyleReceiver[V](val style: Style[V]) extends AnyVal {
 
-  def <--($value: XStream[V]): Modifier[ReactiveElement] = {
-    new Modifier[ReactiveElement] {
-      override def applyTo(element: ReactiveElement): Unit = {
+  def <--($value: XStream[V]): Modifier[ReactiveElement[dom.Element]] = {
+    new Modifier[ReactiveElement[dom.Element]] {
+      override def applyTo(element: ReactiveElement[dom.Element]): Unit = {
         element.subscribe($value, onNext)
 
         @inline def onNext(value: V): Unit = {
-          element.elementApi.setStyle(element.ref, style.name, value)
+          element.setStyle(style.name, value)
         }
       }
     }

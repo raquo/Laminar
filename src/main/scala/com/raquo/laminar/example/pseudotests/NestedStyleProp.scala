@@ -7,10 +7,11 @@ import com.raquo.laminar.tags._
 import com.raquo.laminar.props._
 import com.raquo.laminar.styles._
 import com.raquo.xstream.XStream
+import org.scalajs.dom
 
 object NestedStyleProp {
 
-  def render($color: XStream[String]): ReactiveElement = {
+  def render($color: XStream[String]): ReactiveElement[dom.Element] = {
     div(
       color <-- $color,
       span("HELLO"),
@@ -18,7 +19,7 @@ object NestedStyleProp {
     )
   }
 
-  def apply(): ReactiveElement = {
+  def apply(): ReactiveElement[dom.Element] = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")

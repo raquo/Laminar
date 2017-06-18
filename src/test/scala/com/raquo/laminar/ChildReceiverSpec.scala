@@ -3,9 +3,9 @@ package com.raquo.laminar
 import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.utils.UnitSpec
 import com.raquo.dombuilder.utils.testing.matching.ExpectedNode
-import com.raquo.laminar
-import com.raquo.laminar.nodes.ReactiveNode
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode}
 import com.raquo.xstream.{ShamefulStream, XStream}
+import org.scalajs.dom
 
 class ChildReceiverSpec extends UnitSpec {
 
@@ -21,7 +21,7 @@ class ChildReceiverSpec extends UnitSpec {
 
   it("updates one child") {
     withClue("Regular stream:") {
-      test($child = XStream.create[ChildNode]())
+      test($child = XStream.create[ReactiveChildNode[dom.Element]]())
     }
 
     withClue("Memory stream:") {
@@ -32,8 +32,8 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     def test(
-      $child: XStream[ChildNode],
-      initialChild: ExpectedNode[ReactiveNode] = laminar.commentBuilder likeWhatever
+      $child: XStream[ReactiveChildNode[dom.Element]],
+      initialChild: ExpectedNode[ReactiveNode] = comment likeWhatever
     ): Unit = {
       val $varChild = new ShamefulStream($child)
 
@@ -62,8 +62,8 @@ class ChildReceiverSpec extends UnitSpec {
   it("updates two children") {
     withClue("Regular stream:") {
       test(
-        $fooChild = XStream.create[ChildNode](),
-        $barChild = XStream.create[ChildNode]()
+        $fooChild = XStream.create[ReactiveChildNode[dom.Element]](),
+        $barChild = XStream.create[ReactiveChildNode[dom.Element]]()
       )
     }
 
@@ -77,10 +77,10 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     def test(
-      $fooChild: XStream[ChildNode],
-      $barChild: XStream[ChildNode],
-      initialFooChild: ExpectedNode[ReactiveNode] = laminar.commentBuilder likeWhatever,
-      initialBarChild: ExpectedNode[ReactiveNode] = laminar.commentBuilder likeWhatever
+      $fooChild: XStream[ReactiveChildNode[dom.Element]],
+      $barChild: XStream[ReactiveChildNode[dom.Element]],
+      initialFooChild: ExpectedNode[ReactiveNode] = comment likeWhatever,
+      initialBarChild: ExpectedNode[ReactiveNode] = comment likeWhatever
     ): Unit = {
       val $varFooChild = new ShamefulStream($fooChild)
       val $varBarChild = new ShamefulStream($barChild)

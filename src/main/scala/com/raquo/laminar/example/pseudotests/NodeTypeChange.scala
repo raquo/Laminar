@@ -10,7 +10,7 @@ import org.scalajs.dom
 
 object NodeTypeChange {
 
-  def boldOrItalic($useB: XStream[Boolean], $bigFont: XStream[Boolean]): XStream[ReactiveElement] = {
+  def boldOrItalic($useB: XStream[Boolean], $bigFont: XStream[Boolean]): XStream[ReactiveElement[dom.Element]] = {
     val $fontSize = fontSizeStream($bigFont) // @TODO use remember()?
     $useB.map { useB =>
       dom.console.warn("useB: " + useB)
@@ -36,7 +36,7 @@ object NodeTypeChange {
     })
   }
 
-  def apply(): ReactiveElement = {
+  def apply(): ReactiveElement[dom.Element] = {
 
     val toggle = Toggle("Bold")
     val toggle2 = Toggle("Big")

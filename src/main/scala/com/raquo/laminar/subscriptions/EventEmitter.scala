@@ -1,21 +1,16 @@
 package com.raquo.laminar.subscriptions
 
-import com.raquo.dombuilder.keys.EventProp
-import com.raquo.dombuilder.modifiers.EventPropSetter
-import com.raquo.laminar
-import com.raquo.laminar.nodes.ReactiveNode
+import com.raquo.dombuilder.jsdom
 import com.raquo.xstream.{ShamefulStream, XStream}
 import org.scalajs.dom
 
-import scala.scalajs.js
-
 class EventEmitter[Ev <: dom.Event](
-  val eventProp: EventProp[Ev, ReactiveNode, dom.Event, js.Function1]
+  val eventProp: jsdom.keys.EventProp[Ev]
 ) extends AnyVal {
 
   // @TODO[Test] verify new fancy methods
 
-  type EventSetter = EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1]
+  type EventSetter = jsdom.modifiers.EventPropSetter[Ev]
 
   @inline def -->(stream: XStream[Ev]): EventSetter = {
     sendTo(stream)
@@ -30,26 +25,23 @@ class EventEmitter[Ev <: dom.Event](
   }
 
   def sendTo(stream: XStream[Ev]): EventSetter = {
-    new EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1](
+    new jsdom.modifiers.EventPropSetter[Ev](
       key = eventProp,
-      value = pushToStream(stream),
-      laminar.eventApi
+      value = pushToStream(stream)
     )
   }
 
   def send[V](value: V, to: XStream[V]): EventSetter = {
-    new EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1](
+    new jsdom.modifiers.EventPropSetter[Ev](
       key = eventProp,
-      value = (event: Ev) => pushToStream(to)(value),
-      laminar.eventApi
+      value = (event: Ev) => pushToStream(to)(value)
     )
   }
 
   def send[V](processor: Ev => V, to: XStream[V]): EventSetter = {
-    new EventPropSetter[Ev, ReactiveNode, dom.Event, js.Function1](
+    new jsdom.modifiers.EventPropSetter[Ev](
       key = eventProp,
-      value = (event: Ev) => pushToStream(to)(processor(event)),
-      laminar.eventApi
+      value = (event: Ev) => pushToStream(to)(processor(event))
     )
   }
 

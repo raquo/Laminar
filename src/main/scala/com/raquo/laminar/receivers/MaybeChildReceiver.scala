@@ -1,18 +1,17 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.dombuilder.modifiers.Modifier
-import com.raquo.laminar
-import com.raquo.laminar.ChildNode
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.dombuilder.generic.modifiers.Modifier
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.xstream.XStream
+import org.scalajs.dom
 
-class MaybeChildReceiver($maybeNode: XStream[MaybeChildReceiver.MaybeChildNode]) extends Modifier[ReactiveElement] {
+class MaybeChildReceiver($maybeNode: XStream[MaybeChildReceiver.MaybeChildNode]) extends Modifier[ReactiveElement[dom.Element]] {
 
   // @TODO[Elegance] Unify this logic with ChildReceiver? Or not...
 
-  override def applyTo(parentNode: ReactiveElement): Unit = {
-    val sentinelNode = laminar.commentBuilder.createNode()
-    var childNode: ChildNode = sentinelNode
+  override def applyTo(parentNode: ReactiveElement[dom.Element]): Unit = {
+    val sentinelNode = new ReactiveComment("")
+    var childNode: ReactiveChildNode[dom.Node] = sentinelNode
 
     // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)
@@ -28,7 +27,7 @@ class MaybeChildReceiver($maybeNode: XStream[MaybeChildReceiver.MaybeChildNode])
 
 object MaybeChildReceiver {
 
-  type MaybeChildNode = Option[ChildNode]
+  type MaybeChildNode = Option[ReactiveChildNode[dom.Node]]
 
   def <--($maybeNode: XStream[MaybeChildReceiver.MaybeChildNode]): MaybeChildReceiver = {
     new MaybeChildReceiver($maybeNode)

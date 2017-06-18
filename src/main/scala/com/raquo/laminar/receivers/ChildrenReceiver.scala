@@ -1,23 +1,22 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.dombuilder.modifiers.Modifier
-import com.raquo.laminar
-import com.raquo.laminar.ChildNode
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.dombuilder.generic.modifiers.Modifier
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.xstream.XStream
 import com.raquo.laminar.subscriptions.ListDiff
+import org.scalajs.dom
 
 import scala.collection.mutable
 import scala.scalajs.js
 
 class ChildrenReceiver(
   $diff: XStream[ChildrenReceiver.Diff]
-) extends Modifier[ReactiveElement] {
+) extends Modifier[ReactiveElement[dom.Element]] {
 
-  override def applyTo(parentNode: ReactiveElement): Unit = {
+  override def applyTo(parentNode: ReactiveElement[dom.Element]): Unit = {
     var nodeCount = 0
 
-    val sentinelNode = laminar.commentBuilder.createNode()
+    val sentinelNode = new ReactiveComment("")
     parentNode.appendChild(sentinelNode)
 
     parentNode.subscribe(
@@ -36,8 +35,8 @@ class ChildrenReceiver(
 
   def updateList(
     diff: ChildrenReceiver.Diff,
-    parentNode: ReactiveElement,
-    sentinelNode: ChildNode,
+    parentNode: ReactiveElement[dom.Element],
+    sentinelNode: ReactiveChildNode[dom.Comment],
     nodeCount: Int
   ): Int = {
     var nodeCountDiff = 0
@@ -92,7 +91,7 @@ class ChildrenReceiver(
 
 object ChildrenReceiver {
 
-  type Diff = ListDiff[ChildNode, mutable.Buffer]
+  type Diff = ListDiff[ReactiveChildNode[dom.Node], mutable.Buffer]
 
   def <--($diff: XStream[Diff]): ChildrenReceiver = {
     new ChildrenReceiver($diff)
@@ -100,28 +99,41 @@ object ChildrenReceiver {
 
   // These helpers are solely there to help type inference
 
-  @inline def append(node: ChildNode): ListDiff.Append[ChildNode, mutable.Buffer] = {
+  @inline def append(
+    node: ReactiveChildNode[dom.Node]
+  ): ListDiff.Append[ReactiveChildNode[dom.Node], mutable.Buffer] = {
     ListDiff.Append(node)
   }
 
-  @inline def prepend(node: ChildNode): ListDiff.Prepend[ChildNode, mutable.Buffer] = {
+  @inline def prepend(
+    node: ReactiveChildNode[dom.Node]
+  ): ListDiff.Prepend[ReactiveChildNode[dom.Node], mutable.Buffer] = {
     ListDiff.Prepend(node)
   }
 
-  @inline def insert(node: ChildNode, atIndex: Int): ListDiff.Insert[ChildNode, mutable.Buffer] = {
+  @inline def insert(
+    node: ReactiveChildNode[dom.Node], atIndex: Int
+  ): ListDiff.Insert[ReactiveChildNode[dom.Node], mutable.Buffer] = {
     ListDiff.Insert(node, atIndex)
   }
 
-  @inline def remove(node: ChildNode): ListDiff.Remove[ChildNode, mutable.Buffer] = {
+  @inline def remove(
+    node: ReactiveChildNode[dom.Node]
+  ): ListDiff.Remove[ReactiveChildNode[dom.Node], mutable.Buffer] = {
     ListDiff.Remove(node)
   }
 
-  @inline def replace(node: ChildNode, withNode: ChildNode): ListDiff.Replace[ChildNode, mutable.Buffer] = {
+  @inline def replace(
+    node: ReactiveChildNode[dom.Node],
+    withNode: ReactiveChildNode[dom.Node]
+  ): ListDiff.Replace[ReactiveChildNode[dom.Node], mutable.Buffer] = {
     ListDiff.Replace(item = node, withItem = withNode)
   }
 
   // @TODO[API] we really shouldn't be expecting a mutable buffer here.
-  @inline def replaceAll(newNodes: mutable.Buffer[ChildNode]): ListDiff.ReplaceAll[ChildNode, mutable.Buffer] = {
+  @inline def replaceAll(
+    newNodes: mutable.Buffer[ReactiveChildNode[dom.Node]]
+  ): ListDiff.ReplaceAll[ReactiveChildNode[dom.Node], mutable.Buffer] = {
     ListDiff.ReplaceAll(newNodes)
   }
 }

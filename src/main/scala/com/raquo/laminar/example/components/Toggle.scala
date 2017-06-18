@@ -6,13 +6,14 @@ import com.raquo.laminar.events._
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.tags._
 import com.raquo.xstream.XStream
+import org.scalajs.dom
 import org.scalajs.dom.raw.{HTMLInputElement, MouseEvent}
 
 import scala.util.Random
 
 class Toggle private (
   val $checked: XStream[Boolean],
-  val node: ReactiveElement
+  val node: ReactiveElement[dom.html.Div]
 )
 
 object Toggle {

@@ -7,6 +7,7 @@ import com.raquo.laminar.receivers.ChildrenReceiver.{Diff, append}
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
 import com.raquo.laminar.tags._
 import com.raquo.xstream.XStream
+import org.scalajs.dom
 
 // @TODO[API] Create Var and VarStream from XStream's ShamefulStream + MemoryStream?
 
@@ -18,7 +19,7 @@ class TaskList {
 
   private var count = 0
 
-  val node: ReactiveElement = div(
+  val node: ReactiveElement[dom.html.Div] = div(
     h1("TaskList"),
     children <-- $taskDiff,
     maybeChild <-- maybeNewTask,

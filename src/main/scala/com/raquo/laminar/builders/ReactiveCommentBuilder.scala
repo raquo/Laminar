@@ -1,12 +1,11 @@
 package com.raquo.laminar.builders
 
-import com.raquo.dombuilder.builders.NodeBuilder
-import com.raquo.laminar.nodes.{ReactiveComment, ReactiveNode}
-import org.scalajs.dom
+import com.raquo.dombuilder.generic
+import com.raquo.laminar.nodes.ReactiveComment
 
-trait ReactiveCommentBuilder extends NodeBuilder[ReactiveComment, ReactiveNode, dom.Comment, dom.Node] {
+object ReactiveCommentBuilder extends generic.builders.Builder[ReactiveComment] {
 
-  override def createNode(): ReactiveComment = {
+  override def build(): ReactiveComment = {
     new ReactiveComment("")
   }
 }
