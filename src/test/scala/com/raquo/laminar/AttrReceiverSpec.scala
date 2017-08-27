@@ -48,7 +48,7 @@ class AttrReceiverSpec extends UnitSpec {
     $writeableTitle.shamefullySendNext(title3)
     expectNode(div like (title is title3, "Hello"))
 
-    root.unmount()
+    unmount()
     mount(div(cls := "unrelated"))
     expectNode(div like (cls is "unrelated"))
 
@@ -104,7 +104,7 @@ class AttrReceiverSpec extends UnitSpec {
     $writeableTitle.shamefullySendNext(title5)
     expectNode(div like (title is title5, rel is rel4, "Hello"))
 
-    root.unmount()
+    unmount()
     mount(div(cls := "unrelated"))
     expectNode(div like (cls is "unrelated"))
 

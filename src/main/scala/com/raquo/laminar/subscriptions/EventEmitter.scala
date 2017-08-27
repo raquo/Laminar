@@ -1,11 +1,12 @@
 package com.raquo.laminar.subscriptions
 
 import com.raquo.dombuilder.jsdom
+import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.xstream.{ShamefulStream, XStream}
 import org.scalajs.dom
 
 class EventEmitter[Ev <: dom.Event](
-  val eventProp: jsdom.keys.EventProp[Ev]
+  val eventProp: EventProp[Ev]
 ) extends AnyVal {
 
   // @TODO[Test] verify new fancy methods

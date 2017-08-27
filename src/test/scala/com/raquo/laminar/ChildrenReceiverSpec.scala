@@ -1,10 +1,10 @@
 package com.raquo.laminar
 
+import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar
 import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.receivers.ChildrenReceiver
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.dombuilder.utils.testing.matching.Rule
 import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.xstream.{ShamefulStream, XStream}
 

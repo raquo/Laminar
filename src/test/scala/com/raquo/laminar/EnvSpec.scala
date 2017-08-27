@@ -1,5 +1,5 @@
 package com.raquo.laminar
 
-import com.raquo.dombuilder.utils.testing.DomEnvSpec
+import com.raquo.domtestutils.scalatest.DomEnvSpec
 
 class EnvSpec extends DomEnvSpec

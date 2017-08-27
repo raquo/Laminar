@@ -1,10 +1,13 @@
 package com.raquo.laminar
 
+import com.raquo.domtestutils.matching.ExpectedNode
+
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode}
 import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.dombuilder.utils.testing.matching.ExpectedNode
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode}
+
 import com.raquo.xstream.{ShamefulStream, XStream}
+
 import org.scalajs.dom
 
 class ChildReceiverSpec extends UnitSpec {

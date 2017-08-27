@@ -1,6 +1,6 @@
 package com.raquo.laminar.example.pseudotests
 
-import com.raquo.laminar.child
+import com.raquo.laminar._
 import com.raquo.laminar.example.components.Toggle
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.props.className

@@ -12,18 +12,19 @@ version := "0.1-SNAPSHOT"
 
 scalaVersion := "2.11.11"
 
-// crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 homepage := Some(url("https://github.com/raquo/laminar"))
 
 licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.txt"))
 
 libraryDependencies ++= Seq(
-  "org.scala-js" %%% "scalajs-dom" % "0.9.1",
+  "org.scala-js" %%% "scalajs-dom" % "0.9.3",
 //  "org.scala-js" %% "scalajs-env-selenium" % "0.1.3",
   "com.raquo.xstream" %%% "xstream" % "0.2",
   "com.raquo" %%% "dombuilder" % "0.1-SNAPSHOT",
-  "org.scalatest" %%% "scalatest" % "3.0.1" % "test"
+  "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
+  "com.raquo" %%% "domtestutils" % "0.1-SNAPSHOT" % Test
 )
 
 //jsEnv := new org.scalajs.jsenv.selenium.SeleniumJSEnv(org.scalajs.jsenv.selenium.Firefox()).withKeepAlive()
@@ -53,4 +54,4 @@ enableReloadWorkflow in Test := false
 
 //scalaJSModuleKind := ModuleKind.CommonJSModule // not needed if using scalajs-bundler
 
-emitSourceMaps in fastOptJS := false
+emitSourceMaps := false

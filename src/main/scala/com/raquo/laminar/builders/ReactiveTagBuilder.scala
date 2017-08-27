@@ -1,6 +1,6 @@
 package com.raquo.laminar.builders
 
-import com.raquo.dombuilder.generic
+import com.raquo.domtypes.generic
 import org.scalajs.dom
 
 trait ReactiveTagBuilder extends generic.builders.TagBuilder[ReactiveTag, dom.Element]

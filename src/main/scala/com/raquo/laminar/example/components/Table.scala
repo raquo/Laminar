@@ -1,5 +1,6 @@
 package com.raquo.laminar.example.components
 
+import com.raquo.laminar._
 import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.laminar.tags._
 import com.raquo.laminar.props._

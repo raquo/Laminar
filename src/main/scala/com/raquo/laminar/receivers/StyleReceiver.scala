@@ -1,6 +1,6 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.dombuilder.generic.keys.Style
+import com.raquo.domtypes.generic.keys.Style
 import com.raquo.dombuilder.generic.modifiers.Modifier
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.xstream.XStream
@@ -14,7 +14,7 @@ class StyleReceiver[V](val style: Style[V]) extends AnyVal {
         element.subscribe($value, onNext)
 
         @inline def onNext(value: V): Unit = {
-          element.setStyle(style.name, value)
+          element.setStyle(style.jsName, value)
         }
       }
     }

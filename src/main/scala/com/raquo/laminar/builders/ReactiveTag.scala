@@ -1,6 +1,6 @@
 package com.raquo.laminar.builders
 
-import com.raquo.dombuilder.generic
+import com.raquo.domtypes.generic
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
