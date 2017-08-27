@@ -50,11 +50,9 @@ I will eventually write up a detailed _"Laminar vs the World"_ post to compare i
 
 This is an early preview of an upcoming library. It already works, a few example components are included in the repo.
 
-Next step is to get rid of the Snabbdom dependency. Once that is done, building reusable components with Laminar will become even more pleasant.
-
-Another thing I would like to do is to create a couple wrappers around [XStream](https://github.com/raquo/XStream.scala), the stream library used by Laminar, to provide better types for streams.
+One of the things I would like to do is to create a couple wrappers around [XStream](https://github.com/raquo/XStream.scala), the stream library used by Laminar, to provide better types for streams.
   
-Once both of these are done I will write proper documentation and publish the library to Maven Central. For now you would need to use `sbt publishLocal` to try it out.
+Once that is done I will write proper documentation and publish the library to Maven Central. For now you would need to use `sbt publishLocal` to try it out.
 
 ## Author
 
