@@ -42,7 +42,7 @@ object Counter {
 
 Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however Laminar is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a simpler foundation for the kind of API that we provide.
 
-There are more _Laminar_ examples in the [`example`](https://github.com/raquo/laminar/tree/master/src/main/scala/com/raquo/laminar/example) directory.
+There are more _Laminar_ examples in the [`example`](https://github.com/raquo/laminar/tree/master/src/main/scala/com/raquo/laminar/example) directory. If you clone this project, you can run the examples locally by running `fastOptJS::webpack` and opening the `index-fastopt.html` file in your browser.
 
 I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why Laminar exists.
 

@@ -2,22 +2,6 @@ enablePlugins(ScalaJSPlugin)
 
 enablePlugins(ScalaJSBundlerPlugin)
 
-name := "Laminar"
-
-normalizedName := "laminar"
-
-organization := "com.raquo"
-
-version := "0.1-SNAPSHOT"
-
-scalaVersion := "2.11.11"
-
-crossScalaVersions := Seq("2.11.11", "2.12.3")
-
-homepage := Some(url("https://github.com/raquo/laminar"))
-
-licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.md"))
-
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.3",
 //  "org.scala-js" %% "scalajs-env-selenium" % "0.1.3",
@@ -33,7 +17,7 @@ useYarn := true
 
 requiresDOM in Test := true
 
-enableReloadWorkflow in Test := false
+scalaJSUseMainModuleInitializer := true
 
 // Note: we need to run `npm install jsdom` for this to work
 //jsDependencies += RuntimeDOM % Test
