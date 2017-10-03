@@ -1,11 +1,11 @@
 package com.raquo.laminar
 
-import com.raquo.laminar._
-import com.raquo.laminar.utils.AsyncUnitSpec
-import com.raquo.laminar.attrs.{title, rel}
+import com.raquo.laminar.attrs.{rel, title}
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.tags.{div, span}
+import com.raquo.laminar.utils.AsyncUnitSpec
 import com.raquo.xstream.{ShamefulStream, XStream}
-import org.scalatest.{Assertion, AsyncFunSpec}
+import org.scalatest.Assertion
 
 import scala.concurrent.Promise
 import scala.scalajs.concurrent.JSExecutionContext

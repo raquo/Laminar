@@ -1,7 +1,10 @@
 package com.raquo.laminar.subscriptions
 
-import com.raquo.dombuilder.jsdom
+import com.raquo.dombuilder.generic
+import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.EventProp
+import com.raquo.laminar.DomApi
+import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.xstream.{ShamefulStream, XStream}
 import org.scalajs.dom
 
@@ -11,43 +14,63 @@ class EventEmitter[Ev <: dom.Event](
 
   // @TODO[Test] verify new fancy methods
 
-  type EventSetter = jsdom.modifiers.EventPropSetter[Ev]
+  type EventSetter = generic.modifiers.EventPropSetter[ReactiveNode, dom.Element, dom.Node, Ev, dom.Event, JsCallback]
 
   @inline def -->(stream: XStream[Ev]): EventSetter = {
     sendTo(stream)
   }
 
-  @inline def -->[V](processor: Ev => V, sendTo: XStream[V]): EventSetter = {
-    send(processor, sendTo)
+  @inline def -->(stream: XStream[Ev], useCapture: Boolean): EventSetter = {
+    sendTo(stream, useCapture)
   }
 
-  @inline def -->[V](value: V, sendTo: XStream[V]): EventSetter = {
-    this.send(value, sendTo)
+  @inline def -->[V](value: V, target: XStream[V]): EventSetter = {
+    sendValue(value, target)
   }
 
-  def sendTo(stream: XStream[Ev]): EventSetter = {
-    new jsdom.modifiers.EventPropSetter[Ev](
-      key = eventProp,
-      value = pushToStream(stream)
-    )
+  @inline def -->[V](value: V, sendTo: XStream[V], useCapture: Boolean = false): EventSetter = {
+    sendValue(value, sendTo, useCapture)
   }
 
-  def send[V](value: V, to: XStream[V]): EventSetter = {
-    new jsdom.modifiers.EventPropSetter[Ev](
-      key = eventProp,
-      value = (event: Ev) => pushToStream(to)(value)
-    )
+  @inline def -->[V](processor: Ev => V, target: XStream[V]): EventSetter = {
+    sendVia(processor, target)
   }
 
-  def send[V](processor: Ev => V, to: XStream[V]): EventSetter = {
-    new jsdom.modifiers.EventPropSetter[Ev](
-      key = eventProp,
-      value = (event: Ev) => pushToStream(to)(processor(event))
-    )
+  @inline def -->[V](processor: Ev => V, target: XStream[V], useCapture: Boolean): EventSetter = {
+    sendVia(processor, target, useCapture)
   }
+
+  @inline def sendTo(
+    targetStream: XStream[Ev],
+    useCapture: Boolean = false
+  ): EventSetter = new EventSetter(
+    key = eventProp,
+    value = pushToStream(targetStream),
+    useCapture
+  )(DomApi.eventApi)
+
+  @inline def sendValue[V](
+    value: V,
+    target: XStream[V],
+    useCapture: Boolean = false
+  ): EventSetter = new EventSetter(
+    key = eventProp,
+    value = (event: Ev) => pushToStream(target)(value),
+    useCapture
+  )(DomApi.eventApi)
+
+  @inline def sendVia[V](
+    processor: Ev => V,
+    target: XStream[V],
+    useCapture: Boolean = false
+  ): EventSetter = new EventSetter(
+    key = eventProp,
+    value = (event: Ev) => pushToStream(target)(processor(event)),
+    useCapture
+  )(DomApi.eventApi)
 
   @inline private def pushToStream[T](stream: XStream[T])(value: T): Unit = {
-    // @TODO this should probably work on producers... somehow
+    // @TODO this should probably work on Producers... somehow
     // In sendTo:
     // - Create producer
     // - When producer is started, add an event listener to the node

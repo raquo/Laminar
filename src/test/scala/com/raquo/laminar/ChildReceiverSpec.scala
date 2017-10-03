@@ -2,7 +2,8 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode}
+import com.raquo.laminar.implicits._
+import com.raquo.laminar.nodes.ReactiveChildNode
 import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.utils.UnitSpec
 
@@ -36,7 +37,7 @@ class ChildReceiverSpec extends UnitSpec {
 
     def test(
       $child: XStream[ReactiveChildNode[dom.Element]],
-      initialChild: ExpectedNode[ReactiveNode] = comment likeWhatever
+      initialChild: ExpectedNode = ExpectedNode.comment()
     ): Unit = {
       val $varChild = new ShamefulStream($child)
 
@@ -82,8 +83,8 @@ class ChildReceiverSpec extends UnitSpec {
     def test(
       $fooChild: XStream[ReactiveChildNode[dom.Element]],
       $barChild: XStream[ReactiveChildNode[dom.Element]],
-      initialFooChild: ExpectedNode[ReactiveNode] = comment likeWhatever,
-      initialBarChild: ExpectedNode[ReactiveNode] = comment likeWhatever
+      initialFooChild: ExpectedNode = ExpectedNode.comment(),
+      initialBarChild: ExpectedNode = ExpectedNode.comment()
     ): Unit = {
       val $varFooChild = new ShamefulStream($fooChild)
       val $varBarChild = new ShamefulStream($barChild)

@@ -1,11 +1,10 @@
 package com.raquo.laminar
 
-import com.raquo.domtestutils.matching.Rule
-import com.raquo.laminar
+import com.raquo.laminar.implicits._
+import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.receivers.ChildrenReceiver
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.xstream.{ShamefulStream, XStream}
 
 import scala.collection.mutable
@@ -56,12 +55,12 @@ class ChildrenReceiverSpec extends UnitSpec {
     $varDiff.shamefullySendNext(ChildrenReceiver.insert(span(text5), atIndex = 2))
     expectChildren("insert:", span like text1, span like text0, span like text5, span like text4)
 
-    def expectChildren(clue: String, childRules: Rule[ReactiveNode]*) = {
+    def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
-        val first: Rule[ReactiveNode] = "Hello"
-        val last: Rule[ReactiveNode] = div like "World"
-        val sentinelNode: Rule[ReactiveNode] = comment likeWhatever
-        val rules: Seq[Rule[ReactiveNode]] = first +: sentinelNode +: childRules :+ last
+        val first: Rule = "Hello"
+        val last: Rule = div like "World"
+        val sentinelNode: Rule = ExpectedNode.comment()
+        val rules: Seq[Rule] = first +: sentinelNode +: childRules :+ last
 
         expectNode(div like(rules: _*))
       }

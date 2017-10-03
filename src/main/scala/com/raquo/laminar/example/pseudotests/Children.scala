@@ -1,10 +1,11 @@
 package com.raquo.laminar.example.pseudotests
 
-import com.raquo.laminar._
+import com.raquo.laminar.child
 import com.raquo.laminar.example.components.Toggle
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.props.className
-import com.raquo.laminar.tags.{a, div, h1, span}
+import com.raquo.laminar.tags.{div, h1}
 import org.scalajs.dom
 
 object Children {

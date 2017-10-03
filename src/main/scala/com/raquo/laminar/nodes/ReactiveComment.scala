@@ -1,9 +1,19 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.dombuilder.jsdom
+import com.raquo.dombuilder.generic
+import com.raquo.dombuilder.jsdom.domapi.JsTreeApi
+import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
-class ReactiveComment(override protected[this] var _text: String)
-  extends ReactiveChildNode[dom.Comment]
-  with jsdom.nodes.Comment
+class ReactiveComment(val text: String)
+  extends ReactiveNode
+  with ReactiveChildNode[dom.Comment]
+  with generic.nodes.Comment[ReactiveNode, dom.Comment, dom.Node] {
+
+  override val treeApi: JsTreeApi[ReactiveNode] = DomApi.treeApi
+
+  override val ref: dom.Comment = DomApi.commentApi.createNode
+
+  setText(text)(DomApi.commentApi)
+}
 

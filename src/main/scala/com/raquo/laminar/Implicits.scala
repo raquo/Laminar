@@ -1,29 +1,34 @@
 package com.raquo.laminar
 
-import com.raquo.dombuilder.jsdom.syntax
-
+import com.raquo.dombuilder.generic.KeyImplicits
+import com.raquo.dombuilder.generic.builders.SetterBuilders
+import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
+import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Style}
-
-import com.raquo.laminar.nodes.ReactiveText
+import com.raquo.laminar.nodes.{ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, StyleReceiver}
 import com.raquo.laminar.subscriptions.EventEmitter
-
 import org.scalajs.dom
 
-trait Implicits extends syntax.Implicits {
+trait Implicits
+  extends SyntaxImplicits[ReactiveNode, dom.Element, dom.Node, dom.Event, JsCallback]
+  with KeyImplicits[ReactiveNode, dom.Element, dom.Node]
+  with SetterBuilders[ReactiveNode, dom.Element, dom.Node]
+  with DomApi
+{
 
-  implicit def toAttrReceiver[V](attr: Attr[V]
+  @inline implicit def toAttrReceiver[V](attr: Attr[V]
   ): AttrReceiver[V] = {
     new AttrReceiver(attr)
   }
 
-  implicit def toStyleReceiver[V](
+  @inline implicit def toStyleReceiver[V](
     style: Style[V]
   ): StyleReceiver[V] = {
     new StyleReceiver(style)
   }
 
-  implicit def toEventEmitter[Ev <: dom.Event](
+  @inline implicit def toEventEmitter[Ev <: dom.Event](
     eventProp: EventProp[Ev]
   ): EventEmitter[Ev] = {
     new EventEmitter(eventProp)
@@ -41,6 +46,3 @@ trait Implicits extends syntax.Implicits {
   //    Conversions.optionToModifier(maybeModifier)
   //  }
 }
-
-/** You can import this to load implicits if you don't want to `import com.raquo.laminar._` */
-object Implicits extends Implicits

@@ -1,8 +1,9 @@
 package com.raquo.laminar.example.components
 
-import com.raquo.laminar._
 import com.raquo.laminar.attrs._
+import com.raquo.laminar.child
 import com.raquo.laminar.events._
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.tags._
 import com.raquo.xstream.XStream

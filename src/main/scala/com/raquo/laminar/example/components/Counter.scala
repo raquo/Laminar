@@ -1,8 +1,9 @@
 package com.raquo.laminar.example.components
 
-import com.raquo.laminar._
 import com.raquo.laminar.attrs.cls
+import com.raquo.laminar.child
 import com.raquo.laminar.events.onClick
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.ReactiveNode
 import com.raquo.laminar.tags.{button, div, span}
 import com.raquo.xstream.{MemoryStream, XStream}

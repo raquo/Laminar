@@ -1,5 +1,6 @@
 package com.raquo.laminar
 
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.utils.UnitSpec
 import com.raquo.laminar.attrs._
 import com.raquo.laminar.tags._

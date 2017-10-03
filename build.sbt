@@ -16,15 +16,15 @@ crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 homepage := Some(url("https://github.com/raquo/laminar"))
 
-licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.txt"))
+licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.md"))
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.3",
 //  "org.scala-js" %% "scalajs-env-selenium" % "0.1.3",
   "com.raquo.xstream" %%% "xstream" % "0.2.1",
-  "com.raquo" %%% "dombuilder" % "0.1-SNAPSHOT",
-  "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
-  "com.raquo" %%% "domtestutils" % "0.1-SNAPSHOT" % Test
+  "com.raquo" %%% "dombuilder" % "0.2",
+  "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
+  "com.raquo" %%% "domtestutils" % "0.2" % Test
 )
 
 //jsEnv := new org.scalajs.jsenv.selenium.SeleniumJSEnv(org.scalajs.jsenv.selenium.Firefox()).withKeepAlive()

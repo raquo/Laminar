@@ -1,11 +1,12 @@
 package com.raquo.laminar.example.components
 
-import com.raquo.laminar._
 import com.raquo.laminar.events._
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.receivers.ChildrenReceiver.{Diff, append}
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
 import com.raquo.laminar.tags._
+import com.raquo.laminar.{children, maybeChild}
 import com.raquo.xstream.XStream
 import org.scalajs.dom
 
@@ -33,7 +34,7 @@ class TaskList {
         count += 1
         Some(
           button(
-            onClick --> (append(div("hello")), sendTo = $taskDiff),
+            onClick --> (append(div("hello")), target = $taskDiff),
             //        onClick --> (true, sendTo = $showAddTaskInput),
             "Add task"
           )

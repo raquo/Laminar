@@ -1,6 +1,7 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.dombuilder.generic.modifiers.Modifier
+import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.xstream.XStream
 import com.raquo.laminar.subscriptions.ListDiff
@@ -13,11 +14,11 @@ class ChildrenReceiver(
   $diff: XStream[ChildrenReceiver.Diff]
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
-  override def applyTo(parentNode: ReactiveElement[dom.Element]): Unit = {
+  override def apply(parentNode: ReactiveElement[dom.Element]): Unit = {
     var nodeCount = 0
 
     val sentinelNode = new ReactiveComment("")
-    parentNode.appendChild(sentinelNode)
+    parentNode.appendChild(sentinelNode)(DomApi.treeApi)
 
     parentNode.subscribe(
       $diff,
@@ -43,32 +44,32 @@ class ChildrenReceiver(
     diff match {
       case ListDiff.Append(node) =>
         val sentinelIndex = parentNode.indexOfChild(sentinelNode)
-        if (parentNode.insertChild(node, atIndex = sentinelIndex + nodeCount + 1)) {
+        if (parentNode.insertChild(node, atIndex = sentinelIndex + nodeCount + 1)(DomApi.treeApi)) {
           nodeCountDiff = 1
         }
         nodeCountDiff = 1
       case ListDiff.Prepend(node) =>
         val sentinelIndex = parentNode.indexOfChild(sentinelNode)
-        if (parentNode.insertChild(node, atIndex = sentinelIndex + 1)) {
+        if (parentNode.insertChild(node, atIndex = sentinelIndex + 1)(DomApi.treeApi)) {
           nodeCountDiff = 1
         }
       case ListDiff.Insert(node, atIndex) =>
         val sentinelIndex = parentNode.indexOfChild(sentinelNode)
-        if (parentNode.insertChild(node, sentinelIndex + atIndex + 1)) {
+        if (parentNode.insertChild(node, sentinelIndex + atIndex + 1)(DomApi.treeApi)) {
           nodeCountDiff = 1
         }
       case ListDiff.Remove(node) =>
-        if (parentNode.removeChild(node)) {
+        if (parentNode.removeChild(node)(DomApi.treeApi)) {
           nodeCountDiff = -1
         }
       case ListDiff.Replace(node, withNode) =>
-        parentNode.replaceChild(oldChild = node, newChild = withNode)
+        parentNode.replaceChild(oldChild = node, newChild = withNode)(DomApi.treeApi)
       case ListDiff.ReplaceAll(newNodes) =>
         val sentinelIndex = parentNode.indexOfChild(sentinelNode)
         if (nodeCount == 0) {
           var numInsertedNodes = 0
           newNodes.foreach { newChild =>
-            if (parentNode.insertChild(newChild, atIndex = sentinelIndex + 1 + numInsertedNodes)) {
+            if (parentNode.insertChild(newChild, atIndex = sentinelIndex + 1 + numInsertedNodes)(DomApi.treeApi)) {
               numInsertedNodes += 1
             }
           }
@@ -79,7 +80,7 @@ class ChildrenReceiver(
             fromIndex = sentinelIndex + 1,
             toIndex = sentinelIndex + nodeCount,
             js.Array(newNodes: _*)
-          )
+          )(DomApi.treeApi)
           if (replaced) {
             nodeCountDiff = newNodes.length - oldNodeCount
           }

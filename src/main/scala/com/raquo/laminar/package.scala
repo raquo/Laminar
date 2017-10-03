@@ -1,9 +1,8 @@
 package com.raquo
 
-import com.raquo.dombuilder.generic.modifiers.{StringStyleSetter, StyleSetter}
-import com.raquo.dombuilder.jsdom.builders.StyleBuilder
-import com.raquo.dombuilder.jsdom.nodes.ChildNode
-
+import com.raquo.dombuilder.generic.builders.SetterBuilders
+import com.raquo.dombuilder.generic.nodes.Element
+import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.builders.{BoundedBuilder, SpecializedBuilder}
 import com.raquo.domtypes.generic.defs.attrs.{Attrs, GlobalAttrs, InputAttrs}
 import com.raquo.domtypes.generic.defs.props.{NodeProps, Props}
@@ -11,28 +10,14 @@ import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
 import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MouseEventProps}
 import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, TableTags, TextTags}
-
 import com.raquo.laminar.builders.{ReactiveTag, ReactiveTagBuilder}
-import com.raquo.laminar.nodes.{ReactiveNode, ReactiveRoot}
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode, ReactiveRoot}
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, MaybeChildReceiver}
-
 import org.scalajs.dom
 
-package object laminar extends Implicits {
+// @TODO[API,WTF] I can't make laminar extend `Implicits` – test code does not pick up the implicits. Why?
 
-  object tags
-    extends DocumentTags[ReactiveTag]
-    with GroupingTags[ReactiveTag]
-    with TextTags[ReactiveTag]
-    with FormTags[ReactiveTag]
-    with SectionTags[ReactiveTag]
-    with EmbedTags[ReactiveTag]
-    with TableTags[ReactiveTag]
-    with ReactiveTagBuilder
-
-  object tags2
-    extends MiscTags[ReactiveTag]
-    with ReactiveTagBuilder
+package object laminar {
 
   object attrs
     extends Attrs[Attr]
@@ -63,12 +48,28 @@ package object laminar extends Implicits {
   }
 
   object styles
-    extends Styles[StyleSetter, StringStyleSetter]
-    with StyleBuilder
+    extends Styles[Modifier[ReactiveNode with Element[ReactiveNode, dom.Element, dom.Node]]]
+    with SetterBuilders[ReactiveNode, dom.Element, dom.Node]
+    with DomApi
 
   object styles2
-    extends Styles2[StyleSetter, StringStyleSetter]
-    with StyleBuilder
+    extends Styles2[Modifier[ReactiveNode with Element[ReactiveNode, dom.Element, dom.Node]]]
+    with SetterBuilders[ReactiveNode, dom.Element, dom.Node]
+    with DomApi
+
+  object tags
+    extends DocumentTags[ReactiveTag]
+      with GroupingTags[ReactiveTag]
+      with TextTags[ReactiveTag]
+      with FormTags[ReactiveTag]
+      with SectionTags[ReactiveTag]
+      with EmbedTags[ReactiveTag]
+      with TableTags[ReactiveTag]
+      with ReactiveTagBuilder
+
+  object tags2
+    extends MiscTags[ReactiveTag]
+      with ReactiveTagBuilder
 
   val child: ChildReceiver.type = ChildReceiver
 
@@ -76,9 +77,12 @@ package object laminar extends Implicits {
 
   val children: ChildrenReceiver.type = ChildrenReceiver
 
+  /** Import `implicits._` if you don't want to import laminar._ */
+  object implicits extends Implicits
+
   @inline def render(
     container: dom.Element,
-    rootNode: ReactiveNode with ChildNode[ReactiveNode, dom.Element]
+    rootNode: ReactiveChildNode[dom.Element]
   ): ReactiveRoot = {
     new ReactiveRoot(container, rootNode)
   }

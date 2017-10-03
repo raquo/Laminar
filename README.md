@@ -1,18 +1,16 @@
 # Laminar
 
-Laminar is a small reactive UI library for Scala.js, allowing you to interact with the DOM using reactive streams.
+_Laminar_ is a small reactive UI library for Scala.js, allowing you to interact with the DOM using reactive streams. I'm building _Laminar_ because I believe that UI logic is best expressed with functional reactive programming patterns in a type-safe environment.
 
-Laminar has no concept of components because it has no need for them. Write your own functions that accept any kind of inputs and one way or another provide you with a reference to a Node.
+    "com.raquo" %%% "laminar" % "0.1"
 
-Laminar is very efficient. It makes minimal required changes to the DOM. For example, if you say you need to update an attribute of a node, that's exactly what will happen. No other code of yours will be re-evaluated because of that (unlike for example React.js where the render() methods on components will be called recursively on every little change in props).
+We have no concept of components because we don't need the conceptual overhead. Write your own functions or classes or anything that somehow provides a reference to a `ReactiveNode`, and you're good.
 
-Currently Laminar depends on a virtual DOM library called [Snabbdom](https://github.com/raquo/Snabbdom.scala), however I am working on removing that dependency. Laminar's API allows us to be even more efficient than Snabbdom by making direct DOM updates. Snabbdom's patching model also doesn't map all that well to our precise-DOM-updates use case.
+_Laminar_ uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder) under the hood, and is very efficient. Instead of using a virtual DOM, it makes precision updates to the real DOM. For example, if you say you need to update an attribute of a node, that's exactly what will happen. There is nothing else happening, no diffing of virtual DOM trees, no redundant re-evaluation of your component. Laminar's API lets you express what exactly needs to happen when without the inefficiency and under-the-hood complexity of virtual DOM.
 
-I created Laminar because I believe that UI is best built with functional reactive programming patterns in a type-safe environment. I will publish a TodoMVC example app to showcase how nice Laminar is to work with as soon as I get a bit of time.
+## Example Laminar "Component"
 
-## Example Laminar "component"
-
-Here's `Counter.apply`, a contrived example function that produces a Counter "component" that exposes a node that should be provided to Laminar, and a stream of counts generated from user clicks that you do whatever you want with.
+Here's `Counter.apply`, a contrived example function that produces a Counter "component" that exposes a `node` that should be provided to Laminar, and `$count`, a stream of counts generated from user clicks that you do whatever you want with.
 
 ```scala
 class Counter private (
@@ -42,20 +40,26 @@ object Counter {
 }
 ```
 
-Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however Laminar is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a better foundation for the kind of API that we provide. Laminar also supports more flexible use cases. For example Laminar is more accommodating when you need to render a dynamically updated list of children.
+Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however Laminar is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a simpler foundation for the kind of API that we provide.
+
+There are more _Laminar_ examples in the [`example`](https://github.com/raquo/laminar/tree/master/src/main/scala/com/raquo/laminar/example) directory.
 
 I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why Laminar exists.
 
-## Status
+## My Related Projects
 
-This is an early preview of an upcoming library. It already works, a few example components are included in the repo.
+- [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles
+- [Scala DOM Builder](https://github.com/raquo/scala-dom-builder) – Low-level Scala & Scala.js library for building and manipulating DOM trees
+- [Scala DOM TestUtils](https://github.com/raquo/scala-dom-testutils) – Test that your Javascript DOM nodes match your expectations
+- [Snabbdom.scala](https://github.com/raquo/Snabbdom.scala) – Scala.js interface to a popular JS virtual DOM library
+- [XStream.scala](https://github.com/raquo/XStream.scala) – Scala.js interface to a simple JS reactive streams library
+- [Cycle.scala](https://github.com/raquo/Cycle.scala) – Scala.js interface to a popular JS functional reactive library
 
-One of the things I would like to do is to create a couple wrappers around [XStream](https://github.com/raquo/XStream.scala), the stream library used by Laminar, to provide better types for streams.
-  
-Once that is done I will write proper documentation and publish the library to Maven Central. For now you would need to use `sbt publishLocal` to try it out.
 
 ## Author
 
 Nikita Gazarov – [raquo.com](http://raquo.com)
 
-License – MIT
+## License
+
+_Laminar_ is provided under the [MIT license](https://github.com/raquo/laminar/blob/master/LICENSE.md).

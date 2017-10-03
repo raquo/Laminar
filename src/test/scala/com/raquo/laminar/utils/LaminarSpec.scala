@@ -1,21 +1,16 @@
 package com.raquo.laminar.utils
 
-import com.raquo.dombuilder.generic.nodes.Root
-import com.raquo.dombuilder.jsdom.nodes.ChildNode
-
 import com.raquo.domtestutils.EventSimulator
-import com.raquo.domtestutils.matching.{ExpectedNode, RuleImplicits}
+import com.raquo.domtestutils.matching.RuleImplicits
 import com.raquo.domtestutils.scalatest.MountSpec
-
 import com.raquo.laminar
-import com.raquo.laminar.builders.{ReactiveCommentBuilder, ReactiveTextBuilder}
-import com.raquo.laminar.nodes.ReactiveNode
-
+import com.raquo.laminar.DomApi
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveRoot}
 import org.scalajs.dom
 
 trait LaminarSpec
-  extends MountSpec[ReactiveNode]
-  with RuleImplicits[ReactiveNode]
+  extends MountSpec
+  with RuleImplicits
   with EventSimulator
 {
   // === On nullable variables ===
@@ -23,10 +18,10 @@ trait LaminarSpec
   // forget to handle the `None` case when mapping or foreach-ing over it.
   // In test code, We'd rather have a null pointer exception than an assertion that you don't
   // realize isn't running because it's inside a None.foreach.
-  var root: Root[ReactiveNode, ReactiveNode with ChildNode[ReactiveNode, dom.Element], dom.Element, dom.Node] = null
+  var root: ReactiveRoot = null
 
   def mount(
-    node: ReactiveNode with ChildNode[ReactiveNode, dom.Element],
+    node: ReactiveChildNode[dom.Element],
     clue: String = defaultMountedElementClue
   ): Unit = {
     mountedElementClue = clue
@@ -36,7 +31,7 @@ trait LaminarSpec
 
   def mount(
     clue: String,
-    node: ReactiveNode with ChildNode[ReactiveNode, dom.Element]
+    node: ReactiveChildNode[dom.Element]
   ): Unit = {
     mount(node, clue)
   }
@@ -52,17 +47,9 @@ trait LaminarSpec
       "ASSERT FAILED [laminar.unmount]: Laminar root's ref does not match rootNode. What did you do!?"
     )
     doAssert(
-      root.unmount(),
+      root.unmount()(DomApi.treeApi),
       "ASSERT FAILED [laminar.unmount]: Laminar root failed to unmount"
     )
     mountedElementClue = defaultMountedElementClue
-  }
-
-  override def comment: ExpectedNode[ReactiveNode] = {
-    new ExpectedNode(ReactiveCommentBuilder)
-  }
-
-  override def textNode: ExpectedNode[ReactiveNode] = {
-    new ExpectedNode(ReactiveTextBuilder)
   }
 }
