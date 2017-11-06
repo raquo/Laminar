@@ -1,12 +1,8 @@
 package com.raquo.laminar.example.pseudotests
 
-import com.raquo.laminar.attrs.href
+import com.raquo.laminar.bundle._
 import com.raquo.laminar.example.components.Toggle
-import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.props.className
-import com.raquo.laminar.styles._
-import com.raquo.laminar.tags._
 import org.scalajs.dom
 
 object MultiSetters {

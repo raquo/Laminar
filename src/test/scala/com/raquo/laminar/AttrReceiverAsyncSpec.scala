@@ -1,8 +1,6 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.attrs.{rel, title}
-import com.raquo.laminar.implicits._
-import com.raquo.laminar.tags.{div, span}
+import com.raquo.laminar.bundle._
 import com.raquo.laminar.utils.AsyncUnitSpec
 import com.raquo.xstream.{ShamefulStream, XStream}
 import org.scalatest.Assertion

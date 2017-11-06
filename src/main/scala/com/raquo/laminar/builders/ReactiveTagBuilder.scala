@@ -5,7 +5,7 @@ import org.scalajs.dom
 
 trait ReactiveTagBuilder extends generic.builders.TagBuilder[ReactiveTag, dom.Element]
 {
-  override def build[Ref <: dom.Element](tagName: String, void: Boolean): ReactiveTag[Ref] = {
+  override def tag[Ref <: dom.Element](tagName: String, void: Boolean): ReactiveTag[Ref] = {
     new ReactiveTag[Ref](tagName, void)
   }
 }

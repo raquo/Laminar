@@ -6,11 +6,11 @@ _Laminar_ is a small reactive UI library for Scala.js, allowing you to interact 
 
 We have no concept of components because we don't need the conceptual overhead. Write your own functions or classes or anything that somehow provides a reference to a `ReactiveNode`, and you're good.
 
-_Laminar_ uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder) under the hood, and is very efficient. Instead of using a virtual DOM, it makes precision updates to the real DOM. For example, if you say you need to update an attribute of a node, that's exactly what will happen. There is nothing else happening, no diffing of virtual DOM trees, no redundant re-evaluation of your component. Laminar's API lets you express what exactly needs to happen when without the inefficiency and under-the-hood complexity of virtual DOM.
+_Laminar_ uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder) under the hood, and is very efficient. Instead of using a virtual DOM, it makes precision updates to the real DOM. For example, if you say you need to update an attribute of a node, that's exactly what will happen. There is nothing else happening, no diffing of virtual DOM trees, no redundant re-evaluation of your component. _Laminar_'s API lets you express what exactly needs to happen when without the inefficiency and under-the-hood complexity of virtual DOM.
 
 ## Example Laminar "Component"
 
-Here's `Counter.apply`, a contrived example function that produces a Counter "component" that exposes a `node` that should be provided to Laminar, and `$count`, a stream of counts generated from user clicks that you do whatever you want with.
+Here's `Counter.apply`, a contrived example function that produces a Counter "component" that exposes a `node` that should be provided to _Laminar_, and `$count`, a stream of counts generated from user clicks that you do whatever you want with.
 
 ```scala
 class Counter private (
@@ -28,7 +28,7 @@ object Counter {
       .fold((a: Int, b: Int) => a + b, seed = 0)
  
     val node = div(
-      cls := "Counter" // this does not need to be in a separate .apply() call, just for aesthetics
+      className := "Counter" // this does not need to be in a separate .apply() call, just for aesthetics
     )(
       button(onClick --> $decClick, "–"),
       child <-- $count.map(count => span(s" :: $count ($label) :: ")),
@@ -40,11 +40,11 @@ object Counter {
 }
 ```
 
-Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however Laminar is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a simpler foundation for the kind of API that we provide.
+Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however _Laminar_ is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a simpler foundation for the kind of API that we provide.
 
 There are more _Laminar_ examples in the [`example`](https://github.com/raquo/laminar/tree/master/src/main/scala/com/raquo/laminar/example) directory. If you clone this project, you can run the examples locally by running `fastOptJS::webpack` and opening the `index-fastopt.html` file in your browser.
 
-I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why Laminar exists.
+I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why _Laminar_ exists.
 
 ## My Related Projects
 

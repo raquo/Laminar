@@ -2,9 +2,8 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 
-import com.raquo.laminar.implicits._
+import com.raquo.laminar.bundle._
 import com.raquo.laminar.nodes.ReactiveChildNode
-import com.raquo.laminar.tags.{div, span}
 import com.raquo.laminar.utils.UnitSpec
 
 import com.raquo.xstream.{ShamefulStream, XStream}

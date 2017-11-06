@@ -1,9 +1,7 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.implicits._
+import com.raquo.laminar.bundle._
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.laminar.attrs._
-import com.raquo.laminar.tags._
 import com.raquo.xstream.{ShamefulStream, XStream}
 
 class AttrReceiverSpec extends UnitSpec {
@@ -25,11 +23,11 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is title2, "Hello"))
 
     unmount()
-    mount(div(cls := "unrelated"))
-    expectNode(div like (cls is "unrelated"))
+    mount(div(className := "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title3)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
   }
 
   it("updates attr with memory stream") {
@@ -50,11 +48,11 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is title3, "Hello"))
 
     unmount()
-    mount(div(cls := "unrelated"))
-    expectNode(div like (cls is "unrelated"))
+    mount(div(className := "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title4)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
   }
 
   it("supports multiple attr receivers on same node") {
@@ -106,14 +104,14 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is title5, rel is rel4, "Hello"))
 
     unmount()
-    mount(div(cls := "unrelated"))
-    expectNode(div like (cls is "unrelated"))
+    mount(div(className := "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title6)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableRel.shamefullySendNext(rel5)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
   }
 
   it("supports multiple memory streams") {
@@ -159,14 +157,14 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is title5, rel is rel4, "Hello"))
 
     unmount()
-    mount(div(cls := "unrelated"))
-    expectNode(div like (cls is "unrelated"))
+    mount(div(className := "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title6)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableRel.shamefullySendNext(rel5)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
   }
 
   it("updates two attrs subscribed to the same stream") {
@@ -186,11 +184,11 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is value2, rel is value2, "Hello"))
 
     unmount()
-    mount(div(cls := "unrelated"))
-    expectNode(div like (cls is "unrelated"))
+    mount(div(className := "unrelated"))
+    expectNode(div like (className is "unrelated"))
 
     $writeableValue.shamefullySendNext(value3)
-    expectNode(div like (cls is "unrelated"))
+    expectNode(div like (className is "unrelated"))
   }
 
   it("works with child receiver on same node") {

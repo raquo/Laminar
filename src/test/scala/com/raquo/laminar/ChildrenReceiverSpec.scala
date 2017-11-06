@@ -1,13 +1,11 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.implicits._
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
-import com.raquo.laminar.tags.{div, span}
-import com.raquo.laminar.receivers.ChildrenReceiver
+import com.raquo.laminar.bundle._
+import com.raquo.laminar.emitter.EventBus
+import com.raquo.laminar.nodes.ReactiveChildNode
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.xstream.{ShamefulStream, XStream}
-
-import scala.collection.mutable
+import org.scalajs.dom
 
 class ChildrenReceiverSpec extends UnitSpec {
 
@@ -18,51 +16,77 @@ class ChildrenReceiverSpec extends UnitSpec {
   private val text3 = randomString("text3_")
   private val text4 = randomString("text4_")
   private val text5 = randomString("text5_")
-//  private val text6 = randomString("text6_")
-//  private val text7 = randomString("text7_")
+  //  private val text6 = randomString("text6_")
+  //  private val text7 = randomString("text7_")
 
   it("updates a list of children") {
-    val $diff = XStream.create[ChildrenReceiver.Diff]()
-    val $varDiff = new ShamefulStream($diff)
+
+    val childrenBus = new EventBus[Vector[ReactiveChildNode[dom.Node]]]
+    val $children = childrenBus.$
 
     val span0 = span(text0)
     val span1 = span(text1)
+    val div2 = div(text2)
+    val div3 = div(text3)
+    val span4 = span(text4)
+    val span5 = span(text5)
 
-    mount(div("Hello", children <-- $diff, div("World")))
+    mount(main(children <-- $children))
     expectChildren("none")
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.append(span0))
+    childrenBus.sendNext(Vector(span0))
     expectChildren("append #1:", span like text0)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.append(span1))
+    childrenBus.sendNext(Vector(span0, span1))
     expectChildren("append #2:", span like text0, span like text1)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.prepend(div(text2)))
+    childrenBus.sendNext(Vector(div2, span0, span1))
     expectChildren("prepend:", div like text2, span like text0, span like text1)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.remove(span0))
+    childrenBus.sendNext(Vector(div2, span1))
     expectChildren("remove:", div like text2, span like text1)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.replace(span1, div(text3)))
+    childrenBus.sendNext(Vector(div2, div3))
     expectChildren("replace:", div like text2, div like text3)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.replaceAll(mutable.Buffer(span1, span0)))
+    childrenBus.sendNext(Vector(span1, span0))
     expectChildren("replaceAll:", span like text1, span like text0)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.append(span(text4)))
+    childrenBus.sendNext(Vector(span1, span0, span4))
     expectChildren("append #3:", span like text1, span like text0, span like text4)
 
-    $varDiff.shamefullySendNext(ChildrenReceiver.insert(span(text5), atIndex = 2))
+    childrenBus.sendNext(Vector(span1, span0, span5, span4))
     expectChildren("insert:", span like text1, span like text0, span like text5, span like text4)
+
+    childrenBus.sendNext(Vector(span5, span4))
+    expectChildren("remove #2:", span like text5, span like text4)
+
+    childrenBus.sendNext(Vector(span1, span5, span4))
+    expectChildren("prepend #2:", span like text1, span like text5, span like text4)
+
+    childrenBus.sendNext(Vector(span1, span5, span4, span0, div2, div3))
+    expectChildren("insert #2:", span like text1, span like text5, span like text4, span like text0, div like text2, div like text3)
+
+    childrenBus.sendNext(Vector(span1, span5, span4, span0))
+    expectChildren("remove #3:", span like text1, span like text5, span like text4, span like text0)
+
+    childrenBus.sendNext(Vector(span0, span1, div2, div3, span4))
+    expectChildren("mix:", span like text0, span like text1, div like text2, div like text3, span like text4)
+
+    childrenBus.sendNext(Vector(div3, div2, span1, span4, span0))
+    expectChildren("reorder:", div like text3, div like text2, span like text1, span like text4, span like text0)
+
+    childrenBus.sendNext(Vector())
+    expectChildren("clear:")
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
         val first: Rule = "Hello"
-        val last: Rule = div like "World"
+        val last: Rule = article like "World"
         val sentinelNode: Rule = ExpectedNode.comment()
-        val rules: Seq[Rule] = first +: sentinelNode +: childRules :+ last
+        val rules: Seq[Rule] = sentinelNode +: childRules
 
-        expectNode(div like(rules: _*))
+        expectNode(main like(rules: _*))
       }
     }
   }
