@@ -4,8 +4,11 @@ import com.raquo.dombuilder.generic.modifiers.EventPropSetter
 import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.bundle.onClick
 import com.raquo.laminar.nodes.ReactiveNode
 import org.scalajs.dom
+
+import scala.scalajs.js
 
 // @TODO[Naming] I'm not sure if "Receiver" is a good term for this
 class EventPropReceiver[Ev <: dom.Event, V](
@@ -78,7 +81,20 @@ object EventPropReceiver {
       if (stopPropagation) {
         ev.stopPropagation()
       }
-      sendNext(ev)
+
+      if (
+        preventDefault
+        && eventProp == onClick
+        && ev.target.asInstanceOf[dom.Element].tagName == "INPUT"
+        && ev.target.asInstanceOf[dom.html.Input].`type` == "checkbox"
+      ) {
+        // Special case: See README and/or https://stackoverflow.com/a/32710212/2601788
+        // @TODO[API] Should this behaviour extend to all checkbox.onClick events by default?
+        js.timers.setTimeout(0)(sendNext(ev))
+        ()
+      } else {
+        sendNext(ev)
+      }
     }
 
     new EventPropSetter[ReactiveNode, dom.Element, dom.Node, Ev, dom.Event, JsCallback](

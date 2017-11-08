@@ -46,6 +46,31 @@ There are more _Laminar_ examples in the [`example`](https://github.com/raquo/la
 
 I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why _Laminar_ exists.
 
+## Documentation
+
+### Elements, Attributes, Props, etc.
+
+Import those from `laminar.bundle._`. Naming generally follows native JS DOM naming, except it's camelCased. Some keys are named differently, those are documented in [Scala DOM Types](https://github.com/raquo/scala-dom-types#naming-differences-compared-to-native-html--dom). For example, the `value` *HTML attribute* is named `defaultValue` in Laminar, because [that's how it behaves](https://stackoverflow.com/a/6004028/2601788) and that's what the corresponding *DOM property* is called.
+
+### Special Cases
+
+Laminar is conceptually a simple layer adding a reactive streaming API to Scala DOM Builder. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
+
+Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.
+
+##### 1. checkbox.onClick + event.preventDefault() = async event stream
+
+All event streams in Laminar emit events synchronously, as soon as they happen, except if the stream is of `onClick` events on an `input(typ := "checkbox")` element, and you have used `preventDefault = true` option in Laminar's API.
+
+In that case each event is sent after a `setTimeout(0)` after the browser triggers it. Without this, you would not have been able to update the `checked` property of this checkbox from a stream that is (synchronously) derived from the stream of `onClick` events, and this is a common practice when building controlled components.
+
+The underlying issue is described in [this StackOverflow answer](https://stackoverflow.com/a/32710212/2601788).
+
+**Escape hatch:** to bypass this magic, call `ev.preventDefault()` manually on the event object instead of using Laminar's `preventDefault` option.
+
+**Watch out:** If you are reading the `checked` property of the checkbox in an affected stream, it might be the opposite of what you'd expect if you know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug.
+
+
 ## My Related Projects
 
 - [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles
