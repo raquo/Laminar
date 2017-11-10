@@ -1,5 +1,6 @@
 package com.raquo.laminar.nodes
 
+import com.raquo.laminar.emitter.EventBus.WriteBus
 import com.raquo.xstream.{Listener, Subscription, XStream}
 
 import scala.collection.mutable
@@ -20,6 +21,13 @@ trait ReactiveNode {
       case None =>
         maybeSubscriptions = Some(mutable.Buffer(subscription))
     }
+  }
+
+  @inline def subscribeBus[V](
+    $source: XStream[V],
+    targetBus: WriteBus[V]
+  ): Unit = {
+    subscribe($value = $source, onNext = targetBus.sendNext)
   }
 
   def unsubscribeFromAll(): Unit = {
