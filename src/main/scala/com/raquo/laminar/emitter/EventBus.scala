@@ -10,7 +10,7 @@ import scala.collection.mutable
 /** Event encapsulates a producer into which you can send events.
   *
   * This has two common usages:
-  * - Receive events from [[EventEmitter]] when using `onClick --> eventBus` syntax
+  * - Receive events from [[EventPropOps]] when using `onClick --> eventBus` syntax
   * - Shared event stream that is populated from multiple sources which are otherwise
   *   hard or inefficient to compose into a single stream. For instance, when dealing
   *   with streams of lists this is a simpler and better performing alternative to
@@ -52,6 +52,8 @@ object EventBus {
     def sendNext(event: A): Unit = {
       maybeListener.foreach(listener => listener.next(event))
     }
+
+    // @TODO map / compose are pretty bad for memory management since they call addSource internally
 
     /** Create a new Event bus and set it as a source to this Event bus
       * @param project  converts new events from the newly created event bus into events for this event bus

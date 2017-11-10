@@ -5,7 +5,7 @@ import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
 import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style}
-import com.raquo.laminar.emitter.EventEmitter
+import com.raquo.laminar.emitter.EventPropOps
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver}
 import com.raquo.laminar.syntax.ReactiveHtmlElementSyntax
@@ -33,8 +33,8 @@ trait Implicits
     new StyleReceiver(style)
   }
 
-  @inline implicit def toEventEmitter[Ev <: dom.Event](eventProp: EventProp[Ev]): EventEmitter[Ev] = {
-    new EventEmitter(eventProp)
+  @inline implicit def toEventPropOps[Ev <: dom.Event](eventProp: EventProp[Ev]): EventPropOps[Ev] = {
+    new EventPropOps(eventProp)
   }
 
   @inline implicit def textToNode(text: String): ReactiveText = {

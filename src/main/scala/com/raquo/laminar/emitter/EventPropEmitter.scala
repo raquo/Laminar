@@ -10,8 +10,7 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-// @TODO[Naming] I'm not sure if "Receiver" is a good term for this
-class EventPropReceiver[Ev <: dom.Event, V](
+class EventPropEmitter[Ev <: dom.Event, V](
   protected val key: EventProp[Ev],
   protected val eventBus: EventBus[V],
   protected val processor: Ev => V
@@ -52,10 +51,10 @@ class EventPropReceiver[Ev <: dom.Event, V](
   }
 }
 
-object EventPropReceiver {
+object EventPropEmitter {
 
-  implicit def eventPropReceiverToEventPropSetter[Ev <: dom.Event, V](
-    eventPropReceiver: EventPropReceiver[Ev, V]
+  implicit def eventPropEmitterToEventPropSetter[Ev <: dom.Event, V](
+    eventPropReceiver: EventPropEmitter[Ev, V]
   ): EventPropSetter[ReactiveNode, dom.Element, dom.Node, Ev, dom.Event, JsCallback] = {
     eventPropSetter(
       eventPropReceiver.key,

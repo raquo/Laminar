@@ -5,7 +5,7 @@ import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.dombuilder.jsdom.domapi.JsTreeApi
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.emitter.{EventBus, EventPropReceiver}
+import com.raquo.laminar.emitter.{EventBus, EventPropEmitter}
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, LockedAttrReceiver, LockedPropReceiver, MaybeChildReceiver, TextChildReceiver}
 import com.raquo.xstream.XStream
 import org.scalajs.dom
@@ -40,6 +40,8 @@ class ReactiveElement[+Ref <: dom.Element](
   //  // @TODO This needs the string magic thing
   //  def <-- [V](style: Style[V]): StyleReceiver[V] = new StyleReceiver(style)
 
+  //  def -->[Ev <: dom.Event](eventProp: EventProp[Ev])
+
   def $event[Ev <: dom.Event](
     eventProp: EventProp[Ev],
     useCapture: Boolean = false,
@@ -48,7 +50,7 @@ class ReactiveElement[+Ref <: dom.Element](
   ): XStream[Ev] = {
     // @TODO[Integrity] is EventBus the correct thing to use here? Maybe a manual producer, or would it just be the same?
     val eventBus = new EventBus[Ev]
-    val setter = EventPropReceiver.eventPropSetter(
+    val setter = EventPropEmitter.eventPropSetter(
       eventProp,
       sendNext = eventBus.sendNext,
       useCapture = useCapture,
