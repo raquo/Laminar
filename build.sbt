@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   "com.raquo.xstream" %%% "xstream" % "0.2.2-SNAPSHOT",
   "com.raquo" %%% "dombuilder" % "0.3",
   "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
-  "com.raquo" %%% "domtestutils" % "0.3" % Test
+  "com.raquo" %%% "domtestutils" % "0.3.1-SNAPSHOT" % Test
 )
 
 //jsEnv := new org.scalajs.jsenv.selenium.SeleniumJSEnv(org.scalajs.jsenv.selenium.Firefox()).withKeepAlive()

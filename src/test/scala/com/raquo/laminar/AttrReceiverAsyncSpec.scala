@@ -75,6 +75,48 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
     promise.future
   }
 
+  it("unsubscribes from the stream in a child element after parent node was unmounted") {
+    // @TODO: This is failing because we don't properly detect mounting / unmounting
+    var titleCounter = 0
+    val $title = XStream.create[String]()
+    val $titleWithDebugger = $title.map(title => {
+      titleCounter += 1
+      title
+    })
+
+    val element = span(div(title <-- $titleWithDebugger, "Hello"))
+    mount(element)
+
+    expectNode(span like (div like (title isEmpty, "Hello")))
+
+    val $writeableTitle = new ShamefulStream($title)
+
+    titleCounter shouldBe 0
+
+    $writeableTitle.shamefullySendNext(title1)
+    expectNode(span like (div like (title is title1, "Hello")))
+    titleCounter shouldBe 1
+
+    $writeableTitle.shamefullySendNext(title2)
+    expectNode(span like (div like (title is title2, "Hello")))
+    titleCounter shouldBe 2
+
+    unmount()
+    mount(div(rel := "unmounted"))
+
+    expectNode(div like (title isEmpty, rel is "unmounted"))
+
+    val promise = Promise[Assertion]()
+    js.timers.setTimeout(1) {
+      promise.complete(Try{
+        $writeableTitle.shamefullySendNext(title3)
+        expectNode(div like (title isEmpty, rel is "unmounted"))
+        titleCounter shouldBe 2
+      })
+    }
+    promise.future
+  }
+
   it("unsubscribes from the stream after node is removed using replaceChild") {
     var titleCounter = 0
     val $title = XStream.create[String]()
