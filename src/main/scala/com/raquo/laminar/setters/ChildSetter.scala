@@ -3,7 +3,7 @@ package com.raquo.laminar.setters
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
-import com.raquo.xstream.XStream
+import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 class ChildSetter($node: XStream[ReactiveChildNode[dom.Node]])
@@ -14,7 +14,7 @@ class ChildSetter($node: XStream[ReactiveChildNode[dom.Node]])
 
     // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
-    parentNode.subscribe($node, onNext)
+    parentNode.subscribe($node, Listener(onNext = onNext))
 
     @inline def onNext(newChildNode: ReactiveChildNode[dom.Node]): Unit = {
       parentNode.replaceChild(childNode, newChildNode)(DomApi.treeApi)

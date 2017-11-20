@@ -5,7 +5,7 @@ import com.raquo.laminar.DomApi
 import com.raquo.laminar.collection.CollectionCommand
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Child
-import com.raquo.xstream.XStream
+import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -24,7 +24,7 @@ class ChildrenCommandSetter(
 
     parentNode.subscribe(
       $diff,
-      onNext = (diff: ChildrenCommandSetter.ChildrenCommand) => {
+      Listener(onNext = (diff: ChildrenCommandSetter.ChildrenCommand) => {
         val nodeCountDiff = updateList(
           diff,
           parentNode = parentNode,
@@ -32,7 +32,7 @@ class ChildrenCommandSetter(
           nodeCount
         )
         nodeCount += nodeCountDiff
-      }
+      })
     )
   }
 }

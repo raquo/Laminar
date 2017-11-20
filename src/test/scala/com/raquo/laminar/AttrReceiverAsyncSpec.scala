@@ -76,7 +76,6 @@ class AttrReceiverAsyncSpec extends AsyncUnitSpec {
   }
 
   it("unsubscribes from the stream in a child element after parent node was unmounted") {
-    // @TODO: This is failing because we don't properly detect mounting / unmounting
     var titleCounter = 0
     val $title = XStream.create[String]()
     val $titleWithDebugger = $title.map(title => {

@@ -13,21 +13,21 @@ class AttrReceiverSpec extends UnitSpec {
     val $title = XStream.create[String]()
     val $writeableTitle = new ShamefulStream($title)
 
-    mount(div(title <-- $title, "Hello"))
-    expectNode(div like (title isEmpty, "Hello"))
+    mount(span(title <-- $title, "Hello"))
+    expectNode(span like (title isEmpty, "Hello"))
 
     $writeableTitle.shamefullySendNext(title1)
-    expectNode(div like (title is title1, "Hello"))
+    expectNode(span like (title is title1, "Hello"))
 
     $writeableTitle.shamefullySendNext(title2)
-    expectNode(div like (title is title2, "Hello"))
+    expectNode(span like (title is title2, "Hello"))
 
     unmount()
-    mount(div(className := "unrelated"))
-    expectNode(div like (className is "unrelated"))
+    mount(span(className := "unrelated"))
+    expectNode(span like (className is "unrelated"))
 
     $writeableTitle.shamefullySendNext(title3)
-    expectNode(div like (className is "unrelated"))
+    expectNode(span like (className is "unrelated"))
   }
 
   it("updates attr with memory stream") {

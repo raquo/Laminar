@@ -2,7 +2,7 @@ package com.raquo.laminar.setters
 
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.xstream.XStream
+import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 class FocusSetter($isFocused: XStream[Boolean])
@@ -13,7 +13,7 @@ class FocusSetter($isFocused: XStream[Boolean])
 
   override def apply(element: ReactiveElement[dom.html.Element]): Unit = {
 
-    element.subscribe($isFocused, onNext)
+    element.subscribe($isFocused, Listener(onNext = onNext))
 
     def onNext(isFocused: Boolean): Unit = {
       if (isFocused) {

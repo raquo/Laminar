@@ -4,10 +4,8 @@ import com.raquo.laminar.implicits._
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
-import com.raquo.xstream.XStream
+import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
-
-import scala.scalajs.js
 
 class ChildrenSetter(
   $children: XStream[Children]
@@ -25,7 +23,7 @@ class ChildrenSetter(
 
     parentNode.subscribe(
       $childrenDiff,
-      onNext = (childrenDiff: (Children, Children)) => {
+      Listener(onNext = (childrenDiff: (Children, Children)) => {
         nodeCount = updateChildren(
           prevChildren = childrenDiff._1,
           nextChildren = childrenDiff._2,
@@ -33,7 +31,7 @@ class ChildrenSetter(
           sentinelNode = sentinelNode,
           nodeCount
         )
-      }
+      })
     )
   }
 }

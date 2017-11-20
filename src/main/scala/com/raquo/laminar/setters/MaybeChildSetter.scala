@@ -4,7 +4,7 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
-import com.raquo.xstream.XStream
+import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 class MaybeChildSetter($maybeNode: XStream[MaybeChildNode])
@@ -18,7 +18,7 @@ class MaybeChildSetter($maybeNode: XStream[MaybeChildNode])
 
     // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
-    parentNode.subscribe($maybeNode, onNext)
+    parentNode.subscribe($maybeNode, Listener(onNext = onNext))
 
     @inline def onNext(maybeNewChildNode: MaybeChildNode): Unit = {
       val newChildNode = maybeNewChildNode.getOrElse(sentinelNode)

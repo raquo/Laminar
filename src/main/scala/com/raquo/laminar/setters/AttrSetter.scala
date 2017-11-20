@@ -4,7 +4,7 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Attr
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.xstream.XStream
+import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 class AttrSetter[V](
@@ -15,7 +15,7 @@ class AttrSetter[V](
   override def apply(element: ReactiveElement[dom.Element]): Unit = {
     element.subscribe[V](
       $value,
-      onNext = value => DomApi.elementApi.setAttribute(element, attr, value)
+      Listener(onNext = value => DomApi.elementApi.setAttribute(element, attr, value))
     )
   }
 }
