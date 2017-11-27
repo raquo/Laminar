@@ -23,7 +23,7 @@ trait ReactiveChildNode[+Ref <: dom.Node]
     * For efficiency, it is only initialized when someone accesses [[$parentChange]].
     * Normally this happens when subscribing to [[$parentChange]] or [[$mountEvent]].
     */
-  private var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
+  private[laminar] var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
 
   /** Stream of parent change events for this node.
     * For efficiency, it is lazy loaded, only being initialized when accessed,
@@ -112,21 +112,28 @@ trait ReactiveChildNode[+Ref <: dom.Node]
 
   /** This hook is exposed by Scala DOM Builder for this exact purpose */
   override def willSetParent(maybeNextParent: Option[BaseParentNode]): Unit = {
-    maybeParentChangeBus.foreach(_.sendNext(ParentChangeEvent(
-      alreadyChanged = false,
-      maybePrevParent = maybeParent,
-      maybeNextParent = maybeNextParent
-    )))
+    if (maybeNextParent != maybeParent) {
+      maybeParentChangeBus.foreach(_.sendNext(ParentChangeEvent(
+        alreadyChanged = false,
+        maybePrevParent = maybeParent,
+        maybeNextParent = maybeNextParent
+      )))
+    }
   }
 
   override def setParent(maybeNextParent: Option[BaseParentNode]): Unit = {
+    // @TODO[Integrity] Beware of calling setParent directly – willSetParent will not be called?
+    // @TODO[Integrity] this method (and others) should be protected
+    // @TODO[Performance] We probably shouldn't fire events that we won't need (e.g. those for willMount, didUnmount)
     val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
-    maybeParentChangeBus.foreach(_.sendNext(ParentChangeEvent(
-      alreadyChanged = true,
-      maybePrevParent = maybePrevParent,
-      maybeNextParent = maybeNextParent
-    )))
+    if (maybeNextParent != maybePrevParent) {
+      maybeParentChangeBus.foreach(_.sendNext(ParentChangeEvent(
+        alreadyChanged = true,
+        maybePrevParent = maybePrevParent,
+        maybeNextParent = maybeNextParent
+      )))
+    }
   }
 }
 
