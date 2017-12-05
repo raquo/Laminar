@@ -25,6 +25,8 @@ trait ReactiveChildNode[+Ref <: dom.Node]
     */
   private[laminar] var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
 
+  private[laminar] var maybeThisNodeMountEventBus: Option[EventBus[MountEvent]] = None
+
   /** Stream of parent change events for this node.
     * For efficiency, it is lazy loaded, only being initialized when accessed,
     * either directly or (more commonly) as a dependency of [[$mountEvent]]
@@ -35,40 +37,35 @@ trait ReactiveChildNode[+Ref <: dom.Node]
     parentChangeBus.$
   }
 
+  /** Emits mount events from all ancestors of this node, making sure to account for all hierarchy changes. */
+  lazy val $ancestorMountEvent: XStream[MountEvent] = {
+    val $maybeParent = $parentChange
+      .filter(!_.alreadyChanged) // @TODO[Integrity] is this important?
+      .map(_.maybeNextParent)
+      .startWith(maybeParent)
+
+    val $$parentMountEvent: XStream[XStream[MountEvent]] = $maybeParent.map { maybeParent =>
+      maybeParent match { // @TODO[Elegance] can we shorten this without creating a partial function? @TODO[Performance] Maybe move all this to ReactiveElement?
+        case Some(nextParent: ReactiveElement[_]) =>
+          nextParent.$mountEvent
+        case _ =>
+          $noMountEvents
+      }
+    }
+
+    $$parentMountEvent.flatten // Important: `flatten` outputs a stream that happens to not be a MemoryStream anymore. This ensures that listeners of this stream don't immediately get the last event on subscription.
+  }
+
+  /** Emits mount events caused by this node changing its parent */
+  lazy val $thisNodeMountEvent: XStream[MountEvent] = {
+    val thisNodeMountEventBus = new EventBus[MountEvent]
+    maybeThisNodeMountEventBus = Some(thisNodeMountEventBus)
+    thisNodeMountEventBus.$
+  }
+
+  /** Emits mount events for this node, including mount events fired by all of its ancestors */
   lazy val $mountEvent: XStream[MountEvent] = {
-    // $parentMountEvent emits mount events from the current node's parent,
-    // making sure to account for parent changes.
-    val $parentMountEvent: XStream[MountEvent] = $parentChange.collect {
-      case ParentChangeEvent(false, _, maybeNextParent) =>
-        maybeNextParent match {
-          case Some(nextParent: ReactiveElement[_]) => nextParent.$mountEvent
-          case _ => $noMountEvents
-        }
-    }.flatten
-
-    // isParentMounted is expensive – it accesses DOM recursively until it finds the top level parent,
-    // so we optimize by calculating this only once (in XStream all stream executions are shared)
-    // @TODO[Performance] Further optimization is possible (e.g. don't compute anything when neither event would fire) but needs benchmarking.
-    // @TODO[API] Should we move some of this into ParentChangeEvent class?
-    val $parentChangeWithMountStatus = $parentChange.map(parentChange => (
-      parentChange,
-      isParentMounted(parentChange.maybePrevParent),
-      isParentMounted(parentChange.maybeNextParent)
-    ))
-
-    val $thisNodeDidMount = $parentChangeWithMountStatus
-      .filter3((parentChange, isPrevMounted, isNextMounted) =>
-        parentChange.alreadyChanged && !isPrevMounted && isNextMounted
-      )
-      .mapTo(NodeDidMount)
-    val $thisNodeWillUnmount = $parentChangeWithMountStatus
-      .filter3((parentChange, isPrevMounted, isNextMounted) =>
-        !parentChange.alreadyChanged && isPrevMounted && !isNextMounted
-      )
-      .mapTo(NodeWillUnmount)
-    val $thisNodeWillBeDiscarded = $thisNodeWillUnmount.mapTo(NodeWillBeDiscarded)
-
-    XStream.merge($parentMountEvent, $thisNodeDidMount, $thisNodeWillUnmount, $thisNodeWillBeDiscarded)
+    XStream.merge($ancestorMountEvent, $thisNodeMountEvent) // @TODO[Integrity] Does the order of merge matter here?
   }
 
   private lazy val mountEventSubscription: DynamicSubscription[MountEvent] = new DynamicSubscription(
@@ -118,13 +115,18 @@ trait ReactiveChildNode[+Ref <: dom.Node]
         maybePrevParent = maybeParent,
         maybeNextParent = maybeNextParent
       )))
+      if (!isParentMounted(maybeNextParent) && isParentMounted(maybeParent)) {
+        maybeThisNodeMountEventBus.foreach { bus =>
+          bus.sendNext(NodeWillUnmount)
+          bus.sendNext(NodeWillBeDiscarded) // @TODO this should be optional
+        }
+      }
     }
   }
 
   override def setParent(maybeNextParent: Option[BaseParentNode]): Unit = {
     // @TODO[Integrity] Beware of calling setParent directly – willSetParent will not be called?
     // @TODO[Integrity] this method (and others) should be protected
-    // @TODO[Performance] We probably shouldn't fire events that we won't need (e.g. those for willMount, didUnmount)
     val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
     if (maybeNextParent != maybePrevParent) {
@@ -133,6 +135,9 @@ trait ReactiveChildNode[+Ref <: dom.Node]
         maybePrevParent = maybePrevParent,
         maybeNextParent = maybeNextParent
       )))
+      if (!isParentMounted(maybePrevParent) && isParentMounted(maybeNextParent)) {
+        maybeThisNodeMountEventBus.foreach(_.sendNext(NodeDidMount))
+      }
     }
   }
 }
@@ -152,12 +157,12 @@ object ReactiveChildNode {
     isDescendantOf(node = node, ancestor = dom.document)
   }
 
-  // @TODO What to do with SDB implementation?
   @tailrec final def isDescendantOf(node: dom.Node, ancestor: dom.Node): Boolean = {
+    // @TODO[Performance] Maybe use https://developer.mozilla.org/en-US/docs/Web/API/Node/contains instead (but IE only supports it for Elements)
     node.parentNode match {
       case null => false
       case `ancestor` => true
-      case _ => isDescendantOf(node.parentNode, ancestor)
+      case intermediateParent => isDescendantOf(intermediateParent, ancestor)
     }
   }
 }
