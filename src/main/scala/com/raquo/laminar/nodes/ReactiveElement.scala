@@ -60,7 +60,7 @@ class ReactiveElement[+Ref <: dom.Element](
 
   /** Emits mount events from all ancestors of this node, making sure to account for all hierarchy changes. */
   lazy val $ancestorMountEvent: XStream[MountEvent] = {
-    val $maybeParent = $parentChange
+    val $maybeParent = $parentChange // @TODO[API] expose this stream?
       .filter(!_.alreadyChanged) // @TODO[Integrity] is this important?
       .map(_.maybeNextParent)
       .startWith(maybeParent)
