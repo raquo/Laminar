@@ -37,6 +37,8 @@ trait MergeWriteBus[A] extends WriteBus[A] {
     super.onStop()
   }
 
+  // @TODO API all methods below need automatic lifecycle management, I think.
+
   // TODO[Naming] addSource has a different "add" semantic than addListener – maybe rename?
   def addSource(sourceStream: XStream[A]): Unit = {
     if (sourceStreams.add(sourceStream)) {

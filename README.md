@@ -52,6 +52,214 @@ I will eventually write up a detailed _"Laminar vs the World"_ post to compare i
 
 Import those from `laminar.bundle._`. Naming generally follows native JS DOM naming, except it's camelCased. Some keys are named differently, those are documented in [Scala DOM Types](https://github.com/raquo/scala-dom-types#naming-differences-compared-to-native-html--dom). For example, the `value` *HTML attribute* is named `defaultValue` in Laminar, because [that's how it behaves](https://stackoverflow.com/a/6004028/2601788) and that's what the corresponding *DOM property* is called.
 
+### Event System: Emitters, Transformations, Buses 
+
+#### Registering an DOM Event Listener
+
+To start listening to DOM events, you need to register a listener for a specific event type (`EventProp`) on a specific DOM Element (`ReactiveElement`). `EventPropEmitter` is a `Modifier` that performs this action. 
+
+This is how it's done in the simplest case:
+
+```scala
+val clickBus = new EventBus[dom.MouseEvent]
+val $click: XStream[dom.MouseEvent] = clickBus.$ // resulting event stream that you can access any time  
+val element: ReactiveElement[dom.html.Div] = div(onClick --> clickBus, "Click me")
+```
+
+What this does line-by-line:
+
+1. Create an `EventBus` – an object that accepts any kind of event, and forwards it to the stream that it exposes (see next line). EventBus simply encapsulates a an XStream `Producer` that fires events when its sendNext method is called. However, we hide both the producer and the sendNext method from you, the end user, to prevent mistakes if you decided to manually manage those. 
+
+2. `$click` is simply the stream of events received (and therefore produced) by the `clickBus`. You can use it immediately after the event bus is created, no need to wait until the eventBus is attached to the element (see next line). You don't actually need this line for event registration to work. But you will want to read the events you capture at some point, and I'm just showing how that stream is exposed.
+
+3. Last line creates a div element with a text node, and registers an event listener on it that listens to click events and forwards them to the clickBus. 
+ 
+ `onClick --> clickBus` returns an `EventPropEmitter` which is a `Modifier`. Modifiers are applied to elements immediately after the element is created, and in the order in which they were defined on the element. An `EventPropEmitter` carries no element-specific state in its instance, so it can be reused on multiple elements if needed.
+ 
+ Two conditions need to be met for `$click` to start firing events: 1) It needs to have at least one listener (standard for XStream streams), and 2) the `EventPropEmitter` that is built out of `clickBus` needs to be applied to some element.
+ 
+ The implicit third condition is that the JS DOM actually produces click events on the div in question, so (without going into DOM event simulation) the div needs to be mounted and the user needs to click on it.
+ 
+ Currently the event instances that you get in the output stream are native JS events. There are no magic synthetic events, no event pooling, nothing like that. There is one exception for certain `onClick` events on checkboxes, see "Special Cases" at the bottom of this document.
+
+#### Alternative Event Listener Registration Syntax
+
+Imagine you're building `TextInput`, a component that wraps an `input` element into a `div` with some styles added on top:
+
+```scala
+class TextInput private (
+  val wrapperNode: ReactiveElement[dom.html.Div],
+  val inputNode: ReactiveElement[dom.html.Input]
+)
+ 
+object TextInput {
+  def apply(caption: String): TextInput = {
+    val inputNode = input(typ := "text", color := "grey")
+    val wrapperNode = div(caption, inputNode)
+    new TextInput(wrapperNode, inputNode)
+  }
+}
+```
+
+This generic component does not necessarily know what events on `inputNode` the developer will care about when using it – `onKeyUp`, `onKeyPress`, `onChange`, `onInput`, others? There's just too many possibilities. And of course you wouldn't want to clutter your `TextInput`'s API by e.g. exposing all possibly useful event streams as vals on the `TextInput` class.
+
+That's what `ReactiveElement.$event` method was made for:
+
+```scala
+val textInput = TextInput("Full name:")
+val $changeEvent: XStream[dom.Event] = textInput.inputNode.$event(onChange)
+```
+
+Under the hood, `element.$event(eventProp)` creates an `eventBus`, applies an `eventProp --> eventBus` modifier to `element`, and returns `eventBus.$`. That's all there is to it, no magic – just alternative syntax that makes it easier to compose your components without tight coupling.
+
+#### Multiple Event Listeners
+ 
+Just like in native JS DOM, nothing is stopping you from registering two or more event listeners for the same event type on the same element:
+ 
+ ```scala
+div(onClick --> clickBus1, onClick --> clickBus2, "Click me")
+``` 
+
+In this case, two event listeners will be registered on the DOM node, one of them sending events to clickBus1, the other sending the exact same events to clickBus2. Of course, this works the same regardless of what syntax you use to register event listeners (see "Alternative Syntax" section above).
+
+In most cases you could simply add another listener to `clickBus.$` to achieve whatever you needed multiple event listeners bound to the same element for – it's easier and more performant in extreme cases (thousands of nodes, I'd guess).
+
+However, sometimes simpler composition is more important. For example, consider the `TextInput` component mentioned above. If the component itself had an internal need to listen to its own `onChange` events (e.g. for some built-in validation), that would be a case when adding a second `onChange` event listener to `inputNode` would make sense (the first one was added externally by end user of the component, as shown in the `TextInput` code snippet in the section above).
+
+#### Event Transformations
+
+Often times you don't really need a stream of e.g. click events – you know well in advance what each click event means, or which of the events you care about, etc. With the Alternative Syntax described above you would just use XStream operators to transform the stream of events, like this:
+
+```scala
+val incrementButton = button("+1")
+val decrementButton = button("-1")
+ 
+val $diff: XStream[Int] = XStream.merge(
+  incrementButton.$event(onClick).mapTo(1), 
+  decrementButton.$event(onClick).mapTo(-1) 
+) // this stream emits +1 or -1
+```
+
+However, when using the standard `onClick --> eventBus` syntax, there is no stream that you could operate on before the events hit `eventBus`. Instead, we provide a different way to transform events:
+
+First, you need to create an instance of `EventPropTransformation` by calling `apply` on your `EventProp` (via an implicit conversion to `EventPropOps`), e.g. `onClick()`. Then you can call a bunch of transformation methods on the resulting object like `mapTo` or `filter` which would return new instances of `EventPropTransformation`. Lastly, you call the `-->` method as before. So the example above would translate into:
+
+```scala
+val diffBus = new EventBus[Int]
+val incrementButton = button("+1", onClick().mapTo(1) --> diffBus)
+val decrementButton = button("-1", onClick().mapTo(-1) --> diffBus)
+val $diff: XStream[Int] = diffBus.$ // this stream emits +1 or -1
+```
+
+More syntax examples:
+
+```scala
+div("Click me", onClick().map(getClickCoordinates) --> clickCoordinatesBus)
+ 
+div(onScroll().filter(throttle) --> filteredScrollEventBus)
+ 
+div(onClick(useCapture = true) --> captureModeClickBus)
+ 
+input(onKeyUp().filter(_.keyCode == KeyCode.Enter).preventDefault --> enterPressBus)
+ 
+div(onClick().collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
+ 
+// TODO[Docs] Come up with more relatable examples
+```
+
+`EventPropTransformation` instances are immutable and contain no element-specific state, so you can reuse them freely across multiple elements.
+
+##### preventDefault & stopPropagation
+
+These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation)
+
+Importantly, these are just ordinarily transformations, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == KeyCode.Enter)`. Internally all transformations have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` transformation even after you've used `.map(_.keyCode)` for example.
+
+##### useCapture
+
+JS DOM has two event modes: capture, and bubbling. Typically and by default we use the latter, but capture mode is sometimes useful for event listener priority/ordering (not specific to Laminar, standard JS DOM rules/limitations apply).
+
+You need to specify whether to use capture mode the moment you register an event listener on the element, so it's passed as a parameter to `onClick(useCapture = true)` instead of being a method on `EventPropTransformation`.
+
+See MDN [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) page for details ("useCapture" section).
+
+##### Obtaining Typed Event Target
+
+Due to dynamic nature of Javascript, `dom.Event.target` is typed only as `dom.EventTarget` for most events, which is not useful when you want to get `ev.target.value` from a target that is a `dom.html.Input` (but doesn't know it). So, you can't do this:
+
+```scala
+// Does not work because .value is defined on dom.html.Input, but not on dom.EventTarget :(
+input(typ := "text", onChange().map(_.target.value) --> inputStringBus)
+```
+
+Easiest hackiest solution would be to use `.map(_.target.asInstanceOf[dom.html.Input].value)` but you should reconsider using Scala if you aren't cringing looking at this.
+
+You could use our Alternative Syntax for registering events (see section above) for a somewhat safer solution:
+
+```scala
+val inputNode = input(typ := "text")
+val $inputString = inputNode.$event(onChange).map(_ => inputNode.ref.value)
+```
+
+However, this is often cumbersome, and introduces the risk of referencing the wrong input node of the same type. We have a better way to get a properly typed target node, using a transformation:
+
+```scala
+input(onChange().mapToThisNode.map(_.ref.value) --> inputStringBus)
+```
+
+Or if you for example need to both filter events by .value and then grab the event.
+
+```scala
+input(onChange().mapToThisNode.filter(_.ref.value == "").mapToEvent --> filteredEventBus)
+```
+
+Lastly, if you need access to both the current node and the event, you can use the `.zipWithThisNode` method that gives you `(event, thisNode)` tuples.
+
+Under the hood this works similar to `preventDefault` and `stopPropagation` (see above), relying on the transformation having access to both the original event and the processed value. And since all this eventually ends up as part of an `EventPropEmitter`, it also has access to the element to which we apply this `Modifier`.  
+
+Note: "thisNode" in the method names refers to the element on which the event listener is **registered**. In JS DOM terms, this is `dom.Event.currentTarget`, not `dom.Event.target` – the latter refers to the node at which the event **originates**. When dealing with inputs these two targets are usually the same since inputs don't have any child elements, but you need to be aware of this conceptual difference for other events. MDN docs: [target](https://developer.mozilla.org/en-US/docs/Web/API/Event/target), [currentTarget](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget).
+
+You might have noticed that some `EventProp`s like `onClick` promise somewhat peculiar event types like `TypedTargetMouseEvent` instead of the expected `MouseEvent` – these refined types come from _Scala DOM Types_, and merely provide more specific types for `.target` (as much as is reasonably possible). These types are optional – if you don't care about `.target`, you can just treat such events as simple `MouseEvent`s because `TypedTargetMouseEvent` do in fact extend `MouseEvent`.
+
+#### Reusing an Event Bus
+ 
+What if you want to render a few elements, and combine all of their `onClick` events into a single event bus? Just add a `onClick --> clickBus` modifier to all of them in whatever way is most convenient.
+ 
+ The event bus itself is not tied to any element by any means, the `-->` method simply provides a way for an element to pass events to an event bus. If multiple elements are doing that, well, then your event bus is receiving events from all those elements.
+
+#### MergeBus
+
+`EventBus` is great when your event source comes directly from _Laminar_'s own `EvenPropEmitter`, as shown above. But this Subject/Proxy-like concept has one more useful application, for which we have a special subclass: `MergeBus`. 
+
+`XStream.merge(stream2, stream2, ...)` can merge a fixed set of streams into one stream that re-emits all of the events that are fired on each of the input streams. This is useful for simple cases when you know which streams you need to merge in advance, like in the code snippet with increment/decrement buttons in the "Event Transformations" section above.
+
+`MergeBus` acts very much like `XStream.merge`, except it lets you add and remove source streams dynamically. This is invaluable to avoid complicated and often inefficient data structures like streams-of-lists-of-streams when dealing with changing lists of things.
+
+For example, if you're rendering a list of child components each of which exposes a stream of events, and you want to get a stream that merges all those streams into one stream, you would create a `MergeBus` in the parent component, and whenever you create an instance of a child component you call `childNode.subscribeBus(childStream, mergeBus)`. What this does is calls `mergeBus.addSource(childStream)` under the hood, making sure to call `mergeBus.removeSource(childStream)` when `childNode` is discarded.
+
+That way as you create and destroy child components, your `mergeBus` continues to receive events from only the currently relevant (in this case, mounted) child components, discarding unused streams with no memory leaks.
+
+Note that `MergeBus` behaves more like a complex operator than an XStream `Listener` in terms of laziness and memory management. Under the hood it adds a listener to every source stream if/when its output stream (.$) acquires its first listener, and removes the listener from every source stream when its output stream loses its last listener. So if the output stream has no listeners, the input streams will not get a listener either.
+
+When passing down a `MergeBus` to child components, you're exposing its output stream to the children, which is usually undesired because you don't want to give child components access to read all the events sent into `MergeBus` by other child components, you only want to give them write access into that bus. It is recommended to upcast your `MergeBus` to `WriteMergeBus` (e.g. using `MergeBus.asWriteBus`). `WriteMergeBus` does not expose an output stream.
+
+TODO[Docs]: Too many words. Provide or link to concrete examples that I developed.
+
+##### MergeBus Transformations
+
+To reduce boilerplate and simplify composition, we provide a few methods that let you create new `MergeBus`-es from an existing `MergeBus`. For example:
+
+```scala
+val requestBus = new MergeBus[AJAXRequest]
+val modelDiffToRequest: ModelDiff => AJAXRequest
+val modelDiffBus: MergeBus[ModelDiff] = requestBus.map(modelDiffToRequest)
+```
+
+Now, all events that are outputted by `modelDiffBus.$` will be forwarded into `requestBus` after being processed by `modelDiffToRequest`, so you can pass `modelDiffBus` down to a child component that knows how to output model diffs into a bus, but doesn't / shouldn't know how to convert them into AJAX requests.
+
+There's also a `compose` method for more complicated transformations. We might add `filter` and `collect` in the future.
+
+
 ### Stream Memory Management
 
 Streams are not garbage collected as long as they have listeners. So, if you call `myStream.addListener` or `myStream.subscribe`, you need to also call `myStream.removeListener` or `myStream.unsubscribe` respectively when you are done using `myStream` and would like it to be garbage collected (normal JS GC rules apply as well, of course).
@@ -69,7 +277,7 @@ _Laminar_ nodes that are elements expose streams of lifecycle events that can be
 
 All lifecycle events are fired synchronously, with no async delay.
 
-#### Parent change events
+#### Parent Change Events
 
 ##### `$parentChange: XStream[ParentChangeEvent]`
 

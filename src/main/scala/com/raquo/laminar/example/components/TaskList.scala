@@ -13,7 +13,7 @@ import org.scalajs.dom
 
 class TaskList {
 
-  private var taskDiffBus = new EventBus[ChildrenCommand]
+  private val taskDiffBus = new EventBus[ChildrenCommand]
 
   private val $showAddTaskInputBus = new ReactiveVar(false)
 

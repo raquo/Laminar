@@ -33,7 +33,7 @@ class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Elem
     * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
     * So for example, you can [[filter]] events before applying this, preventing default action only for certain events.
     *
-    * Example: `input(onKeyUp().filter(ev => ev.keyCode == KeyCodes.Tab).preventDefault --> tabKeyUpBus)`
+    * Example: `input(onKeyUp().filter(ev => ev.keyCode == KeyCode.Tab).preventDefault --> tabKeyUpBus)`
     */
   def preventDefault: EventPropTransformation[Ev, V, El] = {
     copy(newProcessor = (ev, thisNode) => {
@@ -68,6 +68,12 @@ class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Elem
     copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(project))
   }
 
+  /** Note: similar to XStream, `value` is passed as call-by-value, not call-by-name,
+    * i.e. it's evaluated only once before being passed to this method, it is not
+    * re-evaluated on every event.
+    *
+    * TODO[API]: this is consistent with XStream, but do other Scala libs behave the same?
+    */
   def mapTo[V2](value: V2): EventPropTransformation[Ev, V2, El] = {
     copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(_ => value))
   }
