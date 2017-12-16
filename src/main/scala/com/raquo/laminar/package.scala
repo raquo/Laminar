@@ -9,7 +9,7 @@ import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
-import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowEventProps}
+import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowOnlyEventProps}
 import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, TableTags, TextTags}
 import com.raquo.laminar.builders.{ReactiveTag, ReactiveTagBuilder}
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode, ReactiveRoot}
@@ -35,7 +35,7 @@ package object laminar {
     with MediaEventProps[EventProp]
     with MiscellaneousEventProps[EventProp]
     with MouseEventProps[EventProp]
-    with WindowEventProps[EventProp]
+    with WindowOnlyEventProps[EventProp]
     // Props
     with Props[Prop]
     // Reflected Attrs

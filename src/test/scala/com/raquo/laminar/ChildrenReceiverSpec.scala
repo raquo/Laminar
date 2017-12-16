@@ -2,8 +2,8 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.bundle._
-import com.raquo.laminar.emitter.EventBus
 import com.raquo.laminar.nodes.ReactiveChildNode
+import com.raquo.laminar.streams.EventBus
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 

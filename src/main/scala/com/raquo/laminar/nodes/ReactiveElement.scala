@@ -3,12 +3,12 @@ package com.raquo.laminar.nodes
 import com.raquo.dombuilder.generic
 import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
-import com.raquo.laminar.emitter.EventBus.WriteBus
-import com.raquo.laminar.emitter.{EventBus, EventPropEmitter}
+import com.raquo.laminar.emitter.EventPropEmitter
 import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWillBeDiscarded, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ReactiveElement.$noMountEvents
 import com.raquo.laminar.nodes.ReactiveChildNode.isParentMounted
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, LockedAttrReceiver, LockedPropReceiver, MaybeChildReceiver, TextChildReceiver}
+import com.raquo.laminar.streams.{EventBus, MergeWriteBus}
 import com.raquo.laminar.{DomApi, DynamicSubscription}
 import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
@@ -37,7 +37,7 @@ class ReactiveElement[+Ref <: dom.Element](
   /** This built-in subscription monitors the element's mount events, and activates / deactivates other subscriptions accordingly */
   private lazy val mountEventSubscription: DynamicSubscription[MountEvent] = new DynamicSubscription(
     $mountEvent,
-    Listener(onNext = {
+    Listener[MountEvent](onNext = {
       case NodeDidMount => subscriptions.foreach(_.activate())
       case NodeWillUnmount => subscriptions.foreach(_.deactivate())
       case NodeWillBeDiscarded => mountEventSubscription.deactivate()
@@ -93,17 +93,15 @@ class ReactiveElement[+Ref <: dom.Element](
   def $event[Ev <: dom.Event](
     eventProp: EventProp[Ev],
     useCapture: Boolean = false,
-    stopPropagation: Boolean = false,
-    preventDefault: Boolean = false
+    stopPropagation: Boolean = false, // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
+    preventDefault: Boolean = false // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
   ): XStream[Ev] = {
-    // @TODO[Integrity] is EventBus the correct thing to use here? Maybe a manual producer, or would it just be the same?
     val eventBus = new EventBus[Ev]
-    val setter = EventPropEmitter.eventPropSetter(
+    val setter = new EventPropEmitter[Ev, Ev, Ev, this.type](
+      eventBus,
       eventProp,
-      sendNext = eventBus.sendNext,
-      useCapture = useCapture,
-      preventDefault = preventDefault,
-      stopPropagation = stopPropagation
+      useCapture,
+      processor = (ev: Ev, _: this.type) => Some(ev)
     )
     setter(this)
     eventBus.$
@@ -128,24 +126,32 @@ class ReactiveElement[+Ref <: dom.Element](
 
   //  def -->[Ev <: dom.Event](eventProp: EventProp[Ev])
 
-  def subscribe[V](
-    $value: XStream[V],
-    listener: Listener[V]
-  ): Unit = {
-    val subscription = new DynamicSubscription($value, listener)
-    subscriptions.push(subscription)
+  // @TODO These methods should be replaced bysubscription lifecycle context functionality
+
+  def subscribeDynamic[V](dynamicSubscription: DynamicSubscription[V]): Unit = {
+    subscriptions.push(dynamicSubscription)
     mountEventSubscription.activate()
     if (isMounted) {
-      subscription.activate()
+      dynamicSubscription.activate()
       // Otherwise, subscription will activate if/when node is mounted
     }
   }
 
-  @inline def subscribeBus[V](
-    $source: XStream[V],
-    targetBus: WriteBus[V]
+  def subscribe[V](
+    $value: XStream[V],
+    listener: Listener[V]
   ): Unit = {
-    subscribe($value = $source, listener = Listener(onNext = targetBus.sendNext))
+    subscribeDynamic(new DynamicSubscription($value, listener))
+  }
+
+  def subscribeBus[V](
+    sourceStream: XStream[V],
+    targetBus: MergeWriteBus[V]
+  ): Unit = {
+    subscribeDynamic(new DynamicSubscription(
+      subscribe = () => targetBus.addSource(sourceStream),
+      unsubscribe = () => targetBus.removeSource(sourceStream)
+    ))
   }
 
   /** Check whether the node is currently mounted.

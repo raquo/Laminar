@@ -1,4 +1,4 @@
-package com.raquo.laminar.emitter
+package com.raquo.laminar.streams
 
 import com.raquo.xstream.MemoryStream
 

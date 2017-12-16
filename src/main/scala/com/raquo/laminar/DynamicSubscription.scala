@@ -1,8 +1,11 @@
 package com.raquo.laminar
 
-import com.raquo.xstream.{Listener, Subscription, XStream}
+import com.raquo.xstream.{Listener, XStream}
 
-/** This class represents a subscription that can be turned on and off.
+/** TODO With the new API this is kind of more of a lifecycle context than a subscription. Adjust name accordingly?
+  * TODO[API] We should reconsider this API when we deal with subscription lifecycle management. These () => Unit are ugly AF
+  *
+  * This class represents a subscription that can be turned on and off.
   * Note: creating such a dynamic subscription does not automatically activate it.
   *
   * This class is used by Laminar internally to suspend subscriptions when nodes
@@ -10,25 +13,32 @@ import com.raquo.xstream.{Listener, Subscription, XStream}
   * nodes, and we want to revive the subscriptions at that point.
   */
 class DynamicSubscription[V](
-  val stream: XStream[V],
-  val listener: Listener[V]
+  val subscribe: () => Unit,
+  val unsubscribe: () => Unit
 ) {
 
-  private var maybeSubscription: Option[Subscription[V]] = None
+  def this (
+    stream: XStream[V],
+    listener: Listener[V]
+  ) {
+    this(
+      subscribe = () => stream.addListener(listener),
+      unsubscribe = () => stream.removeListener(listener)
+    )
+  }
 
-  def isActive: Boolean = maybeSubscription.isDefined
+  private[laminar] var isActive = false
 
   def activate(): Unit = {
     if (!isActive) {
-      maybeSubscription = Some(stream.subscribe(listener))
+      isActive = true
+      subscribe()
     }
-    // @TODO else, log warning?
-    // @TODO Note: we do rely on this !isActive check in ReactiveNode.subscribe
   }
 
   def deactivate(): Unit = {
-    maybeSubscription.foreach(_.unsubscribe())
-    maybeSubscription = None
+    isActive = false
+    unsubscribe()
     // @TODO If already not active, throw warning?
   }
 }

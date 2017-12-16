@@ -1,8 +1,8 @@
 package com.raquo.laminar.example.components
 
 import com.raquo.laminar.bundle._
-import com.raquo.laminar.emitter.EventBus
 import com.raquo.laminar.nodes.ReactiveNode
+import com.raquo.laminar.streams.EventBus
 import com.raquo.xstream.{MemoryStream, XStream}
 import org.scalajs.dom
 

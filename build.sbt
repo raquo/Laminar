@@ -3,12 +3,12 @@ enablePlugins(ScalaJSPlugin)
 enablePlugins(ScalaJSBundlerPlugin)
 
 libraryDependencies ++= Seq(
-  "org.scala-js" %%% "scalajs-dom" % "0.9.3",
+  "org.scala-js" %%% "scalajs-dom" % "0.9.4",
 //  "org.scala-js" %% "scalajs-env-selenium" % "0.1.3",
   "com.raquo.xstream" %%% "xstream" % "0.2.2-SNAPSHOT",
-  "com.raquo" %%% "dombuilder" % "0.3.1-SNAPSHOT",
-  "org.scalatest" %%% "scalatest" % "3.0.3" % Test,
-  "com.raquo" %%% "domtestutils" % "0.3.1-SNAPSHOT" % Test
+  "com.raquo" %%% "dombuilder" % "0.4.1-SNAPSHOT",
+  "org.scalatest" %%% "scalatest" % "3.0.4" % Test,
+  "com.raquo" %%% "domtestutils" % "0.4" % Test
 )
 
 //jsEnv := new org.scalajs.jsenv.selenium.SeleniumJSEnv(org.scalajs.jsenv.selenium.Firefox()).withKeepAlive()
