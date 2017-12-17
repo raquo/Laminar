@@ -46,11 +46,102 @@ There are more _Laminar_ examples in the [`example`](https://github.com/raquo/la
 
 I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why _Laminar_ exists.
 
+
+
 ## Documentation
 
-### Elements, Attributes, Props, etc.
 
-Import those from `laminar.bundle._`. Naming generally follows native JS DOM naming, except it's camelCased. Some keys are named differently, those are documented in [Scala DOM Types](https://github.com/raquo/scala-dom-types#naming-differences-compared-to-native-html--dom). For example, the `value` *HTML attribute* is named `defaultValue` in Laminar, because [that's how it behaves](https://stackoverflow.com/a/6004028/2601788) and that's what the corresponding *DOM property* is called.
+### Tags & Elements
+
+Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listings of typed tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`. All of these are available by importing `com.raquo.laminar.bundle._` (Note: this also imports the necessary implicits. If you don't want to import `bundle._`, make sure to import `laminar.implicits._` instead).  
+
+`div` is a `ReactiveTag[dom.html.Div]`, it's a factory of div elements. `ReactiveTag` extends `Tag` from _Scala DOM Types_ and contains basic information needed to create such an element, such as its tag name ("div"). 
+
+`div()` is a `ReactiveElement[dom.html.Div]` built using `TagSyntax.apply` (applied implicitly) which ultimately calls `ReactiveTag.build`. `TagSyntax` comes from [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), a low level DOM manipulation library that lets you build trees of Scala objects (elements) that represent the actual tree of JS DOM elements.
+
+In short, that element you created by calling `div()` is not what we call a native/real JS DOM Element, it's not an instance of `dom.Element`. It's our own `ReactiveElement` object that is _linked_ to the real JS DOM element (`dom.Element`) that it represents via its `.ref` property.
+
+This is also not a virtual DOM. When you create a `ReactiveElement`, Laminar immediately creates the underlying `dom.Element`. That reference is immutable, so these two instances will go together for the duration of their lifetimes. In contrast, in a virtual DOM library (which Laminar is not) you typically create new instances of virtual elements when they change, and these get loosely matched to a `dom.Element` which could actually be a different element over time depending on how the updates that you're requesting and the implementation of virtual DOM's diffing algorithm.  
+
+Read on for how to use this element we've created.
+
+
+### Modifiers
+
+The `div()` call described above creates an empty div element – no children, no attributes, nothing. Here's how to specify desired attributes:
+
+```scala
+input(typ := "checkbox", defaultChecked := true)
+```
+
+This creates an `input` element and sets two attributes on it. It's mostly obvious what it does, but how?
+
+As we've established before, `input()` call is actually `TagSyntax[El].apply(modifiers: Modifier[El]*)`. So, we can pass Modifiers to it. A `Modifier[El]` is a simple trait that extends `El => Unit`. Conceptually, it's a function that you can apply to an element `El` to modify it in some way. In our case, `typ := "checkbox"` is a `Modifier` that sets the "type" attribute on the element given to it to "checkbox".
+
+The `:=` method is coming from `KeySyntax`, another _Scala DOM Builder_ class that's used via an implicit conversion. It creates a setter – a `Modifier` that sets a specific key to a specific value. You can set DOM props and CSS style props the same way (e.g. `backgroundColor := "red"`)
+
+`typ` is coming from _Scala DOM Types_ and represents the "type" attribute. You should consult _Scala DOM Types_ documentation for a list of naming differences relative to the native JS DOM API. It will also explain why the "checked" attribute is called `defaultChecked`, and why it accepts a boolean even though all HTML attributes only ever deal in strings in JS DOM (hint: Codecs).
+
+### Nesting and Children
+
+```scala
+val inputCaption = span("First & last name:") 
+ 
+div(
+  h1("Hello world", color := "red"),
+  inputCaption,
+  input(typ := "text", name := "fullName"),
+  div(
+    ">>",
+    button("Submit"),
+    "<<"
+  )
+)
+```
+
+This above is how you nest multiple elements. Any element is actually a Modifier that **appends** itself as a child to the element to which the modifier is applied. Modifiers are applied in the order in which they're passed to the element, so what you see in your code is what you get in the resulting DOM.  
+
+Strings are implicitly converted to `ReactiveText` nodes which are also modifiers that append text nodes with a given text to the element in question. 
+
+Notice that the code snippet above does not require you to HTML-escape `"&"` or `"<"`. You're just writing Scala code, you're not writing HTML (or anything that will be parsed as HTML), so don't worry about it.
+
+#### Reusing Elements
+
+You can't put the same element twice into the real JS DOM – instead, it will be removed from its old location and **moved** into its new location. That's just how the browser DOM works.
+
+If you need a bunch of identical elements in the DOM, create a function that creates and returns such elements.
+
+#### Modifiers FAQ
+
+1. Yes, you can create custom Modifiers. You could for example define your own attributes or CSS props (consult _Scala DOM Types_) so that the `:=` method picks them up to create Modifiers. Or for completely custom logic you could create a class extending the `Modifier` trait. That way you could for example make a modifier that applies multiple other modifiers that you often use together.
+
+2. Yes, you can add Modifiers to an element that already exists: `myModifier.apply(myElement)`. Of course, be careful for what you wish for. Your code should have some kind of concept on who owns and is responsible for which elements. If you think you need this feature, please do read about components and reactive data first.
+
+3. No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results from applying it only once. Setters like `key := value` typically _are_ idempotent. There  should be no surprises as long as you understand what the modifier does at a high level.
+
+4. Yes, Modifiers are reusable. The same modifier can be applied to multiple nodes (with some exceptions, e.g. not if the Modifier is an element – see "Reusing Elements" section above). If you're writing your own Modifier, don't store application-specific state outside of its `apply` method to make it reusable.
+
+### Rendering
+
+When you create an element, it is initially detached from the DOM. That is, it has no parent element, and does not appear in the document that the user sees. Such an element is _unmounted_.
+
+For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask _Laminar_ to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by _Laminar_. 
+
+```scala
+val appContainer: dom.Element = dom.document.querySelector("#appContainer")
+val appElement: ReactiveElement[dom.html.Div] = div(
+  h1("Hello"),
+  "Current time is:",
+  b("12:00") 
+)
+ 
+val root: ReactiveRoot = laminar.render(appContainer, appElement)
+```
+
+That's it. _Laminar_ will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
+
+To remove your whole app from the DOM, simply call `root.unmount()`. 
+
 
 ### Event System: Emitters, Transformations, Buses 
 
