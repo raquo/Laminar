@@ -143,6 +143,96 @@ That's it. _Laminar_ will find an element with id "appContainer" in the document
 To remove your whole app from the DOM, simply call `root.unmount()`. 
 
 
+### Reactive Data
+
+In the code snippet above we're mounting a completely static element – it will not change over time. This section is about creating elements that will one way or another change over time.
+
+In a virtual DOM library like React or Snabbdom, changing an element over time is achieved by creating a new virtual element that contains the information on what the element should look like, then running a diffing algorithm on this new virtual element and the previous virtual element representing the same real JS DOM element. Said diffing algorithm will come up with a list of operations that need to be performed on the underlying JS DOM element in order to bring it to the state prescribed by the new virtual element you've created.  
+
+_Laminar_ does not work like that. We use reactive streams to represent elements changing over time. Let's see how this is much simpler than any virtual DOM.
+
+_Laminar_ uses [XStream.js](https://github.com/staltz/xstream) streams via [XStream.scala](https://github.com/raquo/XStream.scala) typed interface. It is designed specifically for Cycle.js, a use case much like _Laminar_', and is much simpler than typical Scala streaming libraries (no execution context / multi-threading – thanks, Javascript). To use Laminar, you will need an understanding of how typical lazy streams work, and some basic knowledge of XStream.  
+
+Note: As a convention both in the docs and in _Laminar_ API, we use dollar-prefixed names for streams. So `$count: XStream[Int]` would be a stream of counts. A `$url: XStream[String]` would be a stream of URLs. Notice that `url` is singular. if the stream emitted lists of urls instead, then you could call it `$urls: XStream[List[String]]` (or `$urlList`). So:
+
+```scala
+val $prettyColor: XStream[String] = ???
+val myDiv: ReactiveElement[dom.html.Div] = div(color <-- $prettyColor, "Hello")
+```
+
+The above snippet creates a div element with the word "Hello" in it, and a dynamic `color` CSS property. Any time the `$prettyColor` stream emits an event, this element's `color` property will be updated to the emitted value. 
+
+The method `<--` comes from `AttrReceiver` (which wraps an `Attr` with an implicit conversion) and creates an `AttrSetter`, which is a `Modifier` that subscribes to the given stream, and sets the given attribute on a given element when the stream emits a new value. This subscription will be automatically removed when the div element is discarded. More on that in the sections "Stream Memory Management" and "Node Lifecycle Events" way below. Don't worry about that for now.
+
+What happens if `$prettyColor` didn't emit an event yet? Nothing. We don't set a default value. You could achieve that in two ways: Use an XStream.js MemoryStream (consult XStream docs)
+
+One very important takeaway from the code snippet above is that `myDiv` did not become a stream of elements just because it depends on a stream now. Think about it: you are not creating new elements when `$prettyColor` emits an event, you are merely setting an attribute to a new value on an existing element. This is very efficient and is in stark contrast to the amount of work a virtual DOM needs to do in order to perform (or, more accurately, determine the need for) a simple change like this.
+
+So in Laminar, **ReactiveElement-s manage themselves**. A `ReactiveElement` encapsulates all the reactive updates that are happening inside. This means that you can add an element as a child without knowing how it's implemented or whether it's even static or dynamic. So a simple component could look like this:
+
+```scala
+// Define your "Component"
+def colorfulSpan($color: XStream[String], caption: String): ReactiveElement[dom.html.Element] = {
+  span(color <-- $color, caption)
+}
+ 
+// Now use it
+val $prettyColor: XStream[String] = ???
+val myDiv: ReactiveElement[dom.html.Div] = div(
+  "Hello ",
+  colorfulSpan($prettyColor, "World")
+)
+```
+
+This lets you to build loosely coupled applications very easily.
+
+Having a stable reference to `myDiv` also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and avoiding needless complexity is one of _Laminar_'s most important goals.
+
+
+### Available Receivers
+
+TODO[Docs]: This section needs to be expanded. For now, just some examples:
+
+```scala
+input(focus <-- $isFocused) // either focuses or blurs the given element 
+div(child <-- $childElement) // note: Every new element from the stream replaces the previous child emitted by this stream. All in all, works like you'd expect 
+div(maybeChild <-- $elementOption)
+div(children <-- $childList) // Efficient diff-ing is performed to add / move / remove children to match the new list
+div(children.command <-- $command) // command could be e.g. Append(element)
+```
+
+All these, especially the latter ones deserve much more explanation, which I will add eventually. For now please find the receivers in the source code, they do have some comments.
+
+All of these receivers can co-exist on the same element, so something like this will work as expected:
+
+```scala
+div(
+  color <-- $color,
+  child <-- $firstChild,
+  "Here's a list of items for you:",
+  children <-- $items,
+  "End of list! One more thing:",
+  child <-- $goodbyeMessage
+)
+```
+
+This will be very stable – it doesn't matter in what order the events on those streams will come, the children will always appear in the expected order. Under the hood this is achieved by creating invisible sentinel comment nodes for each child/children receiver to "reserve the spot" for future children coming in. This allows for great flexibility in writing your components with very little overhead.
+
+
+#### Alternative Syntax for Receivers
+
+TODO[Docs]: This section needs to be written.
+
+For now, please see the various `<--` methods defined on `ReactiveElement`. This feature lets you write code like this:
+
+```scala
+myElement <-- color <-- $prettyColor
+myElement <-- child <-- $child
+myInput <-- focus <-- $isFocused
+// (and so on)
+```
+
+
 ### Event System: Emitters, Transformations, Buses 
 
 #### Registering an DOM Event Listener
