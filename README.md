@@ -1,12 +1,12 @@
 # Laminar
 
-_Laminar_ is a small Scala.js library that lets you to build UI components using reactive streams.
+Laminar is a small Scala.js library that lets you to build UI components using reactive streams.
 
-    "com.raquo" %%% "laminar" % "0.1" // TODO: this is way outdated. Next version is not published yet.
+    "com.raquo" %%% "laminar" % "0.2"
 
 ## Design Goals
 
-* Easy to map desired components and their interactions to uncomplicated _Laminar_ code 
+* Easy to map desired components and their interactions to uncomplicated Laminar code 
 * Easy to understand Laminar source code – small, no macros, limited usage of implicits
 * Extremely flexible composition and abstraction methods (no prescription for what a "Component" is)
 * Automatic stream subscription lifecycle management
@@ -47,7 +47,7 @@ _Laminar_ is a small Scala.js library that lets you to build UI components using
 
 ## Introduction
 
-_Laminar_'s basic building block are elements:
+Laminar's basic building block are elements:
 
 ```scala
 val streamOfNames: XStream[String] = ???
@@ -56,9 +56,9 @@ val helloDiv: ReactiveElement[dom.html.Div] = div("Hello, ", child <-- streamOfN
 
 `helloDiv` is a div element that contains the text "Hello, `<Name>`", where `<Name>` is the latest value emitted by `streamOfNames`. As you see, `helloDiv` is **self-contained**. It depends on a stream, but is not a stream itself. It manages itself, abstracting away the complexity of its innards from the rest of your program.
 
-_Laminar_ does not use virtual DOM, and a _Laminar_ element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element. That means that if you want something about that element to be dynamic, you should define it inside the element like we did with `child <-- streamOfNames` above. This allows for precision DOM updates instead of inefficient virtual DOM diffing.
+Laminar does not use virtual DOM, and a Laminar element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element. That means that if you want something about that element to be dynamic, you should define it inside the element like we did with `child <-- streamOfNames` above. This allows for precision DOM updates instead of inefficient virtual DOM diffing.
 
-With that out of the way, here is what a pretty simple _Laminar_ "Component" could look like:
+With that out of the way, here is what a pretty simple Laminar "Component" could look like:
 
 ```scala
 def Hello(streamOfNames: XStream[String], streamOfColors: XStream[String]): ReactiveElement[dom.html.Div] = {
@@ -112,7 +112,7 @@ val appDiv: ReactiveElement[dom.thml.Div] = div(
 
 That's a lot to take in, so let's explain some new features we're using:
 
-An `EventBus` is an object that can receive events from a _Laminar_ element, and exposes a stream of those events as property `$` (`$` stands for "stream" / "stream of").
+An `EventBus` is an object that can receive events from a Laminar element, and exposes a stream of those events as property `$` (`$` stands for "stream" / "stream of").
 
 Inside the input node we're registering an event listener for the `onInput` event, and apply some transformations (that are explained in detail in the documentation below) to convert those DOM events into text values that we actually care about. Then we pass those text values into `nameBus` using `-->`.   
 
@@ -265,7 +265,7 @@ If you need a bunch of identical elements in the DOM, create a function that cre
 
 When you create an element, it is initially detached from the DOM. That is, it has no parent element, and does not appear in the document that the user sees. Such an element is _unmounted_.
 
-For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask _Laminar_ to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by _Laminar_. 
+For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by Laminar. 
 
 ```scala
 val appContainer: dom.Element = dom.document.querySelector("#appContainer")
@@ -278,7 +278,7 @@ val appElement: ReactiveElement[dom.html.Div] = div(
 val root: ReactiveRoot = laminar.render(appContainer, appElement)
 ```
 
-That's it. _Laminar_ will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
+That's it. Laminar will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
 
 To remove your whole app from the DOM, simply call `root.unmount()`. 
 
@@ -289,11 +289,11 @@ In the code snippet above we're mounting a completely static element – it will
 
 In a virtual DOM library like React or Snabbdom, changing an element over time is achieved by creating a new virtual element that contains the information on what the element should look like, then running a diffing algorithm on this new virtual element and the previous virtual element representing the same real JS DOM element. Said diffing algorithm will come up with a list of operations that need to be performed on the underlying JS DOM element in order to bring it to the state prescribed by the new virtual element you've created.  
 
-_Laminar_ does not work like that. We use reactive streams to represent elements changing over time. Let's see how this is much simpler than any virtual DOM.
+Laminar does not work like that. We use reactive streams to represent elements changing over time. Let's see how this is much simpler than any virtual DOM.
 
-_Laminar_ uses [XStream.js](https://github.com/staltz/xstream) streams via [XStream.scala](https://github.com/raquo/XStream.scala) typed interface. It is designed specifically for Cycle.js, a use case much like _Laminar_', and is much simpler than typical Scala streaming libraries (no execution context / multi-threading – thanks, Javascript). To use Laminar, you will need an understanding of how typical lazy streams work, and some basic knowledge of XStream.  
+Laminar uses [XStream.js](https://github.com/staltz/xstream) streams via [XStream.scala](https://github.com/raquo/XStream.scala) typed interface. It is designed specifically for Cycle.js, a use case much like Laminar', and is much simpler than typical Scala streaming libraries (no execution context / multi-threading – thanks, Javascript). To use Laminar, you will need an understanding of how typical lazy streams work, and some basic knowledge of XStream.  
 
-Note: As a convention both in the docs and in _Laminar_ API, we use dollar-prefixed names for streams. So `$count: XStream[Int]` would be a stream of counts. A `$url: XStream[String]` would be a stream of URLs. Notice that `url` is singular. if the stream emitted lists of urls instead, then you could call it `$urls: XStream[List[String]]` (or `$urlList`). So:
+Note: As a convention both in the docs and in Laminar API, we use dollar-prefixed names for streams. So `$count: XStream[Int]` would be a stream of counts. A `$url: XStream[String]` would be a stream of URLs. Notice that `url` is singular. if the stream emitted lists of urls instead, then you could call it `$urls: XStream[List[String]]` (or `$urlList`). So:
 
 ```scala
 val $prettyColor: XStream[String] = ???
@@ -326,7 +326,7 @@ val myDiv: ReactiveElement[dom.html.Div] = div(
 
 This lets you to build loosely coupled applications very easily.
 
-Having a stable reference to `myDiv` also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and avoiding needless complexity is one of _Laminar_'s most important goals.
+Having a stable reference to `myDiv` also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and avoiding needless complexity is one of Laminar's most important goals.
 
 
 #### Available Receivers
@@ -550,7 +550,7 @@ What if you want to render a few elements, and combine all of their `onClick` ev
 
 #### MergeBus
 
-`EventBus` is great when your event source comes directly from _Laminar_'s own `EvenPropEmitter`, as shown above. But this Subject/Proxy-like concept has one more useful application, for which we have a special subclass: `MergeBus`. 
+`EventBus` is great when your event source comes directly from Laminar's own `EvenPropEmitter`, as shown above. But this Subject/Proxy-like concept has one more useful application, for which we have a special subclass: `MergeBus`. 
 
 `XStream.merge(stream2, stream2, ...)` can merge a fixed set of streams into one stream that re-emits all of the events that are fired on each of the input streams. This is useful for simple cases when you know which streams you need to merge in advance, like in the code snippet with increment/decrement buttons in the "Event Transformations" section above.
 
@@ -587,14 +587,14 @@ Streams are not garbage collected as long as they have listeners. So, if you cal
 
 Some subscriptions you might want to exist for the whole lifetime of your app, so you don't need to do anything about them, but most of the subscriptions in your app at some point should be discarded.
 
-For example, when _Laminar_ subscribes to a stream internally, e.g. via `color <-- myColorStream` or `myNode <-- color <-- myColorStream`, that subscription should only exist for as long as the relevant DOM node is used. Once the node is discarded, we can also discard the subscription. Laminar handles this automatically (read more on this below).
+For example, when Laminar subscribes to a stream internally, e.g. via `color <-- myColorStream` or `myNode <-- color <-- myColorStream`, that subscription should only exist for as long as the relevant DOM node is used. Once the node is discarded, we can also discard the subscription. Laminar handles this automatically (read more on this below).
 
-However, you're responsible for cleaning up subscriptions that you create manually. Currently you can manually tie the lifecycle of a subscription to the lifecycle of a particular element using `ReactiveElement.subscribe` or `ReactiveElement.subscribeBus`. Future versions of _Laminar_ will provide a way to tie subscriptions to a lifecycle context automatically.
+However, you're responsible for cleaning up subscriptions that you create manually. Currently you can manually tie the lifecycle of a subscription to the lifecycle of a particular element using `ReactiveElement.subscribe` or `ReactiveElement.subscribeBus`. Future versions of Laminar will provide a way to tie subscriptions to a lifecycle context automatically.
 
 
 ### Element Lifecycle Events
 
-_Laminar_ nodes that are elements expose streams of lifecycle events that can be useful for integrating third party DOM libraries and other tasks. This events are similar in spirit to React.js lifecycle hooks like `componentDidMount` or `componentWillUnmount`, but are implemented very differently.
+Laminar nodes that are elements expose streams of lifecycle events that can be useful for integrating third party DOM libraries and other tasks. This events are similar in spirit to React.js lifecycle hooks like `componentDidMount` or `componentWillUnmount`, but are implemented very differently.
 
 All lifecycle events are fired synchronously, with no async delay.
 
@@ -610,7 +610,7 @@ This stream only fires when direct parent of this element is changed. It does no
 
 An element is considered mounted if it is present in the DOM, i.e. if its real DOM node is a descendant of `org.scalajs.dom.document`. All elements that are not mounted are considered unmounted.
 
-_Laminar_ has three kinds of mount events:
+Laminar has three kinds of mount events:
 
 **`NodeDidMount`** – fired when the element **becomes mounted ** (i.e. it was previously unmounted). Specifically, this happens immediately after the corresponding parent change event with `alreadyChanged=true` (see above) is fired. At this point, the element is **already** present in the DOM.
 
@@ -624,7 +624,7 @@ If you want to temporarily "remove" the element from the DOM, but still keep its
 
 When an element is unmounted, one subscription, `ReactiveElement.mountEventSubscription`, remains active – it listens for mount events, ready to re-activate all the other subscriptions if this element gets re-mounted. However, we don't want this subscription to exist indefinitely, otherwise we would leak memory every time an element is unmounted never to be used again, which brings us to the last type of mount events:
 
-**`NodeWillBeDiscarded`** – fired when the end user has indicated that they will not mount this element ever again. Currently, this is always fired right after the `NodeWillUnmount` event, so currently unmounting an element means that you can't re-mount it again (its subscriptions will not re-activate). Future versions of _Laminar_ will include a way for end users to specify that they intend to re-mount a given element after unmounting it.
+**`NodeWillBeDiscarded`** – fired when the end user has indicated that they will not mount this element ever again. Currently, this is always fired right after the `NodeWillUnmount` event, so currently unmounting an element means that you can't re-mount it again (its subscriptions will not re-activate). Future versions of Laminar will include a way for end users to specify that they intend to re-mount a given element after unmounting it.
 
 #### Order of Lifecycle Events
 
@@ -638,7 +638,7 @@ For extra clarity, lifecycle events triggered by the same underlying parent chan
 
 #### Mount Event Streams
 
-So how do you actually listen for mount events? _Laminar_ exposes the following streams on each `ReactiveElement`:
+So how do you actually listen for mount events? Laminar exposes the following streams on each `ReactiveElement`:
 
 **`$mountEvent`** – fires a full stream of mount events that affect this node. If the node was mounted or will be unmounted, directly or indirectly, this event will be here. This stream is a simple merge of the two mutually exclusive streams below: 
 
@@ -648,9 +648,9 @@ So how do you actually listen for mount events? _Laminar_ exposes the following 
 
 #### Lifecycle Events Performance
 
-Maintaining multiple lifecycle event streams for every single element in the DOM would be needlessly costly, especially given that `$mountEvent` is recursive – a child's `$mountEvent` stream is in part derived from all of its ancestors' `$mountEvent` streams. _Laminar_ has a few optimizations to make this efficient. Here is how it works:
+Maintaining multiple lifecycle event streams for every single element in the DOM would be needlessly costly, especially given that `$mountEvent` is recursive – a child's `$mountEvent` stream is in part derived from all of its ancestors' `$mountEvent` streams. Laminar has a few optimizations to make this efficient. Here is how it works:
 
-1) All streams are defined as `lazy val`-s, and are not even initialized until you access them. Then when you do, only the required dependencies of those streams are initialized. So when you ask for a `$mountEvent` stream of one element, only then will _Laminar_ initialize `$mountEvent` streams of this child's parents, if they weren't initialized already. 
+1) All streams are defined as `lazy val`-s, and are not even initialized until you access them. Then when you do, only the required dependencies of those streams are initialized. So when you ask for a `$mountEvent` stream of one element, only then will Laminar initialize `$mountEvent` streams of this child's parents, if they weren't initialized already. 
 
 2) Until the streams are initialized, the underlying event buses don't even receive events. `$parentChange` gets its events from the event bus stored inside `maybeParentChangeBus`, but that `Option` remains `None` until `$parentChange` is accessed. Similarly with `$thisNodeMountEvent` and `maybeThisNodeMountEventBus`. All other lifecycle streams are derived from these two streams using simple transformations.
 
@@ -660,17 +660,17 @@ Importantly, you don't need to be accessing `$mountEvent` directly in order to t
 
 There's more to this system, but for now this will have to do as an MVP summary. All in all, this system should work quite well, and if you run into performance problems on huge DOM trees with many subscriptions, this should give you some understanding of which bottleneck you could be hitting, and how to work around it. 
 
-One way to simplify your code that is _Laminar_-specific is to use `ReactiveElement.isMounted` method instead of subscribing to `$mountEvent`. It is provided mostly as an escape hatch for third party integrations that do not map  well to FRP design patterns, but using it could also potentially improve performance over using `$mountEvent` (but again, don't worry about it if you're not actually hitting a performance problem). 
+One way to simplify your code that is Laminar-specific is to use `ReactiveElement.isMounted` method instead of subscribing to `$mountEvent`. It is provided mostly as an escape hatch for third party integrations that do not map  well to FRP design patterns, but using it could also potentially improve performance over using `$mountEvent` (but again, don't worry about it if you're not actually hitting a performance problem). 
 
 ### Special Cases
 
-_Laminar_ is conceptually a simple layer adding a reactive streaming API to Scala DOM Builder. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
+Laminar is conceptually a simple layer adding a reactive streaming API to Scala DOM Builder. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
 
 Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.
 
 ##### 1. checkbox.onClick + event.preventDefault() = async event stream
 
-All event streams in _Laminar_ emit events synchronously – as soon as they happen – **except** if the stream in question is a stream of `onClick` events on an `input(typ := "checkbox")` element, and you generated wthis stream using `preventDefault = true` option in Laminar's API.
+All event streams in Laminar emit events synchronously – as soon as they happen – **except** if the stream in question is a stream of `onClick` events on an `input(typ := "checkbox")` element, and you generated wthis stream using `preventDefault = true` option in Laminar's API.
 
 Such streams fire events after a `setTimeout(0)` instead of firing immediately after the browser triggers the event. Without this hack/magic, you would have been unable to update the `checked` property of this checkbox from a stream that is (synchronously) derived from the given stream of `onClick` events, and this is a common practice when building controlled components.
 
@@ -697,4 +697,4 @@ Nikita Gazarov – [raquo.com](http://raquo.com)
 
 ## License
 
-_Laminar_ is provided under the [MIT license](https://github.com/raquo/laminar/blob/master/LICENSE.md).
+Laminar is provided under the [MIT license](https://github.com/raquo/laminar/blob/master/LICENSE.md).
