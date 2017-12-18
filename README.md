@@ -2,53 +2,152 @@
 
 _Laminar_ is a small reactive UI library for Scala.js, allowing you to interact with the DOM using reactive streams. I'm building _Laminar_ because I believe that UI logic is best expressed with functional reactive programming patterns in a type-safe environment.
 
-    "com.raquo" %%% "laminar" % "0.1"
+    "com.raquo" %%% "laminar" % "0.1" // TODO: this is way outdated. Next version is not published yet.
 
-We have no concept of components because we don't need the conceptual overhead. Write your own functions or classes or anything that somehow provides a reference to a `ReactiveNode`, and you're good.
+## Introduction
 
-_Laminar_ uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder) under the hood, and is very efficient. Instead of using a virtual DOM, it makes precision updates to the real DOM. For example, if you say you need to update an attribute of a node, that's exactly what will happen. There is nothing else happening, no diffing of virtual DOM trees, no redundant re-evaluation of your component. _Laminar_'s API lets you express what exactly needs to happen when without the inefficiency and under-the-hood complexity of virtual DOM.
-
-## Example Laminar "Component"
-
-Here's `Counter.apply`, a contrived example function that produces a Counter "component" that exposes a `node` that should be provided to _Laminar_, and `$count`, a stream of counts generated from user clicks that you do whatever you want with.
+_Laminar_'s basic building block are elements:
 
 ```scala
-class Counter private (
-  val $count: XStream[Int],
-  val node: RNode
+val streamOfNames: XStream[String] = ???
+val helloDiv: ReactiveElement[dom.html.Div] = div("Hello, ", child <-- streamOfNames)
+```
+
+`helloDiv` is a div element that contains the text "Hello, `<Name>`", where `<Name>` is the latest value emitted by `streamOfNames`. As you see, `helloDiv` is **self-contained**. It depends on a stream, but is not a stream itself. It manages itself, abstracting away the complexity of its innards from the rest of your program.
+
+_Laminar_ does not use virtual DOM, and a _Laminar_ element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element. That means that if you want something about that element to be dynamic, you should define it inside the element like we did with `child <-- streamOfNames` above. This allows for precision DOM updates instead of inefficient virtual DOM diffing.
+
+With that out of the way, here is what a pretty simple _Laminar_ "Component" could look like:
+
+```scala
+def Hello(streamOfNames: XStream[String], streamOfColors: XStream[String]): ReactiveElement[dom.html.Div] = {
+  div(
+    fontSize := "20px",
+    color <-- streamOfColors, // dynamic CSS property
+    "Hello, ",
+    child <-- streamOfNames // dynamic child (text node in this case)
+  )
+}
+```
+
+Almost the same as what we had before, but now with dynamic color and a bit of styling, and more importantly – abstracted away inside a function. Here's how you use it in your app:
+
+```scala
+val streamOfNames: XStream[String] = ???
+val streamOfColors: XStream[String] = ???
+ 
+val appDiv: ReactiveElement[dom.thml.Div] = div(
+  h1("User Welcomer 9000"),
+  div(
+    "Please accept our greeting: ",
+    Hello(streamOfNames, streamOfColors) // Inserts the div element here
+  )
+)
+```
+
+Easy, eh? But wait a minute, the streams are coming out of thin air! Fair enough, let's add an input text box for users to type their name into, and get the name from there:
+
+```scala
+val nameBus: EventBus[String] = new EventBus[String]
+val $color: XStream[String] = nameBus.$.map { name => // $ prefix is Laminar's naming convention for "stream of"
+  if (name == "Sébastien") "red" else "auto" // make Sébastien feel special 
+}
+ 
+val appDiv: ReactiveElement[dom.thml.Div] = div(
+  h1("User Welcomer 9000"),
+  div(
+    "Please enter your name:"
+    input(
+      typ := "text",
+      onInput().mapToThisNode.map(_.ref.value) --> nameBus // extract text entered into this input node whenever the user types in it
+    )
+  )
+  div(
+    "Please accept our greeting: ",
+    Hello(nameBus.$, $color) // Inserts the div element here
+  )
+)
+```
+
+That's a lot to take in, so let's explain some new features we're using:
+
+An `EventBus` is an object that can receive events from a _Laminar_ element, and exposes a stream of those events as property `$` (`$` stands for "stream" / "stream of").
+
+Inside the input node we're registering an event listener for the `onInput` event, and apply some transformations (that are explained in detail in the documentation below) to convert those DOM events into text values that we actually care about. Then we pass those text values into `nameBus` using `-->`.   
+
+Color stream (`$color`) is now derived entirely out of the stream of names.
+ 
+For extra clarity: `nameBus.$` is a stream of all values passed to `nameBus`. In our case it contains a stream of values from the input text box. Whenever the user types into the text box, this stream emits an updated name.
+
+We could abstract away the input box to simplify our appDiv code. Here's one way to do it:
+
+```scala
+def InputBox(caption: String, textBus: WriteBus[String]): ReactiveElement[dom.html.Div] = {
+  div(
+    caption,
+    input(
+      typ := "text",
+      onInput().mapToThisNode.map(_.ref.value) --> textBus
+    )
+  )
+}
+```
+
+Then you just call `InputBox("Please enter your name:", nameBus)` instead of `div("Please enter your name:", input(...))` in `appDiv`.
+
+But this is not the only way! Being a generic component, `InputBox` should probably not assume what events the consumer is interested in (`onInput`, `onKeyUp`, `onChange`?), so instead we could write a component that simply exports the elements that it creates, letting the consumer subscribe to whatever events it cares about on those elements: 
+
+```scala
+class InputBox private ( // create instances of InputBox using InputBox.apply
+  val node: ReactiveElement[dom.html.Div], // consumers should add this element into the tree
+  val inputNode: ReactiveElement[dom.html.Input] // consumers can subscribe to events coming from this element
 )
  
-object Counter {
-  def apply(label: String): Counter = {
-    val $incClick = XStream.create[MouseEvent]()
-    val $decClick = XStream.create[MouseEvent]()
-    
-    val $count = XStream
-      .merge($incClick.mapTo(1), $decClick.mapTo(-1))
-      .fold((a: Int, b: Int) => a + b, seed = 0)
- 
-    val node = div(
-      className := "Counter" // this does not need to be in a separate .apply() call, just for aesthetics
-    )(
-      button(onClick --> $decClick, "–"),
-      child <-- $count.map(count => span(s" :: $count ($label) :: ")),
-      button(onClick --> $incClick, "+")
-    )
- 
-    new Counter($count, node)
+object InputBox {
+  def apply(caption: String): InputBox = {
+    val inputNode = input(typ := "text")
+    val node = div(caption, inputNode)
+    InputBox(node, inputNode)
   }
 }
 ```
 
-Cosmetically, this looks similar to [Outwatch](https://github.com/OutWatch/outwatch), however _Laminar_ is implemented very differently – instead of a virtual DOM it uses [Scala DOM Builder](https://github.com/raquo/scala-dom-builder), which is a simpler foundation for the kind of API that we provide.
+And this is how we would use it:
 
-There are more _Laminar_ examples in the [`example`](https://github.com/raquo/laminar/tree/master/src/main/scala/com/raquo/laminar/example) directory. If you clone this project, you can run the examples locally by running `fastOptJS::webpack` and opening the `index-fastopt.html` file in your browser.
+```scala
+val inputBox = InputBox("Please enter your name:")
+ 
+val $name: XStream[String] inputBox.inputNode.$event(onInput) // .$event(eventProp) gets a stream of <eventProp> events (works on any ReactiveElement)
+  .map(_ => inputBox.inputNode.ref.value) // gets the current value from the input text box
+   
+val $color: XStream[String] = $name.map { name => // $ prefix is Laminar's naming convention for "stream of"
+  if (name == "Sébastien") "red" else "black" // make Sébastien feel special 
+} 
+ 
+val appDiv: ReactiveElement[dom.thml.Div] = div(
+  h1("User Welcomer 9000"),
+  inputBox.node,
+  div(
+    "Please accept our greeting: ",
+    Hello($name, $color) // Inserts the div element here
+  )
+)
+```
 
-I will eventually write up a detailed _"Laminar vs the World"_ post to compare it to other solutions and explain why _Laminar_ exists.
+It's all the same behaviour, just different composition. In this pattern the `InputBox` component exposes two important nodes: `node` that should be included into the DOM tree, and `inputNode` that it knows the consuming code will want to listen for events. This is a very good pattern for generic components.
 
+Lastly, you should mount `appDiv` so that it actually appears in the document:
+
+```scala
+render(dom.document.querySelector("#appContainer"), appDiv)
+```
+
+Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation below explaining all of Laminar's concepts in much greater detail.
 
 
 ## Documentation
+
+Laminar is very simple under the hood. You can see how most of it works just by using "Go to definition" functionality of your IDE. Nevertheless, the documentation provided here will help you understand how everything ties together. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.
 
 
 ### Tags & Elements
