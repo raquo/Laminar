@@ -29,12 +29,12 @@ _Laminar_ is a small Scala.js library that lets you to build UI components using
     * [Alternative Event Listener Registration Syntax](#alternative-event-listener-registration-syntax)
     * [Multiple Event Listeners](#multiple-event-listeners)
     * [Event Transformations](#event-transformations)
-    * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
-    * [useCapture](#usecapture)
-    * [Obtaining Typed Event Target](#obtaining-typed-event-target)
+      * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
+      * [useCapture](#usecapture)
+      * [Obtaining Typed Event Target](#obtaining-typed-event-target)
     * [Reusing an Event Bus](#reusing-an-event-bus)
     * [MergeBus](#mergebus)
-    * [MergeBus Transformations](#mergebus-transformations)
+      * [MergeBus Transformations](#mergebus-transformations)
   * [Stream Memory Management](#stream-memory-management)
   * [Element Lifecycle Events](#element-lifecycle-events)
     * [Parent Change Events](#parent-change-events)
@@ -676,7 +676,7 @@ Such streams fire events after a `setTimeout(0)` instead of firing immediately a
 
 The underlying issue is described in [this StackOverflow answer](https://stackoverflow.com/a/32710212/2601788).
 
-**Escape hatch:** to bypass this magic, call `ev.preventDefault()` manually on the event object instead of using Laminar's `preventDefault` option.
+**Escape hatch:** instead of using Laminar's `preventDefault` option/method, call `ev.preventDefault()` manually _after_ the event was passed to the event bus.
 
 **Watch out:** If you are reading the `checked` property of the checkbox in an affected stream, it will contain the original, unchanged value. This behaviour could be surprising  if you don't know about this stream being async, but do know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug, and better matches the commonly-expected semantics of `preventDefault`.
 
