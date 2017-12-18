@@ -1,15 +1,14 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.EventSimulator
+import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtestutils.matching.RuleImplicits
-import com.raquo.domtestutils.scalatest.MountSpec
 import com.raquo.laminar
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveRoot}
 import org.scalajs.dom
 
 trait LaminarSpec
-  extends MountSpec
+  extends MountOps
   with RuleImplicits
   with EventSimulator
 {

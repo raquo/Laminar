@@ -1,12 +1,11 @@
 package com.raquo.laminar.example.components
 
-import com.raquo.laminar.events._
-import com.raquo.laminar.implicits._
+import com.raquo.laminar.bundle._
+import com.raquo.laminar.collection.CollectionCommand.Append
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.receivers.ChildrenReceiver.{Diff, append}
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
-import com.raquo.laminar.tags._
-import com.raquo.laminar.{children, maybeChild}
+import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
+import com.raquo.laminar.streams.{EventBus, ReactiveVar}
 import com.raquo.xstream.XStream
 import org.scalajs.dom
 
@@ -14,27 +13,27 @@ import org.scalajs.dom
 
 class TaskList {
 
-  private var $taskDiff = XStream.create[Diff]()
+  private val taskDiffBus = new EventBus[ChildrenCommand]
 
-  private val $showAddTaskInput = XStream.create().startWith(false)
+  private val $showAddTaskInputBus = new ReactiveVar(false)
 
   private var count = 0
 
   val node: ReactiveElement[dom.html.Div] = div(
     h1("TaskList"),
-    children <-- $taskDiff,
+    children.command <-- taskDiffBus.$,
     maybeChild <-- maybeNewTask,
     maybeChild <-- maybeNewTaskButton
   )
 
   def maybeNewTaskButton: XStream[MaybeChildNode] = {
-    $showAddTaskInput.map { showAddTaskInput =>
+    $showAddTaskInputBus.$.map { showAddTaskInput =>
       val showNewTaskButton = !showAddTaskInput
       if (showNewTaskButton) {
         count += 1
         Some(
           button(
-            onClick --> (append(div("hello")), target = $taskDiff),
+            onClick().map(_ => Append(div("hello"))) --> taskDiffBus,
             //        onClick --> (true, sendTo = $showAddTaskInput),
             "Add task"
           )
@@ -46,10 +45,10 @@ class TaskList {
   }
 
   def maybeNewTask: XStream[MaybeChildNode] = {
-    $showAddTaskInput.map { showAddTaskInput =>
+    $showAddTaskInputBus.$.map { showAddTaskInput =>
       if (showAddTaskInput) {
         Some(button(
-          onClick --> (false, $showAddTaskInput),
+          onClick().mapTo(false) --> $showAddTaskInputBus,
           "Cancel"
         ))
       } else {
