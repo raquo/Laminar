@@ -1,8 +1,49 @@
 # Laminar
 
-_Laminar_ is a small reactive UI library for Scala.js, allowing you to interact with the DOM using reactive streams. I'm building _Laminar_ because I believe that UI logic is best expressed with functional reactive programming patterns in a type-safe environment.
+_Laminar_ is a small Scala.js library that lets you to build UI components using reactive streams.
 
     "com.raquo" %%% "laminar" % "0.1" // TODO: this is way outdated. Next version is not published yet.
+
+## Design Goals
+
+* Easy to map desired components and their interactions to uncomplicated _Laminar_ code 
+* Easy to understand Laminar source code – small, no macros, limited usage of implicits
+* Extremely flexible composition and abstraction methods (no prescription for what a "Component" is)
+* Automatic stream subscription lifecycle management
+* Efficient DOM manipulation – precise DOM updates without virtual DOM diffing
+
+ ## Table of Contents
+
+* [Introduction](#introduction)
+* [Documentation](#documentation)
+  * [Tags & Elements](#tags--elements)
+  * [Modifiers](#modifiers)
+    * [Nesting and Children](#nesting-and-children)
+    * [Reusing Elements](#reusing-elements)
+    * [Modifiers FAQ](#modifiers-faq)
+  * [Reactive Data](#reactive-data)
+    * [Available Receivers](#available-receivers)
+    * [Alternative Syntax for Receivers](#alternative-syntax-for-receivers)
+  * [Event System: Emitters, Transformations, Buses](#event-system-emitters-transformations-buses)
+    * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
+    * [Alternative Event Listener Registration Syntax](#alternative-event-listener-registration-syntax)
+    * [Multiple Event Listeners](#multiple-event-listeners)
+    * [Event Transformations](#event-transformations)
+    * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
+    * [useCapture](#usecapture)
+    * [Obtaining Typed Event Target](#obtaining-typed-event-target)
+    * [Reusing an Event Bus](#reusing-an-event-bus)
+    * [MergeBus](#mergebus)
+    * [MergeBus Transformations](#mergebus-transformations)
+  * [Stream Memory Management](#stream-memory-management)
+  * [Element Lifecycle Events](#element-lifecycle-events)
+    * [Parent Change Events](#parent-change-events)
+    * [Mount Events](#mount-events)
+    * [Order of Lifecycle Events](#order-of-lifecycle-events)
+    * [Mount Event Streams](#mount-event-streams)
+    * [Lifecycle Events Performance](#lifecycle-events-performance)
+  * [Special Cases](#special-cases)
+* [Related Projects](#my-related-projects)
 
 ## Introduction
 
@@ -181,7 +222,7 @@ The `:=` method is coming from `KeySyntax`, another _Scala DOM Builder_ class th
 
 `typ` is coming from _Scala DOM Types_ and represents the "type" attribute. You should consult _Scala DOM Types_ documentation for a list of naming differences relative to the native JS DOM API. It will also explain why the "checked" attribute is called `defaultChecked`, and why it accepts a boolean even though all HTML attributes only ever deal in strings in JS DOM (hint: Codecs).
 
-### Nesting and Children
+#### Nesting and Children
 
 ```scala
 val inputCaption = span("First & last name:") 
@@ -261,7 +302,7 @@ val myDiv: ReactiveElement[dom.html.Div] = div(color <-- $prettyColor, "Hello")
 
 The above snippet creates a div element with the word "Hello" in it, and a dynamic `color` CSS property. Any time the `$prettyColor` stream emits an event, this element's `color` property will be updated to the emitted value. 
 
-The method `<--` comes from `AttrReceiver` (which wraps an `Attr` with an implicit conversion) and creates an `AttrSetter`, which is a `Modifier` that subscribes to the given stream, and sets the given attribute on a given element when the stream emits a new value. This subscription will be automatically removed when the div element is discarded. More on that in the sections "Stream Memory Management" and "Node Lifecycle Events" way below. Don't worry about that for now.
+The method `<--` comes from `AttrReceiver` (which wraps an `Attr` with an implicit conversion) and creates an `AttrSetter`, which is a `Modifier` that subscribes to the given stream, and sets the given attribute on a given element when the stream emits a new value. This subscription will be automatically removed when the div element is discarded. More on that in the sections "Stream Memory Management" and "Element Lifecycle Events" way below. Don't worry about that for now.
 
 What happens if `$prettyColor` didn't emit an event yet? Nothing. We don't set a default value. You could achieve that in two ways: Use an XStream.js MemoryStream (consult XStream docs)
 
@@ -288,7 +329,7 @@ This lets you to build loosely coupled applications very easily.
 Having a stable reference to `myDiv` also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and avoiding needless complexity is one of _Laminar_'s most important goals.
 
 
-### Available Receivers
+#### Available Receivers
 
 TODO[Docs]: This section needs to be expanded. For now, just some examples:
 
@@ -334,7 +375,7 @@ myInput <-- focus <-- $isFocused
 
 ### Event System: Emitters, Transformations, Buses 
 
-#### Registering an DOM Event Listener
+#### Registering a DOM Event Listener
 
 To start listening to DOM events, you need to register a listener for a specific event type (`EventProp`) on a specific DOM Element (`ReactiveElement`). `EventPropEmitter` is a `Modifier` that performs this action. 
 
@@ -551,7 +592,7 @@ For example, when _Laminar_ subscribes to a stream internally, e.g. via `color <
 However, you're responsible for cleaning up subscriptions that you create manually. Currently you can manually tie the lifecycle of a subscription to the lifecycle of a particular element using `ReactiveElement.subscribe` or `ReactiveElement.subscribeBus`. Future versions of _Laminar_ will provide a way to tie subscriptions to a lifecycle context automatically.
 
 
-### Node Lifecycle Events
+### Element Lifecycle Events
 
 _Laminar_ nodes that are elements expose streams of lifecycle events that can be useful for integrating third party DOM libraries and other tasks. This events are similar in spirit to React.js lifecycle hooks like `componentDidMount` or `componentWillUnmount`, but are implemented very differently.
 
@@ -559,7 +600,7 @@ All lifecycle events are fired synchronously, with no async delay.
 
 #### Parent Change Events
 
-##### `$parentChange: XStream[ParentChangeEvent]`
+**`$parentChange: XStream[ParentChangeEvent]`**
 
 This stream fires any time when this element's direct parent changes. Actually, two events are fired at that time: immediately before the change is applied to both the real DOM and Laminar's DOM tree, and immediately after that. In addition to the `alreadyChanged` flag, these events carry references to `maybePrevParent` and `maybeNextParent`, letting you know exactly what happened.
 
