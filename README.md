@@ -1,8 +1,12 @@
 # Laminar
 
+![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs0.6_2.12.svg)
+
 Laminar is a small Scala.js library that lets you to build UI components using reactive streams.
 
     "com.raquo" %%% "laminar" % "0.2"
+
+
 
 ## Design Goals
 
@@ -12,7 +16,15 @@ Laminar is a small Scala.js library that lets you to build UI components using r
 * Automatic stream subscription lifecycle management
 * Efficient DOM manipulation – precise DOM updates without virtual DOM diffing
 
- ## Table of Contents
+
+
+## Community
+
+Please use [github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, as well as all kinds of discussions, including questions on usage and roadmap. I think this will work better than spreading thin across gitter / stackoverflow / etc. You can _watch_ this project on github to get issue updates if you're interested in following discussions.
+
+
+
+## Table of Contents
 
 * [Introduction](#introduction)
 * [Documentation](#documentation)
@@ -43,7 +55,10 @@ Laminar is a small Scala.js library that lets you to build UI components using r
     * [Mount Event Streams](#mount-event-streams)
     * [Lifecycle Events Performance](#lifecycle-events-performance)
   * [Special Cases](#special-cases)
+  * [FAQ](#faq)
 * [Related Projects](#my-related-projects)
+
+
 
 ## Introduction
 
@@ -186,6 +201,7 @@ render(dom.document.querySelector("#appContainer"), appDiv)
 Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation below explaining all of Laminar's concepts in much greater detail.
 
 
+
 ## Documentation
 
 Laminar is very simple under the hood. You can see how most of it works just by using "Go to definition" functionality of your IDE. Nevertheless, the documentation provided here will help you understand how everything ties together. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.
@@ -260,6 +276,7 @@ If you need a bunch of identical elements in the DOM, create a function that cre
 3. No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results from applying it only once. Setters like `key := value` typically _are_ idempotent. There  should be no surprises as long as you understand what the modifier does at a high level.
 
 4. Yes, Modifiers are reusable. The same modifier can be applied to multiple nodes (with some exceptions, e.g. not if the Modifier is an element – see "Reusing Elements" section above). If you're writing your own Modifier, don't store application-specific state outside of its `apply` method to make it reusable.
+
 
 ### Rendering
 
@@ -679,6 +696,19 @@ The underlying issue is described in [this StackOverflow answer](https://stackov
 **Escape hatch:** instead of using Laminar's `preventDefault` option/method, call `ev.preventDefault()` manually _after_ the event was passed to the event bus.
 
 **Watch out:** If you are reading the `checked` property of the checkbox in an affected stream, it will contain the original, unchanged value. This behaviour could be surprising  if you don't know about this stream being async, but do know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug, and better matches the commonly-expected semantics of `preventDefault`.
+
+
+### FAQ
+
+#### Why XStream.js instead of Monix / Scala.rx / etc.?
+
+I chose XStream.s because it was designed specifically for Cycle.js, a use case very similar to Laminar. XStream's main strengths are: 
+
+* Conceptually simple. XStream streams are synchronous, "hot" / multicast (executed only once per event, not once per event per listener). There are no schedulers, execution contexts, backpressure strategies / etc because those are irrelevant in Javascript. It is very beginner-friendly.
+
+* Small download size. XStream is less than 40KB in production. For comparison, as far as I can tell Monix is around 200KB, which is significantly more. Not just because of the download latency, but because all that code needs to be unzipped, parsed and loaded into memory. Especially on mobile devices that's a big problem.
+
+That said, XStream is not perfect in a number of ways, and we are looking for a better solution. See [issue #5](https://github.com/raquo/laminar/issues/5) for ongoing discussion.
 
 
 ## My Related Projects
