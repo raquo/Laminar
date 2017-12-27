@@ -9,7 +9,7 @@ class Var[A](initialValue: A) extends Signal[A] {
   dom.console.log(s"> Create $this")
 
   def set(newValue: A): Unit = {
-    Var.set(Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
+    Var.set(new Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
   }
 
   // The original stream can always be transformed to A
@@ -31,6 +31,11 @@ class Var[A](initialValue: A) extends Signal[A] {
 
 object Var {
 
+  /** Set multiple vars at once. These updates will be treated as a single propagation.
+    *
+    * Use this syntax for brevity: Var.set(myVar1 -> value1, myVar2 -> value2)
+    * (Powered by implicit conversions defined in the [[Assignment]] object)
+    */
   def set(assignments: Assignment[_]*): Unit = {
     // First we update all source vars, and for each of them we initiate propagation
     assignments.foreach { assignment =>
@@ -41,4 +46,5 @@ object Var {
     // it does not matter anymore how many vars were initially updated.
     Airstream.finalizePropagation()
   }
+
 }

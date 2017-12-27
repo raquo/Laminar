@@ -211,9 +211,9 @@ class AirstreamSpec extends FunSpec with Matchers {
     )
     effects.clear()
 
-    airstream.batchUpdate(
-      Assignment($v1, 3),
-      Assignment($v2, 30)
+    Var.set(
+      $v1 -> 3,
+      $v2 -> 30
     )
 
     // Batch update should be treated like a single propagation (e.g. c4 updated only once)
