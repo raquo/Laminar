@@ -117,6 +117,7 @@ object Airstream {
       parent match {
         case `otherSignal` => true
         case _: Var[_] => false
+        case _: Val[_] => false
         case computed: ComputedSignal[_] => dependsOnOtherSignal(signal = computed, otherSignal)
       }
     }

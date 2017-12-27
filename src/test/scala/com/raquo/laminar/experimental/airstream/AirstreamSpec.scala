@@ -35,7 +35,7 @@ class AirstreamSpec extends FunSpec with Matchers {
     $m7.now() shouldBe 100001
     $m8.now() shouldBe 1100001
 
-    $v1.update(2)
+    $v1.set(2)
 
     $v1.now() shouldBe 2
     $m2.now() shouldBe 3
@@ -48,7 +48,7 @@ class AirstreamSpec extends FunSpec with Matchers {
     $m7.now() shouldBe 100002
     $m8.now() shouldBe 1100002
 
-    $v1.update(3)
+    $v1.set(3)
 
     $v1.now() shouldBe 3
     $m2.now() shouldBe 4
@@ -115,7 +115,7 @@ class AirstreamSpec extends FunSpec with Matchers {
     // For subsequent values:
     // - All observers now fire
     // - Order is topological (happens to be depth-first)
-    $v1.update(2)
+    $v1.set(2)
 
     effects shouldEqual mutable.Buffer(
       Effect("v1", 2),
@@ -139,7 +139,7 @@ class AirstreamSpec extends FunSpec with Matchers {
     effects.clear()
 
     // Subsequent update should include the m7 observer effect that we added later on
-    $v1.update(3)
+    $v1.set(3)
 
     effects shouldEqual mutable.Buffer(
       Effect("v1", 3),
@@ -192,7 +192,7 @@ class AirstreamSpec extends FunSpec with Matchers {
 
     // Updating v1 and v2 should only update their respective parts of the chain
 
-    $v1.update(2)
+    $v1.set(2)
 
     effects shouldEqual mutable.Buffer(
       Effect("v1", 2),
@@ -201,7 +201,7 @@ class AirstreamSpec extends FunSpec with Matchers {
     )
     effects.clear()
 
-    $v2.update(20)
+    $v2.set(20)
 
     effects shouldEqual mutable.Buffer(
       Effect("v2", 20),
@@ -255,7 +255,7 @@ class AirstreamSpec extends FunSpec with Matchers {
     $int3.now() shouldEqual (2, 200)
     $int33.now() shouldBe 202
 
-    $int1.update(2)
+    $int1.set(2)
 
     $int1.now() shouldBe 2
     $int2.now() shouldBe 100

@@ -1,6 +1,5 @@
 package com.raquo.laminar.experimental.airstream
 
-import com.raquo.laminar.experimental.airstream
 import org.scalajs.dom
 
 class Var[A](initialValue: A) extends Signal[A] {
@@ -9,8 +8,8 @@ class Var[A](initialValue: A) extends Signal[A] {
 
   dom.console.log(s"> Create $this")
 
-  def update(newValue: A): Unit = {
-    airstream.batchUpdate(Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
+  def set(newValue: A): Unit = {
+    Var.set(Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
   }
 
   // The original stream can always be transformed to A
@@ -30,3 +29,16 @@ class Var[A](initialValue: A) extends Signal[A] {
   override def toString: String = s"Var@${hashCode()}(value=$currentValue)"
 }
 
+object Var {
+
+  def set(assignments: Assignment[_]*): Unit = {
+    // First we update all source vars, and for each of them we initiate propagation
+    assignments.foreach { assignment =>
+      assignment.assign()
+      assignment.sourceVar.propagate(haltOnNextCombine = true)
+    }
+    // We now have some pending signals and observations, and at this point
+    // it does not matter anymore how many vars were initially updated.
+    Airstream.finalizePropagation()
+  }
+}
