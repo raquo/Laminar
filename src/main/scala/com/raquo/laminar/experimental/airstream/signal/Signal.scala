@@ -40,8 +40,8 @@ trait Signal[A] extends Observable[A] with Owned {
   }
 
   /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
-  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription[A] = {
-    val subscription = super.addObserver(observer)
+  override def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
+    val subscription = super.addObserver[B](observer)
     observer.onNext(currentValue)
     subscription
   }
@@ -54,9 +54,9 @@ trait Signal[A] extends Observable[A] with Owned {
 
   protected def createObservations(): Unit = {
     dom.console.log(s"> $this.createObservations")
-    subscriptions.foreach { subscription =>
-      dom.console.log(s">> for observer: $subscription")
-      Propagation.addPendingObservation(currentValue, subscription.observer)
+    observers.foreach { observer =>
+      dom.console.log(s">> for observer: $observer")
+      Propagation.addPendingObservation(currentValue, observer)
     }
   }
 
@@ -73,7 +73,7 @@ trait Signal[A] extends Observable[A] with Owned {
     */
   override private[airstream] def kill(): Unit = {
     removeAllChildren()
-    removeAllSubscriptions()
+    removeAllObservers()
   }
 }
 

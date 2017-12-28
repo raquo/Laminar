@@ -1,5 +1,6 @@
 package com.raquo.laminar.experimental.airstream.ownership
 
+import com.raquo.laminar.experimental.airstream.fixtures.TestableOwner
 import org.scalatest.{FunSpec, Matchers}
 
 class OwnerSpec extends FunSpec with Matchers {
@@ -15,7 +16,7 @@ class OwnerSpec extends FunSpec with Matchers {
 
   it("Owner kills all possessions when discarded and continues to function") {
 
-    val owner = new Owner {}
+    val owner = new TestableOwner
 
     val possession1 = new TestOwned(owner)
     val possession2 = new TestOwned(owner)

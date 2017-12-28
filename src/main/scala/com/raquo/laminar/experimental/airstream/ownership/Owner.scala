@@ -2,8 +2,8 @@ package com.raquo.laminar.experimental.airstream.ownership
 
 import scala.scalajs.js
 
-/** Owner decides when to kill its possessions (Owned-s).
-  * - Ownership is defined at creation of the possession (the Owned instance)
+/** Owner decides when to kill its possessions ([[Owned]]-s).
+  * - Ownership is defined at creation of the possession (the [[Owned]] instance)
   * - Ownership is non-transferable
   * - There is no way to unkill a possession
   * - In other words: Owner can only own a possession once,
@@ -17,8 +17,8 @@ trait Owner {
   /** Note: This is enforced to be a set outside the type system. #performance */
   private[airstream] val possessions: js.Array[Owned] = js.Array()
 
-  /** Note: you can make this method more */
-  private[airstream] def killPossessions(): Unit = {
+  // @TODO Figure out proper visibility for this. Don't want to pollute the consuming library's API
+  protected[this] def killPossessions(): Unit = {
     possessions.foreach(_.kill())
     possessions.length = 0 // This actually clears the JS array, amazing
   }

@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.fixtures
 
-import com.raquo.laminar.experimental.airstream.observation.Subscription
+import com.raquo.laminar.experimental.airstream.observation.Observer
 import com.raquo.laminar.experimental.airstream.signal.{ComputedSignal, Signal}
 
 import scala.scalajs.js
@@ -11,6 +11,6 @@ trait TestableSignal[A] extends Signal[A] {
 
   def _testChildren: Seq[ComputedSignal[_]] = children
 
-  def _testSubscriptions: js.Array[Subscription[A]] = subscriptions
+  def _testObservers: js.Array[Observer[A]] = observers
 
 }

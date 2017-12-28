@@ -1,7 +1,6 @@
 package com.raquo.laminar.experimental.airstream.signal
 
-import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect, TestableSignal}
-import com.raquo.laminar.experimental.airstream.ownership.Owner
+import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect, TestableOwner, TestableSignal}
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.collection.mutable
@@ -24,8 +23,8 @@ class SignalOwnershipSpec extends FunSpec with Matchers {
       effects += Effect(name, value)
     }
 
-    implicit val owner1: Owner = new Owner {}
-    val owner2 = new Owner {}
+    implicit val owner1: TestableOwner = new TestableOwner
+    val owner2 = new TestableOwner
 
     val var1 = new Var("a") with TestableSignal[String] // implicit owner1
     val map1 = var1.map(makeCalculation("map1", _ + "-x")) // implicit owner1
@@ -58,7 +57,7 @@ class SignalOwnershipSpec extends FunSpec with Matchers {
     // - clear list of observers
     owner1.killPossessions()
 
-    var1._testSubscriptions.toSeq shouldEqual Nil
+    var1._testObservers.toSeq shouldEqual Nil
     var1._testChildren shouldEqual Nil
 
     var1.set("b")

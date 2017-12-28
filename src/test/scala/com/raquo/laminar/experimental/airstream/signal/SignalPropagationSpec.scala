@@ -1,7 +1,6 @@
 package com.raquo.laminar.experimental.airstream.signal
 
-import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect}
-import com.raquo.laminar.experimental.airstream.ownership.Owner
+import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect, TestableOwner}
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.collection.mutable
@@ -10,7 +9,7 @@ class SignalPropagationSpec extends FunSpec with Matchers {
 
   it("simple var-map chain with two forks - propagates values") {
 
-    implicit val owner: Owner = new Owner {}
+    implicit val owner: TestableOwner = new TestableOwner
 
     val calculations = mutable.Buffer[Calculation[Int]]()
 
@@ -104,7 +103,7 @@ class SignalPropagationSpec extends FunSpec with Matchers {
 
   it("simple var-map chain with two forks - triggers observers") {
 
-    implicit val context: Owner = new Owner {}
+    implicit val owner: TestableOwner = new TestableOwner
 
     val effects = mutable.Buffer[Effect[Int]]()
 
@@ -198,7 +197,7 @@ class SignalPropagationSpec extends FunSpec with Matchers {
 
   it("combine after vars - triggers observers") {
 
-    implicit val context: Owner = new Owner {}
+    implicit val owner: TestableOwner = new TestableOwner
 
     val effects = mutable.Buffer[Effect[_]]()
 
@@ -271,7 +270,7 @@ class SignalPropagationSpec extends FunSpec with Matchers {
   // TODO[Test] Review if we need this test
   it("diamond case") {
 
-    implicit val context: Owner = new Owner {}
+    implicit val owner: TestableOwner = new TestableOwner
 
     val $int1 = new Var(1)
     val $int2 = new Var(100)
