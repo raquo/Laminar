@@ -17,6 +17,7 @@ trait Observable[+A] {
 
   def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
     val subscription = new Subscription[B](observer, this, subscriptionOwner)
+    observers.push(observer)
     dom.console.log(s"Adding subscription: $subscription")
     subscription
   }
