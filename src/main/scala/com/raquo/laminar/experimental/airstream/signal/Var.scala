@@ -1,18 +1,26 @@
-package com.raquo.laminar.experimental.airstream
+package com.raquo.laminar.experimental.airstream.signal
 
+import com.raquo.laminar.experimental.airstream.ownership.Owner
 import org.scalajs.dom
 
-class Var[A](initialValue: A) extends Signal[A] {
+class Var[A](initialValue: A)(override protected implicit val owner: Owner) extends Signal[A] {
 
   override protected var currentValue: A = initialValue
 
   dom.console.log(s"> Create $this")
 
+  private[this] var isDead = false
+
+  /** Update the value of this var. Does nothing after this var is killed. */
   def set(newValue: A): Unit = {
-    Var.set(new Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
+    if (!isDead) {
+      Var.set(new Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
+    }
   }
 
+  // TODO I think this and set() should be part of the Observer API... Maybe... Think about it.
   // The original stream can always be transformed to A
+  // @TODO Make sure to properly handle killing when we add/remove these streams
 //  def updateFromStream(sourceStream: Stream[A])(implicit context: Context): Unit = {
 //    sourceStream.foreach(this.update, context)
 //  }
@@ -24,6 +32,11 @@ class Var[A](initialValue: A) extends Signal[A] {
       currentValue = newValue
     }
     valueChanged
+  }
+
+  override private[airstream] def kill(): Unit = {
+    super.kill()
+    isDead = true
   }
 
   override def toString: String = s"Var@${hashCode()}(value=$currentValue)"
@@ -44,7 +57,7 @@ object Var {
     }
     // We now have some pending signals and observations, and at this point
     // it does not matter anymore how many vars were initially updated.
-    Airstream.finalizePropagation()
+    Propagation.finalizePropagation()
   }
 
 }

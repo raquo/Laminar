@@ -1,4 +1,4 @@
-package com.raquo.laminar.experimental.airstream
+package com.raquo.laminar.experimental.airstream.signal
 
 /** Encapsulates the act of assigning a new value to a Var. Only used for type safety when issuing a batch update. */
 class Assignment[A](val sourceVar: Var[A], val newValue: A) {

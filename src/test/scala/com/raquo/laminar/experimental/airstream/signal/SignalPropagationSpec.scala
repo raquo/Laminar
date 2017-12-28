@@ -1,28 +1,35 @@
-package com.raquo.laminar.experimental.airstream
+package com.raquo.laminar.experimental.airstream.signal
 
-import com.raquo.laminar.experimental.airstream
-import org.scalajs.dom
+import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect}
+import com.raquo.laminar.experimental.airstream.ownership.Owner
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.collection.mutable
-import scala.scalajs.js
 
-class AirstreamSpec extends FunSpec with Matchers {
+class SignalPropagationSpec extends FunSpec with Matchers {
 
-  ignore("simple var-map chain with two forks - propagates values") {
+  it("simple var-map chain with two forks - propagates values") {
 
-    implicit val context: Context = new Context
+    implicit val owner: Owner = new Owner {}
+
+    val calculations = mutable.Buffer[Calculation[Int]]()
+
+    def makeCalculation(name: String, project: Int => Int)(value: Int): Int = {
+      val newValue = project(value)
+      calculations += Calculation(name, newValue)
+      newValue
+    }
 
     val $v1 = new Var(1)
-    val $m2 = $v1.map(_ + 1)
-    val $m3 = $m2.map(_ + 10)
-    val $m4 = $m3.map(_ + 100)
+    val $m2 = $v1.map(makeCalculation("m2", _ + 1))
+    val $m3 = $m2.map(makeCalculation("m3", _ + 10))
+    val $m4 = $m3.map(makeCalculation("m4", _ + 100))
 
-    val $m5 = $m3.map(_ + 1000)
-    val $m6 = $m5.map(_ + 10000)
+    val $m5 = $m3.map(makeCalculation("m5", _ + 1000))
+    val $m6 = $m5.map(makeCalculation("m6", _ + 10000))
 
-    val $m7 = $v1.map(_ + 100000)
-    val $m8 = $m7.map(_ + 1000000)
+    val $m7 = $v1.map(makeCalculation("m7", _ + 100000))
+    val $m8 = $m7.map(makeCalculation("m8", _ + 1000000))
 
     $v1.now() shouldBe 1
     $m2.now() shouldBe 2
@@ -34,6 +41,17 @@ class AirstreamSpec extends FunSpec with Matchers {
 
     $m7.now() shouldBe 100001
     $m8.now() shouldBe 1100001
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("m2", 2),
+      Calculation("m3", 12),
+      Calculation("m4", 112),
+      Calculation("m5", 1012),
+      Calculation("m6", 11012),
+      Calculation("m7", 100001),
+      Calculation("m8", 1100001)
+    )
+    calculations.clear()
 
     $v1.set(2)
 
@@ -48,6 +66,17 @@ class AirstreamSpec extends FunSpec with Matchers {
     $m7.now() shouldBe 100002
     $m8.now() shouldBe 1100002
 
+    calculations shouldEqual mutable.Buffer(
+      Calculation("m2", 3),
+      Calculation("m3", 13),
+      Calculation("m4", 113),
+      Calculation("m5", 1013),
+      Calculation("m6", 11013),
+      Calculation("m7", 100002),
+      Calculation("m8", 1100002)
+    )
+    calculations.clear()
+
     $v1.set(3)
 
     $v1.now() shouldBe 3
@@ -60,17 +89,26 @@ class AirstreamSpec extends FunSpec with Matchers {
 
     $m7.now() shouldBe 100003
     $m8.now() shouldBe 1100003
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("m2", 4),
+      Calculation("m3", 14),
+      Calculation("m4", 114),
+      Calculation("m5", 1014),
+      Calculation("m6", 11014),
+      Calculation("m7", 100003),
+      Calculation("m8", 1100003)
+    )
+    calculations.clear()
   }
 
-  ignore("simple var-map chain with two forks - triggers observers") {
+  it("simple var-map chain with two forks - triggers observers") {
 
-    implicit val context: Context = new Context
+    implicit val context: Owner = new Owner {}
 
-    case class Effect(name: String, value: Int)
+    val effects = mutable.Buffer[Effect[Int]]()
 
-    val effects = mutable.Buffer[Effect]()
-
-    def makeObserver(name: String)(value: Int) = {
+    def makeObserver(name: String)(value: Int): Unit = {
       effects += Effect(name, value)
     }
 
@@ -81,12 +119,12 @@ class AirstreamSpec extends FunSpec with Matchers {
     val $m2 = $v1.map(_ + 1)
     $m2.foreach(makeObserver("m2"))
     val $m3 = $m2.map(_ + 10)
-    $m3.foreach(makeObserver("m3"), skipInitial = true)
+    $m3.foreach(makeObserver("m3")/*, skipInitial = true*/)
     val $m4 = $m3.map(_ + 100)
     $m4.foreach(makeObserver("m4"))
 
     val $m5 = $m3.map(_ + 1000)
-    $m5.foreach(makeObserver("m5-1"), skipInitial = true)
+    $m5.foreach(makeObserver("m5-1")/*, skipInitial = true*/)
     $m5.foreach(makeObserver("m5-2"))
     $m5.foreach(makeObserver("m5-3"))
     val $m6 = $m5.map(_ + 10000)
@@ -104,7 +142,9 @@ class AirstreamSpec extends FunSpec with Matchers {
     effects shouldEqual mutable.Buffer(
       Effect("v1", 1),
       Effect("m2", 2),
+      Effect("m3", 12), // @TODO skipInitial
       Effect("m4", 112),
+      Effect("m5-1", 1012), // @TODO skipInitial
       Effect("m5-2", 1012),
       Effect("m5-3", 1012),
       Effect("m8", 1100001),
@@ -158,13 +198,11 @@ class AirstreamSpec extends FunSpec with Matchers {
 
   it("combine after vars - triggers observers") {
 
-    implicit val context: Context = new Context
-
-    case class Effect[V](name: String, value: V)
+    implicit val context: Owner = new Owner {}
 
     val effects = mutable.Buffer[Effect[_]]()
 
-    def makeObserver[V](name: String)(value: V) = {
+    def makeObserver[V](name: String)(value: V): Unit = {
       effects += Effect(name, value)
     }
 
@@ -233,7 +271,7 @@ class AirstreamSpec extends FunSpec with Matchers {
   // TODO[Test] Review if we need this test
   it("diamond case") {
 
-    implicit val context: Context = new Context
+    implicit val context: Owner = new Owner {}
 
     val $int1 = new Var(1)
     val $int2 = new Var(100)

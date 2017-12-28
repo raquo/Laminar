@@ -1,4 +1,4 @@
-package com.raquo.laminar.experimental.airstream
+package com.raquo.laminar.experimental.airstream.signal
 
 import org.scalajs.dom
 
@@ -9,8 +9,6 @@ trait ComputedSignal[A] extends Signal[A] {
   dom.console.log(s"> Create $this")
 
   private[airstream] val parents: Seq[Signal[_]] // @TODO[API] this could be a set, probably
-
-  val context: Context
 
   protected[this] def calc(): A
 
@@ -26,6 +24,15 @@ trait ComputedSignal[A] extends Signal[A] {
     if (recalculate()) {
       super.propagate(haltOnNextCombine = true)
     }
+  }
+
+  /** When killing a computed signal, we additionally want to make sure that its parents don't hold a reference to it.
+    * This ensures that a circular reference between parents and children will not prevent GC of killed children
+    * (assuming the killed children are otherwise unreachable).
+    */
+  override private[airstream] def kill(): Unit = {
+    parents.foreach(_.removeChild(this))
+    super.kill()
   }
 
   override def toString: String = s"ComputedSignal@${hashCode()}(value=$currentValue)"

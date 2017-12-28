@@ -1,4 +1,4 @@
-package com.raquo.laminar.experimental.airstream
+package com.raquo.laminar.experimental.airstream.stream
 
 // @TODO Unused
 

@@ -1,11 +1,12 @@
-package com.raquo.laminar.experimental.airstream
+package com.raquo.laminar.experimental.airstream.signal
 
+import com.raquo.laminar.experimental.airstream.observation.{Observation, Observer}
 import org.scalajs.dom
 
 import scala.scalajs.js
 
 // @TODO[API] Add private[airstream] to the whole object? Maybe classes as well? See how that works, exactly
-object Airstream {
+object Propagation {
 
   private[this] val pendingSignals: js.Array[CombineSignal[_]] = js.Array()
 
