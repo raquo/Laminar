@@ -11,7 +11,7 @@ trait Observable[+A] {
   protected[this] lazy val observers: js.Array[Observer[A]] = js.Array()
 
   def foreach[B >: A](action: B => Unit)(implicit subscriptionOwner: Owner): Subscription[B] = {
-    val observer = new Observer(action)
+    val observer = Observer(action)
     addObserver[B](observer)(subscriptionOwner)
   }
 

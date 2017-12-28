@@ -1,9 +1,10 @@
 package com.raquo.laminar.experimental.airstream.signal
 
+import com.raquo.laminar.experimental.airstream.observation.Observer
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 import org.scalajs.dom
 
-class Var[A](initialValue: A)(override protected implicit val owner: Owner) extends Signal[A] {
+class Var[A](initialValue: A)(override protected implicit val owner: Owner) extends Signal[A] with Observer[A] {
 
   override protected var currentValue: A = initialValue
 
@@ -12,10 +13,8 @@ class Var[A](initialValue: A)(override protected implicit val owner: Owner) exte
   private[this] var isDead = false
 
   /** Update the value of this Var. Does nothing after this var is killed. */
-  def set(newValue: A): Unit = {
-    if (!isDead) {
-      Var.set(new Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
-    }
+  @inline def set(newValue: A): Unit = {
+    onNext(newValue)
   }
 
   /** Convenient syntax for myVar.set(fn(myVar.now())), e.g.:
@@ -23,8 +22,8 @@ class Var[A](initialValue: A)(override protected implicit val owner: Owner) exte
     * Var.update(_ + 1) // increment counter
     * Var.update(_.copy(someProp = newValue)) // update case class
     */
-  def update(fn: A => A): Unit = {
-    set(fn(currentValue))
+  @inline def update(fn: A => A): Unit = {
+    onNext(fn(currentValue))
   }
 
   // TODO I think this and set() should be part of the Observer API... Maybe... Think about it.
@@ -33,6 +32,14 @@ class Var[A](initialValue: A)(override protected implicit val owner: Owner) exte
 //  def updateFromStream(sourceStream: Stream[A])(implicit context: Context): Unit = {
 //    sourceStream.foreach(this.update, context)
 //  }
+
+  /** Standard [[Observer]] method for receiving a new value.
+    * [[set]] and [[update]] methods call into this, and are provided just for convenience. */
+  override def onNext(nextValue: A): Unit = {
+    if (!isDead) {
+      Var.set(new Assignment(this, nextValue)) // @TODO[Performance] can be denormalized to make more efficient
+    }
+  }
 
   /** @return whether value was changed */
   private[airstream] def recalculate(newValue: A): Boolean = {
