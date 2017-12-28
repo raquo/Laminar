@@ -11,11 +11,20 @@ class Var[A](initialValue: A)(override protected implicit val owner: Owner) exte
 
   private[this] var isDead = false
 
-  /** Update the value of this var. Does nothing after this var is killed. */
+  /** Update the value of this Var. Does nothing after this var is killed. */
   def set(newValue: A): Unit = {
     if (!isDead) {
       Var.set(new Assignment(this, newValue)) // @TODO[Performance] can be denormalized to make more efficient
     }
+  }
+
+  /** Convenient syntax for myVar.set(fn(myVar.now())), e.g.:
+    *
+    * Var.update(_ + 1) // increment counter
+    * Var.update(_.copy(someProp = newValue)) // update case class
+    */
+  def update(fn: A => A): Unit = {
+    set(fn(currentValue))
   }
 
   // TODO I think this and set() should be part of the Observer API... Maybe... Think about it.
