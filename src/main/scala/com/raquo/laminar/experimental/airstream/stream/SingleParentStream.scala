@@ -1,19 +1,26 @@
 package com.raquo.laminar.experimental.airstream.stream
 
+import com.raquo.laminar.experimental.airstream.observation.Observer
+
 /** Represents a simple stream that only has one parent.
   * The starting/stopping logic is pretty standard for this case.
   */
 trait SingleParentStream[I, O] extends Stream[O] {
 
-  protected val onParentFired: I => Unit
+  /** An internal observer that we subscribe to the parent observable
+    * when this stream starts, and unsubscribe when this stream stops.
+    *
+    * This part is customized in each concrete subclass of this trait.
+    */
+  protected[this] val inputObserver: Observer[I]
 
-  protected val parent: Stream[I]
+  protected[this] val parent: Stream[I]
 
-  override protected def onStart(): Unit = {
-    parent.onChildStarted(onParentFired)
+  override protected[this] def onStart(): Unit = {
+    parent.addChildObserver(inputObserver)
   }
 
-  override protected def onStop(): Unit = {
-    parent.onChildStopped(onParentFired)
+  override protected[this] def onStop(): Unit = {
+    parent.removeChildObserver(inputObserver)
   }
 }

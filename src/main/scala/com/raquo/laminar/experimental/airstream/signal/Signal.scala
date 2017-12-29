@@ -33,7 +33,7 @@ trait Signal[A] extends Observable[A] with Parent[ComputedSignal[_]] with Owned 
 
   protected def createObservations(): Unit = {
     dom.console.log(s"> $this.createObservations")
-    observers.foreach { observer =>
+    externalObservers.foreach { observer =>
       dom.console.log(s">> for observer: $observer")
       Propagation.addPendingObservation(currentValue, observer)
     }

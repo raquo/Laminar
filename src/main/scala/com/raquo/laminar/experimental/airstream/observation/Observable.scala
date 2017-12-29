@@ -11,16 +11,21 @@ trait Observable[+A] {
   /** Note: Observer can be added more than once to an Observable.
     * If so, it will observe each event as many times as it was added.
     */
-  protected[this] lazy val observers: js.Array[Observer[A]] = js.Array()
+  protected[this] lazy val externalObservers: js.Array[Observer[A]] = js.Array()
+
+  /** Note: This is enforced to be a Set outside of the type system #performance */
+  protected[this] val childObservers: js.Array[Observer[A]] = js.Array()
 
   def foreach[B >: A](action: B => Unit)(implicit subscriptionOwner: Owner): Subscription[B] = {
     val observer = Observer(action)
     addObserver[B](observer)(subscriptionOwner)
   }
 
+  // @TODO explain the difference between child observers and external observers
+  /** And an external observer */
   def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
     val subscription = new Subscription[B](observer, this, subscriptionOwner)
-    observers.push(observer)
+    externalObservers.push(observer)
     dom.console.log(s"Adding subscription: $subscription")
     subscription
   }
@@ -31,21 +36,38 @@ trait Observable[+A] {
     * @return whether observer was removed (`false` if it wasn't subscribed to this observable)
     */
   def removeObserver[B >: A](observer: Observer[B]): Boolean = {
-    val index = observers.indexOf(observer)
+    val index = externalObservers.indexOf(observer)
     val shouldRemove = index != -1
     if (shouldRemove) {
-      observers.splice(index, deleteCount = 1)
+      externalObservers.splice(index, deleteCount = 1)
+    }
+    shouldRemove
+  }
+
+  // @TODO Why does simple "protected" not work? Specialization?
+
+  /** Child stream calls this to declare that it was started */
+  protected[airstream] def addChildObserver(observer: Observer[A]): Unit = {
+    childObservers.push(observer)
+  }
+
+  /** */
+  protected[airstream] def removeChildObserver(observer: Observer[A]): Boolean = {
+    val index = childObservers.indexOf(observer)
+    val shouldRemove = index != -1
+    if (shouldRemove) {
+      childObservers.splice(index, deleteCount = 1)
     }
     shouldRemove
   }
 
   // @TODO[API] Maybe this method belongs to Signal? It's the only "Owned Observable" that we have, and it seems that this is the only time this is needed.
   protected def removeAllObservers(): Unit = {
-    observers.length = 0 // Yes, this does what you didn't think it would
+    externalObservers.length = 0 // Yes, this does what you didn't think it would
   }
 
   // @TODO Should Signals use or override this method?
-  protected[this] def notifyObservers(nextValue: A): Unit = {
-    observers.foreach(_.onNext(nextValue))
+  protected[this] def notifyExternalObservers(nextValue: A): Unit = {
+    externalObservers.foreach(_.onNext(nextValue))
   }
 }

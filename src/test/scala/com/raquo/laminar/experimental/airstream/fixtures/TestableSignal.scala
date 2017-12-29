@@ -11,6 +11,6 @@ trait TestableSignal[A] extends Signal[A] {
 
   def _testChildren: Seq[ComputedSignal[_]] = linkedChildren
 
-  def _testObservers: js.Array[Observer[A]] = observers
+  def _testObservers: js.Array[Observer[A]] = externalObservers
 
 }

@@ -3,8 +3,6 @@ package com.raquo.laminar.experimental.airstream.stream
 import com.raquo.laminar.experimental.airstream.observation.{Observable, Observer, Subscription}
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 
-import scala.scalajs.js
-
 class Stream[+A] extends Observable[A] {
 
   // @TODO[API] All those onStart/onStop methods could be in their own LazyObservable class
@@ -18,11 +16,6 @@ class Stream[+A] extends Observable[A] {
     * to be garbage collected if they are otherwise unreachable (which they should become
     * when their subscriptions are killed by their owners)
     */
-  // @TODO[Performance] This whole map & array thing could be more efficient in many ways
-  //  private[this] val childObserverCounts: mutable.Map[Stream[_], Int] = mutable.Map().withDefaultValue(0)
-
-  /** Note: This is enforced to be a Set outside of the type system #performance */
-  private[this] val childActions: js.Array[A => Unit] = js.Array()
 
   def map[B](project: A => B): Stream[B] = {
     new MapStream(this, project)
@@ -39,9 +32,11 @@ class Stream[+A] extends Observable[A] {
   }
 
   protected[this] def fire(nextValue: A): Unit = {
-    childActions.foreach(action => action(nextValue))
-    notifyObservers(nextValue) // @TODO When should this happen? Before or after propagation?
+    childObservers.foreach(_.onNext(nextValue))
+    notifyExternalObservers(nextValue) // @TODO When should this happen? Before or after propagation?
   }
+
+  // @TODO should onStart / onStop be part of Observable? Or are those specifically an APi for a Lazy Observable? Which is what a Stream is, essentially?
 
   /** This method is fired when this stream gets its first observer,
     * directly or indirectly (via child streams).
@@ -53,7 +48,7 @@ class Stream[+A] extends Observable[A] {
     *
     * This method is called when any of these conditions become false (often together at the same time)
     */
-  protected def onStart(): Unit = ()
+  protected[this] def onStart(): Unit = ()
 
   /** This method is fired when this stream loses its last observer,
     * including indirect ones (observers of child streams)
@@ -65,14 +60,11 @@ class Stream[+A] extends Observable[A] {
     *
     * This method is called when any of these conditions become false
     */
-  protected def onStop(): Unit = ()
+  protected[this] def onStop(): Unit = ()
 
   override def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
     val subscription = super.addObserver[B](observer)
-    val isStarting = numObserversAndChildActions == 1
-    if (isStarting) {
-      onStart()
-    }
+    maybeStart()
     subscription
   }
 
@@ -83,36 +75,43 @@ class Stream[+A] extends Observable[A] {
     */
   override def removeObserver[B >: A](observer: Observer[B]): Boolean = {
     val removed = super.removeObserver(observer)
-    val isStopping = removed && numObserversAndChildActions == 0
-    if (isStopping) {
-      onStop()
+    if (removed) {
+      maybeStop()
     }
     removed
   }
 
   /** Child stream calls this to declare that it was started */
-  private[stream] def onChildStarted(onNext: A => Unit): Unit = {
-    childActions.push(onNext)
-    val isStarting = numObserversAndChildActions == 1
+  override protected[airstream] def addChildObserver(observer: Observer[A]): Unit = {
+    super.addChildObserver(observer)
+    maybeStart()
+  }
+
+  /** Child stream calls this to declare that it was stopped */
+  override protected[airstream] def removeChildObserver(observer: Observer[A]): Boolean = {
+    val removed = super.removeChildObserver(observer)
+    if (removed) {
+      maybeStop()
+    }
+    removed
+  }
+
+  private[this] def maybeStart(): Unit = {
+    val isStarting = numAllObservers == 1
     if (isStarting) {
       onStart()
     }
   }
 
-  /** Child stream calls this to declare that it was stopped */
-  private[stream] def onChildStopped(onNext: A => Unit): Unit = {
-    val index = childActions.indexOf(onNext)
-    if (index != -1) {
-      childActions.splice(index, deleteCount = 1)
-      val isStopping = numObserversAndChildActions == 0
-      if (isStopping) {
-        onStop()
-      }
+  private[this] def maybeStop(): Unit = {
+    val isStopping = numAllObservers == 0
+    if (isStopping) {
+      onStop()
     }
   }
 
-  private[this] def numObserversAndChildActions: Int = {
-    observers.length + childActions.length
+  private[this] def numAllObservers: Int = {
+    externalObservers.length + childObservers.length
   }
 }
 
