@@ -31,7 +31,7 @@ trait ComputedSignal[A] extends Signal[A] {
     * (assuming the killed children are otherwise unreachable).
     */
   override private[airstream] def kill(): Unit = {
-    parents.foreach(_.removeChild(this))
+    parents.foreach(_.unlinkChild(this))
     super.kill()
   }
 

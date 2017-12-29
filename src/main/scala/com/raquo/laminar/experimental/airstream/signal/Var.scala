@@ -26,13 +26,6 @@ class Var[A](initialValue: A)(override protected implicit val owner: Owner) exte
     onNext(fn(currentValue))
   }
 
-  // TODO I think this and set() should be part of the Observer API... Maybe... Think about it.
-  // The original stream can always be transformed to A
-  // @TODO Make sure to properly handle killing when we add/remove these streams
-//  def updateFromStream(sourceStream: Stream[A])(implicit context: Context): Unit = {
-//    sourceStream.foreach(this.update, context)
-//  }
-
   /** Standard [[Observer]] method for receiving a new value.
     * [[set]] and [[update]] methods call into this, and are provided just for convenience. */
   override def onNext(nextValue: A): Unit = {

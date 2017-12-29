@@ -9,7 +9,7 @@ trait TestableSignal[A] extends Signal[A] {
 
   // Make these fields public for testing
 
-  def _testChildren: Seq[ComputedSignal[_]] = children
+  def _testChildren: Seq[ComputedSignal[_]] = linkedChildren
 
   def _testObservers: js.Array[Observer[A]] = observers
 

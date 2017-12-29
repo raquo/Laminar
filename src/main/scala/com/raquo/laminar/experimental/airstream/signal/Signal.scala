@@ -2,16 +2,12 @@ package com.raquo.laminar.experimental.airstream.signal
 
 import com.raquo.laminar.experimental.airstream.observation.{Observable, Observer, Subscription}
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
+import com.raquo.laminar.experimental.airstream.propagation.Parent
 import org.scalajs.dom
 
-trait Signal[A] extends Observable[A] with Owned {
+trait Signal[A] extends Observable[A] with Parent[ComputedSignal[_]] with Owned {
 
   protected[this] var currentValue: A
-
-  // @TODO "children" functionality probably belongs in the Observable trait (yes, really, even despite different memory management for streams)
-  // @TODO this is "protected" only for testing, otherwise could be private. Maybe use proper test tools
-  /** Note: This is enforced to be a set outside the type system (@TODO: or is it?). #performance */
-  protected[this] var children: Seq[ComputedSignal[_]] = Nil
 
   @inline def now(): A = currentValue
 
@@ -20,23 +16,6 @@ trait Signal[A] extends Observable[A] with Owned {
 
   def map[B](project: A => B)(implicit mapSignalOwner: Owner): MapSignal[A, B] = {
     new MapSignal(parent = this, project, mapSignalOwner)
-  }
-
-  // @TODO[WTF] Why can't this be simply "protected"? Because specialization?
-  private[airstream] def addChild(child: ComputedSignal[_]): Unit = {
-    children = children :+ child
-  }
-
-  private[airstream] def removeChild(child: ComputedSignal[_]): Unit = {
-    val index = children.indexOf(child)
-    if (index != -1) {
-      val parts = children.splitAt(index)
-      parts._1 ++ parts._2
-    }
-  }
-
-  private[airstream] def removeAllChildren(): Unit = {
-    children = Nil
   }
 
   /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
@@ -49,7 +28,7 @@ trait Signal[A] extends Observable[A] with Owned {
   private[airstream] def propagate(haltOnNextCombine: Boolean): Unit = {
     dom.console.log(s"> ${this}.Signal.propagate", haltOnNextCombine)
     createObservations()
-    children.foreach(_.propagate(haltOnNextCombine = true))
+    linkedChildren.foreach(_.propagate(haltOnNextCombine = true))
   }
 
   protected def createObservations(): Unit = {
@@ -72,7 +51,7 @@ trait Signal[A] extends Observable[A] with Owned {
     * - prevent side effects from firing
     */
   override private[airstream] def kill(): Unit = {
-    removeAllChildren()
+    unlinkAllChildren()
     removeAllObservers()
   }
 }

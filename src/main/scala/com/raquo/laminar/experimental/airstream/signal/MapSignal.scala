@@ -2,17 +2,17 @@ package com.raquo.laminar.experimental.airstream.signal
 
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 
-class MapSignal[A, B](
-  parent: Signal[A],
-  project: A => B,
+class MapSignal[I, O](
+  parent: Signal[I],
+  project: I => O,
   override val owner: Owner
-) extends ComputedSignal[B] {
+) extends ComputedSignal[O] {
 
-  override val parents: Seq[Signal[A]] = List(parent)
+  override val parents: Seq[Signal[I]] = List(parent)
 
-  parent.addChild(this)
+  parent.linkChild(this)
 
-  override protected[this] def calc(): B = {
+  override protected[this] def calc(): O = {
     project(parent.now())
   }
 

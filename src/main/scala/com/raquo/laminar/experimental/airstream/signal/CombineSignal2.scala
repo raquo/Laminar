@@ -10,8 +10,8 @@ class CombineSignal2[A, B](
 
   override private[airstream] val parents: Seq[Signal[_]] = List(parent1, parent2)
 
-  parent1.addChild(this)
-  parent2.addChild(this)
+  parent1.linkChild(this)
+  parent2.linkChild(this)
 
   override protected[this] def calc(): (A, B) = {
     (parent1.now(), parent2.now())
