@@ -5,9 +5,13 @@ import org.scalatest.{FunSpec, Matchers}
 
 class OwnerSpec extends FunSpec with Matchers {
 
-  class TestOwned(override val owner: Owner) extends Owned {
+  class TestOwned(owner: Owner) extends Owned {
 
     var killCount = 0
+
+    override protected[this] def registerWithOwner(): Unit = {
+      owner.own(this)
+    }
 
     override private[airstream] def kill(): Unit = {
       killCount += 1
