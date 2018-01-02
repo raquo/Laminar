@@ -16,15 +16,15 @@ trait Observable[+A] {
   /** Note: This is enforced to be a Set outside of the type system #performance */
   protected[this] val internalObservers: js.Array[Observer[A]] = js.Array()
 
-  def foreach[B >: A](onNext: B => Unit)(implicit subscriptionOwner: Owner): Subscription[B] = {
+  def foreach(onNext: A => Unit)(implicit subscriptionOwner: Owner): Subscription = {
     val observer = Observer(onNext)
-    addObserver[B](observer)(subscriptionOwner)
+    addObserver(observer)(subscriptionOwner)
   }
 
   // @TODO explain the difference between child observers and external observers
   /** And an external observer */
-  def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
-    val subscription = new Subscription[B](observer, this, subscriptionOwner)
+  def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
+    val subscription = Subscription(observer, this, subscriptionOwner)
     externalObservers.push(observer)
     dom.console.log(s"Adding subscription: $subscription")
     subscription
@@ -35,7 +35,7 @@ trait Observable[+A] {
     *
     * @return whether observer was removed (`false` if it wasn't subscribed to this observable)
     */
-  def removeObserver[B >: A](observer: Observer[B]): Boolean = {
+  def removeObserver(observer: Observer[A]): Boolean = {
     val index = externalObservers.indexOf(observer)
     val shouldRemove = index != -1
     if (shouldRemove) {

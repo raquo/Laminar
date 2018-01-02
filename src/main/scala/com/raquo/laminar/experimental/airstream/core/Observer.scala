@@ -15,7 +15,7 @@ object Observer {
     val onNextParam = onNext // It's beautiful on the outside
     new Observer[A] { // @TODO[Elegance] Make this a Single Abstract Method eventually (2.12) https://stackoverflow.com/a/4387368/2601788
       override def onNext(nextValue: A): Unit = {
-        dom.console.log("===== Observer.onNext", nextValue.asInstanceOf[js.Any])
+        dom.console.log(s"===== Observer(${hashCode()}).onNext", nextValue.asInstanceOf[js.Any])
         onNextParam(nextValue)
       }
     }

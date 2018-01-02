@@ -9,7 +9,7 @@ package com.raquo.laminar.experimental.airstream.ownership
   * a given [[Owned]] depends on becomes unreachable, which might never happen.
   *
   * So, such leaky resources can only be instantiated if they notify their [[Owner]]
-  * about their existence. An owner is something that knows when these resources
+  * about their existence. The owner is something that knows when these resources
   * are no longer needed. For example, an owner could be a UI component that knows
   * when it was unmounted / discarded. The component would then `kill`s the Signals
   * and Subscriptions that were defined to belong to it upon creation.
@@ -20,9 +20,11 @@ package com.raquo.laminar.experimental.airstream.ownership
   */
 trait Owned {
 
-  protected val owner: Owner
+  registerWithOwner()
 
-  owner.own(this)
+  // @TODO[Elegance] This API is weird and not very useful (not really enforcing all ownership constraints). Reconsider.
+  /** This method should call owner.own(this) for a particular owner. */
+  protected[this] def registerWithOwner(): Unit
 
   /** This will be called by an [[Owner]] when this resource should be discarded.
     *

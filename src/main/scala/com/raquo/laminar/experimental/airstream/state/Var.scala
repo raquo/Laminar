@@ -6,7 +6,7 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-class Var[A](initialValue: A)(override protected implicit val owner: Owner) extends State[A] {
+class Var[A](initialValue: A)(implicit owner: Owner) extends State[A] {
 
   override protected var currentValue: A = initialValue
 
@@ -39,6 +39,10 @@ class Var[A](initialValue: A)(override protected implicit val owner: Owner) exte
     // @TODO Wait, but how do we deal with this being an Observer, so essentially being able to observe any other Observable with no record of it?
     // @TODO I think the answer lies in this observation not being part of the propagation. Technically you could do anything inside any .foreach anyway.
     false
+  }
+
+  override protected[this] def registerWithOwner(): Unit = {
+    owner.own(this)
   }
 
   override def toString: String = s"Var@${hashCode()}(value=$currentValue)"

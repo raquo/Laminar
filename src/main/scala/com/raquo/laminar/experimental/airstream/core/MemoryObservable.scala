@@ -20,8 +20,8 @@ trait MemoryObservable[+A] extends Observable[A] {
   }
 
   /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
-  override def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
-    val subscription = super.addObserver[B](observer)
+  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
+    val subscription = super.addObserver(observer)
     observer.onNext(currentValue) // @TODO now or later? Call notifyObserver instead or something?
     subscription
   }

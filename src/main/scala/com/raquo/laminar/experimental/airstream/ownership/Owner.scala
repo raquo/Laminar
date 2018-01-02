@@ -24,7 +24,7 @@ trait Owner {
   }
 
   /** This method should only be called from the Owned instance when it's initialized */
-  private[ownership] def own(owned: Owned): Unit = {
+  private[airstream] def own(owned: Owned): Unit = {
     possessions.push(owned)
   }
 }

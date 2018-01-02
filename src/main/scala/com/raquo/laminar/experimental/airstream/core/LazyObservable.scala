@@ -25,8 +25,8 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
 
   def combineWith[AA >: A, B](otherObservable: S[B]): S[(AA, B)]
 
-  override def addObserver[B >: A](observer: Observer[B])(implicit subscriptionOwner: Owner): Subscription[B] = {
-    val subscription = super.addObserver[B](observer)
+  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
+    val subscription = super.addObserver(observer)
     maybeStart()
     subscription
   }
@@ -36,7 +36,7 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
     *
     * @return whether observer was removed (`false` if it wasn't subscribed to this observable)
     */
-  override def removeObserver[B >: A](observer: Observer[B]): Boolean = {
+  override def removeObserver(observer: Observer[A]): Boolean = {
     val removed = super.removeObserver(observer)
     if (removed) {
       maybeStop()
