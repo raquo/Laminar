@@ -1,7 +1,8 @@
 package com.raquo.laminar.experimental.airstream.fixtures
 
-import com.raquo.laminar.experimental.airstream.observation.Observer
-import com.raquo.laminar.experimental.airstream.signal.{ComputedSignal, Signal}
+import com.raquo.laminar.experimental.airstream.core.Observer
+import com.raquo.laminar.experimental.airstream.old.{ComputedSignal, Signal}
+import com.raquo.laminar.experimental.airstream.signal.Signal
 
 import scala.scalajs.js
 

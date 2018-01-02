@@ -1,6 +1,10 @@
 # Airstream
 
 
+# TODO: THIS IS CRIMINALLY OUT OF DATE.
+
+## This is only relevant to the very first implementation of Airstream which was rewritten almost from scratch.
+
 
 ## Ownership
 

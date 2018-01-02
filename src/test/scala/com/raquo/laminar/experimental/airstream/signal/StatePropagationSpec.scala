@@ -1,11 +1,13 @@
 package com.raquo.laminar.experimental.airstream.signal
 
 import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect, TestableOwner}
+import com.raquo.laminar.experimental.airstream.state.State
+import com.raquo.laminar.experimental.airstream.state.Var
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.collection.mutable
 
-class SignalPropagationSpec extends FunSpec with Matchers {
+class StatePropagationSpec extends FunSpec with Matchers {
 
   it("simple var-map chain with two forks - propagates values") {
 
@@ -210,7 +212,7 @@ class SignalPropagationSpec extends FunSpec with Matchers {
     val $v1 = new Var(1)
     val $v2 = new Var(10)
     val $m3 = $v2.map(_ + 10)
-    val $c4 = Signal.combine($v1, $m3)
+    val $c4 = $v1.combineWith($m3)
     val $m5 = $c4.map2(_ + _ + 1000)
     $m5.foreach(makeObserver[Int]("m5"))
     $c4.foreach(makeObserver[(Int, Int)]("c4"))

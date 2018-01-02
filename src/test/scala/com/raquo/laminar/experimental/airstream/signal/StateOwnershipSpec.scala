@@ -1,11 +1,12 @@
 package com.raquo.laminar.experimental.airstream.signal
 
 import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect, TestableOwner, TestableSignal}
+import com.raquo.laminar.experimental.airstream.state.Var
 import org.scalatest.{FunSpec, Matchers}
 
 import scala.collection.mutable
 
-class SignalOwnershipSpec extends FunSpec with Matchers {
+class StateOwnershipSpec extends FunSpec with Matchers {
 
   it("Var that was killed does not respond to updates") {
 

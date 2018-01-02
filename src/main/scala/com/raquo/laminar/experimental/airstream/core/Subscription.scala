@@ -1,4 +1,4 @@
-package com.raquo.laminar.experimental.airstream.observation
+package com.raquo.laminar.experimental.airstream.core
 
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
 

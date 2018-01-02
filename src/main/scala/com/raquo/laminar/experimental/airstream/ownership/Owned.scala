@@ -2,14 +2,14 @@ package com.raquo.laminar.experimental.airstream.ownership
 
 /** Represents a leaky resource such as a
   * [[com.raquo.laminar.experimental.airstream.signal.Signal]] or a
-  * [[com.raquo.laminar.experimental.airstream.observation.Subscription]]
+  * [[com.raquo.laminar.experimental.airstream.core.Subscription]]
   *
   * Due to circular references, such resources will leak memory if
   * not explicitly disabled. Well, unless the whole Signal/Stream graph that
-  * a given [[Owned]] depends on becomes unreachable, which never happen.
+  * a given [[Owned]] depends on becomes unreachable, which might never happen.
   *
   * So, such leaky resources can only be instantiated if they notify their [[Owner]]
-  * about their existence. The owner is something that knows when these resources
+  * about their existence. An owner is something that knows when these resources
   * are no longer needed. For example, an owner could be a UI component that knows
   * when it was unmounted / discarded. The component would then `kill`s the Signals
   * and Subscriptions that were defined to belong to it upon creation.
