@@ -54,6 +54,8 @@ trait Observable[+A] {
     *         For example, [[com.raquo.laminar.experimental.airstream.eventstream.MapEventStream]] will return true when asked
     *         if it depends on its parent, even though it will only fire if its filter condition passes.
     *
+    *         Note: you should NOT call this method with otherObservable == this
+    *
     *         When implementing this method, make sure to add current observable to `seenObservables`
     * - if returning `false`, and
     * - before calling this method on any other observable

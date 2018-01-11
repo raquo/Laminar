@@ -27,4 +27,12 @@ trait Owner {
   private[airstream] def own(owned: Owned): Unit = {
     possessions.push(owned)
   }
+
+  /** Some possessions can be killed externally, e.g. `WriteBusSource.` */
+  def onKilledExternally(owned: Owned): Unit = {
+    val index = possessions.indexOf(owned)
+    if (index != -1) {
+      possessions.splice(index, deleteCount = 1)
+    }
+  }
 }

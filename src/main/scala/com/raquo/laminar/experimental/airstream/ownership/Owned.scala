@@ -26,8 +26,7 @@ trait Owned {
   /** This method should call owner.own(this) for a particular owner. */
   protected[this] def registerWithOwner(): Unit
 
-  /** This will be called by an [[Owner]] when this resource should be discarded.
-    *
-    */
+  // @TODO[API,Docs] Update access level and comment...
+  /** This will be called by an [[Owner]] when this resource should be discarded. */
   private[airstream] def kill(): Unit
 }
