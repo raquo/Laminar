@@ -3,7 +3,7 @@ package com.raquo.laminar.experimental.airstream.features
 import com.raquo.laminar.experimental.airstream.core.{Observable, Observer}
 
 /** A simple observable that only has one parent. */
-trait SingleParentObservable[I, O] extends Observable[O] {
+trait SingleParentObservable[I, +O] extends Observable[O] {
 
   /** An internal observer that we subscribe to the parent observable
     * when this stream starts, and unsubscribe when this stream stops.

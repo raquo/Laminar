@@ -27,7 +27,14 @@ import scala.scalajs.js
   */
 trait SyncObservable[A] extends SingleParentSyncObservable[A, A] {
 
-  private[SyncObservable] var maybeLastValue: Option[A] = None
+  /** Soft sync allows this observable to be evaluated without sync as a
+    * solution to deadlock, a situation where all pending observables
+    * sync-depend on each other. In that case, the first soft-synced pending
+    * observable will be evaluated until the deadlock is resolved.
+    */
+  val isSoft: Boolean
+
+  private[this] var maybeLastValue: Option[A] = None
 
   @inline private[this] def isPending = maybeLastValue.isDefined
 
@@ -42,7 +49,7 @@ trait SyncObservable[A] extends SingleParentSyncObservable[A, A] {
     // @TODO[Integrity] maybeLastValue MUST be defined at this point, if it isn't, something is wrong with Airstream logic
     maybeLastValue.foreach { syncedValue =>
       maybeLastValue = None
-      super.fire(syncedValue)
+      fire(syncedValue)
     }
   }
 }
@@ -56,22 +63,48 @@ object SyncObservable {
   private[airstream] def resolvePendingSyncObservables(): Unit = {
     dom.console.log(">>>>>> resolvePendingSyncObservables")
     dom.console.log(pendingObservables)
-    // @TODO[Integrity,Performance] recursion here is simply to blow up the stack in case of a deadlock. We should
-    // @TODO We should handle deadlocks properly
-    // @TODO We should have weakSync() or something that would allow the observable to be processed in case of deadlock
-    def loop(): Unit = {
+    // @TODO[Performance] recursion was here simply to blow up the stack in case of a deadlock, but we don't need that anymore
+    def loop(shouldResolveDeadlock: Boolean = false): Unit = {
       if (pendingObservables.length > 0) {
+        var isDeadlock = true
         var index = 0
-        while (pendingObservables.length > index) {
+        while (index < pendingObservables.length) {
           val observable = pendingObservables(index)
-          if (!syncDependsOnAnyOtherPendingObservable(observable)) {
+          val shouldFire = if (shouldResolveDeadlock) {
+            // We try to resolve deadlock by getting through a soft synced observable.
+            // Note: deadlock condition means that all pending observables
+            //       depend on each other, so there is no point in checking
+            //       syncDependsOnAnyOtherPendingObservable in this branch
+            //       (we clear deadlock status down below as soon as we find
+            //       a soft sync observable to fire).
+            observable.isSoft
+          } else {
+            // Normally, we fire the first pending observable that does not depend on
+            // any other pending observables
+            !syncDependsOnAnyOtherPendingObservable(observable)
+          }
+          if (shouldFire) {
+            isDeadlock = false
             pendingObservables.splice(index, deleteCount = 1)
             observable.syncFire()
+            if (shouldResolveDeadlock) {
+              // We've fired a soft-synced observable to resolve the deadlock.
+              // At this point, the deadlock *might* be resolved.
+              // We should start a new loop to try from the beginning.
+              index = pendingObservables.length
+            }
           } else {
             index += 1
           }
         }
-        loop()
+        if (isDeadlock) {
+          throw new Exception("Airstream: Deadlock detected")
+          // @TODO[API] Exception should be its own class
+          // @TODO[Integrity] What should we do here? Should we clear pending observables?
+          // @TODO We should probably send an error to the first observable and check for deadlock again (once we have error handling)
+        }
+        // @TODO >>> throw a deadlock exception here?
+        loop(shouldResolveDeadlock = isDeadlock)
       }
     }
     loop()

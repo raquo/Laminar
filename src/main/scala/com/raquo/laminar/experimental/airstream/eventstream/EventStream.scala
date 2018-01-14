@@ -4,6 +4,17 @@ import com.raquo.laminar.experimental.airstream.core.LazyObservable
 
 trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
+  // @TODO[API] Can we make SyncEventStream covariant in A and include that type in .softSync/.sync output?
+  // @TODO[Performance] SyncEventStream should override .softSync and .sync to return `this`, I think
+
+  def softSync(): EventStream[A] = {
+    new SyncEventStream(this, isSoft = true)
+  }
+
+  def sync(): EventStream[A] = {
+    new SyncEventStream(this, isSoft = false)
+  }
+
   override def map[B](project: A => B): EventStream[B] = {
     new MapEventStream(this, project)
   }

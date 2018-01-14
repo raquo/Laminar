@@ -30,6 +30,7 @@ class CombineEventStream2[A, B](
     }
   })
 
+  // @TODO[API] This should be in an implicit value class, I think.
   def map2[C](project: (A, B) => C): EventStream[C] = {
     new MapEventStream[(A, B), C](
       parent = this,
