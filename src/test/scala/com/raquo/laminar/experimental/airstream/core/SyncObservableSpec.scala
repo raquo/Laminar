@@ -1,6 +1,7 @@
 package com.raquo.laminar.experimental.airstream.core
 
 import com.raquo.laminar.experimental.airstream.eventbus.EventBus
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.experimental.airstream.fixtures.{Calculation, Effect, TestableOwner}
 import org.scalatest.{FunSpec, Matchers}
 
@@ -92,6 +93,95 @@ class SyncObservableSpec extends FunSpec with Matchers {
       Effect("tuples", (300, 30)),
       Effect("syncTuples", (300, 30)),
       Effect("softSyncTuples", (300, 30))
+    )
+    effects.clear()
+  }
+
+  it("sync and softSync fix merge stream glitch") {
+
+    implicit val testOwner: TestableOwner = new TestableOwner
+    val bus = new EventBus[Int]
+    val unrelatedBus = new EventBus[Int]
+
+    val tens = bus.events.map(_ * 10)
+    val hundreds = tens.map(_ * 10)
+
+    val numbers = EventStream.merge(tens, hundreds, unrelatedBus.events)
+    val syncNumbers = numbers.sync()
+    val softSyncNumbers = numbers.softSync()
+
+    val calculations = mutable.Buffer[Calculation[Int]]()
+    val effects = mutable.Buffer[Effect[Int]]()
+
+    numbers
+      .map(Calculation.log("numbers", calculations))
+      .foreach(effects += Effect("numbers", _))
+    syncNumbers
+      .map(Calculation.log("syncNumbers", calculations))
+      .foreach(effects += Effect("syncNumbers", _))
+    softSyncNumbers
+      .map(Calculation.log("softSyncNumbers", calculations))
+      .foreach(effects += Effect("softSyncNumbers", _))
+
+    // Sync and Soft Sync should propagate only the last event
+    // fired by the merged stream within the propagation
+
+    // ---
+
+    bus.writer.onNext(1)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("numbers", 10),
+      Calculation("numbers", 100),
+      Calculation("syncNumbers", 100),
+      Calculation("softSyncNumbers", 100)
+    )
+    calculations.clear()
+
+    effects shouldEqual mutable.Buffer(
+      Effect("numbers", 10),
+      Effect("numbers", 100),
+      Effect("syncNumbers", 100),
+      Effect("softSyncNumbers", 100)
+    )
+    effects.clear()
+
+    // ---
+
+    // Firing an event on an unrelated bus should behave normally
+    unrelatedBus.writer.onNext(-1)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("numbers", -1),
+      Calculation("syncNumbers", -1),
+      Calculation("softSyncNumbers", -1)
+    )
+    calculations.clear()
+
+    effects shouldEqual mutable.Buffer(
+      Effect("numbers", -1),
+      Effect("syncNumbers", -1),
+      Effect("softSyncNumbers", -1)
+    )
+    effects.clear()
+
+    // ---
+
+    bus.writer.onNext(2)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("numbers", 20),
+      Calculation("numbers", 200),
+      Calculation("syncNumbers", 200),
+      Calculation("softSyncNumbers", 200)
+    )
+    calculations.clear()
+
+    effects shouldEqual mutable.Buffer(
+      Effect("numbers", 20),
+      Effect("numbers", 200),
+      Effect("syncNumbers", 200),
+      Effect("softSyncNumbers", 200)
     )
     effects.clear()
   }

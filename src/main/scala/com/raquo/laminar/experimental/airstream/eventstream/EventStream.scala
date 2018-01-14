@@ -47,4 +47,8 @@ object EventStream {
   ): EventStream[(A, B)] = {
     new CombineEventStream2(stream1, stream2)
   }
+
+  def merge[A](streams: EventStream[A]*): EventStream[A] = {
+    new MergeEventStream[A](streams)
+  }
 }
