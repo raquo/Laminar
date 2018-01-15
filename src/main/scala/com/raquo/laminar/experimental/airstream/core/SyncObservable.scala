@@ -61,7 +61,7 @@ object SyncObservable {
   // @TODO Add more comments / description
 
   private[airstream] def resolvePendingSyncObservables(): Unit = {
-    dom.console.log(">>>>>> resolvePendingSyncObservables")
+    dom.console.log(s">>>>>> resolvePendingSyncObservables (num=${pendingObservables.length})")
     dom.console.log(pendingObservables)
     // @TODO[Performance] recursion was here simply to blow up the stack in case of a deadlock, but we don't need that anymore
     def loop(shouldResolveDeadlock: Boolean = false): Unit = {

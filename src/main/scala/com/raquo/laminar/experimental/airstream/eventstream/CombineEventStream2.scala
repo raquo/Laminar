@@ -17,6 +17,7 @@ class CombineEventStream2[A, B](
   private[this] var maybeLastParent2Value: Option[B] = None
 
   override protected[this] lazy val parent1Observer: Observer[A] = Observer(nextParent1Value => {
+    // println(s"> updated p1 value to $nextParent1Value")
     maybeLastParent1Value = Some(nextParent1Value)
     maybeLastParent2Value.foreach { lastParent2Value =>
       fire((nextParent1Value, lastParent2Value))
@@ -24,6 +25,7 @@ class CombineEventStream2[A, B](
   })
 
   override protected[this] lazy val parent2Observer: Observer[B] = Observer(nextParent2Value => {
+    // println(s"> updated p2 value to $nextParent2Value")
     maybeLastParent2Value = Some(nextParent2Value)
     maybeLastParent1Value.foreach { lastParent1Value =>
       fire((lastParent1Value, nextParent2Value))

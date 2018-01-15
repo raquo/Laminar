@@ -13,7 +13,7 @@ class WriteBus[A] extends Observer[A] { self =>
     new WriteBusSource(stream, sourceStream, owner)
   }
 
-  // @TODO better names fpr mapWriter / filterWriter, consider lens/zoom/etc.
+  // @TODO better names for mapWriter / filterWriter, consider lens/zoom/etc.
 
   def mapWriter[B](project: B => A)(implicit owner: Owner): WriteBus[B] = {
     val mapBus = new WriteBus[B]

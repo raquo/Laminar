@@ -12,20 +12,21 @@ class SyncObservableSpec extends FunSpec with Matchers {
   it("sync and softSync fix diamond case glitch (combineWith)") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
+
+    val calculations = mutable.Buffer[Calculation[(Int, Int)]]()
+    val effects = mutable.Buffer[Effect[(Int, Int)]]()
+
     val bus = new EventBus[Int]
 
     val tens = bus.events.map(_ * 10)
     val hundreds = tens.map(_ * 10)
 
     val tuples = hundreds.combineWith(tens)
+      .map(Calculation.log("tuples", calculations))
     val syncTuples = tuples.sync()
     val softSyncTuples = tuples.softSync()
 
-    val calculations = mutable.Buffer[Calculation[(Int, Int)]]()
-    val effects = mutable.Buffer[Effect[(Int, Int)]]()
-
     tuples
-      .map(Calculation.log("tuples", calculations))
       .foreach(effects += Effect("tuples", _))
     syncTuples
       .map(Calculation.log("syncTuples", calculations))
@@ -100,21 +101,23 @@ class SyncObservableSpec extends FunSpec with Matchers {
   it("sync and softSync fix merge stream glitch") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
+
+    val calculations = mutable.Buffer[Calculation[Int]]()
+    val effects = mutable.Buffer[Effect[Int]]()
+
     val bus = new EventBus[Int]
     val unrelatedBus = new EventBus[Int]
 
     val tens = bus.events.map(_ * 10)
     val hundreds = tens.map(_ * 10)
 
-    val numbers = EventStream.merge(tens, hundreds, unrelatedBus.events)
+    val numbers = EventStream
+      .merge(tens, hundreds, unrelatedBus.events)
+      .map(Calculation.log("numbers", calculations))
     val syncNumbers = numbers.sync()
     val softSyncNumbers = numbers.softSync()
 
-    val calculations = mutable.Buffer[Calculation[Int]]()
-    val effects = mutable.Buffer[Effect[Int]]()
-
     numbers
-      .map(Calculation.log("numbers", calculations))
       .foreach(effects += Effect("numbers", _))
     syncNumbers
       .map(Calculation.log("syncNumbers", calculations))
@@ -186,12 +189,160 @@ class SyncObservableSpec extends FunSpec with Matchers {
     effects.clear()
   }
 
-  ignore("dependent but not deadlocked pending observables resolve correctly") {
+  it("dependent but not deadlocked pending observables resolve correctly") {
 
+    implicit val testOwner: TestableOwner = new TestableOwner
+
+    val calculations = mutable.Buffer[Calculation[Int]]()
+    val effects = mutable.Buffer[Effect[Int]]()
+
+    val busA = new EventBus[Int]
+    val busB = new EventBus[Int]
+
+    // A, B – independent
+    // C = A + B
+    // D = C + B
+    // E = C + A
+    // X = D + E
+
+    val streamTupleAB = busA.events.combineWith(busB.events)
+    val streamC = streamTupleAB.map2(_ + _).map(Calculation.log("C", calculations))
+    val streamD = busB.events.combineWith(streamC).map2(_ + _).map(Calculation.log("D", calculations))
+    val streamE = busA.events.combineWith(streamC).map2(_ + _).map(Calculation.log("E", calculations))
+
+    val streamX = streamD.combineWith(streamE).map2(_ + _)
+      .map(Calculation.log("X", calculations))
+
+    streamX
+      .foreach(effects += Effect("X", _))
+    streamX.sync()
+      .map(Calculation.log("sync-X", calculations))
+      .foreach(effects += Effect("sync-X", _))
+    streamX.softSync()
+      .map(Calculation.log("softSync-X", calculations))
+      .foreach(effects += Effect("softSync-X", _))
+
+    // ---
+
+    // First event does not propagate because streamTupleAB lacks the second input
+    busB.writer.onNext(1)
+
+    calculations shouldEqual mutable.Buffer()
+    effects shouldEqual mutable.Buffer()
+
+    // ---
+
+    // Second event does not have redundant calculations because D lacked second input until now
+    busA.writer.onNext(100)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("C", 101),
+      Calculation("D", 102),
+      Calculation("E", 201),
+      Calculation("X", 303),
+      Calculation("sync-X", 303),
+      Calculation("softSync-X", 303)
+    )
+    effects shouldEqual mutable.Buffer(
+      Effect("X", 303),
+      Effect("sync-X", 303),
+      Effect("softSync-X", 303)
+    )
+    calculations.clear()
+    effects.clear()
+
+    // ---
+
+    // Third event results in redundant calculations and inconsistent effects for unsynced
+    // streams, whereas synced and soft-synced streams remain consistent
+    busA.writer.onNext(200)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("C", 201),
+      Calculation("D", 202),
+      Calculation("X", 403), // Inconsistent: calculated with old E = 201, and new D = 202
+      Calculation("E", 301), // Inconsistent: calculated with new C = 201, but old A = 100
+      Calculation("X", 503), // Inconsistent: calculated with inconsistent E = 301, and new D = 202
+      Calculation("E", 401), // Now consistent: calculated with new C = 201, and new A = 200
+      Calculation("X", 603), // Now consistent: calculated with new E = 401, and new D = 202
+      Calculation("sync-X", 603), // sync and softSync versions are always consistent
+      Calculation("softSync-X", 603)
+    )
+    effects shouldEqual mutable.Buffer(
+      Effect("X", 403), // Inconsistent because not sync-ed (see explanation in calculations above)
+      Effect("X", 503), // ^ same
+      Effect("X", 603),
+      Effect("sync-X", 603), // sync and softSync versions are always consistent
+      Effect("softSync-X", 603)
+    )
+    calculations.clear()
+    effects.clear()
+
+    // @TODO Fire another test event to busB for slightly more thorough test
   }
 
   ignore("deadlocked pending observables resolve by firing a soft synced observable") {
 
+    // @TODO Unsynced version produces unexpected results. Figure that out first before proceeding. Something probably wrong in EventBus
+
+    implicit val testOwner: TestableOwner = new TestableOwner
+
+    val calculations = mutable.Buffer[Calculation[Int]]()
+    val effects = mutable.Buffer[Effect[Int]]()
+
+    val busA = new EventBus[Int]
+    val busB = new EventBus[Int]
+    val busC = new EventBus[Int]
+
+    // A = C | B.map(_ * 10)
+    // B = C | A.filter(_ <= 30).map(_ + 1)
+    // D = A + B
+
+    val streamA = busA.events
+      .map(Calculation.log("A", calculations))
+    val streamB = busB.events
+      .map(Calculation.log("B", calculations))
+    val streamC = busC.events
+      .map(Calculation.log("C", calculations))
+
+    busA.writer.addSource(streamC)
+    busB.writer.addSource(streamC)
+    busA.writer.addSource(streamB.map(_ * 10).map(Calculation.log("B x 10", calculations)))
+    busB.writer.addSource(streamA.filter(_ <= 100).map(_ + 1))
+
+    val streamD = streamA.combineWith(streamB).map2((x, y) => {
+      println(x, y)
+      x + y
+    })
+      //.map2(_ + _)
+      .map(Calculation.log("D", calculations))
+
+    streamB
+      .foreach(effects += Effect("B", _))
+    streamD
+      .foreach(effects += Effect("D", _))
+
+    busA.writer.onNext(1)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("A", 1),
+      Calculation("B", 2),
+      Calculation("A", 20),
+      Calculation("B", 21),
+      Calculation("A", 210)
+    )
+    effects shouldEqual mutable.Buffer(
+      Effect("D", 231),
+      Effect("D", 212)
+    )
+    calculations.clear()
+    effects.clear()
+
+
+    // >> create two event buses that depend on each other's streams
+    // >> add some filter to make sure the loop terminates
+    // >> fire event on one bus, expect certain events on the output stream,
+    //    as well as different events on the soft-sync-ed output stream
   }
 
 }

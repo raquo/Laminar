@@ -9,7 +9,9 @@ package object fixtures {
   object Calculation {
 
     def log[V](name: String, to: mutable.Buffer[Calculation[V]])(value: V): V = {
-      to += Calculation(name, value)
+      val calculation = Calculation(name, value)
+      println(calculation)
+      to += calculation
       value
     }
   }
