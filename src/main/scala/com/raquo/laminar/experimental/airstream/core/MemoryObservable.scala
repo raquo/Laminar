@@ -13,10 +13,10 @@ trait MemoryObservable[+A] extends Observable[A] {
   //  lazy val changes: Stream[A] = ???
 
 
-  override protected[this] def fire(nextValue: A): Unit = {
+  override protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
     // @TODO Should this fire if value didn't actually change?
     currentValue = nextValue
-    super.fire(nextValue)
+    super.fire(nextValue, transaction)
   }
 
   /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
@@ -27,8 +27,9 @@ trait MemoryObservable[+A] extends Observable[A] {
   }
 
   /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
-  override protected[airstream] def addInternalObserver(observer: Observer[A]): Unit = {
+  override protected[airstream] def addInternalObserver(observer: InternalObserver[A]): Unit = {
+    // @TODO when is this actually called, and is it ok to create a new transaction here?
     super.addInternalObserver(observer)
-    observer.onNext(currentValue)
+    new Transaction(observer.onNext(currentValue, _))
   }
 }

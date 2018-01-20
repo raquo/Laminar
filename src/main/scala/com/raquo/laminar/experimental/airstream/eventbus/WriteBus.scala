@@ -1,10 +1,10 @@
 package com.raquo.laminar.experimental.airstream.eventbus
 
-import com.raquo.laminar.experimental.airstream.core.{Observer, SyncObservable}
+import com.raquo.laminar.experimental.airstream.core.{Observer, Transaction}
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 
-class WriteBus[A] extends Observer[A] { self =>
+class WriteBus[A] extends Observer[A] {
 
   private[eventbus] val stream: WriteBusStream[A] = new WriteBusStream(this)
 
@@ -28,17 +28,16 @@ class WriteBus[A] extends Observer[A] { self =>
   }
 
   override def onNext(nextValue: A): Unit = {
-    if (stream.isStarted) {
-      stream.fireBus(nextValue)
-      SyncObservable.resolvePendingSyncObservables()
+    if (stream.isStarted) { // important check
+      new Transaction(stream.onNext(nextValue, _))
     }
   }
 
   override def map[B](project: B => A): Observer[B] = {
-    Observer(nextValue => self.onNext(project(nextValue)))
+    Observer(nextValue => onNext(project(nextValue)))
   }
 
   override def filter[B <: A](passes: B => Boolean): Observer[B] = {
-    Observer(nextValue => if (passes(nextValue)) self.onNext(nextValue))
+    Observer(nextValue => if (passes(nextValue)) onNext(nextValue))
   }
 }

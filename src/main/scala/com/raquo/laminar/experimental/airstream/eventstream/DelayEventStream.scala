@@ -1,7 +1,7 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
 import com.raquo.laminar.experimental.airstream.features.SingleParentObservable
-import com.raquo.laminar.experimental.airstream.core.{Observable, Observer}
+import com.raquo.laminar.experimental.airstream.core.{Observable, Transaction}
 
 import scala.scalajs.js
 import scala.scalajs.js.timers.setTimeout
@@ -11,8 +11,10 @@ class DelayEventStream[A](
   delayMillis: Int
 ) extends EventStream[A] with SingleParentObservable[A, A] {
 
-  override protected[this] val inputObserver: Observer[A] = Observer { newParentValue =>
-    setTimeout(interval = delayMillis)(fire(newParentValue))
+  override protected[airstream] def onNext(nextValue: A, transaction: Transaction): Unit = {
+    setTimeout(interval = delayMillis){
+      new Transaction(fire(nextValue, _))
+    }
   }
 
   /** Async stream does not depend on anything synchronously. */

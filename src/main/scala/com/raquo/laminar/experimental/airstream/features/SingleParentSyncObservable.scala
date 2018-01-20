@@ -9,7 +9,10 @@ trait SingleParentSyncObservable[I, +O] extends SingleParentObservable[I, O] {
 
   // @TODO Seems like a good default, but only for sync streams. Keep it here or move somewhere else?
   /** This only works for synchronous streams*/
-  override protected[airstream] def syncDependsOn(otherObservable: Observable[_], seenObservables: js.Array[Observable[_]]): Boolean = {
+  override protected[airstream] def syncDependsOn(
+    otherObservable: Observable[_],
+    seenObservables: js.Array[Observable[_]]
+  ): Boolean = {
     if (otherObservable == parent) {
       true
     } else {

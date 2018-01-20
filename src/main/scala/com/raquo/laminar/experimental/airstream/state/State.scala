@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.state
 
-import com.raquo.laminar.experimental.airstream.core.MemoryObservable
+import com.raquo.laminar.experimental.airstream.core.{MemoryObservable, Transaction}
 import com.raquo.laminar.experimental.airstream.ownership.Owned
 
 // @TODO
@@ -12,10 +12,10 @@ trait State[+A] extends MemoryObservable[A] with Owned {
   onStart() // State starts itself, it does not need any dependencies to run
 
   /** State propagates only if its value has changed */ // @TODO Should this also apply to MemoryStream-s?
-  override protected[this] def fire(nextValue: A): Unit = {
+  override protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
     if (!isDead) { // ??
       if (nextValue != currentValue) {
-        super.fire(nextValue)
+        super.fire(nextValue, transaction)
       }
     }
   }

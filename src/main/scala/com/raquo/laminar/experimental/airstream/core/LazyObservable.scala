@@ -45,13 +45,13 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
   }
 
   /** Child stream calls this to declare that it was started */
-  override protected[airstream] def addInternalObserver(observer: Observer[A]): Unit = {
+  override protected[airstream] def addInternalObserver(observer: InternalObserver[A]): Unit = {
     super.addInternalObserver(observer)
     maybeStart()
   }
 
   /** Child stream calls this to declare that it was stopped */
-  override protected[airstream] def removeInternalObserver(observer: Observer[A]): Boolean = {
+  override protected[airstream] def removeInternalObserver(observer: InternalObserver[A]): Boolean = {
     val removed = super.removeInternalObserver(observer)
     if (removed) {
       maybeStop()

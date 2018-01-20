@@ -12,10 +12,11 @@ trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A, Signal] {
     operator(this)
   }
 
-  override def combineWith[AA >: A, B](otherSignal: Signal[B]): CombineSignal2[AA, B] = {
+  override def combineWith[AA >: A, B](otherSignal: Signal[B]): CombineSignal2[AA, B, (AA, B)] = {
     new CombineSignal2(
       parent1 = this,
-      parent2 = otherSignal
+      parent2 = otherSignal,
+      combinator = (_, _)
     )
   }
 }

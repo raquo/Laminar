@@ -1,7 +1,7 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
 import com.raquo.laminar.experimental.airstream.features.SingleParentSyncObservable
-import com.raquo.laminar.experimental.airstream.core.Observer
+import com.raquo.laminar.experimental.airstream.core.{Observer, Transaction}
 
 /** This stream fires a subset of the events fired by its parent */
 class FilterEventStream[A](
@@ -9,9 +9,9 @@ class FilterEventStream[A](
   passes: A => Boolean
 ) extends EventStream[A] with SingleParentSyncObservable[A, A] {
 
-  override protected[this] val inputObserver: Observer[A] = Observer { newParentValue =>
-    if (passes(newParentValue)) {
-      fire(newParentValue)
+  override protected[airstream] def onNext(nextParentValue: A, transaction: Transaction): Unit = {
+    if (passes(nextParentValue)) {
+      fire(nextParentValue, transaction)
     }
   }
 }

@@ -9,7 +9,7 @@ import scala.collection.mutable
 
 class SyncObservableSpec extends FunSpec with Matchers {
 
-  it("sync and softSync fix diamond case glitch (combineWith)") {
+  it("diamond case has no glitch (combineWith)") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
 
@@ -23,57 +23,34 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     val tuples = hundreds.combineWith(tens)
       .map(Calculation.log("tuples", calculations))
-    val syncTuples = tuples.sync()
-    val softSyncTuples = tuples.softSync()
 
-    tuples
-      .foreach(effects += Effect("tuples", _))
-    syncTuples
-      .map(Calculation.log("syncTuples", calculations))
-      .foreach(effects += Effect("syncTuples", _))
-    softSyncTuples
-      .map(Calculation.log("softSyncTuples", calculations))
-      .foreach(effects += Effect("softSyncTuples", _))
+    tuples.foreach(effects += Effect("tuples", _))
 
     // ---
 
-    // On first event the "tuples" stream appears to have no glitch because
-    // combined stream needs events from both streams to emit a tuple.
     bus.writer.onNext(1)
 
     calculations shouldEqual mutable.Buffer(
-      Calculation("tuples", (100, 10)),
-      Calculation("syncTuples", (100, 10)),
-      Calculation("softSyncTuples", (100, 10))
+      Calculation("tuples", (100, 10))
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
-      Effect("tuples", (100, 10)),
-      Effect("syncTuples", (100, 10)),
-      Effect("softSyncTuples", (100, 10))
+      Effect("tuples", (100, 10))
     )
     effects.clear()
 
     // ---
 
-    // Subsequent events demonstrate the glitch – without sync, an extra event
-    // with inconsistent state is fired
     bus.writer.onNext(2)
 
     calculations shouldEqual mutable.Buffer(
-      Calculation("tuples", (200, 10)),
-      Calculation("tuples", (200, 20)),
-      Calculation("syncTuples", (200, 20)),
-      Calculation("softSyncTuples", (200, 20))
+      Calculation("tuples", (200, 20))
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
-      Effect("tuples", (200, 10)), // 200 is updated first due to depth-first propagation
-      Effect("tuples", (200, 20)),
-      Effect("syncTuples", (200, 20)),
-      Effect("softSyncTuples", (200, 20))
+      Effect("tuples", (200, 20))
     )
     effects.clear()
 
@@ -82,23 +59,21 @@ class SyncObservableSpec extends FunSpec with Matchers {
     bus.writer.onNext(3)
 
     calculations shouldEqual mutable.Buffer(
-      Calculation("tuples", (300, 20)),
-      Calculation("tuples", (300, 30)),
-      Calculation("syncTuples", (300, 30)),
-      Calculation("softSyncTuples", (300, 30))
+      Calculation("tuples", (300, 30))
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
-      Effect("tuples", (300, 20)),
-      Effect("tuples", (300, 30)),
-      Effect("syncTuples", (300, 30)),
-      Effect("softSyncTuples", (300, 30))
+      Effect("tuples", (300, 30))
     )
     effects.clear()
   }
 
-  it("sync and softSync fix merge stream glitch") {
+  // I don't really consider doubling of events a glitch in this case.
+  // Merge operator does not transform the values of its inputs
+  // so there is usually no inconsistent state.
+  // @TODO[API] see if there is a use case for a merge-like operator that only returns the last event
+  it("diamond case with a merge produces two events in correct order") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
 
@@ -114,20 +89,9 @@ class SyncObservableSpec extends FunSpec with Matchers {
     val numbers = EventStream
       .merge(tens, hundreds, unrelatedBus.events)
       .map(Calculation.log("numbers", calculations))
-    val syncNumbers = numbers.sync()
-    val softSyncNumbers = numbers.softSync()
 
     numbers
       .foreach(effects += Effect("numbers", _))
-    syncNumbers
-      .map(Calculation.log("syncNumbers", calculations))
-      .foreach(effects += Effect("syncNumbers", _))
-    softSyncNumbers
-      .map(Calculation.log("softSyncNumbers", calculations))
-      .foreach(effects += Effect("softSyncNumbers", _))
-
-    // Sync and Soft Sync should propagate only the last event
-    // fired by the merged stream within the propagation
 
     // ---
 
@@ -135,17 +99,13 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     calculations shouldEqual mutable.Buffer(
       Calculation("numbers", 10),
-      Calculation("numbers", 100),
-      Calculation("syncNumbers", 100),
-      Calculation("softSyncNumbers", 100)
+      Calculation("numbers", 100)
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
       Effect("numbers", 10),
-      Effect("numbers", 100),
-      Effect("syncNumbers", 100),
-      Effect("softSyncNumbers", 100)
+      Effect("numbers", 100)
     )
     effects.clear()
 
@@ -155,16 +115,12 @@ class SyncObservableSpec extends FunSpec with Matchers {
     unrelatedBus.writer.onNext(-1)
 
     calculations shouldEqual mutable.Buffer(
-      Calculation("numbers", -1),
-      Calculation("syncNumbers", -1),
-      Calculation("softSyncNumbers", -1)
+      Calculation("numbers", -1)
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
-      Effect("numbers", -1),
-      Effect("syncNumbers", -1),
-      Effect("softSyncNumbers", -1)
+      Effect("numbers", -1)
     )
     effects.clear()
 
@@ -174,17 +130,13 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     calculations shouldEqual mutable.Buffer(
       Calculation("numbers", 20),
-      Calculation("numbers", 200),
-      Calculation("syncNumbers", 200),
-      Calculation("softSyncNumbers", 200)
+      Calculation("numbers", 200)
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
       Effect("numbers", 20),
-      Effect("numbers", 200),
-      Effect("syncNumbers", 200),
-      Effect("softSyncNumbers", 200)
+      Effect("numbers", 200)
     )
     effects.clear()
   }
@@ -213,14 +165,7 @@ class SyncObservableSpec extends FunSpec with Matchers {
     val streamX = streamD.combineWith(streamE).map2(_ + _)
       .map(Calculation.log("X", calculations))
 
-    streamX
-      .foreach(effects += Effect("X", _))
-    streamX.sync()
-      .map(Calculation.log("sync-X", calculations))
-      .foreach(effects += Effect("sync-X", _))
-    streamX.softSync()
-      .map(Calculation.log("softSync-X", calculations))
-      .foreach(effects += Effect("softSync-X", _))
+    streamX.foreach(effects += Effect("X", _))
 
     // ---
 
@@ -232,48 +177,32 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     // ---
 
-    // Second event does not have redundant calculations because D lacked second input until now
     busA.writer.onNext(100)
 
     calculations shouldEqual mutable.Buffer(
       Calculation("C", 101),
       Calculation("D", 102),
       Calculation("E", 201),
-      Calculation("X", 303),
-      Calculation("sync-X", 303),
-      Calculation("softSync-X", 303)
+      Calculation("X", 303)
     )
     effects shouldEqual mutable.Buffer(
-      Effect("X", 303),
-      Effect("sync-X", 303),
-      Effect("softSync-X", 303)
+      Effect("X", 303)
     )
     calculations.clear()
     effects.clear()
 
     // ---
 
-    // Third event results in redundant calculations and inconsistent effects for unsynced
-    // streams, whereas synced and soft-synced streams remain consistent
     busA.writer.onNext(200)
 
     calculations shouldEqual mutable.Buffer(
       Calculation("C", 201),
+      Calculation("E", 401),
       Calculation("D", 202),
-      Calculation("X", 403), // Inconsistent: calculated with old E = 201, and new D = 202
-      Calculation("E", 301), // Inconsistent: calculated with new C = 201, but old A = 100
-      Calculation("X", 503), // Inconsistent: calculated with inconsistent E = 301, and new D = 202
-      Calculation("E", 401), // Now consistent: calculated with new C = 201, and new A = 200
-      Calculation("X", 603), // Now consistent: calculated with new E = 401, and new D = 202
-      Calculation("sync-X", 603), // sync and softSync versions are always consistent
-      Calculation("softSync-X", 603)
+      Calculation("X", 603)
     )
     effects shouldEqual mutable.Buffer(
-      Effect("X", 403), // Inconsistent because not sync-ed (see explanation in calculations above)
-      Effect("X", 503), // ^ same
-      Effect("X", 603),
-      Effect("sync-X", 603), // sync and softSync versions are always consistent
-      Effect("softSync-X", 603)
+      Effect("X", 603)
     )
     calculations.clear()
     effects.clear()
@@ -281,6 +210,9 @@ class SyncObservableSpec extends FunSpec with Matchers {
     // @TODO Fire another test event to busB for slightly more thorough test
   }
 
+  // @TODO NEED AN EVENT BUS TEST SIMILAR TO MERGE TEST ABOVE
+
+  // @TODO NEED TO TEST NEW CYCLICAL LOGIC (FIX seenObservables first)
   ignore("deadlocked pending observables resolve by firing a soft synced observable") {
 
     // @TODO Unsynced version produces unexpected results. Figure that out first before proceeding. Something probably wrong in EventBus

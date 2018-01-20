@@ -1,6 +1,7 @@
 package com.raquo.laminar.experimental.airstream.core
 
 import com.raquo.laminar.experimental.airstream.ownership.Owner
+import com.raquo.laminar.experimental.airstream.util.GlobalCounter
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -8,13 +9,15 @@ import scala.scalajs.js
 /** This trait represents a reactive value that can be subscribed to. */
 trait Observable[+A] {
 
+  val id: Int = Observable.nextId()
+
   /** Note: Observer can be added more than once to an Observable.
     * If so, it will observe each event as many times as it was added.
     */
   protected[this] lazy val externalObservers: js.Array[Observer[A]] = js.Array()
 
   /** Note: This is enforced to be a Set outside of the type system #performance */
-  protected[this] val internalObservers: js.Array[Observer[A]] = js.Array()
+  protected[this] val internalObservers: js.Array[InternalObserver[A]] = js.Array()
 
   def foreach(onNext: A => Unit)(implicit subscriptionOwner: Owner): Subscription = {
     val observer = Observer(onNext)
@@ -61,17 +64,20 @@ trait Observable[+A] {
     * - before calling this method on any other observable
     *         This will avoid trapping recursion in an infinite loop of observables that depend on each other.
     */
-  protected[airstream] def syncDependsOn(otherObservable: Observable[_], seenObservables: js.Array[Observable[_]]): Boolean
+  protected[airstream] def syncDependsOn(
+    otherObservable: Observable[_],
+    seenObservables: js.Array[Observable[_]]
+  ): Boolean
 
   // @TODO Why does simple "protected" not work? Specialization?
 
   /** Child stream calls this to declare that it was started */
-  protected[airstream] def addInternalObserver(observer: Observer[A]): Unit = {
+  protected[airstream] def addInternalObserver(observer: InternalObserver[A]): Unit = {
     internalObservers.push(observer)
   }
 
   /** */
-  protected[airstream] def removeInternalObserver(observer: Observer[A]): Boolean = {
+  protected[airstream] def removeInternalObserver(observer: InternalObserver[A]): Boolean = {
     val index = internalObservers.indexOf(observer)
     val shouldRemove = index != -1
     if (shouldRemove) {
@@ -116,8 +122,10 @@ trait Observable[+A] {
     externalObservers.foreach(_.onNext(nextValue))
   }
 
-  protected[this] def fire(nextValue: A): Unit = {
-    internalObservers.foreach(_.onNext(nextValue))
+  protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
+    internalObservers.foreach(_.onNext(nextValue, transaction))
     notifyExternalObservers(nextValue) // @TODO When should this happen? Before or after propagation?
   }
 }
+
+object Observable extends GlobalCounter

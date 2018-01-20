@@ -1,19 +1,22 @@
 package com.raquo.laminar.experimental.airstream.features
 
-import com.raquo.laminar.experimental.airstream.core.{MemoryObservable, Observer}
+import com.raquo.laminar.experimental.airstream.core.{InternalParentObserver, MemoryObservable}
 
-trait CombineMemoryObservable2[A, B] extends MemoryObservable[(A, B)] with CombineObservable2[A, B] {
+trait CombineMemoryObservable2[A, B, O] extends MemoryObservable[O] with CombineObservable[O] {
 
-  override protected[this] val parent1: MemoryObservable[A]
-  override protected[this] val parent2: MemoryObservable[B]
+  val combinator: (A, B) => O
 
-  override protected[this] var currentValue: (A, B) = (parent1.now(), parent2.now())
+  protected[this] val parent1: MemoryObservable[A]
+  protected[this] val parent2: MemoryObservable[B]
 
-  override protected[this] val parent1Observer: Observer[A] = Observer(nextParent1Value => {
-    fire((nextParent1Value, parent2.now()))
-  })
+  override protected[this] var currentValue: O = combinator(parent1.now(), parent2.now())
 
-  override protected[this] val parent2Observer: Observer[B] = Observer(nextParent2Value => {
-    fire((parent1.now(), nextParent2Value))
-  })
+  parentObservers.push(
+    InternalParentObserver[A](parent1, (nextParent1Value, transaction) => {
+      internalObserver.onNext(combinator(nextParent1Value, parent2.now()), transaction)
+    }),
+    InternalParentObserver[B](parent2, (nextParent2Value, transaction) => {
+      internalObserver.onNext(combinator(parent1.now(), nextParent2Value), transaction)
+    })
+  )
 }

@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.state
 
-import com.raquo.laminar.experimental.airstream.core.{Observable, Observation, Observer, SyncObservable}
+import com.raquo.laminar.experimental.airstream.core.{Observable, Observation, Observer, Transaction}
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 import org.scalajs.dom
 
@@ -56,12 +56,17 @@ object Var {
     * (Powered by implicit conversions defined in the [[Observation]] object)
     */
   def set(observations: Observation[_]*): Unit = {
+    // @TODO The way it is, each update will happen in a separate transaction
+    // @TODO rework this eventually once other things are done
+
+    /// val transaction = new Transaction
+    // @TODO this needs a transaction, if we decide to keep vars
     // First we update all source vars, and for each of them we initiate propagation
     observations.foreach { observation =>
       observation.observe()
 //      observation.sourceVar.propagate(haltOnNextCombine = true)
     }
-    SyncObservable.resolvePendingSyncObservables()
+    //transaction.resolvePendingSyncObservables()
   }
 
 }

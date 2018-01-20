@@ -4,17 +4,6 @@ import com.raquo.laminar.experimental.airstream.core.LazyObservable
 
 trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
-  // @TODO[API] Can we make SyncEventStream covariant in A and include that type in .softSync/.sync output?
-  // @TODO[Performance] SyncEventStream should override .softSync and .sync to return `this`, I think
-
-  def softSync(): EventStream[A] = {
-    new SyncEventStream(this, isSoft = true)
-  }
-
-  def sync(): EventStream[A] = {
-    new SyncEventStream(this, isSoft = false)
-  }
-
   override def map[B](project: A => B): EventStream[B] = {
     new MapEventStream(this, project)
   }
@@ -29,10 +18,11 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
   def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
 
-  override def combineWith[AA >: A, B](otherEventStream: EventStream[B]): CombineEventStream2[AA, B] = {
+  override def combineWith[AA >: A, B](otherEventStream: EventStream[B]): CombineEventStream2[AA, B, (AA, B)] = {
     new CombineEventStream2(
       parent1 = this,
-      parent2 = otherEventStream
+      parent2 = otherEventStream,
+      combinator = (_, _)
     )
   }
 
@@ -45,10 +35,14 @@ object EventStream {
     stream1: EventStream[A],
     stream2: EventStream[B]
   ): EventStream[(A, B)] = {
-    new CombineEventStream2(stream1, stream2)
+    new CombineEventStream2[A, B, (A, B)](stream1, stream2, (_, _))
   }
 
   def merge[A](streams: EventStream[A]*): EventStream[A] = {
     new MergeEventStream[A](streams)
+  }
+
+  implicit def toTuple2Stream[A, B](stream: EventStream[(A, B)]): Tuple2EventStream[A, B] = {
+    new Tuple2EventStream(stream)
   }
 }
