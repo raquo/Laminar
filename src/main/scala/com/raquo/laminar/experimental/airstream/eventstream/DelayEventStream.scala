@@ -11,15 +11,13 @@ class DelayEventStream[A](
   delayMillis: Int
 ) extends EventStream[A] with SingleParentObservable[A, A] {
 
+  /** Async stream, so reset rank */
+  override protected[airstream] val topoRank: Int = 1
+
   override protected[airstream] def onNext(nextValue: A, transaction: Transaction): Unit = {
     setTimeout(interval = delayMillis){
+      println("NEW TRX from DelayStream")
       new Transaction(fire(nextValue, _))
     }
-  }
-
-  /** Async stream does not depend on anything synchronously. */
-  override protected[airstream] def syncDependsOn(otherObservable: Observable[_], seenObservables: js.Array[Observable[_]]): Boolean = {
-    seenObservables.push(this)
-    false
   }
 }

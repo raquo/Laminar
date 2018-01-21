@@ -4,15 +4,16 @@ import com.raquo.laminar.experimental.airstream.core.{Observable, Observation, O
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 import org.scalajs.dom
 
-import scala.scalajs.js
-
 class Var[A](initialValue: A)(implicit owner: Owner) extends State[A] {
 
   override protected var currentValue: A = initialValue
 
   dom.console.log(s"> Create $this")
 
+  // @TODO this is not used. Remove?
   private[this] var isDead = false
+
+  override protected[airstream] val topoRank: Int = 1
 
   val toObserver: Observer[A] = Observer(set)
 
@@ -30,15 +31,6 @@ class Var[A](initialValue: A)(implicit owner: Owner) extends State[A] {
     */
   @inline def update(fn: A => A): Unit = {
     set(fn(currentValue))
-  }
-
-  override protected[airstream] def syncDependsOn(
-    otherObservable: Observable[_],
-    seenObservables: js.Array[Observable[_]]
-  ): Boolean = {
-    // @TODO Wait, but how do we deal with this being an Observer, so essentially being able to observe any other Observable with no record of it?
-    // @TODO I think the answer lies in this observation not being part of the propagation. Technically you could do anything inside any .foreach anyway.
-    false
   }
 
   override protected[this] def registerWithOwner(): Unit = {

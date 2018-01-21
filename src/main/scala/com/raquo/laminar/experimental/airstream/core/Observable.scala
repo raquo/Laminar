@@ -9,7 +9,10 @@ import scala.scalajs.js
 /** This trait represents a reactive value that can be subscribed to. */
 trait Observable[+A] {
 
+  // @TODO remove id? Why did I even add it?
   val id: Int = Observable.nextId()
+
+  protected[airstream] val topoRank: Int
 
   /** Note: Observer can be added more than once to an Observable.
     * If so, it will observe each event as many times as it was added.
@@ -46,28 +49,6 @@ trait Observable[+A] {
     }
     shouldRemove
   }
-
-  // @TODO[Performance] Use ES6 set for seenObservables (need a shim for older browsers)
-  /** @return Whether this observable synchronously depends on another observable.
-    *         `false` means that firing `otherObservable` WILL NOT cause this observable to fire SYNCHRONOUSLY.
-    *         `true` means that firing `otherObservable` MIGHT cause this observable to fire SYNCHRONOUSLY.
-    *
-    *         Note: each observable is responsible for reporting its part of the dependency chain. If the observable
-    *         does not know if it synchronously depends on another observable, it should generally return `true`.
-    *         For example, [[com.raquo.laminar.experimental.airstream.eventstream.MapEventStream]] will return true when asked
-    *         if it depends on its parent, even though it will only fire if its filter condition passes.
-    *
-    *         Note: you should NOT call this method with otherObservable == this
-    *
-    *         When implementing this method, make sure to add current observable to `seenObservables`
-    * - if returning `false`, and
-    * - before calling this method on any other observable
-    *         This will avoid trapping recursion in an infinite loop of observables that depend on each other.
-    */
-  protected[airstream] def syncDependsOn(
-    otherObservable: Observable[_],
-    seenObservables: js.Array[Observable[_]]
-  ): Boolean
 
   // @TODO Why does simple "protected" not work? Specialization?
 

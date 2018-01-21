@@ -4,8 +4,8 @@ import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
 
 // @TODO Rename? Maybe something with "Subscription"? Although nah...
-class WriteBusSource[A](
-  eventBusStream: WriteBusStream[A],
+class EventBusSource[A](
+  eventBusStream: EventBusStream[A],
   val sourceStream: EventStream[A],
   owner: Owner
 ) extends Owned {

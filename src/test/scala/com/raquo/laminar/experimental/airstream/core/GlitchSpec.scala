@@ -7,7 +7,8 @@ import org.scalatest.{FunSpec, Matchers}
 
 import scala.collection.mutable
 
-class SyncObservableSpec extends FunSpec with Matchers {
+/** A collection of tests that ensure that there are no FRP glitches */
+class GlitchSpec extends FunSpec with Matchers {
 
   it("diamond case has no glitch (combineWith)") {
 
@@ -73,7 +74,7 @@ class SyncObservableSpec extends FunSpec with Matchers {
   // Merge operator does not transform the values of its inputs
   // so there is usually no inconsistent state.
   // @TODO[API] see if there is a use case for a merge-like operator that only returns the last event
-  it("diamond case with a merge produces two events in correct order") {
+  it("diamond case with a merge produces events in correct order") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
 
@@ -83,11 +84,12 @@ class SyncObservableSpec extends FunSpec with Matchers {
     val bus = new EventBus[Int]
     val unrelatedBus = new EventBus[Int]
 
-    val tens = bus.events.map(_ * 10)
+    val tens = bus.events.map(identity).map(_ * 10)
     val hundreds = tens.map(_ * 10)
+    val thousands = hundreds.map(_ * 10)
 
     val numbers = EventStream
-      .merge(tens, hundreds, unrelatedBus.events)
+      .merge(tens, thousands, hundreds, unrelatedBus.events)
       .map(Calculation.log("numbers", calculations))
 
     numbers
@@ -99,13 +101,15 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     calculations shouldEqual mutable.Buffer(
       Calculation("numbers", 10),
-      Calculation("numbers", 100)
+      Calculation("numbers", 100),
+      Calculation("numbers", 1000)
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
       Effect("numbers", 10),
-      Effect("numbers", 100)
+      Effect("numbers", 100),
+      Effect("numbers", 1000)
     )
     effects.clear()
 
@@ -130,18 +134,20 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     calculations shouldEqual mutable.Buffer(
       Calculation("numbers", 20),
-      Calculation("numbers", 200)
+      Calculation("numbers", 200),
+      Calculation("numbers", 2000)
     )
     calculations.clear()
 
     effects shouldEqual mutable.Buffer(
       Effect("numbers", 20),
-      Effect("numbers", 200)
+      Effect("numbers", 200),
+      Effect("numbers", 2000)
     )
     effects.clear()
   }
 
-  it("dependent but not deadlocked pending observables resolve correctly") {
+  it("Multi-level pending observables resolve in correct order") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
 
@@ -197,7 +203,7 @@ class SyncObservableSpec extends FunSpec with Matchers {
 
     calculations shouldEqual mutable.Buffer(
       Calculation("C", 201),
-      Calculation("E", 401),
+      Calculation("E", 401), // @TODO[Integrity] This order is acceptable, but why is E evaluated before D?
       Calculation("D", 202),
       Calculation("X", 603)
     )

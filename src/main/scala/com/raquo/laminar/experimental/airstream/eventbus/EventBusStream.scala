@@ -6,20 +6,23 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-class WriteBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with InternalObserver[A] {
+class EventBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with InternalObserver[A] {
 
   private[eventbus] var isStarted = false
 
-  private[eventbus] val sources: js.Array[WriteBusSource[A]] = js.Array()
+  private[eventbus] val sources: js.Array[EventBusSource[A]] = js.Array()
 
-  @inline private[eventbus] def addSource(source: WriteBusSource[A]): Unit = {
+  // @TODO document why. Basically event bus breaks the "static DAG" requirement for topo ranking
+  override protected[airstream] val topoRank: Int = 1
+
+  @inline private[eventbus] def addSource(source: EventBusSource[A]): Unit = {
     sources.push(source)
     if (isStarted) {
       source.sourceStream.addInternalObserver(this)
     }
   }
 
-  private[eventbus] def removeSource(source: WriteBusSource[A]): Unit = {
+  private[eventbus] def removeSource(source: EventBusSource[A]): Unit = {
     val index = sources.indexOf(source)
     if (index != -1) {
       sources.splice(index, deleteCount = 1)
@@ -35,24 +38,8 @@ class WriteBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with Inter
     // Note: We're not checking isStarted here because if this stream wasn't started, it wouldn't have been
     // fired as an internal observer. WriteBus calls this method manually, so it checks .isStarted on its own.
     // @TODO ^^^^ We should document this contract in InternalObserver
-    fire(nextValue, transaction)
-  }
-
-  override protected[airstream] def syncDependsOn(
-    otherObservable: Observable[_],
-    seenObservables: js.Array[Observable[_]]
-  ): Boolean = {
-    // @TODO Check seenObservables, ESPECIALLY here!!!!
-    // Ask every WriteBusSource, essentially
-    sources.exists { source =>
-      val sourceStream = source.sourceStream
-      seenObservables.push(sourceStream)
-      if (sourceStream == otherObservable) {
-        true
-      } else {
-        sourceStream.syncDependsOn(otherObservable, seenObservables)
-      }
-    }
+    println("NEW TRX from EventBusStream")
+    new Transaction(fire(nextValue, _))
   }
 
   override protected[this] def onStart(): Unit = {

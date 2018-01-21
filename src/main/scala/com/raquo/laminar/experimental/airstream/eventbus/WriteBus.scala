@@ -6,11 +6,11 @@ import com.raquo.laminar.experimental.airstream.ownership.Owner
 
 class WriteBus[A] extends Observer[A] {
 
-  private[eventbus] val stream: WriteBusStream[A] = new WriteBusStream(this)
+  private[eventbus] val stream: EventBusStream[A] = new EventBusStream(this)
 
   /** Note: to remove this source, call .removeSource() on the resulting WriteBusSource */
-  def addSource(sourceStream: EventStream[A])(implicit owner: Owner): WriteBusSource[A] = {
-    new WriteBusSource(stream, sourceStream, owner)
+  def addSource(sourceStream: EventStream[A])(implicit owner: Owner): EventBusSource[A] = {
+    new EventBusSource(stream, sourceStream, owner)
   }
 
   // @TODO better names for mapWriter / filterWriter, consider lens/zoom/etc.
@@ -29,7 +29,8 @@ class WriteBus[A] extends Observer[A] {
 
   override def onNext(nextValue: A): Unit = {
     if (stream.isStarted) { // important check
-      new Transaction(stream.onNext(nextValue, _))
+      // @TODO[Integrity] We rely on the knowledge that EventBusStream discards the transaction it's given. Laaaame
+      stream.onNext(nextValue, transaction = null)
     }
   }
 

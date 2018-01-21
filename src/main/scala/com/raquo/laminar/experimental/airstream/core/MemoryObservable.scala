@@ -30,6 +30,7 @@ trait MemoryObservable[+A] extends Observable[A] {
   override protected[airstream] def addInternalObserver(observer: InternalObserver[A]): Unit = {
     // @TODO when is this actually called, and is it ok to create a new transaction here?
     super.addInternalObserver(observer)
+    println("NEW TRX from MemoryObservable")
     new Transaction(observer.onNext(currentValue, _))
   }
 }

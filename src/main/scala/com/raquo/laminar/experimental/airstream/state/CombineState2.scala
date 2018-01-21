@@ -10,6 +10,8 @@ class CombineState2[A, B, O](
   owner: Owner
 ) extends State[O] with CombineMemoryObservable2[A, B, O] {
 
+  override protected[airstream] val topoRank: Int = (parent1.topoRank max parent2.topoRank) + 1
+
   override protected[this] def registerWithOwner(): Unit = {
     owner.own(this)
   }

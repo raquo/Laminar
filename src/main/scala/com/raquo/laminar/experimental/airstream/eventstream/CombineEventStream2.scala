@@ -14,6 +14,8 @@ class CombineEventStream2[A, B, O](
   combinator: (A, B) => O
 ) extends EventStream[O] with CombineObservable[O] {
 
+  override protected[airstream] val topoRank: Int = (parent1.topoRank max parent2.topoRank) + 1
+
   private[this] var maybeLastParent1Value: Option[A] = None
   private[this] var maybeLastParent2Value: Option[B] = None
 

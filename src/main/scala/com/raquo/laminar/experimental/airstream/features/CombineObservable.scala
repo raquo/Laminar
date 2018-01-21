@@ -17,38 +17,24 @@ trait CombineObservable[A] extends Observable[A] {
   // Transaction will call .fireSync() when it's time, and that will in turn call .fire()
   protected[this] val internalObserver: InternalObserver[A] = InternalObserver(
     (nextValue, transaction) => {
-      if (!transaction.isPending(this)) {
-        transaction.addPending(this)
+      if (!transaction.hasPendingObservable(this)) {
+        println(s"Marking CombineObs($id) as pending in TRX(${transaction.id})")
+        transaction.addPendingObservable(this)
       }
       maybeCombinedValue = Some(nextValue)
     }
   )
+
+  override protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
+    println(s"!!! Firing CombineObs($id) in TRX(${transaction.id}) (isPending=${transaction.hasPendingObservable(this)})")
+    super.fire(nextValue, transaction)
+  }
 
   /** This method is called after this pending observable has been resolved */
   private[airstream] def syncFire(transaction: Transaction): Unit = {
     maybeCombinedValue.foreach { combinedValue =>
       maybeCombinedValue = None
       fire(combinedValue, transaction)
-    }
-  }
-
-  override protected[airstream] def syncDependsOn(
-    otherObservable: Observable[_],
-    seenObservables: js.Array[Observable[_]]
-  ): Boolean = {
-    // @TODO the below few lines should be extracted somehow...
-    // @TODO do we need to check for cycles everywhere, or just for looping observables????
-    if (seenObservables.indexOf(this) != -1) {
-      false
-    } else {
-      seenObservables.push(this)
-      parentObservers.exists { parentObserver =>
-        if (parentObserver.parent == otherObservable) {
-          true
-        } else {
-          parentObserver.parent.syncDependsOn(otherObservable, seenObservables)
-        }
-      }
     }
   }
 
