@@ -1,6 +1,7 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
-import com.raquo.laminar.experimental.airstream.core.{InternalObserver, Observable, Transaction}
+import com.raquo.laminar.experimental.airstream.core.{InternalParentObserver, Observable, SyncObservable, Transaction}
+import com.raquo.laminar.experimental.airstream.util.JsPriorityQueue
 
 import scala.scalajs.js
 
@@ -14,7 +15,7 @@ import scala.scalajs.js
   */
 class MergeEventStream[A](
   parents: Iterable[Observable[A]]
-) extends EventStream[A] with InternalObserver[A] {
+) extends EventStream[A] with SyncObservable[A] {
 
   override protected[airstream] val topoRank: Int = {
     var maxParentRank = 0
@@ -24,33 +25,46 @@ class MergeEventStream[A](
     maxParentRank + 1
   }
 
-  private[this] var lastFiredInTransactionId: js.UndefOr[Int] = js.undefined
+  private[this] val pendingParentValues: JsPriorityQueue[(Observable[A], A)] = new JsPriorityQueue(_._1.topoRank)
 
+  private[this] val parentObservers: js.Array[InternalParentObserver[A]] = js.Array()
+
+  parents.foreach(parent => parentObservers.push(makeInternalObserver(parent)))
+
+  // @TODO document this, and document the topo parent order
   /** If this stream has already fired in a given transaction, the next firing will happen in a new transaction.
     *
     * This is needed for a combination of two reasons:
     * 1) only one event can propagate in a transaction at the same time
     * 2) We do not want the merged stream to "swallow" events
+    *
+    * We made it this way because the user probably expects this behavior.
     */
-  override protected[airstream] def onNext(nextValue: A, transaction: Transaction): Unit = {
-    if (js.defined(transaction.id) == lastFiredInTransactionId) {
+  override private[airstream] def syncFire(transaction: Transaction): Unit = {
+    // At least one value is guaranteed to exist if this observable is pending
+    fire(pendingParentValues.dequeue()._2, transaction)
+
+    while (pendingParentValues.nonEmpty) {
       println("NEW TRX from MergeEventStream")
+      val nextValue = pendingParentValues.dequeue()._2
       new Transaction(fire(nextValue, _))
-    } else {
-      fire(nextValue, transaction)
     }
   }
 
-  override protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
-    lastFiredInTransactionId = transaction.id
-    super.fire(nextValue, transaction)
-  }
-
   override protected[this] def onStart(): Unit = {
-    parents.foreach(_.addInternalObserver(this))
+    parentObservers.foreach(_.addToParent())
   }
 
   override protected[this] def onStop(): Unit = {
-    parents.foreach(_.removeInternalObserver(this))
+    parentObservers.foreach(_.removeFromParent())
+  }
+
+  private def makeInternalObserver(parent: Observable[A]): InternalParentObserver[A] = {
+    InternalParentObserver(parent, onNext = (nextValue, transaction) => {
+      pendingParentValues.enqueue((parent, nextValue))
+      if (!transaction.pendingObservables.contains(this)) {
+        transaction.pendingObservables.enqueue(this)
+      }
+    })
   }
 }

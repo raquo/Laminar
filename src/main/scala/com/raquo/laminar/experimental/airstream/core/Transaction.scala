@@ -1,7 +1,6 @@
 package com.raquo.laminar.experimental.airstream.core
 
-import com.raquo.laminar.experimental.airstream.features.CombineObservable
-import com.raquo.laminar.experimental.airstream.util.GlobalCounter
+import com.raquo.laminar.experimental.airstream.util.{GlobalCounter, JsPriorityQueue}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -11,38 +10,18 @@ class Transaction(code: Transaction => Any) {
   val id: Int = Transaction.nextId()
 
   /** "Priority queue" of pending observables: sorted by their topoRank */
-  private[this] val pendingObservables: js.Array[CombineObservable[_]] = js.Array()
+  private[airstream] val pendingObservables: JsPriorityQueue[SyncObservable[_]] = new JsPriorityQueue(_.topoRank)
 
   Transaction.add(this)
-
-  /** Insert pending observable into priority queue at the correct index */
-  private[airstream] def addPendingObservable(observable: CombineObservable[_]): Unit = {
-    var insertAtIndex = 0
-    var foundHigherRank = false
-    while (
-      insertAtIndex < pendingObservables.length &&
-      !foundHigherRank
-    ) {
-      if (pendingObservables(insertAtIndex).topoRank <= observable.topoRank) {
-        foundHigherRank = true
-      }
-      insertAtIndex += 1
-    }
-    pendingObservables.splice(index = insertAtIndex, deleteCount = 0, observable) // insert at index
-  }
-
-  private[airstream] def hasPendingObservable(observable: CombineObservable[_]): Boolean = {
-    pendingObservables.indexOf(observable) != -1
-  }
 
   // @TODO rename
   private[airstream] def run(): Unit = {
     dom.console.log(s"TRX($id).run")
     code(this) // this evaluates a pass-by-name param @TODO[Integrity] make sure this is not DCE-d in fullOptJS
-    dom.console.log(s"TRX($id).pendingObservables.length = ${pendingObservables.length}")
-    while (pendingObservables.length > 0) {
-      dom.console.log("RANKS: ", pendingObservables.map(_.topoRank))
-      pendingObservables.shift().syncFire(this) // Fire the first pending observable and remove it from the list
+    dom.console.log(s"TRX($id).pendingObservables.length = ${pendingObservables.size}")
+    while (pendingObservables.nonEmpty) {
+//      dom.console.log("RANKS: ", pendingObservables.map(_.topoRank))
+      pendingObservables.dequeue().syncFire(this) // Fire the first pending observable and remove it from the list
     }
     Transaction.done(this)
   }
