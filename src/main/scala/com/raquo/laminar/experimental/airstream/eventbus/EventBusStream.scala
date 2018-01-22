@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.eventbus
 
-import com.raquo.laminar.experimental.airstream.core.{InternalObserver, Observable, Transaction}
+import com.raquo.laminar.experimental.airstream.core.{InternalObserver, Transaction}
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import org.scalajs.dom
 

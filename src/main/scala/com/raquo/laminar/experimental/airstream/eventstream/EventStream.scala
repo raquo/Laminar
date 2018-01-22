@@ -4,19 +4,23 @@ import com.raquo.laminar.experimental.airstream.core.LazyObservable
 
 trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
-  override def map[B](project: A => B): EventStream[B] = {
-    new MapEventStream(this, project)
+  def mapTo[B](value: B): EventStream[B] = {
+    new MapEventStream(this, _ => value)
   }
 
   def filter(passes: A => Boolean): EventStream[A] = {
     new FilterEventStream(this, passes)
   }
 
+  def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
+
+  override def map[B](project: A => B): EventStream[B] = {
+    new MapEventStream(this, project)
+  }
+
   override def compose[B](operator: EventStream[A] => EventStream[B]): EventStream[B] = {
     operator(this)
   }
-
-  def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
 
   override def combineWith[AA >: A, B](otherEventStream: EventStream[B]): CombineEventStream2[AA, B, (AA, B)] = {
     new CombineEventStream2(

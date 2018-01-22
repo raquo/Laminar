@@ -7,6 +7,7 @@ import scala.scalajs.js
 
 class Transaction(code: Transaction => Any) {
 
+  // @TODO this is not used except for debug logging. Remove eventually
   val id: Int = Transaction.nextId()
 
   /** "Priority queue" of pending observables: sorted by their topoRank */
