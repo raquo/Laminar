@@ -93,19 +93,11 @@ trait Observable[+A] {
     */
   protected[this] def onStop(): Unit = ()
 
-  // @TODO[API] Maybe this method belongs to Signal? It's the only "Owned Observable" that we have, and it seems that this is the only time this is needed.
-  protected def removeAllObservers(): Unit = {
-    externalObservers.length = 0 // Yes, this does what you didn't think it would
-  }
-
-  // @TODO Should Signals use or override this method?
-  protected[this] def notifyExternalObservers(nextValue: A): Unit = {
-    externalObservers.foreach(_.onNext(nextValue))
-  }
-
+  // @TODO[API] It is rather curious/unintuitive that firing external observers first seems to make more sense. Think about it some more.
+  // @TODO[API] Should probably use while-loops here to support the case of adding observers on the fly (will fix simpler cases of https://github.com/raquo/laminar/issues/11)
   protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
+    externalObservers.foreach(_.onNext(nextValue))
     internalObservers.foreach(_.onNext(nextValue, transaction))
-    notifyExternalObservers(nextValue) // @TODO When should this happen? Before or after propagation?
   }
 }
 

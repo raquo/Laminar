@@ -8,9 +8,10 @@ import scala.scalajs.js
 
 class EventBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with InternalObserver[A] {
 
-  private[eventbus] var isStarted = false
-
   private[eventbus] val sources: js.Array[EventBusSource[A]] = js.Array()
+
+  /** Made more public to allow usage from WriteBus */
+  override protected[eventbus] def isStarted: Boolean = super.isStarted
 
   // @TODO document why. Basically event bus breaks the "static DAG" requirement for topo ranking
   override protected[airstream] val topoRank: Int = 1
@@ -43,12 +44,10 @@ class EventBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with Inter
   }
 
   override protected[this] def onStart(): Unit = {
-    isStarted = true
     sources.foreach(_.sourceStream.addInternalObserver(this))
   }
 
   override protected[this] def onStop(): Unit = {
-    isStarted = false
     sources.foreach(_.sourceStream.removeInternalObserver(this))
   }
 }

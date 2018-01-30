@@ -12,6 +12,8 @@ class CombineState2[A, B, O](
 
   override protected[airstream] val topoRank: Int = (parent1.topoRank max parent2.topoRank) + 1
 
+  override protected[this] def initialValue(): O = combinator(parent1.now(), parent2.now())
+
   override protected[this] def registerWithOwner(): Unit = {
     owner.own(this)
   }

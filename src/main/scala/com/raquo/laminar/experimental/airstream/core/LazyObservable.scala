@@ -25,6 +25,8 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
 
   def combineWith[AA >: A, B](otherObservable: S[B]): S[(AA, B)]
 
+  protected[this] def isStarted: Boolean = numAllObservers > 0
+
   override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
     val subscription = super.addObserver(observer)
     maybeStart()
@@ -62,13 +64,14 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
   private[this] def maybeStart(): Unit = {
     val isStarting = numAllObservers == 1
     if (isStarting) {
+      // We've just added first observer
       onStart()
     }
   }
 
   private[this] def maybeStop(): Unit = {
-    val isStopping = numAllObservers == 0
-    if (isStopping) {
+    if (!isStarted) {
+      // We've just removed last observer
       onStop()
     }
   }

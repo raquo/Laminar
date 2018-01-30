@@ -9,8 +9,6 @@ trait CombineMemoryObservable2[A, B, O] extends MemoryObservable[O] with Combine
   protected[this] val parent1: MemoryObservable[A]
   protected[this] val parent2: MemoryObservable[B]
 
-  override protected[this] var currentValue: O = combinator(parent1.now(), parent2.now())
-
   parentObservers.push(
     InternalParentObserver[A](parent1, (nextParent1Value, transaction) => {
       internalObserver.onNext(combinator(nextParent1Value, parent2.now()), transaction)

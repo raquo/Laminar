@@ -1,17 +1,12 @@
 package com.raquo.laminar.experimental.airstream.state
 
-import com.raquo.laminar.experimental.airstream.core.{Observable, Observation, Observer, Transaction}
+import com.raquo.laminar.experimental.airstream.core.{Observation, Observer}
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 import org.scalajs.dom
 
-class Var[A](initialValue: A)(implicit owner: Owner) extends State[A] {
-
-  override protected var currentValue: A = initialValue
+class Var[A](override protected[this] val initialValue: A)(implicit owner: Owner) extends State[A] {
 
   dom.console.log(s"> Create $this")
-
-  // @TODO this is not used. Remove?
-  private[this] var isDead = false
 
   override protected[airstream] val topoRank: Int = 1
 
@@ -30,14 +25,14 @@ class Var[A](initialValue: A)(implicit owner: Owner) extends State[A] {
     * Var.update(_.copy(someProp = newValue)) // update case class
     */
   @inline def update(fn: A => A): Unit = {
-    set(fn(currentValue))
+    set(fn(now()))
   }
 
   override protected[this] def registerWithOwner(): Unit = {
     owner.own(this)
   }
 
-  override def toString: String = s"Var@${hashCode()}(value=$currentValue)"
+  override def toString: String = s"Var@${hashCode()}(value=${now()})"
 }
 
 object Var {

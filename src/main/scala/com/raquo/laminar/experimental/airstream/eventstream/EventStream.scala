@@ -1,11 +1,12 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
 import com.raquo.laminar.experimental.airstream.core.LazyObservable
+import com.raquo.laminar.experimental.airstream.signal.{SignalFromEventStream, Signal}
 
 trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
   def mapTo[B](value: B): EventStream[B] = {
-    new MapEventStream(this, _ => value)
+    new MapEventStream[A, B](this, _ => value)
   }
 
   def filter(passes: A => Boolean): EventStream[A] = {
@@ -13,6 +14,10 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
   }
 
   def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
+
+  def toSignal[B >: A](initialValue: B): Signal[B] = {
+    new SignalFromEventStream(parent = this, initialValue)
+  }
 
   override def map[B](project: A => B): EventStream[B] = {
     new MapEventStream(this, project)
@@ -29,8 +34,6 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
       combinator = (_, _)
     )
   }
-
-//  def toSignal(initialValue: A): Signal[A]
 }
 
 object EventStream {

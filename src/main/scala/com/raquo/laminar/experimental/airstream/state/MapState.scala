@@ -10,9 +10,9 @@ class MapState[I, O](
   owner: Owner
 ) extends State[O] with SingleParentObservable[I, O] {
 
-  override protected[this] var currentValue: O = project(parent.now())
-
   override protected[airstream] val topoRank: Int = parent.topoRank + 1
+
+  override protected[this] def initialValue(): O = project(parent.now())
 
   override protected[airstream] def onNext(nextParentValue: I, transaction: Transaction): Unit = {
     fire(project(nextParentValue), transaction)
