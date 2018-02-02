@@ -1,7 +1,6 @@
 package com.raquo.laminar.experimental.airstream.signal
 
-import com.raquo.laminar.experimental.airstream.core.{LazyObservable, MemoryObservable, Observer, Subscription}
-import com.raquo.laminar.experimental.airstream.eventstream.{ChangesEventStream, EventStream}
+import com.raquo.laminar.experimental.airstream.core.{LazyObservable, MemoryObservable}
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 import com.raquo.laminar.experimental.airstream.state.{MapState, State}
 
