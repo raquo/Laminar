@@ -1,7 +1,7 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
 import com.raquo.laminar.experimental.airstream.core.LazyObservable
-import com.raquo.laminar.experimental.airstream.signal.{Signal, SignalFromEventStream}
+import com.raquo.laminar.experimental.airstream.signal.{FoldSignal, Signal, SignalFromEventStream}
 
 trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
@@ -14,6 +14,10 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
   }
 
   def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
+
+  def fold[B](initialValue: B)(fn: (B, A) => B): Signal[B] = {
+    new FoldSignal(parent = this, initialValue, fn)
+  }
 
   def toSignal[B >: A](initialValue: B): Signal[B] = {
     new SignalFromEventStream(parent = this, initialValue)
