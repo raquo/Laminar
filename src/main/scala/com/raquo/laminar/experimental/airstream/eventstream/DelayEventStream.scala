@@ -4,7 +4,6 @@ import com.raquo.laminar.experimental.airstream.features.SingleParentObservable
 import com.raquo.laminar.experimental.airstream.core.{Observable, Transaction}
 
 import scala.scalajs.js
-import scala.scalajs.js.timers.setTimeout
 
 class DelayEventStream[A](
   override protected val parent: EventStream[A],
@@ -15,7 +14,7 @@ class DelayEventStream[A](
   override protected[airstream] val topoRank: Int = 1
 
   override protected[airstream] def onNext(nextValue: A, transaction: Transaction): Unit = {
-    setTimeout(interval = delayMillis){
+    js.timers.setTimeout(delayMillis) {
       println("NEW TRX from DelayStream")
       new Transaction(fire(nextValue, _))
     }

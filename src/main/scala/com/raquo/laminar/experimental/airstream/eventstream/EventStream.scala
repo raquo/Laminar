@@ -13,6 +13,14 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
     new FilterEventStream(this, passes)
   }
 
+  def throttle(intervalMillis: Int): EventStream[A] = {
+    ThrottleEventStream(parent = this, intervalMillis)
+  }
+
+  def debounce(delayFromLastEventMillis: Int): EventStream[A] = {
+    new DebounceEventStream(parent = this, delayFromLastEventMillis)
+  }
+
   def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
 
   def fold[B](initialValue: B)(fn: (B, A) => B): Signal[B] = {
