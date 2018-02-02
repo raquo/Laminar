@@ -19,6 +19,9 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
     * when their subscriptions are killed by their owners)
     */
 
+  // @TODO[API] Should LazyObservable have these abstract methods? Event streams and Signals are pretty different beasts.
+  // @TODO[API] Probably yes, because some things like <-- don't care much whether the observable has a current value
+
   def map[B](project: A => B): S[B]
 
   def compose[B](operator: S[A] => S[B]): S[B]
@@ -46,13 +49,19 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
     removed
   }
 
-  /** Child stream calls this to declare that it was started */
+  /** Child observable should call this method on this lazy observable when it was started.
+    * This lazy observable calls [[onStart]] if this action has given it its first observer (internal or external).
+    * See docs for [[Observable.onStart]]
+    */
   override protected[airstream] def addInternalObserver(observer: InternalObserver[A]): Unit = {
     super.addInternalObserver(observer)
     maybeStart()
   }
 
-  /** Child stream calls this to declare that it was stopped */
+  /** Child observable should call this method on this lazy observable when it was stopped.
+    * This lazy observable calls [[onStop]] if this action has removed its last observer (internal or external).
+    * See also docs for [[Observable.onStop]]
+    */
   override protected[airstream] def removeInternalObserver(observer: InternalObserver[A]): Boolean = {
     val removed = super.removeInternalObserver(observer)
     if (removed) {

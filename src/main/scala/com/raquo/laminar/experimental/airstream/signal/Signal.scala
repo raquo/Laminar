@@ -3,19 +3,19 @@ package com.raquo.laminar.experimental.airstream.signal
 import com.raquo.laminar.experimental.airstream.core.{LazyObservable, MemoryObservable, Observer, Subscription}
 import com.raquo.laminar.experimental.airstream.eventstream.{ChangesEventStream, EventStream}
 import com.raquo.laminar.experimental.airstream.ownership.Owner
+import com.raquo.laminar.experimental.airstream.state.{MapState, State}
 
 import scala.scalajs.js
 
-// @TODO[Integrity] Check inheritance order, could be important (add Observer is defined in both MO and LO traits)
+// @TODO[Integrity] Careful with multiple inheritance & addObserver here
 /** Signal is a lazy observable with a current value */
 trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A, Signal] {
 
   protected[this] var maybeLastSeenCurrentValue: js.UndefOr[A] = js.undefined
 
-  protected[this] def initialValue(): A
-
-  // @TODO[API] Move out into MemoryObservable?
-  lazy val changes: EventStream[A] = new ChangesEventStream[A](parent = this)
+  def toState(implicit owner: Owner): State[A] = {
+    new MapState[A, A](parent = this, project = identity, owner)
+  }
 
   override def map[B](project: A => B): Signal[B] = {
     new MapSignal(parent = this, project)
@@ -31,13 +31,6 @@ trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A, Signal] {
       parent2 = otherSignal,
       combinator = (_, _)
     )
-  }
-
-  /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
-  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
-    val subscription = super.addObserver(observer)
-    observer.onNext(now())
-    subscription
   }
 
   /** Initial value is only evaluated if/when needed (when there are observers) */
@@ -66,4 +59,7 @@ object Signal {
 //    new CombineSignal2(parent1 = signal1, parent2 = signal2, combineSignalOwner)
 //  }
 
+  implicit def toTuple2Signal[A, B](signal: Signal[(A, B)]): Tuple2Signal[A, B] = {
+    new Tuple2Signal(signal)
+  }
 }

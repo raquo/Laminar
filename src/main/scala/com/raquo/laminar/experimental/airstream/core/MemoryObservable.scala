@@ -1,5 +1,8 @@
 package com.raquo.laminar.experimental.airstream.core
 
+import com.raquo.laminar.experimental.airstream.eventstream.{ChangesEventStream, EventStream}
+import com.raquo.laminar.experimental.airstream.ownership.Owner
+
 /** An observable that remembers its current value */
 trait MemoryObservable[+A] extends Observable[A] {
 
@@ -9,14 +12,28 @@ trait MemoryObservable[+A] extends Observable[A] {
     * has observers.*/
   protected[airstream] def now(): A
 
+  /** Evaluate initial value of this [[MemoryObservable]].
+    * This method should only be called once, when first needed
+    */
+  protected[this] def initialValue(): A
+
+  /** Update the current value of this [[MemoryObservable]] */
   protected[this] def setCurrentValue(newValue: A): Unit
+
+  def changes: EventStream[A] = new ChangesEventStream[A](parent = this)
 
   // @TODO implement this
 //  lazy val changes: Stream[A] = ???
 
+  /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
+  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
+    val subscription = super.addObserver(observer)
+    observer.onNext(now()) // send current value immediately
+    subscription
+  }
 
   override protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
-    // @TOTO[API] The reason we might not want this for Signal is because Signal's now() is not guaranteed to be fresh. Not sure if we care.
+    // @TODO[API] The reason we might not want this for Signal is because Signal's now() is not guaranteed to be fresh. Not sure if we care.
 //    if (nextValue != currentValue) {  // @TODO we want this check here, right? There's another check like this in State
     setCurrentValue(nextValue)
     super.fire(nextValue, transaction)

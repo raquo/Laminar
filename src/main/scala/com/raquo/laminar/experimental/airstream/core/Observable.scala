@@ -1,6 +1,7 @@
 package com.raquo.laminar.experimental.airstream.core
 
-import com.raquo.laminar.experimental.airstream.ownership.Owner
+import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
+import com.raquo.laminar.experimental.airstream.state.State
 import com.raquo.laminar.experimental.airstream.util.GlobalCounter
 import org.scalajs.dom
 
@@ -69,29 +70,28 @@ trait Observable[+A] {
 
   // @TODO These two methods need updated description because I'm getting them to work for non-lazy observables as well
 
-  /** This method is fired when this stream gets its first observer,
-    * directly or indirectly (via child streams).
+  /** This method is fired when this observable starts working (listening for parent events and/or firing its own events)
     *
-    * Before this method is called:
-    * - 1) This stream has no direct observers
-    * - 2) None of the streams that depend on this stream have observers
-    * - 3) Item (2) above is true for all streams depend on this stream
+    * The above semantic is universal, but different observables fit [[onStart]] differently in their lifecycle:
+    * - [[State]] is an eager observable, it calls [[onStart]] on initialization.
+    * - [[LazyObservable]] (Stream or Signal) calls [[onStart]] when it gets its first observer (internal or external)
     *
-    * This method is called when any of these conditions become false (often together at the same time)
+    * So, a [[State]] observable calls [[onStart]] only once in its existence, whereas a [[LazyObservable]] calls it
+    * potentially multiple times, the second time being after it has stopped (see [[onStop]]).
     */
-  protected[this] def onStart(): Unit = ()
+  @inline protected[this] def onStart(): Unit = ()
 
-  /** This method is fired when this stream loses its last observer,
-    * including indirect ones (observers of child streams)
+  /** This method is fired when this observable stops working (listening for parent events and/or firing its own events)
     *
-    * Before this method is called:
-    * - 1) This stream has observers, or
-    * - 2) At least one stream that depends on this stream has observers, or
-    * - 3) Item (2) above is true for all streams depend on this stream
+    * The above semantic is universal, but different observables fit [[onStop]] differently in their lifecycle:
+    * - [[State]] is an eager, [[Owned]] observable. It calls [[onStop]] when its [[Owner]] decides to [[State.kill]] it
+    * - [[LazyObservable]] (Stream or Signal) calls [[onStop]] when it loses its last observer (internal or external)
     *
-    * This method is called when any of these conditions become false
+    * So, a [[State]] observable calls [[onStop]] only once in its existence. After that, the observable is disabled and
+    * will never start working again. On the other hand, a [[LazyObservable]] calls [[onStop]] potentially multiple
+    * times, the second time being after it has started again (see [[onStart]]).
     */
-  protected[this] def onStop(): Unit = ()
+  @inline protected[this] def onStop(): Unit = ()
 
   // @TODO[API] It is rather curious/unintuitive that firing external observers first seems to make more sense. Think about it some more.
   // @TODO[API] Should probably use while-loops here to support the case of adding observers on the fly (will fix simpler cases of https://github.com/raquo/laminar/issues/11)

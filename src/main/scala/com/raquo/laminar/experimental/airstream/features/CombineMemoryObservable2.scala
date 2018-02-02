@@ -4,7 +4,7 @@ import com.raquo.laminar.experimental.airstream.core.{InternalParentObserver, Me
 
 trait CombineMemoryObservable2[A, B, O] extends MemoryObservable[O] with CombineObservable[O] {
 
-  val combinator: (A, B) => O
+  protected[this] val combinator: (A, B) => O
 
   protected[this] val parent1: MemoryObservable[A]
   protected[this] val parent2: MemoryObservable[B]

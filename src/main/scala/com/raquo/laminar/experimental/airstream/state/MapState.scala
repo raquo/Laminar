@@ -1,16 +1,18 @@
 package com.raquo.laminar.experimental.airstream.state
 
 import com.raquo.laminar.experimental.airstream.features.SingleParentObservable
-import com.raquo.laminar.experimental.airstream.core.{Observer, Transaction}
+import com.raquo.laminar.experimental.airstream.core.{MemoryObservable, Transaction}
 import com.raquo.laminar.experimental.airstream.ownership.Owner
 
 class MapState[I, O](
-  override protected[this] val parent: State[I],
+  override protected[this] val parent: MemoryObservable[I],
   project: I => O,
-  owner: Owner
+  override protected[state] val owner: Owner
 ) extends State[O] with SingleParentObservable[I, O] {
 
   override protected[airstream] val topoRank: Int = parent.topoRank + 1
+
+  onStart()
 
   override protected[this] def initialValue(): O = project(parent.now())
 

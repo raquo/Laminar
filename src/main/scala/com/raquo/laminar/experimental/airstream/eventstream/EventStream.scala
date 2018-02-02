@@ -1,7 +1,7 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
 import com.raquo.laminar.experimental.airstream.core.LazyObservable
-import com.raquo.laminar.experimental.airstream.signal.{SignalFromEventStream, Signal}
+import com.raquo.laminar.experimental.airstream.signal.{Signal, SignalFromEventStream}
 
 trait EventStream[+A] extends LazyObservable[A, EventStream] {
 

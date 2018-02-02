@@ -6,11 +6,9 @@ import scala.scalajs.js
 
 trait CombineObservable[A] extends SyncObservable[A] {
 
-  // @TODO[API] This is a legacy field from SyncObservable. It allows for bypassing deadlock. Not sure what to do with it yet.
-  private[airstream] val isSoft: Boolean = true
-
   protected[this] var maybeCombinedValue: Option[A] = None
 
+  /** Parent observers are not immediately active. onStart/onStop regulates that. */
   protected[this] val parentObservers: js.Array[InternalParentObserver[_]] = js.Array()
 
   // Implementations should call internalObserver.onNext() instead of .fire()
@@ -40,10 +38,12 @@ trait CombineObservable[A] extends SyncObservable[A] {
 
   override protected[this] def onStart(): Unit = {
     parentObservers.foreach(_.addToParent())
+    super.onStart()
   }
 
   override protected[this] def onStop(): Unit = {
     parentObservers.foreach(_.removeFromParent())
+    super.onStop()
   }
 
 }

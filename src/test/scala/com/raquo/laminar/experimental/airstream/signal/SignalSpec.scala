@@ -9,7 +9,7 @@ import scala.collection.mutable
 
 class SignalSpec extends FunSpec with Matchers {
 
-  it("SignalFromEvent lazily propagates values to child MapSignal") {
+  it("EventStream.toSignal creates a properly wired Signal") {
 
     // @TODO add another mapped dependency on signal and verify that one's evaluations as well (maybe in a separate test?)
 
@@ -170,8 +170,9 @@ class SignalSpec extends FunSpec with Matchers {
       .map(Calculation.log("map-signal", calculations))
     val changes = signal.changes.map(Calculation.log("changes", calculations))
 
-    // Verify that .changes returns the same stream every time (lazy val)
-    signal.changes shouldBe signal.changes
+    // .changes can't be a lazy val for memory management purposes
+    // (parent should not have a reference to a child that has no observers)
+    signal.changes shouldNot be(signal.changes)
 
     // --
 
