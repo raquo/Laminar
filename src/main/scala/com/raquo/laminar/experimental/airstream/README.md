@@ -36,7 +36,11 @@ TODO[Docs] compile this when the docs stabilize
 
 The provided documentation is a high level overview that occasionally dives into gritty details for things that are hard to figure on your own. It is not a full replacement to discovering available methods by reading the code (which is quite simple, and has comments) or simply with an IDE's autocomplete functionality.
 
-I try my best, but I can't possibly assume zero knowledge of streams and observables in this documentation. If you need a primer on standard reactive programming, consider [this guide](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) by André Staltz or its [video adaptation](https://egghead.io/courses/introduction-to-reactive-programming). 
+This documentation is not an introduction to functional reactive programming. Instead, it explains the specifics of one library. I therefore assume basic knowledge of streams and observables here. If you need a primer on standard reactive programming, consider [this guide](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) by André Staltz or its [video adaptation](https://egghead.io/courses/introduction-to-reactive-programming). 
+
+This documentation is intended to be read top to bottom, sections further down the line assume knowledge of concepts and behaviours introduced in earlier sections.
+
+Warning: there is some rambling involved. I will need to revise this at some point.
 
 
 
@@ -48,7 +52,7 @@ EventStream has no concept of "current value". It is a stream of events, and the
 
 EventStream is a **lazy** observable. That means that it will not receive or process events unless it has at least one Observer (more on this below).
 
-When you add an Observer to a stream, it typically begins to receive events emitted from the stream from now on. Different streams could have custom code in them overriding this behaviour however.
+When you add an Observer to a stream, it typically starts to send events to the observer from now on. Different streams could potentially have custom code in them overriding this behaviour however.
 
 The result of calling `observable.addObserver(observer)(owner)` or `observable.foreach(onNext)(owner)` is a Subscription. To remove the observer you can call `observable.removeObserver(sameObserver)` or `subscription.kill()`. You can ignore the `owner` implicit param for now. Read about it later in the [Ownership](#ownership) section. 
 
@@ -76,11 +80,11 @@ val rap: EventStream[Rap] = qux.map(quxToRap)
 baz.addObserver(bazObserver)
 ```
 
-Until or unless `baz.addObserver(bazObserver)` was called, these streams would not be receiving or emitting any events because they have no observers, internal or external. After `addObserver` is called, `baz.onStart` is called, adding `baz` as an InternalObserver to `bar`. `baz` will now receive and process any events emitted by `bar`.
+Until `baz.addObserver(bazObserver)` was called, these streams would not be receiving or emitting any events because they have no observers, internal or external. After `addObserver` is called, `baz.onStart` is called, adding `baz` as an InternalObserver to `bar`. `baz` will now receive and process any events emitted by `bar`.
 
 But this means that `bar` just got its first observer – even if an internal one, it still matters – someone started caring, even if indirectly. So its `onStart` method is called, and it adds `bar` as the first InternalObserver to `foo`. Now, `foo` is started as well, and its `onStart` method does _something_ to ensure that `foo` will now start sending out events. We don't actually know what it is that needs to be done for `foo`, because we didn't define `foo`'s implementation. For example, its `onStart` method could be adding a DOM listener to a DOM element.
 
-Now we see how adding an observer resulted in a chain of activations of all upstream streams that were required, directly or indirectly, to get the events out of the stream we actually wanted to observe. The `onStart` method ensured – recursively – that the stream of interest is now running.
+Now we see how adding an observer resulted in a chain of activations of all upstream streams that were required, directly or indirectly, to get the events out of the stream we actually wanted to observe. The `onStart` method ensured – recursively – that the observed stream is now running.
 
 Adding another observer to the now already running streams – `foo` or `bar` or `baz` – would not need to cause such a chain reaction because the stream to which it is being added already has observers (internal or external).
 
