@@ -12,15 +12,13 @@ class MapState[I, O](
 
   override protected[airstream] val topoRank: Int = parent.topoRank + 1
 
+  init()
+
   onStart()
 
   override protected[this] def initialValue(): O = project(parent.now())
 
   override protected[airstream] def onNext(nextParentValue: I, transaction: Transaction): Unit = {
     fire(project(nextParentValue), transaction)
-  }
-
-  override protected[this] def registerWithOwner(): Unit = {
-    owner.own(this)
   }
 }

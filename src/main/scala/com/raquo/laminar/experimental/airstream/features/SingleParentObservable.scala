@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.features
 
-import com.raquo.laminar.experimental.airstream.core.{InternalObserver, Observable, Observer}
+import com.raquo.laminar.experimental.airstream.core.{InternalObserver, Observable, Observer, Transaction}
 
 /** A simple observable that only has one parent. */
 trait SingleParentObservable[I, +O] extends Observable[O] with InternalObserver[I] {
@@ -13,7 +13,7 @@ trait SingleParentObservable[I, +O] extends Observable[O] with InternalObserver[
   }
 
   override protected[this] def onStop(): Unit = {
-    parent.removeInternalObserver(this)
+    Transaction.removeInternalObserver(parent, observer = this)
     super.onStop()
   }
 }

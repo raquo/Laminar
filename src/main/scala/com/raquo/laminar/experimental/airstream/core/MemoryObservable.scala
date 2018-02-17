@@ -23,7 +23,7 @@ trait MemoryObservable[+A] extends Observable[A] {
   def changes: EventStream[A] = new MapEventStream[A, A](parent = this, project = identity)
 
   /** Note: if you want your observer to only get changes, subscribe to .changes stream instead */
-  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
+  override def addObserver(observer: Observer[A])(implicit owner: Owner): Subscription = {
     val subscription = super.addObserver(observer)
     observer.onNext(now()) // send current value immediately
     subscription

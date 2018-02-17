@@ -3,7 +3,11 @@ package com.raquo.laminar.experimental.airstream.eventstream
 import com.raquo.laminar.experimental.airstream.core.LazyObservable
 import com.raquo.laminar.experimental.airstream.signal.{FoldSignal, Signal, SignalFromEventStream}
 
-trait EventStream[+A] extends LazyObservable[A, EventStream] {
+trait EventStream[+A] extends LazyObservable[A] {
+
+  override def map[B](project: A => B): EventStream[B] = {
+    new MapEventStream(this, project)
+  }
 
   def mapTo[B](value: B): EventStream[B] = {
     new MapEventStream[A, B](this, _ => value)
@@ -11,6 +15,10 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
   def filter(passes: A => Boolean): EventStream[A] = {
     new FilterEventStream(this, passes)
+  }
+
+  def delay(intervalMillis: Int = 0): EventStream[A] = {
+    new DelayEventStream(parent = this, intervalMillis)
   }
 
   def throttle(intervalMillis: Int): EventStream[A] = {
@@ -21,8 +29,6 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
     new DebounceEventStream(parent = this, delayFromLastEventMillis)
   }
 
-  def flatten[B](implicit ev: A <:< EventStream[B]): EventStream[B] = ???
-
   def fold[B](initialValue: B)(fn: (B, A) => B): Signal[B] = {
     new FoldSignal(parent = this, initialValue, fn)
   }
@@ -31,15 +37,11 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
     new SignalFromEventStream(parent = this, initialValue)
   }
 
-  override def map[B](project: A => B): EventStream[B] = {
-    new MapEventStream(this, project)
-  }
-
-  override def compose[B](operator: EventStream[A] => EventStream[B]): EventStream[B] = {
+  def compose[B](operator: EventStream[A] => EventStream[B]): EventStream[B] = {
     operator(this)
   }
 
-  override def combineWith[AA >: A, B](otherEventStream: EventStream[B]): CombineEventStream2[AA, B, (AA, B)] = {
+  def combineWith[AA >: A, B](otherEventStream: EventStream[B]): CombineEventStream2[AA, B, (AA, B)] = {
     new CombineEventStream2(
       parent1 = this,
       parent2 = otherEventStream,
@@ -50,11 +52,15 @@ trait EventStream[+A] extends LazyObservable[A, EventStream] {
 
 object EventStream {
 
-  def combine[A, B](
+  def fromSeq[A](events: Seq[A]): EventStream[A] = {
+    new SeqEventStream[A](events)
+  }
+
+  @inline def combine[A, B](
     stream1: EventStream[A],
     stream2: EventStream[B]
   ): EventStream[(A, B)] = {
-    new CombineEventStream2[A, B, (A, B)](stream1, stream2, (_, _))
+    stream1.combineWith(stream2)
   }
 
   def merge[A](streams: EventStream[A]*): EventStream[A] = {

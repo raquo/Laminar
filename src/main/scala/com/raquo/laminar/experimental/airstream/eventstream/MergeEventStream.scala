@@ -1,6 +1,7 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
-import com.raquo.laminar.experimental.airstream.core.{InternalParentObserver, Observable, SyncObservable, Transaction}
+import com.raquo.laminar.experimental.airstream.core.{Observable, Observation, SyncObservable, Transaction}
+import com.raquo.laminar.experimental.airstream.features.InternalParentObserver
 import com.raquo.laminar.experimental.airstream.util.JsPriorityQueue
 
 import scala.scalajs.js
@@ -25,7 +26,7 @@ class MergeEventStream[A](
     maxParentRank + 1
   }
 
-  private[this] val pendingParentValues: JsPriorityQueue[(Observable[A], A)] = new JsPriorityQueue(_._1.topoRank)
+  private[this] val pendingParentValues: JsPriorityQueue[Observation[A]] = new JsPriorityQueue(_.observable.topoRank)
 
   private[this] val parentObservers: js.Array[InternalParentObserver[A]] = js.Array()
 
@@ -42,11 +43,11 @@ class MergeEventStream[A](
     */
   override private[airstream] def syncFire(transaction: Transaction): Unit = {
     // At least one value is guaranteed to exist if this observable is pending
-    fire(pendingParentValues.dequeue()._2, transaction)
+    fire(pendingParentValues.dequeue().value, transaction)
 
     while (pendingParentValues.nonEmpty) {
       println("NEW TRX from MergeEventStream")
-      val nextValue = pendingParentValues.dequeue()._2
+      val nextValue = pendingParentValues.dequeue().value
       new Transaction(fire(nextValue, _))
     }
   }
@@ -61,7 +62,7 @@ class MergeEventStream[A](
 
   private def makeInternalObserver(parent: Observable[A]): InternalParentObserver[A] = {
     InternalParentObserver(parent, onNext = (nextValue, transaction) => {
-      pendingParentValues.enqueue((parent, nextValue))
+      pendingParentValues.enqueue(new Observation(parent, nextValue))
       if (!transaction.pendingObservables.contains(this)) {
         transaction.pendingObservables.enqueue(this)
       }

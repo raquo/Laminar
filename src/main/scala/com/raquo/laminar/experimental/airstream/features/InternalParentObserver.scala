@@ -1,4 +1,6 @@
-package com.raquo.laminar.experimental.airstream.core
+package com.raquo.laminar.experimental.airstream.features
+
+import com.raquo.laminar.experimental.airstream.core.{InternalObserver, Observable, Transaction}
 
 trait InternalParentObserver[A] extends InternalObserver[A] {
 
@@ -9,7 +11,7 @@ trait InternalParentObserver[A] extends InternalObserver[A] {
   }
 
   def removeFromParent(): Unit = {
-    parent.removeInternalObserver(this)
+    Transaction.removeInternalObserver(parent, observer = this)
   }
 }
 

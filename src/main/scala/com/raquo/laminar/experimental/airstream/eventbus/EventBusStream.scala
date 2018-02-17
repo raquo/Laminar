@@ -28,7 +28,7 @@ class EventBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with Inter
     if (index != -1) {
       sources.splice(index, deleteCount = 1)
       if (isStarted) {
-        source.sourceStream.removeInternalObserver(this)
+        Transaction.removeInternalObserver(source.sourceStream, observer = this)
       }
     }
   }
@@ -48,6 +48,8 @@ class EventBusStream[A](writeBus: WriteBus[A]) extends EventStream[A] with Inter
   }
 
   override protected[this] def onStop(): Unit = {
-    sources.foreach(_.sourceStream.removeInternalObserver(this))
+    // dom.console.log("EventBusStream STOPPED!", this.toString)
+    // @TODO[Performance] Doing this in the middle of a transaction would cause source.length transactions to be created – not good
+    sources.foreach(source => Transaction.removeInternalObserver(source.sourceStream, observer = this))
   }
 }

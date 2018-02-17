@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 // @TODO[Integrity] Careful with multiple inheritance & addObserver here
 /** Signal is a lazy observable with a current value */
-trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A, Signal] {
+trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A] {
 
   protected[this] var maybeLastSeenCurrentValue: js.UndefOr[A] = js.undefined
 
@@ -20,11 +20,11 @@ trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A, Signal] {
     new MapSignal(parent = this, project)
   }
 
-  override def compose[B](operator: Signal[A] => Signal[B]): Signal[B] = {
+  def compose[B](operator: Signal[A] => Signal[B]): Signal[B] = {
     operator(this)
   }
 
-  override def combineWith[AA >: A, B](otherSignal: Signal[B]): CombineSignal2[AA, B, (AA, B)] = {
+  def combineWith[AA >: A, B](otherSignal: Signal[B]): CombineSignal2[AA, B, (AA, B)] = {
     new CombineSignal2(
       parent1 = this,
       parent2 = otherSignal,

@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.features
 
-import com.raquo.laminar.experimental.airstream.core.{InternalObserver, InternalParentObserver, SyncObservable, Transaction}
+import com.raquo.laminar.experimental.airstream.core.{InternalObserver, SyncObservable, Transaction}
 
 import scala.scalajs.js
 

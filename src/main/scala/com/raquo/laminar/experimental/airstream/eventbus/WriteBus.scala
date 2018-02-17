@@ -32,6 +32,9 @@ class WriteBus[A] extends Observer[A] {
       // @TODO[Integrity] We rely on the knowledge that EventBusStream discards the transaction it's given. Laaaame
       stream.onNext(nextValue, transaction = null)
     }
+    // else {
+    //   println(">>>> WriteBus.onNext called, but stream is not started!")
+    // }
   }
 
   override def map[B](project: B => A): Observer[B] = {

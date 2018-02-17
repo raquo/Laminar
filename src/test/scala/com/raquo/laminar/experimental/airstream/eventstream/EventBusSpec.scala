@@ -112,7 +112,7 @@ class EventBusSpec extends FunSpec with Matchers {
 
     // ---
 
-    source1.removeSource()
+    source1.kill()
 
     bus1.writer.onNext(4)
     bus2.writer.onNext(4)

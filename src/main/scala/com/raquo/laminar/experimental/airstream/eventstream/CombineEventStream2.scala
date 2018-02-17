@@ -1,7 +1,6 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
-import com.raquo.laminar.experimental.airstream.core.InternalParentObserver
-import com.raquo.laminar.experimental.airstream.features.CombineObservable
+import com.raquo.laminar.experimental.airstream.features.{CombineObservable, InternalParentObserver}
 
 /** Stream that combines the latest values from two streams into a tuple.
   * Only fires after both streams have sent a value.

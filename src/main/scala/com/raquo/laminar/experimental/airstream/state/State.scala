@@ -36,7 +36,9 @@ trait State[+A] extends MemoryObservable[A] with Owned {
     )
   }
 
-  def toSignal: Signal[A] = {
+  @inline def toSignal: Signal[A] = toLazy
+
+  override def toLazy: Signal[A] = {
     new MapSignal[A, A](parent = this, project = identity)
   }
 
@@ -51,7 +53,7 @@ trait State[+A] extends MemoryObservable[A] with Owned {
     }
   }
 
-  override private[airstream] def kill(): Unit = {
+  override protected[this] def onKilled(): Unit = {
     onStop() // @TODO[Integrity] onStop must not be called anywhere else on State observables. Possible to enforce that?
   }
 }

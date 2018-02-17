@@ -15,18 +15,18 @@ import scala.scalajs.js
 trait Owner {
 
   /** Note: This is enforced to be a set outside the type system. #performance */
-  private[airstream] val possessions: js.Array[Owned] = js.Array()
+  protected[this] val possessions: js.Array[Owned] = js.Array()
 
-  // @TODO Figure out proper visibility for this. Don't want to pollute the consuming library's API
   protected[this] def killPossessions(): Unit = {
-    possessions.foreach(_.kill())
-    possessions.length = 0 // This actually clears the JS array, amazing
+    possessions.foreach(_.onKilledByOwner())
+    possessions.clear()
   }
 
-  /** This method should only be called from the Owned instance when it's initialized */
-  private[airstream] def own(owned: Owned): Unit = {
-    possessions.push(owned)
-  }
+  /** This method will be called when this [[Owner]] has just started owning this resource.
+    * You can override it to add custom behaviour.
+    * Note: You can rely on this base method being empty.
+    */
+  protected[this] def onOwned(owned: Owned): Unit = ()
 
   /** Some possessions can be killed externally, e.g. `WriteBusSource.` */
   def onKilledExternally(owned: Owned): Unit = {
@@ -34,5 +34,10 @@ trait Owner {
     if (index != -1) {
       possessions.splice(index, deleteCount = 1)
     }
+  }
+
+  private[ownership] def own(owned: Owned): Unit = {
+    possessions.push(owned)
+    onOwned(owned)
   }
 }

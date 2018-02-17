@@ -8,6 +8,8 @@ trait Observer[-A] {
 
   def onNext(nextValue: A): Unit
 
+  // @TODO this needs to be implemented, and probably with an implicit owner, just like WriteBus
+
   // @TODO are map and filter good names? Maybe use lens/zoom/etc?
 
   /** Creates another Observer such that calling its onNext will call this observer's onNext

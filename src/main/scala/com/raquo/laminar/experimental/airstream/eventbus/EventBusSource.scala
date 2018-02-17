@@ -3,26 +3,24 @@ package com.raquo.laminar.experimental.airstream.eventbus
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
 
-// @TODO Rename? Maybe something with "Subscription"? Although nah...
+// @TODO[Naming] Maybe something with "Subscription"? Although nah...
 class EventBusSource[A](
   eventBusStream: EventBusStream[A],
   val sourceStream: EventStream[A],
-  owner: Owner
+  override protected[this] val owner: Owner
 ) extends Owned {
+
+  init()
 
   eventBusStream.addSource(this)
 
-  override protected[this] def registerWithOwner(): Unit = {
-    owner.own(this)
-  }
-
-  def removeSource(): Unit = {
-    kill()
-    owner.onKilledExternally(this)
-  }
-
-  override private[airstream] def kill(): Unit = {
-    // @TODO need to do anything else here, or maybe in removeSource? like onStop?
+  override protected[this] def onKilled(): Unit = {
     eventBusStream.removeSource(this)
+  }
+
+  /** Remove this source stream from this event bus */
+  override def kill(): Unit = {
+    onKilled()
+    owner.onKilledExternally(this)
   }
 }

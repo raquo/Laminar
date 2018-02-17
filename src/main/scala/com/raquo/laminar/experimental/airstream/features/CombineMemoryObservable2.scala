@@ -1,6 +1,6 @@
 package com.raquo.laminar.experimental.airstream.features
 
-import com.raquo.laminar.experimental.airstream.core.{InternalParentObserver, MemoryObservable}
+import com.raquo.laminar.experimental.airstream.core.MemoryObservable
 
 trait CombineMemoryObservable2[A, B, O] extends MemoryObservable[O] with CombineObservable[O] {
 

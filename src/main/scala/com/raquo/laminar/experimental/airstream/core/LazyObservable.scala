@@ -7,7 +7,7 @@ import com.raquo.laminar.experimental.airstream.ownership.Owner
   *
   * Stream and Signal are lazy observables. State is not.
   */
-trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
+trait LazyObservable[+A] extends Observable[A] {
 
   /** Basic idea: Lazy Observable only holds references to those children that have any observers
     * (either directly on themselves, or on any of their descendants). What this achieves:
@@ -19,30 +19,20 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
     * when their subscriptions are killed by their owners)
     */
 
-  // @TODO[API] Should LazyObservable have these abstract methods? Event streams and Signals are pretty different beasts.
-  // @TODO[API] Probably yes, because some things like <-- don't care much whether the observable has a current value
-
-  def map[B](project: A => B): S[B]
-
-  def compose[B](operator: S[A] => S[B]): S[B]
-
-  def combineWith[AA >: A, B](otherObservable: S[B]): S[(AA, B)]
+  def map[B](project: A => B): LazyObservable[B]
 
   protected[this] def isStarted: Boolean = numAllObservers > 0
 
-  override def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
+  override def toLazy: this.type = this
+
+  override def addObserver(observer: Observer[A])(implicit owner: Owner): Subscription = {
     val subscription = super.addObserver(observer)
     maybeStart()
     subscription
   }
 
-  /** Note: To completely disconnect an Observer from this Observable,
-    * you need to remove it as many times as you added it to this Observable.
-    *
-    * @return whether observer was removed (`false` if it wasn't subscribed to this observable)
-    */
-  override def removeObserver(observer: Observer[A]): Boolean = {
-    val removed = super.removeObserver(observer)
+  override protected[airstream] def removeExternalObserverNow(observer: Observer[A]): Boolean = {
+    val removed = super.removeExternalObserverNow(observer)
     if (removed) {
       maybeStop()
     }
@@ -62,8 +52,8 @@ trait LazyObservable[+A, S[+_] <: LazyObservable[_, S]] extends Observable[A] {
     * This lazy observable calls [[onStop]] if this action has removed its last observer (internal or external).
     * See also docs for [[Observable.onStop]]
     */
-  override protected[airstream] def removeInternalObserver(observer: InternalObserver[A]): Boolean = {
-    val removed = super.removeInternalObserver(observer)
+  override protected[airstream] def removeInternalObserverNow(observer: InternalObserver[A]): Boolean = {
+    val removed = super.removeInternalObserverNow(observer)
     if (removed) {
       maybeStop()
     }

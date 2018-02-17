@@ -1,5 +1,6 @@
 package com.raquo.laminar.experimental.airstream.core
 
+import com.raquo.laminar.experimental.airstream.eventstream.{EventStream, FlattenEventStream}
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
 import com.raquo.laminar.experimental.airstream.state.State
 import com.raquo.laminar.experimental.airstream.util.GlobalCounter
@@ -23,32 +24,42 @@ trait Observable[+A] {
   /** Note: This is enforced to be a Set outside of the type system #performance */
   protected[this] val internalObservers: js.Array[InternalObserver[A]] = js.Array()
 
-  def foreach(onNext: A => Unit)(implicit subscriptionOwner: Owner): Subscription = {
-    val observer = Observer(onNext)
-    addObserver(observer)(subscriptionOwner)
+  def flatten[B](implicit evidence: Observable[A] <:< Observable[EventStream[B]]): EventStream[B] = {
+    new FlattenEventStream[B](parent = evidence(this))
   }
 
-  // @TODO explain the difference between child observers and external observers
+  /** Get a lazy observable that emits the same values as this one (assuming it has observers, as usual)
+    *
+    * This is useful when you want to map over an Observable of an unknown type.
+    *
+    * Note: [[Observable]] itself has no "map" method because mapping over [[State]]
+    * without expecting / accounting for State's eagerness can result in memory leaks. See README.
+    */
+  def toLazy: LazyObservable[A]
+
+  def foreach(onNext: A => Unit)(implicit owner: Owner): Subscription = {
+    val observer = Observer(onNext)
+    addObserver(observer)(owner)
+  }
+
   /** And an external observer */
-  def addObserver(observer: Observer[A])(implicit subscriptionOwner: Owner): Subscription = {
-    val subscription = Subscription(observer, this, subscriptionOwner)
+  def addObserver(observer: Observer[A])(implicit owner: Owner): Subscription = {
+    val subscription = Subscription(observer, this, owner)
     externalObservers.push(observer)
     dom.console.log(s"Adding subscription: $subscription")
     subscription
   }
 
-  /** Note: To completely disconnect an Observer from this Observable,
-    * you need to remove it as many times as you added it to this Observable.
+  /** Schedule an external observer to be removed in the next transaction.
+    * This will still happen synchronously, but will not interfere with
+    * iteration over the observables' lists of observers during the current
+    * transaction.
     *
-    * @return whether observer was removed (`false` if it wasn't subscribed to this observable)
+    * Note: To completely disconnect an Observer from this Observable,
+    * you need to remove it as many times as you added it to this Observable.
     */
-  def removeObserver(observer: Observer[A]): Boolean = {
-    val index = externalObservers.indexOf(observer)
-    val shouldRemove = index != -1
-    if (shouldRemove) {
-      externalObservers.splice(index, deleteCount = 1)
-    }
-    shouldRemove
+  @inline def removeObserver(observer: Observer[A]): Unit = {
+    Transaction.removeExternalObserver(this, observer)
   }
 
   // @TODO Why does simple "protected" not work? Specialization?
@@ -58,12 +69,25 @@ trait Observable[+A] {
     internalObservers.push(observer)
   }
 
-  /** */
-  protected[airstream] def removeInternalObserver(observer: InternalObserver[A]): Boolean = {
+//  @inline protected[airstream] def removeInternalObserver(observer: InternalObserver[A]): Unit = {
+//    Transaction.removeInternalObserver(observable = this, observer)
+//  }
+
+  protected[airstream] def removeInternalObserverNow(observer: InternalObserver[A]): Boolean = {
     val index = internalObservers.indexOf(observer)
     val shouldRemove = index != -1
     if (shouldRemove) {
       internalObservers.splice(index, deleteCount = 1)
+    }
+    shouldRemove
+  }
+
+  /** @return whether observer was removed (`false` if it wasn't subscribed to this observable) */
+  protected[airstream] def removeExternalObserverNow(observer: Observer[A]): Boolean = {
+    val index = externalObservers.indexOf(observer)
+    val shouldRemove = index != -1
+    if (shouldRemove) {
+      externalObservers.splice(index, deleteCount = 1)
     }
     shouldRemove
   }
@@ -94,10 +118,20 @@ trait Observable[+A] {
   @inline protected[this] def onStop(): Unit = ()
 
   // @TODO[API] It is rather curious/unintuitive that firing external observers first seems to make more sense. Think about it some more.
-  // @TODO[API] Should probably use while-loops here to support the case of adding observers on the fly (will fix simpler cases of https://github.com/raquo/laminar/issues/11)
   protected[this] def fire(nextValue: A, transaction: Transaction): Unit = {
-    externalObservers.foreach(_.onNext(nextValue))
-    internalObservers.foreach(_.onNext(nextValue, transaction))
+    // Note: Removal of observers is always scheduled for a new transaction, so the iteration here is safe
+
+    var index = 0
+    while (index < externalObservers.length) {
+      externalObservers(index).onNext(nextValue)
+      index += 1
+    }
+
+    index = 0
+    while (index < internalObservers.length) {
+      internalObservers(index).onNext(nextValue, transaction)
+      index += 1
+    }
   }
 }
 

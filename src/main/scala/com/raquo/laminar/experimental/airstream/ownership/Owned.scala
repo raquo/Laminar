@@ -1,8 +1,9 @@
 package com.raquo.laminar.experimental.airstream.ownership
 
 /** Represents a leaky resource such as a
-  * [[com.raquo.laminar.experimental.airstream.signal.Signal]] or a
-  * [[com.raquo.laminar.experimental.airstream.core.Subscription]]
+  * [[com.raquo.laminar.experimental.airstream.state.State]] or a
+  * [[com.raquo.laminar.experimental.airstream.core.Subscription]] or a
+  * [[com.raquo.laminar.experimental.airstream.eventbus.EventBusSource]]
   *
   * Due to circular references, such resources will leak memory if
   * not explicitly disabled. Well, unless the whole Signal/Stream graph that
@@ -20,13 +21,27 @@ package com.raquo.laminar.experimental.airstream.ownership
   */
 trait Owned {
 
-  registerWithOwner()
+  protected[this] val owner: Owner
 
-  // @TODO[Elegance] This API is weird and not very useful (not really enforcing all ownership constraints). Reconsider.
-  /** This method should call owner.own(this) for a particular owner. */
-  protected[this] def registerWithOwner(): Unit
+  // @TODO[Elegance] Try getting around this with Scala's early initializers https://stackoverflow.com/q/4712468/2601788
+  /** You MUST call this method in the constructor of your [[Owned]] instance.
+    * Note: We can't call init() here because [[owner]] is not initialized yet.
+    */
+  protected[this] def init(): Unit = {
+    owner.own(this)
+  }
 
-  // @TODO[API,Docs] Update access level and comment...
-  /** This will be called by an [[Owner]] when this resource should be discarded. */
-  private[airstream] def kill(): Unit
+  /** You can expose this method if your [[Owned]] resource can be killed manually */
+  protected[this] def kill(): Unit = {
+    onKilled()
+    owner.onKilledExternally(this)
+  }
+
+  // @TODO[API] This method exists only due to permissions. Is there another way?
+  @inline private[ownership] def onKilledByOwner(): Unit = onKilled()
+
+  /** This method will be called when this [[Owned]] resource is killed, either manually or by the owner.
+    * This is where you implement cleanup for your resource.
+    */
+  protected[this] def onKilled(): Unit
 }
