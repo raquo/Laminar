@@ -3,9 +3,9 @@ package com.raquo.laminar
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.bundle._
 import com.raquo.laminar.collection.CollectionCommand.{Append, Insert, Prepend, Remove, Replace, ReplaceAll}
+import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.xstream.{ShamefulStream, XStream}
 
 import scala.collection.mutable
 
@@ -22,37 +22,36 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
 //  private val text7 = randomString("text7_")
 
   it("updates a list of children") {
-    val $command = XStream.create[ChildrenCommand]()
-    val $varDiff = new ShamefulStream($command)
+    val commandBus = new EventBus[ChildrenCommand]
 
     val span0 = span(text0)
     val span1 = span(text1)
 
-    mount(div("Hello", children.command <-- $command, div("World")))
+    mount(div("Hello", children.command <-- commandBus.events, div("World")))
     expectChildren("none")
 
-    $varDiff.shamefullySendNext(Append(span0))
+    commandBus.writer.onNext(Append(span0))
     expectChildren("append #1:", span like text0)
 
-    $varDiff.shamefullySendNext(Append(span1))
+    commandBus.writer.onNext(Append(span1))
     expectChildren("append #2:", span like text0, span like text1)
 
-    $varDiff.shamefullySendNext(Prepend(div(text2)))
+    commandBus.writer.onNext(Prepend(div(text2)))
     expectChildren("prepend:", div like text2, span like text0, span like text1)
 
-    $varDiff.shamefullySendNext(Remove(span0))
+    commandBus.writer.onNext(Remove(span0))
     expectChildren("remove:", div like text2, span like text1)
 
-    $varDiff.shamefullySendNext(Replace(span1, div(text3)))
+    commandBus.writer.onNext(Replace(span1, div(text3)))
     expectChildren("replace:", div like text2, div like text3)
 
-    $varDiff.shamefullySendNext(ReplaceAll(mutable.Buffer(span1, span0)))
+    commandBus.writer.onNext(ReplaceAll(mutable.Buffer(span1, span0)))
     expectChildren("replaceAll:", span like text1, span like text0)
 
-    $varDiff.shamefullySendNext(Append(span(text4)))
+    commandBus.writer.onNext(Append(span(text4)))
     expectChildren("append #3:", span like text1, span like text0, span like text4)
 
-    $varDiff.shamefullySendNext(Insert(span(text5), atIndex = 2))
+    commandBus.writer.onNext(Insert(span(text5), atIndex = 2))
     expectChildren("insert:", span like text1, span like text0, span like text5, span like text4)
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {

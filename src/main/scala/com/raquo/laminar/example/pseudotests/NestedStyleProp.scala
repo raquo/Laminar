@@ -2,13 +2,13 @@ package com.raquo.laminar.example.pseudotests
 
 import com.raquo.laminar.bundle._
 import com.raquo.laminar.example.components.Toggle
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.xstream.XStream
 import org.scalajs.dom
 
 object NestedStyleProp {
 
-  def render($color: XStream[String]): ReactiveElement[dom.Element] = {
+  def render($color: EventStream[String]): ReactiveElement[dom.Element] = {
     div(
       color <-- $color,
       span("HELLO"),

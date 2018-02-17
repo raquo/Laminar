@@ -3,17 +3,18 @@ package com.raquo.laminar.nodes
 import com.raquo.dombuilder.generic
 import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
+import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropEmitter
-import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWillBeDiscarded, NodeWillUnmount, ParentChangeEvent}
-import com.raquo.laminar.nodes.ReactiveElement.$noMountEvents
+import com.raquo.laminar.experimental.airstream.core.{Observable, Observer, Subscription}
+import com.raquo.laminar.experimental.airstream.eventbus.{EventBus, EventBusSource, WriteBus}
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
+import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
+import com.raquo.laminar.experimental.airstream.signal.Signal
+import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWasDiscarded, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ReactiveChildNode.isParentMounted
+import com.raquo.laminar.nodes.ReactiveElement.$noMountEvents
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, LockedAttrReceiver, LockedPropReceiver, MaybeChildReceiver, TextChildReceiver}
-import com.raquo.laminar.streams.{EventBus, MergeWriteBus}
-import com.raquo.laminar.{DomApi, DynamicSubscription}
-import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
-
-import scala.scalajs.js
 
 class ReactiveElement[+Ref <: dom.Element](
   override val tagName: String,
@@ -22,29 +23,18 @@ class ReactiveElement[+Ref <: dom.Element](
   with ReactiveChildNode[Ref]
   with generic.nodes.Element[ReactiveNode, Ref, dom.Node]
   with generic.nodes.EventfulNode[ReactiveNode, Ref, dom.Element, dom.Node, dom.Event, JsCallback]
-  with generic.nodes.ParentNode[ReactiveNode, Ref, dom.Node] {
+  with generic.nodes.ParentNode[ReactiveNode, Ref, dom.Node]
+  with Owner {
 
   /** Event bus that emits parent change events.
-    * For efficiency, it is only initialized when someone accesses [[$parentChange]]
+    * For efficiency, it is only populated when someone accesses [[$parentChange]]
     */
   private[laminar] var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
 
   /** Event bus that emits this node's mount events.
-    * For efficiency, it is only initialized when someone accesses [[$thisNodeMountEvent]]
+    * For efficiency, it is only populated when someone accesses [[$thisNodeMountEvent]]
     */
   private[laminar] var maybeThisNodeMountEventBus: Option[EventBus[MountEvent]] = None
-
-  /** This built-in subscription monitors the element's mount events, and activates / deactivates other subscriptions accordingly */
-  private lazy val mountEventSubscription: DynamicSubscription[MountEvent] = new DynamicSubscription(
-    $mountEvent,
-    Listener[MountEvent](onNext = {
-      case NodeDidMount => subscriptions.foreach(_.activate())
-      case NodeWillUnmount => subscriptions.foreach(_.deactivate())
-      case NodeWillBeDiscarded => mountEventSubscription.deactivate()
-    })
-  )
-
-  private lazy val subscriptions: js.Array[DynamicSubscription[_]] = js.Array()
 
   override val ref: Ref = DomApi.elementApi.createNode(this)
 
@@ -52,41 +42,37 @@ class ReactiveElement[+Ref <: dom.Element](
     * For efficiency, it is lazy loaded, only being initialized when accessed,
     * either directly or (more commonly) as a dependency of [[$mountEvent]]
     */
-  lazy val $parentChange: XStream[ParentChangeEvent] = {
+  lazy val $parentChange: EventStream[ParentChangeEvent] = {
     val parentChangeBus = new EventBus[ParentChangeEvent]
     maybeParentChangeBus = Some(parentChangeBus)
-    parentChangeBus.$
+    parentChangeBus.events
   }
 
+  lazy val $maybeParent: Signal[Option[BaseParentNode]] = $parentChange
+    .filter(_.alreadyChanged) // @TODO[Integrity] is this important?
+    .map(_.maybeNextParent)
+    .toSignal(maybeParent)
+
   /** Emits mount events from all ancestors of this node, making sure to account for all hierarchy changes. */
-  lazy val $ancestorMountEvent: XStream[MountEvent] = {
-    val $maybeParent = $parentChange // @TODO[API] expose this stream?
-      .filter(!_.alreadyChanged) // @TODO[Integrity] is this important?
-      .map(_.maybeNextParent)
-      .startWith(maybeParent)
-
-    val $$parentMountEvent: XStream[XStream[MountEvent]] = $maybeParent.map { maybeParent =>
-      maybeParent match { // @TODO[Elegance] can we shorten this without creating a partial function? Can we avoid an instanceof check?
-        case Some(nextParent: ReactiveElement[_]) =>
-          nextParent.$mountEvent
-        case _ =>
-          $noMountEvents
-      }
-    }
-
-    $$parentMountEvent.flatten // Important: `flatten` outputs a stream that happens to not be a MemoryStream anymore. This ensures that listeners of this stream don't immediately get the last event on subscription.
+  lazy val $ancestorMountEvent: EventStream[MountEvent] = {
+    $maybeParent.map {
+      case Some(nextParent: ReactiveElement[_]) =>
+        nextParent.$mountEvent
+      case _ =>
+        $noMountEvents
+    }.flatten
   }
 
   /** Emits mount events caused by this node changing its parent */
-  lazy val $thisNodeMountEvent: XStream[MountEvent] = {
+  lazy val $thisNodeMountEvent: EventStream[MountEvent] = {
     val thisNodeMountEventBus = new EventBus[MountEvent]
     maybeThisNodeMountEventBus = Some(thisNodeMountEventBus)
-    thisNodeMountEventBus.$
+    thisNodeMountEventBus.events
   }
 
   /** Emits mount events for this node, including mount events fired by all of its ancestors */
-  lazy val $mountEvent: XStream[MountEvent] = {
-    XStream.merge($ancestorMountEvent, $thisNodeMountEvent) // @TODO[Integrity] Does the order of merge matter here?
+  lazy val $mountEvent: EventStream[MountEvent] = {
+    EventStream.merge($ancestorMountEvent, $thisNodeMountEvent)
   }
 
   /** Create and get a stream of events on this node */
@@ -95,16 +81,16 @@ class ReactiveElement[+Ref <: dom.Element](
     useCapture: Boolean = false,
     stopPropagation: Boolean = false, // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
     preventDefault: Boolean = false // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
-  ): XStream[Ev] = {
+  ): EventStream[Ev] = {
     val eventBus = new EventBus[Ev]
-    val setter = new EventPropEmitter[Ev, Ev, Ev, this.type](
-      eventBus,
+    val setter = new EventPropEmitter[Ev, Ev, this.type](
+      eventBus.writer,
       eventProp,
       useCapture,
       processor = (ev: Ev, _: this.type) => Some(ev)
     )
     setter(this)
-    eventBus.$
+    eventBus.events
   }
 
   @inline def <--[V](childReceiver: ChildReceiver.type): ChildReceiver = new ChildReceiver(this)
@@ -121,40 +107,50 @@ class ReactiveElement[+Ref <: dom.Element](
 
   @inline def <--[V, DomV](prop: Prop[V, DomV]): LockedPropReceiver[V, DomV] = new LockedPropReceiver(prop, this)
 
-  //  // @TODO This needs the string magic thing
+  //  // @TODO[API] This needs the string magic thing
   //  def <-- [V](style: Style[V]): StyleReceiver[V] = new StyleReceiver(style)
 
-  //  def -->[Ev <: dom.Event](eventProp: EventProp[Ev])
+  // @TODO vvvv This API gotta change, I think
 
-  // @TODO These methods should be replaced bysubscription lifecycle context functionality
+  // @TODO[API] User needs to provide explicit type params to use the subscribe methods below. How to fix that? 2.12?
 
-  def subscribeDynamic[V](dynamicSubscription: DynamicSubscription[V]): Unit = {
-    subscriptions.push(dynamicSubscription)
-    mountEventSubscription.activate()
-    if (isMounted) {
-      dynamicSubscription.activate()
-      // Otherwise, subscription will activate if/when node is mounted
-    }
+  @inline def subscribe[V](
+    getObservable: this.type => Observable[V],
+    observer: Observer[V]
+  ): Subscription = {
+    subscribe(getObservable(this), observer)
   }
 
-  def subscribe[V](
-    $value: XStream[V],
-    listener: Listener[V]
-  ): Unit = {
-    subscribeDynamic(new DynamicSubscription($value, listener))
+  @inline def subscribe[V](
+    getObservable: this.type => Observable[V],
+    onNext: V => Unit
+  ): Subscription = {
+    subscribe(getObservable(this), Observer(onNext))
   }
 
-  def subscribeBus[V](
-    sourceStream: XStream[V],
-    targetBus: MergeWriteBus[V]
-  ): Unit = {
-    subscribeDynamic(new DynamicSubscription(
-      subscribe = () => targetBus.addSource(sourceStream),
-      unsubscribe = () => targetBus.removeSource(sourceStream)
-    ))
+  @inline def subscribe[V](
+    observable: Observable[V],
+    onNext: V => Unit
+  ): Subscription = {
+    subscribe(observable, Observer(onNext))
+  }
+
+  @inline def subscribe[V](
+    observable: Observable[V],
+    observer: Observer[V]
+  ): Subscription = {
+    observable.addObserver(observer)(owner = this)
+  }
+
+  @inline def subscribeBus[V](
+    sourceStream: EventStream[V],
+    targetBus: WriteBus[V]
+  ): EventBusSource[V] = {
+    targetBus.addSource(sourceStream)(owner = this)
   }
 
   /** Check whether the node is currently mounted.
+    *
     * You can use this method to simplify your code and possibly improve performance
     * where you'd otherwise need to subscribe to and transform [[$mountEvent]]
     */
@@ -164,16 +160,19 @@ class ReactiveElement[+Ref <: dom.Element](
 
   /** This hook is exposed by Scala DOM Builder for this exact purpose */
   override def willSetParent(maybeNextParent: Option[BaseParentNode]): Unit = {
+    // @TODO[Integrity] In dombuilder, willSetParent is called at incorrect time in ParentNode.appendChild
+    // dom.console.log(">>>> willSetParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybeParent == maybeNextParent, maybeParent.toString, maybeNextParent.toString)
     if (maybeNextParent != maybeParent) {
-      maybeParentChangeBus.foreach(_.sendNext(ParentChangeEvent(
-        alreadyChanged = false,
-        maybePrevParent = maybeParent,
-        maybeNextParent = maybeNextParent
-      )))
+      maybeParentChangeBus.foreach(bus => {
+        bus.writer.onNext(ParentChangeEvent(
+          alreadyChanged = false,
+          maybePrevParent = maybeParent,
+          maybeNextParent = maybeNextParent
+        ))
+      })
       if (!isParentMounted(maybeNextParent) && isParentMounted(maybeParent)) {
         maybeThisNodeMountEventBus.foreach { bus =>
-          bus.sendNext(NodeWillUnmount)
-          bus.sendNext(NodeWillBeDiscarded) // @TODO this should be optional
+          bus.writer.onNext(NodeWillUnmount)
         }
       }
     }
@@ -184,20 +183,42 @@ class ReactiveElement[+Ref <: dom.Element](
     // @TODO[Integrity] this method (and others) should be protected
     val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
+    // dom.console.log(">>>> setParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybePrevParent == maybeNextParent, maybePrevParent.toString, maybeNextParent.toString)
     if (maybeNextParent != maybePrevParent) {
-      maybeParentChangeBus.foreach(_.sendNext(ParentChangeEvent(
-        alreadyChanged = true,
-        maybePrevParent = maybePrevParent,
-        maybeNextParent = maybeNextParent
-      )))
-      if (!isParentMounted(maybePrevParent) && isParentMounted(maybeNextParent)) {
-        maybeThisNodeMountEventBus.foreach(_.sendNext(NodeDidMount))
+      maybeParentChangeBus.foreach( bus => {
+        bus.writer.onNext(ParentChangeEvent(
+          alreadyChanged = true,
+          maybePrevParent = maybePrevParent,
+          maybeNextParent = maybeNextParent
+        ))
+      })
+      val prevParentIsMounted = isParentMounted(maybePrevParent)
+      val nextParentIsMounted = isParentMounted(maybeNextParent)
+      if (!prevParentIsMounted && nextParentIsMounted) {
+        maybeThisNodeMountEventBus.foreach(_.writer.onNext(NodeDidMount))
+      }
+      if (prevParentIsMounted && !nextParentIsMounted) {
+        maybeThisNodeMountEventBus.foreach { bus =>
+          bus.writer.onNext(NodeWasDiscarded) // @TODO this should be optional
+        }
       }
     }
   }
+
+  override protected[this] def onOwned(owned: Owned): Unit = {
+    val isFirstSubscription = possessions.length == 1
+    if (isFirstSubscription) {
+      // Create a subscription that will kill all subscriptions that this element owns when it is discarded.
+      // Note: Once this subscription is created, it will persist until this element is discarded.
+      //       This might be suboptimal in a narrow range of conditions, I don't think anyone will run into those.
+      // @TODO[Performance] ^^^^ The above can be addressed by e.g. overriding onKilledExternally (but permissions)
+      $mountEvent.filter(_ == NodeWasDiscarded).foreach(_ => killPossessions() )(owner = this)
+    }
+  }
+
 }
 
 object ReactiveElement {
 
-  val $noMountEvents: XStream[MountEvent] = XStream.fromSeq(Nil)
+  private val $noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil)
 }

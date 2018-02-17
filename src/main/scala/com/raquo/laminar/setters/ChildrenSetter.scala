@@ -1,14 +1,14 @@
 package com.raquo.laminar.setters
 
-import com.raquo.laminar.implicits._
 import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
+import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
-import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 class ChildrenSetter(
-  $children: XStream[Children]
+  $children: EventStream[Children] // @TODO[API] This could/should be a Signal, maybe?
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
   import ChildrenSetter.updateChildren
@@ -19,11 +19,14 @@ class ChildrenSetter(
     val sentinelNode = new ReactiveComment("")
     parentNode.appendChild(sentinelNode)
 
-    val $childrenDiff = $children.slide2by1(initial = Vector())
+    // @TODO Not 100% sure that this is equivalent. Also, this should be an Airstream operator
+    val $childrenDiff = $children
+      .fold[(Children, Children)](initialValue = (Vector(), Vector()))((diff, nextValue) => (diff._2, nextValue))
+      .changes
 
     parentNode.subscribe(
       $childrenDiff,
-      Listener(onNext = (childrenDiff: (Children, Children)) => {
+      (childrenDiff: (Children, Children)) => {
         nodeCount = updateChildren(
           prevChildren = childrenDiff._1,
           nextChildren = childrenDiff._2,
@@ -31,7 +34,7 @@ class ChildrenSetter(
           sentinelNode = sentinelNode,
           nodeCount
         )
-      })
+      }
     )
   }
 }

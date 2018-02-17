@@ -1,11 +1,11 @@
 package com.raquo.laminar.setters
 
 import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
-class FocusSetter($isFocused: XStream[Boolean])
+class FocusSetter($isFocused: Observable[Boolean])
   extends Modifier[ReactiveElement[dom.html.Element]] {
 
   // @TODO[Convenience] This could use some isMounted lifecycle hook or something so that we can have focused-on-creation elements
@@ -13,7 +13,7 @@ class FocusSetter($isFocused: XStream[Boolean])
 
   override def apply(element: ReactiveElement[dom.html.Element]): Unit = {
 
-    element.subscribe($isFocused, Listener(onNext = onNext))
+    element.subscribe($isFocused, onNext(_))
 
     def onNext(isFocused: Boolean): Unit = {
       if (isFocused) {

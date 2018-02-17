@@ -2,32 +2,32 @@ package com.raquo.laminar.example.components
 
 import com.raquo.laminar.bundle._
 import com.raquo.laminar.collection.CollectionCommand.Append
+import com.raquo.laminar.experimental.airstream.eventbus.EventBus
+import com.raquo.laminar.experimental.airstream.signal.Signal
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
 import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
-import com.raquo.laminar.streams.{EventBus, ReactiveVar}
-import com.raquo.xstream.XStream
 import org.scalajs.dom
-
-// @TODO[API] Create Var and VarStream from XStream's ShamefulStream + MemoryStream?
 
 class TaskList {
 
   private val taskDiffBus = new EventBus[ChildrenCommand]
 
-  private val $showAddTaskInputBus = new ReactiveVar(false)
+  private val showAddTaskInputBus = new EventBus[Boolean]
+
+  private val $showAddTaskInput = showAddTaskInputBus.events.toSignal(false)
 
   private var count = 0
 
   val node: ReactiveElement[dom.html.Div] = div(
     h1("TaskList"),
-    children.command <-- taskDiffBus.$,
+    children.command <-- taskDiffBus.events,
     maybeChild <-- maybeNewTask,
     maybeChild <-- maybeNewTaskButton
   )
 
-  def maybeNewTaskButton: XStream[MaybeChildNode] = {
-    $showAddTaskInputBus.$.map { showAddTaskInput =>
+  def maybeNewTaskButton: Signal[MaybeChildNode] = {
+    $showAddTaskInput.map { showAddTaskInput =>
       val showNewTaskButton = !showAddTaskInput
       if (showNewTaskButton) {
         count += 1
@@ -44,11 +44,11 @@ class TaskList {
     }
   }
 
-  def maybeNewTask: XStream[MaybeChildNode] = {
-    $showAddTaskInputBus.$.map { showAddTaskInput =>
+  def maybeNewTask: Signal[MaybeChildNode] = {
+    $showAddTaskInput.map { showAddTaskInput =>
       if (showAddTaskInput) {
         Some(button(
-          onClick().mapTo(false) --> $showAddTaskInputBus,
+          onClick().mapTo(false) --> showAddTaskInputBus,
           "Cancel"
         ))
       } else {

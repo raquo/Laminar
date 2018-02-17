@@ -11,8 +11,8 @@ object MultiStyleProp {
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")
 
-    val $fontSize = toggle.$checked.startWith(true).map(checked => if (checked) "45px" else "30px")
-    val $fontColor = toggle2.$checked.startWith(true).map(checked => if (checked) "red" else "lime")
+    val $fontSize = toggle.$checked.toSignal(true).map(checked => if (checked) "45px" else "30px")
+    val $fontColor = toggle2.$checked.toSignal(true).map(checked => if (checked) "red" else "lime")
 
     div(
       className := "yolo",

@@ -1,8 +1,8 @@
 package com.raquo.laminar.emitter
 
 import com.raquo.domtypes.generic.keys.EventProp
+import com.raquo.laminar.experimental.airstream.core.Observer
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.streams.WriteBus
 import org.scalajs.dom
 
 class EventPropOps[Ev <: dom.Event](
@@ -14,10 +14,10 @@ class EventPropOps[Ev <: dom.Event](
     new EventPropTransformation(eventProp, useCapture, processor = (ev: Ev, _: El) => Some(ev))
   }
 
-  def -->[El <: ReactiveElement[dom.Element], BusEv >: Ev](
-    writeBus: WriteBus[BusEv]
-  ): EventPropEmitter[Ev, Ev, BusEv, El] = new EventPropEmitter[Ev, Ev, BusEv, El](
-    writeBus,
+  def -->[El <: ReactiveElement[dom.Element]](
+    observer: Observer[Ev]
+  ): EventPropEmitter[Ev, Ev, El] = new EventPropEmitter[Ev, Ev, El](
+    observer,
     eventProp,
     useCapture = false,
     processor = (ev: Ev, _: El) => Some(ev)

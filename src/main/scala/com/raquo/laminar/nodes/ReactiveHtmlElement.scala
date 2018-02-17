@@ -1,11 +1,10 @@
-package com.raquo.laminar.syntax
+package com.raquo.laminar.nodes
 
-import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.receivers.FocusReceiver
 import org.scalajs.dom
 
 /** This only applies to **HTML** elements */
-class ReactiveHtmlElementSyntax(val element: ReactiveElement[dom.html.Element]) extends AnyVal {
+class ReactiveHtmlElement(val element: ReactiveElement[dom.html.Element]) extends AnyVal {
 
   @inline def <--[V] (focus: FocusReceiver.type): FocusReceiver = new FocusReceiver(element)
 }

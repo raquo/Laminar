@@ -1,20 +1,20 @@
 package com.raquo.laminar.receivers
 
+import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveText}
 import com.raquo.laminar.setters.ChildSetter
-import com.raquo.xstream.XStream
 import org.scalajs.dom
 
 class TextChildReceiver(element: ReactiveElement[dom.Element]) {
 
-  def <--($node: XStream[String]): Unit = {
+  def <--($node: Observable[String]): Unit = {
     (TextChildReceiver <-- $node)(element)
   }
 }
 
 object TextChildReceiver {
 
-  def <--($node: XStream[String]): ChildSetter = {
-    new ChildSetter($node.map(new ReactiveText(_)))
+  def <--($node: Observable[String]): ChildSetter = {
+    new ChildSetter($node.toLazy.map(new ReactiveText(_)))
   }
 }
