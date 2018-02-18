@@ -192,7 +192,7 @@ You might have noticed in the code snippet above that you need an `owner` to cre
 
 A Signal is not an EventStream. Both are a LazyObservable (need observers to run).
 
-You can `fold(initialValue)(fn)` an EventStream into a Signal, or make a Signal directly with `stream.toSignal(initialValue)`.
+You can `fold(initialValue)(fn)` an EventStream into a Signal, or make a Signal directly with `stream.toSignal(initialValue)`, or `stream.toWeakSignal` (which initially starts out with `None`, and has events wrapped in `Some`).
 
 A State is not a Signal. Both are a MemoryObservable (remember their current value).
 

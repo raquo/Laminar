@@ -37,6 +37,10 @@ trait EventStream[+A] extends LazyObservable[A] {
     new SignalFromEventStream(parent = this, initialValue)
   }
 
+  def toWeakSignal: Signal[Option[A]] = {
+    new SignalFromEventStream(parent = this.map(Some(_)), initialValue = None)
+  }
+
   def compose[B](operator: EventStream[A] => EventStream[B]): EventStream[B] = {
     operator(this)
   }
