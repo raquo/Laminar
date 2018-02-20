@@ -6,3 +6,8 @@ class Val[A](value: A) extends Signal[A] {
 
   override protected[this] def initialValue(): A = value
 }
+
+object Val {
+
+  def apply[A](value: A): Val[A] = new Val(value)
+}
