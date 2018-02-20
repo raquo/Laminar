@@ -16,7 +16,7 @@ class ModifierSpec extends UnitSpec {
     val checkedBus = new EventBus[Boolean]
 
     val events = mutable.Buffer[Boolean]()
-    checkedBus.events.foreach(events += _)
+    checkedBus.events.foreach(events += _)(testOwner)
 
     val checkbox = input(
       typ := "checkbox",
