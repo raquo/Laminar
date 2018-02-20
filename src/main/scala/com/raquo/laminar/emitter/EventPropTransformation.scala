@@ -79,18 +79,6 @@ class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Elem
     copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(_ => value))
   }
 
-  def mapToThisNode: EventPropTransformation[Ev, El, El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(_ => thisNode))
-  }
-
-  def mapToEvent: EventPropTransformation[Ev, Ev, El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(_ => ev))
-  }
-
-  def zipWithThisNode: EventPropTransformation[Ev, (V, El), El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(value => (value, thisNode)))
-  }
-
   def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2, El] = {
     copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).collect(pf))
   }

@@ -4,6 +4,7 @@ import com.raquo.dombuilder.generic.KeyImplicits
 import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
 import com.raquo.dombuilder.jsdom.JsCallback
+import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style}
 import com.raquo.laminar.emitter.EventPropOps
 import com.raquo.laminar.experimental.airstream.core.Observable
@@ -42,6 +43,12 @@ trait Implicits
 
   @inline implicit def reactiveElementToReactiveHtmlElement(element: ReactiveElement[dom.html.Element]): ReactiveHtmlElement = {
     new ReactiveHtmlElement(element)
+  }
+
+  implicit def metaModifierToFlatModifier[El](makeModifier: El => Modifier[El]): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = makeModifier(element) apply element
+    }
   }
 
   // @TODO[IDE] This implicit conversion is actually never used by the compiler. However, this makes the Scala plugin for IntelliJ 2017.3 happy.
