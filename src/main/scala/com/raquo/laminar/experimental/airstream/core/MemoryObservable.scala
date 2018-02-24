@@ -6,10 +6,12 @@ import com.raquo.laminar.experimental.airstream.ownership.Owner
 /** An observable that remembers its current value */
 trait MemoryObservable[+A] extends Observable[A] {
 
-  // @TODO I guess we need sample/sampledBy methods after all
   /** We don't want public access to this for lazy MemoryObservables (Signals) because if you called .now() on a Signal,
     * you wouldn't know if you were getting the updated value or not, because that would depend on whether said Signal
-    * has observers.*/
+    * has observers.
+    *
+    * Use EventStream.sample and EventStream.withCurrentValueOf if you need this on a Signal.
+    */
   protected[airstream] def now(): A
 
   /** Evaluate initial value of this [[MemoryObservable]].

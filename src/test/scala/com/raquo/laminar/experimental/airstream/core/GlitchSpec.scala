@@ -70,6 +70,68 @@ class GlitchSpec extends FunSpec with Matchers {
     effects.clear()
   }
 
+  it("diamond case has no glitch (withCurrentValueOf)") {
+    implicit val testOwner: TestableOwner = new TestableOwner
+
+    val calculations = mutable.Buffer[Calculation[(Int, Int)]]()
+    val effects = mutable.Buffer[Effect[(Int, Int)]]()
+
+    val bus = new EventBus[Int]
+
+    val tens = bus.events.map(_ * 10)
+    val hundreds = tens.map(_ * 10).toSignal(0)
+
+    val tuples = tens.withCurrentValueOf(hundreds)
+      .map(Calculation.log("tuples", calculations))
+
+    tuples.foreach(effects += Effect("tuples", _))
+
+    calculations shouldEqual mutable.Buffer()
+    effects shouldEqual mutable.Buffer()
+
+    // ---
+
+    bus.writer.onNext(1)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("tuples", (10, 100))
+    )
+    calculations.clear()
+
+    effects shouldEqual mutable.Buffer(
+      Effect("tuples", (10, 100))
+    )
+    effects.clear()
+
+    // ---
+
+    bus.writer.onNext(2)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("tuples", (20, 200))
+    )
+    calculations.clear()
+
+    effects shouldEqual mutable.Buffer(
+      Effect("tuples", (20, 200))
+    )
+    effects.clear()
+
+    // ---
+
+    bus.writer.onNext(3)
+
+    calculations shouldEqual mutable.Buffer(
+      Calculation("tuples", (30, 300))
+    )
+    calculations.clear()
+
+    effects shouldEqual mutable.Buffer(
+      Effect("tuples", (30, 300))
+    )
+    effects.clear()
+  }
+
   // I don't really consider doubling of events a glitch in this case.
   // Merge operator does not transform the values of its inputs
   // so there is usually no inconsistent state.

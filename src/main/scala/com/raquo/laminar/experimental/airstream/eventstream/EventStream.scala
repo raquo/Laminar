@@ -1,7 +1,9 @@
 package com.raquo.laminar.experimental.airstream.eventstream
 
-import com.raquo.laminar.experimental.airstream.core.LazyObservable
+import com.raquo.laminar.experimental.airstream.core.{LazyObservable, MemoryObservable}
+import com.raquo.laminar.experimental.airstream.ownership.Owner
 import com.raquo.laminar.experimental.airstream.signal.{FoldSignal, Signal, SignalFromEventStream}
+import com.raquo.laminar.experimental.airstream.state.{MapState, State}
 
 trait EventStream[+A] extends LazyObservable[A] {
 
@@ -15,6 +17,10 @@ trait EventStream[+A] extends LazyObservable[A] {
 
   def filter(passes: A => Boolean): EventStream[A] = {
     new FilterEventStream(this, passes)
+  }
+
+  def collect[B](pf: PartialFunction[A, B]): EventStream[B] = {
+    filter(pf.isDefinedAt).map(pf)
   }
 
   def delay(intervalMillis: Int = 0): EventStream[A] = {
@@ -41,6 +47,10 @@ trait EventStream[+A] extends LazyObservable[A] {
     new SignalFromEventStream(parent = this.map(Some(_)), initialValue = None)
   }
 
+  def toState[B >: A](initialValue: B)(implicit owner: Owner): State[B] = {
+    new MapState[B, B](parent = this.toSignal(initialValue), project = identity, owner)
+  }
+
   def compose[B](operator: EventStream[A] => EventStream[B]): EventStream[B] = {
     operator(this)
   }
@@ -50,6 +60,22 @@ trait EventStream[+A] extends LazyObservable[A] {
       parent1 = this,
       parent2 = otherEventStream,
       combinator = (_, _)
+    )
+  }
+
+  def withCurrentValueOf[B](memoryObservable: MemoryObservable[B]): EventStream[(A, B)] = {
+    new SampleCombineEventStream2[A, B, (A, B)](
+      samplingStream = this,
+      sampledMemoryObservable = memoryObservable,
+      combinator = (_, _)
+    )
+  }
+
+  def sample[B](memoryObservable: MemoryObservable[B]): EventStream[B] = {
+    new SampleCombineEventStream2[A, B, B](
+      samplingStream = this,
+      sampledMemoryObservable = memoryObservable,
+      combinator = (_, sampledValue) => sampledValue
     )
   }
 }
