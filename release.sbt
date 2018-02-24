@@ -4,18 +4,18 @@ normalizedName := "laminar"
 
 organization := "com.raquo"
 
-scalaVersion := "2.11.11"
+scalaVersion := "2.12.3"
 
 crossScalaVersions := Seq("2.11.11", "2.12.3")
 
-homepage := Some(url("https://github.com/raquo/laminar"))
+homepage := Some(url("https://github.com/raquo/Laminar"))
 
-licenses += ("MIT", url("https://github.com/raquo/laminar/blob/master/LICENSE.md"))
+licenses += ("MIT", url("https://github.com/raquo/Laminar/blob/master/LICENSE.md"))
 
 scmInfo := Some(
   ScmInfo(
-    url("https://github.com/raquo/laminar"),
-    "scm:git@github.com/raquo/laminar.git"
+    url("https://github.com/raquo/Laminar"),
+    "scm:git@github.com/raquo/Laminar.git"
   )
 )
 
