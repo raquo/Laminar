@@ -21,7 +21,7 @@ class FoldSignalSpec extends FunSpec with Matchers {
     val bus = new EventBus[Int]
 
     val signal = bus.events
-      .fold(initialValue = "numbers:"){ (acc, nextValue) => acc + " " + nextValue.toString }
+      .fold(initial = "numbers:"){ (acc, nextValue) => acc + " " + nextValue.toString }
       .map(Calculation.log("signal", calculations))
 
     bus.writer.onNext(1)

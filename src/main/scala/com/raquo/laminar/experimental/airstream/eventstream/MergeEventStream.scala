@@ -6,9 +6,6 @@ import com.raquo.laminar.experimental.airstream.util.JsPriorityQueue
 
 import scala.scalajs.js
 
-// @TODO[API] Provide EventStream.toSignal(initialValue), Signal.changes and other integration methods
-// @TODO[API] to make this API indirectly applicable to Signals and State
-
 /** Stream that emit events from all of its parents.
   *
   * This feature exists only for EventStream-s because merging MemoryObservable-s

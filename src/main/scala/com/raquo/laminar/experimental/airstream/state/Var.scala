@@ -19,8 +19,8 @@ class Var[A] private(
 
 object Var {
 
-  def apply[A](initialValue: A)(implicit owner: Owner): Var[A] = {
+  def apply[A](initial: A)(implicit owner: Owner): Var[A] = {
     val bus = new EventBus[A]
-    new Var(initialValue, bus, owner)
+    new Var(initial, bus, owner)
   }
 }

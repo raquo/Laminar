@@ -25,7 +25,7 @@ class SignalSpec extends FunSpec with Matchers {
     val signal = bus.events
       .map(Calculation.log("bus", calculations))
       .map(_ * 10)
-      .toSignal(initialValue = -1)
+      .toSignal(initial = -1)
       .map(Calculation.log("map-signal", calculations))
 
     // --
@@ -166,7 +166,7 @@ class SignalSpec extends FunSpec with Matchers {
     val signal = bus.events
       .map(Calculation.log("bus", calculations))
       .map(_ * 10)
-      .toSignal(initialValue = -1)
+      .toSignal(initial = -1)
       .map(Calculation.log("map-signal", calculations))
     val changes = signal.changes.map(Calculation.log("changes", calculations))
 
@@ -276,7 +276,7 @@ class SignalSpec extends FunSpec with Matchers {
     val signal = bus.events
       .map(Calculation.log("bus", calculations))
       .map(_ * 10)
-      .toSignal(initialValue = -1)
+      .toSignal(initial = -1)
       .map(Calculation.log("map-signal", calculations))
 
     // --

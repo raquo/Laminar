@@ -21,7 +21,7 @@ class ChildrenSetter(
 
     // @TODO Not 100% sure that this is equivalent. Also, this should be an Airstream operator
     val $childrenDiff = $children
-      .fold[(Children, Children)](initialValue = (Vector(), Vector()))((diff, nextValue) => (diff._2, nextValue))
+      .fold[(Children, Children)](initial = (Vector(), Vector()))((diff, nextValue) => (diff._2, nextValue))
       .changes
 
     parentNode.subscribe(

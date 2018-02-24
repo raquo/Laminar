@@ -35,20 +35,20 @@ trait EventStream[+A] extends LazyObservable[A] {
     new DebounceEventStream(parent = this, delayFromLastEventMillis)
   }
 
-  def fold[B](initialValue: B)(fn: (B, A) => B): Signal[B] = {
-    new FoldSignal(parent = this, initialValue, fn)
+  def fold[B](initial: B)(fn: (B, A) => B): Signal[B] = {
+    new FoldSignal(parent = this, initial, fn)
   }
 
-  def toSignal[B >: A](initialValue: B): Signal[B] = {
-    new SignalFromEventStream(parent = this, initialValue)
+  def toSignal[B >: A](initial: B): Signal[B] = {
+    new SignalFromEventStream(parent = this, initial)
   }
 
   def toWeakSignal: Signal[Option[A]] = {
     new SignalFromEventStream(parent = this.map(Some(_)), initialValue = None)
   }
 
-  def toState[B >: A](initialValue: B)(implicit owner: Owner): State[B] = {
-    new MapState[B, B](parent = this.toSignal(initialValue), project = identity, owner)
+  def toState[B >: A](initial: B)(implicit owner: Owner): State[B] = {
+    new MapState[B, B](parent = this.toSignal(initial), project = identity, owner)
   }
 
   def compose[B](operator: EventStream[A] => EventStream[B]): EventStream[B] = {
