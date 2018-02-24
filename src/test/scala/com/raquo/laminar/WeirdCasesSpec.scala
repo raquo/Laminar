@@ -1,5 +1,6 @@
 package com.raquo.laminar
 
+import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.utils.UnitSpec
 import com.raquo.laminar.bundle._
@@ -31,7 +32,8 @@ class WeirdCasesSpec extends UnitSpec {
       )
     )
 
-    expectNode(div like "hello")
+    // @TODO[Test] we should not need to specify this sentinel comment node here. Gotta find a way to ignore those.
+    expectNode(div like ("hello", ExpectedNode.comment()))
 
     bus.writer.onNext(1)
 
