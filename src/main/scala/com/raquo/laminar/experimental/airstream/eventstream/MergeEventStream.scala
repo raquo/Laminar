@@ -43,7 +43,7 @@ class MergeEventStream[A](
     fire(pendingParentValues.dequeue().value, transaction)
 
     while (pendingParentValues.nonEmpty) {
-      println("NEW TRX from MergeEventStream")
+      //println("NEW TRX from MergeEventStream")
       val nextValue = pendingParentValues.dequeue().value
       new Transaction(fire(nextValue, _))
     }

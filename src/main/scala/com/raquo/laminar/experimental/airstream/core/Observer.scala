@@ -37,7 +37,7 @@ object Observer {
     new Observer[A] {
 
       override def onNext(nextValue: A): Unit = {
-        dom.console.log(s"===== Observer(${hashCode()}).onNext", nextValue.asInstanceOf[js.Any])
+        // dom.console.log(s"===== Observer(${hashCode()}).onNext", nextValue.asInstanceOf[js.Any])
         onNextParam(nextValue)
       }
 

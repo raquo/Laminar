@@ -4,7 +4,6 @@ import com.raquo.laminar.experimental.airstream.eventstream.{EventStream, Flatte
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
 import com.raquo.laminar.experimental.airstream.state.State
 import com.raquo.laminar.experimental.airstream.util.GlobalCounter
-import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -46,7 +45,7 @@ trait Observable[+A] {
   def addObserver(observer: Observer[A])(implicit owner: Owner): Subscription = {
     val subscription = Subscription(observer, this, owner)
     externalObservers.push(observer)
-    dom.console.log(s"Adding subscription: $subscription")
+    //dom.console.log(s"Adding subscription: $subscription")
     subscription
   }
 

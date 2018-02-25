@@ -17,10 +17,10 @@ class Transaction(code: Transaction => Any) {
 
   // @TODO rename
   private[airstream] def run(): Unit = {
-    dom.console.log(s"TRX($id).run")
+    //dom.console.log(s"TRX($id).run")
     Transaction.isSafeToRemoveObserver = false
     code(this) // this evaluates a pass-by-name param @TODO[Integrity] make sure this is not DCE-d in fullOptJS
-    dom.console.log(s"TRX($id).pendingObservables.length = ${pendingObservables.size}")
+    //dom.console.log(s"TRX($id).pendingObservables.length = ${pendingObservables.size}")
     resolvePendingObservables()
     Transaction.isSafeToRemoveObserver = true
     Transaction.done(this)
