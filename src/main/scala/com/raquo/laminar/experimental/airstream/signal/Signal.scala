@@ -32,6 +32,14 @@ trait Signal[+A] extends MemoryObservable[A] with LazyObservable[A] {
     )
   }
 
+  def fold[B](makeInitial: A => B)(fn: (B, A) => B): Signal[B] = {
+    new FoldSignal(
+      parent = this,
+      makeInitialValue = () => makeInitial(now()),
+      fn
+    )
+  }
+
   /** Initial value is only evaluated if/when needed (when there are observers) */
   override protected[airstream] def now(): A = {
     maybeLastSeenCurrentValue.getOrElse {

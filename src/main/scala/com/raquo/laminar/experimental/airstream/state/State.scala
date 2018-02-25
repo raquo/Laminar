@@ -2,7 +2,7 @@ package com.raquo.laminar.experimental.airstream.state
 
 import com.raquo.laminar.experimental.airstream.core.{MemoryObservable, Transaction}
 import com.raquo.laminar.experimental.airstream.ownership.{Owned, Owner}
-import com.raquo.laminar.experimental.airstream.signal.{MapSignal, Signal}
+import com.raquo.laminar.experimental.airstream.signal.{FoldSignal, MapSignal, Signal}
 
 /** State is an eager, [[Owned]] observable */
 trait State[+A] extends MemoryObservable[A] with Owned {
@@ -32,8 +32,16 @@ trait State[+A] extends MemoryObservable[A] with Owned {
       parent1 = this,
       parent2 = otherState,
       combinator = (_, _),
-      this.owner // @TODO[API] Is this obvious enough?
+      owner // @TODO[API] Is this obvious enough?
     )
+  }
+
+  def fold[B](makeInitial: A => B)(fn: (B, A) => B): State[B] = {
+    new FoldSignal(
+      parent = this,
+      makeInitialValue = () => makeInitial(now()),
+      fn
+    ).toState(owner)
   }
 
   @inline def toSignal: Signal[A] = toLazy

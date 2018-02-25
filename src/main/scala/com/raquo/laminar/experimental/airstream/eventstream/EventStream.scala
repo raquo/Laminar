@@ -36,7 +36,7 @@ trait EventStream[+A] extends LazyObservable[A] {
   }
 
   def fold[B](initial: B)(fn: (B, A) => B): Signal[B] = {
-    new FoldSignal(parent = this, initial, fn)
+    new FoldSignal(parent = this, () => initial, fn)
   }
 
   def toSignal[B >: A](initial: B): Signal[B] = {

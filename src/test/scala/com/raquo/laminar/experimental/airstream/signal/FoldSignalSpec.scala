@@ -9,6 +9,8 @@ import scala.collection.mutable
 
 class FoldSignalSpec extends FunSpec with Matchers {
 
+  // @TODO[Test] Verify Signal.fold and State.fold as well
+
   it("FoldSignal made with EventStream.fold") {
 
     implicit val testOwner: TestableOwner = new TestableOwner
