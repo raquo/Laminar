@@ -1,17 +1,20 @@
 package com.raquo.laminar.setters
 
 import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
+import com.raquo.laminar.experimental.airstream.signal.Signal
+import com.raquo.laminar.experimental.airstream.state.State
 import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
 import org.scalajs.dom
 
 class ChildrenSetter(
-  $children: EventStream[Children] // @TODO[API] This could/should be a Signal, maybe?
+  $children: Observable[Children]
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
-  import ChildrenSetter.updateChildren
+  import ChildrenSetter.{emptyChildren, updateChildren}
 
   override def apply(parentNode: ReactiveElement[dom.Element]): Unit = {
     var nodeCount = 0
@@ -19,13 +22,17 @@ class ChildrenSetter(
     val sentinelNode = new ReactiveComment("")
     parentNode.appendChild(sentinelNode)
 
-    // @TODO Not 100% sure that this is equivalent. Also, this should be an Airstream operator
-    val $childrenDiff = $children
-      .fold[(Children, Children)](initial = (Vector(), Vector()))((diff, nextValue) => (diff._2, nextValue))
-      .changes
+    val childrenSignal = $children match {
+      case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
+      case state: State[Children @unchecked] => state.toSignal
+      case signal: Signal[Children @unchecked] => signal
+    }
+
+    val childrenDiffSignal = childrenSignal
+      .fold[(Children, Children)](initial => (emptyChildren, initial))((diff, nextChildren) => (diff._2, nextChildren))
 
     parentNode.subscribe(
-      $childrenDiff,
+      childrenDiffSignal,
       (childrenDiff: (Children, Children)) => {
         nodeCount = updateChildren(
           prevChildren = childrenDiff._1,
@@ -40,6 +47,8 @@ class ChildrenSetter(
 }
 
 object ChildrenSetter {
+
+  private val emptyChildren = Vector()
 
   type Child = ReactiveChildNode[dom.Node]
   type Children = Seq[Child]
@@ -62,15 +71,15 @@ object ChildrenSetter {
 
     // @TODO Remove all the debug comments
 
-//    dom.console.log(">>>>>>>>>>>>>>>>>")
-//    dom.console.log(">>>>>>>>>>>>>>>>>")
+    //    dom.console.log(">>>>>>>>>>>>>>>>>")
+    //    dom.console.log(">>>>>>>>>>>>>>>>>")
 
     nextChildren.foreach { nextChild =>
 
       /** Desired index of `nextChild` in `liveNodeList` */
       val nextChildNodeIndex = sentinelIndex + index + 1
 
-//      dom.console.log("\nevaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if (prevChildRef == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))
+      //      dom.console.log("\nevaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if (prevChildRef == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))
 
       // @TODO[Integrity] prevChildRef can be null or even undefined here if we reach the end, under certain circumstances. See what can be done...
 
@@ -81,7 +90,7 @@ object ChildrenSetter {
 
       if (currentChildrenCount <= index) {
         // Note: `prevChildRef` is not valid in this branch
-//        dom.console.log("INSERTING " + nextChild.ref.textContent + " at index-" + index + " (nextChildNodeIndex=" + nextChildNodeIndex + ")")
+        //        dom.console.log("INSERTING " + nextChild.ref.textContent + " at index-" + index + " (nextChildNodeIndex=" + nextChildNodeIndex + ")")
         // We ran through the whole prevChildren list already, we just need to append all remaining nextChild-s into the DOM
         parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)
         // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
@@ -89,16 +98,16 @@ object ChildrenSetter {
         currentChildrenCount += 1
       } else {
         if (nextChild.ref == prevChildRef) {
-//          dom.console.log("NODE MATCHES – " + nextChild.ref.textContent)
+          //          dom.console.log("NODE MATCHES – " + nextChild.ref.textContent)
           // Child nodes already match – do nothing, go to the next child
         } else {
-//          dom.console.log("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
+          //          dom.console.log("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
 
-//          dom.console.log(parentNode.ref.childNodes(0), parentNode.ref.childNodes(0).textContent)
-//          dom.console.log(parentNode.ref.childNodes(1), parentNode.ref.childNodes(1).textContent)
-//          dom.console.log(parentNode.ref.childNodes(2), parentNode.ref.childNodes(2).textContent)
-//          dom.console.log(parentNode.ref.childNodes(3), parentNode.ref.childNodes(3).textContent)
-//          dom.console.log(parentNode.ref.childNodes(4), parentNode.ref.childNodes(4).textContent)
+          //          dom.console.log(parentNode.ref.childNodes(0), parentNode.ref.childNodes(0).textContent)
+          //          dom.console.log(parentNode.ref.childNodes(1), parentNode.ref.childNodes(1).textContent)
+          //          dom.console.log(parentNode.ref.childNodes(2), parentNode.ref.childNodes(2).textContent)
+          //          dom.console.log(parentNode.ref.childNodes(3), parentNode.ref.childNodes(3).textContent)
+          //          dom.console.log(parentNode.ref.childNodes(4), parentNode.ref.childNodes(4).textContent)
 
           if (!prevChildren.contains(nextChild)) {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
@@ -141,8 +150,8 @@ object ChildrenSetter {
 
     while (index < currentChildrenCount) {
 
-//      dom.console.log("\nDELETING REMAINDER: index=" + index + ", currentChildrenCount = " + currentChildrenCount)
-//      dom.console.log("prevChildRef: " + prevChildRef.textContent)
+      //      dom.console.log("\nDELETING REMAINDER: index=" + index + ", currentChildrenCount = " + currentChildrenCount)
+      //      dom.console.log("prevChildRef: " + prevChildRef.textContent)
 
       val nextPrevChildRef = prevChildRef.nextSibling
       parentNode.removeChild(prevChildFromRef(prevChildren, prevChildRef))
@@ -169,10 +178,10 @@ object ChildrenSetter {
   }
 
   protected def prevChildFromRef(prevChildren: Children, ref: dom.Node): Child = {
-//    println("> prevChildFromDomNode")
-//    dom.console.log(prevChildren(0))
-//    dom.console.log(prevChildren(1))
-//    dom.console.log(ref, ref.textContent)
+    //    println("> prevChildFromDomNode")
+    //    dom.console.log(prevChildren(0))
+    //    dom.console.log(prevChildren(1))
+    //    dom.console.log(ref, ref.textContent)
     prevChildren.find(_.ref == ref).get // @TODO[Integrity] Throw a more meaningful error (that would be unrecoverable inconsistent state)
   }
 }
