@@ -2,28 +2,26 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.bundle._
+import com.raquo.laminar.experimental.airstream.eventbus.EventBus
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.streams.EventBus
-import com.raquo.laminar.utils.AsyncUnitSpec
-import com.raquo.xstream.XStream
+import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 import org.scalatest.Assertion
 
-import scala.concurrent.Future
-
-class SubscriptionLifecycleSpec extends AsyncUnitSpec {
+class SubscriptionLifecycleSpec extends UnitSpec {
 
   case class SimpleTest[V](
-    makeElement: XStream[V] => ReactiveElement[dom.html.Element],
+    makeElement: EventStream[V] => ReactiveElement[dom.html.Element],
     emptyExpectedNode: ExpectedNode,
     makeExpectedNode: V => ExpectedNode,
     values: Seq[V]
   ) {
 
-    def run(): Future[Assertion] = {
+    def run(): Assertion = {
       val bus = new EventBus[V]
       var counter = 0
-      val $value = bus.$.map(value => {
+      val $value = bus.events.map(value => {
         counter += 1
         value
       })
@@ -34,17 +32,17 @@ class SubscriptionLifecycleSpec extends AsyncUnitSpec {
       counter shouldBe 0
 
       val value0 = values(0)
-      bus.sendNext(value0)
+      bus.writer.onNext(value0)
       expectNode(makeExpectedNode(value0))
       counter shouldBe 1
 
       val value1 = values(1)
-      bus.sendNext(value1)
+      bus.writer.onNext(value1)
       expectNode(makeExpectedNode(value1))
       counter shouldBe 2
 
       val value2 = values(2)
-      bus.sendNext(value2)
+      bus.writer.onNext(value2)
       expectNode(makeExpectedNode(value2))
       counter shouldBe 3
 
@@ -52,18 +50,16 @@ class SubscriptionLifecycleSpec extends AsyncUnitSpec {
       mount(div(rel := "unmounted"))
       expectNode(div like (rel is "unmounted"))
 
-      delay {
-        bus.sendNext(values(3))
-        expectNode(div like (rel is "unmounted"))
-        counter shouldBe 3
-      }
+      bus.writer.onNext(values(3))
+      expectNode(div like (rel is "unmounted"))
+      counter shouldBe 3
     }
   }
 
   case class NestedSubscriptionChildTest[V](
-    makeElement: XStream[ReactiveElement[dom.html.Element]] => ReactiveElement[dom.html.Element],
-    makeChildA: XStream[V] => ReactiveElement[dom.html.Element],
-    makeChildB: XStream[V] => ReactiveElement[dom.html.Element],
+    makeElement: EventStream[ReactiveElement[dom.html.Element]] => ReactiveElement[dom.html.Element],
+    makeChildA: EventStream[V] => ReactiveElement[dom.html.Element],
+    makeChildB: EventStream[V] => ReactiveElement[dom.html.Element],
     emptyExpectedNode: ExpectedNode,
     emptyExpectedNodeA: ExpectedNode,
     emptyExpectedNodeB: ExpectedNode,
@@ -72,22 +68,22 @@ class SubscriptionLifecycleSpec extends AsyncUnitSpec {
     values: Seq[V]
   ) {
 
-    def run(): Future[Assertion] = {
+    def run(): Assertion = {
       val busA = new EventBus[V]
       val busB = new EventBus[V]
       val childBus = new EventBus[ReactiveElement[dom.html.Element]]
       var counterA = 0
       var counterB = 0
       var childCounter = 0
-      val $valueA = busA.$.map(value => {
+      val $valueA = busA.events.map(value => {
         counterA += 1
         value
       })
-      val $valueB = busB.$.map(value => {
+      val $valueB = busB.events.map(value => {
         counterB += 1
         value
       })
-      val $child = childBus.$.map(child => {
+      val $child = childBus.events.map(child => {
         childCounter += 1
         child
       })
@@ -102,63 +98,61 @@ class SubscriptionLifecycleSpec extends AsyncUnitSpec {
       counterB shouldBe 0
       childCounter shouldBe 0
 
-      childBus.sendNext(childA)
+      childBus.writer.onNext(childA)
       expectNode(emptyExpectedNodeA)
       counterA shouldBe 0
       counterB shouldBe 0
       childCounter shouldBe 1
 
       val value0 = values(0)
-      busA.sendNext(value0)
+      busA.writer.onNext(value0)
       expectNode(makeExpectedNodeA(value0))
       counterA shouldBe 1
       counterB shouldBe 0
       childCounter shouldBe 1
 
-      busB.sendNext(value0)
+      busB.writer.onNext(value0)
       expectNode(makeExpectedNodeA(value0))
       counterA shouldBe 1
-      counterB shouldBe 0
+      counterB shouldBe 1 // even if not mounted, the subscriptions are active already
       childCounter shouldBe 1
 
       val value1 = values(1)
-      childBus.sendNext(childB)
+      childBus.writer.onNext(childB)
 
-      delay {
-        // @TODO[Integrity] If we fire this event before the `delay`, it will still be processed because XStream unsubscription happens asynchronously. We should fix that, I think.
-        busA.sendNext(value1)
+      busA.writer.onNext(value1)
 
-        expectNode(emptyExpectedNodeB)
-        counterA shouldBe 1
-        counterB shouldBe 0
-        childCounter shouldBe 2
+      expectNode(makeExpectedNodeB(value0)) // This used to expect an empty node B, but now with Airstream the noode starts listening when it's initialized, not when it's mounted
+      counterA shouldBe 1
+      counterB shouldBe 1
+      childCounter shouldBe 2
 
-        busB.sendNext(value1)
-        expectNode(makeExpectedNodeB(value1))
-        counterA shouldBe 1
-        counterB shouldBe 1
-        childCounter shouldBe 2
+      busB.writer.onNext(value1)
+      expectNode(makeExpectedNodeB(value1))
+      counterA shouldBe 1
+      counterB shouldBe 2
+      childCounter shouldBe 2
 
-        val value2 = values(2)
-        busB.sendNext(value2)
-        expectNode(makeExpectedNodeB(value2))
-        counterA shouldBe 1
-        counterB shouldBe 2
-        childCounter shouldBe 2
+      val value2 = values(2)
+      busB.writer.onNext(value2)
+      expectNode(makeExpectedNodeB(value2))
+      counterA shouldBe 1
+      counterB shouldBe 3
+      childCounter shouldBe 2
 
-        unmount()
-        mount(div(rel := "unmounted"))
-        expectNode(div like (rel is "unmounted"))
+      unmount()
 
-      }.flatMap(_ => delay {
-        busA.sendNext(values(3))
-        busB.sendNext(values(3))
-        childBus.sendNext(childA)
-        expectNode(div like (rel is "unmounted"))
-        counterA shouldBe 1
-        counterB shouldBe 2
-        childCounter shouldBe 2
-      })
+      mount(div(rel := "unmounted"))
+
+      expectNode(div like (rel is "unmounted"))
+
+      busA.writer.onNext(values(3))
+      busB.writer.onNext(values(3))
+      childBus.writer.onNext(childA)
+      expectNode(div like (rel is "unmounted"))
+      counterA shouldBe 1
+      counterB shouldBe 3
+      childCounter shouldBe 2
     }
   }
 

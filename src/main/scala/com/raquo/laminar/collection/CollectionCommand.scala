@@ -60,6 +60,7 @@ object CollectionCommand {
   }
 
   // @TODO[Performance,Integrity] Is Vector an appropriate data structure for our use case? Maybe use SortedSet, or TreeSet?
+  // @TODO[Performance] Actually, seeing as this interface is intended for performance, js.Array is probably a better choice
 
   // @TODO[Test] vectorProcessor needs unit testing
 

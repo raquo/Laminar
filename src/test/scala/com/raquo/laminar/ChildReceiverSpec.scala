@@ -1,13 +1,12 @@
 package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
-
 import com.raquo.laminar.bundle._
+import com.raquo.laminar.experimental.airstream.core.Observable
+import com.raquo.laminar.experimental.airstream.eventbus.EventBus
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveChildNode
 import com.raquo.laminar.utils.UnitSpec
-
-import com.raquo.xstream.{ShamefulStream, XStream}
-
 import org.scalajs.dom
 
 class ChildReceiverSpec extends UnitSpec {
@@ -24,37 +23,39 @@ class ChildReceiverSpec extends UnitSpec {
 
   it("updates one child") {
     withClue("Regular stream:") {
-      test($child = XStream.create[ReactiveChildNode[dom.Element]]())
+      test(makeObservable = identity)
     }
 
     withClue("Memory stream:") {
       test(
-        $child = XStream.create().startWith(span(text0)),
-        initialChild = span like text0
+        makeObservable = _.toSignal(span(text0)),
+        expectedInitialChild = span like text0
       )
     }
 
     def test(
-      $child: XStream[ReactiveChildNode[dom.Element]],
-      initialChild: ExpectedNode = ExpectedNode.comment()
+      makeObservable: EventStream[ReactiveChildNode[dom.Element]] => Observable[ReactiveChildNode[dom.Element]],
+      expectedInitialChild: ExpectedNode = ExpectedNode.comment()
     ): Unit = {
-      val $varChild = new ShamefulStream($child)
+
+      val childBus = new EventBus[ReactiveChildNode[dom.Element]]
+      val $child = makeObservable(childBus.events)
 
       mount(div("Hello, ", child <-- $child))
-      expectNode(div like("Hello, ", initialChild))
+      expectNode(div like("Hello, ", expectedInitialChild))
 
       withClue("First event:") {
-        $varChild.shamefullySendNext(span(text1))
+        childBus.writer.onNext(span(text1))
         expectNode(div like("Hello, ", span like text1))
       }
 
       withClue("Second event, changing node type (span->div):") {
-        $varChild.shamefullySendNext(div(text2))
+        childBus.writer.onNext(div(text2))
         expectNode(div like("Hello, ", div like text2))
       }
 
       withClue("Third event:") {
-        $varChild.shamefullySendNext(div(text3))
+        childBus.writer.onNext(div(text3))
         expectNode(div like("Hello, ", div like text3))
       }
 
@@ -65,64 +66,64 @@ class ChildReceiverSpec extends UnitSpec {
   it("updates two children") {
     withClue("Regular stream:") {
       test(
-        $fooChild = XStream.create[ReactiveChildNode[dom.Element]](),
-        $barChild = XStream.create[ReactiveChildNode[dom.Element]]()
+        makeFooObservable = identity,
+        makeBarObservable = identity
       )
     }
 
     withClue("Memory stream:") {
       test(
-        $fooChild = XStream.create().startWith(span(text0)),
-        $barChild = XStream.create().startWith(span(text00)),
+        makeFooObservable = _.toSignal(span(text0)),
+        makeBarObservable = _.toSignal(span(text00)),
         initialFooChild = span like text0,
         initialBarChild = span like text00
       )
     }
 
     def test(
-      $fooChild: XStream[ReactiveChildNode[dom.Element]],
-      $barChild: XStream[ReactiveChildNode[dom.Element]],
+      makeFooObservable: EventStream[ReactiveChildNode[dom.Element]] => Observable[ReactiveChildNode[dom.Element]],
+      makeBarObservable: EventStream[ReactiveChildNode[dom.Element]] => Observable[ReactiveChildNode[dom.Element]],
       initialFooChild: ExpectedNode = ExpectedNode.comment(),
       initialBarChild: ExpectedNode = ExpectedNode.comment()
     ): Unit = {
-      val $varFooChild = new ShamefulStream($fooChild)
-      val $varBarChild = new ShamefulStream($barChild)
+      val fooChildBus = new EventBus[ReactiveChildNode[dom.Element]]
+      val barChildBus = new EventBus[ReactiveChildNode[dom.Element]]
 
-      mount(div(child <-- $fooChild, child <-- $barChild))
+      mount(div(child <-- makeFooObservable(fooChildBus.events), child <-- makeBarObservable(barChildBus.events)))
       expectNode(div like(initialFooChild, initialBarChild))
 
       withClue("1. foo event:") {
-        $varFooChild.shamefullySendNext(span(text1))
+        fooChildBus.writer.onNext(span(text1))
         expectNode(div like(span like text1, initialBarChild))
       }
 
       withClue("2. bar event:") {
-        $varBarChild.shamefullySendNext(span(text4))
+        barChildBus.writer.onNext(span(text4))
         expectNode(div like(span like text1, span like text4))
       }
 
       withClue("3. another bar event:") {
-        $varBarChild.shamefullySendNext(span(text5))
+        barChildBus.writer.onNext(span(text5))
         expectNode(div like(span like text1, span like text5))
       }
 
       withClue("4. foo switch to div:") {
-        $varFooChild.shamefullySendNext(div(text2))
+        fooChildBus.writer.onNext(div(text2))
         expectNode(div like(div like text2, span like text5))
       }
 
       withClue("5. another foo event:") {
-        $varFooChild.shamefullySendNext(div(text3))
+        fooChildBus.writer.onNext(div(text3))
         expectNode(div like(div like text3, span like text5))
       }
 
       withClue("6. another bar event:") {
-        $varBarChild.shamefullySendNext(span(text6))
+        barChildBus.writer.onNext(span(text6))
         expectNode(div like(div like text3, span like text6))
       }
 
       withClue("7. yet another bar event:") {
-        $varBarChild.shamefullySendNext(span(text7))
+        barChildBus.writer.onNext(span(text7))
         expectNode(div like(div like text3, span like text7))
       }
 

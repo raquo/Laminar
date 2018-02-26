@@ -6,14 +6,14 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.bundle.onClick
+import com.raquo.laminar.experimental.airstream.core.Observer
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
-import com.raquo.laminar.streams.WriteBus
 import org.scalajs.dom
 
 import scala.scalajs.js
 
-class EventPropEmitter[Ev <: dom.Event, V, BusEv >: V, El <: ReactiveElement[dom.Element]](
-  protected val writeBus: WriteBus[BusEv],
+class EventPropEmitter[Ev <: dom.Event, V, El <: ReactiveElement[dom.Element]](
+  protected val observer: Observer[V],
   eventProp: EventProp[Ev],
   useCapture: Boolean,
   processor: (Ev, El) => Option[V]
@@ -30,10 +30,10 @@ class EventPropEmitter[Ev <: dom.Event, V, BusEv >: V, El <: ReactiveElement[dom
       ) {
         // Special case: See README and/or https://stackoverflow.com/a/32710212/2601788
         // @TODO[API] Should this behaviour extend to all checkbox.onClick events by default?
-        js.timers.setTimeout(0)(processor(ev, element).foreach(writeBus.sendNext))
+        js.timers.setTimeout(0)(processor(ev, element).foreach(observer.onNext))
         ()
       } else {
-        processor(ev, element).foreach(writeBus.sendNext)
+        processor(ev, element).foreach(observer.onNext)
       }
     }
 

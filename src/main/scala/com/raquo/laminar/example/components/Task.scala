@@ -1,11 +1,11 @@
 package com.raquo.laminar.example.components
 
 import com.raquo.laminar.bundle._
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveNode
-import com.raquo.xstream.XStream
 
 class Task (
-  val $checked: XStream[Boolean],
+  val $checked: EventStream[Boolean],
   val node: ReactiveNode
 )
 

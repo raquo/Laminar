@@ -35,20 +35,17 @@ object NodeWillUnmount extends MountEvent
 
 // @TODO Provide a way to avoid discarding nodes (and how do we manually discard them then? Discard when parent is discarded...? Think about it and update the docs before implementing)
 // @TODO Think about the inheritance mechanics of discarding, and document all this
-/** `NodeWillBeDiscarded` event fires immediately after `NodeWillUnmount` unless the end
+/** `NodeWasDiscarded` event fires after `NodeWillUnmount` unless the end
   * user specified that the node should not be discarded when it's unmounted.
   *
   * A discarded node is defined as a node that is unmounted and will not be mounted again.
   * The latter is a promise by the end user, not enforced by Laminar.
   *
-  * Internally, Laminar will deactivate the node's subscription that listens to $mountEvent
-  * when the node discarded. Note that by this point the node is already unmounted, so all
-  * other subscriptions have already been deactivated by Laminar in response to a
-  * NodeWillUnmount event. This means that the node's subscriptions will not re-activate if
-  * the node is mounted again (because the node will not be aware of this).
+  * Internally, when discarding a node Laminar kills all of the subscriptions that it owned.
+  * NodeWasDiscarded event is your last chance to do any cleanup related to this node.
   *
   * Note: There currently is no way for the end user to specify that the node should not be
   * discarded, so the end user implicitly promises to not re-mount nodes which have
   * been unmounted.
   */
-object NodeWillBeDiscarded extends MountEvent
+object NodeWasDiscarded extends MountEvent

@@ -9,7 +9,7 @@ object Children {
   def apply(): ReactiveElement[dom.Element] = {
     val toggle = Toggle("Toggle #1")
     val $text = toggle.$checked.map(checked => if (checked) "[X]" else "[O]")
-    val $div = $text.map(div(_)).startWith(div("INIT"))
+    val $div = $text.map(div(_)).toSignal(div("INIT"))
 
     div(
       className := "yolo",

@@ -4,12 +4,12 @@ import com.raquo.dombuilder.generic.KeyImplicits
 import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
 import com.raquo.dombuilder.jsdom.JsCallback
+import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style}
 import com.raquo.laminar.emitter.EventPropOps
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode, ReactiveText}
+import com.raquo.laminar.experimental.airstream.core.Observable
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver}
-import com.raquo.laminar.syntax.ReactiveHtmlElementSyntax
-import com.raquo.xstream.XStream
 import org.scalajs.dom
 
 import scala.scalajs.js.|
@@ -41,20 +41,18 @@ trait Implicits
     new ReactiveText(text)
   }
 
-  @inline implicit def reactiveHtmlElementToSyntax(element: ReactiveElement[dom.html.Element]): ReactiveHtmlElementSyntax = {
-    new ReactiveHtmlElementSyntax(element)
+  @inline implicit def reactiveElementToReactiveHtmlElement(element: ReactiveElement[dom.html.Element]): ReactiveHtmlElement = {
+    new ReactiveHtmlElement(element)
   }
 
-  // @TODO[IDE] This implicit conversion is actually never used by the compiler. However, this makes the Scala plugin for IntelliJ 2017.2.5 happy.
-  @inline implicit def intellijStringStreamAsStringOrStringStream(stringStream: XStream[String]): XStream[String | String] = {
-    stringStream.asInstanceOf[XStream[String | String]]
+  implicit def metaModifierToFlatModifier[El](makeModifier: El => Modifier[El]): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = makeModifier(element) apply element
+    }
   }
 
-  //  @inline implicit def optionToModifier[T](
-  //    maybeModifier: Option[T]
-  //  )(
-  //    implicit toModifier: T => Modifier[RNode, RNodeData]
-  //  ): Modifier[RNode, RNodeData] = {
-  //    Conversions.optionToModifier(maybeModifier)
-  //  }
+  // @TODO[IDE] This implicit conversion is actually never used by the compiler. However, this makes the Scala plugin for IntelliJ 2017.3 happy.
+  @inline implicit def intellijStringObservableAsStringOrStringObservable(stringStream: Observable[String]): Observable[String | String] = {
+    stringStream.asInstanceOf[Observable[String | String]]
+  }
 }

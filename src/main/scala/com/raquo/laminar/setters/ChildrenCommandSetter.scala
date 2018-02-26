@@ -3,15 +3,15 @@ package com.raquo.laminar.setters
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.collection.CollectionCommand
+import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Child
-import com.raquo.xstream.{Listener, XStream}
 import org.scalajs.dom
 
 import scala.scalajs.js
 
 class ChildrenCommandSetter(
-  $diff: XStream[ChildrenCommandSetter.ChildrenCommand]
+  $diff: EventStream[ChildrenCommandSetter.ChildrenCommand]
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
   import ChildrenCommandSetter.updateList
@@ -24,7 +24,7 @@ class ChildrenCommandSetter(
 
     parentNode.subscribe(
       $diff,
-      Listener(onNext = (diff: ChildrenCommandSetter.ChildrenCommand) => {
+      (diff: ChildrenCommandSetter.ChildrenCommand) => {
         val nodeCountDiff = updateList(
           diff,
           parentNode = parentNode,
@@ -32,7 +32,7 @@ class ChildrenCommandSetter(
           nodeCount
         )
         nodeCount += nodeCountDiff
-      })
+      }
     )
   }
 }

@@ -353,7 +353,8 @@ TODO[Docs]: This section needs to be expanded. For now, just some examples:
 ```scala
 input(focus <-- $isFocused) // either focuses or blurs the given element 
 div(child <-- $childElement) // note: Every new element from the stream replaces the previous child emitted by this stream. All in all, works like you'd expect 
-div(maybeChild <-- $elementOption)
+div(child.maybe <-- $elementOption)
+div(child.text <-- $stringOption)
 div(children <-- $childList) // Efficient diff-ing is performed to add / move / remove children to match the new list
 div(children.command <-- $command) // command could be e.g. Append(element)
 ```
