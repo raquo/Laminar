@@ -5,19 +5,19 @@ import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
 import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style}
+import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style, SvgAttr}
 import com.raquo.laminar.emitter.EventPropOps
 import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveNode, ReactiveText}
-import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver}
+import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver, SvgAttrReceiver}
 import org.scalajs.dom
 
 import scala.scalajs.js.|
 
 trait Implicits
-  extends SyntaxImplicits[ReactiveNode, dom.Element, dom.Node, dom.Event, JsCallback]
-  with KeyImplicits[ReactiveNode, dom.Element, dom.Node]
-  with SetterBuilders[ReactiveNode, dom.Element, dom.Node]
+  extends SyntaxImplicits[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node, dom.Event, JsCallback]
+  with KeyImplicits[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node]
+  with SetterBuilders[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node]
   with DomApi
 {
 
@@ -37,12 +37,12 @@ trait Implicits
     new EventPropOps(eventProp)
   }
 
-  @inline implicit def textToNode(text: String): ReactiveText = {
-    new ReactiveText(text)
+  @inline implicit def toSvgAttrReceiver[V](attr: SvgAttr[V]): SvgAttrReceiver[V] = {
+    new SvgAttrReceiver(attr)
   }
 
-  @inline implicit def reactiveElementToReactiveHtmlElement(element: ReactiveElement[dom.html.Element]): ReactiveHtmlElement = {
-    new ReactiveHtmlElement(element)
+  @inline implicit def textToNode(text: String): ReactiveText = {
+    new ReactiveText(text)
   }
 
   implicit def metaModifierToFlatModifier[El](makeModifier: El => Modifier[El]): Modifier[El] = {

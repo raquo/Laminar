@@ -3,17 +3,17 @@ package com.raquo
 import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.nodes.Element
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.builders.canonical.{CanonicalAttrBuilder, CanonicalEventPropBuilder, CanonicalPropBuilder, CanonicalReflectedAttrBuilder}
-import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, Attrs}
+import com.raquo.domtypes.generic.builders.canonical.{CanonicalAttrBuilder, CanonicalEventPropBuilder, CanonicalPropBuilder, CanonicalReflectedAttrBuilder, CanonicalSvgAttrBuilder}
+import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, Attrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
-import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
+import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, SvgAttr}
 import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowOnlyEventProps}
-import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, TableTags, TextTags}
-import com.raquo.laminar.builders.{ReactiveTag, ReactiveTagBuilder}
+import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, SvgTags, TableTags, TextTags}
+import com.raquo.laminar.builders.{ReactiveHtmlTag, ReactiveHtmlTagBuilder, ReactiveSvgTag, ReactiveSvgTagBuilder}
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveNode, ReactiveRoot}
-import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver, MaybeChildReceiver}
+import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver}
 import org.scalajs.dom
 
 // @TODO[API,WTF] I can't make laminar extend `Implicits` – test code does not pick up the implicits. Why?
@@ -21,7 +21,7 @@ import org.scalajs.dom
 package object laminar {
 
   type ReflectedAttr[V, DomV] = Attr[V]
-  type StyleSetter = Modifier[ReactiveNode with Element[ReactiveNode, dom.Element, dom.Node]]
+  type StyleSetter = Modifier[ReactiveNode with Element[ReactiveNode, dom.html.Element, dom.Node]]
 
   object bundle
     // Attrs
@@ -44,30 +44,34 @@ package object laminar {
     with Styles[StyleSetter]
     with Styles2[StyleSetter]
     // Tags
-    with DocumentTags[ReactiveTag]
-    with EmbedTags[ReactiveTag]
-    with FormTags[ReactiveTag]
-    with GroupingTags[ReactiveTag]
-    with MiscTags[ReactiveTag]
-    with SectionTags[ReactiveTag]
-    with TableTags[ReactiveTag]
-    with TextTags[ReactiveTag]
+    with DocumentTags[ReactiveHtmlTag]
+    with EmbedTags[ReactiveHtmlTag]
+    with FormTags[ReactiveHtmlTag]
+    with GroupingTags[ReactiveHtmlTag]
+    with MiscTags[ReactiveHtmlTag]
+    with SectionTags[ReactiveHtmlTag]
+    with TableTags[ReactiveHtmlTag]
+    with TextTags[ReactiveHtmlTag]
     // Builders
     with CanonicalAttrBuilder
     with CanonicalReflectedAttrBuilder
     with CanonicalEventPropBuilder[dom.Event]
     with CanonicalPropBuilder
-    with ReactiveTagBuilder
-    with SetterBuilders[ReactiveNode, dom.Element, dom.Node]
+    with ReactiveHtmlTagBuilder
+    with SetterBuilders[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node]
     // Other things
     with DomApi
     with Implicits {
 
+    object svg
+      extends SvgTags[ReactiveSvgTag]
+      with SvgAttrs[SvgAttr]
+      with CanonicalSvgAttrBuilder
+      with ReactiveSvgTagBuilder
+
     val focus: FocusReceiver.type = FocusReceiver
 
     val child: ChildReceiver.type = ChildReceiver
-
-    val maybeChild: MaybeChildReceiver.type = MaybeChildReceiver
 
     val children: ChildrenReceiver.type = ChildrenReceiver
   }

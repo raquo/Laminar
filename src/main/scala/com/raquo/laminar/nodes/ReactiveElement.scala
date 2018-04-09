@@ -2,8 +2,7 @@ package com.raquo.laminar.nodes
 
 import com.raquo.dombuilder.generic
 import com.raquo.dombuilder.jsdom.JsCallback
-import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop}
-import com.raquo.laminar.DomApi
+import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.emitter.EventPropEmitter
 import com.raquo.laminar.experimental.airstream.core.{Observable, Observer, Subscription}
 import com.raquo.laminar.experimental.airstream.eventbus.{EventBus, EventBusSource, WriteBus}
@@ -13,13 +12,11 @@ import com.raquo.laminar.experimental.airstream.signal.Signal
 import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWasDiscarded, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ReactiveChildNode.isParentMounted
 import com.raquo.laminar.nodes.ReactiveElement.$noMountEvents
-import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, LockedAttrReceiver, LockedPropReceiver, MaybeChildReceiver, TextChildReceiver}
+import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
 import org.scalajs.dom
 
-class ReactiveElement[+Ref <: dom.Element](
-  override val tagName: String,
-  override val void: Boolean
-) extends ReactiveNode
+trait ReactiveElement[+Ref <: dom.Element]
+  extends ReactiveNode
   with ReactiveChildNode[Ref]
   with generic.nodes.Element[ReactiveNode, Ref, dom.Node]
   with generic.nodes.EventfulNode[ReactiveNode, Ref, dom.Element, dom.Node, dom.Event, JsCallback]
@@ -35,8 +32,6 @@ class ReactiveElement[+Ref <: dom.Element](
     * For efficiency, it is only populated when someone accesses [[$thisNodeMountEvent]]
     */
   private[laminar] var maybeThisNodeMountEventBus: Option[EventBus[MountEvent]] = None
-
-  override val ref: Ref = DomApi.elementApi.createNode(this)
 
   /** Stream of parent change events for this node.
     * For efficiency, it is lazy loaded, only being initialized when accessed,
@@ -102,13 +97,6 @@ class ReactiveElement[+Ref <: dom.Element](
   @inline def <--[V](childrenReceiver: ChildrenReceiver.type): ChildrenReceiver = new ChildrenReceiver(this)
 
   @inline def <--[V](childrenCommandReceiver: ChildrenCommandReceiver.type): ChildrenCommandReceiver = new ChildrenCommandReceiver(this)
-
-  @inline def <--[V](attr: Attr[V]): LockedAttrReceiver[V] = new LockedAttrReceiver(attr, this)
-
-  @inline def <--[V, DomV](prop: Prop[V, DomV]): LockedPropReceiver[V, DomV] = new LockedPropReceiver(prop, this)
-
-  //  // @TODO[API] This needs the string magic thing
-  //  def <-- [V](style: Style[V]): StyleReceiver[V] = new StyleReceiver(style)
 
   // @TODO vvvv This API gotta change, I think
 

@@ -88,11 +88,11 @@ class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Elem
     new EventPropTransformation(eventProp, useCapture, newProcessor)
   }
 
-  @inline def -->(observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[El2 <: El](observer: Observer[V]): EventPropEmitter[Ev, V, El2] = {
     new EventPropEmitter(observer, eventProp, useCapture, processor)
   }
 
-  @inline def -->[BusEv >: V](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[BusEv >: V, El2 <: El](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El2] = {
     -->(eventBus.writer)
   }
 }
