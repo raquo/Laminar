@@ -4,9 +4,9 @@ enablePlugins(ScalaJSBundlerPlugin)
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.4",
-  "com.raquo" %%% "dombuilder" % "0.5.1-SNAPSHOT",
+  "com.raquo" %%% "dombuilder" % "0.6.1",
   "org.scalatest" %%% "scalatest" % "3.0.4" % Test,
-  "com.raquo" %%% "domtestutils" % "0.5.1-SNAPSHOT" % Test
+  "com.raquo" %%% "domtestutils" % "0.6" % Test
 )
 
 useYarn := true

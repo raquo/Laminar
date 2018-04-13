@@ -1,18 +1,15 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.utils.UnitSpec
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api.L._
 import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.experimental.airstream.fixtures.TestableOwner
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
-import org.scalajs.dom
+import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.mutable
 
 class ModifierSpec extends UnitSpec {
 
-  // @TODO @TODO @TODO
-  ignore("meta modifier infers precise type") {
+  it("meta modifier infers precise type") {
 
     val testOwner = new TestableOwner
 
@@ -23,30 +20,34 @@ class ModifierSpec extends UnitSpec {
 
     val checkbox = input(
       typ := "checkbox",
-      checked := true//,
-//      (thisNode: ReactiveHtmlElement[dom.html.Input]) => onClick().map(_ => thisNode.ref.checked) --> checkedBus
+      checked := true,
+      inContext(thisNode => onClick.map(_ => thisNode.ref.checked) --> checkedBus)
     )
 
     mount(checkbox)
 
     events shouldEqual mutable.Buffer()
 
-    // @TODO[Test] Well at least this compiles. Event simulation is broken, it seems.
+    // --
 
     simulateClick(checkbox.ref)
 
     events shouldEqual mutable.Buffer(false)
     events.clear()
-//
-//    simulateClick(checkbox.ref)
-//
-//    events shouldEqual mutable.Buffer(true)
-//    events.clear()
-//
-//    simulateClick(checkbox.ref)
-//
-//    events shouldEqual mutable.Buffer(false)
-//    events.clear()
+
+    // --
+
+    simulateClick(checkbox.ref)
+
+    events shouldEqual mutable.Buffer(true)
+    events.clear()
+
+    // --
+
+    simulateClick(checkbox.ref)
+
+    events shouldEqual mutable.Buffer(false)
+    events.clear()
   }
 
 }

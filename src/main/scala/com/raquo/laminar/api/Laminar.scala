@@ -77,6 +77,12 @@ private[laminar] object Laminar
     new ReactiveRoot(container, rootNode)
   }
 
+  def inContext[El <: ReactiveElement[dom.Element]](makeModifier: El => Modifier[El]): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = makeModifier(element).apply(element)
+    }
+  }
+
   type HtmlElement = ReactiveHtmlElement[dom.html.Element]
 
   type SvgElement = ReactiveSvgElement[dom.svg.Element]
