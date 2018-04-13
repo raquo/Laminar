@@ -2,7 +2,7 @@ package com.raquo.laminar.utils
 
 import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtestutils.matching.RuleImplicits
-import com.raquo.laminar
+import com.raquo.laminar.api._
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveRoot}
 import org.scalajs.dom
@@ -25,7 +25,7 @@ trait LaminarSpec
   ): Unit = {
     mountedElementClue = clue
     assertEmptyContainer("laminar.mount")
-    root = laminar.render(containerNode, node)
+    root = L.render(containerNode, node)
   }
 
   def mount(

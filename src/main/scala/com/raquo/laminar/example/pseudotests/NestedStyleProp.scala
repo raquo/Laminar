@@ -1,6 +1,6 @@
 package com.raquo.laminar.example.pseudotests
 
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api._
 import com.raquo.laminar.example.components.Toggle
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
@@ -9,10 +9,10 @@ import org.scalajs.dom
 object NestedStyleProp {
 
   def render($color: EventStream[String]): ReactiveElement[dom.Element] = {
-    div(
-      color <-- $color,
-      span("HELLO"),
-      child <-- $color.map(color => span(color))
+    L.div(
+      L.color <-- $color,
+      L.span("HELLO"),
+      L.child <-- $color.map(color => L.span(color))
     )
   }
 
@@ -30,12 +30,12 @@ object NestedStyleProp {
 //      .startWith(true)
       .map(checked => if (checked) "red" else "lime")
 
-    div(
-      className := "yolo",
-      h1("MultiStyleProp"),
+    L.div(
+      L.className := "yolo",
+      L.h1("MultiStyleProp"),
 //      toggle.vnode,
       toggle2.node,
-      div(
+      L.div(
 //        color <-- $fontColor,
 //        fontSize <-- $fontSize,
         render($fontColor)

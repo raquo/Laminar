@@ -1,6 +1,6 @@
 package com.raquo.laminar.example
 
-import com.raquo.laminar._
+import com.raquo.laminar.api.L._
 import com.raquo.laminar.example.components.{Counter, TaskList}
 import com.raquo.laminar.example.pseudotests.{Children, MultiSetters, MultiStyleProp, NestedStyleProp, NodeTypeChange}
 import org.scalajs.dom

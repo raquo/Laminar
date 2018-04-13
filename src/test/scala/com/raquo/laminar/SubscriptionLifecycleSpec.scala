@@ -1,7 +1,8 @@
 package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L
 import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
@@ -193,9 +194,9 @@ class SubscriptionLifecycleSpec extends UnitSpec {
   ).run())
 
   it("GRANDPARENT UNMOUNT: href reflectedAttr")(SimpleTest[String](
-    makeElement = $href => span(bundle.a(href <-- $href, "Hello")),
-    emptyExpectedNode = span like (bundle.a like(href isEmpty, "Hello")),
-    makeExpectedNode = expectedHref => span like (bundle.a like(href is expectedHref, "Hello")),
+    makeElement = $href => span(L.a(href <-- $href, "Hello")),
+    emptyExpectedNode = span like (L.a like(href isEmpty, "Hello")),
+    makeExpectedNode = expectedHref => span like (L.a like(href is expectedHref, "Hello")),
     values = Seq("href 1", "href 2", "href 3", "href 4").map(randomString(_))
   ).run())
 
@@ -230,12 +231,12 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
   it("PARENT UNMOUNT [$CHILD]: title reflectedAttr")(NestedSubscriptionChildTest[String](
     makeElement = $child => span(child <-- $child, "Hello"),
-    makeChildA = $testTitle => bundle.a(title <-- $testTitle),
+    makeChildA = $testTitle => L.a(title <-- $testTitle),
     makeChildB = $testTitle => b(title <-- $testTitle),
     emptyExpectedNode = span like(ExpectedNode.comment(), "Hello"), // @TODO[API] We should not need to reference EN.comment here like this (it's a sentinel node, and we should use implicit conversion)
-    emptyExpectedNodeA = span like(bundle.a like (title isEmpty), "Hello"),
+    emptyExpectedNodeA = span like(L.a like (title isEmpty), "Hello"),
     emptyExpectedNodeB = span like(b like (title isEmpty), "Hello"),
-    makeExpectedNodeA = expectedTitle => span like(bundle.a like (title is expectedTitle), "Hello"),
+    makeExpectedNodeA = expectedTitle => span like(L.a like (title is expectedTitle), "Hello"),
     makeExpectedNodeB = expectedTitle => span like(b like (title is expectedTitle), "Hello"),
     values = Seq("Title 1", "Title 2", "Title 3", "Title 4").map(randomString(_))
   ).run())

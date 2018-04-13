@@ -5,14 +5,14 @@ import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.bundle.onClick
+import com.raquo.laminar.api.L.onClick
 import com.raquo.laminar.experimental.airstream.core.Observer
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
 import org.scalajs.dom
 
 import scala.scalajs.js
 
-class EventPropEmitter[Ev <: dom.Event, V, El <: ReactiveElement[dom.Element]](
+class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
   protected val observer: Observer[V],
   eventProp: EventProp[Ev],
   useCapture: Boolean,

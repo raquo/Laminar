@@ -1,14 +1,14 @@
-package com.raquo.laminar
+package com.raquo.laminar.implicits
 
 import com.raquo.dombuilder.generic.KeyImplicits
 import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
 import com.raquo.dombuilder.jsdom.JsCallback
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style, SvgAttr}
+import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropOps
 import com.raquo.laminar.experimental.airstream.core.Observable
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveNode, ReactiveText}
+import com.raquo.laminar.nodes.{ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver, SvgAttrReceiver}
 import org.scalajs.dom
 
@@ -16,6 +16,7 @@ import scala.scalajs.js.|
 
 trait Implicits
   extends SyntaxImplicits[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node, dom.Event, JsCallback]
+  with LowPriorityImplicits
   with KeyImplicits[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node]
   with SetterBuilders[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node]
   with DomApi
@@ -33,7 +34,7 @@ trait Implicits
     new StyleReceiver(style)
   }
 
-  @inline implicit def toEventPropOps[Ev <: dom.Event](eventProp: EventProp[Ev]): EventPropOps[Ev] = {
+  @inline implicit def eventPropToEventPropOps[Ev <: dom.Event](eventProp: EventProp[Ev]): EventPropOps[Ev] = {
     new EventPropOps(eventProp)
   }
 
@@ -43,12 +44,6 @@ trait Implicits
 
   @inline implicit def textToNode(text: String): ReactiveText = {
     new ReactiveText(text)
-  }
-
-  implicit def metaModifierToFlatModifier[El](makeModifier: El => Modifier[El]): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = makeModifier(element) apply element
-    }
   }
 
   // @TODO[IDE] This implicit conversion is actually never used by the compiler. However, this makes the Scala plugin for IntelliJ 2017.3 happy.

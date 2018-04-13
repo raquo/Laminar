@@ -3,7 +3,7 @@ package com.raquo.laminar
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.utils.UnitSpec
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api.L._
 
 /** These tests verify Laminar's behaviour in weird cases.
   *

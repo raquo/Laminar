@@ -1,11 +1,11 @@
 package com.raquo.laminar.setters
 
 import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.api._
 import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.experimental.airstream.signal.Signal
 import com.raquo.laminar.experimental.airstream.state.State
-import com.raquo.laminar.implicits._
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
 import org.scalajs.dom

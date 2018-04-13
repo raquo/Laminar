@@ -1,6 +1,6 @@
 package com.raquo.laminar.example.pseudotests
 
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api._
 import com.raquo.laminar.example.components.Toggle
 import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.experimental.airstream.signal.Signal
@@ -17,13 +17,13 @@ object NodeTypeChange {
     $useB.map { useB =>
       dom.console.warn("useB: " + useB)
       if (useB) {
-        b(
+        L.b(
           "B",
-          fontSize <-- $fontSize
+          L.fontSize <-- $fontSize
         )
       } else {
-        i(
-          fontSize <-- $fontSize,
+        L.i(
+          L.fontSize <-- $fontSize,
           "I"
         )
       }
@@ -43,12 +43,12 @@ object NodeTypeChange {
     val toggle = Toggle("Bold")
     val toggle2 = Toggle("Big")
     //    val counter = Counter()
-    div(
+    L.div(
       "APP",
-      div(
+      L.div(
         toggle.node,
         toggle2.node,
-        child <-- boldOrItalic($useB = toggle.$checked, $bigFont = toggle2.$checked.toSignal(false))
+        L.child <-- boldOrItalic($useB = toggle.$checked, $bigFont = toggle2.$checked.toSignal(false))
         //        div(
         //          color <-- myColor(toggle.$checked),
         //          b("COLOR")

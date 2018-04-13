@@ -22,7 +22,7 @@ import org.scalajs.dom
   *          Processes incoming events before they're passed to the next processor or to the listening EventBus.
   *          Returns an Option of the processed value. If None, the value should not passed down the chain.
   */
-class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Element]](
+class EventPropTransformation[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
   protected val eventProp: EventProp[Ev],
   protected val useCapture: Boolean = false,
   protected val processor: (Ev, El) => Option[V]
@@ -50,7 +50,7 @@ class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Elem
     * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
     * So for example, you can [[filter]] events before applying this, preventing default action only for certain events.
     *
-    * Example: `div(onClick().filter(isGoodClick).stopPropagation --> goodClickBus)`
+    * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
      */
   def stopPropagation: EventPropTransformation[Ev, V, El] = {
     copy(newProcessor = (ev, thisNode) => {
@@ -84,8 +84,8 @@ class EventPropTransformation[Ev <: dom.Event, V, El <: ReactiveElement[dom.Elem
   }
 
   // Don't need the extra codegen overhead of a case class
-  private def copy[V2](newProcessor: (Ev, El) => Option[V2]): EventPropTransformation[Ev, V2, El] = {
-    new EventPropTransformation(eventProp, useCapture, newProcessor)
+  private def copy[V2, El2 <: El](newProcessor: (Ev, El2) => Option[V2]): EventPropTransformation[Ev, V2, El2] = {
+    new EventPropTransformation[Ev, V2, El2](eventProp, useCapture, newProcessor)
   }
 
   @inline def -->[El2 <: El](observer: Observer[V]): EventPropEmitter[Ev, V, El2] = {

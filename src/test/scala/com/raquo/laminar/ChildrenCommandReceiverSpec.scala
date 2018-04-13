@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api.L._
 import com.raquo.laminar.collection.CollectionCommand.{Append, Insert, Prepend, Remove, Replace, ReplaceAll}
 import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand

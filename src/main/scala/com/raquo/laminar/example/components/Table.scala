@@ -1,6 +1,6 @@
 package com.raquo.laminar.example.components
 
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveNode
 
 object Table {

@@ -292,7 +292,7 @@ val appElement: ReactiveElement[dom.html.Div] = div(
   b("12:00") 
 )
  
-val root: ReactiveRoot = laminar.render(appContainer, appElement)
+val root: ReactiveRoot = L.render(appContainer, appElement)
 ```
 
 That's it. Laminar will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
@@ -481,27 +481,27 @@ val $diff: XStream[Int] = XStream.merge(
 
 However, when using the standard `onClick --> eventBus` syntax, there is no stream that you could operate on before the events hit `eventBus`. Instead, we provide a different way to transform events:
 
-First, you need to create an instance of `EventPropTransformation` by calling `apply` on your `EventProp` (via an implicit conversion to `EventPropOps`), e.g. `onClick()`. Then you can call a bunch of transformation methods on the resulting object like `mapTo` or `filter` which would return new instances of `EventPropTransformation`. Lastly, you call the `-->` method as before. So the example above would translate into:
+First, you need to create an instance of `EventPropTransformation` by calling `apply` on your `EventProp` (via an implicit conversion to `EventPropOps`), e.g. `onClick`. Then you can call a bunch of transformation methods on the resulting object like `mapTo` or `filter` which would return new instances of `EventPropTransformation`. Lastly, you call the `-->` method as before. So the example above would translate into:
 
 ```scala
 val diffBus = new EventBus[Int]
-val incrementButton = button("+1", onClick().mapTo(1) --> diffBus)
-val decrementButton = button("-1", onClick().mapTo(-1) --> diffBus)
+val incrementButton = button("+1", onClick.mapTo(1) --> diffBus)
+val decrementButton = button("-1", onClick.mapTo(-1) --> diffBus)
 val $diff: XStream[Int] = diffBus.$ // this stream emits +1 or -1
 ```
 
 More syntax examples:
 
 ```scala
-div("Click me", onClick().map(getClickCoordinates) --> clickCoordinatesBus)
+div("Click me", onClick.map(getClickCoordinates) --> clickCoordinatesBus)
  
 div(onScroll().filter(throttle) --> filteredScrollEventBus)
  
-div(onClick(useCapture = true) --> captureModeClickBus)
+div(onClick.config(useCapture = true) --> captureModeClickBus)
  
 input(onKeyUp().filter(_.keyCode == KeyCode.Enter).preventDefault --> enterPressBus)
  
-div(onClick().collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
+div(onClick.collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
  
 // TODO[Docs] Come up with more relatable examples
 ```
@@ -518,7 +518,7 @@ Importantly, these are just ordinarily transformations, and happen in the order 
 
 JS DOM has two event modes: capture, and bubbling. Typically and by default we use the latter, but capture mode is sometimes useful for event listener priority/ordering (not specific to Laminar, standard JS DOM rules/limitations apply).
 
-You need to specify whether to use capture mode the moment you register an event listener on the element, so it's passed as a parameter to `onClick(useCapture = true)` instead of being a method on `EventPropTransformation`.
+You need to specify whether to use capture mode the moment you register an event listener on the element, so it's passed as a parameter to `onClick.config(useCapture = true)` instead of being a method on `EventPropTransformation`.
 
 See MDN [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) page for details ("useCapture" section).
 

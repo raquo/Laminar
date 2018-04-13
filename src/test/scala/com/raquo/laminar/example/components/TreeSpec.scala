@@ -1,8 +1,7 @@
 package com.raquo.laminar.example.components
 
-import com.raquo.laminar
-import com.raquo.laminar.bundle
-import com.raquo.laminar.bundle._
+import com.raquo.laminar.api.L
+import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveChildNode
 import com.raquo.laminar.utils.UnitSpec
 
@@ -17,11 +16,11 @@ class TreeSpec extends UnitSpec {
     val el10 = span("el10")
     val el11 = span("el11")
     val el2 = article("el2")
-    val el3 = bundle.a("el3", href := "http://example.com")
-    val root = laminar.render(container1, el0)
+    val el3 = L.a("el3", href := "http://example.com")
+    val root = render(container1, el0)
 
     val otherEl = div("otherEl")
-    val otherRoot = laminar.render(otherContainer, otherEl)
+    val otherRoot = render(otherContainer, otherEl)
 
     val elx = b("elx")
 
@@ -94,7 +93,7 @@ class TreeSpec extends UnitSpec {
     val el0 = span("el0")
     val el10 = span("el10")
     val el2 = article("el2")
-    val unmountedRoot = laminar.render(container1, el0)
+    val unmountedRoot = render(container1, el0)
 
     ReactiveChildNode.isNodeMounted(node = el0.ref) shouldBe false
     ReactiveChildNode.isNodeMounted(node = el10.ref) shouldBe false

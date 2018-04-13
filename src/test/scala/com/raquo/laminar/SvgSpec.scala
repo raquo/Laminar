@@ -1,13 +1,10 @@
 package com.raquo.laminar
 
-import com.raquo.laminar.bundle.{div, onClick}
-import com.raquo.laminar.implicits._
-import com.raquo.laminar.bundle.svg._
+import com.raquo.laminar.api.L.svg._
+import com.raquo.laminar.api._
 import com.raquo.laminar.experimental.airstream.core.Observer
-import com.raquo.laminar.experimental.airstream.eventbus.EventBus
 import com.raquo.laminar.experimental.airstream.fixtures.TestableOwner
 import com.raquo.laminar.experimental.airstream.state.Var
-import com.raquo.laminar.receivers.SvgAttrReceiver
 import com.raquo.laminar.utils.UnitSpec
 
 class SvgSpec extends UnitSpec {
@@ -25,7 +22,7 @@ class SvgSpec extends UnitSpec {
       fill := "none",
       stroke := "black",
       strokeWidth <-- $strokeWidth,
-      onClick --> Observer(_ => clickCount += 1)
+      L.onClick --> Observer(_ => clickCount += 1)
     )
 
     val el = svg(
@@ -34,9 +31,9 @@ class SvgSpec extends UnitSpec {
       polylineEl
     )
 
-    mount(div(el))
+    mount(L.div(el))
 
-    expectNode(div like (svg like(
+    expectNode(L.div like (svg like(
       height is "800",
       width is "500",
       polyline like(
@@ -51,7 +48,7 @@ class SvgSpec extends UnitSpec {
 
     (stroke := "red").apply(polylineEl)
 
-    expectNode(div like (svg like(
+    expectNode(L.div like (svg like(
       height is "800",
       width is "500",
       polyline like(
@@ -66,7 +63,7 @@ class SvgSpec extends UnitSpec {
 
     $strokeWidth.writer.onNext("4")
 
-    expectNode(div like (svg like(
+    expectNode(L.div like (svg like(
       height is "800",
       width is "500",
       polyline like(
