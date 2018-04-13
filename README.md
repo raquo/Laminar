@@ -1,5 +1,7 @@
 # Laminar
 
+[![Join the chat at https://gitter.im/Laminar_/Lobby](https://badges.gitter.im/Laminar_/Lobby.svg)](https://gitter.im/Laminar_/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs0.6_2.12.svg)
 
 Laminar is a small Scala.js library that lets you to build UI components using reactive streams.
