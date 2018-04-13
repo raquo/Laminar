@@ -22,8 +22,8 @@ class TaskList {
   val node: ReactiveElement[dom.html.Div] = div(
     h1("TaskList"),
     children.command <-- taskDiffBus.events,
-    maybeChild <-- maybeNewTask,
-    maybeChild <-- maybeNewTaskButton
+    child.maybe <-- maybeNewTask,
+    child.maybe <-- maybeNewTaskButton
   )
 
   def maybeNewTaskButton: Signal[MaybeChildNode] = {
