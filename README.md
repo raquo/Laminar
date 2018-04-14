@@ -1,5 +1,6 @@
 # Laminar
 
+[![Join the chat at https://gitter.im/Laminar_/Lobby](https://badges.gitter.im/Laminar_/Lobby.svg)](https://gitter.im/Laminar_/Lobby)
 ![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs0.6_2.12.svg)
 
 Laminar is a small Scala.js library that lets you to build UI components using reactive streams.
@@ -20,7 +21,8 @@ Laminar is a small Scala.js library that lets you to build UI components using r
 
 ## Community
 
-Please use [github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, as well as all kinds of discussions, including questions on usage and roadmap. I think this will work better than spreading thin across gitter / stackoverflow / etc. You can _watch_ this project on github to get issue updates if you're interested in following discussions.
+* [Gitter](https://gitter.im/Laminar_/Lobby) for chat and random questions
+* [Github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, and more in-depth discussions
 
 
 
