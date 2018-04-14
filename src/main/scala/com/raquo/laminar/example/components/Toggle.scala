@@ -1,8 +1,8 @@
 package com.raquo.laminar.example.components
 
+import com.raquo.airstream.eventbus.EventBus
+import com.raquo.airstream.eventstream.EventStream
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.experimental.airstream.eventbus.EventBus
-import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 import org.scalajs.dom.raw.{HTMLInputElement, MouseEvent}

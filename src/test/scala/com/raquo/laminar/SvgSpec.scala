@@ -1,10 +1,10 @@
 package com.raquo.laminar
 
+import com.raquo.airstream.core.Observer
+import com.raquo.airstream.state.Var
 import com.raquo.laminar.api.L.svg._
 import com.raquo.laminar.api._
-import com.raquo.laminar.experimental.airstream.core.Observer
-import com.raquo.laminar.experimental.airstream.fixtures.TestableOwner
-import com.raquo.laminar.experimental.airstream.state.Var
+import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.utils.UnitSpec
 
 class SvgSpec extends UnitSpec {

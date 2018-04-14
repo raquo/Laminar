@@ -1,8 +1,8 @@
 package com.raquo.laminar.example.pseudotests
 
+import com.raquo.airstream.eventstream.EventStream
 import com.raquo.laminar.api._
 import com.raquo.laminar.example.components.Toggle
-import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 

@@ -1,6 +1,6 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.laminar.experimental.airstream.core.Observable
+import com.raquo.airstream.core.Observable
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.setters.ChildrenSetter
 import com.raquo.laminar.setters.ChildrenSetter.Children

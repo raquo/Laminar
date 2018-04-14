@@ -1,7 +1,7 @@
 package com.raquo.laminar.receivers
 
+import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.keys.Style
-import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom
 

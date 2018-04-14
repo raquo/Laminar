@@ -1,12 +1,11 @@
 package com.raquo.laminar.example.components
 
+import com.raquo.airstream.eventbus.EventBus
+import com.raquo.airstream.signal.Signal
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.collection.CollectionCommand.Append
-import com.raquo.laminar.experimental.airstream.eventbus.EventBus
-import com.raquo.laminar.experimental.airstream.signal.Signal
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
 import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
-import org.scalajs.dom
 
 class TaskList {
 

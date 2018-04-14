@@ -1,5 +1,6 @@
 package com.raquo.laminar.implicits
 
+import com.raquo.airstream.core.Observable
 import com.raquo.dombuilder.generic.KeyImplicits
 import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
@@ -7,7 +8,6 @@ import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style, SvgAttr}
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropOps
-import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.nodes.{ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver, SvgAttrReceiver}
 import org.scalajs.dom

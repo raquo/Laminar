@@ -1,8 +1,8 @@
 package com.raquo.laminar.receivers
 
+import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
-import com.raquo.laminar.experimental.airstream.core.Observable
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.setters.StyleSetter
 import org.scalajs.dom

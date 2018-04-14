@@ -1,9 +1,9 @@
 package com.raquo.laminar.setters
 
+import com.raquo.airstream.eventstream.EventStream
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.collection.CollectionCommand
-import com.raquo.laminar.experimental.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Child
 import org.scalajs.dom

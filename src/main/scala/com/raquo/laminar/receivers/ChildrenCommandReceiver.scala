@@ -1,6 +1,6 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.laminar.experimental.airstream.eventstream.EventStream
+import com.raquo.airstream.eventstream.EventStream
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.setters.ChildrenCommandSetter
 import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand

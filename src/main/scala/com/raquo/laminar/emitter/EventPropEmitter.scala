@@ -1,12 +1,12 @@
 package com.raquo.laminar.emitter
 
+import com.raquo.airstream.core.Observer
 import com.raquo.dombuilder.generic.modifiers.EventPropSetter
 import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L.onClick
-import com.raquo.laminar.experimental.airstream.core.Observer
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
 import org.scalajs.dom
 

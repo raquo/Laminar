@@ -1,6 +1,6 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.laminar.experimental.airstream.core.Observable
+import com.raquo.airstream.core.Observable
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveText}
 import com.raquo.laminar.setters.ChildSetter
 import org.scalajs.dom

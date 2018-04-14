@@ -5,8 +5,8 @@ package com.raquo.laminar.collection
 // just seems like an awkward, ad-hoc solution. I don't think we need it in Laminar. Or at least it doesn't make sense
 // to me anymore now that we have children diffing.
 
-//import com.raquo.laminar.experimental.airstream.eventstream.EventStream
-//import com.raquo.laminar.experimental.airstream.signal.Signal
+//import com.raquo.airstream.eventstream.EventStream
+//import com.raquo.airstream.signal.Signal
 //
 //class ReactiveCollection[Model, Node](
 //  makeCommandStream: ReactiveCollection[Model, Node] => EventStream[CollectionCommand[Model]],
