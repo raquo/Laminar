@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.dombuilder.generic.builders.SetterBuilders
-import com.raquo.domtypes.generic.Modifier
+import com.raquo.domtypes.generic
 import com.raquo.domtypes.generic.builders.canonical.{CanonicalAttrBuilder, CanonicalEventPropBuilder, CanonicalPropBuilder, CanonicalReflectedAttrBuilder, CanonicalSvgAttrBuilder}
 import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, Attrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
@@ -64,6 +64,38 @@ private[laminar] object Laminar
     with CanonicalSvgAttrBuilder
     with ReactiveSvgTagBuilder
 
+
+  type HtmlElement = ReactiveHtmlElement[dom.html.Element]
+
+  type SvgElement = ReactiveSvgElement[dom.svg.Element]
+
+  type Element = ReactiveElement[dom.Element]
+
+
+  type Modifier[El <: Element] = generic.Modifier[El]
+
+
+  type Anchor = ReactiveHtmlElement[dom.html.Anchor]
+
+  type Button = ReactiveHtmlElement[dom.html.Button]
+
+  type Div = ReactiveHtmlElement[dom.html.Div]
+
+  type IFrame = ReactiveHtmlElement[dom.html.IFrame]
+
+  type Image = ReactiveHtmlElement[dom.html.Image]
+
+  type Input = ReactiveHtmlElement[dom.html.Input]
+
+  type Label = ReactiveHtmlElement[dom.html.Label]
+
+  type Li = ReactiveHtmlElement[dom.html.LI]
+
+  type Span = ReactiveHtmlElement[dom.html.Span]
+
+  type TextArea = ReactiveHtmlElement[dom.html.TextArea]
+
+
   val focus: FocusReceiver.type = FocusReceiver
 
   val child: ChildReceiver.type = ChildReceiver
@@ -82,26 +114,5 @@ private[laminar] object Laminar
       override def apply(element: El): Unit = makeModifier(element).apply(element)
     }
   }
-
-  type HtmlElement = ReactiveHtmlElement[dom.html.Element]
-
-  type SvgElement = ReactiveSvgElement[dom.svg.Element]
-
-  type Element = ReactiveElement[dom.Element]
-
-
-  type Div = ReactiveHtmlElement[dom.html.Div]
-
-  type IFrame = ReactiveHtmlElement[dom.html.IFrame]
-
-  type Image = ReactiveHtmlElement[dom.html.Image]
-
-  type Input = ReactiveHtmlElement[dom.html.Input]
-
-  type Li = ReactiveHtmlElement[dom.html.LI]
-
-  type TextArea = ReactiveHtmlElement[dom.html.TextArea]
-
-  type Span = ReactiveHtmlElement[dom.html.Span]
 
 }
