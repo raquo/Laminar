@@ -9,7 +9,7 @@ class ReactiveText(initialText: String)
   with ReactiveChildNode[dom.Text]
   with generic.nodes.Text[ReactiveNode, dom.Text, dom.Node] {
 
-  @inline override def text: String = ref.data
+  final override def text: String = ref.data
 
-  override val ref: dom.Text = DomApi.textApi.createNode(initialText)
+  final override val ref: dom.Text = DomApi.textApi.createNode(initialText)
 }

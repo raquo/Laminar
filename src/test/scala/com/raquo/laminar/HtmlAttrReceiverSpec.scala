@@ -4,7 +4,7 @@ import com.raquo.airstream.eventbus.EventBus
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.utils.UnitSpec
 
-class AttrReceiverSpec extends UnitSpec {
+class HtmlAttrReceiverSpec extends UnitSpec {
 
   it("updates attr") {
     val title1 = randomString("title1_")
@@ -190,7 +190,12 @@ class AttrReceiverSpec extends UnitSpec {
     expectNode(div like (className is "unrelated"))
   }
 
-  it("works with child receiver on same node") {
+  ignore("works with child receiver on same node") {
 
+  }
+
+  it("supports attr(value) syntax") {
+    mount(div(title("Hello"), tabIndex(5)))
+    expectNode(div like (title is "Hello", tabIndex is 5))
   }
 }

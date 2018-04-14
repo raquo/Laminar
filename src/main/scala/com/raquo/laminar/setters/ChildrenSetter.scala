@@ -5,6 +5,7 @@ import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.signal.Signal
 import com.raquo.airstream.state.State
 import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.DomApi
 import com.raquo.laminar.api._
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
@@ -20,7 +21,7 @@ class ChildrenSetter(
     var nodeCount = 0
 
     val sentinelNode = new ReactiveComment("")
-    parentNode.appendChild(sentinelNode)
+    parentNode.appendChild(sentinelNode)(DomApi.treeApi)
 
     val childrenSignal = $children match {
       case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
@@ -92,7 +93,7 @@ object ChildrenSetter {
         // Note: `prevChildRef` is not valid in this branch
         //        dom.console.log("INSERTING " + nextChild.ref.textContent + " at index-" + index + " (nextChildNodeIndex=" + nextChildNodeIndex + ")")
         // We ran through the whole prevChildren list already, we just need to append all remaining nextChild-s into the DOM
-        parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)
+        parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
         // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
         prevChildRef = nextChild.ref
         currentChildrenCount += 1
@@ -111,7 +112,7 @@ object ChildrenSetter {
 
           if (!prevChildren.contains(nextChild)) {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
-            parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)
+            parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
             prevChildRef = nextChild.ref
             currentChildrenCount += 1
           } else {
@@ -130,7 +131,7 @@ object ChildrenSetter {
               val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
-              parentNode.removeChild(prevChild)
+              parentNode.removeChild(prevChild)(DomApi.treeApi)
 
               currentChildrenCount -= 1
               // Update prevChildNode reference
@@ -138,7 +139,7 @@ object ChildrenSetter {
             }
             if (nextChild.ref != prevChildRef) {
               // nextChild is still not in the right place, so let's move it to the correct index
-              parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex) // MOVE, so we DO NOT update currentDomChildrenCount
+              parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi) // MOVE, so we DO NOT update currentDomChildrenCount
               prevChildRef = nextChild.ref
             }
           }
@@ -154,7 +155,7 @@ object ChildrenSetter {
       //      dom.console.log("prevChildRef: " + prevChildRef.textContent)
 
       val nextPrevChildRef = prevChildRef.nextSibling
-      parentNode.removeChild(prevChildFromRef(prevChildren, prevChildRef))
+      parentNode.removeChild(prevChildFromRef(prevChildren, prevChildRef))(DomApi.treeApi)
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1
     }

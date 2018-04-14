@@ -9,6 +9,6 @@ class ReactiveComment(val text: String)
   with ReactiveChildNode[dom.Comment]
   with generic.nodes.Comment[ReactiveNode, dom.Comment, dom.Node] {
 
-  override val ref: dom.Comment = DomApi.commentApi.createNode(text)
+  final override val ref: dom.Comment = DomApi.commentApi.createNode(text)
 }
 

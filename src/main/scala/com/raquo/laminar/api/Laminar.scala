@@ -1,40 +1,37 @@
 package com.raquo.laminar.api
 
-import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.builders.canonical.{CanonicalAttrBuilder, CanonicalEventPropBuilder, CanonicalPropBuilder, CanonicalReflectedAttrBuilder, CanonicalSvgAttrBuilder}
 import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, Attrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
-import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, SvgAttr}
 import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowOnlyEventProps}
 import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, SvgTags, TableTags, TextTags}
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.builders.{ReactiveHtmlTag, ReactiveHtmlTagBuilder, ReactiveSvgTag, ReactiveSvgTagBuilder}
-import com.raquo.laminar.implicits.Implicits
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveElement, ReactiveHtmlElement, ReactiveNode, ReactiveRoot, ReactiveSvgElement}
+import com.raquo.laminar.Implicits
+import com.raquo.laminar.builders.{ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
+import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedAttr, ReactiveSvgAttr}
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement}
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver}
 import org.scalajs.dom
 
 
 private[laminar] object Laminar
   // Attrs
-  extends Attrs[Attr]
-  with AriaAttrs[Attr]
+  extends Attrs[ReactiveHtmlAttr]
+  with AriaAttrs[ReactiveHtmlAttr]
   // Event Props
-  with ClipboardEventProps[EventProp]
-  with ErrorEventProps[EventProp]
-  with FormEventProps[EventProp]
-  with KeyboardEventProps[EventProp]
-  with MediaEventProps[EventProp]
-  with MiscellaneousEventProps[EventProp]
-  with MouseEventProps[EventProp]
-  with WindowOnlyEventProps[EventProp]
+  with ClipboardEventProps[ReactiveEventProp]
+  with ErrorEventProps[ReactiveEventProp]
+  with FormEventProps[ReactiveEventProp]
+  with KeyboardEventProps[ReactiveEventProp]
+  with MediaEventProps[ReactiveEventProp]
+  with MiscellaneousEventProps[ReactiveEventProp]
+  with MouseEventProps[ReactiveEventProp]
+  with WindowOnlyEventProps[ReactiveEventProp]
   // Props
-  with Props[Prop]
+  with Props[ReactiveProp]
   // Reflected Attrs
-  with ReflectedAttrs[ReflectedAttr]
+  with ReflectedAttrs[ReactiveReflectedAttr]
   // Styles
   with Styles[StyleSetter]
   with Styles2[StyleSetter]
@@ -47,23 +44,14 @@ private[laminar] object Laminar
   with SectionTags[ReactiveHtmlTag]
   with TableTags[ReactiveHtmlTag]
   with TextTags[ReactiveHtmlTag]
-  // Builders
-  with CanonicalAttrBuilder
-  with CanonicalReflectedAttrBuilder
-  with CanonicalEventPropBuilder[dom.Event]
-  with CanonicalPropBuilder
-  with ReactiveHtmlTagBuilder
-  with SetterBuilders[ReactiveNode, dom.html.Element, dom.svg.Element, dom.Node]
   // Other things
-  with DomApi
+  with ReactiveHtmlBuilders
   with Implicits {
 
   object svg
     extends SvgTags[ReactiveSvgTag]
-    with SvgAttrs[SvgAttr]
-    with CanonicalSvgAttrBuilder
-    with ReactiveSvgTagBuilder
-
+    with SvgAttrs[ReactiveSvgAttr]
+    with ReactiveSvgBuilders
 
   type HtmlElement = ReactiveHtmlElement[dom.html.Element]
 

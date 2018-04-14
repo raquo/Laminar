@@ -11,7 +11,7 @@ trait ReactiveChildNode[+Ref <: dom.Node]
   extends ReactiveNode
   with ChildNode[ReactiveNode, Ref, dom.Node] {
 
-  override val treeApi: JsTreeApi[ReactiveNode] = DomApi.treeApi
+  final override val treeApi: JsTreeApi[ReactiveNode] = DomApi.treeApi
 }
 
 object ReactiveChildNode {

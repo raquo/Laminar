@@ -1,12 +1,16 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Observable
-import com.raquo.domtypes.generic.keys.Attr
-import com.raquo.laminar.setters.AttrSetter
+import com.raquo.laminar.keys.ReactiveHtmlAttr
+import com.raquo.laminar.nodes.ReactiveHtmlElement
+import org.scalajs.dom
 
-class AttrReceiver[V](val attr: Attr[V]) extends AnyVal {
+class AttrReceiver[V](
+  attr: ReactiveHtmlAttr[V],
+  element: ReactiveHtmlElement[dom.html.Element]
+) {
 
-  @inline def <--($value: Observable[V]): AttrSetter[V] = {
-    new AttrSetter(attr, $value)
+  def <--($value: Observable[V]): Unit = {
+    (attr <-- $value)(element)
   }
 }

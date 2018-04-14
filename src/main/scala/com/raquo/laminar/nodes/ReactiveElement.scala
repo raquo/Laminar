@@ -88,49 +88,49 @@ trait ReactiveElement[+Ref <: dom.Element]
     eventBus.events
   }
 
-  @inline def <--[V](childReceiver: ChildReceiver.type): ChildReceiver = new ChildReceiver(this)
+  final def <--[V](childReceiver: ChildReceiver.type): ChildReceiver = new ChildReceiver(this)
 
-  @inline def <--[V](maybeChildReceiver: MaybeChildReceiver.type): MaybeChildReceiver = new MaybeChildReceiver(this)
+  final def <--[V](maybeChildReceiver: MaybeChildReceiver.type): MaybeChildReceiver = new MaybeChildReceiver(this)
 
-  @inline def <--[V](textChildReceiver: TextChildReceiver.type): TextChildReceiver = new TextChildReceiver(this)
+  final def <--[V](textChildReceiver: TextChildReceiver.type): TextChildReceiver = new TextChildReceiver(this)
 
-  @inline def <--[V](childrenReceiver: ChildrenReceiver.type): ChildrenReceiver = new ChildrenReceiver(this)
+  final def <--[V](childrenReceiver: ChildrenReceiver.type): ChildrenReceiver = new ChildrenReceiver(this)
 
-  @inline def <--[V](childrenCommandReceiver: ChildrenCommandReceiver.type): ChildrenCommandReceiver = new ChildrenCommandReceiver(this)
+  final def <--[V](childrenCommandReceiver: ChildrenCommandReceiver.type): ChildrenCommandReceiver = new ChildrenCommandReceiver(this)
 
   // @TODO vvvv This API gotta change, I think
 
   // @TODO[API] User needs to provide explicit type params to use the subscribe methods below. How to fix that? 2.12?
 
-  @inline def subscribe[V](
+  def subscribe[V](
     getObservable: this.type => Observable[V],
     observer: Observer[V]
   ): Subscription = {
     subscribe(getObservable(this), observer)
   }
 
-  @inline def subscribe[V](
+  def subscribe[V](
     getObservable: this.type => Observable[V],
     onNext: V => Unit
   ): Subscription = {
     subscribe(getObservable(this), Observer(onNext))
   }
 
-  @inline def subscribe[V](
+  def subscribe[V](
     observable: Observable[V],
     onNext: V => Unit
   ): Subscription = {
     subscribe(observable, Observer(onNext))
   }
 
-  @inline def subscribe[V](
+  def subscribe[V](
     observable: Observable[V],
     observer: Observer[V]
   ): Subscription = {
     observable.addObserver(observer)(owner = this)
   }
 
-  @inline def subscribeBus[V](
+  def subscribeBus[V](
     sourceStream: EventStream[V],
     targetBus: WriteBus[V]
   ): EventBusSource[V] = {
@@ -142,7 +142,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     * You can use this method to simplify your code and possibly improve performance
     * where you'd otherwise need to subscribe to and transform [[$mountEvent]]
     */
-  @inline def isMounted: Boolean = {
+  def isMounted: Boolean = {
     isParentMounted(maybeParent)
   }
 
