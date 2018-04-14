@@ -6,8 +6,26 @@ import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.mutable
+import scala.scalajs.js
 
 class ModifierSpec extends UnitSpec {
+
+  it("ModifierSeq implicit conversion works for both strings and nodes") {
+
+    val strings = List("a", "b")
+    val nodes = Vector(span("ya"), article("yo"))
+    val jsNodes: Seq[Mod[Element]] = js.Array(span("js")) // JS arrays need some help for now. We could optimize that if needed
+    val mixed: Seq[Mod[HtmlElement]] = Vector("c", input())
+
+    mount(div(strings, nodes, jsNodes, mixed))
+
+    expectNode(div like (
+      "a", "b",
+      span like "ya", article like "yo",
+      span like "js",
+      "c", input like ()
+    ))
+  }
 
   it("meta modifier infers precise type") {
 

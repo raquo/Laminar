@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.dombuilder.generic.builders.SetterBuilders
-import com.raquo.domtypes.generic
+import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.builders.canonical.{CanonicalAttrBuilder, CanonicalEventPropBuilder, CanonicalPropBuilder, CanonicalReflectedAttrBuilder, CanonicalSvgAttrBuilder}
 import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, Attrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
@@ -72,7 +72,7 @@ private[laminar] object Laminar
   type Element = ReactiveElement[dom.Element]
 
 
-  type Modifier[El <: Element] = generic.Modifier[El]
+  type Mod[El] = Modifier[El]
 
 
   type Anchor = ReactiveHtmlElement[dom.html.Anchor]

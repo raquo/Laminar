@@ -5,10 +5,11 @@ import com.raquo.dombuilder.generic.KeyImplicits
 import com.raquo.dombuilder.generic.builders.SetterBuilders
 import com.raquo.dombuilder.generic.syntax.SyntaxImplicits
 import com.raquo.dombuilder.jsdom.JsCallback
+import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.{Attr, EventProp, Prop, Style, SvgAttr}
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropOps
-import com.raquo.laminar.nodes.{ReactiveNode, ReactiveText}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode, ReactiveText}
 import com.raquo.laminar.receivers.{AttrReceiver, PropReceiver, StyleReceiver, SvgAttrReceiver}
 import org.scalajs.dom
 
@@ -44,6 +45,15 @@ trait Implicits
 
   @inline implicit def textToNode(text: String): ReactiveText = {
     new ReactiveText(text)
+  }
+
+  implicit def seqToModifier[A, El <: ReactiveElement[dom.Element]](seq: Seq[A])(implicit evidence: A => Modifier[El]): Modifier[El] = {
+    // @TODO[Performance] See if we might want a separate conversion for cases when we don't need `evidence`
+    new Modifier[El] {
+      override def apply(el: El): Unit = {
+        seq.foreach(evidence(_).apply(el))
+      }
+    }
   }
 
   // @TODO[IDE] This implicit conversion is actually never used by the compiler. However, this makes the Scala plugin for IntelliJ 2017.3 happy.
