@@ -22,7 +22,7 @@ class SvgSpec extends UnitSpec {
       fill := "none",
       stroke := "black",
       strokeWidth <-- $strokeWidth,
-      L.onClick --> Observer(_ => clickCount += 1)
+      L.onClick --> Observer((_: Any) => clickCount += 1)
     )
 
     val el = svg(
