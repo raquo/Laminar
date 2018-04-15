@@ -4,9 +4,9 @@ normalizedName := "laminar"
 
 organization := "com.raquo"
 
-scalaVersion := "2.12.3"
+scalaVersion := "2.12.5"
 
-crossScalaVersions := Seq("2.11.11", "2.12.3")
+crossScalaVersions := Seq("2.11.12", "2.12.5")
 
 homepage := Some(url("https://github.com/raquo/Laminar"))
 
@@ -34,13 +34,7 @@ publishMavenStyle := true
 
 publishArtifact in Test := false
 
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-}
+publishTo := sonatypePublishTo.value
 
 releaseCrossBuild := true
 
