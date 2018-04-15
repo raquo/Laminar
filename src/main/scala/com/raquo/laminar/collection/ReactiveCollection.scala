@@ -1,4 +1,4 @@
-package com.raquo.laminar.collection
+// package com.raquo.laminar.collection
 
 // @TODO[API] Not sure if this should be part of our API.
 // This method was inspired by https://github.com/cyclejs/collection, and I know I've used it at some point but it
