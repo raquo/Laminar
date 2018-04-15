@@ -10,7 +10,7 @@ import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, Gr
 import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders.{ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedAttr, ReactiveSvgAttr}
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement}
+import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement, ReactiveText}
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver}
 import org.scalajs.dom
 
@@ -58,6 +58,12 @@ private[laminar] object Laminar
   type SvgElement = ReactiveSvgElement[dom.svg.Element]
 
   type Element = ReactiveElement[dom.Element]
+
+  type Node = ReactiveChildNode[dom.Node]
+
+  type Text = ReactiveText
+
+  type Comment = ReactiveComment
 
 
   type Mod[El] = Modifier[El]

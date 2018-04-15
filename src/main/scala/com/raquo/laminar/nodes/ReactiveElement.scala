@@ -82,7 +82,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       eventBus.writer,
       eventProp,
       useCapture,
-      processor = (ev: Ev, _: this.type) => Some(ev)
+      processor = Some(_)
     )
     setter(this)
     eventBus.events

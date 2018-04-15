@@ -8,8 +8,8 @@ import org.scalajs.dom
 
 class ReactiveEventProp[Ev <: dom.Event](override val name: String) extends EventProp[Ev](name) {
 
-  def config[El <: ReactiveElement[dom.Element]](useCapture: Boolean = false): EventPropTransformation[Ev, Ev, El] = {
-    new EventPropTransformation(this, useCapture, processor = (ev: Ev, _: El) => Some(ev))
+  def config[El <: ReactiveElement[dom.Element]](useCapture: Boolean = false): EventPropTransformation[Ev, Ev] = {
+    new EventPropTransformation(this, useCapture, processor = Some(_))
   }
 
   def -->[El <: ReactiveElement[dom.Element]](
@@ -18,7 +18,7 @@ class ReactiveEventProp[Ev <: dom.Event](override val name: String) extends Even
     observer,
     this,
     useCapture = false,
-    processor = (ev: Ev, _: El) => Some(ev)
+    processor = Some(_)
   )
 
 }

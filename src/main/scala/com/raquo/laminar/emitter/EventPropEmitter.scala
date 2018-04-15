@@ -16,7 +16,7 @@ class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
   protected val observer: Observer[V],
   eventProp: EventProp[Ev],
   useCapture: Boolean,
-  processor: (Ev, El) => Option[V]
+  processor: Ev => Option[V]
 ) extends EventPropTransformation(eventProp, useCapture, processor)
   with Modifier[El]
 {
@@ -30,10 +30,10 @@ class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
       ) {
         // Special case: See README and/or https://stackoverflow.com/a/32710212/2601788
         // @TODO[API] Should this behaviour extend to all checkbox.onClick events by default?
-        js.timers.setTimeout(0)(processor(ev, element).foreach(observer.onNext))
+        js.timers.setTimeout(0)(processor(ev).foreach(observer.onNext))
         ()
       } else {
-        processor(ev, element).foreach(observer.onNext)
+        processor(ev).foreach(observer.onNext)
       }
     }
 

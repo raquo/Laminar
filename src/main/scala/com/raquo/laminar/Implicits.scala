@@ -14,8 +14,8 @@ trait Implicits extends DomApi {
 
   implicit def eventPropToEventPropTransformation[Ev <: dom.Event, El <: ReactiveElement[dom.Element]](
     eventProp: ReactiveEventProp[Ev]
-  ): EventPropTransformation[Ev, Ev, El] = {
-    new EventPropTransformation(eventProp, useCapture = false, processor = (ev: Ev, _: El) => Some(ev))
+  ): EventPropTransformation[Ev, Ev] = {
+    new EventPropTransformation(eventProp, useCapture = false, processor = Some(_))
   }
 
   @inline implicit def styleToReactiveStyle[V](style: Style[V]): ReactiveStyle[V] = {

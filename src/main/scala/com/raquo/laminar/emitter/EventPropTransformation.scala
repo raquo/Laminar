@@ -22,10 +22,10 @@ import org.scalajs.dom
   *          Processes incoming events before they're passed to the next processor or to the listening EventBus.
   *          Returns an Option of the processed value. If None, the value should not passed down the chain.
   */
-class EventPropTransformation[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
+class EventPropTransformation[Ev <: dom.Event, V](
   protected val eventProp: EventProp[Ev],
   protected val useCapture: Boolean = false,
-  protected val processor: (Ev, El) => Option[V]
+  protected val processor: Ev => Option[V]
 ) {
 
   /** Prevent default browser action for the given event (e.g. following the link when it is clicked)
@@ -36,9 +36,9 @@ class EventPropTransformation[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Ele
     *
     * Example: `input(onKeyUp().filter(ev => ev.keyCode == KeyCode.Tab).preventDefault --> tabKeyUpBus)`
     */
-  def preventDefault: EventPropTransformation[Ev, V, El] = {
-    copy(newProcessor = (ev, thisNode) => {
-      val value = processor(ev, thisNode)
+  def preventDefault: EventPropTransformation[Ev, V] = {
+    copy(newProcessor = ev => {
+      val value = processor(ev)
       ev.preventDefault()
       value
     })
@@ -52,21 +52,21 @@ class EventPropTransformation[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Ele
     *
     * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
      */
-  def stopPropagation: EventPropTransformation[Ev, V, El] = {
-    copy(newProcessor = (ev, thisNode) => {
-      val value = processor(ev, thisNode)
+  def stopPropagation: EventPropTransformation[Ev, V] = {
+    copy(newProcessor = ev => {
+      val value = processor(ev)
       ev.stopPropagation()
       value
     })
   }
 
   /** Values that do not pass will not propagate down the chain and into the emitter. */
-  def filter(passes: V => Boolean): EventPropTransformation[Ev, V, El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).filter(passes))
+  def filter(passes: V => Boolean): EventPropTransformation[Ev, V] = {
+    copy(newProcessor = ev => processor(ev).filter(passes))
   }
 
-  def map[V2](project: V => V2): EventPropTransformation[Ev, V2, El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(project))
+  def map[V2](project: V => V2): EventPropTransformation[Ev, V2] = {
+    copy(newProcessor = ev => processor(ev).map(project))
   }
 
   /** Note: similar to XStream, `value` is passed as call-by-value, not call-by-name,
@@ -75,24 +75,24 @@ class EventPropTransformation[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Ele
     *
     * TODO[API]: this is consistent with XStream, but do other Scala libs behave the same?
     */
-  def mapTo[V2](value: V2): EventPropTransformation[Ev, V2, El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).map(_ => value))
+  def mapTo[V2](value: V2): EventPropTransformation[Ev, V2] = {
+    copy(newProcessor = ev => processor(ev).map(_ => value))
   }
 
-  def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2, El] = {
-    copy(newProcessor = (ev, thisNode) => processor(ev, thisNode).collect(pf))
+  def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2] = {
+    copy(newProcessor = ev => processor(ev).collect(pf))
   }
 
   // Don't need the extra codegen overhead of a case class
-  private def copy[V2, El2 <: El](newProcessor: (Ev, El2) => Option[V2]): EventPropTransformation[Ev, V2, El2] = {
-    new EventPropTransformation[Ev, V2, El2](eventProp, useCapture, newProcessor)
+  private def copy[V2](newProcessor: Ev => Option[V2]): EventPropTransformation[Ev, V2] = {
+    new EventPropTransformation[Ev, V2](eventProp, useCapture, newProcessor)
   }
 
-  @inline def -->[El2 <: El](observer: Observer[V]): EventPropEmitter[Ev, V, El2] = {
+  @inline def -->[El <: ReactiveElement[dom.Element]](observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
     new EventPropEmitter(observer, eventProp, useCapture, processor)
   }
 
-  @inline def -->[BusEv >: V, El2 <: El](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El2] = {
+  @inline def -->[BusEv >: V, El <: ReactiveElement[dom.Element]](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
     -->(eventBus.writer)
   }
 }
