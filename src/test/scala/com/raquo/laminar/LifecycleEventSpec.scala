@@ -127,27 +127,27 @@ class LifecycleEventSpec extends UnitSpec {
       )
     )
 
-    child.subscribe(_.$parentChange, (ev: ParentChangeEvent) => {
+    child.subscribe(_.parentChangeEvents, (ev: ParentChangeEvent) => {
       parentEvents = parentEvents :+ ev
     })
 
-    child.subscribe(_.$mountEvent, (ev: MountEvent) => {
+    child.subscribe(_.mountEvents, (ev: MountEvent) => {
       mountEvents = mountEvents :+ ev
     })
 
-    child.subscribe(_.$ancestorMountEvent, (ev: MountEvent) => {
+    child.subscribe(_.ancestorMountEvents, (ev: MountEvent) => {
       ancestorMountEvents = ancestorMountEvents :+ ev
     })
 
-    grandChild.subscribe(_.$parentChange, (_ : ParentChangeEvent)=> {
+    grandChild.subscribe(_.parentChangeEvents, (_ : ParentChangeEvent)=> {
       fail("grandChild received a ParentChangeEvent. This is not supposed to happen, as such events should not be inherited by child nodes.")
     })
 
-    grandChild.subscribe(_.$mountEvent, (ev: MountEvent) => {
+    grandChild.subscribe(_.mountEvents, (ev: MountEvent) => {
       grandChildMountEvents = grandChildMountEvents :+ ev
     })
 
-    grandChild.subscribe(_.$ancestorMountEvent, (ev: MountEvent) => {
+    grandChild.subscribe(_.ancestorMountEvents, (ev: MountEvent) => {
       grandChildAncestorMountEvents = grandChildAncestorMountEvents :+ ev
     })
 
@@ -187,12 +187,12 @@ class LifecycleEventSpec extends UnitSpec {
     child.maybeParentChangeBus.isDefined shouldBe false
     child.maybeThisNodeMountEventBus.isDefined shouldBe false
 
-    child.$parentChange // Touching this should be enough to initialize `maybeParentChangeBus`
+    child.parentChangeEvents // Touching this should be enough to initialize `maybeParentChangeBus`
 
     child.maybeParentChangeBus.isDefined shouldBe true
     child.maybeThisNodeMountEventBus.isDefined shouldBe false
 
-    child.$thisNodeMountEvent // Touching this should be enough to initialize `maybeThisNodeMountEventBus`
+    child.thisNodeMountEvents // Touching this should be enough to initialize `maybeThisNodeMountEventBus`
 
     child.maybeParentChangeBus.isDefined shouldBe true
     child.maybeThisNodeMountEventBus.isDefined shouldBe true
@@ -228,17 +228,17 @@ class LifecycleEventSpec extends UnitSpec {
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
       if (testAncestorMountEvents) {
-        node.subscribe(_.$ancestorMountEvent, (ev: MountEvent) => {
+        node.subscribe(_.ancestorMountEvents, (ev: MountEvent) => {
           ancestorMountEvents = ancestorMountEvents :+ (node, ev)
         })
       }
       if (testThisNodeMountEvents) {
-        node.subscribe(_.$thisNodeMountEvent, (ev: MountEvent) => {
+        node.subscribe(_.thisNodeMountEvents, (ev: MountEvent) => {
           thisNodeMountEvents = thisNodeMountEvents :+ (node, ev)
         })
       }
       if (testMountEvents) {
-        node.subscribe(_.$mountEvent, (ev: MountEvent) => {
+        node.subscribe(_.mountEvents, (ev: MountEvent) => {
           mountEvents = mountEvents :+ (node, ev)
         })
       }

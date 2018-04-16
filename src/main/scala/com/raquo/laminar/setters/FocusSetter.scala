@@ -5,7 +5,7 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom
 
-class FocusSetter($isFocused: Observable[Boolean])
+class FocusSetter(isFocusedObservable: Observable[Boolean])
   extends Modifier[ReactiveHtmlElement[dom.html.Element]] {
 
   // @TODO[Convenience] This could use some isMounted lifecycle hook or something so that we can have focused-on-creation elements
@@ -13,7 +13,7 @@ class FocusSetter($isFocused: Observable[Boolean])
 
   override def apply(element: ReactiveHtmlElement[dom.html.Element]): Unit = {
 
-    element.subscribe($isFocused, onNext(_))
+    element.subscribe(isFocusedObservable, onNext(_))
 
     def onNext(isFocused: Boolean): Unit = {
       if (isFocused) {

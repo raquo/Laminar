@@ -12,7 +12,7 @@ import com.raquo.laminar.setters.ChildrenSetter.Children
 import org.scalajs.dom
 
 class ChildrenSetter(
-  $children: Observable[Children]
+  childrenObservable: Observable[Children]
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
   import ChildrenSetter.{emptyChildren, updateChildren}
@@ -23,7 +23,7 @@ class ChildrenSetter(
     val sentinelNode = new ReactiveComment("")
     parentNode.appendChild(sentinelNode)(DomApi.treeApi)
 
-    val childrenSignal = $children match {
+    val childrenSignal = childrenObservable match {
       case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
       case state: State[Children @unchecked] => state.toSignal
       case signal: Signal[Children @unchecked] => signal

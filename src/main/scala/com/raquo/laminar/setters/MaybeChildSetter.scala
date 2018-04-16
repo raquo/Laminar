@@ -7,7 +7,7 @@ import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElem
 import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
 import org.scalajs.dom
 
-class MaybeChildSetter($maybeNode: Observable[MaybeChildNode])
+class MaybeChildSetter(maybeNodeObservable: Observable[MaybeChildNode])
   extends Modifier[ReactiveElement[dom.Element]] {
 
   // @TODO[Elegance] Unify this logic with ChildSetter? Or not... Almost the same thing.
@@ -18,7 +18,7 @@ class MaybeChildSetter($maybeNode: Observable[MaybeChildNode])
 
     // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
-    parentNode.subscribe($maybeNode, onNext(_))
+    parentNode.subscribe(maybeNodeObservable, onNext(_))
 
     @inline def onNext(maybeNewChildNode: MaybeChildNode): Unit = {
       val newChildNode = maybeNewChildNode.getOrElse(sentinelNode)

@@ -11,7 +11,7 @@ import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.emitter.EventPropEmitter
 import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWasDiscarded, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ReactiveChildNode.isParentMounted
-import com.raquo.laminar.nodes.ReactiveElement.$noMountEvents
+import com.raquo.laminar.nodes.ReactiveElement.noMountEvents
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
 import org.scalajs.dom
 
@@ -24,54 +24,54 @@ trait ReactiveElement[+Ref <: dom.Element]
   with Owner {
 
   /** Event bus that emits parent change events.
-    * For efficiency, it is only populated when someone accesses [[$parentChange]]
+    * For efficiency, it is only populated when someone accesses [[parentChangeEvents]]
     */
   private[laminar] var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
 
   /** Event bus that emits this node's mount events.
-    * For efficiency, it is only populated when someone accesses [[$thisNodeMountEvent]]
+    * For efficiency, it is only populated when someone accesses [[thisNodeMountEvents]]
     */
   private[laminar] var maybeThisNodeMountEventBus: Option[EventBus[MountEvent]] = None
 
   /** Stream of parent change events for this node.
     * For efficiency, it is lazy loaded, only being initialized when accessed,
-    * either directly or (more commonly) as a dependency of [[$mountEvent]]
+    * either directly or (more commonly) as a dependency of [[mountEvents]]
     */
-  lazy val $parentChange: EventStream[ParentChangeEvent] = {
+  lazy val parentChangeEvents: EventStream[ParentChangeEvent] = {
     val parentChangeBus = new EventBus[ParentChangeEvent]
     maybeParentChangeBus = Some(parentChangeBus)
     parentChangeBus.events
   }
 
-  lazy val $maybeParent: Signal[Option[BaseParentNode]] = $parentChange
+  lazy val maybeParentSignal: Signal[Option[BaseParentNode]] = parentChangeEvents
     .filter(_.alreadyChanged) // @TODO[Integrity] is this important?
     .map(_.maybeNextParent)
     .toSignal(maybeParent)
 
   /** Emits mount events from all ancestors of this node, making sure to account for all hierarchy changes. */
-  lazy val $ancestorMountEvent: EventStream[MountEvent] = {
-    $maybeParent.map {
+  lazy val ancestorMountEvents: EventStream[MountEvent] = {
+    maybeParentSignal.map {
       case Some(nextParent: ReactiveElement[_]) =>
-        nextParent.$mountEvent
+        nextParent.mountEvents
       case _ =>
-        $noMountEvents
+        noMountEvents
     }.flatten
   }
 
   /** Emits mount events caused by this node changing its parent */
-  lazy val $thisNodeMountEvent: EventStream[MountEvent] = {
+  lazy val thisNodeMountEvents: EventStream[MountEvent] = {
     val thisNodeMountEventBus = new EventBus[MountEvent]
     maybeThisNodeMountEventBus = Some(thisNodeMountEventBus)
     thisNodeMountEventBus.events
   }
 
   /** Emits mount events for this node, including mount events fired by all of its ancestors */
-  lazy val $mountEvent: EventStream[MountEvent] = {
-    EventStream.merge($ancestorMountEvent, $thisNodeMountEvent)
+  lazy val mountEvents: EventStream[MountEvent] = {
+    EventStream.merge(ancestorMountEvents, thisNodeMountEvents)
   }
 
   /** Create and get a stream of events on this node */
-  def $event[Ev <: dom.Event](
+  def events[Ev <: dom.Event](
     eventProp: EventProp[Ev],
     useCapture: Boolean = false,
     stopPropagation: Boolean = false, // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
@@ -140,7 +140,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   /** Check whether the node is currently mounted.
     *
     * You can use this method to simplify your code and possibly improve performance
-    * where you'd otherwise need to subscribe to and transform [[$mountEvent]]
+    * where you'd otherwise need to subscribe to and transform [[mountEvents]]
     */
   def isMounted: Boolean = {
     isParentMounted(maybeParent)
@@ -200,7 +200,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       // Note: Once this subscription is created, it will persist until this element is discarded.
       //       This might be suboptimal in a narrow range of conditions, I don't think anyone will run into those.
       // @TODO[Performance] ^^^^ The above can be addressed by e.g. overriding onKilledExternally (but permissions)
-      $mountEvent.filter(_ == NodeWasDiscarded).foreach(_ => killPossessions() )(owner = this)
+      mountEvents.filter(_ == NodeWasDiscarded).foreach(_ => killPossessions() )(owner = this)
     }
   }
 
@@ -208,5 +208,5 @@ trait ReactiveElement[+Ref <: dom.Element]
 
 object ReactiveElement {
 
-  private val $noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil)
+  private val noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil)
 }
