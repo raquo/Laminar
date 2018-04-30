@@ -11,7 +11,7 @@ import org.scalajs.dom
 import scala.scalajs.js
 
 class ChildrenCommandSetter(
-  $diff: EventStream[ChildrenCommandSetter.ChildrenCommand]
+  commandStream: EventStream[ChildrenCommandSetter.ChildrenCommand]
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
   import ChildrenCommandSetter.updateList
@@ -23,10 +23,10 @@ class ChildrenCommandSetter(
     parentNode.appendChild(sentinelNode)(DomApi.treeApi)
 
     parentNode.subscribe(
-      $diff,
-      (diff: ChildrenCommandSetter.ChildrenCommand) => {
+      commandStream,
+      (command: ChildrenCommandSetter.ChildrenCommand) => {
         val nodeCountDiff = updateList(
-          diff,
+          command,
           parentNode = parentNode,
           sentinelNode = sentinelNode,
           nodeCount

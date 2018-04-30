@@ -8,14 +8,14 @@ import org.scalajs.dom
 
 class ChildrenCommandReceiver(val element: ReactiveElement[dom.Element]) extends AnyVal {
 
-  @inline def <--($command: EventStream[ChildrenCommand]): Unit = {
-    (ChildrenCommandReceiver <-- $command)(element)
+  @inline def <--(commandStream: EventStream[ChildrenCommand]): Unit = {
+    (ChildrenCommandReceiver <-- commandStream)(element)
   }
 }
 
 object ChildrenCommandReceiver {
 
-  def <--($command: EventStream[ChildrenCommand]): ChildrenCommandSetter = {
-    new ChildrenCommandSetter($command)
+  def <--(commandStream: EventStream[ChildrenCommand]): ChildrenCommandSetter = {
+    new ChildrenCommandSetter(commandStream)
   }
 }

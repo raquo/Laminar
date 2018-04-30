@@ -25,11 +25,11 @@ object NodeDidMount extends MountEvent
   * Note: when the even fires the node is still mounted.
   *
   * Internally, Laminar will deactivate the node's subscriptions when it's unmounted,
-  * except for the internal subscription that listens to $mountEvent (so that we can
+  * except for the internal subscription that listens to mountEvents (so that we can
   * re-activate the other subscriptions when the node gets mounted again).
   *
   * Note: currently, every `NodeWillUnmount` event is followed by a `NodeWillBeDiscarded`
-  * event which deactivates the subscription that listens to $mountEvent
+  * event which deactivates the subscription that listens to mountEvents
   */
 object NodeWillUnmount extends MountEvent
 

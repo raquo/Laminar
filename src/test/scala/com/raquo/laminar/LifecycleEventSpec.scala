@@ -167,7 +167,7 @@ class LifecycleEventSpec extends UnitSpec {
     }
   }
 
-  it("$parentChange lazy val is not initialized if nothing asks for it even if the node has children") {
+  it("parentChangeEvents lazy val is not initialized if nothing asks for it even if the node has children") {
 
     val parent1 = div()
     val parent2 = p("Yolo")
@@ -301,7 +301,7 @@ class LifecycleEventSpec extends UnitSpec {
     subscribeToEvents(grandChild3)
     expectNewEvents(
       "child3 and grandChild3 streams were initialized and subscribed to",
-      expectedAncestorMountEvents = Nil, // MemoryStream inside `$ancestorMountEvent` should not trigger any events here
+      expectedAncestorMountEvents = Nil, // MemoryStream inside `ancestorMountEvents` should not trigger any events here
       expectedThisNodeMountEvents = Nil,
       expectedMountEvents = Nil
     )
