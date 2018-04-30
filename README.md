@@ -58,7 +58,7 @@ I understand that the importance of some of these points might not be immediatel
   * [Tags & Elements](#tags--elements)
   * [Modifiers](#modifiers)
     * [Nesting and Children](#nesting-and-children)
-    * [Manual Application](#manual-pplication)
+    * [Manual Application](#manual-application)
     * [inContext](#incontext)
     * [Reusing Elements](#reusing-elements)
     * [Modifiers FAQ](#modifiers-faq)
