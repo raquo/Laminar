@@ -6,10 +6,11 @@ import com.raquo.airstream.signal.Signal
 import com.raquo.airstream.state.State
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api._
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
 import org.scalajs.dom
+
+import scala.collection.immutable
 
 class ChildrenSetter(
   childrenObservable: Observable[Children]
@@ -52,7 +53,7 @@ object ChildrenSetter {
   private val emptyChildren = Vector()
 
   type Child = ReactiveChildNode[dom.Node]
-  type Children = Seq[Child]
+  type Children = immutable.Seq[Child]
 
   /** @return New child node count */
   protected def updateChildren(
