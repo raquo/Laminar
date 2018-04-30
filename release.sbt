@@ -4,9 +4,9 @@ normalizedName := "laminar"
 
 organization := "com.raquo"
 
-scalaVersion := "2.12.5"
+scalaVersion := "2.12.6"
 
-crossScalaVersions := Seq("2.11.12", "2.12.5")
+crossScalaVersions := Seq("2.11.12", "2.12.6")
 
 homepage := Some(url("https://github.com/raquo/Laminar"))
 
@@ -39,7 +39,5 @@ publishTo := sonatypePublishTo.value
 releaseCrossBuild := true
 
 pomIncludeRepository := { _ => false }
-
-useGpg := true
 
 releasePublishArtifactsAction := PgpKeys.publishSigned.value
