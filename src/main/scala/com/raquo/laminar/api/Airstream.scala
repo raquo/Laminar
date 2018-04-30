@@ -18,6 +18,10 @@ trait Airstream {
 
   type Observer[-A] = airstream.core.Observer[A]
 
+  type Owned = airstream.ownership.Owned
+
+  type Owner = airstream.ownership.Owner
+
   type Signal[+A] = airstream.signal.Signal[A]
 
   type State[+A] = airstream.state.State[A]
