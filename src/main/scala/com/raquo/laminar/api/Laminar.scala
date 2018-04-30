@@ -9,7 +9,7 @@ import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEvent
 import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, SvgTags, TableTags, TextTags}
 import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders.{ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
-import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedAttr, ReactiveSvgAttr}
+import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedAttr, ReactiveStyle, ReactiveSvgAttr}
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement, ReactiveText}
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver}
 import org.scalajs.dom
@@ -77,6 +77,19 @@ private[laminar] object Laminar
   type Mod[El] = domtypes.generic.Modifier[El]
 
   type Modifier[-El] = domtypes.generic.Modifier[El]
+
+
+  // Keys
+
+  type EventProp[Ev <: dom.Event] = ReactiveEventProp[Ev]
+
+  type HtmlAttr[V] = ReactiveHtmlAttr[V]
+
+  type Prop[V, DomV] = ReactiveProp[V, DomV]
+
+  type Style[V] = ReactiveStyle[V]
+
+  type SvgAttr[V] = ReactiveSvgAttr[V]
 
 
   // Specific HTML elements
