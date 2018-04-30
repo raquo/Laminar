@@ -3,7 +3,7 @@ enablePlugins(ScalaJSPlugin)
 enablePlugins(ScalaJSBundlerPlugin)
 
 libraryDependencies ++= Seq(
-  "com.raquo" %%% "airstream" % "0.1.1-SNAPSHOT",
+  "com.raquo" %%% "airstream" % "0.2",
   "com.raquo" %%% "dombuilder" % "0.7",
   "org.scala-js" %%% "scalajs-dom" % "0.9.5",
   "com.raquo" %%% "domtestutils" % "0.7" % Test,
