@@ -1,8 +1,5 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.Observable
-import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.eventstream.EventStream
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveChildNode

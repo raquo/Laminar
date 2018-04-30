@@ -22,7 +22,7 @@ class ReactiveEventProp[Ev <: dom.Event](override val name: String) extends Even
     processor = Some(_)
   )
 
-  // @TODO[API] Ev2 type param requires users to specify El type param in the --> method above when passing e.g. Observer(_ => ...), that's inconvenient
+  // @TODO[API] BusEv type param requires users to specify El type param in the --> method above when passing e.g. Observer(_ => ...), that's inconvenient
   /** Note: Without Ev2 this method would not work for TypedTargetMouseEvent events going into MouseEvent bus.
     *       Instead, EventPropTransformation.--> would apply instead, which is less efficient.
     */

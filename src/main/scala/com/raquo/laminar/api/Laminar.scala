@@ -1,6 +1,6 @@
 package com.raquo.laminar.api
 
-import com.raquo.domtypes.generic.Modifier
+import com.raquo.domtypes
 import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, Attrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedAttrs
@@ -16,8 +16,9 @@ import org.scalajs.dom
 
 
 private[laminar] object Laminar
+  extends Airstream
   // Attrs
-  extends Attrs[ReactiveHtmlAttr]
+  with Attrs[ReactiveHtmlAttr]
   with AriaAttrs[ReactiveHtmlAttr]
   // Event Props
   with ClipboardEventProps[ReactiveEventProp]
@@ -53,6 +54,9 @@ private[laminar] object Laminar
     with SvgAttrs[ReactiveSvgAttr]
     with ReactiveSvgBuilders
 
+
+  // Base elements and nodes
+
   type HtmlElement = ReactiveHtmlElement[dom.html.Element]
 
   type SvgElement = ReactiveSvgElement[dom.svg.Element]
@@ -65,9 +69,17 @@ private[laminar] object Laminar
 
   type Comment = ReactiveComment
 
+  type Root = ReactiveRoot
 
-  type Mod[El] = Modifier[El]
 
+  // Modifiers
+
+  type Mod[El] = domtypes.generic.Modifier[El]
+
+  type Modifier[-El] = domtypes.generic.Modifier[El]
+
+
+  // Specific HTML elements
 
   type Anchor = ReactiveHtmlElement[dom.html.Anchor]
 

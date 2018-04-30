@@ -8,5 +8,7 @@ package object api extends Implicits {
 
   private[laminar] type StyleSetter = Modifier[ReactiveHtmlElement[dom.html.Element]]
 
+  val A: Airstream = new Airstream {}
+
   val L: Laminar.type = Laminar
 }

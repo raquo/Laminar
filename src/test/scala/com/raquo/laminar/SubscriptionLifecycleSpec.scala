@@ -1,7 +1,5 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.eventstream.EventStream
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._

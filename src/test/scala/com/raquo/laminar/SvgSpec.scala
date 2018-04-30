@@ -1,7 +1,6 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.Observer
-import com.raquo.airstream.state.Var
+import com.raquo.laminar.api.A._
 import com.raquo.laminar.api.L.svg._
 import com.raquo.laminar.api._
 import com.raquo.laminar.fixtures.TestableOwner
@@ -13,7 +12,7 @@ class SvgSpec extends UnitSpec {
 
     implicit val testOwner = new TestableOwner
 
-    val $strokeWidth = Var("3")
+    val strokeWidthVar = StateVar("3")
 
     var clickCount = 0
 
@@ -21,8 +20,8 @@ class SvgSpec extends UnitSpec {
       points := "20,20 40,25 60,40 80,120 120,140 200,180",
       fill := "none",
       stroke := "black",
-      strokeWidth <-- $strokeWidth,
-      L.onClick --> Observer((_: Any) => clickCount += 1)
+      strokeWidth <-- strokeWidthVar.state,
+      L.onClick --> Observer[Any](_ => clickCount += 1)
     )
 
     val el = svg(
@@ -61,7 +60,7 @@ class SvgSpec extends UnitSpec {
 
     // --
 
-    $strokeWidth.writer.onNext("4")
+    strokeWidthVar.writer.onNext("4")
 
     expectNode(L.div like (svg like(
       height is "800",
