@@ -1,5 +1,6 @@
 # Laminar
 
+[![Build Status](https://travis-ci.org/raquo/Laminar.svg?branch=master)](https://travis-ci.org/raquo/Laminar)
 [![Join the chat at https://gitter.im/Laminar_/Lobby](https://badges.gitter.im/Laminar_/Lobby.svg)](https://gitter.im/Laminar_/Lobby)
 ![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs0.6_2.12.svg)
 
@@ -42,10 +43,11 @@ I understand that the importance of some of these points might not be immediatel
 
 
 
-## Community
+## Community & Support
 
 * [Gitter](https://gitter.im/Laminar_/Lobby) for chat and random questions
 * [Github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, and more in-depth discussions
+* I also offer commercial support and consulting services for Laminar and Airstream. Ping me at [nikita@raquo.com](nikita@raquo.com).
 
 
 
@@ -405,7 +407,7 @@ Also, currently, even if a Laminar element was properly removed from the DOM, it
 
 ### Rendering
 
-When you create a element Laminar, the underlying real JS DOM element (`.ref`) is created at the same time. However, it is initially detached from the DOM. That is, it does not appear in the document that the user sees. Such an element is _unmounted_.
+When you create a Laminar element, the underlying real JS DOM element (`.ref`) is created at the same time. However, it is initially detached from the DOM. That is, it does not appear in the document that the user sees. Such an element is _unmounted_.
 
 For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by Laminar. 
 
@@ -435,12 +437,12 @@ Laminar does not work like that. We use reactive streams to represent things cha
 
 Laminar uses [Airstream](https://github.com/raquo/Airstream) observables (event streams, signals, state). Airstream is an integral part of Laminar, and a huge part of what makes it unique.
 
-**To use Laminar effectively, you need to understand the principles of conventional lazy streams, and basic knowledge of Airstream. Please do read Airstream documentation, it's not scary.**
+**To use Laminar effectively, you need to understand the principles of conventional lazy streams, and have basic knowledge of Airstream. Please do read [Airstream documentation](https://github.com/raquo/Airstream), it's not scary.**
 
 
 #### Attributes and Properties
 
-Dynamic attributes / properties / css properties are the simplest use case for laminar's reactive layer:
+Dynamic attributes / properties / css properties are the simplest use case for Laminar's reactive layer:
 
 ```scala
 val prettyColorStream: EventStream[String] = ???
