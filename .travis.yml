@@ -1,0 +1,20 @@
+language: scala
+jdk:
+  - oraclejdk8
+scala:
+  - 2.11.12
+  - 2.12.6
+
+cache:
+  yarn: true
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.ivy2/local
+    - $HOME/.sbt/boot/
+    - $HOME/.sbt/launchers/
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  # http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
