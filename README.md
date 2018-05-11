@@ -287,7 +287,7 @@ Another import you will want in some cases is `import org.scalajs.dom` – whene
 
 ### Tags & Elements
 
-Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listings of typed tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`.
+Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listings of typed HTML & SVG tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`.
 
 `div` is a `ReactiveHtmlTag[dom.html.Div]`. It's a factory of div elements. `ReactiveHtmlTag` extends `Tag` from _Scala DOM Types_ and contains basic information needed to create such an element, such as its tag name ("div"). 
 
