@@ -28,10 +28,9 @@ class ReactiveHtmlAttr[V](
   def <--($value: Observable[V]): Modifier[HtmlElement] = {
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(
-          $value,
-          (value: V) => DomApi.htmlElementApi.setHtmlAttribute(element, self, value)
-        )
+        element.subscribe($value) { value =>
+          DomApi.htmlElementApi.setHtmlAttribute(element, self, value)
+        }
       }
     }
   }

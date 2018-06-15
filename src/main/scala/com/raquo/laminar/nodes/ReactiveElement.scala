@@ -98,36 +98,22 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   final def <--[V](childrenCommandReceiver: ChildrenCommandReceiver.type): ChildrenCommandReceiver = new ChildrenCommandReceiver(this)
 
-  // @TODO vvvv This API gotta change, I think
+  // @TODO[Naming] Not a fan of `subscribeO` name, but it needs to be different from `subscribe` for type inference to work
 
-  // @TODO[API] User needs to provide explicit type params to use the subscribe methods below. How to fix that? 2.12?
-
-  def subscribe[V](
-    getObservable: this.type => Observable[V],
-    observer: Observer[V]
-  ): Subscription = {
-    subscribe(getObservable(this), observer)
-  }
-
-  def subscribe[V](
-    getObservable: this.type => Observable[V],
-    onNext: V => Unit
-  ): Subscription = {
-    subscribe(getObservable(this), Observer(onNext))
-  }
-
-  def subscribe[V](
-    observable: Observable[V],
-    onNext: V => Unit
-  ): Subscription = {
-    subscribe(observable, Observer(onNext))
-  }
-
-  def subscribe[V](
-    observable: Observable[V],
-    observer: Observer[V]
-  ): Subscription = {
+  def subscribeO[V](observable: Observable[V])(observer: Observer[V]): Subscription = {
     observable.addObserver(observer)(owner = this)
+  }
+
+  def subscribeO[V](getObservable: this.type => Observable[V])(observer: Observer[V]): Subscription = {
+    subscribeO(getObservable(this))(observer)
+  }
+
+  def subscribe[V](observable: Observable[V])(onNext: V => Unit): Subscription = {
+    subscribeO(observable)(Observer(onNext))
+  }
+
+  def subscribe[V](getObservable: this.type => Observable[V])(onNext: V => Unit): Subscription = {
+    subscribeO(getObservable(this))(Observer(onNext))
   }
 
   def subscribeBus[V](

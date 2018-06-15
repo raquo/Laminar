@@ -22,18 +22,15 @@ class ChildrenCommandSetter(
     val sentinelNode = new ReactiveComment("")
     parentNode.appendChild(sentinelNode)(DomApi.treeApi)
 
-    parentNode.subscribe(
-      commandStream,
-      (command: ChildrenCommandSetter.ChildrenCommand) => {
-        val nodeCountDiff = updateList(
-          command,
-          parentNode = parentNode,
-          sentinelNode = sentinelNode,
-          nodeCount
-        )
-        nodeCount += nodeCountDiff
-      }
-    )
+    parentNode.subscribe(commandStream) { command =>
+      val nodeCountDiff = updateList(
+        command,
+        parentNode = parentNode,
+        sentinelNode = sentinelNode,
+        nodeCount
+      )
+      nodeCount += nodeCountDiff
+    }
   }
 }
 

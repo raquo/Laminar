@@ -27,10 +27,9 @@ class ReactiveProp[V, DomV](
   def <--($value: Observable[V]): Modifier[HtmlElement] = {
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(
-          $value,
-          (value: V) => DomApi.htmlElementApi.setProperty(element, self, value)
-        )
+        element.subscribe($value) { value =>
+          DomApi.htmlElementApi.setProperty(element, self, value)
+        }
       }
     }
   }

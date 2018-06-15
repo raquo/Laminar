@@ -36,10 +36,9 @@ class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
   def <--($value: Observable[V | String]): Modifier[HtmlElement] = {
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(
-          $value,
-          (value: V | String) => DomApi.htmlElementApi.setAnyStyle(element, style, value)
-        )
+        element.subscribe($value) { value =>
+          DomApi.htmlElementApi.setAnyStyle(element, style, value)
+        }
       }
     }
   }
