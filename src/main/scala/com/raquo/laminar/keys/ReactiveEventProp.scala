@@ -13,21 +13,4 @@ class ReactiveEventProp[Ev <: dom.Event](override val name: String) extends Even
     new EventPropTransformation(this, useCapture, processor = Some(_))
   }
 
-  def -->[El <: ReactiveElement[dom.Element]](
-    observer: Observer[Ev]
-  ): EventPropEmitter[Ev, Ev, El] = new EventPropEmitter[Ev, Ev, El](
-    observer,
-    this,
-    useCapture = false,
-    processor = Some(_)
-  )
-
-  // @TODO[API] BusEv type param requires users to specify El type param in the --> method above when passing e.g. Observer(_ => ...), that's inconvenient
-  /** Note: Without Ev2 this method would not work for TypedTargetMouseEvent events going into MouseEvent bus.
-    *       Instead, EventPropTransformation.--> would apply instead, which is less efficient.
-    */
-  @inline def -->[BusEv >: Ev, El <: ReactiveElement[dom.Element]](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, Ev, El] = {
-    -->(eventBus.writer)
-  }
-
 }

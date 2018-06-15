@@ -21,7 +21,7 @@ class SvgSpec extends UnitSpec {
       fill := "none",
       stroke := "black",
       strokeWidth <-- strokeWidthVar.state,
-      L.onClick --> Observer[Any](_ => clickCount += 1)
+      L.onClick --> (_ => clickCount += 1)
     )
 
     val el = svg(
