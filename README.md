@@ -346,7 +346,9 @@ div(
 
 Well, a tiny bit of magic – strings are not modifiers themselves, but are implicitly converted to `Text` (Laminar text nodes) which _are_ modifiers that append text nodes with a given text to the element in question. They are not implicitly wrapped into `span` elements.
 
-For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq (see `Implicits.seqToModifier`). This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.
+For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq: see `Implicits.seqToModifier`. This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.
+
+`Implicits.optionToModifier` performs a similar conversion for `Option[Modifier[A]]`.  
 
 Modifiers are applied in the order in which they're passed to the element, so what you see in your code is what you get in the resulting DOM.
 
