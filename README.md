@@ -731,7 +731,7 @@ val element: Div = div(onClick --> clickBus.writer, "Click me") // .writer is ac
 val coordinateObserver = Observer[Int](onNext = x => dom.console.log(x))
 val coordinateStream: EventStream[Int] = clickBus.events.map(ev => ev.screenX)
  
-coordinate.addObserver(coordinateObserver)(owner = element)
+coordinateStream.addObserver(coordinateObserver)(owner = element)
 ```
 
 The first two lines work exactly the same as the previous example, except that `clickBus.writer` is now the Observer that we send the events to. For convenience, the `-->` method will also accept the event bus itself: `div(onClick --> clickBus, "Click me")` will have exactly the same effect.
