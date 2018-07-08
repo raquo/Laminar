@@ -534,7 +534,7 @@ def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = 
   val hasUrlSignal: Signal[Boolean] = maybeUrlSignal.map(_.nonEmpty)
   hasUrlSignal.map {
     case true => a(href <-- urlSignal, "a blog")
-    case None => i("no blog")
+    case false => i("no blog")
   }
 }
 ```
@@ -552,7 +552,7 @@ def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = 
   val noLink = i("no blog")
   hasUrlSignal.map {
     case true => link 
-    case None => noLink
+    case false => noLink
   }
 }
 ```
