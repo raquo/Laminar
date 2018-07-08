@@ -460,7 +460,7 @@ The method `<--` comes from `ReactiveStyle` (which is what `color` is). It creat
 
 What happens before `prettyColorStream` emitted its first event? To understand that, we need a primer on Airstream reactive variables:
 
-- **EventStream** is a lazy Observable without current value. It represents events that happen over time. Philosophically, there is no such thing as a "current event" or "initial event", so streams ahve no initial value.
+- **EventStream** is a lazy Observable without current value. It represents events that happen over time. Philosophically, there is no such thing as a "current event" or "initial event", so streams have no initial value.
 
 - **Signal** is like EventStream, but with current value. Signal represents a value over time, it always has a current value, and therefore it must have an initial value.
 
