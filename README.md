@@ -299,7 +299,6 @@ Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listing
 
 Read on for how to use this element we've created.
 
-BTW,`svg()` is also supported!
 
 
 ### Modifiers
