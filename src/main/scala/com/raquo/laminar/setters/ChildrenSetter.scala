@@ -33,18 +33,15 @@ class ChildrenSetter(
     val childrenDiffSignal = childrenSignal
       .fold[(Children, Children)](initial => (emptyChildren, initial))((diff, nextChildren) => (diff._2, nextChildren))
 
-    parentNode.subscribe(
-      childrenDiffSignal,
-      (childrenDiff: (Children, Children)) => {
-        nodeCount = updateChildren(
-          prevChildren = childrenDiff._1,
-          nextChildren = childrenDiff._2,
-          parentNode = parentNode,
-          sentinelNode = sentinelNode,
-          nodeCount
-        )
-      }
-    )
+    parentNode.subscribe(childrenDiffSignal) { childrenDiff =>
+      nodeCount = updateChildren(
+        prevChildren = childrenDiff._1,
+        nextChildren = childrenDiff._2,
+        parentNode = parentNode,
+        sentinelNode = sentinelNode,
+        nodeCount
+      )
+    }
   }
 }
 

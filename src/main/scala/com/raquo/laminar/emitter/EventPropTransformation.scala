@@ -28,6 +28,21 @@ class EventPropTransformation[Ev <: dom.Event, V](
   protected val processor: Ev => Option[V]
 ) {
 
+  // @TODO[Performance,Elegance] Is it possible to move these --> methods to ReactiveEventProp?
+  // We can't have them in both places, because then type inference does not work
+
+  @inline def -->[El <: ReactiveElement[dom.Element]](observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
+    new EventPropEmitter(observer, eventProp, useCapture, processor)
+  }
+
+  @inline def -->[El <: ReactiveElement[dom.Element]](onNext: V => Unit): EventPropEmitter[Ev, V, El] = {
+    -->(Observer(onNext))
+  }
+
+  @inline def -->[BusEv >: V, El <: ReactiveElement[dom.Element]](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
+    -->(eventBus.writer)
+  }
+
   /** Prevent default browser action for the given event (e.g. following the link when it is clicked)
     * https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
     *
@@ -86,13 +101,5 @@ class EventPropTransformation[Ev <: dom.Event, V](
   // Don't need the extra codegen overhead of a case class
   private def copy[V2](newProcessor: Ev => Option[V2]): EventPropTransformation[Ev, V2] = {
     new EventPropTransformation[Ev, V2](eventProp, useCapture, newProcessor)
-  }
-
-  @inline def -->[El <: ReactiveElement[dom.Element]](observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
-    new EventPropEmitter(observer, eventProp, useCapture, processor)
-  }
-
-  @inline def -->[BusEv >: V, El <: ReactiveElement[dom.Element]](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
-    -->(eventBus.writer)
   }
 }

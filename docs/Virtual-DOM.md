@@ -34,10 +34,9 @@ Outwatch and Laminar are actually quite similar cosmetically – their arrows no
   def <--(valueObservable: Observable[V]): Modifier[HtmlElement] = {
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(
-          valueObservable,
-          (value: V) => DomApi.htmlElementApi.setHtmlAttribute(element, self, value)
-        )
+        element.subscribe(valueObservable) { value =>
+          DomApi.htmlElementApi.setHtmlAttribute(element, self, value)
+        }
       }
     }
   }

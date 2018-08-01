@@ -13,7 +13,7 @@ class FocusSetter(isFocusedObservable: Observable[Boolean])
 
   override def apply(element: ReactiveHtmlElement[dom.html.Element]): Unit = {
 
-    element.subscribe(isFocusedObservable, onNext(_))
+    element.subscribe(isFocusedObservable)(onNext)
 
     def onNext(isFocused: Boolean): Unit = {
       if (isFocused) {

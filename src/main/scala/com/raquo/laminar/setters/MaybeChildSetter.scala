@@ -18,7 +18,7 @@ class MaybeChildSetter(maybeNodeObservable: Observable[MaybeChildNode])
 
     // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
-    parentNode.subscribe(maybeNodeObservable, onNext(_))
+    parentNode.subscribe(maybeNodeObservable)(onNext)
 
     @inline def onNext(maybeNewChildNode: MaybeChildNode): Unit = {
       val newChildNode = maybeNewChildNode.getOrElse(sentinelNode)

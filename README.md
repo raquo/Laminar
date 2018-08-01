@@ -287,7 +287,7 @@ Another import you will want in some cases is `import org.scalajs.dom` – whene
 
 ### Tags & Elements
 
-Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listings of typed tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`.
+Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listings of typed HTML & SVG tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`.
 
 `div` is a `ReactiveHtmlTag[dom.html.Div]`. It's a factory of div elements. `ReactiveHtmlTag` extends `Tag` from _Scala DOM Types_ and contains basic information needed to create such an element, such as its tag name ("div"). 
 
@@ -347,7 +347,9 @@ div(
 
 Well, a tiny bit of magic – strings are not modifiers themselves, but are implicitly converted to `Text` (Laminar text nodes) which _are_ modifiers that append text nodes with a given text to the element in question. They are not implicitly wrapped into `span` elements.
 
-For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq (see `Implicits.seqToModifier`). This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.
+For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq: see `Implicits.seqToModifier`. This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.
+
+`Implicits.optionToModifier` performs a similar conversion for `Option[Modifier[A]]`.  
 
 Modifiers are applied in the order in which they're passed to the element, so what you see in your code is what you get in the resulting DOM.
 
@@ -459,7 +461,7 @@ The method `<--` comes from `ReactiveStyle` (which is what `color` is). It creat
 
 What happens before `prettyColorStream` emitted its first event? To understand that, we need a primer on Airstream reactive variables:
 
-- **EventStream** is a lazy Observable without current value. It represents events that happen over time. Philosophically, there is no such thing as a "current event" or "initial event", so streams ahve no initial value.
+- **EventStream** is a lazy Observable without current value. It represents events that happen over time. Philosophically, there is no such thing as a "current event" or "initial event", so streams have no initial value.
 
 - **Signal** is like EventStream, but with current value. Signal represents a value over time, it always has a current value, and therefore it must have an initial value.
 
@@ -533,7 +535,7 @@ def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = 
   val hasUrlSignal: Signal[Boolean] = maybeUrlSignal.map(_.nonEmpty)
   hasUrlSignal.map {
     case true => a(href <-- urlSignal, "a blog")
-    case None => i("no blog")
+    case false => i("no blog")
   }
 }
 ```
@@ -551,7 +553,7 @@ def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = 
   val noLink = i("no blog")
   hasUrlSignal.map {
     case true => link 
-    case None => noLink
+    case false => noLink
   }
 }
 ```
@@ -730,7 +732,7 @@ val element: Div = div(onClick --> clickBus.writer, "Click me") // .writer is ac
 val coordinateObserver = Observer[Int](onNext = x => dom.console.log(x))
 val coordinateStream: EventStream[Int] = clickBus.events.map(ev => ev.screenX)
  
-coordinate.addObserver(coordinateObserver)(owner = element)
+coordinateStream.addObserver(coordinateObserver)(owner = element)
 ```
 
 The first two lines work exactly the same as the previous example, except that `clickBus.writer` is now the Observer that we send the events to. For convenience, the `-->` method will also accept the event bus itself: `div(onClick --> clickBus, "Click me")` will have exactly the same effect.

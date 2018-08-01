@@ -27,10 +27,9 @@ class ReactiveSvgAttr[V](
   def <--($value: Observable[V]): Modifier[SvgElement] = {
     new Modifier[SvgElement] {
       override def apply(element: SvgElement): Unit = {
-        element.subscribe(
-          $value,
-          (value: V) => DomApi.svgElementApi.setSvgAttribute(element, self, value)
-        )
+        element.subscribe($value) { value =>
+          DomApi.svgElementApi.setSvgAttribute(element, self, value)
+        }
       }
     }
   }

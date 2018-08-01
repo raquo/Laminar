@@ -127,29 +127,29 @@ class LifecycleEventSpec extends UnitSpec {
       )
     )
 
-    child.subscribe(_.parentChangeEvents, (ev: ParentChangeEvent) => {
+    child.subscribe(_.parentChangeEvents) { ev =>
       parentEvents = parentEvents :+ ev
-    })
+    }
 
-    child.subscribe(_.mountEvents, (ev: MountEvent) => {
+    child.subscribe(_.mountEvents) { ev =>
       mountEvents = mountEvents :+ ev
-    })
+    }
 
-    child.subscribe(_.ancestorMountEvents, (ev: MountEvent) => {
+    child.subscribe(_.ancestorMountEvents) { ev =>
       ancestorMountEvents = ancestorMountEvents :+ ev
-    })
+    }
 
-    grandChild.subscribe(_.parentChangeEvents, (_ : ParentChangeEvent)=> {
+    grandChild.subscribe(_.parentChangeEvents) { _ =>
       fail("grandChild received a ParentChangeEvent. This is not supposed to happen, as such events should not be inherited by child nodes.")
-    })
+    }
 
-    grandChild.subscribe(_.mountEvents, (ev: MountEvent) => {
+    grandChild.subscribe(_.mountEvents) { ev =>
       grandChildMountEvents = grandChildMountEvents :+ ev
-    })
+    }
 
-    grandChild.subscribe(_.ancestorMountEvents, (ev: MountEvent) => {
+    grandChild.subscribe(_.ancestorMountEvents) { ev =>
       grandChildAncestorMountEvents = grandChildAncestorMountEvents :+ ev
-    })
+    }
 
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
@@ -228,19 +228,19 @@ class LifecycleEventSpec extends UnitSpec {
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
       if (testAncestorMountEvents) {
-        node.subscribe(_.ancestorMountEvents, (ev: MountEvent) => {
+        node.subscribe(_.ancestorMountEvents) { ev =>
           ancestorMountEvents = ancestorMountEvents :+ (node, ev)
-        })
+        }
       }
       if (testThisNodeMountEvents) {
-        node.subscribe(_.thisNodeMountEvents, (ev: MountEvent) => {
+        node.subscribe(_.thisNodeMountEvents) { ev =>
           thisNodeMountEvents = thisNodeMountEvents :+ (node, ev)
-        })
+        }
       }
       if (testMountEvents) {
-        node.subscribe(_.mountEvents, (ev: MountEvent) => {
+        node.subscribe(_.mountEvents) { ev =>
           mountEvents = mountEvents :+ (node, ev)
-        })
+        }
       }
     }
 

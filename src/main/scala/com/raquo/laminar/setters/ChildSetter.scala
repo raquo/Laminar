@@ -14,7 +14,7 @@ class ChildSetter(nodeObservable: Observable[ReactiveChildNode[dom.Node]])
 
     // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
-    parentNode.subscribe(nodeObservable, onNext(_))
+    parentNode.subscribe(nodeObservable)(onNext)
 
     @inline def onNext(newChildNode: ReactiveChildNode[dom.Node]): Unit = {
       parentNode.replaceChild(childNode, newChildNode)(DomApi.treeApi)
