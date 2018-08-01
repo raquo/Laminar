@@ -53,7 +53,7 @@ private[laminar] object Laminar
     extends SvgTags[ReactiveSvgTag]
     with SvgAttrs[ReactiveSvgAttr]
     with ReactiveSvgBuilders
-
+    with Implicits
 
   // Base elements and nodes
 
