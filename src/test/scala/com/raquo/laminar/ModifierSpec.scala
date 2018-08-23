@@ -38,7 +38,7 @@ class ModifierSpec extends UnitSpec {
     val checkbox = input(
       typ := "checkbox",
       checked := true,
-      inContext(thisNode => onClick.map(_ => thisNode.ref.checked) --> checkedBus)
+      inContext(thisNode => onClick.mapTo(thisNode.ref.checked) --> checkedBus)
     )
 
     mount(checkbox)

@@ -172,7 +172,7 @@ val appDiv: Div = div(
     "Please enter your name:",
     input(
       typ := "text",
-      inContext(thisNode => onInput.map(_ => thisNode.ref.value) --> nameBus) // extract text entered into this input node whenever the user types in it
+      inContext(thisNode => onInput.mapTo(thisNode.ref.value) --> nameBus) // extract text entered into this input node whenever the user types in it
     )
   ),
   div(
@@ -192,6 +192,8 @@ Inside the `input` node we're registering an event listener for the `onInput` ev
  
 For extra clarity: `nameBus.events` is a stream of all values passed to `nameBus`. In this case we wired it to contain a stream of values from the input text box. Whenever the user types into the text box, this stream emits an updated name.
 
+`mapTo` here might seem like magic, but all it does is grab the current value of a mutable DOM reference using a [by-name parameter](https://docs.scala-lang.org/tour/by-name-parameters.html).
+
 We could abstract away the input box to simplify our `appDiv` code. Here's one way to do it:
 
 ```scala
@@ -200,7 +202,7 @@ def InputBox(caption: String, textBus: WriteBus[String]): Div = {
     caption,
     input(
       typ := "text",
-      inContext(thisNode => onInput.map(_ => thisNode.ref.value) --> textBus)
+      inContext(thisNode => onInput.mapTo(thisNode.ref.value) --> textBus)
     )
   )
 }
@@ -235,7 +237,7 @@ val inputBox = InputBox("Please enter your name:")
 
 val nameStream = inputBox.inputNode
   .events(onInput) // .events(eventProp) gets a stream of <eventProp> events (works on any Laminar element)
-  .map(_ => inputBox.inputNode.ref.value) // gets the current value from the input text box
+  .mapTo(inputBox.inputNode.ref.value) // gets the current value from the input text box
  
 val colorStream = nameStream.map { name =>
   if (name == "Sébastien") "red" else "auto" // make Sébastien feel special
@@ -365,22 +367,22 @@ Modifiers have a public `apply(element: El)` method that you can use to manually
 Sometimes you may need to have a reference to the element to which you want to apply a modifier in order to decide which modifier to apply. For example, a common use case is needing to get the input element's `value` property in order to build a modifier that will send that property to an event bus.
 
 ```scala
-input(inContext(thisNode => onChange.map(_ => thisNode.ref.value) --> inputStringBus))
+input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBus))
 ```
 
 The general syntax of this feature is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. Its type is properly inferred to be `Input`.
 
-Without getting ahead of ourselves too much, `onChange.map(_ => thisNode.ref.value) --> inputStringBus)` is a Modifier that handles `onChange` events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple different ways, for example:
+Without getting ahead of ourselves too much, `onChange.mapTo(thisNode.ref.value) --> inputStringBus)` is a Modifier that handles `onChange` events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple different ways, for example:
 
 ```scala
-val myInput: Input = input(onChange.map(_ => myInput.ref.value) --> inputStringBus)
+val myInput: Input = input(onChange.mapTo(myInput.ref.value) --> inputStringBus)
 ```
 
 Or
 
 ```scala
 val myInput = input()
-myInput.events(onChange).map(_ => myInput.ref.value).addObserver(inputStringBus)(owner = myInput)
+myInput.events(onChange).mapTo(myInput.ref.value).addObserver(inputStringBus)(owner = myInput)
 ```
 
 But these can be very cumbersome in a real world application. `inContext` provides an easy, inline solution.
@@ -745,11 +747,11 @@ You might have noticed that to add an Observer to a stream, we need to specify a
 
 ##### Transforming Observers
 
-You can `map` and `filter` Observers similar to Observables, but... the other way. For example:
+You can `contramap` and `filter` Observers, for example:
 
 ```scala
 val pieObserver: Observer[Pie] = Observer(onNext = bakePie)
-val appleObserver: Observer[Apple] = pieObserver.map(apple => makeApplePie(apple))
+val appleObserver: Observer[Apple] = pieObserver.contramap(apple => makeApplePie(apple))
  
 def AppleComponent(observer: Observer[Apple]): Div = {
   val appleStream: EventStream[Apple] = ???
@@ -842,7 +844,7 @@ val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
 val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
+This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToValue`, `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
 
 More examples:
 
@@ -907,13 +909,13 @@ You could use our Alternative Syntax for registering events (see section above) 
 
 ```scala
 val inputNode = input(typ := "text")
-val inputStringStream = inputNode.events(onChange).map(_ => inputNode.ref.value)
+val inputStringStream = inputNode.events(onChange).mapTo(inputNode.ref.value)
 ```
 
 However, this is often cumbersome, and introduces the risk of referencing the wrong input node of the same type. We have a better way to get a properly typed target node:
 
 ```scala
-input(inContext(thisNode => onChange.map(_ => thisNode.ref.value) --> inputStringBus))
+input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBus))
 ```
 
 This feature is not specific to events at all. The general syntax is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. Its type is properly inferred to be `Input`, which is an alias for `ReactiveHtmlElement[dom.html.Input]`, thus its `.ref` property is precisely typed as `dom.html.Input`, which is a native JS type that has a `.value` property that holds the current text in the input.

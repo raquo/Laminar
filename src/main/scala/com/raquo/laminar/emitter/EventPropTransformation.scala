@@ -84,13 +84,11 @@ class EventPropTransformation[Ev <: dom.Event, V](
     copy(newProcessor = ev => processor(ev).map(project))
   }
 
-  /** Note: similar to XStream, `value` is passed as call-by-value, not call-by-name,
-    * i.e. it's evaluated only once before being passed to this method, it is not
-    * re-evaluated on every event.
-    *
-    * TODO[API]: this is consistent with XStream, but do other Scala libs behave the same?
-    */
-  def mapTo[V2](value: V2): EventPropTransformation[Ev, V2] = {
+  def mapTo[V2](value: => V2): EventPropTransformation[Ev, V2] = {
+    copy(newProcessor = ev => processor(ev).map(_ => value))
+  }
+
+  def mapToValue[V2](value: V2): EventPropTransformation[Ev, V2] = {
     copy(newProcessor = ev => processor(ev).map(_ => value))
   }
 

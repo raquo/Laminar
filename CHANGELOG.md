@@ -2,8 +2,10 @@
 
 Breaking changes in **bold**.
 
-#### TO BE RELEASED – v0.4 – ETA Jun 2018
+#### TO BE RELEASED – v0.4 – ETA Sep 2018
 
+* **New: Airstream v0.3 – integration with Futures and other improvements (see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md))**
+* **Naming: Match naming changes in Airstream v0.3 (`mapTo` -> `mapToValue`, new `mapTo` method)**
 * **API: Add currying to `subscribe*` methods on `ReactiveElement`, rename some of those to `subscribeO`**
 * New: Subscribe and --> methods can now accept an onNext function in addition to Observer
 * New: Better type inference for arguments of `-->` and `subscribe*` methods
