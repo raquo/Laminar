@@ -1,16 +1,16 @@
 package com.raquo.laminar.builders
 
-import com.raquo.domtypes.generic.builders.{EventPropBuilder, HtmlAttrBuilder, HtmlTagBuilder, PropBuilder, ReflectedAttrBuilder, StyleBuilders}
+import com.raquo.domtypes.generic.builders.{EventPropBuilder, HtmlAttrBuilder, HtmlTagBuilder, PropBuilder, ReflectedHtmlAttrBuilder, StyleBuilders}
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.api.StyleSetter
-import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedAttr, ReactiveStyle}
+import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedHtmlAttr, ReactiveStyle}
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
 trait ReactiveHtmlBuilders
   extends HtmlAttrBuilder[ReactiveHtmlAttr]
-  with ReflectedAttrBuilder[ReactiveReflectedAttr]
+  with ReflectedHtmlAttrBuilder[ReactiveReflectedHtmlAttr]
   with PropBuilder[ReactiveProp]
   with EventPropBuilder[ReactiveEventProp, dom.Event]
   with StyleBuilders[StyleSetter]
@@ -26,7 +26,7 @@ trait ReactiveHtmlBuilders
     propKey: String,
     attrCodec: Codec[V, String],
     propCodec: Codec[V, DomPropV]
-  ): ReactiveReflectedAttr[V, DomPropV] = {
+  ): ReactiveReflectedHtmlAttr[V, DomPropV] = {
     new ReactiveHtmlAttr(attrKey, attrCodec)
   }
 

@@ -15,8 +15,8 @@ trait ReactiveSvgBuilders
     new ReactiveEventProp(key)
   }
 
-  override protected def svgAttr[V](key: String, codec: Codec[V, String]): ReactiveSvgAttr[V] = {
-    new ReactiveSvgAttr(key, codec)
+  override protected def svgAttr[V](key: String, codec: Codec[V, String], namespace: Option[String]): ReactiveSvgAttr[V] = {
+    new ReactiveSvgAttr(key, codec, namespace)
   }
 
   override def svgTag[Ref <: dom.svg.Element](tagName: String, void: Boolean): ReactiveSvgTag[Ref] = {

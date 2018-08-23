@@ -11,8 +11,9 @@ import org.scalajs.dom
 
 class ReactiveSvgAttr[V](
   override val name: String,
-  override val codec: Codec[V, String]
-) extends domtypes.generic.keys.SvgAttr[V](name, codec) { self =>
+  override val codec: Codec[V, String],
+  override val namespace: Option[String]
+) extends domtypes.generic.keys.SvgAttr[V](name, codec, namespace) { self =>
 
   private type SvgElement = ReactiveSvgElement[dom.svg.Element]
 
