@@ -2,6 +2,9 @@ enablePlugins(ScalaJSPlugin)
 
 enablePlugins(ScalaJSBundlerPlugin)
 
+// @TODO[Security] Is this a good idea to leave this here long term?
+resolvers += Resolver.sonatypeRepo("snapshots")
+
 libraryDependencies ++= Seq(
   "com.raquo" %%% "airstream" % "0.2.1-SNAPSHOT",
   "com.raquo" %%% "dombuilder" % "0.8",
