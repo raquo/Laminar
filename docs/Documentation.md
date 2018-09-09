@@ -395,7 +395,7 @@ Rendering dynamic lists of children efficiently is one of the most challenging p
 #### ChildrenReceiver / ChildrenSetter
 
 ```scala
-val childrenSignal: Signal[immutable.Seq[Node]] = ???
+val childrenSignal: Signal[immutable.Seq[Node]] = ??? // immutable only!
 div("Hello, ", children <-- childrenSignal)
 ```
 
@@ -403,7 +403,7 @@ If you have an Observable of desired children elements, this is the most straigh
 
 As with all Laminar elements, you must avoid reusing elements that were previously removed from the DOM as their subscriptions will not function anymore.
 
-Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them. The general idea here is _vaguely_ similar to virtual DOM, but it's much lighter diffing. We only compare elements for equality using `==`, we do not look at any attributes / props / state / children and we do not re-render anything like React.
+Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them. The general idea here is _vaguely_ similar to virtual DOM, but it's much lighter diffing. We only compare elements for reference equality, we do not look at any attributes / props / state / children and we do not re-render anything like React.
 
 We make one pass through nextChildren, and detect any inconsistencies by checking that `nextChildren(i).ref == childrenInDom(i)` (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (<50LoC total) but efficient.
 
