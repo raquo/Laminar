@@ -13,20 +13,22 @@ All of that diffing machinery is required because virtual DOM elements / subtree
 
 All of this only gets worse when you put wrappers around native javascript libraries. ScalaJS-React for example is not just a bunch of thin `@js.native` interfaces, it brings in its own concepts and runtime code.
 
-Laminar on the other hand does not use virtual DOM diffing. Instead, it uses event streams and reactive state variables for **precise DOM updates**. So when your Laminar code says it needs e.g. that element's color property to be updated, that's exactly what will happen, immediately, directly, and nothing else. For comparison, with virtual DOM a bunch of render methods would have been run, new virtual elements would have been created, the framework would have generated the diff of the new and old subtrees of virtual elements, and finally translated this diff into an actual one-line DOM update that we actually care about.
+Laminar on the other hand does not use virtual DOM diffing. Instead, it uses event streams and reactive state variables for **precise DOM updates**. So when your Laminar code says it needs an element's color property to be updated, that's exactly what will happen, immediately, directly, and nothing else. For comparison, with virtual DOM a bunch of render methods would have been run, new virtual elements would have been created, the framework would have generated the diff of the new and old subtrees of virtual elements, and finally translated this diff into an actual one-line DOM update that we actually care about.
 
-Laminar does maintain its own tree of `ReactiveElement`-s, but it's only used to track parent-child relationships between elements, not their attributes and properties. We never need to diff virtual elements. Also, unlike ephemeral virtual DOM elements, the lifespan of Laminar's reactive elements matches the lifespan of corresponding real DOM elements, so you get stable references that you can work with. 
+Laminar does maintain its own tree of `ReactiveElement`-s, but it's only used to track parent-child relationships between elements, not their attributes and properties. We never need to diff virtual elements. Also, unlike ephemeral virtual DOM elements, the lifespan of Laminar's reactive elements matches the lifespan of corresponding real DOM elements, so you get stable references that you can easily work with. 
 
-I personally see virtual DOM as just a very elaborate way to avoid using actual reactive data structures like streams. And virtual DOM is not useful even if you do use FRP. Early versions of Laminar did actually use virtual DOM (Snabbdom), but I ran away from that when I realized how counter-productive the combination of those paradigms is, both to simplicity and performance.
+I personally see virtual DOM as a very elaborate way to avoid using actual reactive data structures like streams. And virtual DOM is not useful even if you do use FRP. Early versions of Laminar did actually use virtual DOM (Snabbdom), but I ran away from that when I realized how counter-productive the combination of those paradigms is, both to simplicity and performance.
 
 
 ## Virtual DOM _with_ FRP
 
 Some other libraries like Outwatch (or Cycle.js in the JS world) use both FRP and virtual DOM as a way to achieve complete functional purity. To me this concept is largely lost for frontend development. I don't think the effort, conceptual complexity, and performance penalties of wrapping everything in effect types and virtual elements is worth the marginal safety that some of this could provide. The entire frontend application is _supposed_ to be a collection of DOM and network IO effects, there is barely anything else to it. Like any other technique, pure functional programming is only good for the benefits that it provides, and I don't think it provides a net benefit in frontend development when you consider all the compromises you have to make for it, and all of their effects (ha). This is, of course, a matter of preference, and so both Outwatch and Laminar exist.
 
-But as I said above, I did previously use virtual DOM in Laminar, and this experience convinced me that reactive UI development is much, much simpler with FRP alone, without virtual DOM.
+_A bit more on Cycle.js [in our Gitter](https://gitter.im/Laminar_/Lobby?at=5b749e5c5b07ae730ac330c4)._
 
-Outwatch and Laminar are actually quite similar cosmetically – their arrows notation was just too good to not steal – but they're vastly different under the hood. If you're curious, you can dive into sources to compare how a simple expression such as `img(src <-- srcStream)` is handled. See what exactly happens when a new event is sent to `srcStream`. Ignore the internals of the streaming libraries (RxJS and Airstream) which call `Observer.onNext` (as they'll be quite similar), but do look at the rest of the code path otherwise. Here it is for Laminar v0.3:
+As mentioned above, I did previously use virtual DOM in Laminar, and this experience convinced me that reactive UI development is much, much simpler with FRP alone, without virtual DOM.
+
+Outwatch and Laminar are quite similar cosmetically – their arrows notation was just too good to not steal – but they're vastly different under the hood. If you're curious, you can dive into sources to compare how a simple expression such as `img(src <-- srcStream)` is handled. See what exactly happens when a new event is sent to `srcStream`. Ignore the internals of the streaming libraries (RxJS and Airstream) which call `Observer.onNext` (as they'll be quite similar), but do look at the rest of the code path otherwise. Here it is for Laminar v0.3:
 
 1) Go to definition of the `<--` method, it's in `ReactiveHtmlAttr`:
 
@@ -61,4 +63,4 @@ I guess I did not explain when `Modifier.apply` is actually called. It's not rea
 
 ---
 
-Well, if there is any magic in Laminar, it's in Airstream, the library that provides reactive streams, signals and state variables. But it's just a small streaming library, much simpler and smaller than Monix or RxJS. It is as straightforward as Laminar itself, and you can dig into its source code and documentation to completely understand it.
+Well, if there is any magic in Laminar, it's in Airstream, the library that provides reactive streams, signals and state variables. But it's just a small streaming library, much simpler and smaller than Monix or RxJS. It is as straightforward as Laminar itself, and you can dig into its source code and documentation to understand the entirety of it.
