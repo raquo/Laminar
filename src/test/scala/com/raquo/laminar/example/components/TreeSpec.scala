@@ -9,8 +9,8 @@ class TreeSpec extends UnitSpec {
 
   it("ReactiveChildNode.isDescendantOf") {
 
-    val container1 = div(rel := "foo").ref
-    val otherContainer = div(rel := "foo2").ref
+    val container1 = div(alt := "foo").ref
+    val otherContainer = div(alt := "foo2").ref
 
     val el0 = span("el0")
     val el10 = span("el10")
@@ -87,8 +87,8 @@ class TreeSpec extends UnitSpec {
   }
 
   it("ReactiveChildNode.isMounted") {
-    val container1 = div(rel := "foo").ref
-    val otherContainer = div(rel := "foo2").ref
+    val container1 = div(alt := "foo").ref
+    val otherContainer = div(alt := "foo2").ref
 
     val el0 = span("el0")
     val el10 = span("el10")

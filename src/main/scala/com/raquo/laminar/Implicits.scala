@@ -4,13 +4,14 @@ import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.emitter.EventPropTransformation
+import com.raquo.laminar.keys.CompositeAttr.CompositeValueMappers
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveStyle}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveText}
 import org.scalajs.dom
 
 import scala.scalajs.js.|
 
-trait Implicits extends DomApi {
+trait Implicits extends DomApi with CompositeValueMappers {
 
   implicit def eventPropToEventPropTransformation[Ev <: dom.Event, El <: ReactiveElement[dom.Element]](
     eventProp: ReactiveEventProp[Ev]

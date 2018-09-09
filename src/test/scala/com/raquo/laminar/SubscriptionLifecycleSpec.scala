@@ -46,11 +46,11 @@ class SubscriptionLifecycleSpec extends UnitSpec {
       counter shouldBe 3
 
       unmount()
-      mount(div(rel := "unmounted"))
-      expectNode(div like (rel is "unmounted"))
+      mount(div(alt := "unmounted"))
+      expectNode(div like (alt is "unmounted"))
 
       bus.writer.onNext(values(3))
-      expectNode(div like (rel is "unmounted"))
+      expectNode(div like (alt is "unmounted"))
       counter shouldBe 3
     }
   }
@@ -141,14 +141,14 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
       unmount()
 
-      mount(div(rel := "unmounted"))
+      mount(div(alt := "unmounted"))
 
-      expectNode(div like (rel is "unmounted"))
+      expectNode(div like (alt is "unmounted"))
 
       busA.writer.onNext(values(3))
       busB.writer.onNext(values(3))
       childBus.writer.onNext(childA)
-      expectNode(div like (rel is "unmounted"))
+      expectNode(div like (alt is "unmounted"))
       counterA shouldBe 1
       counterB shouldBe 3
       childCounter shouldBe 2

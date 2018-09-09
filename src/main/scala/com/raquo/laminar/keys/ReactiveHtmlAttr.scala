@@ -6,15 +6,12 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.HtmlAttr
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.nodes.ReactiveHtmlElement
-import org.scalajs.dom
+import com.raquo.laminar.api.Laminar.HtmlElement
 
 class ReactiveHtmlAttr[V](
   override val name: String,
   override val codec: Codec[V, String]
 ) extends HtmlAttr[V](name, codec) { self =>
-
-  private type HtmlElement = ReactiveHtmlElement[dom.html.Element]
 
   @inline def apply(value: V): Modifier[HtmlElement] = {
     :=(value)

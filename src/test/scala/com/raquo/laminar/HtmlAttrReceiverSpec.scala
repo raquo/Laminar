@@ -21,11 +21,11 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     expectNode(span like (title is title2, "Hello"))
 
     unmount()
-    mount(span(className := "unrelated"))
-    expectNode(span like (className is "unrelated"))
+    mount(span(alt := "unrelated"))
+    expectNode(span like (alt is "unrelated"))
 
     titleBus.writer.onNext(title3)
-    expectNode(span like (className is "unrelated"))
+    expectNode(span like (alt is "unrelated"))
   }
 
   it("updates attr with memory stream") {
@@ -46,11 +46,11 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is title3, "Hello"))
 
     unmount()
-    mount(div(className := "unrelated"))
-    expectNode(div like (className is "unrelated"))
+    mount(div(alt := "unrelated"))
+    expectNode(div like (alt is "unrelated"))
 
     titleBus.writer.onNext(title4)
-    expectNode(div like (className is "unrelated"))
+    expectNode(div like (alt is "unrelated"))
   }
 
   it("supports multiple attr receivers on same node") {
@@ -63,53 +63,53 @@ class HtmlAttrReceiverSpec extends UnitSpec {
 
     val titleBus = new EventBus[String]
 
-    val rel1 = randomString("rel1_")
-    val rel2 = randomString("rel2_")
-    val rel3 = randomString("rel3_")
-    val rel4 = randomString("rel4_")
-    val rel5 = randomString("rel5_")
+    val alt1 = randomString("alt1_")
+    val alt2 = randomString("alt2_")
+    val alt3 = randomString("alt3_")
+    val alt4 = randomString("alt4_")
+    val alt5 = randomString("alt5_")
 
-    val relBus = new EventBus[String]
+    val altBus = new EventBus[String]
 
-    mount(div(title <-- titleBus.events, rel <-- relBus.events, "Hello"))
+    mount(div(title <-- titleBus.events, alt <-- altBus.events, "Hello"))
     expectNode(div like "Hello")
 
     titleBus.writer.onNext(title1)
     expectNode(div like (title is title1, "Hello"))
 
-    relBus.writer.onNext(rel1)
-    expectNode(div like (title is title1, rel is rel1, "Hello"))
+    altBus.writer.onNext(alt1)
+    expectNode(div like (title is title1, alt is alt1, "Hello"))
 
     titleBus.writer.onNext(title2)
-    expectNode(div like (title is title2, rel is rel1, "Hello"))
+    expectNode(div like (title is title2, alt is alt1, "Hello"))
 
     titleBus.writer.onNext(title3)
-    expectNode(div like (title is title3, rel is rel1, "Hello"))
+    expectNode(div like (title is title3, alt is alt1, "Hello"))
 
-    relBus.writer.onNext(rel2)
-    expectNode(div like (title is title3, rel is rel2, "Hello"))
+    altBus.writer.onNext(alt2)
+    expectNode(div like (title is title3, alt is alt2, "Hello"))
 
     titleBus.writer.onNext(title4)
-    expectNode(div like (title is title4, rel is rel2, "Hello"))
+    expectNode(div like (title is title4, alt is alt2, "Hello"))
 
-    relBus.writer.onNext(rel3)
-    expectNode(div like (title is title4, rel is rel3, "Hello"))
+    altBus.writer.onNext(alt3)
+    expectNode(div like (title is title4, alt is alt3, "Hello"))
 
-    relBus.writer.onNext(rel4)
-    expectNode(div like (title is title4, rel is rel4, "Hello"))
+    altBus.writer.onNext(alt4)
+    expectNode(div like (title is title4, alt is alt4, "Hello"))
 
     titleBus.writer.onNext(title5)
-    expectNode(div like (title is title5, rel is rel4, "Hello"))
+    expectNode(div like (title is title5, alt is alt4, "Hello"))
 
     unmount()
-    mount(div(className := "unrelated"))
-    expectNode(div like (className is "unrelated"))
+    mount(div(id := "unrelated"))
+    expectNode(div like (id is "unrelated"))
 
     titleBus.writer.onNext(title6)
-    expectNode(div like (className is "unrelated"))
+    expectNode(div like (id is "unrelated"))
 
-    relBus.writer.onNext(rel5)
-    expectNode(div like (className is "unrelated"))
+    altBus.writer.onNext(alt5)
+    expectNode(div like (id is "unrelated"))
   }
 
   it("supports multiple memory streams") {
@@ -122,47 +122,47 @@ class HtmlAttrReceiverSpec extends UnitSpec {
 
     val titleBus = new EventBus[String]
 
-    val rel1 = randomString("rel1_")
-    val rel2 = randomString("rel2_")
-    val rel3 = randomString("rel3_")
-    val rel4 = randomString("rel4_")
-    val rel5 = randomString("rel5_")
+    val alt1 = randomString("alt1_")
+    val alt2 = randomString("alt2_")
+    val alt3 = randomString("alt3_")
+    val alt4 = randomString("alt4_")
+    val alt5 = randomString("alt5_")
 
-    val relBus = new EventBus[String]
+    val altBus = new EventBus[String]
 
-    mount(div(title <-- titleBus.events.toSignal(title1), rel <-- relBus.events.toSignal(rel1), "Hello"))
-    expectNode(div like (title is title1, rel is rel1, "Hello"))
+    mount(div(title <-- titleBus.events.toSignal(title1), alt <-- altBus.events.toSignal(alt1), "Hello"))
+    expectNode(div like (title is title1, alt is alt1, "Hello"))
 
     titleBus.writer.onNext(title2)
-    expectNode(div like (title is title2, rel is rel1, "Hello"))
+    expectNode(div like (title is title2, alt is alt1, "Hello"))
 
     titleBus.writer.onNext(title3)
-    expectNode(div like (title is title3, rel is rel1, "Hello"))
+    expectNode(div like (title is title3, alt is alt1, "Hello"))
 
-    relBus.writer.onNext(rel2)
-    expectNode(div like (title is title3, rel is rel2, "Hello"))
+    altBus.writer.onNext(alt2)
+    expectNode(div like (title is title3, alt is alt2, "Hello"))
 
     titleBus.writer.onNext(title4)
-    expectNode(div like (title is title4, rel is rel2, "Hello"))
+    expectNode(div like (title is title4, alt is alt2, "Hello"))
 
-    relBus.writer.onNext(rel3)
-    expectNode(div like (title is title4, rel is rel3, "Hello"))
+    altBus.writer.onNext(alt3)
+    expectNode(div like (title is title4, alt is alt3, "Hello"))
 
-    relBus.writer.onNext(rel4)
-    expectNode(div like (title is title4, rel is rel4, "Hello"))
+    altBus.writer.onNext(alt4)
+    expectNode(div like (title is title4, alt is alt4, "Hello"))
 
     titleBus.writer.onNext(title5)
-    expectNode(div like (title is title5, rel is rel4, "Hello"))
+    expectNode(div like (title is title5, alt is alt4, "Hello"))
 
     unmount()
-    mount(div(className := "unrelated"))
-    expectNode(div like (className is "unrelated"))
+    mount(div(href := "unrelated"))
+    expectNode(div like (href is "unrelated"))
 
     titleBus.writer.onNext(title6)
-    expectNode(div like (className is "unrelated"))
+    expectNode(div like (href is "unrelated"))
 
-    relBus.writer.onNext(rel5)
-    expectNode(div like (className is "unrelated"))
+    altBus.writer.onNext(alt5)
+    expectNode(div like (href is "unrelated"))
   }
 
   it("updates two attrs subscribed to the same stream") {
@@ -172,25 +172,21 @@ class HtmlAttrReceiverSpec extends UnitSpec {
 
     val valueBus = new EventBus[String]
 
-    mount(div(title <-- valueBus.events, rel <-- valueBus.events, "Hello"))
-    expectNode(div like (title isEmpty, rel isEmpty, "Hello"))
+    mount(div(title <-- valueBus.events, alt <-- valueBus.events, "Hello"))
+    expectNode(div like (title isEmpty, alt isEmpty, "Hello"))
 
     valueBus.writer.onNext(value1)
-    expectNode(div like (title is value1, rel is value1, "Hello"))
+    expectNode(div like (title is value1, alt is value1, "Hello"))
 
     valueBus.writer.onNext(value2)
-    expectNode(div like (title is value2, rel is value2, "Hello"))
+    expectNode(div like (title is value2, alt is value2, "Hello"))
 
     unmount()
-    mount(div(className := "unrelated"))
-    expectNode(div like (className is "unrelated"))
+    mount(div(href := "unrelated"))
+    expectNode(div like (href is "unrelated"))
 
     valueBus.writer.onNext(value3)
-    expectNode(div like (className is "unrelated"))
-  }
-
-  ignore("works with child receiver on same node") {
-
+    expectNode(div like (href is "unrelated"))
   }
 
   it("supports attr(value) syntax") {

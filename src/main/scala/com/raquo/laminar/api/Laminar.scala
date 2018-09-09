@@ -9,17 +9,21 @@ import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEvent
 import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, SvgTags, TableTags, TextTags}
 import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders.{ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
+import com.raquo.laminar.defs.{ReactiveComplexHtmlKeys, ReactiveComplexSvgKeys}
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedHtmlAttr, ReactiveStyle, ReactiveSvgAttr}
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement, ReactiveText}
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver}
 import org.scalajs.dom
 
+// @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
 private[laminar] object Laminar
   extends Airstream
+  with ReactiveComplexHtmlKeys
+  // Reflected Attrs
+  with ReflectedHtmlAttrs[ReactiveReflectedHtmlAttr]
   // Attrs
   with HtmlAttrs[ReactiveHtmlAttr]
-  with AriaAttrs[ReactiveHtmlAttr]
   // Event Props
   with ClipboardEventProps[ReactiveEventProp]
   with ErrorEventProps[ReactiveEventProp]
@@ -31,8 +35,6 @@ private[laminar] object Laminar
   with WindowOnlyEventProps[ReactiveEventProp]
   // Props
   with Props[ReactiveProp]
-  // Reflected Attrs
-  with ReflectedHtmlAttrs[ReactiveReflectedHtmlAttr]
   // Styles
   with Styles[StyleSetter]
   with Styles2[StyleSetter]
@@ -49,8 +51,13 @@ private[laminar] object Laminar
   with ReactiveHtmlBuilders
   with Implicits {
 
+  object aria
+    extends AriaAttrs[ReactiveHtmlAttr]
+    with ReactiveHtmlBuilders
+
   object svg
     extends SvgTags[ReactiveSvgTag]
+    with ReactiveComplexSvgKeys
     with SvgAttrs[ReactiveSvgAttr]
     with ReactiveSvgBuilders
 

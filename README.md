@@ -22,14 +22,14 @@ Laminar offers a unique blend of simplicity, expressiveness and safety.
 * Source code is very approachable – small, no macros, almost no implicits
 * Minimalistic pragmatism. No hardcore FP, no typed effects, etc.
 * Precise DOM updates – no [complicated virtual DOM diffing](https://github.com/raquo/Laminar/blob/master/docs/Virtual-DOM.md)
-* Native Scala.js lib with only in-house dependencies, no JS impedance mismatch
+* Native Scala.js lib with no third party or JS dependencies – no JS impedance mismatch
 
 
 
 ### Expressiveness
 * Plain Scala FP and/or OOP composition and abstraction techniques instead of ad-hoc library features ("props" / "context" / "components" / etc.)
-* Everything from individual attribute keys, key-value pairs, to whole elements is easily composable and abstractable
 * First class, interoperable Event Streams and State reactive variables
+* Everything from individual attribute keys, key-value pairs, to whole elements is easily composable and abstractable
 
 
 
@@ -71,6 +71,9 @@ I understand that the importance of some of these points might not be immediatel
     * [Lists of Children](#lists-of-children)
     * [Other Receivers](#other-receivers)
     * [Alternative Syntax for Receivers](#alternative-syntax-for-receivers)
+  * [ClassName and Other Special Keys](#classname-and-other-special-keys)
+    * [cls](#cls)
+    * [Other Composite Keys](#other-composite-keys)
   * [Event System: Emitters, Transformations, Buses](#event-system-emitters-transformations-buses)
     * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
     * [EventBus](#eventbus)
@@ -698,7 +701,102 @@ All of these are equivalent to modifier applications like `(color <-- prettyColo
 
 
 
+### ClassName and Other Special Keys
+
+Almost all props and attributes behave exactly the same way regarding the `apply` / `:=` / `<--` methods, however a few keys are special in Laminar.
+
+#### cls
+
+This [reflected attribute](https://github.com/raquo/scala-dom-types#reflected-attributes) (aliased as **`className`**) contains a string with space-separated CSS class names that a given HTML or SVG element belongs to. Laminar provides a specialized API for this attribute. Consider this use case:
+
+```css
+# CSS
+.LabelComponent {
+  font-size: 20pt;
+  color: red;
+}
+.vip {
+  text-transform: uppercase;
+}
+```
+
+```scala
+// Scala
+val veryImportant: Modifier[HtmlElement] = cls := "vip"
+def Label(caption: String): HtmlElement = div(
+  veryImportant,
+  cls := "LabelComponent",
+  caption
+)
+ 
+val myLabel: HtmlElement = Label("Hi, I'm a caption.") 
+```
+
+Here we have a Label component that we can use to render a pretty caption, and a reusable `veryImportant` modifier that makes any element it is applied to look VERY IMPORTANT. This tasteless styling is provided by CSS class names `LabelComponent` and `vip`.
+
+The code above makes it obvious that we expect `myLabel` element to contain two CSS classes: `LabelComponent` and `vip`. However, does it? From previous documentation sections we know that the `:=` method _sets_ the value of an attribute, overriding its previous value, so in this case it looks like `cls := "LabelComponent"` overrides `cls := "vip"`, leaving `myLabel` without the `vip` class.
+
+Needless to say, if `cls` behaved like that it would be really inconvenient to work with. Just imagine how much more complicated / coupled / inflexible you'd need to make the code to support this simple example of ours.
+
+And so `cls` does not behave like this. Instead of **setting** the list of CSS classes, `cls := "newClass"` **appends** `newClass` to the list of CSS classes already present on the element, so our example code works as intended.
+
+Here are some more `cls` tricks. All of these produce a `Modifier[HtmlElement]`:
+
+```scala
+// ADD multiple class names
+cls := ("class1", "class2")
+cls := List("class1", "class2")
+ 
+// ADD and REMOVE class names (true=add, false=remove)
+cls := ("class1" -> true, "class2" -> false)
+cls := Seq("class1" -> true, "class2" -> false)
+cls := (Seq("class1" -> true, "class2" -> false), Seq("class3" -> true))
+cls := Map("class1" -> true, "class2" -> false)
+ 
+// As usual, all := methods are aliased as `apply`
+cls(List("class1", "class2"))
+ 
+// SET a class name instead of ADDING it
+cls.set("class1")
+// SET multiple class names
+cls.set("class1 class2")
+// CLEAR all class names
+cls.set("")
+
+// Note: some of the := methods accept an implicit param, so you might
+// need to wrap the modifier in a `locally` to help Scala parse an
+// immediate application of such a modifier to an element:
+locally(cls := ("class1", "class2"))(element)
+```
+
+Of course, the reactive layer is similarly considerate in regard to `cls`. Consider this use case:
+
+```scala
+val classesStream: EventStream[Seq[String]]
+ 
+div(
+  cls := "MyComponent"
+  cls <-- classesStream
+)
+``` 
+
+Once again, we don't want the CSS class names coming in from `classesStream` to override (remove) `MyComponent` class name. We want that one to stay forever, and for the class names coming from `classStream` to **override the previous values emitted by that stream**. And this is exactly how Laminar behaves. The Modifier `cls <-- classesStream` keeps track of the class names that it last added to the element's `cls` attribute. When a new event comes in, we remove those previously added class names and add new ones that are not already on the element.
+
+So for example, when `classesStream` emits `List("class1", "class2")`, we will _add_ those classes to the element. When it subsequently emits `List("class1", "class3")`, we will remove `class2` and add `class3` to the element's class list.
+
+The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes (by setting their value to `false`). Note that unless you instruct Laminar to add those classes back, they will not be added back automatically. Only previous _additions_ of classes are undone in the manner described in the previous paragraph, not removals.
+
+Each `cls <-- source` modifier should deal with a certain set of classes that does not intersect with other such modifiers. You should generally avoid adding classes to an element in one reactive modifier and then removing them in another reactive modifier. Basically, if you do this you have two competing sources of truth for whether an element should carry a class at any given time, and the latest source to emit will win. That works, but is a bad practice. Search for "interference" in `CompositeKeySpec` for a simple example.
+
+
+#### Other Composite Keys
+
+**`rel`** is another space-separated attribute. Its API in Laminar is exactly identical to that of `cls` (see right above). For example `rel := ("noopener", "noreferrer")` is a Modifier that makes the `a` element it applies to [safer](https://mathiasbynens.github.io/rel-noopener/) without removing existing `rel` attribute value.
+
+
+
 ### Event System: Emitters, Transformations, Buses 
+
 
 #### Registering a DOM Event Listener
 
@@ -976,6 +1074,8 @@ Admittedly we do have a couple gotchas in memory management:
 
 * When a Laminar element is removed from the DOM, the resources that it owns are killed with no built-in way to resurrect them. Therefore, **do not remove elements from the DOM that you will want to add back to the DOM later**, as their subscriptions and any State owned by them will not be functional anymore. When appropriate, hide the element using CSS instead of temporarily removing it from the DOM, or create a new (similar) element instead of trying to re-insert a previously removed element.
 
+* You must never set [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) or [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) properties on Laminar elements that have subscriptions (e.g. get data from streams) or descendant elements with subscriptions, otherwise those subscriptions would not be properly terminated, and would cause memory leaks and unexpected behaviour. We deliberately do not provide an API to set these properties because of their messy side effects. If you need this functionality, it is up to you to use native JS methods and ensure that you do not affect any subscriptions on Laminar elements. Needless to say, when using native JS methods you need to understand [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and other risks as well.
+
 
 
 ### Element Lifecycle Events
@@ -1059,7 +1159,7 @@ One way to simplify your code that is Laminar-specific is to use `element.isMoun
 
 ### Special Cases
 
-Laminar is conceptually a simple layer adding a reactive API to Scala DOM Builder. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
+Laminar is conceptually a simple layer that brings a reactive API to Scala DOM Builder. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
 
 Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.
 
