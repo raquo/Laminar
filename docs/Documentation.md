@@ -971,3 +971,33 @@ The underlying issue is described in [this StackOverflow answer](https://stackov
 **Watch out:** If you are reading the `checked` property of the checkbox in an affected stream, it will contain the original, unchanged value. This behaviour could be surprising if you don't know about this stream being async, but do know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug, and better matches the commonly-expected semantics of `preventDefault`.
 
 **Escape hatch:** instead of using Laminar's `preventDefault` option/method, call `ev.preventDefault()` manually _after_ the event was passed to the event bus. Then event handling will work as it does in native JS DOM.
+
+
+#### `tbody`
+
+You might be used to writing HTML markup like this:
+
+```html
+<table>
+  <tr>
+    <td>Row1 Cell1</td>
+    <td>Row1 Cell2</td>
+  </tr>
+  <tr>
+    <td>Row2 Cell1</td>
+    <td>Row2 Cell2</td>
+  </tr>
+</table>
+```
+
+However, this is not actually valid HTML. There needs to be a [`tbody`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody) (or `thead` or `tfoot`) element wrapping `tr` elements – you can't nest them directly under `table`.
+
+Nevertheless, web browsers render this invalid HTML just fine, by silently inserting a `tbody` element to wrap all `tr` elements. This is a problem because the web browser will not notify Laminar about this, so Laminar's DOM tree will become incorrect.
+
+Therefore, if you're rendering a table you must make sure to wrap your `tr` elements in `tbody` (or `thead` or `tfoot`) elements.
+
+
+
+## Fin
+
+Hey, you've read all of this? Amazing. Join us in [gitter](https://gitter.im/Laminar_/Lobby).
