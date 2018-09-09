@@ -8,6 +8,7 @@
   * [Manual Application](#manual-application)
   * [inContext](#incontext)
   * [Reusing Elements](#reusing-elements)
+  * [Missing Keys](#missing-keys)
   * [Modifiers FAQ](#modifiers-faq)
 * [Reactive Data](#reactive-data)
   * [Attributes and Properties](#attributes-and-properties)
@@ -179,6 +180,20 @@ Don't. You can't put the same element twice into the real JS DOM – instead, it
 Except for rendering dynamic lists of children (we'll get to that later), you should not need to move a DOM element around. Open a github issue if you want to discuss a valid use case for this.
 
 Also, currently, even if a Laminar element was properly removed from the DOM, it can not be put back in there again because its subscription logic will be dead. This is a limitation with a known fix that will be implemented in the next version.
+
+
+### Missing Keys
+
+Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from [Scala DOM Types](https://github.com/raquo/scala-dom-types). These definitions provide hundreds of keys, but are not exhaustive. For example, we haven't defined touch events like `touchmove` yet, so those are not available to be put on the left hand side of `:=` methods.
+
+To work around this, you can contribute definitions of missing keys to Scala DOM Types. It's easy – you don't even need to code any logic, just specify the names and types of the things you want to add. See the [Contribution Guide](https://github.com/raquo/scala-dom-types/blob/master/CONTRIBUTING.md) and an [example PR](https://github.com/raquo/scala-dom-types/pull/16/files).
+
+Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:
+
+```scala
+val onTouchMove = new ReactiveEventProp[dom.TouchEvent]("touchmove")
+div(onTouchMove --> eventBus)
+```
 
 
 ### Modifiers FAQ
