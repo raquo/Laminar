@@ -793,6 +793,8 @@ Each `cls <-- source` modifier should deal with a certain set of classes that do
 
 **`rel`** is another space-separated attribute. Its API in Laminar is exactly identical to that of `cls` (see right above). For example `rel := ("noopener", "noreferrer")` is a Modifier that makes the `a` element it applies to [safer](https://mathiasbynens.github.io/rel-noopener/) without removing existing `rel` attribute value.
 
+**`role`** attribute works similarly.
+
 
 
 ### Event System: Emitters, Transformations, Buses 
