@@ -415,7 +415,7 @@ Laminar will perform absolutely minimal operations that make sense – for examp
 But where would you actually get an observable of a list of children from? For a canonical example, see `TaskListView.taskViewsStream` in [laminar-examples](https://github.com/raquo/laminar-examples). But sometimes this might be unnecessarily hard. It might be easier for you to tell Laminar when you want items added or removed to the list:
 
 ```scala
-val commandBus = new EventBus[ChildCommand]
+val commandBus = new EventBus[ChildrenCommand]
 val commandStream = commandBus.events
 div("Hello, ", children.command <-- commandStream)
 ```
@@ -423,7 +423,7 @@ div("Hello, ", children.command <-- commandStream)
 EventBus is an Airstream data structure that contains both an Observer (`.writer`) and an EventStream (`.events`). It's basically an event stream that you send events to by invoking the Observer. A more complete example:
 
 ```scala
-val commandBus = new EventBus[ChildCommand]
+val commandBus = new EventBus[ChildrenCommand]
 val commandStream = commandBus.events
 var counter = 0
 div(
