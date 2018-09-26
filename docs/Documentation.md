@@ -438,12 +438,12 @@ div(
 
 We'll explain the `-->` method and the rest of event handling in later sections. Here we're sending `CollectionCommand.Append(span(s"Child # $counter"))` to `commandBus` on every button click. 
 
-The ChildCommand approach offers the best performance too. Since you are directly telling Laminar what to do, no logic stands between your code and Laminar executing your requests. There is no diffing involved.
+The ChildrenCommand approach offers the best performance too. Since you are directly telling Laminar what to do, no logic stands between your code and Laminar executing your requests. There is no diffing involved.
 
 The downside of this approach is that you don't have an observable of the list of children naturally available to you, so if you want to display e.g. the number of children somewhere, you will need to create an observable for that yourself. For example:
 
 ```scala
-val commandBus = new EventBus[ChildCommand]
+val commandBus = new EventBus[ChildrenCommand]
 val commandStream = commandBus.events
 val countSignal = commandStream.fold(initial = 0)(_ + 1)
 
