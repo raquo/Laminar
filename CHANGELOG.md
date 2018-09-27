@@ -2,7 +2,7 @@
 
 Breaking changes in **bold**.
 
-#### TO BE RELEASED – v0.4 – ETA Sep 2018
+#### v0.4 – Sep 2018
 
 * **New: Airstream v0.3 – integration with Futures and other improvements (see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md))**
 * **Naming: Match naming changes in Airstream v0.3 (`mapTo` -> `mapToValue`, new `mapTo` method)**
