@@ -228,7 +228,9 @@ It's all the same behaviour, just different composition. In this pattern the `In
 
 As you learn more about Laminar you will see that there are even more ways to structure this same relationship.
 
-Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation below explaining all of the concepts and features in much greater detail.
+Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation explaining all of the concepts and features in much greater detail.
+
+Read the [docs](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), check out some [examples](https://github.com/raquo/laminar-examples), and join us in [gitter](https://gitter.im/Laminar_/Lobby)!
 
 
 
