@@ -5,10 +5,10 @@ import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
-import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowOnlyEventProps}
+import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, DocumentEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowEventProps, WindowOnlyEventProps}
 import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, SvgTags, TableTags, TextTags}
 import com.raquo.laminar.Implicits
-import com.raquo.laminar.builders.{ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
+import com.raquo.laminar.builders.{DomEventStream, DomEventStreamPropBuilder, ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
 import com.raquo.laminar.defs.{ReactiveComplexHtmlKeys, ReactiveComplexSvgKeys}
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedHtmlAttr, ReactiveStyle, ReactiveSvgAttr}
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement, ReactiveText}
@@ -32,7 +32,6 @@ private[laminar] object Laminar
   with MediaEventProps[ReactiveEventProp]
   with MiscellaneousEventProps[ReactiveEventProp]
   with MouseEventProps[ReactiveEventProp]
-  with WindowOnlyEventProps[ReactiveEventProp]
   // Props
   with Props[ReactiveProp]
   // Styles
@@ -61,6 +60,22 @@ private[laminar] object Laminar
     with SvgAttrs[ReactiveSvgAttr]
     with ReactiveSvgBuilders
 
+  object documentEvents
+    extends DomEventStreamPropBuilder(dom.document)
+    with DocumentEventProps[DomEventStream]
+
+  object windowEvents
+    extends DomEventStreamPropBuilder(dom.window)
+    with WindowEventProps[DomEventStream]
+
+  /** An owner that never kills its possessions.
+    *
+    * Be careful to only use for subscriptions whose lifetime should match
+    * the lifetime of `dom.window` (that is, of your whole application, basically).
+    *
+    * Legitimate use case: for app-wide observers of [[documentEvents]] and [[windowEvents]].
+    */
+  object windowOwner extends Owner {}
 
   // Base elements and nodes
 

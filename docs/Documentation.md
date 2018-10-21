@@ -29,6 +29,7 @@
     * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
     * [useCapture](#usecapture)
     * [Obtaining Typed Event Target](#obtaining-typed-event-target)
+  * [Window & Document Events](#window--document-events)
 * [Ownership](#ownership)
 * [Memory Management](#memory-management)
 * [Element Lifecycle Events](#element-lifecycle-events)
@@ -817,6 +818,17 @@ This feature is not specific to events at all. The general syntax is `inContext(
 Because `thisNode.ref` refers to the element on which the event listener is **registered**, in JS DOM terms, it is actually equivalent to `dom.Event.currentTarget`, not `dom.Event.target` – the latter refers to the node at which the event **originates**. When dealing with inputs these two targets are usually the same since inputs don't have any child elements, but you need to be aware of this conceptual difference for other events. MDN docs: [target](https://developer.mozilla.org/en-US/docs/Web/API/Event/target), [currentTarget](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget).
 
 You might have noticed that some event props like `onClick` promise somewhat peculiar event types like `TypedTargetMouseEvent` instead of the expected `MouseEvent` – these refined types come from _Scala DOM Types_, and merely provide more specific types for `.target` (as much as is reasonably possible). These types are optional – if you don't care about `.target`, you can just treat such events as simple `MouseEvent`s because `TypedTargetMouseEvent` does in fact extend `MouseEvent`. `// @TODO [API] I don't think we need this, really`.
+
+
+### Window & Document Events
+
+In Javascript, `window` and `document` support their own custom sets of events. You can obtain streams of those events like this: `documentEvents.onDomContentLoaded.map(ev => renderApp())`.
+
+`windowEvents` provides similar access to `window` events.
+
+These event streams specify [`useCapture = false`](#usecapture), which is probably what you want. If you need capture mode for window or document events, you can instantiate a `DomEventStream` manually.
+
+Depending on your desired logic, you might not have a Laminar element to act as an Owner for state or subscriptions arising from these event streams. For such app-wide subscriptions you can use `windowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar.
 
 
 

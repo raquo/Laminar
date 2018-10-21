@@ -41,7 +41,7 @@ class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
       eventProp, callback, useCapture = useCapture
     )(DomApi.eventApi)
 
-    // @TODO[Integrity] Check that we're not leaking memory here by never removing this event listener, especially in the zipWithNode case.
+    // @TODO[Integrity,Performance] Check that we're not leaking memory here by never removing this event listener, especially in the zipWithNode case.
     addEventListener(element)
   }
 }
