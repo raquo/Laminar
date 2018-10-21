@@ -13,7 +13,7 @@ class DomEventStream[Ev <: dom.Event](eventTarget: dom.EventTarget, eventKey: St
   // @TODO[API] We need to figure out a better protection mechanism in Airstream, this only works for Laminar because it shares com.raquo with Airstream
   override protected[raquo] val topoRank: Int = 1
 
-  val eventHandler: js.Function1[Ev, Unit] = ev => new Transaction(fire(ev, _))
+  val eventHandler: js.Function1[Ev, Unit] = (ev: Ev) => new Transaction(fireValue(ev, _))
 
   override protected[this] def onStart(): Unit = {
     eventTarget.addEventListener(eventKey, eventHandler, useCapture)
