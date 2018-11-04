@@ -75,7 +75,7 @@ private[laminar] object Laminar
     *
     * Legitimate use case: for app-wide observers of [[documentEvents]] and [[windowEvents]].
     */
-  object windowOwner extends Owner {}
+  object unsafeWindowOwner extends Owner {}
 
   // Base elements and nodes
 

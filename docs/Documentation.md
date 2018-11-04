@@ -828,7 +828,7 @@ In Javascript, `window` and `document` support their own custom sets of events. 
 
 These event streams specify [`useCapture = false`](#usecapture), which is probably what you want. If you need capture mode for window or document events, you can instantiate a `DomEventStream` manually.
 
-Depending on your desired logic, you might not have a Laminar element to act as an Owner for state or subscriptions arising from these event streams. For such app-wide subscriptions you can use `windowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar.
+Depending on your desired logic, you might not have a Laminar element to act as an Owner for state or subscriptions arising from these event streams. For such app-wide subscriptions you can use `unsafeWindowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar.
 
 
 
