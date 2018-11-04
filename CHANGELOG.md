@@ -2,6 +2,14 @@
 
 Breaking changes in **bold**.
 
+#### v0.5 – Nov 2018
+
+* **New: Airstream v0.4 – now with error handling (see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md))**
+* **Build: Drop Scala 2.11 support**
+* New: window and document event streams now available via `windowEvents` and `documentEvents` objects
+* New: `unsafeWindowOwner` that never kills its possessions (careful there, see docs)
+* **API: `api/Laminar` / `api/L` object no longer includes event props from `WindowOnlyEventProps`**  
+
 #### v0.4 – Sep 2018
 
 * **New: Airstream v0.3 – integration with Futures and other improvements (see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md))**

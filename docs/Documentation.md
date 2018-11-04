@@ -49,9 +49,11 @@
 
 Make sure you're reading the docs for the right version:
 
-#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
+#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
 
-#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
+#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
+
+The latest version of Laminar always uses the latest version of Airstream.
 
 Laminar is very simple under the hood. You can see how most of it works just by using "Go to definition" functionality of your IDE. Nevertheless, the documentation provided here will help you understand how everything ties together. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.
 
@@ -667,7 +669,7 @@ Note that Airstream Observers, including `eventBus.writer`, can subscribe to mul
 
 This can be achieved either with `addSource` or `addObserver`. Basically, in terms of laziness, with `addSource` EventBus behaves like a stream that merges other streams – much like `EventStream.merge(stream1, stream2)`, but with the ability to add and remove source streams at any time. So, if you do `eventBus.writer.addSource(sourceStream)(childOwner)`, `sourceStream` will not be started until and unless `eventBus.stream` is started. Conversely, `sourceStream.addObserver(eventBus.writer)(childOwner)` will immediately start `sourceStream` even if `eventBus` does not have any observers.
 
-The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `removeObserver` when removing a child from the list of children. `childOwner` will take care of that. Typically that would be the child's Laminar element. Laminar elements kill the subscriptions that they own when they get removed from the DOM. 
+The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `subscription.kill` when removing a child from the list of children. `childOwner` will take care of that. Typically that would be the child's Laminar element. Laminar elements kill the subscriptions that they own when they get removed from the DOM. 
 
 
 ### Alternative Event Listener Registration Syntax
@@ -838,7 +840,7 @@ Ownership is a core Airstream concept. You **really** need to read about it in [
 
 Basically, Airstream does not let you create a leaky resource without specifying an Owner which will eventually kill said resource. For example, adding an Observer to an EventStream is a potential memory leak. Once a subscription is established like that, the stream in question obtains a reference to that observer, and the stream's parent stream obtains a reference to this stream, etc. Depending on how long that chain is and how it's used, there is a good chance it will either never be garbage collected or will be garbage collected much later than optimal.
 
-With other libraries you would need to manually call `removeObserver` after calling `addObserver` to avoid memory leaks like that. In Airstream however, you don't need to do that. Instead, when adding an observer you need to specify not just the observer, but also the Owner of this new subscription. In Laminar, any Laminar element can be an owner. In fact, when you use `<--` methods on elements or in their modifiers, the element in question becomes the owner of the subscription that the `<--` method creates.
+With other libraries you would need to manually call `subscription.kill()` after calling `addObserver` to avoid memory leaks like that. In Airstream however, you don't need to do that. Instead, when adding an observer you need to specify not just the observer, but also the Owner of this new subscription. In Laminar, any Laminar element can be an owner. In fact, when you use `<--` methods on elements or in their modifiers, the element in question becomes the owner of the subscription that the `<--` method creates.
 
 Laminar elements kill the subscriptions that they own when they are _discarded_. This happens when Laminar removes the element from the DOM. This is your answer to the question of "who should be the owner of this subscription?": you have to find an element the lifespan of which will match the desired lifespan of the subscription.
 

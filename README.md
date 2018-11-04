@@ -6,7 +6,7 @@
 
 Laminar is a small Scala.js library that lets you build UI components using glitch-free reactive Streams, Signals and State variables. It is simpler and more powerful than virtual DOM based solutions.
 
-    "com.raquo" %%% "laminar" % "0.4"
+    "com.raquo" %%% "laminar" % "0.5"
 
 
 
@@ -59,10 +59,11 @@ I understand that the importance of some of these points might not be immediatel
 
 Laminar and Airstream are well documented: 
 
-#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
+#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
 
-#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
+#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
 
+The latest version of Laminar always uses the latest version of Airstream.
 
 
 
