@@ -6,7 +6,7 @@ enablePlugins(ScalaJSBundlerPlugin)
 // resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.raquo" %%% "airstream" % "0.4",
+  "com.raquo" %%% "airstream" % "0.4.1",
   "com.raquo" %%% "dombuilder" % "0.9",
   "com.raquo" %%% "domtypes" % "0.9.1", // Remove once dombuilder is updated
   "com.raquo" %%% "domtestutils" % "0.9" % Test,

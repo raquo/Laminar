@@ -2,6 +2,10 @@
 
 Breaking changes in **bold**.
 
+#### v0.5.1 – Dec 2018
+
+* Fix: Bump Airstream to v0.4.1 to fix NPE in error handling
+
 #### v0.5 – Nov 2018
 
 * **New: Airstream v0.4 – now with error handling (see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md))**
