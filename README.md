@@ -192,7 +192,7 @@ object InputBox {
   def apply(caption: String): InputBox = {
     val inputNode = input(typ := "text")
     val node = div(caption, inputNode)
-    InputBox(node, inputNode)
+    new InputBox(node, inputNode)
   }
 }
 ```
