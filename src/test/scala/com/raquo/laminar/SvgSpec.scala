@@ -3,16 +3,13 @@ package com.raquo.laminar
 import com.raquo.laminar.api.A._
 import com.raquo.laminar.api.L.svg._
 import com.raquo.laminar.api._
-import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.utils.UnitSpec
 
 class SvgSpec extends UnitSpec {
 
   it("renders sample svg, sets attrs and responds to events") {
 
-    implicit val testOwner = new TestableOwner
-
-    val strokeWidthVar = StateVar("3")
+    val strokeWidthVar = Var("3")
 
     var clickCount = 0
 
@@ -20,7 +17,7 @@ class SvgSpec extends UnitSpec {
       points := "20,20 40,25 60,40 80,120 120,140 200,180",
       fill := "none",
       stroke := "black",
-      strokeWidth <-- strokeWidthVar.state,
+      strokeWidth <-- strokeWidthVar.signal,
       L.onClick --> (_ => clickCount += 1)
     )
 

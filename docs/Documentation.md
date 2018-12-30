@@ -12,7 +12,7 @@
   * [Modifiers FAQ](#modifiers-faq)
 * [Reactive Data](#reactive-data)
   * [Attributes and Properties](#attributes-and-properties)
-  * [Event Streams, Signals, and State](#event-streams-signals-and-state)
+  * [Event Streams and Signals](#event-streams-and-signals)
   * [Individual Children](#individual-children)
   * [Lists of Children](#lists-of-children)
   * [Other Receivers](#other-receivers)
@@ -49,9 +49,9 @@
 
 Make sure you're reading the docs for the right version:
 
-#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
+#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
 
-#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
+#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
 
 The latest version of Laminar always uses the latest version of Airstream.
 
@@ -239,7 +239,7 @@ In a virtual DOM library like React or Snabbdom, changing an element over time i
 
 Laminar does not work like that. We use reactive streams to represent things changing over time. Let's see how this is much simpler than any virtual DOM.
 
-Laminar uses [Airstream](https://github.com/raquo/Airstream) observables (event streams, signals, state). Airstream is an integral part of Laminar, and a huge part of what makes it unique.
+Laminar uses [Airstream](https://github.com/raquo/Airstream) observables (event streams and signals). Airstream is an integral part of Laminar, and a huge part of what makes it unique.
 
 **To use Laminar effectively, you need to understand the principles of conventional lazy streams, and have basic knowledge of Airstream. Please do read [Airstream documentation](https://github.com/raquo/Airstream), it's not scary.**
 
@@ -258,19 +258,17 @@ This creates a div element with the word "Hello" in it, and a dynamic `color` CS
 The method `<--` comes from `ReactiveStyle` (which is what `color` is). It creates a `Modifier` that subscribes to the given stream. This subscription will be automatically removed when the div element is discarded. More on that in the sections [Stream Memory Management](#stream-memory-management) and [Element Lifecycle Events](#element-lifecycle-events) way below. Don't worry about that for now.
 
 
-### Event Streams, Signals, and State
+### Event Streams and Signals
 
 What happens before `prettyColorStream` emitted its first event? To understand that, we need a primer on Airstream reactive variables:
 
-- **EventStream** is a lazy Observable without current value. It represents events that happen over time. Philosophically, there is no such thing as a "current event" or "initial event", so streams have no initial value.
+- **EventStream** is a lazy Observable without current value. It represents events that happen at discrete points in time. Philosophically, there is no such thing as a "current event" or "initial event", so streams have no initial value.
 
-- **Signal** is like EventStream, but with current value. Signal represents a value over time, it always has a current value, and therefore it must have an initial value.
-
-- **State** is like Signal, but it's not lazy, it's strict. It is used to represent application state. Signals are lazy, so whether they execute or not depends on whether they have observers. State will execute reliably, which is often desired.
+- **Signal** are also lazy Observables, but unlike streams they do have a current value. Signal represents state – a value persisted over time. It always has a current value, and therefore it must have an initial value.
 
 The `<--` method subscribes to the given observable and updates the DOM whenever the observable emits. `prettyColorStream` is an EventStream, so it will only emit if and when the next event comes in. So, until that time, laminar will not set the color property to any initial or default value.
 
-On the other hand, if `prettyColorStream` was a Signal or a State, the subscription inside the `<--` method would have immediately set the color property to the observable's current value, and behave similar to stream subscription afterwards.
+On the other hand, if `prettyColorStream` was a Signal, the subscription inside the `<--` method would have immediately set the color property to the observable's current value, and behave similar to stream subscription afterwards.
 
 We said that EventStreams and Signals are lazy – that means they wouldn't run without an Observer. By creating a subscription, the `<--` method creates an Observer of the observable that it is given, so we know for sure that it will run.
 
@@ -321,7 +319,7 @@ It should be pretty obvious what this does: `MaybeBlogUrl` maps input Signal to 
 
 The elements are put in the obvious order – what you see is what you get – so, between _"Hello, I have "_ and _", isn't it great?"_ text nodes. Each next emitted element replaces the previously emitted one in the DOM.
 
-EventStreams and State observables work similarly, and there's also `child.maybe` and `child.text` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]` and `Observable[String]` respectively.
+This example uses Signals but EventStreams work similarly, and there's also `child.maybe` and `child.text` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]` and `Observable[String]` respectively.
 
 You have to be careful when using streams of elements, whether with `child <--` or not. Make sure to read about unused elements in [Memory Management](#memory-management).
 
@@ -341,7 +339,7 @@ def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = 
 }
 ```
 
-Unlike EventStreams, Airstream Signals and State variables only emit distinct values. So if `maybeUrlSignal` emits `Some(url1)` and then `Some(url2)`, `hasUrlSignal` will emit `true`, but only once, not twice. So with this new logic, we create new elements only when we switch from `None` to `Some(url)` or the other way.
+Unlike EventStreams, Airstream Signals only emit distinct values. So if `maybeUrlSignal` emits `Some(url1)` and then `Some(url2)`, `hasUrlSignal` will emit `true`, but only once, not twice. So with this new logic, we create new elements only when we switch from `None` to `Some(url)` or the other way.
 
 However, the following **IS NOT CURRENTLY POSSIBLE**: 
 
@@ -830,7 +828,7 @@ In Javascript, `window` and `document` support their own custom sets of events. 
 
 These event streams specify [`useCapture = false`](#usecapture), which is probably what you want. If you need capture mode for window or document events, you can instantiate a `DomEventStream` manually.
 
-Depending on your desired logic, you might not have a Laminar element to act as an Owner for state or subscriptions arising from these event streams. For such app-wide subscriptions you can use `unsafeWindowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar.
+Depending on your desired logic, you might not have a Laminar element to act as an Owner for subscriptions of these event streams. For such app-wide subscriptions you can use `unsafeWindowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar.
 
 
 
@@ -846,19 +844,13 @@ Laminar elements kill the subscriptions that they own when they are _discarded_.
 
 You can also create custom owners by extending the Owner trait. This is useful for leaky resources found in application-wide functionality such as [centralized state management](https://github.com/raquo/Laminar/issues/18) or an ajax service that has internal subscriptions.
 
-Importantly, State is also a leaky resource, just like subscription. This is because unlike streams, State is not lazy, it starts itself upon creation, so you need an owner to stop the State at some point even if it has no observers.
-
-So, if you have a component that renders an element and also maintains some State, that State's owner should be that element.
-
 
 
 ## Memory Management
 
 Once again I assume that you have read the [relevant section](https://github.com/raquo/Airstream#ownership--memory-management) of Airstream docs. The basic principles are as follows:
 
-* Lazy observables (streams, signals) are not garbage collected as long as they have observers or dependent observables that are not eligible for garbage collection
-
-* State observables are not garbage collected unless they are killed by their owner
+* Observables (streams, signals) are not garbage collected as long as they have observers or dependent observables that are not eligible for garbage collection
 
 * However, if your entire observable dependency graph – everything from the original event producer to the observables that depend on it to the observers that listen to those observables – if all that becomes unreachable then all of that will be garbage collected.
 
@@ -866,23 +858,15 @@ Once again I assume that you have read the [relevant section](https://github.com
 
 With proper use of ownership, Laminar's memory management is pleasantly automatic. Nevertheless, programming is hard, so here are a few rules of thumb for preventing memory leaks in Laminar:
 
-* State and subscriptions should generally be owned by a Laminar element that has a lifespan that matches the desired lifespan of said state or subscription. In plain English, **it should make sense** for an element to own the State. For example, if your component needs to maintain a State and also returns an element to be rendered, that element should probably own that state because when that element is discarded you don't want to maintain that State anymore (assuming that's the case). 
+* Subscriptions should generally be owned by a Laminar element that has a lifespan that matches the desired lifespan of said subscription. In plain English, **it should make sense** for an element to own the subscription – the element should be the main user of that subscription. The question to ask yourself is – at which point do you want the subscription to die and release its resources? An element that consumes the subscription and dies at the same time should be its owner. 
 
-* State that is defined in a component must not escape that component. Every State observable contains `map`, which is essentially a factory that creates a new State Observable **with the same owner as the instance it was called on**.
-
-  * So, if you pass a State from a parent component to a child component, **you are letting the child create new State that will be owned by the parent. Do not do this. It's like giving your actual child your credit card.** Instead, convert the State to a Signal before passing it to the child. The child will be able to convert the Signal back to State if it needs to, but that state will be owned by the child, and will be promptly killed when the child is discarded.
-
-  * Also, remember that Laminar has no built-in concept of a component. You need to be careful when passing State to any function, including callbacks. You need to ask yourself – does the lifespan of this function's scope match the lifespan of the function which I consider my "component"? If the answer is no, then you should not be passing State to that function. For example, you should not pass State to a function that is called whenever a click event is emitted on your component, because any State created within that function using `myState.map` will exist until the whole component is discarded, which is much longer than you probably want for a State that is specific to such an ephemeral function call.
-  
-  * This might seem complicated but it's really not. You just need to make sure that every piece of State is owned by the right owner. You will face this decision with any UI library.
-  
-  * Corollary: in most cases, feel free to use Signals instead of State. This will mean err-ing on the side of things not running when they should, which is easier to debug than things running when they shouldn't.
+* There used to be more rules, but we simplified Airstream, yay!
 
 Admittedly we do have a couple gotchas in memory management:
 
-* Every Laminar element is an Owner. An element kills the resources that it owns when that element is discarded. An element is discarded when it is removed from the DOM. Now, here is an unfortunate loophole: what about a Laminar element that was created, owns some State or subscriptions, but that was never inserted into the DOM? Since it was never inserted, it will never be removed from it, so the resources that it owns will never be cleaned up. Unfortunately there is currently no way around this. This is a design bug that I will fix in a later version. So for now, **do not proactively create elements that will never be added to the DOM**. The most trivial workaround is to create a factory that creates an element when it's actually needed instead.  
+* Every Laminar element is an Owner. An element kills the resources that it owns when that element is discarded. An element is discarded when it is removed from the DOM. Now, here is an unfortunate loophole: what about a Laminar element that was created, owns some subscriptions, but that was never inserted into the DOM? Since it was never inserted, it will never be removed from it, so the resources that it owns will never be cleaned up. Unfortunately there is currently no way around this. This is a design bug that I will fix in a later version. So for now, **do not proactively create elements that will never be added to the DOM**. The most trivial workaround is to create a factory that creates an element when it's actually needed instead.  
 
-* When a Laminar element is removed from the DOM, the resources that it owns are killed with no built-in way to resurrect them. Therefore, **do not remove elements from the DOM that you will want to add back to the DOM later**, as their subscriptions and any State owned by them will not be functional anymore. When appropriate, hide the element using CSS instead of temporarily removing it from the DOM, or create a new (similar) element instead of trying to re-insert a previously removed element.
+* When a Laminar element is removed from the DOM, the resources that it owns are killed with no built-in way to resurrect them. Therefore, **do not remove elements from the DOM that you will want to add back to the DOM later**, as their subscriptions will not be functional anymore. When appropriate, hide the element using CSS instead of temporarily removing it from the DOM, or create a new (similar) element instead of trying to re-insert a previously removed element.
 
 * You must never set [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) or [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) properties on Laminar elements that have subscriptions (e.g. get data from streams) or descendant elements with subscriptions, otherwise those subscriptions would not be properly terminated, and would cause memory leaks and unexpected behaviour. We deliberately do not provide an API to set these properties because of their messy side effects. If you need this functionality, it is up to you to use native JS methods and ensure that you do not affect any subscriptions on Laminar elements. Needless to say, when using native JS methods you need to understand [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and other risks as well.
 
@@ -920,7 +904,7 @@ When an element is unmounted, the resources owned by this element are killed:
 
 * Emitters (`onClick --> ...`) stop listening for and relaying events
 * Receivers (`href <-- ...`) unsubscribe from input streams and stop updating the element's node
-* Manually created State observables and subscriptions owned by this element are killed as well
+* Manually created subscriptions owned by this element are killed as well
 
 If you want to temporarily "remove" the element from the DOM, but still keep its subscriptions active, you should hide it using CSS `display: none` instead of unmounting it. 
 

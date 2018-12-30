@@ -15,6 +15,6 @@ class TextChildReceiver(element: ReactiveElement[dom.Element]) {
 object TextChildReceiver {
 
   def <--($node: Observable[String]): ChildSetter = {
-    new ChildSetter($node.toLazy.map(new ReactiveText(_)))
+    new ChildSetter($node.map(new ReactiveText(_)))
   }
 }

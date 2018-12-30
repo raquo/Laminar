@@ -19,11 +19,11 @@ class ChildReceiverSpec extends UnitSpec {
   private val text7 = randomString("text7_")
 
   it("updates one child") {
-    withClue("Regular stream:") {
+    withClue("Stream:") {
       test(makeObservable = identity)
     }
 
-    withClue("Memory stream:") {
+    withClue("Signal:") {
       test(
         makeObservable = _.toSignal(span(text0)),
         expectedInitialChild = span like text0
@@ -61,14 +61,14 @@ class ChildReceiverSpec extends UnitSpec {
   }
 
   it("updates two children") {
-    withClue("Regular stream:") {
+    withClue("Stream:") {
       test(
         makeFooObservable = identity,
         makeBarObservable = identity
       )
     }
 
-    withClue("Memory stream:") {
+    withClue("Signal:") {
       test(
         makeFooObservable = _.toSignal(span(text0)),
         makeBarObservable = _.toSignal(span(text00)),

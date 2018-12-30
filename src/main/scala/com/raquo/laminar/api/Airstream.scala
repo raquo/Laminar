@@ -10,11 +10,7 @@ trait Airstream {
 
   type EventStream[+A] = airstream.eventstream.EventStream[A]
 
-  type FlattenStrategy[-Outer[+_] <: Observable[_], -Inner[_], Output[+_] <: LazyObservable[_]] = airstream.features.FlattenStrategy[Outer, Inner, Output]
-
-  type LazyObservable[+A] = airstream.core.LazyObservable[A]
-
-  type MemoryObservable[+A] = airstream.core.MemoryObservable[A]
+  type FlattenStrategy[-Outer[+_] <: Observable[_], -Inner[_], Output[+_] <: Observable[_]] = airstream.features.FlattenStrategy[Outer, Inner, Output]
 
   type Observable[+A] = airstream.core.Observable[A]
 
@@ -28,9 +24,9 @@ trait Airstream {
 
   type Signal[+A] = airstream.signal.Signal[A]
 
-  type State[+A] = airstream.state.State[A]
+  type SignalViewer[+A] = airstream.signal.SignalViewer[A]
 
-  type StateVar[A] = airstream.state.StateVar[A]
+  type StrictSignal[+A] = airstream.signal.StrictSignal[A]
 
   type Subscription = airstream.core.Subscription
 
@@ -51,8 +47,6 @@ trait Airstream {
   val OverwriteFutureStrategy: airstream.features.FlattenStrategy.OverwriteFutureStrategy.type = airstream.features.FlattenStrategy.OverwriteFutureStrategy
 
   lazy val Ref: airstream.util.Ref.type = airstream.util.Ref
-
-  val StateVar: airstream.state.StateVar.type = airstream.state.StateVar
 
   val SwitchFutureStrategy: airstream.features.FlattenStrategy.SwitchFutureStrategy.type = airstream.features.FlattenStrategy.SwitchFutureStrategy
 

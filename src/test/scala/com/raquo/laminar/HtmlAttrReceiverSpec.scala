@@ -28,7 +28,7 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     expectNode(span like (alt is "unrelated"))
   }
 
-  it("updates attr with memory stream") {
+  it("updates attr with Signal") {
     val title1 = randomString("title1_")
     val title2 = randomString("title2_")
     val title3 = randomString("title3_")
@@ -112,7 +112,7 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     expectNode(div like (id is "unrelated"))
   }
 
-  it("supports multiple memory streams") {
+  it("supports multiple signals") {
     val title1 = randomString("title1_")
     val title2 = randomString("title2_")
     val title3 = randomString("title3_")

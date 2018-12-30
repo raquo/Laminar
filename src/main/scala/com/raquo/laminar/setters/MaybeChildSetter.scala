@@ -16,7 +16,7 @@ class MaybeChildSetter(maybeNodeObservable: Observable[MaybeChildNode])
     val sentinelNode = new ReactiveComment("")
     var childNode: ReactiveChildNode[dom.Node] = sentinelNode
 
-    // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
+    // @TODO[Performance] In case of Signal we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
     parentNode.subscribe(maybeNodeObservable)(onNext)
 

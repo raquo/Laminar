@@ -3,7 +3,6 @@ package com.raquo.laminar.setters
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.signal.Signal
-import com.raquo.airstream.state.State
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
@@ -26,7 +25,6 @@ class ChildrenSetter(
 
     val childrenSignal = childrenObservable match {
       case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
-      case state: State[Children @unchecked] => state.toSignal
       case signal: Signal[Children @unchecked] => signal
     }
 

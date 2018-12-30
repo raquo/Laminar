@@ -2,6 +2,11 @@
 
 Breaking changes in **bold**.
 
+#### v0.6 – Dec 2018
+
+* **New: Airstream v0.4 -> v0.5.1 – improved Vars, no more State, etc.**
+  * Big update, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md) for details and migration guide 
+
 #### v0.5.1 – Dec 2018
 
 * Fix: Bump Airstream to v0.4.1 to fix NPE in error handling

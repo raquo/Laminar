@@ -12,7 +12,7 @@ class ChildSetter(nodeObservable: Observable[ReactiveChildNode[dom.Node]])
   override def apply(parentNode: ReactiveElement[dom.Element]): Unit = {
     var childNode: ReactiveChildNode[dom.Node] = new ReactiveComment("")
 
-    // @TODO[Performance] In case of memory stream we're doing append(comment)+replace(node), but we could do just one append(node)
+    // @TODO[Performance] In case of Signal we're doing append(comment)+replace(node), but we could do just one append(node)
     parentNode.appendChild(childNode)(DomApi.treeApi)
     parentNode.subscribe(nodeObservable)(onNext)
 

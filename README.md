@@ -6,7 +6,7 @@
 
 Laminar is a small Scala.js library that lets you build UI components using glitch-free reactive Streams, Signals and State variables. It is simpler and more powerful than virtual DOM based solutions.
 
-    "com.raquo" %%% "laminar" % "0.5.1"
+    "com.raquo" %%% "laminar" % "0.6"
 
 
 
