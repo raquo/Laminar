@@ -20,7 +20,7 @@ Laminar offers a unique blend of simplicity, expressiveness and safety.
 ### Simplicity
 * Extremely predictable behaviour – no magic involved, what you write is what you get
 * Source code is very approachable – small, no macros, almost no implicits
-* Minimalistic pragmatism. No hardcore FP, no typed effects, etc.
+* Minimalistic pragmatism – no hardcore FP, no typed effects, no backpressure, etc.
 * Precise DOM updates – no [complicated virtual DOM diffing](https://github.com/raquo/Laminar/blob/master/docs/Virtual-DOM.md)
 * Native Scala.js lib with no third party or JS dependencies – no JS impedance mismatch
 
@@ -36,7 +36,7 @@ Laminar offers a unique blend of simplicity, expressiveness and safety.
 ### Safety
 * Automatic and _mandatory_ memory management for _all_ subscriptions, even user created ones – this is significantly safer than what other libraries mean by "automatic memory management"
 * Glitch-free reactive system – consistent observations at no runtime cost
-* Precise Scala and JS types for DOM elements, attributes, etc. – no explicit or implicit casting 
+* Precise Scala and JS types for DOM elements, attributes, etc. – no unsafe casting 
 
 I understand that the importance of some of these points might not be immediately apparent. I will eventually write a more detailed blog post about these, but for now the documentation below will have to do. 
 
@@ -59,9 +59,9 @@ I understand that the importance of some of these points might not be immediatel
 
 Laminar and Airstream are well documented: 
 
-#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
+#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
 
-#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
+#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
 
 The latest version of Laminar always uses the latest version of Airstream.
 
