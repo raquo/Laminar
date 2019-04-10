@@ -48,8 +48,10 @@ trait ReactiveElement[+Ref <: dom.Element]
     .map(_.maybeNextParent)
     .toSignal(maybeParent)
 
-  /** Emits mount events from all ancestors of this node, making sure to account for all hierarchy changes. */
-  lazy val ancestorMountEvents: EventStream[MountEvent] = {
+  /** Emits mount events that were caused by this element's parent changing its parent,
+    * or any such changes up the chain. Does not include mount events triggered by this
+    * element changing its parent - see [[thisNodeMountEvents]] for that. */
+  private lazy val ancestorMountEvents: EventStream[MountEvent] = {
     maybeParentSignal.map {
       case Some(nextParent: ReactiveElement[_]) =>
         nextParent.mountEvents
@@ -58,8 +60,10 @@ trait ReactiveElement[+Ref <: dom.Element]
     }.flatten
   }
 
-  /** Emits mount events caused by this node changing its parent */
-  lazy val thisNodeMountEvents: EventStream[MountEvent] = {
+  /** Emits mount events caused by this node changing its parent. Does not include mount
+    * events triggered by changes higher in the hierarchy (grandparent and up) – see
+    * [[ancestorMountEvents]] for that. */
+  private lazy val thisNodeMountEvents: EventStream[MountEvent] = {
     val thisNodeMountEventBus = new EventBus[MountEvent]
     maybeThisNodeMountEventBus = Some(thisNodeMountEventBus)
     thisNodeMountEventBus.events

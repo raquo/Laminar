@@ -2,6 +2,11 @@
 
 Breaking changes in **bold**.
 
+#### v0.7 – TBD
+
+* **API: Hide `ancestorMountEvents` and `thisNodeMountEvents` (#42)**
+  * Migration: use `mountEvents`, `maybeParentSignal` or `parentChangeEvents` instead
+
 #### v0.6 – Dec 2018
 
 * **New: Airstream v0.4 -> v0.5.1 – improved Vars, no more State, etc.**

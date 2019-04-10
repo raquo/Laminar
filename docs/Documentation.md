@@ -924,13 +924,26 @@ For extra clarity, lifecycle events triggered by the same underlying parent chan
 
 ### Mount Event Streams
 
-So how do you actually listen for mount events? Laminar exposes the following streams on each `ReactiveElement`:
+So how do you actually listen for mount events?
 
-**`mountEvents`** – fires a full stream of mount events that affect this node. If the node was mounted or will be unmounted, directly or indirectly, this event will be here. This stream is a simple merge of the two mutually exclusive streams below: 
+Laminar exposes a `mountEvents` stream on each `ReactiveElement`. If the node was mounted or will be unmounted, that event will be here, even if it was triggered indirectly by a change in this node's parent's parent, rather than directly by a change in this node's parent.
 
-**`thisNodeMountEvents`** – fires mount events that were caused by this element changing its parent only. Does not include mount events triggered by changes higher in the hierarchy (grandparent and up).
+You an use lifecycle events to easily integrate with third party libraries or other resources you want to automatically keep track of. For example, here is a simple timer that schedules a task when an element is mounted, and cancels it if the element is unmounted:
 
-**`ancestorMountEvents`** – fires mount events that were caused by this element's parent changing its parent, or any such changes up the chain. Does not include mount events triggered by this element changing its parent.
+```scala
+lazy val handler: Unit = { /* do something */ }
+val delayMs = 1000.0
+ 
+div(/* ... */).subscribe(_.mountEvents) {
+  var timeoutId = 0
+  Observer[MountEvent] {
+    case NodeDidMount =>
+      timeoutId = js.timers.setTimeout(delayMs)(handler)
+    case NodeWillUnmount =>
+      js.timers.clearTimeout(timeoutId)
+  }
+}
+```
 
 
 ### Lifecycle Events Performance
@@ -939,7 +952,7 @@ Maintaining multiple lifecycle event streams for every single element in the DOM
 
 1) All streams are defined as `lazy val`-s, and are not even initialized until you access them. Then when you do, only the required dependencies of those streams are initialized. So when you ask for a `mountEvents` stream of one element, only then will Laminar initialize `mountEvents` streams of this child's parents, if they weren't initialized already. 
 
-2) Until the streams are initialized, the underlying event buses don't even receive events. `parentChangeEvents` gets its events from the event bus stored inside `maybeParentChangeBus`, but that `Option` remains `None` until `parentChangeEvents` is accessed. Similarly with `thisNodeMountEvents` and `maybeThisNodeMountEventBus`. All other lifecycle streams are derived from these two streams using simple transformations.
+2) Until the streams are initialized, the underlying event buses don't even receive events. `parentChangeEvents` gets its events from the event bus stored inside `maybeParentChangeBus`, but that `Option` remains `None` until `parentChangeEvents` is accessed. Similarly with `thisNodeMountEvents` and `maybeThisNodeMountEventBus` (private members). All other lifecycle streams are derived from these two streams using simple transformations.
 
 3) We avoid redundant computations as much as possible. All Airstream observables have shared execution, which works well for this case because elements high up in the DOM hierarchy will typically have many listeners on their `mountEvents` streams. Also, some of the most expensive calculations like determining whether an element is mounted or not are performed only once per original `ParentChangeEvent` – the same event instance is reused downstream with no additional allocations or DOM access required.
 

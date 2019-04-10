@@ -11,7 +11,6 @@ class LifecycleEventSpec extends UnitSpec {
   case class TestCase(
     action: ReactiveElement[dom.html.Element] => Unit,
     expectedChangeEvents: Seq[ParentChangeEvent],
-    expectedAncestorMountEvents: Seq[MountEvent] = Seq(),
     expectedMountEvents: Seq[MountEvent]
   )
 
@@ -26,9 +25,7 @@ class LifecycleEventSpec extends UnitSpec {
 
     var parentEvents = Seq[ParentChangeEvent]()
     var mountEvents = Seq[MountEvent]()
-    var ancestorMountEvents = Seq[MountEvent]()
     var grandChildMountEvents = Seq[MountEvent]()
-    var grandChildAncestorMountEvents = Seq[MountEvent]()
 
     mount(div("root ", parent1, parent2))
 
@@ -135,10 +132,6 @@ class LifecycleEventSpec extends UnitSpec {
       mountEvents = mountEvents :+ ev
     }
 
-    child.subscribe(_.ancestorMountEvents) { ev =>
-      ancestorMountEvents = ancestorMountEvents :+ ev
-    }
-
     grandChild.subscribe(_.parentChangeEvents) { _ =>
       fail("grandChild received a ParentChangeEvent. This is not supposed to happen, as such events should not be inherited by child nodes.")
     }
@@ -147,22 +140,15 @@ class LifecycleEventSpec extends UnitSpec {
       grandChildMountEvents = grandChildMountEvents :+ ev
     }
 
-    grandChild.subscribe(_.ancestorMountEvents) { ev =>
-      grandChildAncestorMountEvents = grandChildAncestorMountEvents :+ ev
-    }
-
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
         testCase.action(child)
         parentEvents shouldEqual testCase.expectedChangeEvents
         mountEvents shouldEqual testCase.expectedMountEvents
-        ancestorMountEvents shouldEqual testCase.expectedAncestorMountEvents // @TODO We don't have a test case where this is expected to be non empty
         grandChildMountEvents shouldEqual testCase.expectedMountEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
-        grandChildAncestorMountEvents shouldEqual testCase.expectedMountEvents // inheritance. assumes grandchild has no other parents
         parentEvents = Seq()
         mountEvents = Seq()
         grandChildMountEvents = Seq()
-        grandChildAncestorMountEvents = Seq()
       }
     }
   }
@@ -192,7 +178,7 @@ class LifecycleEventSpec extends UnitSpec {
     child.maybeParentChangeBus.isDefined shouldBe true
     child.maybeThisNodeMountEventBus.isDefined shouldBe false
 
-    child.thisNodeMountEvents // Touching this should be enough to initialize `maybeThisNodeMountEventBus`
+    child.mountEvents // Touching this should be enough to initialize `maybeThisNodeMountEventBus`
 
     child.maybeParentChangeBus.isDefined shouldBe true
     child.maybeThisNodeMountEventBus.isDefined shouldBe true
@@ -222,21 +208,9 @@ class LifecycleEventSpec extends UnitSpec {
 
     type TargetNodeWithMountEvent = (ReactiveElement[dom.html.Element], MountEvent)
 
-    var ancestorMountEvents: Seq[TargetNodeWithMountEvent] = Nil
-    var thisNodeMountEvents: Seq[TargetNodeWithMountEvent] = Nil
     var mountEvents: Seq[TargetNodeWithMountEvent] = Nil
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
-      if (testAncestorMountEvents) {
-        node.subscribe(_.ancestorMountEvents) { ev =>
-          ancestorMountEvents = ancestorMountEvents :+ (node, ev)
-        }
-      }
-      if (testThisNodeMountEvents) {
-        node.subscribe(_.thisNodeMountEvents) { ev =>
-          thisNodeMountEvents = thisNodeMountEvents :+ (node, ev)
-        }
-      }
       if (testMountEvents) {
         node.subscribe(_.mountEvents) { ev =>
           mountEvents = mountEvents :+ (node, ev)
@@ -246,28 +220,14 @@ class LifecycleEventSpec extends UnitSpec {
 
     def expectNewEvents(
       clue: String,
-      expectedAncestorMountEvents: Seq[(ReactiveElement[dom.html.Element], MountEvent)],
-      expectedThisNodeMountEvents: Seq[(ReactiveElement[dom.html.Element], MountEvent)],
       expectedMountEvents: Seq[(ReactiveElement[dom.html.Element], MountEvent)]
     ): Unit = {
       withClue(clue + ": ") {
-        if (testAncestorMountEvents) {
-          ancestorMountEvents shouldEqual expectedAncestorMountEvents
-        }
-        if (testThisNodeMountEvents) {
-          thisNodeMountEvents shouldEqual expectedThisNodeMountEvents
-        }
         if (testMountEvents) {
           mountEvents shouldEqual expectedMountEvents
         }
-        resetEvents()
+        mountEvents = Nil
       }
-    }
-
-    def resetEvents(): Unit = {
-      ancestorMountEvents = Nil
-      thisNodeMountEvents = Nil
-      mountEvents = Nil
     }
 
     parent1.appendChild(child1)
@@ -281,18 +241,14 @@ class LifecycleEventSpec extends UnitSpec {
 
     expectNewEvents(
       "grandparent was initialized",
-      expectedAncestorMountEvents = Nil,
-      expectedThisNodeMountEvents = Nil,
-      expectedMountEvents = Nil
+      Nil
     )
 
     mount(grandParent)
 
     expectNewEvents(
       "grandparent was mounted",
-      expectedAncestorMountEvents = Seq((child1, NodeDidMount)),
-      expectedThisNodeMountEvents = Seq((grandParent, NodeDidMount)),
-      expectedMountEvents = Seq((grandParent, NodeDidMount), (child1, NodeDidMount))
+      Seq((grandParent, NodeDidMount), (child1, NodeDidMount))
     )
 
     subscribeToEvents(child2)
@@ -301,18 +257,14 @@ class LifecycleEventSpec extends UnitSpec {
     subscribeToEvents(grandChild3)
     expectNewEvents(
       "child3 and grandChild3 streams were initialized and subscribed to",
-      expectedAncestorMountEvents = Nil, // MemoryStream inside `ancestorMountEvents` should not trigger any events here
-      expectedThisNodeMountEvents = Nil,
-      expectedMountEvents = Nil
+      Nil
     )
 
     parent3.appendChild(child3)
 
     expectNewEvents(
       "child3 was added to a mounted parent3",
-      expectedAncestorMountEvents = Seq((grandChild3, NodeDidMount)),
-      expectedThisNodeMountEvents = Seq((child3, NodeDidMount)),
-      expectedMountEvents = Seq((child3, NodeDidMount), (grandChild3, NodeDidMount))
+      Seq((child3, NodeDidMount), (grandChild3, NodeDidMount))
     )
 
     subscribeToEvents(parent4)
@@ -321,71 +273,49 @@ class LifecycleEventSpec extends UnitSpec {
 
     expectNewEvents(
       "child4 was added to unmounted parent4",
-      expectedAncestorMountEvents = Nil,
-      expectedThisNodeMountEvents = Nil,
-      expectedMountEvents = Nil
+      Nil
     )
 
     grandParent.appendChild(parent4)
 
     expectNewEvents(
       "parent4 was mounted",
-      expectedAncestorMountEvents = Seq((child4, NodeDidMount)), // not parent4 because that is not an ancestor event for parent4
-      expectedThisNodeMountEvents = Seq((parent4, NodeDidMount)),
-      expectedMountEvents = Seq((parent4, NodeDidMount), (child4, NodeDidMount)) // @TODO[Docss] Document: the same mount event is propagated to listeners in the order in which the listeners subscribed
+      Seq((parent4, NodeDidMount), (child4, NodeDidMount)) // @TODO[Docs] Document: the same mount event is propagated to listeners in the order in which the listeners subscribed
     )
 
     parent3.appendChild(child4)
 
     expectNewEvents(
       "child4 was moved to parent3 which is also mounted",
-      expectedAncestorMountEvents = Nil,
-      expectedThisNodeMountEvents = Nil,
-      expectedMountEvents = Nil
+      Nil
     )
 
     parent5.appendChild(child4)
 
     expectNewEvents(
       "child4 was moved to parent5 which is unmounted",
-      expectedAncestorMountEvents = Nil,
-      expectedThisNodeMountEvents = Seq((child4, NodeWillUnmount), (child4, NodeWasDiscarded)),
-      expectedMountEvents = Seq((child4, NodeWillUnmount), (child4, NodeWasDiscarded))
+      Seq((child4, NodeWillUnmount), (child4, NodeWasDiscarded))
     )
 
     parent5.appendChild(parent2)
 
     expectNewEvents(
       "parent2 was moved into parent5 which is unmounted",
-      expectedAncestorMountEvents = Seq((child2, NodeWillUnmount), (child2, NodeWasDiscarded)),
-      expectedThisNodeMountEvents = Nil, // because we're not listening for parent2 events
-      expectedMountEvents = Seq((child2, NodeWillUnmount), (child2, NodeWasDiscarded))
+      Seq((child2, NodeWillUnmount), (child2, NodeWasDiscarded))
     )
 
     subscribeToEvents(parent3)
 
     expectNewEvents(
       "parent3 streams were subscribed to",
-      expectedAncestorMountEvents = Nil,
-      expectedThisNodeMountEvents = Nil,
-      expectedMountEvents = Nil
+      Nil
     )
 
     parent5.appendChild(parent3)
 
     expectNewEvents(
       "parent3 was moved into parent5 which is unmounted",
-      expectedAncestorMountEvents = Seq(
-        (child3, NodeWillUnmount),
-        (grandChild3, NodeWillUnmount),
-        (child3, NodeWasDiscarded),
-        (grandChild3, NodeWasDiscarded)
-      ),
-      expectedThisNodeMountEvents = Seq(
-        (parent3, NodeWillUnmount),
-        (parent3, NodeWasDiscarded)
-      ),
-      expectedMountEvents = Seq(
+      Seq(
         (parent3, NodeWillUnmount),
         (child3, NodeWillUnmount),
         (grandChild3, NodeWillUnmount),
