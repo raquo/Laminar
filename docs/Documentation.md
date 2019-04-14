@@ -750,7 +750,9 @@ div("Click me", onClick.map(getClickCoordinates) --> clickCoordinatesBus)
  
 div(onScroll.filter(throttle) --> filteredScrollEventBus)
  
-div(onClick.config(useCapture = true) --> captureModeClickBus)
+form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
+ 
+div(onClick.config(useCapture = true) --> captureModeClickObserver)
  
 input(onKeyUp.filter(_.keyCode == KeyCode.Enter).preventDefault --> enterPressBus)
  
@@ -775,12 +777,21 @@ This kind of casual flexibility is what Laminar is all about.
 
 #### preventDefault & stopPropagation
 
+```scala
+div(onScroll.stopPropagation.filter(throttle) --> filteredScrollEventBus)
+form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
+```
+
 These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation)
 
 Importantly, these are just ordinarily transformations, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == KeyCode.Enter)`. Internally all transformations have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` transformation even after you've used `.map(_.keyCode)`.
 
 
 #### useCapture
+
+```scala
+div(onClick.config(useCapture = true) --> captureModeClickObserver)
+```
 
 JS DOM has two event modes: capture, and bubbling. Typically and by default we use the latter, but capture mode is sometimes useful for event listener priority/ordering (not specific to Laminar, standard JS DOM rules/limitations apply).
 
