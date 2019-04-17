@@ -15,6 +15,9 @@
   * [Event Streams and Signals](#event-streams-and-signals)
   * [Individual Children](#individual-children)
   * [Lists of Children](#lists-of-children)
+    * [`children <-- observableOfElements`](#children----observableofelements)
+    * [Performant Children Rendering – `split`](#performant-children-rendering--split) 
+    * [Performant Children Rendering – `children.command`](#performant-children-rendering--childrencommand) 
   * [Other Receivers](#other-receivers)
   * [Alternative Syntax for Receivers](#alternative-syntax-for-receivers)
 * [ClassName and Other Special Keys](#classname-and-other-special-keys)
@@ -141,6 +144,10 @@ For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[
 Modifiers are applied in the order in which they're passed to the element, so what you see in your code is what you get in the resulting DOM.
 
 Notice that the code snippet above does not require you to HTML-escape `"&"` or `"<"`. You're just writing Scala code, you're not writing HTML (or anything that will be parsed as HTML), so don't worry about HTML escaping when using Laminar API. However, this warranty is void when you manually invoke native Javascript APIs (e.g. anything under `.ref`, or any interfaces provided by [scala-js-dom](https://github.com/scala-js/scala-js-dom)). Then you need to know Javascript and the DOM API to know what's safe and what [isn't](https://security.stackexchange.com/questions/32347/dom-based-xss-attacks-what-is-the-most-dangerous-example).
+
+---
+
+Note: this section of documentation only explained how to render _static_ data. You will learn to render dynamic data and lists of children in [Reactive Data](#reactive-data) section. 
 
 
 ### Manual Application
@@ -321,7 +328,7 @@ The elements are put in the obvious order – what you see is what you get – s
 
 This example uses Signals but EventStreams work similarly, and there's also `child.maybe` and `child.text` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]` and `Observable[String]` respectively.
 
-You have to be careful when using streams of elements, whether with `child <--` or not. Make sure to read about unused elements in [Memory Management](#memory-management).
+You have to be careful when using streams of elements, whether with `child <--` or not. Make sure to read about **unused elements** in [Memory Management](#memory-management).
 
 
 #### Efficiency
@@ -393,7 +400,7 @@ When engaging in such optimizations, you have to ask yourself – is it worth it
 Rendering dynamic lists of children efficiently is one of the most challenging parts in UI libraries, and Laminar has a couple solutions for that.
 
 
-#### ChildrenReceiver / ChildrenSetter
+#### `children <-- observableOfElements`
 
 ```scala
 val childrenSignal: Signal[immutable.Seq[Node]] = ??? // immutable only!
@@ -404,16 +411,103 @@ If you have an Observable of desired children elements, this is the most straigh
 
 As with all Laminar elements, you must avoid reusing elements that were previously removed from the DOM as their subscriptions will not function anymore.
 
-Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them. The general idea here is _vaguely_ similar to virtual DOM, but it's much lighter diffing. We only compare elements for reference equality, we do not look at any attributes / props / state / children and we do not re-render anything like React.
+Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them. The general idea here is only cosmetically similar to virtual DOM. Laminar diffing is much lighter than typical virtual DOM machinery. We only compare elements for reference equality, we do not look at any attributes / props / state / children and we do not re-render anything like React.
 
-We make one pass through nextChildren, and detect any inconsistencies by checking that `nextChildren(i).ref == childrenInDom(i)` (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (<50LoC total) but efficient.
+We make a single pass through nextChildren, and detect any inconsistencies by checking that `nextChildren(i).ref == childrenInDom(i)` (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (<50LoC total) but efficient.
 
 Laminar will perform absolutely minimal operations that make sense – for example if a new element needs to be inserted, that is the only thing that will happen, _and_ this new element is the only element for which Laminar will spend time figuring out what to do, because all others will match. Reorderings are probably the worst case performance-wise, but still no worse than virtual DOM. You can read the full algorithm in `ChildSetter.updateChildren`.
 
 
-#### Children Commands
+#### Performant Children Rendering – `split`
 
-But where would you actually get an observable of a list of children from? For a canonical example, see `TaskListView.taskViewsStream` in [laminar-examples](https://github.com/raquo/laminar-examples). But sometimes this might be unnecessarily hard. It might be easier for you to tell Laminar when you want items added or removed to the list:
+We've now established how `children <-- childrenObservable` works, but generating this `childrenObservable` easily and efficiently can be quite complicated. For maximum efficiency, you should use Airstream's `split` method. Before we dive into that, let's see what the problem is without it. 
+
+Suppose you want to render a dynamic list of users. Both the set of users, their order, and the attributes of individual users can change, except for user id, which uniquely identifies a user. You also know how to render an individual user element:
+
+```scala
+case class User(id: String, name: String, lastModified: String)
+ 
+val usersStream: EventStream[List[User]] = ???
+   
+def renderUser(user: User): Div = {
+  div(
+    p("user id: ", user.id),
+    p("name: ", user.name)
+  )
+}
+```
+
+Given this, you might be tempted to render users like this:
+
+```scala
+val userElementsStream: EventStream[List[Div]] =
+  usersStream.map(users => users.map(renderUser))
+ 
+div(
+  children <-- userElementsStream
+)
+```
+
+This will work, but it is inefficient. Every time `usersStream` emits a new list of users, Laminar re-creates DOM elements for every single user in the list, and then replaces the old list of elements with this new one.
+
+This is the kind of situation that virtual DOM was designed to avoid. While this pattern is perfectly fine for small lists that don't update often (and if you don't care about losing DOM element state such as text in an input box), with larger lists and frequent updates there is a lot of needless work being done.
+
+So does this mean that virtual DOM is more efficient than Laminar when rendering large lists of dynamic children? Yes, if you render children **as described above**. This might be a surprising admission, but this default is necessary to uphold Laminar's core value: simplicity. There is no magic in Laminar. Laminar does what we tell it to do, and in this case we very explicitly tell it to create a list of elements every time the stream emits a new list of users, and then replace the old elements with brand new ones.
+
+So let's write smarter code. It's actually very easy.
+
+All we need to do is adjust our `renderUser` function to take a different set of parameters:
+
+```scala
+def newRenderUser(userId: String, initialUser: User, usersStream: EventStream[User]): Div = {
+  div(
+    p("user id: " + userId),
+    p("name: ", child.text <-- userStream.map(_.name)), 
+    p(
+      "user was updated: ",
+      child.text <-- userStream.map(_.lastModified != initialUser.lastModified)
+    ) 
+  )
+}
+```
+
+And with this, efficient rendering is as simple as:
+
+```scala
+val userElementsStream: EventStream[List[Div]] =
+  usersStream.split(_.id)(newRenderUser)
+ 
+div(
+  children <-- userElementsStream
+)
+```
+
+Airstream's `split` operator was designed specifically for this use case. On a high level, you need three things to use it:
+
+* `usersStream` – a stream (or signal) of `immutable.Seq[User]`
+* `_.id` – a way to uniquely identify users
+* `newRenderUser` – a way to render a user into a single element given its unique key (`id`), the initial instance of that user (`initialUser`), and a stream of updates to that same user (`userStream`).
+
+To clarify, Airstream-provided `userStream` is a safe and performant equivalent to `usersStream.map(_.find(_.id == userId).get)`. It provides you with updates of one specific user.
+
+---
+
+Here is how `split` works in more detail:
+
+* As soon as a `User` with id="123" appears in `usersStream`, we call `newRenderFoo` to render it. This gives us a `Div` element **that we will reuse** for all future versions of this foo.
+* We remember this `Div` element. Whenever `usersStream` emits a list that includes a new version of the id="123" User, the `userStream` in `renderFoo` emits this new version.
+* Similarly, when other users are updated in `usersStream` their updates are scoped to their own invocations of `newRenderUser`. The grouping happens by `key`, which in our case is the `id` of `User`.
+* When the list emitted by `usersStream` no longer contains a User with id="123", we remove its Div from the output and forget that we ever made it.
+* Thus `userElementsStream` contains a list of Div elements matching one-to-one to the users in the `usersStream`.
+
+---
+
+Lastly, aside from `split` there is also `splitIntoSignals`. Which one you want depends on whether you want `newRenderUser` to accept a stream or a signal. Remember that unlike streams, signals keep track of their current state, and only emit values that don't `==`-equal their current state. This might be desirable or not (or irrelevant) depending on your use case. 
+
+
+#### Performant Children Rendering – `children.command`
+
+In certain cases such as rendering live logs, it might be easier for you to tell Laminar when you want items added or removed to the list instead of giving it an entire updated list of children:
 
 ```scala
 val commandBus = new EventBus[ChildrenCommand]
@@ -439,9 +533,11 @@ div(
 
 We'll explain the `-->` method and the rest of event handling in later sections. Here we're sending `CollectionCommand.Append(span(s"Child # $counter"))` to `commandBus` on every button click. 
 
-The ChildrenCommand approach offers the best performance too. Since you are directly telling Laminar what to do, no logic stands between your code and Laminar executing your requests. There is no diffing involved.
+The ChildrenCommand approach offers the best performance on Laminar side. Since you are directly telling Laminar what to do, no logic stands between your code and Laminar executing your requests. There is no diffing involved.
 
-The downside of this approach is that you don't have an observable of the list of children naturally available to you, so if you want to display e.g. the number of children somewhere, you will need to create an observable for that yourself. For example:
+That said, don't go crazy trying to adapt your logic to it. Airstream's `split` operator described in the previous section offers great performance too. Choose the method that feels more natural for your needs, and micro-optimize later, if needed.
+
+One downside of ChildrenCommand is that you don't have an observable of the list of children naturally available to you, so if you want to display e.g. the number of children somewhere, you will need to create an observable for that yourself. For example:
 
 ```scala
 val commandBus = new EventBus[ChildrenCommand]
