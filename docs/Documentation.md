@@ -52,9 +52,17 @@
 
 Make sure you're reading the docs for the right version:
 
-#### Laminar docs: [master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md), [v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md), [v0.5](https://github.com/raquo/Laminar/blob/v0.5/docs/Documentation.md), [v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md), [v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)
+#### Documentation
 
-#### Airstream docs: [master](https://github.com/raquo/Airstream/blob/master/README.md), [v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md), [v0.4](https://github.com/raquo/Airstream/blob/v0.4/README.md), [v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md), [v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md), [v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)
+| Laminar | Airstream |
+| :--- | :--- |
+| **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
+| **[v0.7](https://github.com/raquo/Laminar/blob/v0.7/docs/Documentation.md)** | **[v0.7](https://github.com/raquo/Airstream/blob/v0.7/README.md)** |
+| **[v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md)** | **[v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md)** |
+| **[v0.5.1](https://github.com/raquo/Laminar/blob/v0.5.1/docs/Documentation.md)** | **[v0.4.1](https://github.com/raquo/Airstream/blob/v0.4.1/README.md)** |
+| **[v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md)** | **[v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md)** |
+| **[v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md)** | **[v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md)** |
+| **[v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)** | **[v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)** |
 
 The latest version of Laminar always uses the latest version of Airstream.
 
@@ -975,7 +983,7 @@ Admittedly we do have a couple gotchas in memory management:
 
 * When a Laminar element is removed from the DOM, the resources that it owns are killed with no built-in way to resurrect them. Therefore, **do not remove elements from the DOM that you will want to add back to the DOM later**, as their subscriptions will not be functional anymore. When appropriate, hide the element using CSS instead of temporarily removing it from the DOM, or create a new (similar) element instead of trying to re-insert a previously removed element.
 
-* You must never set [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) or [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) properties on Laminar elements that have subscriptions (e.g. get data from streams) or descendant elements with subscriptions, otherwise those subscriptions would not be properly terminated, and would cause memory leaks and unexpected behaviour. We deliberately do not provide an API to set these properties because of their messy side effects. If you need this functionality, it is up to you to use native JS methods and ensure that you do not affect any subscriptions on Laminar elements. Needless to say, when using native JS methods you need to understand [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and other risks as well.
+* You must not set [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) or [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) properties on Laminar elements that have any other children given to them by Laminar. We deliberately do not provide an API to set these properties because of their messy side effects. If you need this functionality, it is up to you to use native JS methods to set those properties, **and** ensure that you either manage the contents of a particular element with Laminar, or you do it manually with `innerHtml` / `textContent`, not both. The two approaches don't mix on the same element. Needless to say, when using native JS methods including `innerHtml` you need to understand [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and other risks as well.
 
 
 

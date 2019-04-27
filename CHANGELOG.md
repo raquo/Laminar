@@ -2,10 +2,10 @@
 
 Breaking changes in **bold**.
 
-#### v0.7 – TBD
+#### v0.7 – Apr 2019
 
-* **New: Airstream v0.5.1 -> v0.6 – `split`, `composeChanges`, `flatMap`, etc.**
-  * See Laminar docs for using `split` to to efficiently render dynamic lists of children
+* **New: Airstream v0.5.1 -> v0.7 – `split`, `composeChanges`, `flatMap`, etc.**
+  * See Laminar docs for using `split` to efficiently render dynamic lists of children
 * **API: Hide `ancestorMountEvents` and `thisNodeMountEvents` (#42)**
   * Migration: use `mountEvents`, `maybeParentSignal` or `parentChangeEvents` instead
 
