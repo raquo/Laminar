@@ -198,5 +198,5 @@ trait ReactiveElement[+Ref <: dom.Element]
 
 object ReactiveElement {
 
-  private val noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil)
+  private val noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil, emitOnce = true)
 }
