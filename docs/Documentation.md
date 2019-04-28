@@ -467,7 +467,7 @@ So let's write smarter code. It's actually very easy.
 All we need to do is adjust our `renderUser` function to take a different set of parameters:
 
 ```scala
-def newRenderUser(userId: String, initialUser: User, usersStream: EventStream[User]): Div = {
+def newRenderUser(userId: String, initialUser: User, userStream: EventStream[User]): Div = {
   div(
     p("user id: " + userId),
     p("name: ", child.text <-- userStream.map(_.name)), 
