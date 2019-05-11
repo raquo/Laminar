@@ -50,7 +50,7 @@ I understand that the importance of some of these points might not be immediatel
 * I also offer commercial support and consulting services for Laminar and Airstream. Ping me at [nikita@raquo.com](nikita@raquo.com).
 * **Laminar examples**
   * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/1) to try things on the fly
-  * [raquo/laminar-examples](https://github.com/raquo/laminar-examples) – small frontend-only todo list app in Laminar
+  * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
 
 
