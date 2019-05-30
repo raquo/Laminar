@@ -1,5 +1,6 @@
 package com.raquo.laminar.example.components
 
+import com.raquo.laminar.fixtures.example.components.Toggle
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom.raw.HTMLInputElement
 

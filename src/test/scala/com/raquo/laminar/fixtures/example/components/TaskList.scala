@@ -1,4 +1,4 @@
-package com.raquo.laminar.example.components
+package com.raquo.laminar.fixtures.example.components
 
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.signal.Signal

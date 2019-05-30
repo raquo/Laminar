@@ -1,8 +1,8 @@
-package com.raquo.laminar.example.pseudotests
+package com.raquo.laminar.fixtures.example.pseudotests
 
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.laminar.api._
-import com.raquo.laminar.example.components.Toggle
+import com.raquo.laminar.fixtures.example.components.Toggle
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 

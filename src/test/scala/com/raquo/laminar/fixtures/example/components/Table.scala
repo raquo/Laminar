@@ -1,4 +1,4 @@
-package com.raquo.laminar.example.components
+package com.raquo.laminar.fixtures.example.components
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveNode
