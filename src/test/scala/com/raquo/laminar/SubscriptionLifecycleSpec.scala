@@ -191,11 +191,12 @@ class SubscriptionLifecycleSpec extends UnitSpec {
     values = Seq("red", "orange", "blue", "cyan")
   ).run())
 
-  it("GRANDPARENT UNMOUNT: href reflectedAttr")(SimpleTest[String](
-    makeElement = $href => span(L.a(href <-- $href, "Hello")),
-    emptyExpectedNode = span like (L.a like(href isEmpty, "Hello")),
-    makeExpectedNode = expectedHref => span like (L.a like(href is expectedHref, "Hello")),
-    values = Seq("href 1", "href 2", "href 3", "href 4").map(randomString(_))
+  // @Note href property reflection is apparently slightly broken in jsdom environment so I changed this test to use title
+  it("GRANDPARENT UNMOUNT: title reflectedAttr")(SimpleTest[String](
+    makeElement = $title => span(L.a(title <-- $title, "Hello")),
+    emptyExpectedNode = span like (L.a like(title isEmpty, "Hello")),
+    makeExpectedNode = expectedTitle => span like (L.a like(title is expectedTitle, "Hello")),
+    values = Seq("title 1", "title 2", "title 3", "title 4").map(randomString(_))
   ).run())
 
   // @TODO[Test] Also test that removing only one subscription does not unsubscribe the other one

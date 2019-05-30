@@ -5,14 +5,14 @@ import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
-import com.raquo.domtypes.jsdom.defs.eventProps.{ClipboardEventProps, DocumentEventProps, ErrorEventProps, FormEventProps, KeyboardEventProps, MediaEventProps, MiscellaneousEventProps, MouseEventProps, WindowEventProps, WindowOnlyEventProps}
-import com.raquo.domtypes.jsdom.defs.tags.{DocumentTags, EmbedTags, FormTags, GroupingTags, MiscTags, SectionTags, SvgTags, TableTags, TextTags}
+import com.raquo.domtypes.jsdom.defs.eventProps._
+import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.Implicits
-import com.raquo.laminar.builders.{DomEventStream, DomEventStreamPropBuilder, ReactiveHtmlBuilders, ReactiveHtmlTag, ReactiveSvgBuilders, ReactiveSvgTag}
-import com.raquo.laminar.defs.{ReactiveComplexHtmlKeys, ReactiveComplexSvgKeys}
-import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedHtmlAttr, ReactiveStyle, ReactiveSvgAttr}
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement, ReactiveHtmlElement, ReactiveRoot, ReactiveSvgElement, ReactiveText}
-import com.raquo.laminar.receivers.{ChildReceiver, ChildrenReceiver, FocusReceiver}
+import com.raquo.laminar.builders._
+import com.raquo.laminar.defs._
+import com.raquo.laminar.keys._
+import com.raquo.laminar.nodes._
+import com.raquo.laminar.receivers._
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -21,7 +21,7 @@ private[laminar] object Laminar
   extends Airstream
   with ReactiveComplexHtmlKeys
   // Reflected Attrs
-  with ReflectedHtmlAttrs[ReactiveReflectedHtmlAttr]
+  with ReflectedHtmlAttrs[ReactiveReflectedProp]
   // Attrs
   with HtmlAttrs[ReactiveHtmlAttr]
   // Event Props
@@ -142,6 +142,7 @@ private[laminar] object Laminar
   val child: ChildReceiver.type = ChildReceiver
 
   val children: ChildrenReceiver.type = ChildrenReceiver
+
 
   @inline def render(
     container: dom.Element,

@@ -1,16 +1,16 @@
 package com.raquo.laminar.builders
 
-import com.raquo.domtypes.generic.builders.{EventPropBuilder, HtmlAttrBuilder, HtmlTagBuilder, PropBuilder, ReflectedHtmlAttrBuilder, StyleBuilders}
+import com.raquo.domtypes.generic.builders._
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.api.StyleSetter
-import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveHtmlAttr, ReactiveProp, ReactiveReflectedHtmlAttr, ReactiveStyle}
+import com.raquo.laminar.keys._
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
 trait ReactiveHtmlBuilders
   extends HtmlAttrBuilder[ReactiveHtmlAttr]
-  with ReflectedHtmlAttrBuilder[ReactiveReflectedHtmlAttr]
+  with ReflectedHtmlAttrBuilder[ReactiveReflectedProp]
   with PropBuilder[ReactiveProp]
   with EventPropBuilder[ReactiveEventProp, dom.Event]
   with StyleBuilders[StyleSetter]
@@ -26,8 +26,8 @@ trait ReactiveHtmlBuilders
     propKey: String,
     attrCodec: Codec[V, String],
     propCodec: Codec[V, DomPropV]
-  ): ReactiveReflectedHtmlAttr[V, DomPropV] = {
-    new ReactiveHtmlAttr(attrKey, attrCodec)
+  ): ReactiveReflectedProp[V, DomPropV] = {
+    new ReactiveProp(propKey, propCodec)
   }
 
   override protected def prop[V, DomV](key: String, codec: Codec[V, DomV]): ReactiveProp[V, DomV] = {
