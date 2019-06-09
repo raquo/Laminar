@@ -2,6 +2,16 @@
 
 Breaking changes in **bold**.
 
+#### master
+
+* **New: Use DOM Props to set [Reflected Attributes](https://github.com/raquo/scala-dom-types/#reflected-attributes).**
+  * Better performance than setting HTML attributes
+  * I do not expect a change in behaviour due to the largely symmetrical nature of reflected attributes. At least not when using reflected attributes for writing values. Reading might yield subtle differences as mentioned in the link above.
+  * This change is also potentially breaking because the types of identifiers like `href` changed from `ReactiveHtmlAttr` to `ReactiveProp`. Unless you reference those types or their non-common ancestors in your code you should be fine.
+* New: `maybe` method for keys. You can now do `attr.maybe(optionOfValue)` instead of `optionOfValue.map(attr := _)` 
+* Misc: Move code examples from main into test fixtures to remove them from the JS bundle
+* Misc: Bump _Scala DOM Types_ to v0.9.4 
+
 #### v0.7 – Apr 2019
 
 * **New: Airstream v0.5.1 -> v0.7 – `split`, `composeChanges`, `flatMap`, etc.**

@@ -6,7 +6,7 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.HtmlAttr
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar.HtmlElement
+import com.raquo.laminar.api.Laminar.{HtmlElement, optionToModifier}
 
 class ReactiveHtmlAttr[V](
   override val name: String,
@@ -14,7 +14,11 @@ class ReactiveHtmlAttr[V](
 ) extends HtmlAttr[V](name, codec) { self =>
 
   @inline def apply(value: V): Modifier[HtmlElement] = {
-    :=(value)
+    this := value
+  }
+
+  def maybe(value: Option[V]): Modifier[HtmlElement] = {
+    value.map(v => this := v)
   }
 
   def :=(value: V): Modifier[HtmlElement] = {

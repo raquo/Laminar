@@ -6,8 +6,7 @@ import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.nodes.ReactiveSvgElement
-import org.scalajs.dom
+import com.raquo.laminar.api.Laminar.{SvgElement, optionToModifier}
 
 class ReactiveSvgAttr[V](
   override val name: String,
@@ -15,10 +14,12 @@ class ReactiveSvgAttr[V](
   override val namespace: Option[String]
 ) extends domtypes.generic.keys.SvgAttr[V](name, codec, namespace) { self =>
 
-  private type SvgElement = ReactiveSvgElement[dom.svg.Element]
-
   @inline def apply(value: V): Modifier[SvgElement] = {
-    :=(value)
+    this := value
+  }
+
+  def maybe(value: Option[V]): Modifier[SvgElement] = {
+    value.map(v => this := v)
   }
 
   def :=(value: V): Modifier[SvgElement] = {

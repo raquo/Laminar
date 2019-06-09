@@ -5,7 +5,7 @@ import com.raquo.dombuilder.generic.modifiers.Setter
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar.HtmlElement
+import com.raquo.laminar.api.Laminar.{HtmlElement, optionToModifier}
 
 import scala.scalajs.js.|
 
@@ -17,8 +17,13 @@ import scala.scalajs.js.|
   */
 class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
 
+  // @TODO[API] Should this accept V or V | String?
   @inline def apply(value: V): Modifier[HtmlElement] = {
-    :=(value)
+    this := value
+  }
+
+  def maybe(value: Option[V | String]): Modifier[HtmlElement] = {
+    value.map(v => this := v)
   }
 
   def :=(value: V | String): Modifier[HtmlElement] = {
