@@ -8,6 +8,8 @@ Breaking changes in **bold**.
   * Better performance than setting HTML attributes
   * I do not expect a change in behaviour due to the largely symmetrical nature of reflected attributes. At least not when using reflected attributes for writing values. Reading might yield subtle differences as mentioned in the link above.
   * This change is also potentially breaking because the types of identifiers like `href` changed from `ReactiveHtmlAttr` to `ReactiveProp`. Unless you reference those types or their non-common ancestors in your code you should be fine.
+* API: Return `EventStream` type for `documentEvents` and `windowEvents` props, not the unnecessarily specific `DomEventStream`.
+  * **Note: small chance of breakage** if you rely on `DomEventStream` type in your code
 * New: `maybe` method for keys. You can now do `attr.maybe(optionOfValue)` instead of `optionOfValue.map(attr := _)`
 * New: `emptyNode` to make an empty `Node` (implemented as a comment node)
 * API: Use `Child` / `Children` / `ChildrenCommand` types more consistently internally; expose aliases in Laminar.scala 

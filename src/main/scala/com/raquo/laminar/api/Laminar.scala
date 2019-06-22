@@ -9,7 +9,6 @@ import com.raquo.domtypes.jsdom.defs.eventProps._
 import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders._
-import com.raquo.laminar.collection.CollectionCommand
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes._
@@ -64,11 +63,11 @@ private[laminar] object Laminar
 
   object documentEvents
     extends DomEventStreamPropBuilder(dom.document)
-    with DocumentEventProps[DomEventStream]
+    with DocumentEventProps[EventStream]
 
   object windowEvents
     extends DomEventStreamPropBuilder(dom.window)
-    with WindowEventProps[DomEventStream]
+    with WindowEventProps[EventStream]
 
   /** An owner that never kills its possessions.
     *

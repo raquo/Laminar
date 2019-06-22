@@ -8,7 +8,11 @@ import scala.scalajs.js
 
 // @TODO[API,Integrity] Use this for element events too
 // @TODO[API] This could potentially replace EventPropTransformation
-class DomEventStream[Ev <: dom.Event](eventTarget: dom.EventTarget, eventKey: String, useCapture: Boolean) extends EventStream[Ev] {
+class DomEventStream[Ev <: dom.Event](
+  eventTarget: dom.EventTarget,
+  eventKey: String,
+  useCapture: Boolean
+) extends EventStream[Ev] {
 
   // @TODO[API] We need to figure out a better protection mechanism in Airstream, this only works for Laminar because it shares com.raquo with Airstream
   override protected[raquo] val topoRank: Int = 1
