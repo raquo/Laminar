@@ -4,8 +4,6 @@ import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.signal.Signal
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.collection.CollectionCommand.Append
-import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
-import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
 
 class TaskList {
 
@@ -24,7 +22,7 @@ class TaskList {
     child.maybe <-- maybeNewTaskButton
   )
 
-  def maybeNewTaskButton: Signal[MaybeChildNode] = {
+  def maybeNewTaskButton: Signal[Option[Node]] = {
     $showAddTaskInput.map { showAddTaskInput =>
       val showNewTaskButton = !showAddTaskInput
       if (showNewTaskButton) {
@@ -42,7 +40,7 @@ class TaskList {
     }
   }
 
-  def maybeNewTask: Signal[MaybeChildNode] = {
+  def maybeNewTask: Signal[Option[Node]] = {
     $showAddTaskInput.map { showAddTaskInput =>
       if (showAddTaskInput) {
         Some(button(

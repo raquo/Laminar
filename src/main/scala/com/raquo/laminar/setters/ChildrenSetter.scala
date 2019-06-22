@@ -48,6 +48,7 @@ object ChildrenSetter {
   private val emptyChildren = Vector()
 
   type Child = ReactiveChildNode[dom.Node]
+
   type Children = immutable.Seq[Child]
 
   /** @return New child node count */
@@ -55,7 +56,7 @@ object ChildrenSetter {
     prevChildren: Children,
     nextChildren: Children,
     parentNode: ReactiveElement[dom.Element],
-    sentinelNode: ReactiveChildNode[dom.Node],
+    sentinelNode: Child,
     prevChildrenCount: Int
   ): Int = {
     val liveNodeList = parentNode.ref.childNodes

@@ -158,6 +158,21 @@ Notice that the code snippet above does not require you to HTML-escape `"&"` or 
 Note: this section of documentation only explained how to render _static_ data. You will learn to render dynamic data and lists of children in [Reactive Data](#reactive-data) section. 
 
 
+### Empty Nodes
+
+Thanks to the `optionToModifier` implicit mentioned above, you can use `Option[ReactiveElement]` where a `Modifier` is expected, but in other cases you might not want to deal with Option's boxing.  
+
+And so, an empty DOM node can be created with... `emptyNode`.
+
+// @NC What type actually
+
+```scala
+val node: Node = if (foo) element else emptyNode
+```
+
+Note that `emptyNode` outputs an empty _`<comment>`_ node, which is a `ReactiveComment`, not a `ReactiveElement`. Their common type is `ReactiveChildNode[dom.Node]`, aliased as simply `Node`. This distinction comes from JS world where `dom.Comment` nodes and `dom.Text` nodes can't have children, and are not `dom.Element`-s.
+
+
 ### Manual Application
 
 Modifiers have a public `apply(element: El)` method that you can use to manually apply modifiers. Using it is a bit clunky, for example: `(color := "red")(element)`. This pattern is discouraged to the extent that it enables imperative coding patterns. You should generally use [Reactive Data](#reactive-data) instead.
@@ -220,7 +235,7 @@ div(onTouchMove --> eventBus)
 
 2. No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results from applying it only once. Setters like `key := value` typically _are_ idempotent, but for example a modifier like `onClick --> observer` isn't. There should be no surprises as long as you know what the modifier is supposed to do in plain English.
 
-4. Yes, Modifiers are generally reusable. The same modifier can usually be applied to multiple nodes. But again, you have to understand what the modifier does. Setting an attribute to a particular value – sure, reusable. Adding a particular element as a child – no, not reusable – see [Reusing Elements](#reusing-elements). If you're writing your own Modifier, don't store element-specific state outside of its `apply` method to make it reusable.
+4. Yes, Modifiers are generally reusable. The same modifier can usually be applied to multiple nodes. But again, you have to understand what the modifier does. Setting an attribute to a particular value – sure, reusable. Adding a particular element as a child – no, not reusable – see [Reusing Elements](#reusing-elements). If you're writing your own Modifier and want to make it reusable, don't store element-specific state outside of its `apply` method.
 
 
 

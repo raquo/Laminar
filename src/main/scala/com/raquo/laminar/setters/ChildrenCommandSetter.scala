@@ -5,13 +5,14 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.collection.CollectionCommand
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
+import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
 import com.raquo.laminar.setters.ChildrenSetter.Child
 import org.scalajs.dom
 
 import scala.scalajs.js
 
 class ChildrenCommandSetter(
-  commandStream: EventStream[ChildrenCommandSetter.ChildrenCommand]
+  commandStream: EventStream[ChildrenCommand]
 ) extends Modifier[ReactiveElement[dom.Element]] {
 
   import ChildrenCommandSetter.updateList
@@ -39,7 +40,7 @@ object ChildrenCommandSetter {
   type ChildrenCommand = CollectionCommand[Child]
 
   def updateList(
-    command: ChildrenCommandSetter.ChildrenCommand,
+    command: ChildrenCommand,
     parentNode: ReactiveElement[dom.Element],
     sentinelNode: ReactiveChildNode[dom.Comment],
     nodeCount: Int

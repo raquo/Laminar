@@ -9,10 +9,12 @@ import com.raquo.domtypes.jsdom.defs.eventProps._
 import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders._
+import com.raquo.laminar.collection.CollectionCommand
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes._
 import com.raquo.laminar.receivers._
+import com.raquo.laminar.setters.{ChildrenCommandSetter, ChildrenSetter}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -93,6 +95,12 @@ private[laminar] object Laminar
 
   type Root = ReactiveRoot
 
+  type Child = ChildrenSetter.Child
+
+  type Children = ChildrenSetter.Children
+
+  type ChildrenCommand = ChildrenCommandSetter.ChildrenCommand
+
 
   // Modifiers
 
@@ -135,6 +143,13 @@ private[laminar] object Laminar
   type Span = ReactiveHtmlElement[dom.html.Span]
 
   type TextArea = ReactiveHtmlElement[dom.html.TextArea]
+
+
+  /** Note: this is not a [[ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
+    * This is a bit annoying, I know.
+    * Both [[ReactiveComment]] and [[ReactiveElement]] are `Child` aka `Node`.
+    */
+  val emptyNode: ReactiveComment = new ReactiveComment("")
 
 
   val focus: FocusReceiver.type = FocusReceiver

@@ -108,6 +108,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     observable.addObserver(observer)(owner = this)
   }
 
+  // @TODO[Naming] Rename to subscribeThisO?
   def subscribeO[V](getObservable: this.type => Observable[V])(observer: Observer[V]): Subscription = {
     subscribeO(getObservable(this))(observer)
   }
@@ -116,6 +117,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     subscribeO(observable)(Observer(onNext))
   }
 
+  // @TODO[Naming] Rename to subscribeThis?
   def subscribe[V](getObservable: this.type => Observable[V])(onNext: V => Unit): Subscription = {
     subscribeO(getObservable(this))(Observer(onNext))
   }

@@ -4,10 +4,10 @@ import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
-import com.raquo.laminar.receivers.MaybeChildReceiver.MaybeChildNode
+import com.raquo.laminar.setters.ChildrenSetter.Child
 import org.scalajs.dom
 
-class MaybeChildSetter(maybeNodeObservable: Observable[MaybeChildNode])
+class MaybeChildSetter(maybeNodeObservable: Observable[Option[Child]])
   extends Modifier[ReactiveElement[dom.Element]] {
 
   // @TODO[Elegance] Unify this logic with ChildSetter? Or not... Almost the same thing.
@@ -20,7 +20,7 @@ class MaybeChildSetter(maybeNodeObservable: Observable[MaybeChildNode])
     parentNode.appendChild(childNode)(DomApi.treeApi)
     parentNode.subscribe(maybeNodeObservable)(onNext)
 
-    @inline def onNext(maybeNewChildNode: MaybeChildNode): Unit = {
+    @inline def onNext(maybeNewChildNode: Option[Child]): Unit = {
       val newChildNode = maybeNewChildNode.getOrElse(sentinelNode)
       // @TODO[Performance] Add an "if (childNode != newChildNode)" check? Here or in replaceChild method?
       parentNode.replaceChild(childNode, newChildNode)(DomApi.treeApi)

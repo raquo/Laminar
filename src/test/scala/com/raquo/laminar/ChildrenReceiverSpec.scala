@@ -2,7 +2,6 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveChildNode
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -20,7 +19,7 @@ class ChildrenReceiverSpec extends UnitSpec {
 
   it("updates a list of children") {
 
-    val childrenBus = new EventBus[Vector[ReactiveChildNode[dom.Node]]]
+    val childrenBus = new EventBus[Vector[Child]]
     val $children = childrenBus.events
 
     val span0 = span(text0)
