@@ -170,7 +170,7 @@ And so, an empty DOM node can be created with... `emptyNode`.
 val node: Node = if (foo) element else emptyNode
 ```
 
-Note that `emptyNode` outputs an empty _`<comment>`_ node, which is a `ReactiveComment`, not a `ReactiveElement`. Their common type is `ReactiveChildNode[dom.Node]`, aliased as simply `Node`. This distinction comes from JS world where `dom.Comment` nodes and `dom.Text` nodes can't have children, and are not `dom.Element`-s.
+Note that `emptyNode` outputs an empty HTML comment node, which is a `ReactiveComment`, not a `ReactiveElement`. Their common type is `ReactiveChildNode[dom.Node]`, aliased as simply `Node`. This distinction comes from JS world where `dom.Comment` nodes and `dom.Text` nodes can't have children, and are not `dom.Element`-s.
 
 
 ### Manual Application
@@ -584,7 +584,7 @@ This would need more work if we wanted to support other actions such as removals
 
 ---
 
-You can mix both `children <-- *` and `children.command <-- *` and any other children or modifiers in any order inside one element, and they will happily coexist with no interference. Correct order of elements will be maintained even in edge cases such as showing zero elements. Laminar adds a sentinel `<comment>` node into the DOM for each `child* <-- *` receiver to make this possible. These nodes effectively "reserve the spot" for children provided by a particular receiver.
+You can mix both `children <-- *` and `children.command <-- *` and any other children or modifiers in any order inside one element, and they will happily coexist with no interference. Correct order of elements will be maintained even in edge cases such as showing zero elements. Laminar adds a sentinel HTML comment node into the DOM for each `child* <-- *` receiver to make this possible. These nodes effectively "reserve the spot" for children provided by a particular receiver.
 
 
 ### Other Receivers
