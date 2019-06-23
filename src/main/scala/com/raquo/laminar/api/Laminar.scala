@@ -148,7 +148,7 @@ private[laminar] object Laminar
     * This is a bit annoying, I know.
     * Both [[ReactiveComment]] and [[ReactiveElement]] are `Child` aka `Node`.
     */
-  val emptyNode: ReactiveComment = new ReactiveComment("")
+  def emptyNode: ReactiveComment = new ReactiveComment("")
 
 
   val focus: FocusReceiver.type = FocusReceiver
