@@ -62,7 +62,7 @@ Laminar and Airstream are well documented:
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.7](https://github.com/raquo/Laminar/blob/v0.7/docs/Documentation.md)** | **[v0.7](https://github.com/raquo/Airstream/blob/v0.7/README.md)** |
+| **[v0.7.1](https://github.com/raquo/Laminar/blob/v0.7.1/docs/Documentation.md)** | **[v0.7.1](https://github.com/raquo/Airstream/blob/v0.7.1/README.md)** |
 | **[v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md)** | **[v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md)** |
 | **[v0.5.1](https://github.com/raquo/Laminar/blob/v0.5.1/docs/Documentation.md)** | **[v0.4.1](https://github.com/raquo/Airstream/blob/v0.4.1/README.md)** |
 | **[v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md)** | **[v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md)** |
