@@ -86,12 +86,14 @@ object ChildrenSetter {
       // @TODO[Performance] this diffing algo is decent, but can still be optimized in a few ways (but we need benchmarking & data for that)
       // @TODO[Performance] We could optimize this for specific `Seq` implementations. For example, foreach is faster than while() on a `List`
 
+      // @Note: Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
+
       if (currentChildrenCount <= index) {
-        // Note: `prevChildRef` is not valid in this branch
-        //        dom.console.log("INSERTING " + nextChild.ref.textContent + " at index-" + index + " (nextChildNodeIndex=" + nextChildNodeIndex + ")")
         // We ran through the whole prevChildren list already, we just need to append all remaining nextChild-s into the DOM
+        // Note: `prevChildRef` is not valid in this branch
+        // println("> overflow: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
+        // @Note: DOM update
         parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
-        // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
         prevChildRef = nextChild.ref
         currentChildrenCount += 1
       } else {
@@ -101,14 +103,10 @@ object ChildrenSetter {
         } else {
           //          dom.console.log("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
 
-          //          dom.console.log(parentNode.ref.childNodes(0), parentNode.ref.childNodes(0).textContent)
-          //          dom.console.log(parentNode.ref.childNodes(1), parentNode.ref.childNodes(1).textContent)
-          //          dom.console.log(parentNode.ref.childNodes(2), parentNode.ref.childNodes(2).textContent)
-          //          dom.console.log(parentNode.ref.childNodes(3), parentNode.ref.childNodes(3).textContent)
-          //          dom.console.log(parentNode.ref.childNodes(4), parentNode.ref.childNodes(4).textContent)
-
           if (!prevChildren.contains(nextChild)) {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
+            // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
+            // @Note: DOM update
             parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
             prevChildRef = nextChild.ref
             currentChildrenCount += 1
@@ -128,16 +126,19 @@ object ChildrenSetter {
               val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
+              // println("> removing " + prevChild.ref.textContent)
+              // @Note: DOM update
               parentNode.removeChild(prevChild)(DomApi.treeApi)
-
-              currentChildrenCount -= 1
-              // Update prevChildNode reference
               prevChildRef = nextPrevChildRef
+              currentChildrenCount -= 1
             }
             if (nextChild.ref != prevChildRef) {
               // nextChild is still not in the right place, so let's move it to the correct index
-              parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi) // MOVE, so we DO NOT update currentDomChildrenCount
+              // println("> order: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
+              // @Note: DOM update
+              parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
               prevChildRef = nextChild.ref
+              // This is a MOVE, so we DO NOT update currentDomChildrenCount here.
             }
           }
         }
@@ -147,11 +148,11 @@ object ChildrenSetter {
     }
 
     while (index < currentChildrenCount) {
-
-      //      dom.console.log("\nDELETING REMAINDER: index=" + index + ", currentChildrenCount = " + currentChildrenCount)
-      //      dom.console.log("prevChildRef: " + prevChildRef.textContent)
+      // We ran out of new items before we ran out of current items. Now deleting the remainder of current items.
 
       val nextPrevChildRef = prevChildRef.nextSibling
+      // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
+      // @Note: DOM update
       parentNode.removeChild(prevChildFromRef(prevChildren, prevChildRef))(DomApi.treeApi)
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1
@@ -175,6 +176,7 @@ object ChildrenSetter {
     found
   }
 
+  // @TODO[Performance] This method should not exist, I think. See how it's used, we should just have removeChildByRef method in Laminar or SDB.
   protected def prevChildFromRef(prevChildren: Children, ref: dom.Node): Child = {
     //    println("> prevChildFromDomNode")
     //    dom.console.log(prevChildren(0))

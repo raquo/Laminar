@@ -1,8 +1,8 @@
 language: scala
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 scala:
-  - 2.12.6
+  - 2.12.9
 
 cache:
   yarn: true

@@ -2,8 +2,11 @@
 
 Breaking changes in **bold**.
 
-#### master – TBD
+#### v0.7.1 – Aug 2019
 
+* Fix: Due to a bug in _Scala DOM Builder_, it would make mistakes tracking ReactiveElements' children when Laminar was reordering them e.g. using `children <-- X`. This would then result in "cannot read `nextSibling` of null" errors and potentially other inconsistencies.
+  * I fixed the issue in _Scala DOM Builder_ v0.9.2, and added another reordering test for this particular scenario in Laminar
+  * Thanks to [@gabrielgiussi](https://github.com/gabrielgiussi) for reporting, and nailing the test case!
 * **New: Use DOM Props to set [Reflected Attributes](https://github.com/raquo/scala-dom-types/#reflected-attributes).**
   * Better performance than setting HTML attributes
   * I do not expect a change in behaviour due to the largely symmetrical nature of reflected attributes. At least not when using reflected attributes for writing values. Reading might yield subtle differences as mentioned in the link above.
@@ -12,6 +15,7 @@ Breaking changes in **bold**.
   * **Note: small chance of breakage** if you rely on `DomEventStream` type in your code
 * New: `maybe` method for keys. You can now do `attr.maybe(optionOfValue)` instead of `optionOfValue.map(attr := _)`
 * New: `emptyNode` to make an empty `Node` (implemented as a comment node)
+* New: `WriteBus.contracomposeWriter` and other improvements from Airstream v0.7.1
 * API: Use `Child` / `Children` / `ChildrenCommand` types more consistently internally; expose aliases in Laminar.scala 
 * Misc: Move code examples from main into test fixtures to remove them from the JS bundle
 * Misc: Bump _Scala DOM Types_ to v0.9.4 

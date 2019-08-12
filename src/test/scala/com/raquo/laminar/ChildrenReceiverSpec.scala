@@ -4,8 +4,19 @@ import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
+import org.scalatest.BeforeAndAfter
 
-class ChildrenReceiverSpec extends UnitSpec {
+class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
+
+  before {
+    AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
+    AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+  }
+
+  after {
+    AirstreamError.registerUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
+    AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+  }
 
   private val text0 = randomString("text0_")
   private val text00 = randomString("text00_")
@@ -32,6 +43,8 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount(main(children <-- $children))
     expectChildren("none")
 
+    childrenBus.writer.onNext(Vector())
+
     childrenBus.writer.onNext(Vector(span0))
     expectChildren("append #1:", span like text0)
 
@@ -50,8 +63,11 @@ class ChildrenReceiverSpec extends UnitSpec {
     childrenBus.writer.onNext(Vector(span1, span0))
     expectChildren("replaceAll:", span like text1, span like text0)
 
+    childrenBus.writer.onNext(Vector(span0, span1))
+    expectChildren("switch places:", span like text0, span like text1)
+
     childrenBus.writer.onNext(Vector(span1, span0, span4))
-    expectChildren("append #3:", span like text1, span like text0, span like text4)
+    expectChildren("switch places & append:", span like text1, span like text0, span like text4)
 
     childrenBus.writer.onNext(Vector(span1, span0, span5, span4))
     expectChildren("insert:", span like text1, span like text0, span like text5, span like text4)

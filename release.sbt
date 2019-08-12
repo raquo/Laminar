@@ -4,7 +4,7 @@ normalizedName := "laminar"
 
 organization := "com.raquo"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.12.9"
 
 homepage := Some(url("https://github.com/raquo/Laminar"))
 

@@ -18,4 +18,8 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: ReactiveHtmlTag[Ref
   final def <--[V, DomV](prop: ReactiveProp[V, DomV]): PropReceiver[V, DomV] = new PropReceiver(prop, this)
 
   final def <--[V](focus: FocusReceiver.type): FocusReceiver = new FocusReceiver(this)
+
+  override def toString: String = {
+    s"ReactiveHtmlElement(${ref.outerHTML})"
+  }
 }

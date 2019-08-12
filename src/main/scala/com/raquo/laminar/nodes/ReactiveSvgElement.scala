@@ -12,4 +12,8 @@ class ReactiveSvgElement[+Ref <: dom.svg.Element](val tag: ReactiveSvgTag[Ref])
   final override val ref: Ref = DomApi.svgElementApi.createSvgElement(this)
 
   final def <--[V](attr: ReactiveSvgAttr[V]): SvgAttrReceiver[V] = new SvgAttrReceiver(attr, this)
+
+  override def toString: String = {
+    s"ReactiveSvgElement(${ref.outerHTML})"
+  }
 }
