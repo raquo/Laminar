@@ -139,7 +139,7 @@ import org.scalajs.dom
  
 val nameBus = new EventBus[String]
 val colorStream: EventStream[String] = nameBus.events.map { name =>
-  if (name == "Sébastien") "red" else "auto" // make Sébastien feel special
+  if (name == "Sébastien") "red" else "unset" // make Sébastien feel special
 }
  
 val appDiv: Div = div(
@@ -216,7 +216,7 @@ val nameStream = inputBox.inputNode
   .mapTo(inputBox.inputNode.ref.value) // gets the current value from the input text box (note: parameter passed by name)
  
 val colorStream = nameStream.map { name =>
-  if (name == "Sébastien") "red" else "auto" // make Sébastien feel special
+  if (name == "Sébastien") "red" else "unset" // make Sébastien feel special
 }
 
 val appDiv: Div = div(
