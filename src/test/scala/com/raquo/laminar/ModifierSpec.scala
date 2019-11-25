@@ -13,7 +13,7 @@ class ModifierSpec extends UnitSpec {
 
     val strings = List("a", "b")
     val nodes = Vector(span("ya"), article("yo"))
-    val jsNodes: Seq[Mod[Element]] = js.Array(span("js")) // JS arrays need some help for now. We could optimize that if needed
+    val jsNodes: scala.collection.Seq[Mod[Element]] = js.Array(span("js")) // JS arrays need some help for now. We could optimize that if needed
     val mixed: Seq[Mod[HtmlElement]] = Vector("c", input())
 
     mount(div(strings, nodes, jsNodes, mixed))
@@ -22,7 +22,7 @@ class ModifierSpec extends UnitSpec {
       "a", "b",
       span like "ya", article like "yo",
       span like "js",
-      "c", input like ()
+      "c", input
     ))
   }
 

@@ -12,7 +12,7 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     val titleBus = new EventBus[String]
 
     mount(span(title <-- titleBus.events, "Hello"))
-    expectNode(span like (title isEmpty, "Hello"))
+    expectNode(span like (title.isEmpty, "Hello"))
 
     titleBus.writer.onNext(title1)
     expectNode(span like (title is title1, "Hello"))
@@ -173,7 +173,7 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     val valueBus = new EventBus[String]
 
     mount(div(title <-- valueBus.events, alt <-- valueBus.events, "Hello"))
-    expectNode(div like (title isEmpty, alt isEmpty, "Hello"))
+    expectNode(div like (title.isEmpty, alt.isEmpty, "Hello"))
 
     valueBus.writer.onNext(value1)
     expectNode(div like (title is value1, alt is value1, "Hello"))

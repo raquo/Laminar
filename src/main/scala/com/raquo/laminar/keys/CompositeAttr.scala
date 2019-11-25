@@ -6,6 +6,7 @@ import com.raquo.domtypes.generic.keys.Key
 import com.raquo.laminar.api.Laminar.{HtmlElement, MapValueMapper, StringValueMapper}
 import com.raquo.laminar.keys.CompositeAttr.CompositeValueMapper
 
+import scala.collection
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 
@@ -23,7 +24,7 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
     update(MapValueMapper.toDict(items, separator))
   }
 
-  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[Seq[V]]): Modifier[HtmlElement] = {
+  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Modifier[HtmlElement] = {
     update(mapper.toDict(items, separator))
   }
 
@@ -35,7 +36,7 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
     update(MapValueMapper.toDict(items, separator))
   }
 
-  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[Seq[V]]): Modifier[HtmlElement] = {
+  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Modifier[HtmlElement] = {
     update(mapper.toDict(value, separator))
   }
 
@@ -138,30 +139,36 @@ object CompositeAttr {
       }
     }
 
-    implicit object StringSeqValueMapper extends CompositeValueMapper[Seq[String]] {
-      override def toDict(items: Seq[String], separator: Char): Dictionary[Boolean] = {
+    implicit object StringSeqValueMapper extends CompositeValueMapper[collection.Seq[String]] {
+      override def toDict(items: collection.Seq[String], separator: Char): Dictionary[Boolean] = {
         val dict = js.Dictionary.empty[Boolean]
         items.foreach(item => dict.update(item, true))
         dict
       }
     }
 
-    implicit object StringSeqSeqValueMapper extends CompositeValueMapper[Seq[Seq[String]]] {
-      override def toDict(items: Seq[Seq[String]], separator: Char): Dictionary[Boolean] = {
+    implicit object StringSeqSeqValueMapper extends CompositeValueMapper[collection.Seq[collection.Seq[String]]] {
+      override def toDict(items: collection.Seq[collection.Seq[String]], separator: Char): Dictionary[Boolean] = {
         val dict = js.Dictionary.empty[Boolean]
         items.flatten.foreach(item => dict.update(item, true))
         dict
       }
     }
 
-    implicit object StringBooleanSeqValueMapper extends CompositeValueMapper[Seq[(String, Boolean)]] {
-      // @TODO[Performance] Check how `_*` is encoded in Scala.js, if it's too heavy we should review all usages of it.
-      override def toDict(items: Seq[(String, Boolean)], separator: Char): js.Dictionary[Boolean] = js.Dictionary(items: _*)
+    implicit object StringBooleanSeqValueMapper extends CompositeValueMapper[collection.Seq[(String, Boolean)]] {
+      override def toDict(items: collection.Seq[(String, Boolean)], separator: Char): js.Dictionary[Boolean] = {
+        val dict = js.Dictionary[Boolean]()
+        items.foreach(itemTuple => dict.update(itemTuple._1, itemTuple._2))
+        dict
+      }
     }
 
-    implicit object StringBooleanSeqSeqValueMapper extends CompositeValueMapper[Seq[Seq[(String, Boolean)]]] {
-      // @TODO[Performance] Check how `_*` is encoded in Scala.js, if it's too heavy we should review all usages of it.
-      override def toDict(items: Seq[Seq[(String, Boolean)]], separator: Char): js.Dictionary[Boolean] = js.Dictionary(items.flatten: _*)
+    implicit object StringBooleanSeqSeqValueMapper extends CompositeValueMapper[collection.Seq[collection.Seq[(String, Boolean)]]] {
+      override def toDict(items: collection.Seq[collection.Seq[(String, Boolean)]], separator: Char): js.Dictionary[Boolean] = {
+        val dict = js.Dictionary[Boolean]()
+        items.flatten.foreach(itemTuple => dict.update(itemTuple._1, itemTuple._2))
+        dict
+      }
     }
 
     implicit object MapValueMapper extends CompositeValueMapper[Map[String, Boolean]] {

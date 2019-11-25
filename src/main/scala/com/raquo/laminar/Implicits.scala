@@ -28,7 +28,7 @@ trait Implicits extends DomApi with CompositeValueMappers {
   }
 
   /** Create a modifier that applies each of the modifiers in a seq */
-  implicit def seqToModifier[A, El <: ReactiveElement[dom.Element]](seq: Seq[A])(implicit evidence: A => Modifier[El]): Modifier[El] = {
+  implicit def seqToModifier[A, El <: ReactiveElement[dom.Element]](seq: scala.collection.Seq[A])(implicit evidence: A => Modifier[El]): Modifier[El] = {
     // @TODO[Performance] See if we might want a separate implicit conversion for cases when we don't need `evidence`
     new Modifier[El] {
       override def apply(el: El): Unit = {
