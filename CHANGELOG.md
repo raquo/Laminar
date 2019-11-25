@@ -2,6 +2,10 @@
 
 Breaking changes in **bold**.
 
+#### v0.7.2 – Dec 2019
+
+* Build: Scala 2.13 support
+
 #### v0.7.1 – Aug 2019
 
 * Fix: Due to a bug in _Scala DOM Builder_, it would make mistakes tracking ReactiveElements' children when Laminar was reordering them e.g. using `children <-- X`. This would then result in "cannot read `nextSibling` of null" errors and potentially other inconsistencies.
