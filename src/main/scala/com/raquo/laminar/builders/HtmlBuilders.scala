@@ -8,13 +8,13 @@ import com.raquo.laminar.keys._
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
-trait ReactiveHtmlBuilders
+trait HtmlBuilders
   extends HtmlAttrBuilder[ReactiveHtmlAttr]
   with ReflectedHtmlAttrBuilder[ReactiveReflectedProp]
   with PropBuilder[ReactiveProp]
   with EventPropBuilder[ReactiveEventProp, dom.Event]
   with StyleBuilders[StyleSetter]
-  with HtmlTagBuilder[ReactiveHtmlTag, dom.html.Element]
+  with HtmlTagBuilder[HtmlTag, dom.html.Element]
 {
 
   override protected def htmlAttr[V](key: String, codec: Codec[V, String]): ReactiveHtmlAttr[V] = {
@@ -54,8 +54,8 @@ trait ReactiveHtmlBuilders
     new ReactiveStyle(style) := value
   }
 
-  override def htmlTag[Ref <: dom.html.Element](tagName: String, void: Boolean): ReactiveHtmlTag[Ref] = {
-    new ReactiveHtmlTag[Ref](tagName, void)
+  override def htmlTag[Ref <: dom.html.Element](tagName: String, void: Boolean): HtmlTag[Ref] = {
+    new HtmlTag[Ref](tagName, void)
   }
 
 }

@@ -37,17 +37,17 @@ Outwatch and Laminar are quite similar cosmetically – their arrows notation wa
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
         element.subscribe(valueObservable) { value =>
-          DomApi.htmlElementApi.setHtmlAttribute(element, self, value)
+          DomApi.setHtmlAttribute(element, self, value)
         }
       }
     }
   }
 ```
 
-2) As you see it calls `setHtmlAttribute` when the `srcStream` emits a new `value`. Going to its definition in Scala DOM Builder's `JsHtmlElementApi` we see:
+2) As you see it calls `setHtmlAttribute` when the `srcStream` emits a new `value`. Going to its definition in Scala DOM Builder's `JsDomApi` we see:
 
 ```scala
-  override def setHtmlAttribute[V](element: BaseHtmlElement, attr: HtmlAttr[V], value: V): Unit = {
+  override def setHtmlAttribute[V](element: HtmlElement.Base, attr: HtmlAttr[V], value: V): Unit = {
     val domValue = attr.codec.encode(value)
     if (domValue == null) { // End users should use `removeAttribute` instead. This is to support boolean attributes.
       removeHtmlAttribute(element, attr)

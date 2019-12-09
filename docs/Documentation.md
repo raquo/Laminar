@@ -170,7 +170,7 @@ And so, an empty DOM node can be created with... `emptyNode`.
 val node: Node = if (foo) element else emptyNode
 ```
 
-Note that `emptyNode` outputs an empty HTML comment node, which is a `ReactiveComment`, not a `ReactiveElement`. Their common type is `ReactiveChildNode[dom.Node]`, aliased as simply `Node`. This distinction comes from JS world where `dom.Comment` nodes and `dom.Text` nodes can't have children, and are not `dom.Element`-s.
+Note that `emptyNode` outputs an empty HTML comment node, which is a `ReactiveComment`, not a `ReactiveElement`. Their common type is `ChildNode[dom.Node]`, aliased as simply `Node`. This distinction comes from JS world where `dom.Comment` nodes and `dom.Text` nodes can't have children, and are not `dom.Element`-s.
 
 
 ### Manual Application

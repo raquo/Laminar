@@ -7,7 +7,7 @@ import org.scalajs.dom
 
 class AttrReceiver[V](
   attr: ReactiveHtmlAttr[V],
-  element: ReactiveHtmlElement[dom.html.Element]
+  element: ReactiveHtmlElement.Base
 ) {
 
   def <--($value: Observable[V]): Unit = {

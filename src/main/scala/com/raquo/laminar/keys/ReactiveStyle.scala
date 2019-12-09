@@ -1,11 +1,11 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.dombuilder.generic.modifiers.Setter
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToModifier}
+import com.raquo.laminar.setters.Setter
 
 import scala.scalajs.js.|
 
@@ -27,18 +27,18 @@ class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
   }
 
   def :=(value: V | String): Modifier[HtmlElement] = {
-    new Setter[Style[V], V | String, HtmlElement](style, value, DomApi.htmlElementApi.setAnyStyle)
+    new Setter[Style[V], V | String, HtmlElement](style, value, DomApi.setHtmlAnyStyle)
   }
 
   def :=(value: String): Modifier[HtmlElement] = {
-    new Setter[Style[V], String, HtmlElement](style, value, DomApi.htmlElementApi.setStringStyle)
+    new Setter[Style[V], String, HtmlElement](style, value, DomApi.setHtmlStringStyle)
   }
 
   def <--($value: Observable[V | String]): Modifier[HtmlElement] = {
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
         element.subscribe($value) { value =>
-          DomApi.htmlElementApi.setAnyStyle(element, style, value)
+          DomApi.setHtmlAnyStyle(element, style, value)
         }
       }
     }

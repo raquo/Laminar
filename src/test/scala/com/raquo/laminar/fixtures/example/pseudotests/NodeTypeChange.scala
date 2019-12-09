@@ -12,7 +12,7 @@ object NodeTypeChange {
   def boldOrItalic(
     $useB: EventStream[Boolean],
     $bigFont: Signal[Boolean]
-  ): EventStream[ReactiveElement[dom.Element]] = {
+  ): EventStream[ReactiveElement.Base] = {
     val $fontSize = fontSizeStream($bigFont) // @TODO use remember()?
     $useB.map { useB =>
       dom.console.warn("useB: " + useB)
@@ -38,7 +38,7 @@ object NodeTypeChange {
     })
   }
 
-  def apply(): ReactiveElement[dom.Element] = {
+  def apply(): ReactiveElement.Base = {
 
     val toggle = Toggle("Bold")
     val toggle2 = Toggle("Big")

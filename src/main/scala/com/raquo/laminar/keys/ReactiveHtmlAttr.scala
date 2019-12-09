@@ -1,12 +1,12 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.dombuilder.generic.modifiers.Setter
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.HtmlAttr
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToModifier}
+import com.raquo.laminar.setters.Setter
 
 class ReactiveHtmlAttr[V](
   override val name: String,
@@ -22,7 +22,7 @@ class ReactiveHtmlAttr[V](
   }
 
   def :=(value: V): Modifier[HtmlElement] = {
-    new Setter[ReactiveHtmlAttr[V], V, HtmlElement](this, value, DomApi.htmlElementApi.setHtmlAttribute)
+    new Setter[ReactiveHtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
   }
 
   // @TODO[Performance] Is this encoded efficiently in Scala.js? Note the `self`.
@@ -30,7 +30,7 @@ class ReactiveHtmlAttr[V](
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
         element.subscribe($value) { value =>
-          DomApi.htmlElementApi.setHtmlAttribute(element, self, value)
+          DomApi.setHtmlAttribute(element, self, value)
         }
       }
     }

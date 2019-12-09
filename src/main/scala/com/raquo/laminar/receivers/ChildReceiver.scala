@@ -6,7 +6,7 @@ import com.raquo.laminar.setters.ChildSetter
 import com.raquo.laminar.setters.ChildrenSetter.Child
 import org.scalajs.dom
 
-class ChildReceiver(element: ReactiveElement[dom.Element]) {
+class ChildReceiver(element: ReactiveElement.Base) {
 
   def <--($node: Observable[Child]): Unit = {
     (ChildReceiver <-- $node)(element)

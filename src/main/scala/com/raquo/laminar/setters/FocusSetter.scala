@@ -6,12 +6,12 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom
 
 class FocusSetter(isFocusedObservable: Observable[Boolean])
-  extends Modifier[ReactiveHtmlElement[dom.html.Element]] {
+  extends Modifier[ReactiveHtmlElement.Base] {
 
   // @TODO[Convenience] This could use some isMounted lifecycle hook or something so that we can have focused-on-creation elements
   // @TODO[API] Or maybe have a special Laminar-only focus prop?
 
-  override def apply(element: ReactiveHtmlElement[dom.html.Element]): Unit = {
+  override def apply(element: ReactiveHtmlElement.Base): Unit = {
 
     element.subscribe(isFocusedObservable)(onNext)
 

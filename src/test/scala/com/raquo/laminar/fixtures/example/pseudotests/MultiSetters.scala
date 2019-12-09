@@ -7,7 +7,7 @@ import org.scalajs.dom
 
 object MultiSetters {
 
-  def apply(): ReactiveElement[dom.Element] = {
+  def apply(): ReactiveElement.Base = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("/about")

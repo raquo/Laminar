@@ -1,12 +1,12 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.dombuilder.generic.modifiers.Setter
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.Prop
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToModifier}
+import com.raquo.laminar.setters.Setter
 
 class ReactiveProp[V, DomV](
   override val name: String,
@@ -22,14 +22,14 @@ class ReactiveProp[V, DomV](
   }
 
   def :=(value: V): Modifier[HtmlElement] = {
-    new Setter[ReactiveProp[V, DomV], V, HtmlElement](this, value, DomApi.htmlElementApi.setProperty)
+    new Setter[ReactiveProp[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
   }
 
   def <--($value: Observable[V]): Modifier[HtmlElement] = {
     new Modifier[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
         element.subscribe($value) { value =>
-          DomApi.htmlElementApi.setProperty(element, self, value)
+          DomApi.setHtmlProperty(element, self, value)
         }
       }
     }

@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.collection.CollectionCommand.{Append, Insert, Prepend, Remove, Replace, ReplaceAll}
+import com.raquo.laminar.CollectionCommand.{Append, Insert, Prepend, Remove, Replace, ReplaceAll}
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.mutable

@@ -4,12 +4,12 @@ import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.signal.Signal
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveNode
+import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 class Counter private (
   val $count: Signal[Int],
-  val node: ReactiveNode
+  val node: ReactiveElement.Base
 )
 
 object Counter {

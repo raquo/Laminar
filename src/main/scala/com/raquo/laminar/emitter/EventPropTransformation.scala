@@ -31,15 +31,15 @@ class EventPropTransformation[Ev <: dom.Event, V](
   // @TODO[Performance,Elegance] Is it possible to move these --> methods to ReactiveEventProp?
   // We can't have them in both places, because then type inference does not work
 
-  @inline def -->[El <: ReactiveElement[dom.Element]](observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
     new EventPropEmitter(observer, eventProp, useCapture, processor)
   }
 
-  @inline def -->[El <: ReactiveElement[dom.Element]](onNext: V => Unit): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventPropEmitter[Ev, V, El] = {
     -->(Observer(onNext))
   }
 
-  @inline def -->[BusEv >: V, El <: ReactiveElement[dom.Element]](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
     -->(eventBus.writer)
   }
 

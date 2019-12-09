@@ -11,7 +11,7 @@ import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
-import com.raquo.laminar.nodes._
+import com.raquo.laminar.nodes
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.setters.{ChildrenCommandSetter, ChildrenSetter}
 import org.scalajs.dom
@@ -39,27 +39,27 @@ private[laminar] object Laminar
   with Styles[StyleSetter]
   with Styles2[StyleSetter]
   // Tags
-  with DocumentTags[ReactiveHtmlTag]
-  with EmbedTags[ReactiveHtmlTag]
-  with FormTags[ReactiveHtmlTag]
-  with GroupingTags[ReactiveHtmlTag]
-  with MiscTags[ReactiveHtmlTag]
-  with SectionTags[ReactiveHtmlTag]
-  with TableTags[ReactiveHtmlTag]
-  with TextTags[ReactiveHtmlTag]
+  with DocumentTags[HtmlTag]
+  with EmbedTags[HtmlTag]
+  with FormTags[HtmlTag]
+  with GroupingTags[HtmlTag]
+  with MiscTags[HtmlTag]
+  with SectionTags[HtmlTag]
+  with TableTags[HtmlTag]
+  with TextTags[HtmlTag]
   // Other things
-  with ReactiveHtmlBuilders
+  with HtmlBuilders
   with Implicits {
 
   object aria
     extends AriaAttrs[ReactiveHtmlAttr]
-    with ReactiveHtmlBuilders
+    with HtmlBuilders
 
   object svg
-    extends SvgTags[ReactiveSvgTag]
+    extends SvgTags[SvgTag]
     with ReactiveComplexSvgKeys
     with SvgAttrs[ReactiveSvgAttr]
-    with ReactiveSvgBuilders
+    with SvgBuilders
 
   object documentEvents
     extends DomEventStreamPropBuilder(dom.document)
@@ -80,19 +80,19 @@ private[laminar] object Laminar
 
   // Base elements and nodes
 
-  type HtmlElement = ReactiveHtmlElement[dom.html.Element]
+  type HtmlElement = nodes.ReactiveHtmlElement.Base
 
-  type SvgElement = ReactiveSvgElement[dom.svg.Element]
+  type SvgElement = nodes.ReactiveSvgElement.Base
 
-  type Element = ReactiveElement[dom.Element]
+  type Element = nodes.ReactiveElement.Base
 
-  type Node = ReactiveChildNode[dom.Node]
+  type Node = nodes.ChildNode.Base
 
-  type Text = ReactiveText
+  type TextNode = nodes.TextNode
 
-  type Comment = ReactiveComment
+  type CommentNode = nodes.CommentNode
 
-  type Root = ReactiveRoot
+  type RootNode = nodes.RootNode
 
   type Child = ChildrenSetter.Child
 
@@ -123,32 +123,32 @@ private[laminar] object Laminar
 
   // Specific HTML elements
 
-  type Anchor = ReactiveHtmlElement[dom.html.Anchor]
+  type Anchor = nodes.ReactiveHtmlElement[dom.html.Anchor]
 
-  type Button = ReactiveHtmlElement[dom.html.Button]
+  type Button = nodes.ReactiveHtmlElement[dom.html.Button]
 
-  type Div = ReactiveHtmlElement[dom.html.Div]
+  type Div = nodes.ReactiveHtmlElement[dom.html.Div]
 
-  type IFrame = ReactiveHtmlElement[dom.html.IFrame]
+  type IFrame = nodes.ReactiveHtmlElement[dom.html.IFrame]
 
-  type Image = ReactiveHtmlElement[dom.html.Image]
+  type Image = nodes.ReactiveHtmlElement[dom.html.Image]
 
-  type Input = ReactiveHtmlElement[dom.html.Input]
+  type Input = nodes.ReactiveHtmlElement[dom.html.Input]
 
-  type Label = ReactiveHtmlElement[dom.html.Label]
+  type Label = nodes.ReactiveHtmlElement[dom.html.Label]
 
-  type Li = ReactiveHtmlElement[dom.html.LI]
+  type Li = nodes.ReactiveHtmlElement[dom.html.LI]
 
-  type Span = ReactiveHtmlElement[dom.html.Span]
+  type Span = nodes.ReactiveHtmlElement[dom.html.Span]
 
-  type TextArea = ReactiveHtmlElement[dom.html.TextArea]
+  type TextArea = nodes.ReactiveHtmlElement[dom.html.TextArea]
 
 
-  /** Note: this is not a [[ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
+  /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
     * This is a bit annoying, I know.
-    * Both [[ReactiveComment]] and [[ReactiveElement]] are `Child` aka `Node`.
+    * Both [[CommentNode]] and [[nodes.ReactiveElement]] are `Child` aka `Node`.
     */
-  def emptyNode: ReactiveComment = new ReactiveComment("")
+  def emptyNode: CommentNode = new CommentNode("")
 
 
   val focus: FocusReceiver.type = FocusReceiver
@@ -160,12 +160,12 @@ private[laminar] object Laminar
 
   @inline def render(
     container: dom.Element,
-    rootNode: ReactiveChildNode[dom.Element]
-  ): ReactiveRoot = {
-    new ReactiveRoot(container, rootNode)
+    rootNode: nodes.ChildNode[dom.Element]
+  ): RootNode = {
+    new RootNode(container, rootNode)
   }
 
-  def inContext[El <: ReactiveElement[dom.Element]](makeModifier: El => Modifier[El]): Modifier[El] = {
+  def inContext[El <: nodes.ReactiveElement.Base](makeModifier: El => Modifier[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = makeModifier(element).apply(element)
     }

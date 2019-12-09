@@ -5,22 +5,20 @@ import com.raquo.airstream.eventbus.{EventBus, EventBusSource, WriteBus}
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.{Owned, Owner}
 import com.raquo.airstream.signal.Signal
-import com.raquo.dombuilder.generic
-import com.raquo.dombuilder.jsdom.JsCallback
+import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.emitter.EventPropEmitter
 import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWasDiscarded, NodeWillUnmount, ParentChangeEvent}
-import com.raquo.laminar.nodes.ReactiveChildNode.isParentMounted
+import com.raquo.laminar.nodes.ChildNode.isParentMounted
 import com.raquo.laminar.nodes.ReactiveElement.noMountEvents
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
 import org.scalajs.dom
 
 trait ReactiveElement[+Ref <: dom.Element]
-  extends ReactiveNode
-  with ReactiveChildNode[Ref]
-  with generic.nodes.Element[ReactiveNode, Ref, dom.Node]
-  with generic.nodes.EventfulNode[ReactiveNode, Ref, dom.Element, dom.Node, dom.Event, JsCallback]
-  with generic.nodes.ParentNode[ReactiveNode, Ref, dom.Node]
+  extends EventfulNode[Ref]
+  with ChildNode[Ref]
+  with ParentNode[Ref]
+  with domtypes.generic.nodes.Element
   with Owner {
 
   /** Event bus that emits parent change events.
@@ -43,7 +41,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     parentChangeBus.events
   }
 
-  lazy val maybeParentSignal: Signal[Option[BaseParentNode]] = parentChangeEvents
+  lazy val maybeParentSignal: Signal[Option[ParentNode.Base]] = parentChangeEvents
     .filter(_.alreadyChanged) // @TODO[Integrity] is this important?
     .map(_.maybeNextParent)
     .toSignal(maybeParent)
@@ -139,7 +137,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   }
 
   /** This hook is exposed by Scala DOM Builder for this exact purpose */
-  override def willSetParent(maybeNextParent: Option[BaseParentNode]): Unit = {
+  override def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // @TODO[Integrity] In dombuilder, willSetParent is called at incorrect time in ParentNode.appendChild
     // dom.console.log(">>>> willSetParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybeParent == maybeNextParent, maybeParent.toString, maybeNextParent.toString)
     if (maybeNextParent != maybeParent) {
@@ -158,7 +156,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     }
   }
 
-  override def setParent(maybeNextParent: Option[BaseParentNode]): Unit = {
+  override def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // @TODO[Integrity] Beware of calling setParent directly – willSetParent will not be called?
     // @TODO[Integrity] this method (and others) should be protected
     val maybePrevParent = maybeParent
@@ -199,6 +197,8 @@ trait ReactiveElement[+Ref <: dom.Element]
 }
 
 object ReactiveElement {
+
+  type Base = ReactiveElement[dom.Element]
 
   private val noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil, emitOnce = true)
 }

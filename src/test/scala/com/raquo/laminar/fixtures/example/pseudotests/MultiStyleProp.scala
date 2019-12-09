@@ -2,11 +2,11 @@ package com.raquo.laminar.fixtures.example.pseudotests
 
 import com.raquo.laminar.api._
 import com.raquo.laminar.fixtures.example.components.Toggle
-import com.raquo.laminar.nodes.ReactiveNode
+import com.raquo.laminar.nodes.ReactiveElement
 
 object MultiStyleProp {
 
-  def apply(): ReactiveNode = {
+  def apply(): ReactiveElement.Base = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")

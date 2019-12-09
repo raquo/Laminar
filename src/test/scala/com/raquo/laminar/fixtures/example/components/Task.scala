@@ -2,11 +2,11 @@ package com.raquo.laminar.fixtures.example.components
 
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveNode
+import com.raquo.laminar.nodes.ReactiveElement
 
 class Task (
   val $checked: EventStream[Boolean],
-  val node: ReactiveNode
+  val node: ReactiveElement.Base
 )
 
 object Task {

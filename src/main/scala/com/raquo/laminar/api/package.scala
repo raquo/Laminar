@@ -6,7 +6,7 @@ import org.scalajs.dom
 
 package object api extends Implicits {
 
-  private[laminar] type StyleSetter = Modifier[ReactiveHtmlElement[dom.html.Element]]
+  private[laminar] type StyleSetter = Modifier[ReactiveHtmlElement.Base]
 
   val A: Airstream = new Airstream {}
 
