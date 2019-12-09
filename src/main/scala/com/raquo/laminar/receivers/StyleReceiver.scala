@@ -9,7 +9,7 @@ import scala.scalajs.js.|
 
 class StyleReceiver[V](
   style: ReactiveStyle[V],
-  element: ReactiveHtmlElement[dom.html.Element]
+  element: ReactiveHtmlElement.Base
 ) {
 
   def <--($value: Observable[V | String]): Unit = {

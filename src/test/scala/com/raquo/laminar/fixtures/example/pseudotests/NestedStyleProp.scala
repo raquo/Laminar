@@ -8,7 +8,7 @@ import org.scalajs.dom
 
 object NestedStyleProp {
 
-  def render($color: EventStream[String]): ReactiveElement[dom.Element] = {
+  def render($color: EventStream[String]): ReactiveElement.Base = {
     L.div(
       L.color <-- $color,
       L.span("HELLO"),
@@ -16,7 +16,7 @@ object NestedStyleProp {
     )
   }
 
-  def apply(): ReactiveElement[dom.Element] = {
+  def apply(): ReactiveElement.Base = {
 
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")

@@ -5,7 +5,7 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.setters.FocusSetter
 import org.scalajs.dom
 
-class FocusReceiver(val element: ReactiveHtmlElement[dom.html.Element]) extends AnyVal {
+class FocusReceiver(val element: ReactiveHtmlElement.Base) extends AnyVal {
 
   @inline def <--($isFocused: EventStream[Boolean]): Unit = {
     (FocusReceiver <-- $isFocused)(element)

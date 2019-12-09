@@ -4,8 +4,7 @@ import com.raquo.airstream.core.Observable
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.signal.Signal
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveComment, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import com.raquo.laminar.setters.ChildrenSetter.Children
 import org.scalajs.dom
 
@@ -13,15 +12,15 @@ import scala.collection.immutable
 
 class ChildrenSetter(
   childrenObservable: Observable[Children]
-) extends Modifier[ReactiveElement[dom.Element]] {
+) extends Modifier[ReactiveElement.Base] {
 
   import ChildrenSetter.{emptyChildren, updateChildren}
 
-  override def apply(parentNode: ReactiveElement[dom.Element]): Unit = {
+  override def apply(parentNode: ReactiveElement.Base): Unit = {
     var nodeCount = 0
 
-    val sentinelNode = new ReactiveComment("")
-    parentNode.appendChild(sentinelNode)(DomApi.treeApi)
+    val sentinelNode = new CommentNode("")
+    parentNode.appendChild(sentinelNode)
 
     val childrenSignal = childrenObservable match {
       case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
@@ -47,7 +46,7 @@ object ChildrenSetter {
 
   private val emptyChildren = Vector()
 
-  type Child = ReactiveChildNode[dom.Node]
+  type Child = ChildNode.Base
 
   type Children = immutable.Seq[Child]
 
@@ -55,7 +54,7 @@ object ChildrenSetter {
   protected def updateChildren(
     prevChildren: Children,
     nextChildren: Children,
-    parentNode: ReactiveElement[dom.Element],
+    parentNode: ReactiveElement.Base,
     sentinelNode: Child,
     prevChildrenCount: Int
   ): Int = {
@@ -93,7 +92,7 @@ object ChildrenSetter {
         // Note: `prevChildRef` is not valid in this branch
         // println("> overflow: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
         // @Note: DOM update
-        parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
+        parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)
         prevChildRef = nextChild.ref
         currentChildrenCount += 1
       } else {
@@ -107,7 +106,7 @@ object ChildrenSetter {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
             // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
             // @Note: DOM update
-            parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
+            parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)
             prevChildRef = nextChild.ref
             currentChildrenCount += 1
           } else {
@@ -128,7 +127,7 @@ object ChildrenSetter {
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)
               // @Note: DOM update
-              parentNode.removeChild(prevChild)(DomApi.treeApi)
+              parentNode.removeChild(prevChild)
               prevChildRef = nextPrevChildRef
               currentChildrenCount -= 1
             }
@@ -136,7 +135,7 @@ object ChildrenSetter {
               // nextChild is still not in the right place, so let's move it to the correct index
               // println("> order: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
               // @Note: DOM update
-              parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)(DomApi.treeApi)
+              parentNode.insertChild(nextChild, atIndex = nextChildNodeIndex)
               prevChildRef = nextChild.ref
               // This is a MOVE, so we DO NOT update currentDomChildrenCount here.
             }
@@ -153,7 +152,7 @@ object ChildrenSetter {
       val nextPrevChildRef = prevChildRef.nextSibling
       // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
       // @Note: DOM update
-      parentNode.removeChild(prevChildFromRef(prevChildren, prevChildRef))(DomApi.treeApi)
+      parentNode.removeChild(prevChildFromRef(prevChildren, prevChildRef))
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1
     }

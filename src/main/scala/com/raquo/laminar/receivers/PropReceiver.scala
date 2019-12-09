@@ -7,7 +7,7 @@ import org.scalajs.dom
 
 class PropReceiver[V, DomV](
   prop: ReactiveProp[V, DomV],
-  element: ReactiveHtmlElement[dom.html.Element]
+  element: ReactiveHtmlElement.Base
 ) {
 
   def <--($value: Observable[V]): Unit = {

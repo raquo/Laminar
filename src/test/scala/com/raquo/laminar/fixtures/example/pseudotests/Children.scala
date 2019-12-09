@@ -6,7 +6,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 object Children {
-  def apply(): ReactiveElement[dom.Element] = {
+  def apply(): ReactiveElement.Base = {
     val toggle = Toggle("Toggle #1")
     val $text = toggle.$checked.map(checked => if (checked) "[X]" else "[O]")
     val $div = $text.map(L.div(_)).toSignal(L.div("INIT"))

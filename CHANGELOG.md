@@ -2,6 +2,21 @@
 
 Breaking changes in **bold**.
 
+#### v0.8 – TBD
+
+* **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
+* **API: Move `ChildrenCommand` out of the poorly named `collection` package**
+* **API: Eliminate dependency on _Scala DOM Builder_**
+  * DOM Builder is capable of supporting different DOM backends and even JVM rendering. We have no plans to use either of these in Laminar, so the indirection required by these abstractions is not pulling its weight.
+  * `DomApi`
+    * Remove the old `DomApi` trait and companion object.
+      * Combine `domapi.*Api` traits into a single `DomApi` object
+      * Use the new `DomApi` object directly instead of passing implicit `domapi.*Api` parameters.
+  * Move `Setter` and `EventPropSetter` into Laminar and simplify type signatures
+  * Merge into relevant Laminar subtypes: `Node` -> `ReactiveNode` (add Ref type param), `Comment` -> `ReactiveComment`, `Text` -> `TextNode`, `ParentNode` -> `ParentNode`, `ChildNode` -> `ChildNode`, `EventfulNode` -> `EventfulNode`, `Root` -> `RootNode`, `TagSyntax` -> `HtmlTag` and `SvgTag`
+  * **Migration:** If you reference any of the affected types directly, you will need to import them from Laminar, or use their corresponding Laminar replacements listed above. Other than that, everything should just work.
+* API: `ReactiveElement` and other node types that take type params now have `type Base` defined on their companion objects containing the most generic version of that type, e.g. `ReactiveElement[dom.Element]` for `ReactiveElement`.
+
 #### v0.7.2 – Dec 2019
 
 * Build: Scala 2.13 support

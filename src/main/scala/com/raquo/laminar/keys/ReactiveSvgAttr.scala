@@ -1,12 +1,12 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.dombuilder.generic.modifiers.Setter
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{SvgElement, optionToModifier}
+import com.raquo.laminar.setters.Setter
 
 class ReactiveSvgAttr[V](
   override val name: String,
@@ -23,14 +23,14 @@ class ReactiveSvgAttr[V](
   }
 
   def :=(value: V): Modifier[SvgElement] = {
-    new Setter[ReactiveSvgAttr[V], V, SvgElement](this, value, DomApi.svgElementApi.setSvgAttribute)
+    new Setter[ReactiveSvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
   }
 
   def <--($value: Observable[V]): Modifier[SvgElement] = {
     new Modifier[SvgElement] {
       override def apply(element: SvgElement): Unit = {
         element.subscribe($value) { value =>
-          DomApi.svgElementApi.setSvgAttribute(element, self, value)
+          DomApi.setSvgAttribute(element, self, value)
         }
       }
     }

@@ -1,18 +1,16 @@
 package com.raquo.laminar.emitter
 
 import com.raquo.airstream.core.Observer
-import com.raquo.dombuilder.generic.modifiers.EventPropSetter
-import com.raquo.dombuilder.jsdom.JsCallback
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L.onClick
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveNode}
+import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.setters.EventPropSetter
 import org.scalajs.dom
 
 import scala.scalajs.js
 
-class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
+class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement.Base](
   protected val observer: Observer[V],
   eventProp: EventProp[Ev],
   useCapture: Boolean,
@@ -37,9 +35,9 @@ class EventPropEmitter[Ev <: dom.Event, V, -El <: ReactiveElement[dom.Element]](
       }
     }
 
-    val addEventListener = new EventPropSetter[ReactiveNode, dom.Element, dom.Node, Ev, dom.Event, JsCallback](
+    val addEventListener = new EventPropSetter[Ev](
       eventProp, callback, useCapture = useCapture
-    )(DomApi.eventApi)
+    )
 
     // @TODO[Integrity,Performance] Check that we're not leaking memory here by never removing this event listener, especially in the zipWithNode case.
     addEventListener(element)

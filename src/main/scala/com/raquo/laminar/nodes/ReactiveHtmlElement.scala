@@ -1,15 +1,15 @@
 package com.raquo.laminar.nodes
 
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.builders.ReactiveHtmlTag
+import com.raquo.laminar.builders.HtmlTag
 import com.raquo.laminar.keys.{ReactiveHtmlAttr, ReactiveProp, ReactiveStyle}
-import com.raquo.laminar.receivers.{FocusReceiver, AttrReceiver, PropReceiver, StyleReceiver}
+import com.raquo.laminar.receivers.{AttrReceiver, FocusReceiver, PropReceiver, StyleReceiver}
 import org.scalajs.dom
 
-class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: ReactiveHtmlTag[Ref])
+class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
   extends ReactiveElement[Ref] {
 
-  final override val ref: Ref = DomApi.htmlElementApi.createHtmlElement(this)
+  final override val ref: Ref = DomApi.createHtmlElement(this)
 
   final def <--[V](style: ReactiveStyle[V]): StyleReceiver[V] = new StyleReceiver(style, this)
 
@@ -22,4 +22,9 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: ReactiveHtmlTag[Ref
   override def toString: String = {
     s"ReactiveHtmlElement(${ref.outerHTML})"
   }
+}
+
+object ReactiveHtmlElement {
+
+  type Base = ReactiveHtmlElement[dom.html.Element]
 }

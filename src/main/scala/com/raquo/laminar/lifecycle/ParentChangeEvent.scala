@@ -1,9 +1,9 @@
 package com.raquo.laminar.lifecycle
 
-import com.raquo.laminar.nodes.ReactiveChildNode.BaseParentNode
+import com.raquo.laminar.nodes.ParentNode
 
 case class ParentChangeEvent(
   alreadyChanged: Boolean,
-  maybePrevParent: Option[BaseParentNode],
-  maybeNextParent: Option[BaseParentNode]
+  maybePrevParent: Option[ParentNode.Base],
+  maybeNextParent: Option[ParentNode.Base]
 )

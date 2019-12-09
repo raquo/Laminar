@@ -6,7 +6,7 @@ import com.raquo.laminar.setters.ChildrenCommandSetter
 import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
 import org.scalajs.dom
 
-class ChildrenCommandReceiver(val element: ReactiveElement[dom.Element]) extends AnyVal {
+class ChildrenCommandReceiver(val element: ReactiveElement.Base) extends AnyVal {
 
   @inline def <--(commandStream: EventStream[ChildrenCommand]): Unit = {
     (ChildrenCommandReceiver <-- commandStream)(element)

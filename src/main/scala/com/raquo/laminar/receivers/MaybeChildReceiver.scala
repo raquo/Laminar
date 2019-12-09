@@ -4,9 +4,8 @@ import com.raquo.airstream.core.Observable
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.setters.ChildrenSetter.Child
 import com.raquo.laminar.setters.MaybeChildSetter
-import org.scalajs.dom
 
-class MaybeChildReceiver(element: ReactiveElement[dom.Element]) {
+class MaybeChildReceiver(element: ReactiveElement.Base) {
 
   def <--($node: Observable[Option[Child]]): Unit = {
     (MaybeChildReceiver <-- $node)(element)

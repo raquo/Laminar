@@ -1,12 +1,11 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtestutils.matching.{RuleImplicits, TestableHtmlAttr, TestableSvgAttr}
+import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtypes.generic.keys.{HtmlAttr, SvgAttr}
 import com.raquo.laminar.api._
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.keys.CompositeAttr
-import com.raquo.laminar.nodes.{ReactiveChildNode, ReactiveRoot}
+import com.raquo.laminar.nodes.{ChildNode, RootNode}
 import org.scalajs.dom
 
 trait LaminarSpec
@@ -19,10 +18,10 @@ trait LaminarSpec
   // forget to handle the `None` case when mapping or foreach-ing over it.
   // In test code, We'd rather have a null pointer exception than an assertion that you don't
   // realize isn't running because it's inside a None.foreach.
-  var root: ReactiveRoot = null
+  var root: RootNode = null
 
   def mount(
-    node: ReactiveChildNode[dom.Element],
+    node: ChildNode[dom.Element],
     clue: String = defaultMountedElementClue
   ): Unit = {
     mountedElementClue = clue
@@ -32,7 +31,7 @@ trait LaminarSpec
 
   def mount(
     clue: String,
-    node: ReactiveChildNode[dom.Element]
+    node: ChildNode[dom.Element]
   ): Unit = {
     mount(node, clue)
   }
@@ -48,7 +47,7 @@ trait LaminarSpec
       "ASSERT FAILED [laminar.unmount]: Laminar root's ref does not match rootNode. What did you do!?"
     )
     doAssert(
-      root.unmount()(DomApi.treeApi),
+      root.unmount(),
       "ASSERT FAILED [laminar.unmount]: Laminar root failed to unmount"
     )
     mountedElementClue = defaultMountedElementClue

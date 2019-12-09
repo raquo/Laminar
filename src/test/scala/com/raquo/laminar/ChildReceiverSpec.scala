@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveChildNode
+import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -31,11 +31,11 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     def test(
-      makeObservable: EventStream[ReactiveChildNode[dom.Element]] => Observable[ReactiveChildNode[dom.Element]],
+      makeObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
       expectedInitialChild: ExpectedNode = ExpectedNode.comment()
     ): Unit = {
 
-      val childBus = new EventBus[ReactiveChildNode[dom.Element]]
+      val childBus = new EventBus[ChildNode[dom.Element]]
       val $child = makeObservable(childBus.events)
 
       mount(div("Hello, ", child <-- $child))
@@ -78,13 +78,13 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     def test(
-      makeFooObservable: EventStream[ReactiveChildNode[dom.Element]] => Observable[ReactiveChildNode[dom.Element]],
-      makeBarObservable: EventStream[ReactiveChildNode[dom.Element]] => Observable[ReactiveChildNode[dom.Element]],
+      makeFooObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
+      makeBarObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
       initialFooChild: ExpectedNode = ExpectedNode.comment(),
       initialBarChild: ExpectedNode = ExpectedNode.comment()
     ): Unit = {
-      val fooChildBus = new EventBus[ReactiveChildNode[dom.Element]]
-      val barChildBus = new EventBus[ReactiveChildNode[dom.Element]]
+      val fooChildBus = new EventBus[ChildNode[dom.Element]]
+      val barChildBus = new EventBus[ChildNode[dom.Element]]
 
       mount(div(child <-- makeFooObservable(fooChildBus.events), child <-- makeBarObservable(barChildBus.events)))
       expectNode(div like(initialFooChild, initialBarChild))

@@ -1,4 +1,4 @@
-package com.raquo.laminar.collection
+package com.raquo.laminar
 
 sealed trait CollectionCommand[+Item] {
 
@@ -63,6 +63,7 @@ object CollectionCommand {
   // @TODO[Performance] Actually, seeing as this interface is intended for performance, js.Array is probably a better choice
 
   // @TODO[Test] vectorProcessor needs unit testing
+  // @TODO Why do we even keep this `vectorProcessor` thing around? We don't use it.
 
   def vectorProcessor[Item](prevItems: Vector[Item], command: CollectionCommand[Item]): Vector[Item] = {
     command match {
