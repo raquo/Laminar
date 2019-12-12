@@ -13,7 +13,9 @@ Breaking changes in **bold**.
       * Combine `domapi.*Api` traits into a single `DomApi` object
       * Use the new `DomApi` object directly instead of passing implicit `domapi.*Api` parameters.
   * Move `Setter` and `EventPropSetter` into Laminar and simplify type signatures
-  * Merge into relevant Laminar subtypes: `Node` -> `ReactiveNode` (add Ref type param), `Comment` -> `ReactiveComment`, `Text` -> `TextNode`, `ParentNode` -> `ParentNode`, `ChildNode` -> `ChildNode`, `EventfulNode` -> `EventfulNode`, `Root` -> `RootNode`, `TagSyntax` -> `HtmlTag` and `SvgTag`
+  * Merge into relevant Laminar subtypes: `Node` -> `ReactiveNode` (add Ref type param), `Comment` -> `ReactiveComment`, `Text` -> `TextNode`, `ParentNode` -> `ParentNode`, `ChildNode` -> `ChildNode`, `Root` -> `RootNode`, `TagSyntax` -> `HtmlTag` and `SvgTag`
+  * Merge `EventfulNode` trait into `ReactiveElement` (split members between the trait and the object)
+    * Change type of `maybeEventListeners` to have `List` instead of `mutable.Buffer`
   * **Migration:** If you reference any of the affected types directly, you will need to import them from Laminar, or use their corresponding Laminar replacements listed above. Other than that, everything should just work.
 * API: `ReactiveElement` and other node types that take type params now have `type Base` defined on their companion objects containing the most generic version of that type, e.g. `ReactiveElement[dom.Element]` for `ReactiveElement`.
 

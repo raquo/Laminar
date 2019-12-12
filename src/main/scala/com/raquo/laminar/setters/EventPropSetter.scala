@@ -2,7 +2,7 @@ package com.raquo.laminar.setters
 
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
-import com.raquo.laminar.nodes.EventfulNode
+import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -13,7 +13,7 @@ class EventPropSetter[Ev <: dom.Event](
   val key: EventProp[Ev],
   val value: Ev => Unit,
   val useCapture: Boolean
-) extends Modifier[EventfulNode[dom.Element]] {
+) extends Modifier[ReactiveElement.Base] {
 
   /** To make sure that you remove the event listener successfully in JS DOM, you need to
     * provide the same Javascript callback function that was originally added as a listener.
@@ -24,8 +24,8 @@ class EventPropSetter[Ev <: dom.Event](
     */
   val domValue: js.Function1[Ev, Unit] = value
 
-  override def apply(node: EventfulNode[dom.Element]): Unit = {
-    node.addEventListener(this)
+  override def apply(node: ReactiveElement.Base): Unit = {
+    ReactiveElement.addEventListener(node, this)
   }
 
   override def equals(that: Any): Boolean = {
