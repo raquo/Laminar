@@ -7,19 +7,27 @@ import com.raquo.airstream.ownership.{Owned, Owner}
 import com.raquo.airstream.signal.Signal
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
+import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropEmitter
 import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWasDiscarded, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ChildNode.isParentMounted
 import com.raquo.laminar.nodes.ReactiveElement.noMountEvents
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
+import com.raquo.laminar.setters.EventPropSetter
 import org.scalajs.dom
 
+import scala.collection.mutable
+
 trait ReactiveElement[+Ref <: dom.Element]
-  extends EventfulNode[Ref]
-  with ChildNode[Ref]
+  extends ChildNode[Ref]
   with ParentNode[Ref]
   with domtypes.generic.nodes.Element
   with Owner {
+
+  // @TODO[Naming] We reuse EventPropSetter to represent an active event listener. Makes for a bit confusing naming.
+  private[ReactiveElement] var _maybeEventListeners: Option[mutable.Buffer[EventPropSetter[_]]] = None
+
+  @inline def maybeEventListeners: Option[List[EventPropSetter[_]]] = _maybeEventListeners.map(_.toList)
 
   /** Event bus that emits parent change events.
     * For efficiency, it is only populated when someone accesses [[parentChangeEvents]]
@@ -201,4 +209,59 @@ object ReactiveElement {
   type Base = ReactiveElement[dom.Element]
 
   private val noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil, emitOnce = true)
+
+  /** @return Whether listener was added (false if such a listener has already been present) */
+  def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Boolean = {
+    val shouldAddListener = indexOfEventListener(element, listener) == -1
+    if (shouldAddListener) {
+      // 1. Update this node
+      if (element._maybeEventListeners.isEmpty) {
+        element._maybeEventListeners = Some(mutable.Buffer(listener))
+      } else {
+        element._maybeEventListeners.foreach { eventListeners =>
+          eventListeners += listener
+        }
+      }
+      // 2. Update the DOM
+      DomApi.addEventListener(element, listener)
+    }
+    shouldAddListener
+  }
+
+  /** @return Whether listener was removed (false if such a listener was not found) */
+  def removeEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Boolean = {
+    val index = indexOfEventListener(element, listener)
+    val shouldRemoveListener = index != -1
+    if (shouldRemoveListener) {
+      // 1. Update this node
+      element._maybeEventListeners.foreach(eventListeners => eventListeners.remove(index))
+      // 2. Update the DOM
+      DomApi.removeEventListener(element, listener)
+    }
+    shouldRemoveListener
+  }
+
+  /** @return -1 if not found */
+  def indexOfEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Int = {
+    // Note: Ugly for performance.
+    //  - We want to reduce usage of Scala's collections and anonymous functions
+    //  - js.Array is unaware of Scala's `equals` method
+    val notFoundIndex = -1
+    if (element._maybeEventListeners.isEmpty) {
+      notFoundIndex
+    } else {
+      var found = false
+      var index = 0
+      element._maybeEventListeners.foreach { listeners =>
+        while (!found && index < listeners.length) {
+          if (listener equals listeners(index)) {
+            found = true
+          } else {
+            index += 1
+          }
+        }
+      }
+      if (found) index else notFoundIndex
+    }
+  }
 }
