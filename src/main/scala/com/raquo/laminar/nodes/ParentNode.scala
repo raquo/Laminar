@@ -11,7 +11,10 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
   @inline def maybeChildren: Option[mutable.Buffer[ChildNode.Base]] = _maybeChildren
 
-  /** @return Whether child was successfully appended */
+  /** Note: can also be used to move children, even within the same parent
+    *
+    * @return Whether child was successfully appended
+    */
   def appendChild(child: ChildNode.Base): Boolean = {
     val nextParent = Some(this)
     child.willSetParent(nextParent)
@@ -20,7 +23,12 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     val appended = DomApi.appendChild(parent = this, child = child)
     if (appended) {
 
-      // 2. Update this node
+      // 2A. Update child's current parent node
+      child.maybeParent.foreach { childParent =>
+        childParent._maybeChildren.foreach(childParentChildren => childParentChildren -= child)
+      }
+
+      // 2B. Update this node
       if (_maybeChildren.isEmpty) {
         _maybeChildren = Some(mutable.Buffer(child))
       } else {
@@ -60,7 +68,8 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
   /** Note: can also be used to move children, even within the same parent
     *
-    * @return Whether child was successfully inserted */
+    * @return Whether child was successfully inserted
+    */
   def insertChild(
     child: ChildNode.Base,
     atIndex: Int
