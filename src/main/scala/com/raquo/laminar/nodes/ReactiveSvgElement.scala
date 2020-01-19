@@ -14,7 +14,8 @@ class ReactiveSvgElement[+Ref <: dom.svg.Element](val tag: SvgTag[Ref])
   final def <--[V](attr: ReactiveSvgAttr[V]): SvgAttrReceiver[V] = new SvgAttrReceiver(attr, this)
 
   override def toString: String = {
-    s"ReactiveSvgElement(${ref.outerHTML})"
+    // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.
+    s"ReactiveSvgElement${ if (ref != null) ref.outerHTML else s"tag=${tag.name}"})"
   }
 }
 

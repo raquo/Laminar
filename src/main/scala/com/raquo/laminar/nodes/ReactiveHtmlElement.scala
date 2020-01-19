@@ -20,7 +20,8 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
   final def <--[V](focus: FocusReceiver.type): FocusReceiver = new FocusReceiver(this)
 
   override def toString: String = {
-    s"ReactiveHtmlElement(${ref.outerHTML})"
+    // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.
+    s"ReactiveHtmlElement(${ if (ref != null) ref.outerHTML else s"tag=${tag.name}"})"
   }
 }
 

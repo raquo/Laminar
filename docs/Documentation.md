@@ -164,7 +164,7 @@ Thanks to the `optionToModifier` implicit mentioned above, you can use `Option[R
 
 And so, an empty DOM node can be created with... `emptyNode`.
 
-// @NC What type actually
+// @nc What type actually
 
 ```scala
 val node: Node = if (foo) element else emptyNode
