@@ -4,6 +4,12 @@ Breaking changes in **bold**.
 
 #### v0.8 – TBD
 
+* **API: Lifecycle events & Ownership overhaul**
+  * <TODO: Elaborate> Use Airstream's new `DynamicOwner` and `DynamicSubscription` features: `ReactiveElement` subscriptions are now activated only when the element is mounted, not when it is created.
+  * <TODO: Elaborate> Transaction delay for `mountEvents` now applies to all element subscriptions
+  * <TODO: Elaborate> Allow remounting of unmounted components (document pilot subscription memory management gotcha) 
+  * `NodeWasDiscarded` event is not fired anymore. See `NodeWillUnmount`.
+* **API: Hide `parentChangeEvents` and `maybeParentSignal`. This functionality is not available anymore as it requires undesirable tradeoffs.
 * **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
 * **API: Move `ChildrenCommand` out of the poorly named `collection` package**
 * **API: Eliminate dependency on _Scala DOM Builder_**

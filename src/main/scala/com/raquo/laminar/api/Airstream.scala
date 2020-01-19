@@ -16,8 +16,6 @@ trait Airstream {
 
   type Observer[-A] = airstream.core.Observer[A]
 
-  type Owned = airstream.ownership.Owned
-
   type Owner = airstream.ownership.Owner
 
   type Ref[+A <: AnyRef] = airstream.util.Ref[A]
@@ -28,7 +26,7 @@ trait Airstream {
 
   type StrictSignal[+A] = airstream.signal.StrictSignal[A]
 
-  type Subscription = airstream.core.Subscription
+  type Subscription = airstream.ownership.Subscription
 
   type Val[A] = airstream.signal.Val[A]
 

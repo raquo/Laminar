@@ -5,8 +5,7 @@ import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtypes.generic.keys.{HtmlAttr, SvgAttr}
 import com.raquo.laminar.api._
 import com.raquo.laminar.keys.CompositeAttr
-import com.raquo.laminar.nodes.{ChildNode, RootNode}
-import org.scalajs.dom
+import com.raquo.laminar.nodes.{ReactiveElement, RootNode}
 
 trait LaminarSpec
   extends MountOps
@@ -21,7 +20,7 @@ trait LaminarSpec
   var root: RootNode = null
 
   def mount(
-    node: ChildNode[dom.Element],
+    node: ReactiveElement.Base,
     clue: String = defaultMountedElementClue
   ): Unit = {
     mountedElementClue = clue
@@ -31,7 +30,7 @@ trait LaminarSpec
 
   def mount(
     clue: String,
-    node: ChildNode[dom.Element]
+    node: ReactiveElement.Base
   ): Unit = {
     mount(node, clue)
   }
@@ -50,8 +49,19 @@ trait LaminarSpec
       root.unmount(),
       "ASSERT FAILED [laminar.unmount]: Laminar root failed to unmount"
     )
+    root = null
+    // containerNode = null
     mountedElementClue = defaultMountedElementClue
   }
+
+//  @TODO I don't actually remember why I did this. Super's implementation seems functionally equivalent. Remove this if all is good.
+//  override def clearDOM(): Unit = {
+//    if (root != null) {
+//      unmount()
+//    }
+//    containerNode = null
+//    dom.document.body.textContent = "" // remove the container
+//  }
 
   implicit def makeCompositeHtmlAttrTestable[V](attr: CompositeAttr[HtmlAttr[V]]): TestableHtmlAttr[V] = {
     new TestableHtmlAttr(attr.key)

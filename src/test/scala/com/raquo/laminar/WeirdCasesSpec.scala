@@ -12,10 +12,19 @@ import com.raquo.laminar.utils.UnitSpec
   */
 class WeirdCasesSpec extends UnitSpec {
 
+  // @nc I don't think we can get this to work. Can we maybe write a workaround to detect this condition?
+  // - Similar problem is described in https://github.com/raquo/Laminar/issues/47
+  // - But now in Laminar v0.8 subscriptions are not activated until mount event fires, and that happens in a new transaction,
+  //   but by then the original event that the synchronously dependent observable relies upon is long gone, so it doesn't get that event
+  // - Generally I think this is an acceptable tradeoff, as long as we document this.
+  // - Ideally we should offer a workaround.
+  // - I would assume most encounters of this would be a misuse of streams vs signals...
+  // @nc write a similar test for signals that works
+
   /** See https://github.com/raquo/Laminar/issues/11 for a better approach
     * (basically, use child.text instead of nested observables)
     */
-  it("nested, synchronously dependent observables work as expected for some reason") {
+  ignore("nested, synchronously dependent observables work as expected for some reason") {
 
     val bus = new EventBus[Int]
 

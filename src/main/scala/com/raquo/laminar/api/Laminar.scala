@@ -160,7 +160,7 @@ private[laminar] object Laminar
 
   @inline def render(
     container: dom.Element,
-    rootNode: nodes.ChildNode[dom.Element]
+    rootNode: nodes.ReactiveElement.Base
   ): RootNode = {
     new RootNode(container, rootNode)
   }

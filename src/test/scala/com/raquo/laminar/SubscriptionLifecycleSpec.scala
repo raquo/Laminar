@@ -113,7 +113,7 @@ class SubscriptionLifecycleSpec extends UnitSpec {
       busB.writer.onNext(value0)
       expectNode(makeExpectedNodeA(value0))
       counterA shouldBe 1
-      counterB shouldBe 1 // even if not mounted, the subscriptions are active already
+      counterB shouldBe 0 // new in Laminar v0.8: childB subscriptions are not active yet because it is not mounted yet
       childCounter shouldBe 1
 
       val value1 = values(1)
@@ -121,22 +121,22 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
       busA.writer.onNext(value1)
 
-      expectNode(makeExpectedNodeB(value0)) // This used to expect an empty node B, but now with Airstream the noode starts listening when it's initialized, not when it's mounted
+      expectNode(emptyExpectedNodeB) // node B is mounted and activated, but it missed the value0 event in BusB
       counterA shouldBe 1
-      counterB shouldBe 1
+      counterB shouldBe 0
       childCounter shouldBe 2
 
       busB.writer.onNext(value1)
       expectNode(makeExpectedNodeB(value1))
       counterA shouldBe 1
-      counterB shouldBe 2
+      counterB shouldBe 1
       childCounter shouldBe 2
 
       val value2 = values(2)
       busB.writer.onNext(value2)
       expectNode(makeExpectedNodeB(value2))
       counterA shouldBe 1
-      counterB shouldBe 3
+      counterB shouldBe 2
       childCounter shouldBe 2
 
       unmount()
@@ -150,7 +150,7 @@ class SubscriptionLifecycleSpec extends UnitSpec {
       childBus.writer.onNext(childA)
       expectNode(div like (alt is "unmounted"))
       counterA shouldBe 1
-      counterB shouldBe 3
+      counterB shouldBe 2
       childCounter shouldBe 2
     }
   }
