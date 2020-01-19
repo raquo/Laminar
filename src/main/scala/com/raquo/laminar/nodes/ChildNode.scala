@@ -18,7 +18,7 @@ trait ChildNode[+Ref <: dom.Node]
   }
 
   /** Note: Make sure to call [[willSetParent]] before calling this method manually */
-  def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     _maybeParent = maybeNextParent
   }
 
@@ -36,7 +36,7 @@ trait ChildNode[+Ref <: dom.Node]
     *
     * @param maybeNextParent  `None` means this node is about to be detached form its parent
     */
-  @inline def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
+  @inline private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
   override def apply(parentNode: ParentNode.Base): Unit = {
     // @TODO[Performance] Consider making ChildNode -> Modifier conversion implicit instead (but watch compile times)

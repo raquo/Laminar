@@ -9,7 +9,8 @@ Breaking changes in **bold**.
   * <TODO: Elaborate> Transaction delay for `mountEvents` now applies to all element subscriptions
   * <TODO: Elaborate> Allow remounting of unmounted components (document pilot subscription memory management gotcha) 
   * `NodeWasDiscarded` event is not fired anymore. See `NodeWillUnmount`.
-* **API: Hide `parentChangeEvents` and `maybeParentSignal`. This functionality is not available anymore as it requires undesirable tradeoffs.
+* **API: Hide `parentChangeEvents` and `maybeParentSignal`. This functionality is not available anymore as it requires undesirable tradeoffs.**
+* **API: Hide `willSetParent` and `setParent` methods. Use Laminar's `parentNode.appendChild(childNode)` or similar.**
 * **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
 * **API: Move `ChildrenCommand` out of the poorly named `collection` package**
 * **API: Eliminate dependency on _Scala DOM Builder_**

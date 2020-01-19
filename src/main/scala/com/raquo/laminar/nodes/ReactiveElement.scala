@@ -161,7 +161,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   }
 
   /** This hook is exposed by Scala DOM Builder for this exact purpose */
-  override def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // super.willSetParent(maybeNextParent) // default implementation is a noop, so no need to call it.
     // dom.console.log(">>>> willSetParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybeParent == maybeNextParent, maybeParent.toString, maybeNextParent.toString)
     if (maybeNextParent != maybeParent) {
@@ -180,7 +180,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     }
   }
 
-  override def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  override private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // @TODO[Integrity] Beware of calling setParent directly – willSetParent will not be called?
     // @TODO[Integrity] this method (and others) should be protected
     val maybePrevParent = maybeParent
