@@ -13,6 +13,8 @@ Breaking changes in **bold**.
 * **API: Hide `willSetParent` and `setParent` methods. Use Laminar's `parentNode.appendChild(childNode)` or similar.**
 * **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
 * **API: Move `ChildrenCommand` out of the poorly named `collection` package**
+* **API: Eliminate `EventPropEmitter` (merged into EventPropSetter)**
+  * **Migration:** Replace usages of `EventPropEmitter` with `EventPropSetter`. Also, if you were using `EventPropEmitter` as an `EventPropTransformation`, those methods will not be available anymore as `EventPropSetter` does not extend `EventPropTransformation`, so you will need to rewrite those calls differently, more manually. This usage wasn't explicitly documented, so I hope no one actually runs into this.
 * **API: Eliminate dependency on _Scala DOM Builder_**
   * DOM Builder is capable of supporting different DOM backends and even JVM rendering. We have no plans to use either of these in Laminar, so the indirection required by these abstractions is not pulling its weight.
   * `DomApi`

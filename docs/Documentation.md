@@ -718,7 +718,7 @@ Each `cls <-- source` modifier should deal with a certain set of classes that do
 
 Laminar uses native JS DOM events. We do not have a synthetic event system like React. There is no event pooling, no magic going on. This means there is nothing Laminar-specific to learn about events themselves. There's one exception for certain `onClick` events on checkboxes, see [Special Cases](#special-cases).
 
-To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, `EventPropEmitter` is a `Modifier` that performs this action.
+To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, `EventPropSetter` is a `Modifier` that performs this action.
 
 This is how it's done in the simplest case:
 
