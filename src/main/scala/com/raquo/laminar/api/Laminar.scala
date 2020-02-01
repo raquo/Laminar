@@ -145,10 +145,12 @@ private[laminar] object Laminar
 
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
-    * This is a bit annoying, I know.
-    * Both [[CommentNode]] and [[nodes.ReactiveElement]] are `Child` aka `Node`.
+    * This is a bit annoying, I know, but we kinda have to follow the native JS DOM API on this.
+    * Both [[CommentNode]] and [[nodes.ReactiveElement]] are [[Node]] aka [[Child]].
     */
-  def emptyNode: CommentNode = new CommentNode("")
+  @inline def emptyNode: CommentNode = commentNode("")
+
+  def commentNode(text: String = ""): CommentNode = new CommentNode(text)
 
 
   val focus: FocusReceiver.type = FocusReceiver

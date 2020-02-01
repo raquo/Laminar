@@ -8,7 +8,6 @@ import com.raquo.airstream.signal.Signal
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.emitter.EventPropEmitter
 import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ChildNode.isParentMounted
 import com.raquo.laminar.nodes.ReactiveElement.noMountEvents
@@ -103,11 +102,11 @@ trait ReactiveElement[+Ref <: dom.Element]
   def events[Ev <: dom.Event](
     eventProp: EventProp[Ev],
     useCapture: Boolean = false,
-    stopPropagation: Boolean = false, // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
-    preventDefault: Boolean = false // @TODO[API] This is inconsistent with EventPropEmitter API. Fix or ok?
+    stopPropagation: Boolean = false, // @TODO[API] This is inconsistent with EventPropTransformation API. Fix or ok?
+    preventDefault: Boolean = false // @TODO[API] This is inconsistent with EventPropTransformation API. Fix or ok?
   ): EventStream[Ev] = {
     val eventBus = new EventBus[Ev]
-    val setter = new EventPropEmitter[Ev, Ev, this.type](
+    val setter = EventPropSetter[Ev, Ev, this.type](
       eventBus.writer,
       eventProp,
       useCapture,
@@ -117,6 +116,13 @@ trait ReactiveElement[+Ref <: dom.Element]
     eventBus.events
   }
 
+  /** Note:
+    * - These methods provide the first `<--` in the auxiliary syntax `myElement <-- child <-- childSignal`.
+    * - The second `<--` in that auxiliary syntax is provided by `class ChildReceiver`.
+    * - The more common syntax `myElement(child <-- childSignal)` relies on the `<--` method defined in `object ChildReceiver`
+    *
+    * The alias `val child: ChildReceiver.type = ChildReceiver` is defined in Laminar.scala
+    */
   final def <--[V](childReceiver: ChildReceiver.type): ChildReceiver = new ChildReceiver(this)
 
   final def <--[V](maybeChildReceiver: MaybeChildReceiver.type): MaybeChildReceiver = new MaybeChildReceiver(this)

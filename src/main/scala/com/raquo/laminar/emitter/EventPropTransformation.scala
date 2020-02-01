@@ -4,11 +4,12 @@ import com.raquo.airstream.core.Observer
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.setters.EventPropSetter
 import org.scalajs.dom
 
 /**
-  * This class represents a set of transformations that can be applied to events feeding into an [[EventPropEmitter]]
-  * EventPropTransformation-s are immutable, so can be reused by multiple emitters.
+  * This class represents a set of transformations that can be applied to events feeding into an [[EventPropSetter]]
+  * EventPropTransformation-s are immutable, so can be reused by multiple setters.
   *
   * Example syntax: `input(onChange().preventDefault.mapTo(true) --> myBooleanWriteBus)`
   *
@@ -31,15 +32,15 @@ class EventPropTransformation[Ev <: dom.Event, V](
   // @TODO[Performance,Elegance] Is it possible to move these --> methods to ReactiveEventProp?
   // We can't have them in both places, because then type inference does not work
 
-  @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventPropEmitter[Ev, V, El] = {
-    new EventPropEmitter(observer, eventProp, useCapture, processor)
+  @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventPropSetter[Ev] = {
+    EventPropSetter(observer, eventProp, useCapture, processor)
   }
 
-  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventPropSetter[Ev] = {
     -->(Observer(onNext))
   }
 
-  @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventPropEmitter[Ev, V, El] = {
+  @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventPropSetter[Ev] = {
     -->(eventBus.writer)
   }
 

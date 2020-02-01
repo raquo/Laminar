@@ -1,7 +1,9 @@
 package com.raquo.laminar.setters
 
+import com.raquo.airstream.core.Observer
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
+import com.raquo.laminar.api.L.onClick
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
@@ -34,4 +36,34 @@ class EventPropSetter[Ev <: dom.Event](
       case _ => false
     }
   }
+}
+
+object EventPropSetter {
+
+  def apply[Ev <: dom.Event, V, El <: ReactiveElement.Base](
+    observer: Observer[V],
+    eventProp: EventProp[Ev],
+    useCapture: Boolean,
+    processor: Ev => Option[V]
+  ): EventPropSetter[Ev] = {
+
+    val callback = (ev: Ev) => {
+      if (
+        ev.defaultPrevented
+          && eventProp == onClick
+          && ev.target.asInstanceOf[dom.Element].tagName == "INPUT" // ugly but performy
+          && ev.target.asInstanceOf[dom.html.Input].`type` == "checkbox"
+      ) {
+        // Special case: See README and/or https://stackoverflow.com/a/32710212/2601788
+        // @TODO[API] Should this behaviour extend to all checkbox.onClick events by default?
+        js.timers.setTimeout(0)(processor(ev).foreach(observer.onNext))
+        ()
+      } else {
+        processor(ev).foreach(observer.onNext)
+      }
+    }
+
+    new EventPropSetter[Ev](eventProp, callback, useCapture = useCapture)
+  }
+
 }
