@@ -2,7 +2,8 @@ package com.raquo.laminar.utils
 
 import com.raquo.domtestutils.Utils
 import com.raquo.domtestutils.scalatest.AsyncMountSpec
-import org.scalatest.{AsyncFunSpec, Matchers}
+import org.scalatest.funspec.AsyncFunSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.{Future, Promise}
 import scala.scalajs.js

@@ -47,21 +47,21 @@ class ModifierSpec extends UnitSpec {
 
     // --
 
-    simulateClick(checkbox.ref)
+    checkbox.ref.click()
 
     events shouldEqual mutable.Buffer(false)
     events.clear()
 
     // --
 
-    simulateClick(checkbox.ref)
+    checkbox.ref.click()
 
     events shouldEqual mutable.Buffer(true)
     events.clear()
 
     // --
 
-    simulateClick(checkbox.ref)
+    checkbox.ref.click()
 
     events shouldEqual mutable.Buffer(false)
     events.clear()
