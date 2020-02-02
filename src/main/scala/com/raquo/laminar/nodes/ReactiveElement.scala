@@ -8,9 +8,9 @@ import com.raquo.airstream.signal.Signal
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
+import com.raquo.laminar.lifecycle.{LifecycleEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ChildNode.isParentMounted
-import com.raquo.laminar.nodes.ReactiveElement.noMountEvents
+import com.raquo.laminar.nodes.ReactiveElement.PilotSubscriptionOwner
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
 import com.raquo.laminar.setters.EventPropSetter
 import org.scalajs.dom
@@ -35,9 +35,9 @@ trait ReactiveElement[+Ref <: dom.Element]
   private[this] var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
 
   /** Event bus that emits this node's mount events.
-    * For efficiency, it is only populated when someone accesses [[thisNodeMountEvents]]
+    * For efficiency, it is only populated when someone accesses [[thisNodeLifecycleEvents]]
     */
-  private[this] var maybeThisNodeMountEventBus: Option[EventBus[MountEvent]] = None
+  private[this] var maybeThisNodeLifecycleEventBus: Option[EventBus[LifecycleEvent]] = None
 
   /** Stream of parent change events for this node.
     * For efficiency, it is lazy loaded, only being initialized when accessed
@@ -55,34 +55,38 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   /** Emits mount events that were caused by this element's parent changing its parent,
     * or any such changes up the chain. Does not include mount events triggered by this
-    * element changing its parent - see [[thisNodeMountEvents]] for that. */
-  private[this] lazy val ancestorMountEvents: EventStream[MountEvent] = {
+    * element changing its parent - see [[thisNodeLifecycleEvents]] for that. */
+  private[this] lazy val ancestorLifecycleEvents: EventStream[LifecycleEvent] = {
     maybeParentSignal.map {
       case Some(nextParent: ReactiveElement[_]) =>
-        nextParent.mountEvents
+        nextParent.lifecycleEvents
       case _ =>
-        noMountEvents
+        EventStream.empty
     }.flatten
   }
 
   /** Emits mount events caused by this node changing its parent. Does not include mount
     * events triggered by changes higher in the hierarchy (grandparent and up) – see
-    * [[ancestorMountEvents]] for that. */
-  private[this] lazy val thisNodeMountEvents: EventStream[MountEvent] = {
-    val thisNodeMountEventBus = new EventBus[MountEvent]
-    maybeThisNodeMountEventBus = Some(thisNodeMountEventBus)
-    thisNodeMountEventBus.events
+    * [[ancestorLifecycleEvents]] for that. */
+  private[this] lazy val thisNodeLifecycleEvents: EventStream[LifecycleEvent] = {
+    val thisNodeLifecycleEventBus = new EventBus[LifecycleEvent]
+    maybeThisNodeLifecycleEventBus = Some(thisNodeLifecycleEventBus)
+    thisNodeLifecycleEventBus.events
   }
 
-  /** Emits mount events for this node, including mount events fired by all of its ancestors */
-  lazy val mountEvents: EventStream[MountEvent] = {
-    EventStream.merge(ancestorMountEvents, thisNodeMountEvents)
+  /** Emits lifecycle events for this node, including mount events fired by all of its ancestors */
+  lazy val lifecycleEvents: EventStream[LifecycleEvent] = {
+    EventStream.merge(ancestorLifecycleEvents, thisNodeLifecycleEvents)
   }
+
+  @inline def mountEvents: EventStream[Unit] = lifecycleEvents.collect {case NodeDidMount => () }
+
+  @inline def unmountEvents: EventStream[Unit] = lifecycleEvents.collect {case NodeWillUnmount => () }
 
   // @nc normally this would not work memory management wise, as we create a sub on element init, and never even bother to kill it
   //  - however, this sub only looks at mount events
-  //  - thisNodeMountEvents are contained within this node and don't require any leaky resources
-  //  - ancestorMountEvents look at parent nodes' mountEvents
+  //  - thisNodeLifecycleEvents are contained within this node and don't require any leaky resources
+  //  - ancestorLifecycleEvents look at parent nodes' mountEvents
   //    - while this node is mounted, all ancestors are also mounted and that is ok
   //    - if this node becomes unmounted, the ancestor chain includes only other unmounted nodes
   //    - so this will lock together that ancestor chain, but that's like meh
@@ -90,9 +94,9 @@ trait ReactiveElement[+Ref <: dom.Element]
   //    - as long as we understand and document this limitation, I think it's ok
   // @nc Can we initialize this conditionally, only for elements that need it?
   {
-    val pilotSubscriptionOwner: Owner = new Owner {}
+    val pilotSubscriptionOwner: Owner = new PilotSubscriptionOwner
 
-    mountEvents.foreach{
+    lifecycleEvents.foreach{
       case NodeDidMount => dynamicOwner.activate()
       case NodeWillUnmount => dynamicOwner.deactivate()
     }(pilotSubscriptionOwner)
@@ -179,7 +183,7 @@ trait ReactiveElement[+Ref <: dom.Element]
         ))
       })
       if (!isParentMounted(maybeNextParent) && isParentMounted(maybeParent)) {
-        maybeThisNodeMountEventBus.foreach { bus =>
+        maybeThisNodeLifecycleEventBus.foreach { bus =>
           bus.writer.onNext(NodeWillUnmount)
         }
       }
@@ -204,7 +208,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       val prevParentIsMounted = isParentMounted(maybePrevParent)
       val nextParentIsMounted = isParentMounted(maybeNextParent)
       if (!prevParentIsMounted && nextParentIsMounted) {
-        maybeThisNodeMountEventBus.foreach(_.writer.onNext(NodeDidMount))
+        maybeThisNodeLifecycleEventBus.foreach(_.writer.onNext(NodeDidMount))
       }
     }
   }
@@ -214,7 +218,7 @@ object ReactiveElement {
 
   type Base = ReactiveElement[dom.Element]
 
-  private val noMountEvents: EventStream[MountEvent] = EventStream.fromSeq(Nil, emitOnce = true)
+  private class PilotSubscriptionOwner extends Owner
 
   /** @return Whether listener was added (false if such a listener has already been present) */
   def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Boolean = {
