@@ -8,7 +8,7 @@ import com.raquo.airstream.signal.Signal
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.lifecycle.{LifecycleEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
+import com.raquo.laminar.lifecycle.{MountContext, LifecycleEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ChildNode.isParentMounted
 import com.raquo.laminar.nodes.ReactiveElement.PilotSubscriptionOwner
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
@@ -140,6 +140,24 @@ trait ReactiveElement[+Ref <: dom.Element]
   // @TODO[Naming] Not a fan of `subscribeS` / `subscribeO` names, but it needs to be different from `subscribe` for type inference to work
   // @TODO[API] Consider having subscribe() return a Subscribe object that has several apply methods on it to reign in this madness
   //  - Also, do we really need currying here?
+
+  def onMount(fn: MountContext[this.type, Ref] => Unit): DynamicSubscription = {
+    onLifecycle[Unit](mount = fn, unmount = (_, _) => ())
+  }
+
+  def onUnmount(fn: this.type => Unit): DynamicSubscription = {
+    onLifecycle[Unit](mount = _ => (), unmount = (_, thisNode) => fn(thisNode))
+  }
+
+  def onLifecycle[A](
+    mount: MountContext[this.type, Ref] => A,
+    unmount: (A, this.type) => Unit
+  ): DynamicSubscription = {
+    subscribeS(owner => {
+      val mountState = mount(new MountContext[this.type, Ref](thisNode = this, owner))
+      new Subscription(owner, cleanup = () => unmount(mountState, this))
+    })
+  }
 
   def subscribeS(getSubscription: Owner => Subscription): DynamicSubscription = {
     new DynamicSubscription(dynamicOwner, getSubscription)
