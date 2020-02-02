@@ -19,14 +19,14 @@ package com.raquo.laminar.lifecycle
   * of this new element's subscriptions also react to the same event. The subscription will not see
   * that event. See the ignored test in WeirdCasesSpec.
   */
-sealed trait MountEvent
+sealed trait LifecycleEvent
 
 /** `NodeDidMount` event fires when a previously unmounted (or newly created) node becomes
   * mounted.
   *
   * Internally, Laminar will activate the node's subscriptions when it's mounted.
   */
-object NodeDidMount extends MountEvent
+object NodeDidMount extends LifecycleEvent
 
 /** `NodeWillUnmount` event fires when a previously mounted node is about to be unmounted.
   * Note: when the event fires, the node is still mounted.
@@ -35,5 +35,5 @@ object NodeDidMount extends MountEvent
   * except for the internal pilot subscription that listens to mountEvents (so that we can
   * re-activate the other subscriptions when the node gets mounted again).
   */
-object NodeWillUnmount extends MountEvent
+object NodeWillUnmount extends LifecycleEvent
 

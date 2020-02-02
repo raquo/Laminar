@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.lifecycle.{MountEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
+import com.raquo.laminar.lifecycle.{LifecycleEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
@@ -14,18 +14,18 @@ class LifecycleEventSpec extends UnitSpec {
   case class TestCase(
     action: ReactiveElement[dom.html.Element] => Unit,
 //    expectedChangeEvents: Seq[ParentChangeEvent],
-    expectedMountEvents: Seq[MountEvent]
+    expectedLifecycleEvents: Seq[LifecycleEvent]
   )
 
   it("mount event transaction timing - level 1") {
 
     val textBus = new EventBus[String]
 
-    var events = mutable.Buffer[MountEvent]();
+    var events = mutable.Buffer[LifecycleEvent]();
 
     val readMountEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(_.mountEvents){ ev => events.append(ev) }
+        element.subscribe(_.lifecycleEvents){ ev => events.append(ev) }
       }
     }
 
@@ -60,11 +60,11 @@ class LifecycleEventSpec extends UnitSpec {
 
     val textBus = new EventBus[String]
 
-    var events = mutable.Buffer[MountEvent]();
+    var events = mutable.Buffer[LifecycleEvent]();
 
     val readMountEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(_.mountEvents){ ev => events.append(ev) }
+        element.subscribe(_.lifecycleEvents){ ev => events.append(ev) }
       }
     }
 
@@ -104,8 +104,8 @@ class LifecycleEventSpec extends UnitSpec {
     val parent2 = p("parent2 ", "(two) ")
 
 //    var parentEvents = Seq[ParentChangeEvent]()
-    var mountEvents = Seq[MountEvent]()
-    var grandChildMountEvents = Seq[MountEvent]()
+    var mountEvents = Seq[LifecycleEvent]()
+    var grandChildMountEvents = Seq[LifecycleEvent]()
 
     mount(div("root ", parent1, parent2))
 
@@ -130,12 +130,12 @@ class LifecycleEventSpec extends UnitSpec {
 //            maybeNextParent = Some(parent1)
 //          )
 //        ),
-        expectedMountEvents = Seq(NodeDidMount)
+        expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
         parent1.appendChild,
 //        expectedChangeEvents = Seq(),
-        expectedMountEvents = Seq()
+        expectedLifecycleEvents = Seq()
       ),
       TestCase(
         child => parent2.insertChild(child, atIndex = 1),
@@ -151,7 +151,7 @@ class LifecycleEventSpec extends UnitSpec {
 //            maybeNextParent = Some(parent2)
 //          )
 //        ),
-        expectedMountEvents = Seq()
+        expectedLifecycleEvents = Seq()
       ),
       TestCase(
         parent2.removeChild,
@@ -167,7 +167,7 @@ class LifecycleEventSpec extends UnitSpec {
 //            maybeNextParent = None
 //          )
 //        ),
-        expectedMountEvents = Seq(
+        expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
       ),
@@ -185,7 +185,7 @@ class LifecycleEventSpec extends UnitSpec {
 //            maybeNextParent = Some(parent2)
 //          )
 //        ),
-        expectedMountEvents = Seq(NodeDidMount)
+        expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
         parent2.replaceChild(_, otherChild),
@@ -201,7 +201,7 @@ class LifecycleEventSpec extends UnitSpec {
 //            maybeNextParent = None
 //          )
 //        ),
-        expectedMountEvents = Seq(
+        expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
       )
@@ -211,7 +211,7 @@ class LifecycleEventSpec extends UnitSpec {
 //      parentEvents = parentEvents :+ ev
 //    }
 
-    child.subscribe(_.mountEvents) { ev =>
+    child.subscribe(_.lifecycleEvents) { ev =>
       mountEvents = mountEvents :+ ev
     }
 
@@ -219,7 +219,7 @@ class LifecycleEventSpec extends UnitSpec {
 //      fail("grandChild received a ParentChangeEvent. This is not supposed to happen, as such events should not be inherited by child nodes.")
 //    }
 
-    grandChild.subscribe(_.mountEvents) { ev =>
+    grandChild.subscribe(_.lifecycleEvents) { ev =>
       grandChildMountEvents = grandChildMountEvents :+ ev
     }
 
@@ -227,8 +227,8 @@ class LifecycleEventSpec extends UnitSpec {
       withClue(s"Case index=$index:") {
         testCase.action(child)
         // parentEvents shouldEqual testCase.expectedChangeEvents
-        mountEvents shouldEqual testCase.expectedMountEvents
-        grandChildMountEvents shouldEqual testCase.expectedMountEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
+        mountEvents shouldEqual testCase.expectedLifecycleEvents
+        grandChildMountEvents shouldEqual testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
 //        parentEvents = Seq()
         mountEvents = Seq()
         grandChildMountEvents = Seq()
@@ -247,38 +247,28 @@ class LifecycleEventSpec extends UnitSpec {
 //    val child = span(b("orly"), "yarly")
 //
 //    child.maybeParentChangeBus.isDefined shouldBe false
-//    child.maybeThisNodeMountEventBus.isDefined shouldBe false
+//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
 //
 //    parent1(child)
 //
 //    child.maybeParentChangeBus.isDefined shouldBe false
-//    child.maybeThisNodeMountEventBus.isDefined shouldBe false
+//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
 //
 //    parent2(child)
 //
 //    child.maybeParentChangeBus.isDefined shouldBe false
-//    child.maybeThisNodeMountEventBus.isDefined shouldBe false
+//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
 //
 //    child.parentChangeEvents // Touching this should be enough to initialize `maybeParentChangeBus`
 //
 //    child.maybeParentChangeBus.isDefined shouldBe true
-//    child.maybeThisNodeMountEventBus.isDefined shouldBe false
+//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
 //
-//    child.mountEvents // Touching this should be enough to initialize `maybeThisNodeMountEventBus`
+//    child.mountEvents // Touching this should be enough to initialize `maybeThisLifecycleMountEventBus`
 //
 //    child.maybeParentChangeBus.isDefined shouldBe true
-//    child.maybeThisNodeMountEventBus.isDefined shouldBe true
+//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe true
 //  }
-
-  def makeMountEventTest(
-    testAncestorMountEvents: Boolean,
-    testThisNodeMountEvents: Boolean,
-    testMountEvents: Boolean
-  ) {
-    if (!testAncestorMountEvents && !testThisNodeMountEvents && testAncestorMountEvents) {
-      fail("EventTest: there is nothing to test! Specify some options")
-    }
-  }
 
   it("Nested mount events") {
     val parent1 = div("parent1 ")
@@ -294,23 +284,23 @@ class LifecycleEventSpec extends UnitSpec {
     val child3 = span("child3 ", grandChild3)
     val child4 = span("child4 ", b("orly4"))
 
-    type TargetNodeWithMountEvent = (ReactiveElement[dom.html.Element], MountEvent)
+    type TargetNodeWithLifecycleEvent = (ReactiveElement[dom.html.Element], LifecycleEvent)
 
-    var mountEvents: Seq[TargetNodeWithMountEvent] = Nil
+    var lifecycleEvents: Seq[TargetNodeWithLifecycleEvent] = Nil
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
-      node.subscribe(_.mountEvents) { ev =>
-        mountEvents = mountEvents :+ (node, ev)
+      node.subscribe(_.lifecycleEvents) { ev =>
+        lifecycleEvents = lifecycleEvents :+ (node, ev)
       }
     }
 
     def expectNewEvents(
       clue: String,
-      expectedMountEvents: Seq[(ReactiveElement[dom.html.Element], MountEvent)]
+      expectedMountEvents: Seq[(ReactiveElement[dom.html.Element], LifecycleEvent)]
     ): Unit = {
       withClue(clue + ": ") {
-        mountEvents shouldEqual expectedMountEvents
-        mountEvents = Nil
+        lifecycleEvents shouldEqual expectedMountEvents
+        lifecycleEvents = Nil
       }
     }
 
