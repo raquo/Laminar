@@ -6,8 +6,6 @@ trait Airstream {
 
   type EventBus[A] = airstream.eventbus.EventBus[A]
 
-  type EventBusSource[A] = airstream.eventbus.EventBusSource[A]
-
   type EventStream[+A] = airstream.eventstream.EventStream[A]
 
   type FlattenStrategy[-Outer[+_] <: Observable[_], -Inner[_], Output[+_] <: Observable[_]] = airstream.features.FlattenStrategy[Outer, Inner, Output]

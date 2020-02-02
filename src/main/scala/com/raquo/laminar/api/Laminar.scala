@@ -11,6 +11,7 @@ import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
+import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.nodes
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.setters.{ChildrenCommandSetter, ChildrenSetter}
@@ -165,6 +166,33 @@ private[laminar] object Laminar
     rootNode: nodes.ReactiveElement.Base
   ): RootNode = {
     new RootNode(container, rootNode)
+  }
+
+  def onMount[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element](fn: MountContext[El, Ref] => Unit): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = {
+        element.onMount(fn)
+      }
+    }
+  }
+
+  def onUnmount[El <: nodes.ReactiveElement.Base](fn: El => Unit): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = {
+        element.onUnmount(fn)
+      }
+    }
+  }
+
+  def onLifecycle[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element, A](
+    mount: MountContext[El, Ref] => A,
+    unmount: (A, El) => Unit
+  ): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = {
+        element.onLifecycle(mount, unmount)
+      }
+    }
   }
 
   def inContext[El <: nodes.ReactiveElement.Base](makeModifier: El => Modifier[El]): Modifier[El] = {
