@@ -168,7 +168,7 @@ private[laminar] object Laminar
     new RootNode(container, rootNode)
   }
 
-  def onMount[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element](fn: MountContext[El, Ref] => Unit): Modifier[El] = {
+  def onMount[El <: nodes.ReactiveElement.Base](fn: MountContext[El] => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
         element.onMount(fn)
@@ -185,7 +185,7 @@ private[laminar] object Laminar
   }
 
   def onLifecycle[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element](
-    mount: MountContext[El, Ref] => Unit,
+    mount: MountContext[El] => Unit,
     unmount: El => Unit
   ): Modifier[El] = {
     new Modifier[El] {
