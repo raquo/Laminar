@@ -69,7 +69,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   // @TODO[API] Consider having subscribe() return a Subscribe object that has several apply methods on it to reign in this madness
   //  - Also, do we really need currying here?
 
-  def onMount(fn: MountContext[this.type, Ref] => Unit): DynamicSubscription = {
+  def onMount(fn: MountContext[this.type] => Unit): DynamicSubscription = {
     onLifecycle(mount = fn, unmount = _ => ())
   }
 
@@ -80,7 +80,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   // @TODO[API] should `unmount` callback require a MountContext instead of this.type?
   //  That would be consistent with `mount`, but I think exposing an Owner that's about to be killed would be confusing.
   def onLifecycle(
-    mount: MountContext[this.type, Ref] => Unit,
+    mount: MountContext[this.type] => Unit,
     unmount: this.type => Unit
   ): DynamicSubscription = {
     var ignoreNextActivation = dynamicOwner.isActive
@@ -88,7 +88,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       if (ignoreNextActivation) {
         ignoreNextActivation = false
       } else {
-        mount(new MountContext[this.type, Ref](thisNode = this, owner))
+        mount(new MountContext[this.type](thisNode = this, owner))
       }
       new Subscription(owner, cleanup = () => unmount(this))
     })

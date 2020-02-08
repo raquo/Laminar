@@ -2,11 +2,12 @@ package com.raquo.laminar.lifecycle
 
 import com.raquo.airstream.ownership.Owner
 import com.raquo.laminar.nodes.ReactiveElement
-import org.scalajs.dom
 
-class MountContext[+El <: ReactiveElement[Ref], +Ref <: dom.Element](
+class MountContext[+El <: ReactiveElement.Base](
   val thisNode: El,
   implicit val owner: Owner
 ) {
-  @inline def ref: Ref = thisNode.ref
+
+  // @TODO I can't get this to work, unfortunately. Would have been a nice alias.
+  // @inline def ref: El#Ref = thisNode.ref
 }

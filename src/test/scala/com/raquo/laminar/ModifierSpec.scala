@@ -26,7 +26,7 @@ class ModifierSpec extends UnitSpec {
     ))
   }
 
-  it("meta modifier infers precise type") {
+  it("inContext modifier infers precise type") {
 
     val testOwner = new TestableOwner
 
@@ -65,6 +65,78 @@ class ModifierSpec extends UnitSpec {
 
     events shouldEqual mutable.Buffer(false)
     events.clear()
+  }
+
+  it ("onMount infers precise type and provides implicit owner") {
+
+    var value = 0
+
+    val bus = new EventBus[Int]
+    val observer = Observer[Int](ev => value = ev)
+
+    val el = div("Hello", onMount(ctx => {
+      import ctx.owner
+      bus.events.addObserver(observer) // using owner implicitly
+    }))
+
+    // --
+
+    bus.writer.onNext(1)
+
+    assert(value == 0) // not subscribed yet
+
+    mount(el)
+
+    bus.writer.onNext(2)
+
+    assert(value == 2)
+  }
+
+  it ("onMount and onUnmount work for repeated mounting") {
+
+    var numMounts = 0
+    var numUnmounts = 0
+
+    val el = div("Hello", onMount(_ => numMounts += 1), onUnmount(_ => numUnmounts += 1))
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 0)
+
+    // --
+
+    mount(el)
+
+    assert(numMounts == 1)
+    assert(numUnmounts == 0)
+
+    numMounts = 0
+
+    // --
+
+    unmount()
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 1)
+
+    numUnmounts = 0
+
+    // --
+
+    mount(el)
+
+    assert(numMounts == 1)
+    assert(numUnmounts == 0)
+
+    numMounts = 0
+
+    // --
+
+    unmount()
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 1)
+
+    numUnmounts = 0
   }
 
 }
