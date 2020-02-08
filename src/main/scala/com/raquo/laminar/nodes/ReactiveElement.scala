@@ -7,8 +7,8 @@ import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, 
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.api.Laminar.Mod
 import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
 import com.raquo.laminar.setters.EventPropSetter
 import org.scalajs.dom
 
@@ -48,22 +48,9 @@ trait ReactiveElement[+Ref <: dom.Element]
     eventBus.events
   }
 
-  /** Note:
-    * - These methods provide the first `<--` in the auxiliary syntax `myElement <-- child <-- childSignal`.
-    * - The second `<--` in that auxiliary syntax is provided by `class ChildReceiver`.
-    * - The more common syntax `myElement(child <-- childSignal)` relies on the `<--` method defined in `object ChildReceiver`
-    *
-    * The alias `val child: ChildReceiver.type = ChildReceiver` is defined in Laminar.scala
-    */
-  final def <--[V](childReceiver: ChildReceiver.type): ChildReceiver = new ChildReceiver(this)
-
-  final def <--[V](maybeChildReceiver: MaybeChildReceiver.type): MaybeChildReceiver = new MaybeChildReceiver(this)
-
-  final def <--[V](textChildReceiver: TextChildReceiver.type): TextChildReceiver = new TextChildReceiver(this)
-
-  final def <--[V](childrenReceiver: ChildrenReceiver.type): ChildrenReceiver = new ChildrenReceiver(this)
-
-  final def <--[V](childrenCommandReceiver: ChildrenCommandReceiver.type): ChildrenCommandReceiver = new ChildrenCommandReceiver(this)
+  def amend(mods: Mod[this.type]*): Unit = {
+    mods.foreach(mod => mod(this))
+  }
 
   // @TODO[Naming] Not a fan of `subscribeS` / `subscribeO` names, but it needs to be different from `subscribe` for type inference to work
   // @TODO[API] Consider having subscribe() return a Subscribe object that has several apply methods on it to reign in this madness
