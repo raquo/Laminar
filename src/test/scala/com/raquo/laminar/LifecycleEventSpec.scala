@@ -2,7 +2,6 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.lifecycle.{LifecycleEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
@@ -11,25 +10,31 @@ import scala.collection.mutable
 
 class LifecycleEventSpec extends UnitSpec {
 
+  sealed trait LifecycleEvent
+  object NodeDidMount extends LifecycleEvent
+  object NodeWillUnmount extends LifecycleEvent
+
   case class TestCase(
     action: ReactiveElement[dom.html.Element] => Unit,
-//    expectedChangeEvents: Seq[ParentChangeEvent],
     expectedLifecycleEvents: Seq[LifecycleEvent]
   )
 
-  it("mount event transaction timing - level 1") {
+  it("event timing - level 1") {
 
     val textBus = new EventBus[String]
 
     var events = mutable.Buffer[LifecycleEvent]();
 
-    val readMountEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
+    val readLifecycleEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(_.lifecycleEvents){ ev => events.append(ev) }
+        element.onLifecycle(
+          _ => events.append(NodeDidMount),
+          _ => events.append(NodeWillUnmount)
+        )
       }
     }
 
-    def makeChild(text: String): Div = div(readMountEvents, text)
+    def makeChild(text: String): Div = div(readLifecycleEvents, text)
 
     val $child = textBus.events.map(makeChild)
 
@@ -56,19 +61,22 @@ class LifecycleEventSpec extends UnitSpec {
 
   }
 
-  it("mount event transaction timing - level 2 (nesting)") {
+  it("event timing - level 2 (nesting)") {
 
     val textBus = new EventBus[String]
 
     var events = mutable.Buffer[LifecycleEvent]();
 
-    val readMountEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
+    val readLifecycleEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.subscribe(_.lifecycleEvents){ ev => events.append(ev) }
+        element.onLifecycle(
+          _ => events.append(NodeDidMount),
+          _ => events.append(NodeWillUnmount)
+        )
       }
     }
 
-    def makeChild(text: String): Div = div(span(readMountEvents, text))
+    def makeChild(text: String): Div = div(span(readLifecycleEvents, text))
 
     val $child = textBus.events.map(makeChild)
 
@@ -103,174 +111,64 @@ class LifecycleEventSpec extends UnitSpec {
     val parent1 = div("parent1") // @TODO remove this child
     val parent2 = p("parent2 ", "(two) ")
 
-//    var parentEvents = Seq[ParentChangeEvent]()
-    var mountEvents = Seq[LifecycleEvent]()
-    var grandChildMountEvents = Seq[LifecycleEvent]()
+    var lifecycleEvents = Seq[LifecycleEvent]()
+    var grandChildLifecycleEvents = Seq[LifecycleEvent]()
 
     mount(div("root ", parent1, parent2))
-
-    // If we wanted to test ParentChangeEvent-s, we would need to:
-    // - relax val visibility to allow that, and
-    // - use a different owner to subscribe to those events, because subscriptions on the element itself
-    //   will not see those events when they coincide with mounting / unmounting because of transaction delay.
-    //   We could potentially special-case these similar to pilotSubscription, but I don't know id that's wise.
 
     val testCases = Seq(
       TestCase(
         parent1.appendChild,
-//        expectedChangeEvents = Seq(
-//          ParentChangeEvent(
-//            alreadyChanged = false,
-//            maybePrevParent = None,
-//            maybeNextParent = Some(parent1)
-//          ),
-//          ParentChangeEvent(
-//            alreadyChanged = true,
-//            maybePrevParent = None,
-//            maybeNextParent = Some(parent1)
-//          )
-//        ),
         expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
         parent1.appendChild,
-//        expectedChangeEvents = Seq(),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
         child => parent2.insertChild(child, atIndex = 1),
-//        expectedChangeEvents = Seq(
-//          ParentChangeEvent(
-//            alreadyChanged = false,
-//            maybePrevParent = Some(parent1),
-//            maybeNextParent = Some(parent2)
-//          ),
-//          ParentChangeEvent(
-//            alreadyChanged = true,
-//            maybePrevParent = Some(parent1),
-//            maybeNextParent = Some(parent2)
-//          )
-//        ),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
         parent2.removeChild,
-//        expectedChangeEvents = Seq(
-//          ParentChangeEvent(
-//            alreadyChanged = false,
-//            maybePrevParent = Some(parent2),
-//            maybeNextParent = None
-//          ),
-//          ParentChangeEvent(
-//            alreadyChanged = true,
-//            maybePrevParent = Some(parent2),
-//            maybeNextParent = None
-//          )
-//        ),
         expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
       ),
       TestCase(
         parent2.appendChild,
-//        expectedChangeEvents = Seq(
-//          ParentChangeEvent(
-//            alreadyChanged = false,
-//            maybePrevParent = None,
-//            maybeNextParent = Some(parent2)
-//          ),
-//          ParentChangeEvent(
-//            alreadyChanged = true,
-//            maybePrevParent = None,
-//            maybeNextParent = Some(parent2)
-//          )
-//        ),
         expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
         parent2.replaceChild(_, otherChild),
-//        expectedChangeEvents = Seq(
-//          ParentChangeEvent(
-//            alreadyChanged = false,
-//            maybePrevParent = Some(parent2),
-//            maybeNextParent = None
-//          ),
-//          ParentChangeEvent(
-//            alreadyChanged = true,
-//            maybePrevParent = Some(parent2),
-//            maybeNextParent = None
-//          )
-//        ),
         expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
       )
     )
 
-//    child.subscribe(_.parentChangeEvents) { ev =>
-//      parentEvents = parentEvents :+ ev
-//    }
+    child.onLifecycle(
+      _ => lifecycleEvents = lifecycleEvents :+ NodeDidMount,
+      _ => lifecycleEvents = lifecycleEvents :+ NodeWillUnmount
+    )
 
-    child.subscribe(_.lifecycleEvents) { ev =>
-      mountEvents = mountEvents :+ ev
-    }
-
-//    grandChild.subscribe(_.parentChangeEvents) { _ =>
-//      fail("grandChild received a ParentChangeEvent. This is not supposed to happen, as such events should not be inherited by child nodes.")
-//    }
-
-    grandChild.subscribe(_.lifecycleEvents) { ev =>
-      grandChildMountEvents = grandChildMountEvents :+ ev
-    }
+    grandChild.onLifecycle(
+      _ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeDidMount,
+      _ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeWillUnmount
+    )
 
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
         testCase.action(child)
-        // parentEvents shouldEqual testCase.expectedChangeEvents
-        mountEvents shouldEqual testCase.expectedLifecycleEvents
-        grandChildMountEvents shouldEqual testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
-//        parentEvents = Seq()
-        mountEvents = Seq()
-        grandChildMountEvents = Seq()
+        lifecycleEvents shouldEqual testCase.expectedLifecycleEvents
+        grandChildLifecycleEvents shouldEqual testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
+        lifecycleEvents = Seq()
+        grandChildLifecycleEvents = Seq()
       }
     }
   }
 
-  // This test will not pass because
-  // - these fields are now hidden
-  // - more importantly, we now initialize mountEvents from the start. Maybe we'll get around that eventually
-//  it("parentChangeEvents lazy val is not initialized if nothing asks for it even if the node has children") {
-//
-//    val parent1 = div()
-//    val parent2 = p("Yolo")
-//
-//    val child = span(b("orly"), "yarly")
-//
-//    child.maybeParentChangeBus.isDefined shouldBe false
-//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
-//
-//    parent1(child)
-//
-//    child.maybeParentChangeBus.isDefined shouldBe false
-//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
-//
-//    parent2(child)
-//
-//    child.maybeParentChangeBus.isDefined shouldBe false
-//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
-//
-//    child.parentChangeEvents // Touching this should be enough to initialize `maybeParentChangeBus`
-//
-//    child.maybeParentChangeBus.isDefined shouldBe true
-//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe false
-//
-//    child.mountEvents // Touching this should be enough to initialize `maybeThisLifecycleMountEventBus`
-//
-//    child.maybeParentChangeBus.isDefined shouldBe true
-//    child.maybeThisLifecycleMountEventBus.isDefined shouldBe true
-//  }
-
-  it("Nested mount events") {
+  it("Nested lifecycle events") {
     val parent1 = div("parent1 ")
     val parent2 = p("parent2 ")
     val parent3 = article("parent3 ")
@@ -289,17 +187,18 @@ class LifecycleEventSpec extends UnitSpec {
     var lifecycleEvents: Seq[TargetNodeWithLifecycleEvent] = Nil
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
-      node.subscribe(_.lifecycleEvents) { ev =>
-        lifecycleEvents = lifecycleEvents :+ (node, ev)
-      }
+      node.onLifecycle(
+        _ => lifecycleEvents = lifecycleEvents :+ (node, NodeDidMount),
+        _ => lifecycleEvents = lifecycleEvents :+ (node, NodeWillUnmount)
+      )
     }
 
     def expectNewEvents(
       clue: String,
-      expectedMountEvents: Seq[(ReactiveElement[dom.html.Element], LifecycleEvent)]
+      expectedEvents: Seq[(ReactiveElement[dom.html.Element], LifecycleEvent)]
     ): Unit = {
       withClue(clue + ": ") {
-        lifecycleEvents shouldEqual expectedMountEvents
+        lifecycleEvents shouldEqual expectedEvents
         lifecycleEvents = Nil
       }
     }
@@ -322,7 +221,7 @@ class LifecycleEventSpec extends UnitSpec {
 
     expectNewEvents(
       "grandparent was mounted",
-      Seq((grandParent, NodeDidMount), (child1, NodeDidMount))
+      Seq((child1, NodeDidMount), (grandParent, NodeDidMount))
     )
 
     subscribeToEvents(child2)
@@ -338,7 +237,7 @@ class LifecycleEventSpec extends UnitSpec {
 
     expectNewEvents(
       "child3 was added to a mounted parent3",
-      Seq((child3, NodeDidMount), (grandChild3, NodeDidMount))
+      Seq((grandChild3, NodeDidMount), (child3, NodeDidMount))
     )
 
     subscribeToEvents(parent4)
@@ -390,9 +289,9 @@ class LifecycleEventSpec extends UnitSpec {
     expectNewEvents(
       "parent3 was moved into parent5 which is unmounted",
       Seq(
-        (parent3, NodeWillUnmount),
+        (grandChild3, NodeWillUnmount),
         (child3, NodeWillUnmount),
-        (grandChild3, NodeWillUnmount)
+        (parent3, NodeWillUnmount)
       )
     )
   }

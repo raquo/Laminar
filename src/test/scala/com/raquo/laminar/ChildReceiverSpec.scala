@@ -128,23 +128,23 @@ class ChildReceiverSpec extends UnitSpec {
     }
   }
 
-  ignore("updates two children with the same stream") {
-
-  }
-
-  ignore("works when nested") {
-
-  }
-
-  ignore("works with an attr receiver on the same node") {
-
-  }
-
-  ignore("works with an attr receiver with nesting") {
-
-  }
-
-  ignore("works with an attr receiver on this node") {
-
-  }
+//  ignore("updates two children with the same stream") {
+//
+//  }
+//
+//  ignore("works when nested") {
+//
+//  }
+//
+//  ignore("works with an attr receiver on the same node") {
+//
+//  }
+//
+//  ignore("works with an attr receiver with nesting") {
+//
+//  }
+//
+//  ignore("works with an attr receiver on this node") {
+//
+//  }
 }

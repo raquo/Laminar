@@ -2,12 +2,15 @@ package com.raquo.laminar.nodes
 
 import org.scalajs.dom
 
+/**
+  * We assume that RootNode's `container` element is always mounted.
+  * RootNode does not receive outside notifications about the container becoming unmounted.
+  */
 class RootNode(
   val container: dom.Element,
   val child: ReactiveElement.Base
 ) extends ParentNode[dom.Element] {
 
-  // @nc Do we actually need this? If so, document the exact reason
   if (!ChildNode.isNodeMounted(container)) {
     throw new Exception("Unable to mount Laminar RootNode into an unmounted container.")
   }
@@ -19,8 +22,10 @@ class RootNode(
 
   /** @return Whether child was successfully unmounted */
   def unmount(): Boolean = {
+    dynamicOwner.deactivate()
     this.removeChild(child)
   }
 
+  dynamicOwner.activate()
   appendChild(child)
 }
