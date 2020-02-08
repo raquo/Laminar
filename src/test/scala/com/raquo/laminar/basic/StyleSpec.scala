@@ -9,7 +9,7 @@ class StyleSpec extends UnitSpec {
 
   it("sets styles") {
     val expectedDisplay = "block"
-    val expectedHeight = s"${Random.nextInt(15)}px"
+    val expectedHeight = s"${1 + Random.nextInt(15)}px"
     val expectedWidth = s"${15 + Random.nextInt(7)}px"
 
     mount("div", div(display.block))

@@ -9,7 +9,7 @@ class HtmlAttrSpec extends UnitSpec {
 
   it("sets attrs") {
     val expectedTitle = randomString("title_")
-    val expectedColSpan = Random.nextInt(15)
+    val expectedColSpan = 1 + Random.nextInt(15)
     val expectedRowSpan = 15 + Random.nextInt(7)
 
     mount("div", div(title := expectedTitle))

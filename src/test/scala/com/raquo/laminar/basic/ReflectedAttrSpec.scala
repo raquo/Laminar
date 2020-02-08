@@ -81,7 +81,7 @@ class ReflectedAttrSpec extends UnitSpec {
     val expectedRel2 = randomString("rel2_")
     val expectedText1 = randomString("text1_")
     val expectedText2 = randomString("text2_")
-    val expectedColSpan = Random.nextInt(15)
+    val expectedColSpan = 1 + Random.nextInt(15)
     val expectedRowSpan = 15 + Random.nextInt(7)
 
     mount(
