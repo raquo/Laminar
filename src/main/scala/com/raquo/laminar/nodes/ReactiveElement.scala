@@ -3,14 +3,11 @@ package com.raquo.laminar.nodes
 import com.raquo.airstream.core.{Observable, Observer}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.ownership.{DynamicOwner, DynamicSubscription, Owner, Subscription}
-import com.raquo.airstream.signal.Signal
+import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, TransferableSubscription}
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.lifecycle.{MountContext, LifecycleEvent, NodeDidMount, NodeWillUnmount, ParentChangeEvent}
-import com.raquo.laminar.nodes.ChildNode.isParentMounted
-import com.raquo.laminar.nodes.ReactiveElement.PilotSubscriptionOwner
+import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.receivers.{ChildReceiver, ChildrenCommandReceiver, ChildrenReceiver, MaybeChildReceiver, TextChildReceiver}
 import com.raquo.laminar.setters.EventPropSetter
 import org.scalajs.dom
@@ -27,80 +24,11 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   @inline def maybeEventListeners: Option[List[EventPropSetter[_]]] = _maybeEventListeners.map(_.toList)
 
-  private[this] val dynamicOwner: DynamicOwner = new DynamicOwner
-
-  /** Event bus that emits parent change events.
-    * For efficiency, it is only populated when someone accesses [[parentChangeEvents]]
-    */
-  private[this] var maybeParentChangeBus: Option[EventBus[ParentChangeEvent]] = None
-
-  /** Event bus that emits this node's mount events.
-    * For efficiency, it is only populated when someone accesses [[thisNodeLifecycleEvents]]
-    */
-  private[this] var maybeThisNodeLifecycleEventBus: Option[EventBus[LifecycleEvent]] = None
-
-  /** Stream of parent change events for this node.
-    * For efficiency, it is lazy loaded, only being initialized when accessed
-    */
-  private[this] lazy val parentChangeEvents: EventStream[ParentChangeEvent] = {
-    val parentChangeBus = new EventBus[ParentChangeEvent]
-    maybeParentChangeBus = Some(parentChangeBus)
-    parentChangeBus.events
-  }
-
-  private[this] lazy val maybeParentSignal: Signal[Option[ParentNode.Base]] = parentChangeEvents
-    .filter(_.alreadyChanged) // @TODO[Integrity] is this important?
-    .map(_.maybeNextParent)
-    .toSignal(maybeParent)
-
-  /** Emits mount events that were caused by this element's parent changing its parent,
-    * or any such changes up the chain. Does not include mount events triggered by this
-    * element changing its parent - see [[thisNodeLifecycleEvents]] for that. */
-  private[this] lazy val ancestorLifecycleEvents: EventStream[LifecycleEvent] = {
-    maybeParentSignal.map {
-      case Some(nextParent: ReactiveElement[_]) =>
-        nextParent.lifecycleEvents
-      case _ =>
-        EventStream.empty
-    }.flatten
-  }
-
-  /** Emits mount events caused by this node changing its parent. Does not include mount
-    * events triggered by changes higher in the hierarchy (grandparent and up) – see
-    * [[ancestorLifecycleEvents]] for that. */
-  private[this] lazy val thisNodeLifecycleEvents: EventStream[LifecycleEvent] = {
-    val thisNodeLifecycleEventBus = new EventBus[LifecycleEvent]
-    maybeThisNodeLifecycleEventBus = Some(thisNodeLifecycleEventBus)
-    thisNodeLifecycleEventBus.events
-  }
-
-  /** Emits lifecycle events for this node, including mount events fired by all of its ancestors */
-  lazy val lifecycleEvents: EventStream[LifecycleEvent] = {
-    EventStream.merge(ancestorLifecycleEvents, thisNodeLifecycleEvents)
-  }
-
-  @inline def mountEvents: EventStream[Unit] = lifecycleEvents.collect {case NodeDidMount => () }
-
-  @inline def unmountEvents: EventStream[Unit] = lifecycleEvents.collect {case NodeWillUnmount => () }
-
-  // @nc normally this would not work memory management wise, as we create a sub on element init, and never even bother to kill it
-  //  - however, this sub only looks at mount events
-  //  - thisNodeLifecycleEvents are contained within this node and don't require any leaky resources
-  //  - ancestorLifecycleEvents look at parent nodes' mountEvents
-  //    - while this node is mounted, all ancestors are also mounted and that is ok
-  //    - if this node becomes unmounted, the ancestor chain includes only other unmounted nodes
-  //    - so this will lock together that ancestor chain, but that's like meh
-  //    - even if we re-mounted this node to different parents / ancestors, this chain would be broken as `mountEvents` would now point elsewhere
-  //    - as long as we understand and document this limitation, I think it's ok
-  // @nc Can we initialize this conditionally, only for elements that need it?
-  {
-    val pilotSubscriptionOwner: Owner = new PilotSubscriptionOwner
-
-    lifecycleEvents.foreach{
-      case NodeDidMount => dynamicOwner.activate()
-      case NodeWillUnmount => dynamicOwner.deactivate()
-    }(pilotSubscriptionOwner)
-  }
+  /** This subscription activates and deactivates this element's subscriptions when mounting and unmounting this element. */
+  private val pilotSubscription: TransferableSubscription = new TransferableSubscription(
+    activate = dynamicOwner.activate,
+    deactivate = dynamicOwner.deactivate
+  )
 
   /** Create and get a stream of events on this node */
   def events[Ev <: dom.Event](
@@ -142,22 +70,47 @@ trait ReactiveElement[+Ref <: dom.Element]
   //  - Also, do we really need currying here?
 
   def onMount(fn: MountContext[this.type, Ref] => Unit): DynamicSubscription = {
-    onLifecycle[Unit](mount = fn, unmount = (_, _) => ())
+    onLifecycle(mount = fn, unmount = _ => ())
   }
 
   def onUnmount(fn: this.type => Unit): DynamicSubscription = {
-    onLifecycle[Unit](mount = _ => (), unmount = (_, thisNode) => fn(thisNode))
+    onLifecycle(mount = _ => (), unmount = fn)
   }
 
-  def onLifecycle[A](
-    mount: MountContext[this.type, Ref] => A,
-    unmount: (A, this.type) => Unit
+  // @TODO[API] should `unmount` callback require a MountContext instead of this.type?
+  //  That would be consistent with `mount`, but I think exposing an Owner that's about to be killed would be confusing.
+  def onLifecycle(
+    mount: MountContext[this.type, Ref] => Unit,
+    unmount: this.type => Unit
   ): DynamicSubscription = {
+    var ignoreNextActivation = dynamicOwner.isActive
     subscribeS(owner => {
-      val mountState = mount(new MountContext[this.type, Ref](thisNode = this, owner))
-      new Subscription(owner, cleanup = () => unmount(mountState, this))
+      if (ignoreNextActivation) {
+        ignoreNextActivation = false
+      } else {
+        mount(new MountContext[this.type, Ref](thisNode = this, owner))
+      }
+      new Subscription(owner, cleanup = () => unmount(this))
     })
   }
+
+  // @TODO[API] I'm not sure if this method is a good idea.
+  //  Is it obvious enough? Need a better name too.
+  //  You can just copy it if you need something like that.
+  /** WARNING: init() will be called not only on mount, but also
+    *          when you call this method on an already mounted element.
+    *          This is needed in order to obtain an A for the subsequent unmount call.
+    */
+  //def onLifecyclePaired[A](
+  //  init: MountContext[this.type, Ref] => A
+  //)(
+  //  unmount: (A, this.type) => Unit
+  //): DynamicSubscription = {
+  //  subscribeS(owner => {
+  //    val mountState = init(new MountContext[this.type, Ref](thisNode = this, owner))
+  //    new Subscription(owner, cleanup = () => unmount(mountState, this))
+  //  })
+  //}
 
   def subscribeS(getSubscription: Owner => Subscription): DynamicSubscription = {
     new DynamicSubscription(dynamicOwner, getSubscription)
@@ -188,47 +141,46 @@ trait ReactiveElement[+Ref <: dom.Element]
     subscribeS(owner => targetBus.addSource(sourceStream)(owner))
   }
 
-  /** This hook is exposed by Scala DOM Builder for this exact purpose */
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // super.willSetParent(maybeNextParent) // default implementation is a noop, so no need to call it.
     // dom.console.log(">>>> willSetParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybeParent == maybeNextParent, maybeParent.toString, maybeNextParent.toString)
-    if (maybeNextParent != maybeParent) {
-      maybeParentChangeBus.foreach(bus => {
-        bus.writer.onNext(ParentChangeEvent(
-          alreadyChanged = false,
-          maybePrevParent = maybeParent,
-          maybeNextParent = maybeNextParent
-        ))
-      })
-      if (!isParentMounted(maybeNextParent) && isParentMounted(maybeParent)) {
-        maybeThisNodeLifecycleEventBus.foreach { bus =>
-          bus.writer.onNext(NodeWillUnmount)
-        }
-      }
+    // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
+
+    // @Note this should cover ALL cases not covered by setParent
+    if (isUnmounting(maybePrevParent = maybeParent, maybeNextParent = maybeNextParent)) {
+      setPilotSubscriptionOwner(maybeNextParent)
     }
   }
 
+  /** Don't call setParent directly – willSetParent will not be called. Use methods like `appendChild` defined on `ParentNode` instead. */
   override private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    // @TODO[Integrity] Beware of calling setParent directly – willSetParent will not be called?
-    // @TODO[Integrity] this method (and others) should be protected
+    // dom.console.log(">>>> setParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybePrevParent == maybeNextParent, maybePrevParent.toString, maybeNextParent.toString)
+    // println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
+
     val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
-    // dom.console.log(">>>> setParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybePrevParent == maybeNextParent, maybePrevParent.toString, maybeNextParent.toString)
-    if (maybeNextParent != maybePrevParent) {
-      maybeParentChangeBus.foreach(bus => {
-        val ev = ParentChangeEvent(
-          alreadyChanged = true,
-          maybePrevParent = maybePrevParent,
-          maybeNextParent = maybeNextParent
-        )
-        bus.writer.onNext(ev)
-      })
-      val prevParentIsMounted = isParentMounted(maybePrevParent)
-      val nextParentIsMounted = isParentMounted(maybeNextParent)
-      if (!prevParentIsMounted && nextParentIsMounted) {
-        maybeThisNodeLifecycleEventBus.foreach(_.writer.onNext(NodeDidMount))
-      }
+
+    // @Note this should cover ALL cases not covered by willSetParent
+    if (!isUnmounting(maybePrevParent = maybePrevParent, maybeNextParent = maybeNextParent)) {
+      setPilotSubscriptionOwner(maybeNextParent)
     }
+  }
+
+  private[this] def isUnmounting(
+    maybePrevParent: Option[ParentNode.Base],
+    maybeNextParent: Option[ParentNode.Base]
+  ): Boolean = {
+    val isPrevParentActive = maybePrevParent.exists(_.dynamicOwner.isActive)
+    val isNextParentActive = maybeNextParent.exists(_.dynamicOwner.isActive)
+    isPrevParentActive && !isNextParentActive
+  }
+
+  private[this] def setPilotSubscriptionOwner(maybeNextParent: Option[ParentNode.Base]): Unit = {
+    maybeNextParent.fold(
+      pilotSubscription.clearOwner()
+    )(
+      nextParent => pilotSubscription.setOwner(nextParent.dynamicOwner)
+    )
   }
 }
 

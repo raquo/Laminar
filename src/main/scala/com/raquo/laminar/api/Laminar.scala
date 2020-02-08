@@ -184,9 +184,9 @@ private[laminar] object Laminar
     }
   }
 
-  def onLifecycle[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element, A](
-    mount: MountContext[El, Ref] => A,
-    unmount: (A, El) => Unit
+  def onLifecycle[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element](
+    mount: MountContext[El, Ref] => Unit,
+    unmount: El => Unit
   ): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {

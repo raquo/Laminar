@@ -1,11 +1,14 @@
 package com.raquo.laminar.nodes
 
+import com.raquo.airstream.ownership.DynamicOwner
 import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
 import scala.collection.mutable
 
 trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
+
+  private[nodes] val dynamicOwner: DynamicOwner = new DynamicOwner
 
   private var _maybeChildren: Option[mutable.Buffer[ChildNode.Base]] = None
 

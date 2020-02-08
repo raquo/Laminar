@@ -4,12 +4,10 @@ Breaking changes in **bold**.
 
 #### v0.8 – TBD
 
-* Mount Events renamed to Lifecycle Events
-  - mountEvents -> lifecycleEvents
-  - maybeThisLifecycleMountEventBus
-  - MountEvent -> LifecycleEvent
-  - New: mountEvents / unmountEvents
-* New: onMount / onUnmount / onLifecycle methods
+* **New: Brand new mount Event system renamed to Lifecycle Events**
+  - eliminate `mountEvents` stream `MountEvent`, and all related machinery
+  - New: onMount / onUnmount / onLifecycle methods
+  - Order of unmount events might have changed (see test)
 * **API: Lifecycle events & Ownership overhaul**
   * <TODO: Elaborate> Use Airstream's new `DynamicOwner` and `DynamicSubscription` features: `ReactiveElement` subscriptions are now activated only when the element is mounted, not when it is created.
   * <TODO: Elaborate> Transaction delay for `mountEvents` now applies to all element subscriptions
