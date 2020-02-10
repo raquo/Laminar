@@ -1,11 +1,11 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar.{HtmlElement, optionToModifier}
-import com.raquo.laminar.setters.Setter
+import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
+import com.raquo.laminar.modifiers.{KeySetter, Setter}
+import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js.|
 
@@ -18,28 +18,26 @@ import scala.scalajs.js.|
 class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
 
   // @TODO[API] Should this accept V or V | String?
-  @inline def apply(value: V): Modifier[HtmlElement] = {
+  @inline def apply(value: V): Setter[HtmlElement] = {
     this := value
   }
 
-  def maybe(value: Option[V | String]): Modifier[HtmlElement] = {
+  def maybe(value: Option[V | String]): Setter[HtmlElement] = {
     value.map(v => this := v)
   }
 
-  def :=(value: V | String): Modifier[HtmlElement] = {
-    new Setter[Style[V], V | String, HtmlElement](style, value, DomApi.setHtmlAnyStyle)
+  def :=(value: V | String): Setter[HtmlElement] = {
+    new KeySetter[Style[V], V | String, HtmlElement](style, value, DomApi.setHtmlAnyStyle)
   }
 
-  def :=(value: String): Modifier[HtmlElement] = {
-    new Setter[Style[V], String, HtmlElement](style, value, DomApi.setHtmlStringStyle)
+  def :=(value: String): Setter[HtmlElement] = {
+    new KeySetter[Style[V], String, HtmlElement](style, value, DomApi.setHtmlStringStyle)
   }
 
-  def <--($value: Observable[V | String]): Modifier[HtmlElement] = {
-    new Modifier[HtmlElement] {
-      override def apply(element: HtmlElement): Unit = {
-        element.subscribe($value) { value =>
-          DomApi.setHtmlAnyStyle(element, style, value)
-        }
+  def <--($value: Observable[V | String]): Setter[HtmlElement] = {
+    Setter { element =>
+      ReactiveElement.bindFn(element, $value) { value =>
+        DomApi.setHtmlAnyStyle(element, style, value)
       }
     }
   }

@@ -1,12 +1,12 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Key
 import com.raquo.laminar.api.Laminar.{HtmlElement, MapValueMapper, StringValueMapper}
 import com.raquo.laminar.keys.CompositeAttr.CompositeValueMapper
+import com.raquo.laminar.modifiers.Setter
+import com.raquo.laminar.nodes.ReactiveElement
 
-import scala.collection
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
 
@@ -16,88 +16,82 @@ import scala.scalajs.js.Dictionary
 class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
 
   // @TODO[API] Should StringValueMapper be passed implicitly?
-  @inline def apply(items: String): Modifier[HtmlElement] = {
+  @inline def apply(items: String): Setter[HtmlElement] = {
     update(StringValueMapper.toDict(items, separator))
   }
 
-  @inline def apply(items: Map[String, Boolean]): Modifier[HtmlElement] = {
+  @inline def apply(items: Map[String, Boolean]): Setter[HtmlElement] = {
     update(MapValueMapper.toDict(items, separator))
   }
 
-  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Modifier[HtmlElement] = {
+  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[HtmlElement] = {
     update(mapper.toDict(items, separator))
   }
 
-  @inline def :=(items: String): Modifier[HtmlElement] = {
+  @inline def :=(items: String): Setter[HtmlElement] = {
     update(StringValueMapper.toDict(items, separator))
   }
 
-  @inline def :=(items: Map[String, Boolean]): Modifier[HtmlElement] = {
+  @inline def :=(items: Map[String, Boolean]): Setter[HtmlElement] = {
     update(MapValueMapper.toDict(items, separator))
   }
 
-  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Modifier[HtmlElement] = {
+  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[HtmlElement] = {
     update(mapper.toDict(value, separator))
   }
 
   /** This method provides standard magic-free behaviour, simply overriding the attribute with a new value */
-  def set(newItems: String): Modifier[HtmlElement] = {
-    new Modifier[HtmlElement] {
-      override def apply(element: HtmlElement): Unit = {
-        element.ref.setAttributeNS(namespaceURI = null, qualifiedName = key.name, newItems)
-      }
+  def set(newItems: String): Setter[HtmlElement] = {
+    Setter { element =>
+      element.ref.setAttributeNS(namespaceURI = null, qualifiedName = key.name, newItems)
     }
   }
 
-  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Modifier[HtmlElement] = {
+  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Setter[HtmlElement] = {
     var prevItems = js.Dictionary.empty[Boolean]
-    new Modifier[HtmlElement] {
-      override def apply(element: HtmlElement): Unit = {
-        element.subscribe($items) { items =>
+    Setter { element =>
+      ReactiveElement.bindFn(element, $items) { items =>
 
-          // Convert incoming value into a normalized map of chunks
-          val nextItems = js.Dictionary[Boolean]()
-          normalizeAndUpdateItems(nextItems, valueMapper.toDict(items, separator))
+        // Convert incoming value into a normalized map of chunks
+        val nextItems = js.Dictionary[Boolean]()
+        normalizeAndUpdateItems(nextItems, valueMapper.toDict(items, separator))
 
-          // Mark for removal the previous chunks that are not needed anymore
-          prevItems.foreach { prevClsTuple =>
-            if (!nextItems.contains(prevClsTuple._1)) {
-              nextItems.update(prevClsTuple._1, value = false)
-            }
+        // Mark for removal the previous chunks that are not needed anymore
+        prevItems.foreach { prevClsTuple =>
+          if (!nextItems.contains(prevClsTuple._1)) {
+            nextItems.update(prevClsTuple._1, value = false)
           }
-
-          // @TODO[Performance] nextItems will be normalized again in this call, which is extraneous
-          // Apply changes to the DOM
-          update(nextItems)(element)
-
-          // Update previous chunks
-          prevItems = nextItems.filter(_._2).dict
         }
+
+        // @TODO[Performance] nextItems will be normalized again in this call, which is extraneous
+        // Apply changes to the DOM
+        update(nextItems)(element)
+
+        // Update previous chunks
+        prevItems = nextItems.filter(_._2).dict
       }
     }
   }
 
-  private def update(newItems: js.Dictionary[Boolean]): Modifier[HtmlElement] = {
-    new Modifier[HtmlElement] {
-      override def apply(element: HtmlElement): Unit = {
-        // @TODO[Elegance] We're talking to element.ref directly instead of using DomApi. Not ideal.
-        val items = js.Dictionary.empty[Boolean]
+  private def update(newItems: js.Dictionary[Boolean]): Setter[HtmlElement] = {
+    Setter { element =>
+      // @TODO[Elegance] We're talking to element.ref directly instead of using DomApi. Not ideal.
+      val items = js.Dictionary.empty[Boolean]
 
-        // Get current value from the DOM
-        val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = key.name)
-        normalizeAndUpdateItems(items, if (domValue == null) "" else domValue, add = true)
+      // Get current value from the DOM
+      val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = key.name)
+      normalizeAndUpdateItems(items, if (domValue == null) "" else domValue, add = true)
 
-        // Update value to desired state
-        normalizeAndUpdateItems(items, newItems)
+      // Update value to desired state
+      normalizeAndUpdateItems(items, newItems)
 
-        // Remove keys that should not be present in the DOM
-        items.keys.foreach { key =>
-          if (!items(key)) items.remove(key)
-        }
-
-        // Write desired state to the Dom
-        element.ref.setAttributeNS(namespaceURI = null, qualifiedName = key.name, items.keys.mkString(separator.toString))
+      // Remove keys that should not be present in the DOM
+      items.keys.foreach { key =>
+        if (!items(key)) items.remove(key)
       }
+
+      // Write desired state to the Dom
+      element.ref.setAttributeNS(namespaceURI = null, qualifiedName = key.name, items.keys.mkString(separator.toString))
     }
   }
 
@@ -108,7 +102,7 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
     }
   }
 
-  /** @param newItems non-normalized string with one or more items separated by `separator` */
+  /** @param newItems non-normalized string with one or more items separated by `separator`*/
   private def normalizeAndUpdateItems(items: js.Dictionary[Boolean], newItems: String, add: Boolean): Unit = {
     if (newItems.nonEmpty) {
       if (newItems.contains(separator)) {
@@ -179,5 +173,7 @@ object CompositeAttr {
     implicit object JsDictionaryValueMapper extends CompositeValueMapper[js.Dictionary[Boolean]] {
       override def toDict(items: js.Dictionary[Boolean], separator: Char): js.Dictionary[Boolean] = items
     }
+
   }
+
 }

@@ -13,10 +13,6 @@ trait ChildNode[+Ref <: dom.Node]
 
   def maybeParent: Option[ParentNode.Base] = _maybeParent
 
-  @inline def isDescendantOf(parent: ParentNode.Base): Boolean = {
-    ChildNode.isDescendantOf(child = this, parent)
-  }
-
   /** Note: Make sure to call [[willSetParent]] before calling this method manually */
   private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     _maybeParent = maybeNextParent

@@ -1,48 +1,15 @@
-package com.raquo.laminar.setters
+package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.signal.Signal
-import com.raquo.domtypes.generic.Modifier
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
-import com.raquo.laminar.setters.ChildrenSetter.Children
+import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.collection.immutable
 
-class ChildrenSetter(
-  childrenObservable: Observable[Children]
-) extends Modifier[ReactiveElement.Base] {
-
-  import ChildrenSetter.{emptyChildren, updateChildren}
-
-  override def apply(parentNode: ReactiveElement.Base): Unit = {
-    var nodeCount = 0
-
-    val sentinelNode = new CommentNode("")
-    parentNode.appendChild(sentinelNode)
-
-    val childrenSignal = childrenObservable match {
-      case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
-      case signal: Signal[Children @unchecked] => signal
-    }
-
-    val childrenDiffSignal = childrenSignal
-      .fold[(Children, Children)](initial => (emptyChildren, initial))((diff, nextChildren) => (diff._2, nextChildren))
-
-    parentNode.subscribe(childrenDiffSignal) { childrenDiff =>
-      nodeCount = updateChildren(
-        prevChildren = childrenDiff._1,
-        nextChildren = childrenDiff._2,
-        parentNode = parentNode,
-        sentinelNode = sentinelNode,
-        nodeCount
-      )
-    }
-  }
-}
-
-object ChildrenSetter {
+object ChildrenInserter {
 
   private val emptyChildren = Vector()
 
@@ -50,8 +17,33 @@ object ChildrenSetter {
 
   type Children = immutable.Seq[Child]
 
+  def apply[El <: ReactiveElement.Base] (
+    $children: MountContext[El] => Observable[Children],
+    initialInsertContext: Option[InsertContext[El]]
+  ): Inserter[El] = new Inserter[El](
+    initialInsertContext,
+    insertFn = (c, owner) => {
+      val mountContext = new MountContext[El](thisNode = c.parentNode, owner)
+      val childrenSignal = $children(mountContext) match {
+        case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
+        case signal: Signal[Children @unchecked] => signal
+      }
+
+      childrenSignal.foreach { newChildren =>
+        c.extraNodeCount = updateChildren(
+          prevChildren = c.extraNodes,
+          nextChildren = newChildren,
+          parentNode = c.parentNode,
+          sentinelNode = c.sentinelNode,
+          c.extraNodeCount
+        )
+        c.extraNodes = newChildren
+      }(owner)
+    }
+  )
+
   /** @return New child node count */
-  protected def updateChildren(
+  private def updateChildren(
     prevChildren: Children,
     nextChildren: Children,
     parentNode: ReactiveElement.Base,

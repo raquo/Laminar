@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement, ReactiveHtmlElement, ParentNode, ReactiveSvgElement, TextNode}
-import com.raquo.laminar.setters.EventPropSetter
+import com.raquo.laminar.modifiers.EventPropSetter
 import org.scalajs.dom
 import org.scalajs.dom.DOMException
 

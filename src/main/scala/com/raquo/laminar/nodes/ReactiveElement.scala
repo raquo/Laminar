@@ -5,11 +5,11 @@ import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, TransferableSubscription}
 import com.raquo.domtypes
+import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar.Mod
-import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.setters.EventPropSetter
+import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
+import com.raquo.laminar.modifiers.{EventPropSetter, Inserter, Setter}
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -22,6 +22,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   // @TODO[Naming] We reuse EventPropSetter to represent an active event listener. Makes for a bit confusing naming.
   private[ReactiveElement] var _maybeEventListeners: Option[mutable.Buffer[EventPropSetter[_]]] = None
 
+  @deprecated("ReactiveElement.maybeEventListeners will be removed in a future version of Laminar.", "0.8")
   @inline def maybeEventListeners: Option[List[EventPropSetter[_]]] = _maybeEventListeners.map(_.toList)
 
   /** This subscription activates and deactivates this element's subscriptions when mounting and unmounting this element. */
@@ -48,84 +49,41 @@ trait ReactiveElement[+Ref <: dom.Element]
     eventBus.events
   }
 
-  def amend(mods: Mod[this.type]*): Unit = {
+  def amend(mods: Modifier[this.type]*): Unit = {
     mods.foreach(mod => mod(this))
   }
 
-  // @TODO[Naming] Not a fan of `subscribeS` / `subscribeO` names, but it needs to be different from `subscribe` for type inference to work
-  // @TODO[API] Consider having subscribe() return a Subscribe object that has several apply methods on it to reign in this madness
-  //  - Also, do we really need currying here?
-
-  def onMount(fn: MountContext[this.type] => Unit): DynamicSubscription = {
-    onLifecycle(mount = fn, unmount = _ => ())
+  def onMountSet(fn: MountContext[this.type] => Setter[this.type]): Unit = {
+    onMountCallback(c => fn(c)(c.thisNode))
   }
 
-  def onUnmount(fn: this.type => Unit): DynamicSubscription = {
-    onLifecycle(mount = _ => (), unmount = fn)
+  // Just an alias for when this naming makes more sense.
+  @inline def onMountBind(fn: MountContext[this.type] => Setter[this.type]): Unit = {
+    onMountSet(fn)
+  }
+
+  def onMountInsert(fn: MountContext[this.type] => Inserter[this.type]): Unit = {
+    val lockedContext = InsertContext.reservedSpotContext[this.type](this)
+    onMountCallback(c => fn(c).withContext(lockedContext)(c.thisNode))
+  }
+
+  def onMountCallback(fn: MountContext[this.type] => Unit): DynamicSubscription = {
+    var ignoreNextActivation = dynamicOwner.isActive
+    ReactiveElement.bindCallback[this.type](this) { c =>
+      if (ignoreNextActivation) {
+        ignoreNextActivation = false
+      } else {
+        fn(c)
+      }
+    }
   }
 
   // @TODO[API] should `unmount` callback require a MountContext instead of this.type?
   //  That would be consistent with `mount`, but I think exposing an Owner that's about to be killed would be confusing.
-  def onLifecycle(
-    mount: MountContext[this.type] => Unit,
-    unmount: this.type => Unit
-  ): DynamicSubscription = {
-    var ignoreNextActivation = dynamicOwner.isActive
-    subscribeS(owner => {
-      if (ignoreNextActivation) {
-        ignoreNextActivation = false
-      } else {
-        mount(new MountContext[this.type](thisNode = this, owner))
-      }
-      new Subscription(owner, cleanup = () => unmount(this))
-    })
-  }
-
-  // @TODO[API] I'm not sure if this method is a good idea.
-  //  Is it obvious enough? Need a better name too.
-  //  You can just copy it if you need something like that.
-  /** WARNING: init() will be called not only on mount, but also
-    *          when you call this method on an already mounted element.
-    *          This is needed in order to obtain an A for the subsequent unmount call.
-    */
-  //def onLifecyclePaired[A](
-  //  init: MountContext[this.type, Ref] => A
-  //)(
-  //  unmount: (A, this.type) => Unit
-  //): DynamicSubscription = {
-  //  subscribeS(owner => {
-  //    val mountState = init(new MountContext[this.type, Ref](thisNode = this, owner))
-  //    new Subscription(owner, cleanup = () => unmount(mountState, this))
-  //  })
-  //}
-
-  def subscribeS(getSubscription: Owner => Subscription): DynamicSubscription = {
-    new DynamicSubscription(dynamicOwner, getSubscription)
-  }
-
-  def subscribeO[V](observable: Observable[V])(observer: Observer[V]): DynamicSubscription = {
-    subscribeS(owner => observable.addObserver(observer)(owner))
-  }
-
-  // @TODO[Naming] Rename to subscribeThisO?
-  def subscribeO[V](getObservable: this.type => Observable[V])(observer: Observer[V]): DynamicSubscription = {
-    subscribeO(getObservable(this))(observer)
-  }
-
-  def subscribe[V](observable: Observable[V])(onNext: V => Unit): DynamicSubscription = {
-    subscribeO(observable)(Observer(onNext))
-  }
-
-  // @TODO[Naming] Rename to subscribeThis?
-  def subscribe[V](getObservable: this.type => Observable[V])(onNext: V => Unit): DynamicSubscription = {
-    subscribeO(getObservable(this))(Observer(onNext))
-  }
-
-  def subscribeBus[V](
-    sourceStream: EventStream[V],
-    targetBus: WriteBus[V]
-  ): DynamicSubscription = {
-    subscribeS(owner => targetBus.addSource(sourceStream)(owner))
+  def onUnmountCallback(fn: this.type => Unit): DynamicSubscription = {
+    ReactiveElement.bindSubscription(this) { c =>
+      new Subscription(c.owner, cleanup = () => fn(this))
+    }
   }
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
@@ -230,5 +188,52 @@ object ReactiveElement {
       }
       if (found) index else notFoundIndex
     }
+  }
+
+  @inline def bindFn[V](
+    element: ReactiveElement.Base,
+    observable: Observable[V]
+  )(
+    onNext: V => Unit
+  ): DynamicSubscription = {
+    DynamicSubscription.subscribeFn(element.dynamicOwner, observable, onNext)
+  }
+
+  @inline def bindObserver[V](
+    element: ReactiveElement.Base,
+    observable: Observable[V]
+  )(
+    observer: Observer[V]
+  ): DynamicSubscription = {
+    DynamicSubscription.subscribeObserver(element.dynamicOwner, observable, observer)
+  }
+
+  @inline def bindBus[V](
+    element: ReactiveElement.Base,
+    eventStream: EventStream[V]
+  )(
+    writeBus: WriteBus[V]
+  ): DynamicSubscription = {
+    DynamicSubscription.subscribeBus(element.dynamicOwner, eventStream, writeBus)
+  }
+
+  @inline def bindSubscription[El <: ReactiveElement.Base](
+    element: El
+  )(
+    subscribe: MountContext[El] => Subscription
+  ): DynamicSubscription = {
+    DynamicSubscription(element.dynamicOwner, { owner =>
+      subscribe(new MountContext[El](element, owner))
+    })
+  }
+
+  @inline def bindCallback[El <: ReactiveElement.Base](
+    element: El
+  )(
+    activate: MountContext[El] => Unit
+  ): DynamicSubscription = {
+    DynamicSubscription.subscribeCallback(element.dynamicOwner, owner => {
+      activate(new MountContext[El](element, owner))
+    })
   }
 }

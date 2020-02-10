@@ -1,20 +1,14 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Observable
-import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.setters.ChildrenSetter.Child
-import com.raquo.laminar.setters.MaybeChildSetter
-
-class MaybeChildReceiver(element: ReactiveElement.Base) {
-
-  def <--($node: Observable[Option[Child]]): Unit = {
-    (MaybeChildReceiver <-- $node)(element)
-  }
-}
+import com.raquo.laminar.modifiers.{ChildInserter, Inserter}
+import com.raquo.laminar.modifiers.ChildrenInserter.Child
+import com.raquo.laminar.nodes.{CommentNode, ReactiveElement}
 
 object MaybeChildReceiver {
 
-  def <--($maybeChildNode: Observable[Option[Child]]): MaybeChildSetter = {
-    new MaybeChildSetter($maybeChildNode)
+  def <--($maybeChildNode: Observable[Option[Child]]): Inserter[ReactiveElement.Base] = {
+    val emptyNode = new CommentNode("")
+    ChildInserter[ReactiveElement.Base](_ => $maybeChildNode.map(_.getOrElse(emptyNode)), initialInsertContext = None)
   }
 }

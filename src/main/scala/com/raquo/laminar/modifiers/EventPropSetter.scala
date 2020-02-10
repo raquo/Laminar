@@ -1,7 +1,6 @@
-package com.raquo.laminar.setters
+package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observer
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.api.L.onClick
 import com.raquo.laminar.nodes.ReactiveElement
@@ -15,7 +14,7 @@ class EventPropSetter[Ev <: dom.Event](
   val key: EventProp[Ev],
   val value: Ev => Unit,
   val useCapture: Boolean
-) extends Modifier[ReactiveElement.Base] {
+) extends Setter[ReactiveElement.Base] {
 
   /** To make sure that you remove the event listener successfully in JS DOM, you need to
     * provide the same Javascript callback function that was originally added as a listener.

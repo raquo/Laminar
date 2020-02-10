@@ -27,10 +27,8 @@ class LifecycleEventSpec extends UnitSpec {
 
     val readLifecycleEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.onLifecycle(
-          _ => events.append(NodeDidMount),
-          _ => events.append(NodeWillUnmount)
-        )
+        element.onMountCallback(_ => events.append(NodeDidMount))
+        element.onUnmountCallback(_ => events.append(NodeWillUnmount))
       }
     }
 
@@ -69,10 +67,8 @@ class LifecycleEventSpec extends UnitSpec {
 
     val readLifecycleEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.onLifecycle(
-          _ => events.append(NodeDidMount),
-          _ => events.append(NodeWillUnmount)
-        )
+        element.onMountCallback(_ => events.append(NodeDidMount))
+        element.onUnmountCallback(_ => events.append(NodeWillUnmount))
       }
     }
 
@@ -147,15 +143,11 @@ class LifecycleEventSpec extends UnitSpec {
       )
     )
 
-    child.onLifecycle(
-      _ => lifecycleEvents = lifecycleEvents :+ NodeDidMount,
-      _ => lifecycleEvents = lifecycleEvents :+ NodeWillUnmount
-    )
+    child.onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ NodeDidMount)
+    child.onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ NodeWillUnmount)
 
-    grandChild.onLifecycle(
-      _ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeDidMount,
-      _ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeWillUnmount
-    )
+    grandChild.onMountCallback(_ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeDidMount)
+    grandChild.onUnmountCallback(_ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeWillUnmount)
 
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
@@ -187,10 +179,8 @@ class LifecycleEventSpec extends UnitSpec {
     var lifecycleEvents: Seq[TargetNodeWithLifecycleEvent] = Nil
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
-      node.onLifecycle(
-        _ => lifecycleEvents = lifecycleEvents :+ (node, NodeDidMount),
-        _ => lifecycleEvents = lifecycleEvents :+ (node, NodeWillUnmount)
-      )
+      node.onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeDidMount))
+      node.onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeWillUnmount))
     }
 
     def expectNewEvents(
