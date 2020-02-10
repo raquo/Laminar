@@ -4,12 +4,18 @@ Breaking changes in **bold**.
 
 #### v0.8 – TBD
 
+* **API: New modifier types: `Setter` and `Inserter` (old `Setter` renamed to `KeySetter`)**
+* **API: ReactiveElement.maybeChildren is not mutable anymore (was never intended to be)**
+* New: amend method (same as bind essentially)
+* **API: subscribe* methods renamed and moved to companion object (also use onMount, amend(), and the new --> extension methods on RichObservable and friends)*
+* New: onMountFocus
+* API: forthis instead of inContext
 * **New: Brand new mount Event system renamed to Lifecycle Events**
   - eliminate `mountEvents` stream `MountEvent`, and all related machinery
   - New: onMount / onUnmount / onLifecycle methods
   - Order of unmount events might have changed (see test)
 * **API: eliminate auxiliary syntax `myElement <-- child <-- childSignal`**
-  * Use the new `amend` method instead: `myElement.amend(child <-- childSignal)`
+  * Use the new `bind` method instead: `myElement.bind(child <-- childSignal)`
 * **API: Lifecycle events & Ownership overhaul**
   * <TODO: Elaborate> Use Airstream's new `DynamicOwner` and `DynamicSubscription` features: `ReactiveElement` subscriptions are now activated only when the element is mounted, not when it is created.
   * <TODO: Elaborate> Transaction delay for `mountEvents` now applies to all element subscriptions

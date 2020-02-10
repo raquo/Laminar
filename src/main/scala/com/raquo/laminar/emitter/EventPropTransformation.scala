@@ -4,7 +4,7 @@ import com.raquo.airstream.core.Observer
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.setters.EventPropSetter
+import com.raquo.laminar.modifiers.EventPropSetter
 import org.scalajs.dom
 
 /**

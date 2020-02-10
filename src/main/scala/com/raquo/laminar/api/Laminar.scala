@@ -7,14 +7,13 @@ import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
 import com.raquo.domtypes.jsdom.defs.eventProps._
 import com.raquo.domtypes.jsdom.defs.tags._
-import com.raquo.laminar.Implicits
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.nodes
+import com.raquo.laminar.modifiers.{ChildrenCommandInserter, ChildrenInserter, Inserter, Setter}
+import com.raquo.laminar.{Implicits, nodes}
 import com.raquo.laminar.receivers._
-import com.raquo.laminar.setters.{ChildrenCommandSetter, ChildrenSetter}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -95,11 +94,11 @@ private[laminar] object Laminar
 
   type RootNode = nodes.RootNode
 
-  type Child = ChildrenSetter.Child
+  type Child = ChildrenInserter.Child
 
-  type Children = ChildrenSetter.Children
+  type Children = ChildrenInserter.Children
 
-  type ChildrenCommand = ChildrenCommandSetter.ChildrenCommand
+  type ChildrenCommand = ChildrenCommandInserter.ChildrenCommand
 
 
   // Modifiers
@@ -160,7 +159,6 @@ private[laminar] object Laminar
 
   val children: ChildrenReceiver.type = ChildrenReceiver
 
-
   @inline def render(
     container: dom.Element,
     rootNode: nodes.ReactiveElement.Base
@@ -168,34 +166,51 @@ private[laminar] object Laminar
     new RootNode(container, rootNode)
   }
 
-  def onMount[El <: nodes.ReactiveElement.Base](fn: MountContext[El] => Unit): Modifier[El] = {
+  def onMountFocus: Modifier[HtmlElement] = onMountCallback(_.thisNode.ref.focus())
+
+  def onMountSet[El <: Element](fn: MountContext[El] => Setter[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onMount(fn)
+        element.onMountSet(fn)
       }
     }
   }
 
-  def onUnmount[El <: nodes.ReactiveElement.Base](fn: El => Unit): Modifier[El] = {
+  // Just an alias for when this naming makes more sense.
+  @inline def onMountBind[El <: Element](fn: MountContext[El] => Setter[El]): Modifier[El] = {
+    onMountSet(fn)
+  }
+
+  def onMountInsert[El <: Element](fn: MountContext[El] => Inserter[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onUnmount(fn)
+        element.onMountInsert(fn)
       }
     }
   }
 
-  def onLifecycle[El <: nodes.ReactiveElement[Ref], Ref <: dom.Element](
-    mount: MountContext[El] => Unit,
-    unmount: El => Unit
-  ): Modifier[El] = {
+  def onMountCallback[El <: Element](fn: MountContext[El] => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onLifecycle(mount, unmount)
+        element.onMountCallback(fn)
       }
     }
   }
 
-  def inContext[El <: nodes.ReactiveElement.Base](makeModifier: El => Modifier[El]): Modifier[El] = {
+  def onUnmountCallback[El <: Element](fn: El => Unit): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = {
+        element.onUnmountCallback(fn)
+      }
+    }
+  }
+
+  @inline def forthis[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
+    inContext(makeModifier)
+  }
+
+  // @TODO[Naming] Find a better name for this. We now have actual MountContext classes that this has nothing to do with.
+  def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = makeModifier(element).apply(element)
     }

@@ -2,16 +2,8 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.setters.ChildSetter
-import com.raquo.laminar.setters.ChildrenSetter.Child
-import org.scalajs.dom
-
-class ChildReceiver(element: ReactiveElement.Base) {
-
-  def <--($node: Observable[Child]): Unit = {
-    (ChildReceiver <-- $node)(element)
-  }
-}
+import com.raquo.laminar.modifiers.{ChildInserter, Inserter}
+import com.raquo.laminar.modifiers.ChildrenInserter.Child
 
 object ChildReceiver {
 
@@ -19,7 +11,7 @@ object ChildReceiver {
 
   val text: TextChildReceiver.type = TextChildReceiver
 
-  def <--($node: Observable[Child]): ChildSetter = {
-    new ChildSetter($node)
+  def <--($node: Observable[Child]): Inserter[ReactiveElement.Base] = {
+    ChildInserter[ReactiveElement.Base](_ => $node, initialInsertContext = None)
   }
 }

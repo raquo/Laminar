@@ -12,7 +12,8 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
   private var _maybeChildren: Option[mutable.Buffer[ChildNode.Base]] = None
 
-  @inline def maybeChildren: Option[mutable.Buffer[ChildNode.Base]] = _maybeChildren
+  @deprecated("ParentNode.maybeChildren will be removed in a future version of Laminar.", "0.8")
+  @inline def maybeChildren: Option[List[ChildNode.Base]] = _maybeChildren.map(_.toList)
 
   /** Note: can also be used to move children, even within the same parent
     *

@@ -1,54 +1,49 @@
-package com.raquo.laminar.setters
+package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.eventstream.EventStream
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.CollectionCommand
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
-import com.raquo.laminar.setters.ChildrenCommandSetter.ChildrenCommand
-import com.raquo.laminar.setters.ChildrenSetter.Child
-import org.scalajs.dom
+import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
+import com.raquo.laminar.modifiers.ChildrenInserter.Child
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 
 import scala.scalajs.js
 
-class ChildrenCommandSetter(
-  commandStream: EventStream[ChildrenCommand]
-) extends Modifier[ReactiveElement.Base] {
-
-  import ChildrenCommandSetter.updateList
-
-  override def apply(parentNode: ReactiveElement.Base): Unit = {
-    var nodeCount = 0
-
-    val sentinelNode = new CommentNode("")
-    parentNode.appendChild(sentinelNode)
-
-    parentNode.subscribe(commandStream) { command =>
-      val nodeCountDiff = updateList(
-        command,
-        parentNode = parentNode,
-        sentinelNode = sentinelNode,
-        nodeCount
-      )
-      nodeCount += nodeCountDiff
-    }
-  }
-}
-
-object ChildrenCommandSetter {
+object ChildrenCommandInserter {
 
   type ChildrenCommand = CollectionCommand[Child]
+
+  def apply[El <: ReactiveElement.Base] (
+    $command: MountContext[El] => EventStream[ChildrenCommand],
+    initialInsertContext: Option[InsertContext[El]]
+  ): Inserter[El] = new Inserter[El](
+    initialInsertContext,
+    insertFn = (c, owner) => {
+      val mountContext = new MountContext[El](thisNode = c.parentNode, owner)
+
+      $command(mountContext).foreach { command =>
+        // @Note we never update c.extraNodes. This is ok because we also never read it.
+        val nodeCountDiff = updateList(
+          command,
+          parentNode = c.parentNode,
+          sentinelNode = c.sentinelNode,
+          c.extraNodeCount
+        )
+        c.extraNodeCount += nodeCountDiff
+      }(owner)
+    }
+  )
 
   def updateList(
     command: ChildrenCommand,
     parentNode: ReactiveElement.Base,
-    sentinelNode: ChildNode[dom.Comment],
-    nodeCount: Int
+    sentinelNode: ChildNode.Base,
+    extraNodeCount: Int
   ): Int = {
     var nodeCountDiff = 0
     command match {
       case CollectionCommand.Append(node) =>
         val sentinelIndex = parentNode.indexOfChild(sentinelNode)
-        if (parentNode.insertChild(node, atIndex = sentinelIndex + nodeCount + 1)) {
+        if (parentNode.insertChild(node, atIndex = sentinelIndex + extraNodeCount + 1)) {
           nodeCountDiff = 1
         }
         nodeCountDiff = 1
@@ -77,7 +72,7 @@ object ChildrenCommandSetter {
         parentNode.replaceChild(oldChild = node, newChild = withNode)
       case CollectionCommand.ReplaceAll(newNodes) =>
         val sentinelIndex = parentNode.indexOfChild(sentinelNode)
-        if (nodeCount == 0) {
+        if (extraNodeCount == 0) {
           var numInsertedNodes = 0
           newNodes.foreach { newChild =>
             if (parentNode.insertChild(newChild, atIndex = sentinelIndex + 1 + numInsertedNodes)) {
@@ -86,10 +81,10 @@ object ChildrenCommandSetter {
           }
           nodeCountDiff = numInsertedNodes
         } else {
-          val oldNodeCount = nodeCount
+          val oldNodeCount = extraNodeCount
           val replaced = parentNode.replaceChildren(
             fromIndex = sentinelIndex + 1,
-            toIndex = sentinelIndex + nodeCount,
+            toIndex = sentinelIndex + extraNodeCount,
             js.Array(newNodes.toSeq: _*) // @TODO[Performance]
           )
           if (replaced) {
