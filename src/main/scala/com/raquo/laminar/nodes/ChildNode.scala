@@ -36,7 +36,7 @@ trait ChildNode[+Ref <: dom.Node]
 
   override def apply(parentNode: ParentNode.Base): Unit = {
     // @TODO[Performance] Consider making ChildNode -> Modifier conversion implicit instead (but watch compile times)
-    parentNode.appendChild(this)
+    ParentNode.appendChild(parent = parentNode, child = this)
   }
 
 }

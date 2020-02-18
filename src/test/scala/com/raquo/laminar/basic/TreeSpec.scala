@@ -2,7 +2,7 @@ package com.raquo.laminar.basic
 
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ChildNode
+import com.raquo.laminar.nodes.{ChildNode, ParentNode}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -37,8 +37,8 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el0.ref, ancestor = otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el0.ref, ancestor = otherEl.ref) shouldBe false
 
-    el0.appendChild(el10)
-    el0.appendChild(el11)
+    ParentNode.appendChild(parent = el0, child = el10)
+    ParentNode.appendChild(parent = el0, child = el11)
 
     ChildNode.isDescendantOf(node = el10.ref, ancestor = rootNode.ref) shouldBe true
     ChildNode.isDescendantOf(node = el11.ref, ancestor = rootNode.ref) shouldBe true
@@ -49,7 +49,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el11.ref, ancestor = otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el11.ref, ancestor = otherEl.ref) shouldBe false
 
-    el10.appendChild(el2)
+    ParentNode.appendChild(parent = el10, child = el2)
 
     ChildNode.isDescendantOf(node = el2.ref, rootNode.ref) shouldBe true
     ChildNode.isDescendantOf(node = el2.ref, el0.ref) shouldBe true
@@ -59,7 +59,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el2.ref, otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el2.ref, otherEl.ref) shouldBe false
 
-    el2.appendChild(el3)
+    ParentNode.appendChild(parent = el2, child = el3)
 
     ChildNode.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     ChildNode.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true
@@ -69,7 +69,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    elx.insertChild(el3, atIndex = 0)
+    ParentNode.insertChild(parent = elx, child = el3, atIndex = 0)
 
     ChildNode.isDescendantOf(node = el3.ref, ancestor = elx.ref) shouldBe true
     ChildNode.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe false
@@ -79,7 +79,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    el10.insertChild(el3, atIndex = 0)
+    ParentNode.insertChild(parent = el10, child = el3, atIndex = 0)
 
     ChildNode.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     ChildNode.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true
@@ -101,7 +101,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isNodeMounted(node = el10.ref) shouldBe false
     ChildNode.isNodeMounted(node = el2.ref) shouldBe false
 
-    el0.appendChild(el10)
+    ParentNode.appendChild(parent = el0, child = el10)
 
     ChildNode.isNodeMounted(node = el10.ref) shouldBe false
 
@@ -118,7 +118,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isNodeMounted(node = el10.ref) shouldBe false
     ChildNode.isNodeMounted(node = el2.ref) shouldBe true
 
-    el2.appendChild(el0)
+    ParentNode.appendChild(parent = el2, child = el0)
 
     ChildNode.isNodeMounted(node = el0.ref) shouldBe true
     ChildNode.isNodeMounted(node = el10.ref) shouldBe true

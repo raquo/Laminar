@@ -23,9 +23,9 @@ class RootNode(
   /** @return Whether child was successfully unmounted */
   def unmount(): Boolean = {
     dynamicOwner.deactivate()
-    this.removeChild(child)
+    ParentNode.removeChild(parent = this, child = child)
   }
 
   dynamicOwner.activate()
-  appendChild(child)
+  ParentNode.appendChild(parent = this, child)
 }

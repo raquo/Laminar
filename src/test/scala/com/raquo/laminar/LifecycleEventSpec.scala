@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ParentNode, ReactiveElement}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -114,29 +114,29 @@ class LifecycleEventSpec extends UnitSpec {
 
     val testCases = Seq(
       TestCase(
-        parent1.appendChild,
+        child => ParentNode.appendChild(parent = parent1, child),
         expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
-        parent1.appendChild,
+        child => ParentNode.appendChild(parent = parent1, child),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
-        child => parent2.insertChild(child, atIndex = 1),
+        child => ParentNode.insertChild(parent = parent2, child, atIndex = 1),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
-        parent2.removeChild,
+        child => ParentNode.removeChild(parent = parent2, child),
         expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
       ),
       TestCase(
-        parent2.appendChild,
+        child => ParentNode.appendChild(parent = parent2, child),
         expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
-        parent2.replaceChild(_, otherChild),
+        child => ParentNode.replaceChild(parent = parent2, oldChild = child, newChild = otherChild),
         expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
@@ -193,8 +193,8 @@ class LifecycleEventSpec extends UnitSpec {
       }
     }
 
-    parent1.appendChild(child1)
-    parent2.appendChild(child2)
+    ParentNode.appendChild(parent = parent1, child = child1)
+    ParentNode.appendChild(parent = parent2, child = child2)
 
     subscribeToEvents(child1)
 
@@ -223,7 +223,7 @@ class LifecycleEventSpec extends UnitSpec {
       Nil
     )
 
-    parent3.appendChild(child3)
+    ParentNode.appendChild(parent = parent3, child = child3)
 
     expectNewEvents(
       "child3 was added to a mounted parent3",
@@ -232,35 +232,35 @@ class LifecycleEventSpec extends UnitSpec {
 
     subscribeToEvents(parent4)
     subscribeToEvents(child4)
-    parent4.appendChild(child4)
+    ParentNode.appendChild(parent = parent4, child = child4)
 
     expectNewEvents(
       "child4 was added to unmounted parent4",
       Nil
     )
 
-    grandParent.appendChild(parent4)
+    ParentNode.appendChild(parent = grandParent, child = parent4)
 
     expectNewEvents(
       "parent4 was mounted",
       Seq((parent4, NodeDidMount), (child4, NodeDidMount)) // @TODO[Docs] Document: the same mount event is propagated to listeners in the order in which the listeners subscribed
     )
 
-    parent3.appendChild(child4)
+    ParentNode.appendChild(parent = parent3, child = child4)
 
     expectNewEvents(
       "child4 was moved to parent3 which is also mounted",
       Nil
     )
 
-    parent5.appendChild(child4)
+    ParentNode.appendChild(parent = parent5, child = child4)
 
     expectNewEvents(
       "child4 was moved to parent5 which is unmounted",
       Seq((child4, NodeWillUnmount))
     )
 
-    parent5.appendChild(parent2)
+    ParentNode.appendChild(parent = parent5, child = parent2)
 
     expectNewEvents(
       "parent2 was moved into parent5 which is unmounted",
@@ -274,7 +274,7 @@ class LifecycleEventSpec extends UnitSpec {
       Nil
     )
 
-    parent5.appendChild(parent3)
+    ParentNode.appendChild(parent = parent5, child = parent3)
 
     expectNewEvents(
       "parent3 was moved into parent5 which is unmounted",
