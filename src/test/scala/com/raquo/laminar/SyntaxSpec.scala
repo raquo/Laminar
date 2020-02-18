@@ -72,6 +72,33 @@ class SyntaxSpec extends UnitSpec {
     events.clear()
   }
 
+  it("onMountUnmountCallback infers precise type") {
+
+    val el = div("Hello world", onMountUnmountCallback(
+      mount = c => {
+        val proof: MountContext[Div] = c
+        ()
+      },
+      unmount = n => {
+        val proof: Div = n
+        ()
+      }
+    ))
+
+    el.onMountUnmountCallback(
+      mount = c => {
+        val proof: MountContext[Div] = c
+        ()
+      },
+      unmount = n => {
+        val proof: Div = n
+        ()
+      }
+    )
+
+    mount(el)
+  }
+
   it("onMountBind with implicit setters syntax") {
 
     val el = div("Hello world")

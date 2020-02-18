@@ -266,6 +266,14 @@ private[laminar] object Laminar
     }
   }
 
+  def onMountUnmountCallback[El <: Element](mount: MountContext[El] => Unit, unmount: El => Unit): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = {
+        element.onMountUnmountCallback(mount, unmount)
+      }
+    }
+  }
+
   // @TODO[Naming] Find a better name for this. We now have actual MountContext classes that this has nothing to do with.
   /** Use this when you need a reference to current element. See docs. */
   def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
