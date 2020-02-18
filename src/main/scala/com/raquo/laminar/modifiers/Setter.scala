@@ -3,8 +3,6 @@ package com.raquo.laminar.modifiers
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.ReactiveElement
 
-// @nc Make sure we still need this after we're done updating API
-
 /** This type represents a modifier that sets a "property" of an element.
   *
   * It could be an html attribute, an event prop, or even a custom focus prop,
@@ -17,6 +15,9 @@ import com.raquo.laminar.nodes.ReactiveElement
 trait Setter[-El <: ReactiveElement.Base] extends Modifier[El]
 
 object Setter {
+
+  // @TODO[API] do we need this?
+  val noop: Setter[ReactiveElement.Base] = Setter(_ => ())
 
   def apply[El <: ReactiveElement.Base](fn: El => Unit): Setter[El] = {
     new Setter[El] {

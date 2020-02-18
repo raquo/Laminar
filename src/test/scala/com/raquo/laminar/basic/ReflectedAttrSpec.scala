@@ -39,7 +39,7 @@ class ReflectedAttrSpec extends UnitSpec {
     expectNode(input like(disabled is true, colSpan.isEmpty))
     unmount()
 
-    val expectedColSpan = Random.nextInt(10)
+    val expectedColSpan = 1 + Random.nextInt(10)
     mount("td [colSpan]", td(colSpan := expectedColSpan))
     expectNode(td like(colSpan is expectedColSpan, disabled.isEmpty))
     unmount()

@@ -5,7 +5,7 @@ import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.Prop
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
-import com.raquo.laminar.modifiers.{KeySetter, Setter}
+import com.raquo.laminar.modifiers.{Binder, KeySetter, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 class ReactiveProp[V, DomV](
@@ -25,8 +25,8 @@ class ReactiveProp[V, DomV](
     new KeySetter[ReactiveProp[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
   }
 
-  def <--($value: Observable[V]): Setter[HtmlElement] = {
-    Setter { element =>
+  def <--($value: Observable[V]): Binder[HtmlElement] = {
+    Binder { element =>
       ReactiveElement.bindFn(element, $value) { value =>
         DomApi.setHtmlProperty(element, self, value)
       }

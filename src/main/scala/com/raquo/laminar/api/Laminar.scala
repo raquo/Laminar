@@ -10,10 +10,8 @@ import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
-import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.modifiers.{ChildrenCommandInserter, ChildrenInserter, Inserter, Setter}
-import com.raquo.laminar.{Implicits, nodes}
 import com.raquo.laminar.receivers._
+import com.raquo.laminar.{Implicits, lifecycle, modifiers, nodes}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -94,18 +92,33 @@ private[laminar] object Laminar
 
   type RootNode = nodes.RootNode
 
-  type Child = ChildrenInserter.Child
+  type Child = modifiers.ChildrenInserter.Child
 
-  type Children = ChildrenInserter.Children
+  type Children = modifiers.ChildrenInserter.Children
 
-  type ChildrenCommand = ChildrenCommandInserter.ChildrenCommand
+  type ChildrenCommand = modifiers.ChildrenCommandInserter.ChildrenCommand
 
 
   // Modifiers
 
-  type Mod[El] = domtypes.generic.Modifier[El]
+  type Mod[-El] = domtypes.generic.Modifier[El]
 
   type Modifier[-El] = domtypes.generic.Modifier[El]
+
+  type Setter[-El <: Element] = modifiers.Setter[El]
+
+  val Setter: modifiers.Setter.type = modifiers.Setter
+
+  type Binder[-El <: Element] = modifiers.Binder[El]
+
+  type Inserter[-El <: Element] = modifiers.Inserter[El]
+
+
+  // Lifecycle
+
+  type MountContext[+El <: Element] = lifecycle.MountContext[El]
+
+  type InsertContext[+El <: Element] = lifecycle.InsertContext[El]
 
 
   // Keys
@@ -139,9 +152,19 @@ private[laminar] object Laminar
 
   type Li = nodes.ReactiveHtmlElement[dom.html.LI]
 
+  type Select = nodes.ReactiveHtmlElement[dom.html.Select]
+
   type Span = nodes.ReactiveHtmlElement[dom.html.Span]
 
   type TextArea = nodes.ReactiveHtmlElement[dom.html.TextArea]
+
+
+  @inline def render(
+    container: dom.Element,
+    rootNode: nodes.ReactiveElement.Base
+  ): RootNode = {
+    new RootNode(container, rootNode)
+  }
 
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
@@ -153,21 +176,24 @@ private[laminar] object Laminar
   def commentNode(text: String = ""): CommentNode = new CommentNode(text)
 
 
-  val focus: FocusReceiver.type = FocusReceiver
-
   val child: ChildReceiver.type = ChildReceiver
 
   val children: ChildrenReceiver.type = ChildrenReceiver
 
-  @inline def render(
-    container: dom.Element,
-    rootNode: nodes.ReactiveElement.Base
-  ): RootNode = {
-    new RootNode(container, rootNode)
-  }
 
-  def onMountFocus: Modifier[HtmlElement] = onMountCallback(_.thisNode.ref.focus())
+  /** Focus or blur an element: `focus <-- EventStream[Boolean]` (true = focus, false = blur) */
+  val focus: FocusReceiver.type = FocusReceiver
 
+  /** Focus this element on mount */
+  val onMountFocus: Modifier[HtmlElement] = onMountCallback(_.thisNode.ref.focus())
+
+  /** Set a property / attribute / style on mount.
+    * Similarly to other onMount methods, you only need this when:
+    * a) you need to access MountContext
+    * b) you truly need this to only happen on mount
+    *
+    * Example usage: `onMountSet(ctx => someAttr := someValue(ctx))`. See docs for details.
+    */
   def onMountSet[El <: Element](fn: MountContext[El] => Setter[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
@@ -176,11 +202,25 @@ private[laminar] object Laminar
     }
   }
 
-  // Just an alias for when this naming makes more sense.
-  @inline def onMountBind[El <: Element](fn: MountContext[El] => Setter[El]): Modifier[El] = {
-    onMountSet(fn)
+  /** Bind a subscription on mount
+    *
+    * Example usage: `onMountBind(ctx => someAttr <-- someObservable(ctx))`. See docs for details.
+    */
+  @inline def onMountBind[El <: Element](fn: MountContext[El] => Binder[El]): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = {
+        element.onMountBind(fn)
+      }
+    }
   }
 
+  /** Insert child node(s) on mount.
+    *
+    * Note: insert position is reserved as soon as this modifier is applied to the element.
+    * Basically it will insert elements in the same position, where you'd expect, on every mount.
+    *
+    * Example usage: `onMountInsert(ctx => child <-- someObservable(ctx))`. See docs for details.
+    */
   def onMountInsert[El <: Element](fn: MountContext[El] => Inserter[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
@@ -189,6 +229,18 @@ private[laminar] object Laminar
     }
   }
 
+  /** Execute a callback on mount. Good for integrating third party libraries.
+    *
+    * The callback runs on every mount, not just the first one.
+    * - Therefore, don't bind any subscriptions inside that you won't manually unbind on unmount.
+    *   - If you fail to unbind manually, you will have N copies of them after mounting this element N times.
+    *   - Use onMountBind or onMountInsert for that.
+    *
+    * When the callback is called, the element is already mounted.
+    *
+    * If you apply this modifier to an element that is already mounted, the callback
+    * will not fire until and unless it is unmounted and mounted again.
+    */
   def onMountCallback[El <: Element](fn: MountContext[El] => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
@@ -197,6 +249,13 @@ private[laminar] object Laminar
     }
   }
 
+  /** Execute a callback on unmount. Good for integrating third party libraries.
+    *
+    * When the callback is called, the element is still mounted.
+    *
+    * If you apply this modifier to an element that is already unmounted, the callback
+    * will not fire until and unless it is mounted and then unmounted again.
+    */
   def onUnmountCallback[El <: Element](fn: El => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
@@ -205,15 +264,16 @@ private[laminar] object Laminar
     }
   }
 
-  @inline def forthis[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
-    inContext(makeModifier)
-  }
-
   // @TODO[Naming] Find a better name for this. We now have actual MountContext classes that this has nothing to do with.
+  /** Use this when you need a reference to current element. See docs. */
   def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = makeModifier(element).apply(element)
     }
+  }
+
+  @inline def forthis[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
+    inContext(makeModifier)
   }
 
 }

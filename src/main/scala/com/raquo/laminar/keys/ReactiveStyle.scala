@@ -4,7 +4,7 @@ import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
-import com.raquo.laminar.modifiers.{KeySetter, Setter}
+import com.raquo.laminar.modifiers.{Binder, KeySetter, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js.|
@@ -34,8 +34,8 @@ class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
     new KeySetter[Style[V], String, HtmlElement](style, value, DomApi.setHtmlStringStyle)
   }
 
-  def <--($value: Observable[V | String]): Setter[HtmlElement] = {
-    Setter { element =>
+  def <--($value: Observable[V | String]): Binder[HtmlElement] = {
+    Binder { element =>
       ReactiveElement.bindFn(element, $value) { value =>
         DomApi.setHtmlAnyStyle(element, style, value)
       }

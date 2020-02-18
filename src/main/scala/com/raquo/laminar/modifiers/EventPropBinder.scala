@@ -1,6 +1,7 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observer
+import com.raquo.airstream.ownership.{DynamicSubscription, Subscription}
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.api.L.onClick
 import com.raquo.laminar.nodes.ReactiveElement
@@ -10,11 +11,11 @@ import scala.scalajs.js
 
 /** @param useCapture – see https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener about "useCapture"
   */
-class EventPropSetter[Ev <: dom.Event](
+class EventPropBinder[Ev <: dom.Event](
   val key: EventProp[Ev],
   val value: Ev => Unit,
   val useCapture: Boolean
-) extends Setter[ReactiveElement.Base] {
+) extends Binder[ReactiveElement.Base] {
 
   /** To make sure that you remove the event listener successfully in JS DOM, you need to
     * provide the same Javascript callback function that was originally added as a listener.
@@ -25,26 +26,31 @@ class EventPropSetter[Ev <: dom.Event](
     */
   val domValue: js.Function1[Ev, Unit] = value
 
-  override def apply(node: ReactiveElement.Base): Unit = {
-    ReactiveElement.addEventListener(node, this)
+  override def bind(element: ReactiveElement.Base): DynamicSubscription = {
+    ReactiveElement.bindSubscription(element){ c =>
+      ReactiveElement.addEventListener(element, this)
+      new Subscription(c.owner, cleanup = () => {
+        ReactiveElement.removeEventListener(element, this)
+      })
+    }
   }
 
   override def equals(that: Any): Boolean = {
     that match {
-      case setter: EventPropSetter[_] if (key == setter.key) && (domValue == setter.domValue) => true
+      case setter: EventPropBinder[_] if (key == setter.key) && (domValue == setter.domValue) => true
       case _ => false
     }
   }
 }
 
-object EventPropSetter {
+object EventPropBinder {
 
   def apply[Ev <: dom.Event, V, El <: ReactiveElement.Base](
     observer: Observer[V],
     eventProp: EventProp[Ev],
     useCapture: Boolean,
     processor: Ev => Option[V]
-  ): EventPropSetter[Ev] = {
+  ): EventPropBinder[Ev] = {
 
     val callback = (ev: Ev) => {
       if (
@@ -62,7 +68,7 @@ object EventPropSetter {
       }
     }
 
-    new EventPropSetter[Ev](eventProp, callback, useCapture = useCapture)
+    new EventPropBinder[Ev](eventProp, callback, useCapture = useCapture)
   }
 
 }
