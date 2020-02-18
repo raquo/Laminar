@@ -1,6 +1,6 @@
 # Laminar
 
-[![Build Status](https://travis-ci.org/raquo/Laminar.svg?branch=master)](https://travis-ci.org/raquo/Laminar)
+[![Build Status](https://circleci.com/gh/raquo/Laminar.svg?style=svg)](https://circleci.com/gh/raquo/Laminar)
 [![Join the chat at https://gitter.im/Laminar_/Lobby](https://badges.gitter.im/Laminar_/Lobby.svg)](https://gitter.im/Laminar_/Lobby)
 ![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs0.6_2.12.svg)
 
