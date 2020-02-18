@@ -111,6 +111,8 @@ private[laminar] object Laminar
 
   type Binder[-El <: Element] = modifiers.Binder[El]
 
+  val Binder: modifiers.Binder.type = modifiers.Binder
+
   type Inserter[-El <: Element] = modifiers.Inserter[El]
 
 
