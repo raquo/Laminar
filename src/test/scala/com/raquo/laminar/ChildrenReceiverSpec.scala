@@ -3,7 +3,6 @@ package com.raquo.laminar
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.utils.UnitSpec
-import org.scalajs.dom
 import org.scalatest.BeforeAndAfter
 
 class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
@@ -100,7 +99,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
         val sentinelNode: Rule = ExpectedNode.comment()
         val rules: Seq[Rule] = sentinelNode +: childRules
 
-        expectNode(main like(rules: _*))
+        expectNode(main like (rules: _*))
       }
     }
   }

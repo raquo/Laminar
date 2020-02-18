@@ -8,8 +8,9 @@ import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.emitter.EventPropTransformation
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
-import com.raquo.laminar.modifiers.{EventPropSetter, Inserter, Setter}
+import com.raquo.laminar.modifiers.{Binder, EventPropBinder, Inserter, Setter}
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -20,12 +21,16 @@ trait ReactiveElement[+Ref <: dom.Element]
   with domtypes.generic.nodes.Element {
 
   // @TODO[Naming] We reuse EventPropSetter to represent an active event listener. Makes for a bit confusing naming.
-  private[ReactiveElement] var _maybeEventListeners: Option[mutable.Buffer[EventPropSetter[_]]] = None
+  private[ReactiveElement] var _maybeEventListeners: Option[mutable.Buffer[EventPropBinder[_]]] = None
 
   @deprecated("ReactiveElement.maybeEventListeners will be removed in a future version of Laminar.", "0.8")
-  @inline def maybeEventListeners: Option[List[EventPropSetter[_]]] = _maybeEventListeners.map(_.toList)
+  @inline def maybeEventListeners: Option[List[EventPropBinder[_]]] = _maybeEventListeners.map(_.toList)
 
-  /** This subscription activates and deactivates this element's subscriptions when mounting and unmounting this element. */
+  // @Warning[Fragile] deactivate should not need an isActive guard.
+  //  If Laminar starts to cause exceptions here, we need to find the root cause.
+  /** This subscription activates and deactivates this element's subscriptions when mounting and unmounting this element.
+    * In terms of memory management it's ok because a detached node will not have any active subscriptions here.
+    */
   private val pilotSubscription: TransferableSubscription = new TransferableSubscription(
     activate = dynamicOwner.activate,
     deactivate = dynamicOwner.deactivate
@@ -39,7 +44,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     preventDefault: Boolean = false // @TODO[API] This is inconsistent with EventPropTransformation API. Fix or ok?
   ): EventStream[Ev] = {
     val eventBus = new EventBus[Ev]
-    val setter = EventPropSetter[Ev, Ev, this.type](
+    val setter = EventPropBinder[Ev, Ev, this.type](
       eventBus.writer,
       eventProp,
       useCapture,
@@ -49,24 +54,79 @@ trait ReactiveElement[+Ref <: dom.Element]
     eventBus.events
   }
 
+  @inline def events[Ev <: dom.Event, V](
+    t: EventPropTransformation[Ev, V]
+  ): EventStream[V] = {
+    EventPropTransformation.toEventStream(t, this)
+  }
+
   def amend(mods: Modifier[this.type]*): Unit = {
     mods.foreach(mod => mod(this))
   }
 
+  /** Set a property / attribute / style on mount.
+    * Similarly to other onMount methods, you only need this when:
+    * a) you need to access MountContext
+    * b) you truly need this to only happen on mount
+    *
+    * Example usage: `onMountSet(ctx => someAttr := someValue(ctx))`. See docs for details.
+    */
   def onMountSet(fn: MountContext[this.type] => Setter[this.type]): Unit = {
     onMountCallback(c => fn(c)(c.thisNode))
   }
 
-  // Just an alias for when this naming makes more sense.
-  @inline def onMountBind(fn: MountContext[this.type] => Setter[this.type]): Unit = {
-    onMountSet(fn)
+  /** Bind a subscription on mount
+    *
+    * Example usage: `element.onMountBind(ctx => someAttr <-- someObservable(ctx))`. See docs for details.
+    */
+  def onMountBind(fn: MountContext[this.type] => Binder[this.type]): Unit = {
+    var maybeSubscription: Option[DynamicSubscription] = None
+    onMountUnmountCallback(
+      mount = { c =>
+        val binder = fn(c)
+        maybeSubscription = Some(binder.bind(c.thisNode))
+      },
+      unmount = { _ =>
+        maybeSubscription.foreach(_.kill())
+        maybeSubscription = None
+      }
+    )
   }
 
+  /** Insert child node(s) into this element on mount.
+    *
+    * Note: insert position is reserved as soon as you call this method.
+    * Basically it will insert elements in the same position, where you'd expect, on every mount.
+    *
+    * Example usage: `element.onMountInsert(ctx => child <-- someObservable(ctx))`. See docs for details.
+    */
   def onMountInsert(fn: MountContext[this.type] => Inserter[this.type]): Unit = {
-    val lockedContext = InsertContext.reservedSpotContext[this.type](this)
-    onMountCallback(c => fn(c).withContext(lockedContext)(c.thisNode))
+    var maybeSubscription: Option[DynamicSubscription] = None
+    val lockedContext = InsertContext.reserveSpotContext[this.type](this)
+    onMountUnmountCallback(
+      mount = { c =>
+        val inserter = fn(c).withContext(lockedContext)
+        maybeSubscription = Some(inserter.bind(c.thisNode))
+      },
+      unmount = { _ =>
+        maybeSubscription.foreach(_.kill())
+        maybeSubscription = None
+      }
+    )
   }
 
+  /** Execute a callback on mount. Good for integrating third party libraries.
+    *
+    * The callback runs on every mount, not just the first one.
+    * - Therefore, don't bind any subscriptions inside that you won't manually unbind on unmount.
+    *   - If you fail to unbind manually, you will have N copies of them after mounting this element N times.
+    *   - Use onMountBind or onMountInsert for that.
+    *
+    * When the callback is called, the element is already mounted.
+    *
+    * If you call this on an element that is already mounted at call time,
+    * the callback will not fire until and unless it is unmounted and then mounted again.
+    */
   def onMountCallback(fn: MountContext[this.type] => Unit): DynamicSubscription = {
     var ignoreNextActivation = dynamicOwner.isActive
     ReactiveElement.bindCallback[this.type](this) { c =>
@@ -78,18 +138,40 @@ trait ReactiveElement[+Ref <: dom.Element]
     }
   }
 
-  // @TODO[API] should `unmount` callback require a MountContext instead of this.type?
-  //  That would be consistent with `mount`, but I think exposing an Owner that's about to be killed would be confusing.
+  /** Execute a callback on unmount. Good for integrating third party libraries.
+    *
+    * When the callback is called, the element is still mounted.
+    *
+    * If you call this on an element that is already unmounted at call time, the callback
+    * will not fire until and unless it is mounted and then unmounted again.
+    */
   def onUnmountCallback(fn: this.type => Unit): DynamicSubscription = {
     ReactiveElement.bindSubscription(this) { c =>
       new Subscription(c.owner, cleanup = () => fn(this))
     }
   }
 
+  /** Combines onMountCallback and onUnmountCallback for easier integration.
+    *
+    * Note that the same caveats apply as for those individual methods.
+    */
+  def onMountUnmountCallback(
+    mount: MountContext[this.type] => Unit,
+    unmount: this.type => Unit
+  ): DynamicSubscription = {
+    var ignoreNextActivation = dynamicOwner.isActive
+    ReactiveElement.bindSubscription[this.type](this) { c =>
+      if (ignoreNextActivation) {
+        ignoreNextActivation = false
+      } else {
+        mount(c)
+      }
+      new Subscription(c.owner, cleanup = () => unmount(this))
+    }
+  }
+
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    // super.willSetParent(maybeNextParent) // default implementation is a noop, so no need to call it.
-    // dom.console.log(">>>> willSetParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybeParent == maybeNextParent, maybeParent.toString, maybeNextParent.toString)
-    // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
+    //println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
     // @Note this should cover ALL cases not covered by setParent
     if (isUnmounting(maybePrevParent = maybeParent, maybeNextParent = maybeNextParent)) {
@@ -99,8 +181,7 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   /** Don't call setParent directly – willSetParent will not be called. Use methods like `appendChild` defined on `ParentNode` instead. */
   override private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    // dom.console.log(">>>> setParent", this.ref.tagName + "(" + this.ref.textContent + ")", maybePrevParent == maybeNextParent, maybePrevParent.toString, maybeNextParent.toString)
-    // println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
+    //println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
     val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
@@ -121,11 +202,13 @@ trait ReactiveElement[+Ref <: dom.Element]
   }
 
   private[this] def setPilotSubscriptionOwner(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    maybeNextParent.fold(
-      pilotSubscription.clearOwner()
-    )(
-      nextParent => pilotSubscription.setOwner(nextParent.dynamicOwner)
-    )
+    //println(" - setPilotSubscriptionOwner of " + this + " (active = " + dynamicOwner.isActive + ") to " + maybeNextParent)
+
+    // @Warning[Fragile] I had issues with clearOwner requiring a hasOwner check but that should not be necessary anymore.
+    //  - If exceptions crop up caused by this, need to find the root cause before rushing to patch this here.
+    maybeNextParent.fold(pilotSubscription.clearOwner) { nextParent =>
+      pilotSubscription.setOwner(nextParent.dynamicOwner)
+    }
   }
 }
 
@@ -136,7 +219,7 @@ object ReactiveElement {
   private class PilotSubscriptionOwner extends Owner
 
   /** @return Whether listener was added (false if such a listener has already been present) */
-  def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Boolean = {
+  def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {
     val shouldAddListener = indexOfEventListener(element, listener) == -1
     if (shouldAddListener) {
       // 1. Update this node
@@ -154,7 +237,7 @@ object ReactiveElement {
   }
 
   /** @return Whether listener was removed (false if such a listener was not found) */
-  def removeEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Boolean = {
+  def removeEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {
     val index = indexOfEventListener(element, listener)
     val shouldRemoveListener = index != -1
     if (shouldRemoveListener) {
@@ -167,7 +250,7 @@ object ReactiveElement {
   }
 
   /** @return -1 if not found */
-  def indexOfEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropSetter[Ev]): Int = {
+  def indexOfEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Int = {
     // Note: Ugly for performance.
     //  - We want to reduce usage of Scala's collections and anonymous functions
     //  - js.Array is unaware of Scala's `equals` method
@@ -235,5 +318,14 @@ object ReactiveElement {
     DynamicSubscription.subscribeCallback(element.dynamicOwner, owner => {
       activate(new MountContext[El](element, owner))
     })
+  }
+
+  def isActive(element: ReactiveElement.Base): Boolean = {
+    element.dynamicOwner.isActive
+  }
+
+  /** You should not need this, we're just exposing this for testing. */
+  def numDynamicSubscriptions(element: ReactiveElement.Base): Int = {
+    element.dynamicOwner.numSubscriptions
   }
 }

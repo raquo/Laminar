@@ -10,18 +10,19 @@ import com.raquo.laminar.Implicits.{RichEventStream, RichObservable, RichSignal}
 import com.raquo.laminar.emitter.EventPropTransformation
 import com.raquo.laminar.keys.CompositeAttr.CompositeValueMappers
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveStyle}
-import com.raquo.laminar.modifiers.{ChildInserter, Inserter, Setter}
+import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 import org.scalajs.dom
 
+import scala.scalajs.js
 import scala.scalajs.js.|
 
-trait Implicits extends CompositeValueMappers {
+trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMappers {
 
   implicit def eventPropToEventPropTransformation[Ev <: dom.Event, El <: ReactiveElement.Base](
     eventProp: ReactiveEventProp[Ev]
   ): EventPropTransformation[Ev, Ev] = {
-    new EventPropTransformation(eventProp, useCapture = false, processor = Some(_))
+    new EventPropTransformation(eventProp, shouldUseCapture = false, processor = Some(_))
   }
 
   @inline implicit def styleToReactiveStyle[V](style: Style[V]): ReactiveStyle[V] = {
@@ -32,9 +33,9 @@ trait Implicits extends CompositeValueMappers {
     new TextNode(text)
   }
 
-  /** Create a modifier that applies each of the modifiers in a seq */
-  implicit def nodeToInserter(node: ChildNode.Base): Inserter[ReactiveElement.Base] = {
-    ChildInserter[ReactiveElement.Base](_ => Val(node), initialInsertContext = None)
+  /** Create a setter that applies each of the setters in a seq */
+  implicit def seqToSetter[El <: ReactiveElement.Base](seq: scala.collection.Seq[Setter[El]]): Setter[El] = {
+    Setter(element => seq.foreach(_.apply(element)))
   }
 
   /** Create a modifier that applies each of the modifiers in a seq */
@@ -45,11 +46,6 @@ trait Implicits extends CompositeValueMappers {
         seq.foreach(evidence(_).apply(element))
       }
     }
-  }
-
-  /** Create a setter that applies each of the setters in a seq */
-  implicit def seqToSetter[El <: ReactiveElement.Base](seq: scala.collection.Seq[Setter[El]]): Setter[El] = {
-    Setter(element => seq.foreach(_.apply(element)))
   }
 
   /** Create a modifier that applies the modifier in an option, if it's defined, or does nothing otherwise */
@@ -70,14 +66,33 @@ trait Implicits extends CompositeValueMappers {
     Setter(element => maybeSetter.foreach(_.apply(element)))
   }
 
+  /** This modifier exists to prevent collections of nodes from being converted using [[nodesSeqToInserter]],
+    * which is more expensive. We have a test that will fail should the order of implicits be wrong. */
+  implicit def nodesSeqToModifier(nodes: scala.collection.Seq[ChildNode.Base]): Modifier[ReactiveElement.Base] = {
+    new Modifier[ReactiveElement.Base] {
+      override def apply(element: ReactiveElement.Base): Unit = {
+        nodes.foreach(_.apply(element))
+      }
+    }
+  }
+
+  /** This modifier exists to prevent collections of nodes from being converted using [[nodesArrayToInserter]],
+    * which is more expensive. We have a test that will fail should the order of implicits be wrong. */
+  @inline implicit def nodesArrayToModifier[N <: ChildNode.Base](nodes: js.Array[N]): Modifier[ReactiveElement.Base] = {
+    nodesSeqToModifier(nodes)
+  }
+
+  /** Add --> methods on Observables */
   @inline implicit def enrichObservable[A](observable: Observable[A]): RichObservable[A] = {
     new RichObservable(observable)
   }
 
+  /** Add --> methods on EventStreams */
   @inline implicit def enrichEventStream[A](eventStream: EventStream[A]): RichEventStream[A] = {
     new RichEventStream(eventStream)
   }
 
+  /** Add --> methods on Signals */
   @inline implicit def enrichSignal[A](observable: Signal[A]): RichSignal[A] = {
     new RichSignal(observable)
   }
@@ -93,42 +108,61 @@ trait Implicits extends CompositeValueMappers {
 
 object Implicits {
 
+  trait LowPriorityImplicits {
+
+    // Inserter implicits are needlessly expensive if we just need a Modifier, so we de-prioritize them
+
+    /** Create a modifier that applies each of the modifiers in a seq */
+    implicit def nodeToInserter(node: ChildNode.Base): Inserter[ReactiveElement.Base] = {
+      ChildInserter[ReactiveElement.Base](_ => Val(node), initialInsertContext = None)
+    }
+
+    /** Create a modifier that applies each of the modifiers in a seq */
+    implicit def nodesSeqToInserter(nodes: scala.collection.Seq[ChildNode.Base]): Inserter[ReactiveElement.Base] = {
+      ChildrenInserter[ReactiveElement.Base](_ => Val(nodes.toList), initialInsertContext = None)
+    }
+
+    @inline implicit def nodesArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter[ReactiveElement.Base] = {
+      nodesSeqToInserter(nodes)
+    }
+  }
+
   /** Some of these methods are redundant, but we need them for type inference to work. */
 
   class RichObservable[A](val observable: Observable[A]) extends AnyVal {
 
-    def -->(observer: Observer[A]): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindObserver(_, observable)(observer))
+    def -->(observer: Observer[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindObserver(_, observable)(observer))
     }
 
-    def -->(onNext: A => Unit): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindFn(_, observable)(onNext))
+    def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindFn(_, observable)(onNext))
     }
   }
 
   class RichSignal[A](val signal: Signal[A]) extends AnyVal {
 
-    def -->(observer: Observer[A]): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindObserver(_, signal)(observer))
+    def -->(observer: Observer[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindObserver(_, signal)(observer))
     }
 
-    def -->(onNext: A => Unit): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindFn(_, signal)(onNext))
+    def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindFn(_, signal)(onNext))
     }
   }
 
   class RichEventStream[A](val eventStream: EventStream[A]) extends AnyVal {
 
-    def -->(observer: Observer[A]): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindObserver(_, eventStream)(observer))
+    def -->(observer: Observer[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindObserver(_, eventStream)(observer))
     }
 
-    def -->(onNext: A => Unit): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindFn(_, eventStream)(onNext))
+    def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindFn(_, eventStream)(onNext))
     }
 
-    def -->(writeBus: WriteBus[A]): Setter[ReactiveElement.Base] = {
-      Setter(ReactiveElement.bindBus(_, eventStream)(writeBus))
+    def -->(writeBus: WriteBus[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindBus(_, eventStream)(writeBus))
     }
   }
 }

@@ -16,7 +16,7 @@ class InsertContext[+El <: ReactiveElement.Base](
 object InsertContext {
 
   /** Reserve the spot for when we actually insert real nodes later */
-  def reservedSpotContext[El <: ReactiveElement.Base](parentNode: El): InsertContext[El] = {
+  def reserveSpotContext[El <: ReactiveElement.Base](parentNode: El): InsertContext[El] = {
     val sentinelNode = new CommentNode("")
 
     parentNode.appendChild(sentinelNode)

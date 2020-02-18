@@ -4,10 +4,17 @@ Breaking changes in **bold**.
 
 #### v0.8 – TBD
 
+* New: `ReactiveElement.events(ept: EventPropTransformation)`, works the same as `ReactiveElement.events(p: ReactiveEventProp)`, returning a stream of events
+  * Example: `div(...).events(onClick.useCapture.preventDefault)`
+  * Useful to combine with the new `observable --> observer` method.
+* **API: Replace `ReactiveEventProp.config(useCapture: Boolean)` with `EventPropTransformation.useCapture` and `EventPropTransformation.useBubbleMode`**
+  * Migration example: `onClick.config(useCapture = true)` --> `onClick.useCapture`
+  * Practically this means that you can set `useCapture` anywhere you have an `EventPropTransformation`, not just where you have the original `ReactiveEventProp`
 * **API: New modifier types: `Setter` and `Inserter` (old `Setter` renamed to `KeySetter`)**
 * **API: ReactiveElement.maybeChildren is not mutable anymore (was never intended to be)**
 * New: amend method (same as bind essentially)
 * **API: subscribe* methods renamed and moved to companion object (also use onMount, amend(), and the new --> extension methods on RichObservable and friends)*
+  * Make sure to document `nodeToInserter`
 * New: onMountFocus
 * API: forthis instead of inContext
 * **New: Brand new mount Event system renamed to Lifecycle Events**
@@ -25,8 +32,9 @@ Breaking changes in **bold**.
 * **API: Hide `willSetParent` and `setParent` methods. Use Laminar's `parentNode.appendChild(childNode)` or similar.**
 * **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
 * **API: Move `ChildrenCommand` out of the poorly named `collection` package**
-* **API: Eliminate `EventPropEmitter` (merged into EventPropSetter)**
-  * **Migration:** Replace usages of `EventPropEmitter` with `EventPropSetter`. Also, if you were using `EventPropEmitter` as an `EventPropTransformation`, those methods will not be available anymore as `EventPropSetter` does not extend `EventPropTransformation`, so you will need to rewrite those calls differently, more manually. This usage wasn't explicitly documented, so I hope no one actually runs into this.
+* **API: `EventPropEmitter` and `EventPropSetter` merged into `EventPropBinder`)**
+  * Unlike the old `EventPropSetter`, `EventPropBinder` adds and removes event listeners on mount, not on instantiation. This should not be a problem as event listeners generally don't fire on detached nodes in the first place. 
+  * **Migration:** Replace usages of `EventPropEmitter` with `EventPropBinder`. Also, if you were using `EventPropEmitter` as an `EventPropTransformation`, those methods will not be available anymore as `EventPropBinder` does not extend `EventPropTransformation`, so you will need to rewrite those calls differently, more manually. This usage wasn't explicitly documented, so I hope no one actually runs into this. 
 * **API: Eliminate dependency on _Scala DOM Builder_**
   * DOM Builder is capable of supporting different DOM backends and even JVM rendering. We have no plans to use either of these in Laminar, so the indirection required by these abstractions is not pulling its weight.
   * `DomApi`

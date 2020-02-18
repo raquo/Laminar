@@ -819,6 +819,21 @@ val changeEventStream: EventStream[dom.Event] = textInput.inputNode.events(onCha
 
 Under the hood, `element.events(eventProp)` creates an EventBus, applies an `eventProp --> eventBus` modifier to `element`, and returns `eventBus.events`. That's all there is to it, no magic – just alternative syntax that makes it easier to compose your components without tight coupling.
 
+The `events` method also accepts `EventPropTransformation`, not just ReactiveEventProp. This allows for very flexible composition:
+ 
+ ```scala
+// You can define this once for reusability
+val onEnterPress: EventPropTransformation[dom.KeyboardEvent, dom.KeyboardEvent] =
+  onKeyPress.filter(_keyCode == KeyCodes.Enter)
+ 
+input(onEnterPress --> observer)
+ 
+textArea(onEnterPress.preventDefault --> observer)
+ 
+val changeEventStream = myInputNode.events(onEnterPress)
+```
+
+
 
 ### Multiple Event Listeners
  
@@ -871,7 +886,7 @@ div(onScroll.filter(throttle) --> filteredScrollEventBus)
  
 form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
  
-div(onClick.config(useCapture = true) --> captureModeClickObserver)
+div(onClick.useCapture --> captureModeClickObserver)
  
 input(onKeyUp.filter(_.keyCode == KeyCode.Enter).preventDefault --> enterPressBus)
  
@@ -909,12 +924,10 @@ Importantly, these are just ordinarily transformations, and happen in the order 
 #### useCapture
 
 ```scala
-div(onClick.config(useCapture = true) --> captureModeClickObserver)
+div(onClick.useCapture --> captureModeClickObserver)
 ```
 
-JS DOM has two event modes: capture, and bubbling. Typically and by default we use the latter, but capture mode is sometimes useful for event listener priority/ordering (not specific to Laminar, standard JS DOM rules/limitations apply).
-
-You need to specify whether to use capture mode the moment you register an event listener on the element, so it's passed as a parameter to `onClick.config(useCapture = true)` instead of being a method on `EventPropTransformation`. `// @TODO[API] Reconsider`
+JS DOM has two event modes: capture, and bubbling. Typically and by default everyone uses the latter, but capture mode is sometimes useful for event listener priority/ordering (not specific to Laminar, standard JS DOM rules/limitations apply).
 
 See MDN [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) page for details (see "useCapture" section).
 

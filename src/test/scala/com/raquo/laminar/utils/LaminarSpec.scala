@@ -35,33 +35,24 @@ trait LaminarSpec
     mount(node, clue)
   }
 
-  override def unmount(): Unit = {
-    assertRootNodeMounted("laminar.unmount")
+  override def unmount(clue: String = "unmount"): Unit = {
+    assertRootNodeMounted("unmount:" + clue)
     doAssert(
       root != null,
-      "ASSERT FAILED [laminar.unmount]: Laminar root not found. Did you use Laminar's mount() method in LaminarSpec?"
+      s"ASSERT FAILED [unmount:$clue]: Laminar root not found. Did you use Laminar's mount() method in LaminarSpec? Note: unfortunately this could conceal the true error message."
     )
     doAssert(
       root.child.ref == rootNode,
-      "ASSERT FAILED [laminar.unmount]: Laminar root's ref does not match rootNode. What did you do!?"
+      s"ASSERT FAILED [unmount:$clue]: Laminar root's ref does not match rootNode. What did you do!?"
     )
     doAssert(
       root.unmount(),
-      "ASSERT FAILED [laminar.unmount]: Laminar root failed to unmount"
+      s"ASSERT FAILED [unmount:$clue]: Laminar root failed to unmount"
     )
     root = null
     // containerNode = null
     mountedElementClue = defaultMountedElementClue
   }
-
-//  @TODO I don't actually remember why I did this. Super's implementation seems functionally equivalent. Remove this if all is good.
-//  override def clearDOM(): Unit = {
-//    if (root != null) {
-//      unmount()
-//    }
-//    containerNode = null
-//    dom.document.body.textContent = "" // remove the container
-//  }
 
   implicit def makeCompositeHtmlAttrTestable[V](attr: CompositeAttr[HtmlAttr[V]]): TestableHtmlAttr[V] = {
     new TestableHtmlAttr(attr.key)

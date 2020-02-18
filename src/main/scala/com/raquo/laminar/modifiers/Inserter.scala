@@ -1,11 +1,20 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.airstream.ownership.{Owner, Subscription}
+import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.nodes.ReactiveElement
 
-/** If you DO provide initialContext, its parentNode MUST always
+// @TODO[API] Inserter really wants to extend Binder. And yet.
+
+/** Inserter is a modifier that lets you insert child node(s) on mount.
+  * When used with onMountInsert, it "immediately" reserves an insertion
+  * spot and then on every mount it inserts the node(s) into the same spot.
+  *
+  * Note: As a Modifier this is not idemponent, but overall
+  * it behaves as you would expect. See docs for more details.
+  *
+  * Note: If you DO provide initialContext, its parentNode MUST always
   * be the same `element` that you apply this Modifier to.
   */
 class Inserter[-El <: ReactiveElement.Base] (
@@ -13,15 +22,23 @@ class Inserter[-El <: ReactiveElement.Base] (
   insertFn: (InsertContext[El], Owner) => Subscription
 ) extends Modifier[El] {
 
-  override def apply(element: El): Unit = {
+  def bind(element: El): DynamicSubscription = {
+    // @TODO[Performance] The way it's used in `onMountInsert`, we create a DynSub inside DynSub.
+    //  - Currently this does not seem avoidable as we don't want to expose a `map` on DynSub
+    //  - That would allow you to create leaky resources without having a reference to the owner
+    //  - But maybe we require the user to provide proof of owner: dynSub.map(project)(owner) that must match DynSub
     // @Note we want to remember this even after subscription is deactivated.
     //  Yes, we expect the subscription to re-activate with this initial state
     //  because it would match the state of the DOM upon reactivation.
-    val insertContext = initialContext.getOrElse(InsertContext.reservedSpotContext(element))
+    val insertContext = initialContext.getOrElse(InsertContext.reserveSpotContext(element))
 
     ReactiveElement.bindSubscription(element) { mountContext =>
       insertFn(insertContext, mountContext.owner)
     }
+  }
+
+  override def apply(element: El): Unit = {
+    bind(element)
   }
 
   /** Call this to get a copy of Inserter with a context locked to a certain element.

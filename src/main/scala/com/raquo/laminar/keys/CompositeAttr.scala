@@ -4,7 +4,7 @@ import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.keys.Key
 import com.raquo.laminar.api.Laminar.{HtmlElement, MapValueMapper, StringValueMapper}
 import com.raquo.laminar.keys.CompositeAttr.CompositeValueMapper
-import com.raquo.laminar.modifiers.Setter
+import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
@@ -47,9 +47,9 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
     }
   }
 
-  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Setter[HtmlElement] = {
+  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[HtmlElement] = {
     var prevItems = js.Dictionary.empty[Boolean]
-    Setter { element =>
+    Binder { element =>
       ReactiveElement.bindFn(element, $items) { items =>
 
         // Convert incoming value into a normalized map of chunks

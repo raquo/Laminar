@@ -5,7 +5,7 @@ import com.raquo.domtypes
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{SvgElement, optionToSetter}
-import com.raquo.laminar.modifiers.{KeySetter, Setter}
+import com.raquo.laminar.modifiers.{Binder, KeySetter, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 class ReactiveSvgAttr[V](
@@ -26,8 +26,8 @@ class ReactiveSvgAttr[V](
     new KeySetter[ReactiveSvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
   }
 
-  def <--($value: Observable[V]): Setter[SvgElement] = {
-    Setter { element =>
+  def <--($value: Observable[V]): Binder[SvgElement] = {
+    Binder { element =>
       ReactiveElement.bindFn(element, $value) { value =>
         DomApi.setSvgAttribute(element, self, value)
       }

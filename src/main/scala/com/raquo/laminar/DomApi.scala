@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement, ReactiveHtmlElement, ParentNode, ReactiveSvgElement, TextNode}
-import com.raquo.laminar.modifiers.EventPropSetter
+import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
 import org.scalajs.dom.DOMException
 
@@ -69,7 +69,7 @@ object DomApi {
 
   def addEventListener[Ev <: dom.Event](
     element: ReactiveElement.Base,
-    eventPropSetter: EventPropSetter[Ev]
+    eventPropSetter: EventPropBinder[Ev]
   ): Unit = {
     element.ref.addEventListener(
       `type` = eventPropSetter.key.domName,
@@ -80,7 +80,7 @@ object DomApi {
 
   def removeEventListener[Ev <: dom.Event](
     element: ReactiveElement.Base,
-    eventPropSetter: EventPropSetter[Ev]
+    eventPropSetter: EventPropBinder[Ev]
   ): Unit = {
     element.ref.removeEventListener(
       `type` = eventPropSetter.key.domName,

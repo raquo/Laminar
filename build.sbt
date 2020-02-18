@@ -8,7 +8,7 @@ enablePlugins(ScalaJSBundlerPlugin)
 libraryDependencies ++= Seq(
   "com.raquo" %%% "airstream" % "0.7.3-SNAPSHOT",
   "com.raquo" %%% "domtypes" % "0.9.6",
-  "com.raquo" %%% "domtestutils" % "0.10" % Test,
+  "com.raquo" %%% "domtestutils" % "0.10.1" % Test,
   "org.scalatest" %%% "scalatest" % "3.1.0" % Test
 )
 
@@ -24,4 +24,4 @@ parallelExecution in Test := false
 
 scalaJSUseMainModuleInitializer := true
 
-emitSourceMaps := false
+scalaJSLinkerConfig in (Compile, fastOptJS) ~= { _.withSourceMap(false) }
