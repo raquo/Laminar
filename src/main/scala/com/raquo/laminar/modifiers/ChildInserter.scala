@@ -2,7 +2,7 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
-import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
 // @TODO[Naming] hrm
 object ChildInserter {
@@ -18,7 +18,7 @@ object ChildInserter {
         owner = owner
       )
       $child(mountContext).foreach { newChildNode =>
-        c.parentNode.replaceChild(c.sentinelNode, newChildNode)
+        ParentNode.replaceChild(parent = c.parentNode, oldChild = c.sentinelNode, newChild = newChildNode)
         c.sentinelNode = newChildNode
       }(owner)
     }

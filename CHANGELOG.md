@@ -4,6 +4,8 @@ Breaking changes in **bold**.
 
 #### v0.8 – TBD
 
+* **API: Move `appendChild` and other similar methods from ParentNode instance to companion object. **
+  * Those low-level methods are still available to you as a user, but generally you should avoid them in favor of a reactive approach (various `<--` and `-->` methods).
 * New: `ReactiveElement.events(ept: EventPropTransformation)`, works the same as `ReactiveElement.events(p: ReactiveEventProp)`, returning a stream of events
   * Example: `div(...).events(onClick.useCapture.preventDefault)`
   * Useful to combine with the new `observable --> observer` method.
@@ -29,7 +31,7 @@ Breaking changes in **bold**.
   * <TODO: Elaborate> Allow remounting of unmounted components (document pilot subscription memory management gotcha) 
   * `NodeWasDiscarded` event is not fired anymore. See `NodeWillUnmount`.
 * **API: Hide `parentChangeEvents` and `maybeParentSignal`. This functionality is not available anymore as it requires undesirable tradeoffs.**
-* **API: Hide `willSetParent` and `setParent` methods. Use Laminar's `parentNode.appendChild(childNode)` or similar.**
+* **API: Hide `willSetParent` and `setParent` methods. Use Laminar's `ParentNode.appendChild(parent, childNode)` or similar.**
 * **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
 * **API: Move `ChildrenCommand` out of the poorly named `collection` package**
 * **API: `EventPropEmitter` and `EventPropSetter` merged into `EventPropBinder`)**

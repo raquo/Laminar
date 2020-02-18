@@ -1,6 +1,6 @@
 package com.raquo.laminar.lifecycle
 
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
 
 import scala.collection.immutable
 
@@ -19,7 +19,7 @@ object InsertContext {
   def reserveSpotContext[El <: ReactiveElement.Base](parentNode: El): InsertContext[El] = {
     val sentinelNode = new CommentNode("")
 
-    parentNode.appendChild(sentinelNode)
+    ParentNode.appendChild(parent = parentNode, child = sentinelNode)
 
     new InsertContext[El](
       parentNode = parentNode,

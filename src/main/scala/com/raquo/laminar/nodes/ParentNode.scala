@@ -10,21 +10,41 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
   private[nodes] val dynamicOwner: DynamicOwner = new DynamicOwner
 
+  // @TODO[Performance] We should get rid of this.
+  //  - The only place where we need this is ReplaceAll functionality of ChildrenCommand API
+  //  - We can probably track specific children affected by that API instead
+  //  - That would save us mutable Buffer searches and manipulations when inserting and removing nodes
   private var _maybeChildren: Option[mutable.Buffer[ChildNode.Base]] = None
 
   @deprecated("ParentNode.maybeChildren will be removed in a future version of Laminar.", "0.8")
   @inline def maybeChildren: Option[List[ChildNode.Base]] = _maybeChildren.map(_.toList)
+}
+
+object ParentNode {
+
+  type Base = ParentNode[dom.Element]
+
+  // @Note End users, you should achieve your DOM manipulation goals using the many of <-- and --> methods that Laminar offers.
+  //  Those arrow methods are in fact very flexible. Only use the methods below when really needed, and even then, very carefully.
+  //  The methods below are safe to use IFF you're not doing crazy stuff.
+  //  - For example, don't mess with nodes managed by any other Laminar code such as `child <-- ...` or `children <-- ...`.
+  //  - Also, avoid inserting / removing / moving RELEVANT nodes while any other DOM update operation is in process
+  //    - You don't want to affect the DOM subtree that is being modified with your own ad hoc modifications
+  //    - It should be ok to update UNRELATED nodes though
 
   /** Note: can also be used to move children, even within the same parent
     *
     * @return Whether child was successfully appended
     */
-  def appendChild(child: ChildNode.Base): Boolean = {
-    val nextParent = Some(this)
+  def appendChild(
+    parent: ParentNode.Base,
+    child: ChildNode.Base
+  ): Boolean = {
+    val nextParent = Some(parent)
     child.willSetParent(nextParent)
 
     // 1. Update DOM
-    val appended = DomApi.appendChild(parent = this, child = child)
+    val appended = DomApi.appendChild(parent = parent, child = child)
     if (appended) {
 
       // 2A. Update child's current parent node
@@ -33,10 +53,10 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
       }
 
       // 2B. Update this node
-      if (_maybeChildren.isEmpty) {
-        _maybeChildren = Some(mutable.Buffer(child))
+      if (parent._maybeChildren.isEmpty) {
+        parent._maybeChildren = Some(mutable.Buffer(child))
       } else {
-        _maybeChildren.foreach(children => children += child)
+        parent._maybeChildren.foreach(children => children += child)
       }
 
       // 3. Update child
@@ -46,9 +66,12 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
   }
 
   /** @return Whether child was successfully removed */
-  def removeChild(child: ChildNode.Base): Boolean = {
+  def removeChild(
+    parent: ParentNode.Base,
+    child: ChildNode.Base
+  ): Boolean = {
     var removed = false
-    _maybeChildren.foreach { children =>
+    parent._maybeChildren.foreach { children =>
 
       // 0. Check precondition required for consistency of our own Tree vs real DOM
       val indexOfChild = children.indexOf(child)
@@ -56,7 +79,7 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
         child.willSetParent(None)
 
         // 1. Update DOM
-        removed = DomApi.removeChild(parent = this, child = child)
+        removed = DomApi.removeChild(parent = parent, child = child)
         if (removed) {
 
           // 2. Update this node
@@ -75,30 +98,31 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     * @return Whether child was successfully inserted
     */
   def insertChild(
+    parent: ParentNode.Base,
     child: ChildNode.Base,
     atIndex: Int
   ): Boolean = {
     var inserted = false
 
     // 0. Prep this node
-    if (_maybeChildren.isEmpty) {
-      _maybeChildren = Some(mutable.Buffer())
+    if (parent._maybeChildren.isEmpty) {
+      parent._maybeChildren = Some(mutable.Buffer())
     }
 
-    _maybeChildren.foreach { children =>
-      val nextParent = Some(this)
+    parent._maybeChildren.foreach { children =>
+      val nextParent = Some(parent)
       child.willSetParent(nextParent)
 
       // 1. Update DOM
       if (atIndex < children.length) {
         val nextChild = children.apply(atIndex)
         inserted = DomApi.insertBefore(
-          parent = this,
+          parent = parent,
           newChild = child,
           referenceChild = nextChild
         )
       } else if (atIndex == children.length) {
-        inserted = DomApi.appendChild(parent = this, child = child)
+        inserted = DomApi.appendChild(parent = parent, child = child)
       }
 
       if (inserted) {
@@ -122,23 +146,24 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     * @return Whether child was replaced
     */
   def replaceChild(
+    parent: ParentNode.Base,
     oldChild: ChildNode.Base,
     newChild: ChildNode.Base
   ): Boolean = {
     var replaced = false
-    _maybeChildren.foreach { children =>
+    parent._maybeChildren.foreach { children =>
 
       // 0. Check precondition required for consistency of our own Tree vs real DOM
       if (oldChild != newChild) {
         val indexOfChild = children.indexOf(oldChild)
         if (indexOfChild != -1) {
-          val newChildNextParent = Some(this)
+          val newChildNextParent = Some(parent)
           oldChild.willSetParent(None)
           newChild.willSetParent(newChildNextParent)
 
           // 1. Update DOM
           replaced = DomApi.replaceChild(
-            parent = this,
+            parent = parent,
             newChild = newChild,
             oldChild = oldChild
           )
@@ -160,6 +185,7 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     * @return Whether children were replaced
     */
   def replaceChildren(
+    parent: ParentNode.Base,
     fromIndex: Int,
     toIndex: Int,
     newChildren: Iterable[ChildNode.Base]
@@ -186,12 +212,12 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     // @TODO[Integrity] This does not properly report failures like other methods do
 
     // 0. Prep this node
-    if (_maybeChildren.isEmpty) {
-      _maybeChildren = Some(mutable.Buffer())
+    if (parent._maybeChildren.isEmpty) {
+      parent._maybeChildren = Some(mutable.Buffer())
     }
 
     var replaced = false
-    _maybeChildren.foreach { children =>
+    parent._maybeChildren.foreach { children =>
       if (
         newChildren != children
           && fromIndex >= 0 && fromIndex < children.length
@@ -204,7 +230,7 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
         var numRemovedNodes = 0
         val numNodesToRemove = toIndex - fromIndex + 1
         while (numRemovedNodes < numNodesToRemove) {
-          removeChild(children(fromIndex))
+          removeChild(parent, children(fromIndex))
           numRemovedNodes += 1
         }
 
@@ -212,6 +238,7 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
         var insertedCount = 0
         newChildren.foreach { newChild =>
           insertChild(
+            parent,
             newChild,
             atIndex = fromIndex + insertedCount
           )
@@ -222,25 +249,26 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     replaced
   }
 
-  def replaceAllChildren(newChildren: Iterable[ChildNode.Base]): Unit = {
+  def replaceAllChildren(
+    parent: ParentNode.Base,
+    newChildren: Iterable[ChildNode.Base]
+  ): Unit = {
     // @TODO[Performance] This could be optimized
     // @TODO[Integrity] This does not properly report failures like other methods do
 
     // A. Remove existing children
-    _maybeChildren.foreach { children =>
-      children.foreach(removeChild)
+    parent._maybeChildren.foreach { children =>
+      children.foreach(child => removeChild(parent, child))
     }
 
     // B. Add new children
-    newChildren.foreach(appendChild)
+    newChildren.foreach(child => appendChild(parent, child))
   }
 
-  def indexOfChild(child: ChildNode.Base): Int = {
-    _maybeChildren.map(children => children.indexOf(child)).getOrElse(-1)
+  def indexOfChild(
+    parent: ParentNode.Base,
+    child: ChildNode.Base
+  ): Int = {
+    parent._maybeChildren.map(children => children.indexOf(child)).getOrElse(-1)
   }
-}
-
-object ParentNode {
-
-  type Base = ParentNode[dom.Element]
 }
