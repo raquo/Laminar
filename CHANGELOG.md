@@ -2,53 +2,75 @@
 
 Breaking changes in **bold**.
 
-#### v0.8 – TBD
+#### v0.8.0 – Mar 2020
 
-* **API: Move `appendChild` and other similar methods from ParentNode instance to companion object. **
-  * Those low-level methods are still available to you as a user, but generally you should avoid them in favor of a reactive approach (various `<--` and `-->` methods).
-* New: `ReactiveElement.events(ept: EventPropTransformation)`, works the same as `ReactiveElement.events(p: ReactiveEventProp)`, returning a stream of events
-  * Example: `div(...).events(onClick.useCapture.preventDefault)`
-  * Useful to combine with the new `observable --> observer` method.
+This release is a significant improvement to both usability and safety of Laminar. We overhauled the lifecycle event system, and reworked how Laminar makes use of Airstream ownership, fixing longstanding design flaws in the process. We also simplified many things e.g. we eliminated the whole `Scala DOM Builder` layer. Below is a comprehensive list of changes with migration tips sprinkled throughout.
+
+* Documentation
+  * The entire documentation was of course updated for v0.8.0. For those already familiar with Laminar v0.7 API, the following sections contain new or significantly updated conceptual material:
+    * Manual Application
+    * Reusing Elements
+    * Efficiency
+    * Binding Observables
+    * Ownership
+    * Memory Management
+    * Element Lifecycle Hooks
+    * See also the Changelog for Airstream v0.8.0, and the new Dynamic Ownership section in Airstream docs.
+* **New: Ownership & Lifecycle Events overhaul**
+  * This is the flagship feature of this release.
+  * Ownership
+    * Laminar now uses Airstream's new `DynamicOwner` and `DynamicSubscription` features: `ReactiveElement` subscriptions are now activated every time the element is mounted, not when it is first created. This solves a long standing design flaw ([#33](https://github.com/raquo/Laminar/issues/33)).
+    * You can now re-mount previously unmounted elements: their subscriptions will be re-created and will work again.
+  * Lifecycle Event system
+    * Eliminate `mountEvents` and `parentChangeEvents` streams, `maybeParentSignal` signal, `MountEvent` type, and all related machinery
+    * New: `onMountCallback` / `onMountBind` / `onMountInsert` / `onUnmountCallback` / `onMountUnmountCallback` modifiers
+    * Mount events are now propagated differently down the tree, which has minor timing differences:
+      * Order of unmount events changed between child / parent components. If a subtree is being unmounted, the unmount hooks on children will fire before they fire on their parents.
+      * Previously mount events had to wait for the current Airstream Transaction to finish when propagating to child nodes (similar to how EventBus always emits events in a new Transaction). This is not the case anymore. In practical terms this is unlikely to affect you, except that it fixes [#47](https://github.com/raquo/Laminar/issues/47).
+    * **Migration:** Read the new docs and choose an appropriate onMount* hook instead of the old streams. Don't rush to use `onMountCallback`, check out all of the hooks first.
+* **API: Merge `EventPropEmitter` and `EventPropSetter` into `EventPropBinder`)**
+  * Unlike the old `EventPropSetter`, `EventPropBinder` adds and removes event listeners on mount, not on instantiation. This should not be a problem as event listeners generally don't fire on detached nodes in the first place. 
+  * **Migration:** Replace usages of `EventPropEmitter` with `EventPropBinder`. If you were using `EventPropEmitter` as an `EventPropTransformation`, those methods will not be available anymore as `EventPropBinder` does not extend `EventPropTransformation`, so you will need to rewrite those calls differently, more manually. This usage wasn't explicitly documented, so I hope no one actually runs into this.
+* **API: RootNode no longer automatically mounts itself when the provided `containerElement` is itself unmounted.**
+  * This improves ease of integration if you want to e.g. render a Laminar element in a React component.
+  * **Migration:** this probably does not affect you. If it does, you'll need to call `rootNode.mount()` when appropriate. See the new "What Is Mounting?" section in docs.
 * **API: Replace `ReactiveEventProp.config(useCapture: Boolean)` with `EventPropTransformation.useCapture` and `EventPropTransformation.useBubbleMode`**
   * Migration example: `onClick.config(useCapture = true)` --> `onClick.useCapture`
   * Practically this means that you can set `useCapture` anywhere you have an `EventPropTransformation`, not just where you have the original `ReactiveEventProp`
-* **API: New modifier types: `Setter` and `Inserter` (old `Setter` renamed to `KeySetter`)**
-* **API: ReactiveElement.maybeChildren is not mutable anymore (was never intended to be)**
-* New: amend method (same as bind essentially)
-* **API: subscribe* methods renamed and moved to companion object (also use onMount, amend(), and the new --> extension methods on RichObservable and friends)*
-  * Make sure to document `nodeToInserter`
-* New: onMountFocus
-* API: forthis instead of inContext
-* **New: Brand new mount Event system renamed to Lifecycle Events**
-  - eliminate `mountEvents` stream `MountEvent`, and all related machinery
-  - New: onMount / onUnmount / onLifecycle methods
-  - Order of unmount events might have changed (see test)
-* **API: eliminate auxiliary syntax `myElement <-- child <-- childSignal`**
-  * Use the new `bind` method instead: `myElement.bind(child <-- childSignal)`
-* **API: Lifecycle events & Ownership overhaul**
-  * <TODO: Elaborate> Use Airstream's new `DynamicOwner` and `DynamicSubscription` features: `ReactiveElement` subscriptions are now activated only when the element is mounted, not when it is created.
-  * <TODO: Elaborate> Transaction delay for `mountEvents` now applies to all element subscriptions
-  * <TODO: Elaborate> Allow remounting of unmounted components (document pilot subscription memory management gotcha) 
-  * `NodeWasDiscarded` event is not fired anymore. See `NodeWillUnmount`.
-* **API: Hide `parentChangeEvents` and `maybeParentSignal`. This functionality is not available anymore as it requires undesirable tradeoffs.**
-* **API: Hide `willSetParent` and `setParent` methods. Use Laminar's `ParentNode.appendChild(parent, childNode)` or similar.**
-* **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
-* **API: Move `ChildrenCommand` out of the poorly named `collection` package**
-* **API: `EventPropEmitter` and `EventPropSetter` merged into `EventPropBinder`)**
-  * Unlike the old `EventPropSetter`, `EventPropBinder` adds and removes event listeners on mount, not on instantiation. This should not be a problem as event listeners generally don't fire on detached nodes in the first place. 
-  * **Migration:** Replace usages of `EventPropEmitter` with `EventPropBinder`. Also, if you were using `EventPropEmitter` as an `EventPropTransformation`, those methods will not be available anymore as `EventPropBinder` does not extend `EventPropTransformation`, so you will need to rewrite those calls differently, more manually. This usage wasn't explicitly documented, so I hope no one actually runs into this. 
+* **API: New modifier subtypes: `Setter`, `Binder` and `Inserter` (old `Setter` renamed to `KeySetter`)**
+  * The behaviour is the same except for subscription lifecycle as explained in ownership, but you need to know the distinction between the new types to use the new lifecycle hooks.
 * **API: Eliminate dependency on _Scala DOM Builder_**
   * DOM Builder is capable of supporting different DOM backends and even JVM rendering. We have no plans to use either of these in Laminar, so the indirection required by these abstractions is not pulling its weight.
   * `DomApi`
     * Remove the old `DomApi` trait and companion object.
       * Combine `domapi.*Api` traits into a single `DomApi` object
       * Use the new `DomApi` object directly instead of passing implicit `domapi.*Api` parameters.
-  * Move `Setter` and `EventPropSetter` into Laminar and simplify type signatures
-  * Merge into relevant Laminar subtypes: `Node` -> `ReactiveNode` (add Ref type param), `Comment` -> `ReactiveComment`, `Text` -> `TextNode`, `ParentNode` -> `ParentNode`, `ChildNode` -> `ChildNode`, `Root` -> `RootNode`, `TagSyntax` -> `HtmlTag` and `SvgTag`
-  * Merge `EventfulNode` trait into `ReactiveElement` (split members between the trait and the object)
-    * Change type of `maybeEventListeners` to have `List` instead of `mutable.Buffer`
+  * Move `Setter` and `EventPropSetter` into Laminar, simplify type signatures and rename to `KeySetter` and `EventPropBinder`
+  * Merge into relevant Laminar subtypes: `Node` -> `ReactiveNode` (add `Ref` type param), `Comment` -> `ReactiveComment`, `Text` -> `TextNode`, `ParentNode` -> `ParentNode`, `ChildNode` -> `ChildNode`, `Root` -> `RootNode`, `TagSyntax` -> `HtmlTag` & `SvgTag`
+  * Merge `EventfulNode` trait into `ReactiveElement` (split members between the trait and the companion object)
+    * Change type of `maybeEventListeners` to have `List` instead of `mutable.Buffer`, it was never intended to be mutable
   * **Migration:** If you reference any of the affected types directly, you will need to import them from Laminar, or use their corresponding Laminar replacements listed above. Other than that, everything should just work.
+* **API: Limit access / hide / obscure**
+  * Hide `willSetParent` and `setParent` methods. Use Laminar's `ParentNode.appendChild(parent, childNode)` or similar.
+  * Move `appendChild` and other similar methods from ParentNode instance to companion object.
+    * Those low-level methods are still available to you as a user, but generally you should avoid them in favor of a reactive approach (various `<--` and `-->` methods).
+  * ReactiveElement.maybeChildren is not mutable anymore (was never intended to be)
+  * subscribe\* methods renamed and moved to ReactiveElement companion object
+    * **Migration**: use the new `observable --> observer` modifier, or the new onMount* hooks, and/or the new `element.amend` method.
+    * Make sure to document `nodeToInserter` @nc
+* **API: eliminate auxiliary syntax `myElement <-- child <-- childSignal`**
+  * Use the new `amend` method instead: `myElement.amend(child <-- childSignal)`
+* **API: Remove `ChildNode.isParentMounted` method. Use a similar `ChildNode.isNodeMounted` instead.
+* **API: Move `ChildrenCommand` out of the poorly named `collection` package**
+* **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
+* New: `ReactiveElement.events(ept: EventPropTransformation)`, works the same as `ReactiveElement.events(p: ReactiveEventProp)`, returning a stream of events
+  * Example: `div(...).events(onClick.useCapture.preventDefault)`
+  * Useful to combine with the new `observable --> observer` method.
+* New: `element.amend` method
+* New: `onMountFocus` modifier - focus an element every time it's mounted
+* API: New alias for inContext: `forthis`
 * API: `ReactiveElement` and other node types that take type params now have `type Base` defined on their companion objects containing the most generic version of that type, e.g. `ReactiveElement[dom.Element]` for `ReactiveElement`.
+* Build: Note that this release is version `0.8.0`, not `0.8` as I would have named it before.
 
 #### v0.7.2 – Dec 2019
 
