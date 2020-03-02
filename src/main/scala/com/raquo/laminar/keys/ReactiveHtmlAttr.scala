@@ -11,7 +11,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 class ReactiveHtmlAttr[V](
   override val name: String,
   override val codec: Codec[V, String]
-) extends HtmlAttr[V](name, codec) { self =>
+) extends HtmlAttr[V](name, codec) {
 
   @inline def apply(value: V): Setter[HtmlElement] = {
     this := value
@@ -25,11 +25,10 @@ class ReactiveHtmlAttr[V](
     new KeySetter[ReactiveHtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
   }
 
-  // @TODO[Performance] Is this encoded efficiently in Scala.js? Note the `self`.
   def <--($value: Observable[V]): Binder[HtmlElement] = {
     Binder { element =>
       ReactiveElement.bindFn(element, $value) { value =>
-        DomApi.setHtmlAttribute(element, self, value)
+        DomApi.setHtmlAttribute(element, this, value)
       }
     }
   }

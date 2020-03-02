@@ -60,114 +60,12 @@ trait ReactiveElement[+Ref <: dom.Element]
     EventPropTransformation.toEventStream(t, this)
   }
 
+  @inline def amend(mod: Modifier[this.type]): Unit = {
+    mod(this)
+  }
+
   def amend(mods: Modifier[this.type]*): Unit = {
     mods.foreach(mod => mod(this))
-  }
-
-  /** Set a property / attribute / style on mount.
-    * Similarly to other onMount methods, you only need this when:
-    * a) you need to access MountContext
-    * b) you truly need this to only happen on mount
-    *
-    * Example usage: `onMountSet(ctx => someAttr := someValue(ctx))`. See docs for details.
-    */
-  def onMountSet(fn: MountContext[this.type] => Setter[this.type]): Unit = {
-    onMountCallback(c => fn(c)(c.thisNode))
-  }
-
-  /** Bind a subscription on mount
-    *
-    * Example usage: `element.onMountBind(ctx => someAttr <-- someObservable(ctx))`. See docs for details.
-    */
-  def onMountBind(fn: MountContext[this.type] => Binder[this.type]): Unit = {
-    var maybeSubscription: Option[DynamicSubscription] = None
-    onMountUnmountCallback(
-      mount = { c =>
-        val binder = fn(c)
-        maybeSubscription = Some(binder.bind(c.thisNode))
-      },
-      unmount = { _ =>
-        maybeSubscription.foreach(_.kill())
-        maybeSubscription = None
-      }
-    )
-  }
-
-  /** Insert child node(s) into this element on mount.
-    *
-    * Note: insert position is reserved as soon as you call this method.
-    * Basically it will insert elements in the same position, where you'd expect, on every mount.
-    *
-    * Example usage: `element.onMountInsert(ctx => child <-- someObservable(ctx))`. See docs for details.
-    */
-  def onMountInsert(fn: MountContext[this.type] => Inserter[this.type]): Unit = {
-    var maybeSubscription: Option[DynamicSubscription] = None
-    val lockedContext = InsertContext.reserveSpotContext[this.type](this)
-    onMountUnmountCallback(
-      mount = { c =>
-        val inserter = fn(c).withContext(lockedContext)
-        maybeSubscription = Some(inserter.bind(c.thisNode))
-      },
-      unmount = { _ =>
-        maybeSubscription.foreach(_.kill())
-        maybeSubscription = None
-      }
-    )
-  }
-
-  /** Execute a callback on mount. Good for integrating third party libraries.
-    *
-    * The callback runs on every mount, not just the first one.
-    * - Therefore, don't bind any subscriptions inside that you won't manually unbind on unmount.
-    *   - If you fail to unbind manually, you will have N copies of them after mounting this element N times.
-    *   - Use onMountBind or onMountInsert for that.
-    *
-    * When the callback is called, the element is already mounted.
-    *
-    * If you call this on an element that is already mounted at call time,
-    * the callback will not fire until and unless it is unmounted and then mounted again.
-    */
-  def onMountCallback(fn: MountContext[this.type] => Unit): DynamicSubscription = {
-    var ignoreNextActivation = dynamicOwner.isActive
-    ReactiveElement.bindCallback[this.type](this) { c =>
-      if (ignoreNextActivation) {
-        ignoreNextActivation = false
-      } else {
-        fn(c)
-      }
-    }
-  }
-
-  /** Execute a callback on unmount. Good for integrating third party libraries.
-    *
-    * When the callback is called, the element is still mounted.
-    *
-    * If you call this on an element that is already unmounted at call time, the callback
-    * will not fire until and unless it is mounted and then unmounted again.
-    */
-  def onUnmountCallback(fn: this.type => Unit): DynamicSubscription = {
-    ReactiveElement.bindSubscription(this) { c =>
-      new Subscription(c.owner, cleanup = () => fn(this))
-    }
-  }
-
-  /** Combines onMountCallback and onUnmountCallback for easier integration.
-    *
-    * Note that the same caveats apply as for those individual methods.
-    */
-  def onMountUnmountCallback(
-    mount: MountContext[this.type] => Unit,
-    unmount: this.type => Unit
-  ): DynamicSubscription = {
-    var ignoreNextActivation = dynamicOwner.isActive
-    ReactiveElement.bindSubscription[this.type](this) { c =>
-      if (ignoreNextActivation) {
-        ignoreNextActivation = false
-      } else {
-        mount(c)
-      }
-      new Subscription(c.owner, cleanup = () => unmount(this))
-    }
   }
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
@@ -319,6 +217,15 @@ object ReactiveElement {
       activate(new MountContext[El](element, owner))
     })
   }
+
+  // @TODO Maybe later. Wanted to make a seqToBinder.
+  //@inline def bindCombinedSubscription[El <: ReactiveElement.Base](
+  //  element: El
+  //)(
+  //  subscriptions: DynamicOwner => collection.Seq[DynamicSubscription]
+  //): DynamicSubscription = {
+  //  DynamicSubscription.combine(element.dynamicOwner, subscriptions)
+  //}
 
   def isActive(element: ReactiveElement.Base): Boolean = {
     element.dynamicOwner.isActive

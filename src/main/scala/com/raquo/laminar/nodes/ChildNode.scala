@@ -45,10 +45,6 @@ object ChildNode {
 
   type Base = ChildNode[dom.Node]
 
-  def isParentMounted(maybeParent: Option[ParentNode.Base]): Boolean = {
-    maybeParent.exists(parent => isNodeMounted(parent.ref))
-  }
-
   @inline def isNodeMounted(node: dom.Node): Boolean = {
     isDescendantOf(node = node, ancestor = dom.document)
   }

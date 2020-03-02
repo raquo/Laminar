@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.airstream.core.{Observable, Observer}
-import com.raquo.airstream.eventbus.WriteBus
+import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.signal.{Signal, Val}
 import com.raquo.domtypes.generic.Modifier
@@ -34,16 +34,25 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   }
 
   /** Create a setter that applies each of the setters in a seq */
-  implicit def seqToSetter[El <: ReactiveElement.Base](seq: scala.collection.Seq[Setter[El]]): Setter[El] = {
-    Setter(element => seq.foreach(_.apply(element)))
+  implicit def seqToSetter[El <: ReactiveElement.Base](setters: scala.collection.Seq[Setter[El]]): Setter[El] = {
+    Setter(element => setters.foreach(_.apply(element)))
   }
 
+  /** Create a binder that combines several binders */
+  //implicit def seqToBinder[El <: ReactiveElement.Base](binders: scala.collection.Seq[Binder[El]]): Binder[El] = {
+  //  Binder[El] { ??? }
+  //}
+
   /** Create a modifier that applies each of the modifiers in a seq */
-  implicit def seqToModifier[A, El <: ReactiveElement.Base](seq: scala.collection.Seq[A])(implicit evidence: A => Modifier[El]): Modifier[El] = {
+  implicit def seqToModifier[A, El <: ReactiveElement.Base](
+    modifiers: scala.collection.Seq[A]
+  )(implicit
+    evidence: A => Modifier[El]
+  ): Modifier[El] = {
     // @TODO[Performance] See if we might want a separate implicit conversion for cases when we don't need `evidence`
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        seq.foreach(evidence(_).apply(element))
+        modifiers.foreach(evidence(_).apply(element))
       }
     }
   }
@@ -112,12 +121,10 @@ object Implicits {
 
     // Inserter implicits are needlessly expensive if we just need a Modifier, so we de-prioritize them
 
-    /** Create a modifier that applies each of the modifiers in a seq */
     implicit def nodeToInserter(node: ChildNode.Base): Inserter[ReactiveElement.Base] = {
       ChildInserter[ReactiveElement.Base](_ => Val(node), initialInsertContext = None)
     }
 
-    /** Create a modifier that applies each of the modifiers in a seq */
     implicit def nodesSeqToInserter(nodes: scala.collection.Seq[ChildNode.Base]): Inserter[ReactiveElement.Base] = {
       ChildrenInserter[ReactiveElement.Base](_ => Val(nodes.toList), initialInsertContext = None)
     }
@@ -163,6 +170,10 @@ object Implicits {
 
     def -->(writeBus: WriteBus[A]): Binder[ReactiveElement.Base] = {
       Binder(ReactiveElement.bindBus(_, eventStream)(writeBus))
+    }
+
+    def -->(eventBus: EventBus[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindBus(_, eventStream)(eventBus.writer))
     }
   }
 }

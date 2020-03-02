@@ -10,6 +10,8 @@ import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
+import com.raquo.laminar.lifecycle.InsertContext
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.{Implicits, lifecycle, modifiers, nodes}
 import org.scalajs.dom
@@ -197,11 +199,7 @@ private[laminar] object Laminar
     * Example usage: `onMountSet(ctx => someAttr := someValue(ctx))`. See docs for details.
     */
   def onMountSet[El <: Element](fn: MountContext[El] => Setter[El]): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        element.onMountSet(fn)
-      }
-    }
+    onMountCallback(c => fn(c)(c.thisNode))
   }
 
   /** Bind a subscription on mount
@@ -209,11 +207,17 @@ private[laminar] object Laminar
     * Example usage: `onMountBind(ctx => someAttr <-- someObservable(ctx))`. See docs for details.
     */
   @inline def onMountBind[El <: Element](fn: MountContext[El] => Binder[El]): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        element.onMountBind(fn)
+    var maybeSubscription: Option[DynamicSubscription] = None
+    onMountUnmountCallback(
+      mount = { c =>
+        val binder = fn(c)
+        maybeSubscription = Some(binder.bind(c.thisNode))
+      },
+      unmount = { _ =>
+        maybeSubscription.foreach(_.kill())
+        maybeSubscription = None
       }
-    }
+    )
   }
 
   /** Insert child node(s) on mount.
@@ -226,7 +230,20 @@ private[laminar] object Laminar
   def onMountInsert[El <: Element](fn: MountContext[El] => Inserter[El]): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onMountInsert(fn)
+        var maybeSubscription: Option[DynamicSubscription] = None
+        val lockedContext = InsertContext.reserveSpotContext[El](element)
+        element.amend(
+          onMountUnmountCallback[El](
+            mount = { c =>
+              val inserter = fn(c).withContext(lockedContext)
+              maybeSubscription = Some(inserter.bind(c.thisNode))
+            },
+            unmount = { _ =>
+              maybeSubscription.foreach(_.kill())
+              maybeSubscription = None
+            }
+          )
+        )
       }
     }
   }
@@ -246,7 +263,14 @@ private[laminar] object Laminar
   def onMountCallback[El <: Element](fn: MountContext[El] => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onMountCallback(fn)
+        var ignoreNextActivation = ReactiveElement.isActive(element)
+        ReactiveElement.bindCallback[El](element) { c =>
+          if (ignoreNextActivation) {
+            ignoreNextActivation = false
+          } else {
+            fn(c)
+          }
+        }
       }
     }
   }
@@ -261,15 +285,29 @@ private[laminar] object Laminar
   def onUnmountCallback[El <: Element](fn: El => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onUnmountCallback(fn)
+        ReactiveElement.bindSubscription(element) { c =>
+          new Subscription(c.owner, cleanup = () => fn(element))
+        }
       }
     }
   }
 
+  /** Combines onMountCallback and onUnmountCallback for easier integration.
+    *
+    * Note that the same caveats apply as for those individual methods.
+    */
   def onMountUnmountCallback[El <: Element](mount: MountContext[El] => Unit, unmount: El => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        element.onMountUnmountCallback(mount, unmount)
+        var ignoreNextActivation = ReactiveElement.isActive(element)
+        ReactiveElement.bindSubscription[El](element) { c =>
+          if (ignoreNextActivation) {
+            ignoreNextActivation = false
+          } else {
+            mount(c)
+          }
+          new Subscription(c.owner, cleanup = () => unmount(element))
+        }
       }
     }
   }

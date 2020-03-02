@@ -85,15 +85,17 @@ class SyntaxSpec extends UnitSpec {
       }
     ))
 
-    el.onMountUnmountCallback(
-      mount = c => {
-        val proof: MountContext[Div] = c
-        ()
-      },
-      unmount = n => {
-        val proof: Div = n
-        ()
-      }
+    el.amend(
+      onMountUnmountCallback(
+        mount = c => {
+          val proof: MountContext[Div] = c
+          ()
+        },
+        unmount = n => {
+          val proof: Div = n
+          ()
+        }
+      )
     )
 
     mount(el)
@@ -110,31 +112,39 @@ class SyntaxSpec extends UnitSpec {
     val observable: Observable[Int] = stream
 
     // @TODO[API] Can we have type inference for this [Int]?
-    el.onMountBind(_ => observable --> Observer[Int](num => num * 5))
-    el.onMountBind(_ => signal --> Observer[Int](num => num * 5))
-    el.onMountBind(_ => stream --> Observer[Int](num => num * 5))
-
-    el.onMountInsert(_ => div())
-
-    el.onMountBind(_ => observable --> (num => num * 5))
-    el.onMountBind(_ => signal --> (num => num * 5))
-    el.onMountBind(_ => stream --> (num => num * 5))
-
-    el.onMountBind(_ => onClick --> Observer[dom.MouseEvent](ev => ()))
-    el.onMountBind(_ => onClick.mapTo(1) --> Observer[Int](num => num * 5))
-
-    el.onMountBind(_ => observable --> ((num: Int) => num * 5))
-    el.onMountBind(_ => signal --> ((num: Int) => num * 5))
-    el.onMountBind(_ => stream --> ((num: Int) => num * 5))
-
-    el.onMountBind(_.thisNode.events(onClick).map(_ => 1) --> (num => num * 5))
-
-    el.onMountBind(_ => stream --> bus.writer)
-
     el.amend(
       onMountBind(_ => observable --> Observer[Int](num => num * 5)),
       onMountBind(_ => signal --> Observer[Int](num => num * 5)),
       onMountBind(_ => stream --> Observer[Int](num => num * 5))
+    )
+
+    el.amend(
+      onMountInsert(_ => div())
+    )
+
+    el.amend(
+      onMountBind(_ => observable --> (num => num * 5)),
+      onMountBind(_ => signal --> (num => num * 5)),
+      onMountBind(_ => stream --> (num => num * 5))
+    )
+
+    el.amend(
+      onMountBind(_ => onClick --> Observer[dom.MouseEvent](ev => ())),
+      onMountBind(_ => onClick.mapTo(1) --> Observer[Int](num => num * 5))
+    )
+
+    el.amend(
+      onMountBind(_ => observable --> ((num: Int) => num * 5)),
+      onMountBind(_ => signal --> ((num: Int) => num * 5)),
+      onMountBind(_ => stream --> ((num: Int) => num * 5))
+    )
+
+    el.amend(
+      onMountBind(_.thisNode.events(onClick).map(_ => 1) --> (num => num * 5))
+    )
+
+    el.amend(
+      onMountBind(_ => stream --> bus.writer)
     )
 
     mount(el)

@@ -12,7 +12,7 @@ class ReactiveSvgAttr[V](
   override val name: String,
   override val codec: Codec[V, String],
   override val namespace: Option[String]
-) extends domtypes.generic.keys.SvgAttr[V](name, codec, namespace) { self =>
+) extends domtypes.generic.keys.SvgAttr[V](name, codec, namespace) {
 
   @inline def apply(value: V): Setter[SvgElement] = {
     this := value
@@ -29,7 +29,7 @@ class ReactiveSvgAttr[V](
   def <--($value: Observable[V]): Binder[SvgElement] = {
     Binder { element =>
       ReactiveElement.bindFn(element, $value) { value =>
-        DomApi.setSvgAttribute(element, self, value)
+        DomApi.setSvgAttribute(element, this, value)
       }
     }
   }
