@@ -1,6 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.ExpectedNode
+import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
@@ -147,4 +148,113 @@ class ChildReceiverSpec extends UnitSpec {
 //  ignore("works with an attr receiver on this node") {
 //
 //  }
+
+  it("split[Option] - caching elements to change tag type") {
+
+    var numCreateLinkCalls = 0
+
+    def renderBlogLink(urlSignal: Signal[String]): HtmlElement = {
+      numCreateLinkCalls += 1
+      L.a(href <-- urlSignal, "a blog")
+    }
+
+    def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = {
+      val noBlog = i("no blog")
+      maybeUrlSignal
+        .split(_ => ())((_, _, urlSignal) => renderBlogLink(urlSignal))
+        .map(_.getOrElse(noBlog))
+    }
+
+    val numVar = Var[Option[Int]](Some(1))
+
+    val maybeUrlSignal = numVar.signal.map(_.map(num => s"http://blog${num}.com/"))
+
+    val el = div(
+      child <-- MaybeBlogUrl(maybeUrlSignal)
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div like (L.a like (href is "http://blog1.com/", "a blog"))
+    )
+
+    numCreateLinkCalls shouldBe 1
+    numCreateLinkCalls = 0
+
+    // --
+
+    numVar.writer.onNext(Some(2))
+
+    expectNode(
+      div like (L.a like (href is "http://blog2.com/", "a blog"))
+    )
+
+    numCreateLinkCalls shouldBe 0
+
+    // --
+
+    unmount("first unmount")
+
+    numVar.writer.onNext(Some(3))
+
+    expectNode(
+      el.ref,
+      div like (L.a like (href is "http://blog2.com/", "a blog"))
+    )
+
+    numCreateLinkCalls shouldBe 0
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div like (L.a like (href is "http://blog2.com/", "a blog"))
+    )
+
+    numCreateLinkCalls shouldBe 0
+
+    // --
+
+    numVar.writer.onNext(Some(4))
+
+    expectNode(
+      div like (L.a like (href is "http://blog4.com/", "a blog"))
+    )
+
+    // Previous unmounting stopped the split stream, which cleared the memory of memoized elements
+    numCreateLinkCalls shouldBe 1
+    numCreateLinkCalls = 0
+
+    // --
+
+    numVar.writer.onNext(None)
+
+    expectNode(
+      div like (i like ("no blog"))
+    )
+
+    // --
+
+    numVar.writer.onNext(None)
+
+    expectNode(
+      div like (i like ("no blog"))
+    )
+
+    numCreateLinkCalls shouldBe 0
+
+    // --
+
+    numVar.writer.onNext(Some(5))
+
+    expectNode(
+      div like (L.a like (href is "http://blog5.com/", "a blog"))
+    )
+
+    numCreateLinkCalls shouldBe 1
+  }
 }

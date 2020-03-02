@@ -27,8 +27,10 @@ class LifecycleEventSpec extends UnitSpec {
 
     val readLifecycleEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.onMountCallback(_ => events.append(NodeDidMount))
-        element.onUnmountCallback(_ => events.append(NodeWillUnmount))
+        element.amend(
+          onMountCallback(_ => events.append(NodeDidMount)),
+          onUnmountCallback(_ => events.append(NodeWillUnmount))
+        )
       }
     }
 
@@ -67,8 +69,10 @@ class LifecycleEventSpec extends UnitSpec {
 
     val readLifecycleEvents: Mod[HtmlElement] = new Mod[HtmlElement] {
       override def apply(element: HtmlElement): Unit = {
-        element.onMountCallback(_ => events.append(NodeDidMount))
-        element.onUnmountCallback(_ => events.append(NodeWillUnmount))
+        element.amend(
+          onMountCallback(_ => events.append(NodeDidMount)),
+          onUnmountCallback(_ => events.append(NodeWillUnmount))
+        )
       }
     }
 
@@ -143,11 +147,15 @@ class LifecycleEventSpec extends UnitSpec {
       )
     )
 
-    child.onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ NodeDidMount)
-    child.onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ NodeWillUnmount)
+    child.amend(
+      onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ NodeDidMount),
+      onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ NodeWillUnmount)
+    )
 
-    grandChild.onMountCallback(_ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeDidMount)
-    grandChild.onUnmountCallback(_ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeWillUnmount)
+    grandChild.amend(
+      onMountCallback(_ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeDidMount),
+      onUnmountCallback(_ => grandChildLifecycleEvents = grandChildLifecycleEvents :+ NodeWillUnmount)
+    )
 
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
@@ -179,8 +187,10 @@ class LifecycleEventSpec extends UnitSpec {
     var lifecycleEvents: Seq[TargetNodeWithLifecycleEvent] = Nil
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
-      node.onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeDidMount))
-      node.onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeWillUnmount))
+      node.amend(
+        onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeDidMount)),
+        onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeWillUnmount))
+      )
     }
 
     def expectNewEvents(

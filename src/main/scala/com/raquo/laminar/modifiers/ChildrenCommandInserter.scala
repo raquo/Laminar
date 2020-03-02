@@ -6,8 +6,6 @@ import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.modifiers.ChildrenInserter.Child
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
-import scala.scalajs.js
-
 object ChildrenCommandInserter {
 
   type ChildrenCommand = CollectionCommand[Child]

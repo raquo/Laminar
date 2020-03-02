@@ -11,7 +11,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 class ReactiveProp[V, DomV](
   override val name: String,
   override val codec: Codec[V, DomV]
-) extends Prop[V, DomV](name, codec) { self =>
+) extends Prop[V, DomV](name, codec) {
 
   @inline def apply(value: V): Setter[HtmlElement] = {
     this := value
@@ -28,7 +28,7 @@ class ReactiveProp[V, DomV](
   def <--($value: Observable[V]): Binder[HtmlElement] = {
     Binder { element =>
       ReactiveElement.bindFn(element, $value) { value =>
-        DomApi.setHtmlProperty(element, self, value)
+        DomApi.setHtmlProperty(element, this, value)
       }
     }
   }

@@ -14,7 +14,7 @@ object App extends js.JSApp {
     document.addEventListener("DOMContentLoaded", (e: Event) => {
       dom.console.log("=== DOMContentLoaded ===")
 
-      val container = document.getElementById("app-container")
+      val container = document.getElementById("appContainer")
       container.textContent = ""
 
 //      render(container, MultiSetters())

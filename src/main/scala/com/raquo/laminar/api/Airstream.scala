@@ -26,6 +26,10 @@ trait Airstream {
 
   type Subscription = airstream.ownership.Subscription
 
+  type DynamicOwner = airstream.ownership.DynamicOwner
+
+  type DynamicSubscription = airstream.ownership.DynamicSubscription
+
   type Val[A] = airstream.signal.Val[A]
 
   type Var[A] = airstream.signal.Var[A]
@@ -47,6 +51,8 @@ trait Airstream {
   val SwitchFutureStrategy: airstream.features.FlattenStrategy.SwitchFutureStrategy.type = airstream.features.FlattenStrategy.SwitchFutureStrategy
 
   val SwitchStreamStrategy: airstream.features.FlattenStrategy.SwitchStreamStrategy.type = airstream.features.FlattenStrategy.SwitchStreamStrategy
+
+  val DynamicSubscription: airstream.ownership.DynamicSubscription.type = airstream.ownership.DynamicSubscription
 
   val Val: airstream.signal.Val.type = airstream.signal.Val
 
