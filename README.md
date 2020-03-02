@@ -6,7 +6,7 @@
 
 Laminar is a small Scala.js library that lets you build UI components using glitch-free Streams and Signals (reactive state variables). It is simpler and more powerful than virtual DOM based solutions.
 
-    "com.raquo" %%% "laminar" % "0.7.2"
+    "com.raquo" %%% "laminar" % "0.8.0"
 
 
 
@@ -62,6 +62,7 @@ Laminar and Airstream are well documented:
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
+| **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
 | **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
 | **[v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md)** | **[v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md)** |
 | **[v0.5.1](https://github.com/raquo/Laminar/blob/v0.5.1/docs/Documentation.md)** | **[v0.4.1](https://github.com/raquo/Airstream/blob/v0.4.1/README.md)** |
@@ -95,12 +96,15 @@ val helloDiv: Div = div("Hello, ", child.text <-- streamOfNames)
 
 `helloDiv` is a Laminar Div element that contains the text "Hello, `<Name>`", where `<Name>` is the latest value emitted by `streamOfNames`. As you see, `helloDiv` is **self-contained**. It depends on a stream, but is not a stream itself. It manages itself, abstracting away the reactive complexity of its innards from the rest of your program.
 
-Laminar does not use virtual DOM, and a Laminar element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element (available as `.ref`). That means that if you want something about that element to be dynamic, you should define it inside the element like we did with `child <-- nameStream` above. This allows for precision DOM updates instead of [inefficient virtual DOM diffing](https://github.com/raquo/Laminar/blob/master/docs/Virtual-DOM.md).
+Laminar does not use virtual DOM, and a Laminar element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element (available as `.ref`). That means that if you want something about that element to be dynamic, you should define it **inside** the element like we did with `child <-- nameStream` above. This allows for precision DOM updates instead of [inefficient virtual DOM diffing](https://github.com/raquo/Laminar/blob/master/docs/Virtual-DOM.md).
 
 With that out of the way, here is what a pretty simple Laminar "component" could look like:
 
 ```scala
-def Hello(helloNameStream: EventStream[String], helloColorStream: EventStream[String]): Div = {
+def Hello(
+  helloNameStream: EventStream[String],
+  helloColorStream: EventStream[String]
+): Div = {
   div(
     fontSize := "20px", // static CSS property
     color <-- helloColorStream, // dynamic CSS property
@@ -234,7 +238,7 @@ val appDiv: Div = div(
 render(dom.document.querySelector("#appContainer"), appDiv)
 ```
 
-It's all the same behaviour, just different composition. In this pattern the `InputBox` component exposes two important nodes: `node` that should be included into the DOM tree, and `inputNode` that it knows the consuming code will want to listen for events. This is a simple yet powerful pattern for generic components.
+It's all the same behaviour, just different composition. In this pattern the `InputBox` component exposes two important nodes: `node` that should be included into the DOM tree, and `inputNode` that the consuming code might want to listen for events. This is a simple yet powerful pattern for generic components.
 
 As you learn more about Laminar you will see that there are even more ways to structure this same relationship.
 
