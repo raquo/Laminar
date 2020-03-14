@@ -51,6 +51,7 @@ I understand that the importance of some of these points might not be immediatel
 * **Laminar examples**
   * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/1) to try things on the fly
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
+  * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
 
 
