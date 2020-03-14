@@ -22,7 +22,7 @@ private[laminar] object Laminar
   extends Airstream
   with ReactiveComplexHtmlKeys
   // Reflected Attrs
-  with ReflectedHtmlAttrs[ReactiveReflectedProp]
+  with ReflectedHtmlAttrs[ReactiveProp]
   // Attrs
   with HtmlAttrs[ReactiveHtmlAttr]
   // Event Props
