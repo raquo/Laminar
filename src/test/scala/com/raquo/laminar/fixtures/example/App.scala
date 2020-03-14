@@ -6,9 +6,7 @@ import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.Event
 
-import scala.scalajs.js
-
-object App extends js.JSApp {
+object App extends {
 
   def main(): Unit = {
     document.addEventListener("DOMContentLoaded", (e: Event) => {
@@ -21,4 +19,5 @@ object App extends js.JSApp {
       render(container, Children())
 //      render(container, new TaskList().node)
     })
-  }}
+  }
+}

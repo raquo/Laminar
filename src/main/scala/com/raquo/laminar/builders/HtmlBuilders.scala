@@ -10,7 +10,7 @@ import org.scalajs.dom.Event
 
 trait HtmlBuilders
   extends HtmlAttrBuilder[ReactiveHtmlAttr]
-  with ReflectedHtmlAttrBuilder[ReactiveReflectedProp]
+  with ReflectedHtmlAttrBuilder[ReactiveProp]
   with PropBuilder[ReactiveProp]
   with EventPropBuilder[ReactiveEventProp, dom.Event]
   with StyleBuilders[StyleSetter]
@@ -26,7 +26,7 @@ trait HtmlBuilders
     propKey: String,
     attrCodec: Codec[V, String],
     propCodec: Codec[V, DomPropV]
-  ): ReactiveReflectedProp[V, DomPropV] = {
+  ): ReactiveProp[V, DomPropV] = {
     new ReactiveProp(propKey, propCodec)
   }
 

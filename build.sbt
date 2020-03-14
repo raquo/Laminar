@@ -6,15 +6,15 @@ enablePlugins(ScalaJSBundlerPlugin)
 // resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.raquo" %%% "airstream" % "0.7.3-SNAPSHOT",
-  "com.raquo" %%% "domtypes" % "0.9.6",
-  "com.raquo" %%% "domtestutils" % "0.10.1" % Test,
-  "org.scalatest" %%% "scalatest" % "3.1.0" % Test
+  "com.raquo" %%% "airstream" % "0.8.0",
+  "com.raquo" %%% "domtypes" % "0.9.7",
+  "com.raquo" %%% "domtestutils" % "0.11.0" % Test,
+  "org.scalatest" %%% "scalatest" % "3.1.1" % Test
 )
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions")
 
-version in installJsdom := "16.0.1"
+version in installJsdom := "16.2.0"
 
 useYarn := true
 
@@ -25,3 +25,6 @@ parallelExecution in Test := false
 scalaJSUseMainModuleInitializer := true
 
 scalaJSLinkerConfig in (Compile, fastOptJS) ~= { _.withSourceMap(false) }
+
+// @Warning remove this when scalajs-bundler > 0.17 is out https://github.com/scalacenter/scalajs-bundler/issues/332#issuecomment-594401804
+Test / jsEnv := new tempfix.JSDOMNodeJSEnv(tempfix.JSDOMNodeJSEnv.Config((Test / installJsdom).value))

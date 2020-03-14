@@ -48,7 +48,8 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
   }
 
   def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[HtmlElement] = {
-    var prevItems = js.Dictionary.empty[Boolean]
+    // @TODO[update:scalajs] prevItems should be js.Dictionary, wait for https://github.com/scala-js/scala-js/pull/3991
+    var prevItems = js.WrappedDictionary.empty[Boolean]
     Binder { element =>
       ReactiveElement.bindFn(element, $items) { items =>
 
@@ -68,7 +69,7 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
         update(nextItems)(element)
 
         // Update previous chunks
-        prevItems = nextItems.filter(_._2).dict
+        prevItems = nextItems.filter(_._2)
       }
     }
   }
