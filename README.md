@@ -2,7 +2,7 @@
 
 [![Build Status](https://circleci.com/gh/raquo/Laminar.svg?style=svg)](https://circleci.com/gh/raquo/Laminar)
 [![Join the chat at https://gitter.im/Laminar_/Lobby](https://badges.gitter.im/Laminar_/Lobby.svg)](https://gitter.im/Laminar_/Lobby)
-![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs0.6_2.12.svg)
+![Maven Central](https://img.shields.io/maven-central/v/com.raquo/laminar_sjs1_2.13.svg)
 
 Laminar is a small Scala.js library that lets you build UI components using glitch-free Streams and Signals (reactive state variables). It is simpler and more powerful than virtual DOM based solutions.
 
