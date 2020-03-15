@@ -20,6 +20,10 @@ class RootNode(
   val child: ReactiveElement.Base
 ) extends ParentNode[dom.Element] {
 
+  if (container == null) {
+    throw new Exception("Unable to mount Laminar RootNode into a null container.")
+  }
+
   if (!ChildNode.isNodeMounted(container)) {
     throw new Exception("Unable to mount Laminar RootNode into an unmounted container.")
   }
