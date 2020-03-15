@@ -42,7 +42,6 @@ I understand that the importance of some of these points might not be immediatel
 
 
 
-
 ## Community & Support
 
 * [Gitter](https://gitter.im/Laminar_/Lobby) for chat and random questions
@@ -53,6 +52,12 @@ I understand that the importance of some of these points might not be immediatel
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
   * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
+
+
+
+## Laminar Addons
+
+* [Waypoint](https://github.com/raquo/Waypoint) – Efficient router for Laminar
 
 
 
@@ -252,6 +257,7 @@ Read the [docs](https://github.com/raquo/Laminar/blob/master/docs/Documentation.
 
 ## My Related Projects
 
+- [Waypoint](https://github.com/raquo/Waypoint) – Efficient router for Laminar
 - [Airstream](https://github.com/raquo/Airstream) – State propagation and event streaming library used in Laminar
 - [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles
 - [Scala DOM Builder](https://github.com/raquo/scala-dom-builder) – Low-level Scala & Scala.js library for building and manipulating DOM trees
@@ -262,7 +268,7 @@ Read the [docs](https://github.com/raquo/Laminar/blob/master/docs/Documentation.
 
 ## Author
 
-Nikita Gazarov – [raquo.com](http://raquo.com)
+Nikita Gazarov – [@raquo](https://twitter.com/raquo)
 
 
 

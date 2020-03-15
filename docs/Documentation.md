@@ -46,7 +46,9 @@
   * [Why Use Lifecycle Hooks?](#why-use-lifecycle-hooks)
   * [Lifecycle Event Timing](#lifecycle-event-timing)
   * [How Are Mount Events Propagated?](#how-are-mount-events-propagated)
+* [URL Routing](#url-routing)
 * [Special Cases](#special-cases)
+
 
 
 
@@ -1385,6 +1387,12 @@ Assuming container is present in the DOM, `render(container, contentEl)` will im
 8. Now that this subscription is active, if we emit "Nikita" into `nameStream` a `span("Hello ", b("Nikita"))` element will be created and inserted into `contentEl`. This will mount / activate this new `span` element, and then its child `b("Nikita")` by the same cascading logic we described above.
 
 9. If we then emit "Ivan" into `nameStream`, the parent of `span("Hello ", b("Nikita"))` will be set to `None`, and that will trigger an unmount / deactivation cascade for these `span` and `b` elements. A new element will then be created and mounted / activated: `span("Hello ", b("Ivan"))`.  
+
+
+
+## URL Routing
+
+[Waypoint](https://github.com/raquo/Waypoint) is an efficient Laminar router.
 
 
 
