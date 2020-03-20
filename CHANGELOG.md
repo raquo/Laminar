@@ -6,6 +6,8 @@ Breaking changes in **bold**.
 
 This release is a significant improvement to both usability and safety of Laminar. We overhauled the lifecycle event system, and reworked how Laminar makes use of Airstream ownership, fixing longstanding design flaws in the process. We also simplified many things e.g. we eliminated the whole `Scala DOM Builder` layer. Below is a comprehensive list of changes with migration tips sprinkled throughout.
 
+* Addons
+  * New: [Waypoint](https://github.com/raquo/Waypoint) – efficient URL router for Laminar
 * Documentation
   * The entire documentation was of course updated for v0.8.0. For those already familiar with Laminar v0.7 API, the following sections contain new or significantly updated conceptual material:
     * Manual Application
@@ -16,6 +18,7 @@ This release is a significant improvement to both usability and safety of Lamina
     * Memory Management
     * Element Lifecycle Hooks
     * See also the Changelog for Airstream v0.8.0, and the new Dynamic Ownership section in Airstream docs.
+  * New blog post expanding on the rationale behind Laminar: [My Four Year Quest For Perfect Scala.js UI Development](https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a)
 * **New: Ownership & Lifecycle Events overhaul**
   * This is the flagship feature of this release.
   * Ownership

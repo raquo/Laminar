@@ -22,6 +22,8 @@ I personally see virtual DOM as a very elaborate way to avoid using actual react
 
 ## Virtual DOM _with_ FRP
 
+> I've provided a more in depth explanation for why Virtual DOM and FRP don't mix in this blog post: [My Four Year Quest For Perfect Scala.js UI Development](https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a)
+
 Some other libraries like Outwatch (or Cycle.js in the JS world) use both FRP and virtual DOM as a way to achieve complete functional purity. To me this concept is largely lost for frontend development. I don't think the effort, conceptual complexity, and performance penalties of wrapping everything in effect types and virtual elements is worth the marginal safety that some of this could provide. The entire frontend application is _supposed_ to be a collection of DOM and network IO effects, there is barely anything else to it. Like any other technique, pure functional programming is only good for the benefits that it provides, and I don't think it provides a net benefit in frontend development when you consider all the compromises you have to make for it, and all of their effects (ha). This is, of course, a matter of preference, and so both Outwatch and Laminar exist.
 
 _A bit more on Cycle.js [in our Gitter](https://gitter.im/Laminar_/Lobby?at=5b749e5c5b07ae730ac330c4)._

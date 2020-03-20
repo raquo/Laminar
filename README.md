@@ -48,7 +48,7 @@ I understand that the importance of some of these points might not be immediatel
 * [Github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, and more in-depth discussions
 * I also offer commercial support and consulting services for Laminar and Airstream. Ping me at [nikita@raquo.com](nikita@raquo.com).
 * **Laminar examples**
-  * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/1) to try things on the fly
+  * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/1) to try things on the fly (pending update for v0.8.0...)
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
   * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
@@ -58,6 +58,12 @@ I understand that the importance of some of these points might not be immediatel
 ## Laminar Addons
 
 * [Waypoint](https://github.com/raquo/Waypoint) – Efficient router for Laminar
+
+
+
+## Blog Posts
+
+* [My Four Year Quest For Perfect Scala.js UI Development](https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a)
 
 
 
