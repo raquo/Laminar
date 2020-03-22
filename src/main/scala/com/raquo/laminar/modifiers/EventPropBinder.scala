@@ -3,7 +3,7 @@ package com.raquo.laminar.modifiers
 import com.raquo.airstream.core.Observer
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription}
 import com.raquo.domtypes.generic.keys.EventProp
-import com.raquo.laminar.api.L.onClick
+import com.raquo.laminar.api.Laminar.onClick
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 

@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
 import com.raquo.domtypes.generic.keys.Key
-import com.raquo.laminar.api.Laminar.{HtmlElement, MapValueMapper, StringValueMapper}
+import com.raquo.laminar.api.Laminar.{MapValueMapper, StringValueMapper}
 import com.raquo.laminar.keys.CompositeAttr.CompositeValueMapper
 import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
@@ -13,41 +13,41 @@ import scala.scalajs.js.Dictionary
 // @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
 // @TODO[Performance] Will string splitting be faster with native JS method? How do we access it?
 
-class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
+class CompositeAttr[Attr <: Key, El <: ReactiveElement.Base](val key: Attr, separator: Char) {
 
   // @TODO[API] Should StringValueMapper be passed implicitly?
-  @inline def apply(items: String): Setter[HtmlElement] = {
+  @inline def apply(items: String): Setter[El] = {
     update(StringValueMapper.toDict(items, separator))
   }
 
-  @inline def apply(items: Map[String, Boolean]): Setter[HtmlElement] = {
+  @inline def apply(items: Map[String, Boolean]): Setter[El] = {
     update(MapValueMapper.toDict(items, separator))
   }
 
-  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[HtmlElement] = {
+  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[El] = {
     update(mapper.toDict(items, separator))
   }
 
-  @inline def :=(items: String): Setter[HtmlElement] = {
+  @inline def :=(items: String): Setter[El] = {
     update(StringValueMapper.toDict(items, separator))
   }
 
-  @inline def :=(items: Map[String, Boolean]): Setter[HtmlElement] = {
+  @inline def :=(items: Map[String, Boolean]): Setter[El] = {
     update(MapValueMapper.toDict(items, separator))
   }
 
-  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[HtmlElement] = {
+  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[El] = {
     update(mapper.toDict(value, separator))
   }
 
   /** This method provides standard magic-free behaviour, simply overriding the attribute with a new value */
-  def set(newItems: String): Setter[HtmlElement] = {
+  def set(newItems: String): Setter[El] = {
     Setter { element =>
       element.ref.setAttributeNS(namespaceURI = null, qualifiedName = key.name, newItems)
     }
   }
 
-  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[HtmlElement] = {
+  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[El] = {
     // @TODO[update:scalajs] prevItems should be js.Dictionary, wait for https://github.com/scala-js/scala-js/pull/3991
     var prevItems = js.WrappedDictionary.empty[Boolean]
     Binder { element =>
@@ -74,7 +74,7 @@ class CompositeAttr[Attr <: Key](val key: Attr, separator: Char) {
     }
   }
 
-  private def update(newItems: js.Dictionary[Boolean]): Setter[HtmlElement] = {
+  private def update(newItems: js.Dictionary[Boolean]): Setter[El] = {
     Setter { element =>
       // @TODO[Elegance] We're talking to element.ref directly instead of using DomApi. Not ideal.
       val items = js.Dictionary.empty[Boolean]

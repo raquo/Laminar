@@ -2,6 +2,10 @@
 
 Breaking changes in **bold**.
 
+#### master – TBD
+
+* Fix: Incorrect SVG composite attributes types
+
 #### v0.8.0 – Mar 2020
 
 This release is a significant improvement to both usability and safety of Laminar. We overhauled the lifecycle event system, and reworked how Laminar makes use of Airstream ownership, fixing longstanding design flaws in the process. We also simplified many things e.g. we eliminated the whole `Scala DOM Builder` layer. Below is a comprehensive list of changes with migration tips sprinkled throughout.

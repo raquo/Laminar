@@ -137,6 +137,10 @@ private[laminar] object Laminar
 
   type SvgAttr[V] = ReactiveSvgAttr[V]
 
+  type CompositeHtmlAttr[V] = ReactiveComplexHtmlKeys.CompositeHtmlAttr[V]
+
+  type CompositeSvgAttr[V] = ReactiveComplexSvgKeys.CompositeSvgAttr[V]
+
 
   // Specific HTML elements
 
