@@ -60,12 +60,14 @@ trait ReactiveElement[+Ref <: dom.Element]
     EventPropTransformation.toEventStream(t, this)
   }
 
-  @inline def amend(mod: Modifier[this.type]): Unit = {
+  @inline def amend(mod: Modifier[this.type]): this.type = {
     mod(this)
+    this
   }
 
-  def amend(mods: Modifier[this.type]*): Unit = {
+  def amend(mods: Modifier[this.type]*): this.type = {
     mods.foreach(mod => mod(this))
+    this
   }
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {

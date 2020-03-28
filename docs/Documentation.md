@@ -193,9 +193,21 @@ el.amend(
 )
 ```
 
+This is convenient not only to break apart your logic, but also because `el.amend()` returns `this`, it is especially useful to add arbitrary behaviour to abstracted away "components". The following example uses Reactive Data that we haven't covered yet, but hopefully the pattern is clear enough:
+
+```scala
+val nameVar = Var("")
+def TextInput(): Input = input(typ := "text")
+ 
+div(
+  "Please enter your name: ",
+  TextInput().amend(onInput --> nameVar.writer)
+)
+```
+
 And of course, every Modifier has a public `apply(element: El)` method that you can use to manually apply it to any element, for example: `(color := "red")(element)`.
 
-These patterns are discouraged to the extent that they enable imperative coding patterns. You should learn to use [Reactive Data](#reactive-data) effectively before you sprinkle your code with manual applications.
+Using manual application is only encouraged when it's not enabling imperative coding patterns. You should learn to use [Reactive Data](#reactive-data) effectively before you sprinkle your code with manual applications.
 
 
 ### `inContext`

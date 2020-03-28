@@ -4,6 +4,7 @@ Breaking changes in **bold**.
 
 #### master – TBD
 
+* API: `ReactiveElement.amend()` returns `this` now
 * Fix: Incorrect SVG composite attributes types
 
 #### v0.8.0 – Mar 2020
