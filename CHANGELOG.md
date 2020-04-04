@@ -5,7 +5,8 @@ Breaking changes in **bold**.
 #### v0.9.0 – April 2020
 
 * **Build: Upgrade _Scala DOM Types_ to v0.10.0**
-  * This upgrades scala-js-dom to v1.0.0 which removes all the previously deprecated stuff
+  * A few naming changes, see _Scala DOM Types_ [changelog](https://github.com/raquo/scala-dom-types/blob/master/CHANGELOG.md)
+  * This also bumps scala-js-dom to v1.0.0
 * API: `ReactiveElement.amend()` returns `this` now
 * Fix: Incorrect SVG composite attributes types
 
