@@ -4,9 +4,10 @@ Breaking changes in **bold**.
 
 #### v0.9.0 – April 2020
 
-* **Build: Upgrade _Scala DOM Types_ to v0.10.0**
-  * A few naming changes, see _Scala DOM Types_ [changelog](https://github.com/raquo/scala-dom-types/blob/master/CHANGELOG.md)
+* **Build: Upgrade _Scala DOM Types_ to v0.10.0: [changelog](https://github.com/raquo/scala-dom-types/blob/master/CHANGELOG.md)**
+  * A few naming changes to attributes and tags
   * This also bumps scala-js-dom to v1.0.0
+* Build: Upgrade Airstream to v0.9.0: [changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
 * API: `ReactiveElement.amend()` returns `this` now
 * Fix: Incorrect SVG composite attributes types
 
