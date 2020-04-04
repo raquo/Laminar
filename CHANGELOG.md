@@ -2,10 +2,15 @@
 
 Breaking changes in **bold**.
 
-#### master – TBD
+#### v0.9.0 – April 2020
 
+* **Build: Upgrade _Scala DOM Types_ to v0.10.0**
+  * This upgrades scala-js-dom to v1.0.0 which removes all the previously deprecated stuff
 * API: `ReactiveElement.amend()` returns `this` now
 * Fix: Incorrect SVG composite attributes types
+
+News:
+* Check out [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8), a new giter8 template that sets up a full stack application with Laminar on the frontend, and uses a plain webpack config instead of scalajs-bundler.
 
 #### v0.8.0 – Mar 2020
 

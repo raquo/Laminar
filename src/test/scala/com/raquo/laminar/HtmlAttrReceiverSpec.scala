@@ -102,14 +102,14 @@ class HtmlAttrReceiverSpec extends UnitSpec {
     expectNode(div like (title is title5, alt is alt4, "Hello"))
 
     unmount()
-    mount(div(id := "unrelated"))
-    expectNode(div like (id is "unrelated"))
+    mount(div(idAttr := "unrelated"))
+    expectNode(div like (idAttr is "unrelated"))
 
     titleBus.writer.onNext(title6)
-    expectNode(div like (id is "unrelated"))
+    expectNode(div like (idAttr is "unrelated"))
 
     altBus.writer.onNext(alt5)
-    expectNode(div like (id is "unrelated"))
+    expectNode(div like (idAttr is "unrelated"))
   }
 
   it("supports multiple signals") {

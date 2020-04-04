@@ -6,7 +6,7 @@
 
 Laminar is a small Scala.js library that lets you build UI components using glitch-free Streams and Signals (reactive state variables). It is simpler and more powerful than virtual DOM based solutions.
 
-    "com.raquo" %%% "laminar" % "0.8.0"   // Scala.js 1.x only
+    "com.raquo" %%% "laminar" % "0.9.0"   // Scala.js 1.x only
 
 
 
@@ -50,6 +50,7 @@ I understand that the importance of some of these points might not be immediatel
 * **Laminar examples**
   * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/1) to try things on the fly (pending update for v0.8.0...)
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
+  * [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8) – Laminar setup with Akka HTTP, Tailwind CSS, and a pure webpack config instead of scalajs-bundler 
   * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
 
@@ -58,6 +59,7 @@ I understand that the importance of some of these points might not be immediatel
 ## Laminar Addons
 
 * [Waypoint](https://github.com/raquo/Waypoint) – Efficient router for Laminar
+* [purgecss-laminar-webpack-plugin](https://github.com/yurique/purgecss-laminar-webpack-plugin) – Removes unused CSS from your webpack bundle
 
 
 
@@ -74,6 +76,7 @@ Laminar and Airstream are well documented:
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
+| **[v0.9.0](https://github.com/raquo/Laminar/blob/v0.9.0/docs/Documentation.md)** | **[v0.9.0](https://github.com/raquo/Airstream/blob/v0.9.0/README.md)** |
 | **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
 | **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
 | **[v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md)** | **[v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md)** |

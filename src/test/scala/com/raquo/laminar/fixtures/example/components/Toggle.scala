@@ -24,7 +24,7 @@ object Toggle {
     val rand = Random.nextInt(99)
 
     val checkbox = input.apply(
-      id := "toggle" + rand,
+      idAttr := "toggle" + rand,
       className := "red",
       `type` := "checkbox",
       onClick --> clickBus.writer
