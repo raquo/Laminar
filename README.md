@@ -53,6 +53,7 @@ I understand that the importance of some of these points might not be immediatel
   * [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8) – Laminar setup with Akka HTTP, Tailwind CSS, and a pure webpack config instead of scalajs-bundler 
   * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
+  * [vic/laminar_cycle](https://github.com/vic/laminar_cycle) - Laminar apps following Cycle's dialogue abstraction.
 
 
 
