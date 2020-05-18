@@ -48,7 +48,7 @@ I understand that the importance of some of these points might not be immediatel
 * [Github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, and more in-depth discussions
 * I also offer commercial support and consulting services for Laminar and Airstream. Ping me at [nikita@raquo.com](nikita@raquo.com).
 * **Laminar examples**
-  * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/1) to try things on the fly (pending update for v0.8.0...)
+  * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/36) to try things on the fly
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
   * [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8) – Laminar setup with Akka HTTP, Tailwind CSS, and a pure webpack config instead of scalajs-bundler 
   * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
