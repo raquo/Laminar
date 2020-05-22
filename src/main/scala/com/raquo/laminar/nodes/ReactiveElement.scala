@@ -60,11 +60,10 @@ trait ReactiveElement[+Ref <: dom.Element]
     EventPropTransformation.toEventStream(t, this)
   }
 
-  @inline def amend(mod: Modifier[this.type]): this.type = {
-    mod(this)
-    this
-  }
-
+  // @TODO[Performance] Review scala.js generated code for single-element use case.
+  //  - I would like to also have a `def amend(mod: Modifier[this.type])` method
+  //  - but then SyntaxSpec / "amend on inlined element" test will fail. Check in Dotty later.
+  //  - not a big deal but lame
   def amend(mods: Modifier[this.type]*): this.type = {
     mods.foreach(mod => mod(this))
     this

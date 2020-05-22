@@ -181,4 +181,17 @@ class SyntaxSpec extends UnitSpec {
     mount(el)
   }
 
+  it("amend on inlined element") {
+    // https://github.com/raquo/Laminar/issues/54
+
+    div().amend(
+      cls := "foo"
+    )
+
+    div().amend(
+      cls := "foo",
+      cls := "bar"
+    )
+  }
+
 }
