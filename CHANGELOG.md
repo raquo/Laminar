@@ -2,6 +2,16 @@
 
 Breaking changes in **bold**.
 
+#### v0.9.1 – May 2020
+
+* **Fix: Remove one of the conflicting `amend` methods (#54)**
+  * This change should be almost always source-compatible so no changes required.
+* New: `nbsp` character now available for convenience
+* New: `emptyMod` now available (a universal Modifier that does nothing)
+
+News:
+* Check out [vic/laminar_cycle](https://github.com/vic/laminar_cycle), a small library that lets you build Laminar applications using [Cycle.js dialogue abstraction](https://cycle.js.org/dialogue.html).
+
 #### v0.9.0 – April 2020
 
 * **Build: Upgrade _Scala DOM Types_ to v0.10.0: [changelog](https://github.com/raquo/scala-dom-types/blob/master/CHANGELOG.md)**

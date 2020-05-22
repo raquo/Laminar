@@ -155,7 +155,7 @@ Well, a tiny bit of magic – strings are not modifiers themselves, but are impl
 
 For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq: see `Implicits.seqToModifier`. This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.
 
-`Implicits.optionToModifier` performs a similar conversion for `Option[Modifier[A]]`.
+`Implicits.optionToModifier` performs a similar conversion for `Option[Modifier[A]]`. We also have `emptyMod`, a universal Modifier that does nothing, for when you don't want to wrap your stuff in Option-s.
 
 Modifiers are applied in the order in which they're passed to the element, so in terms of children ordering what you see in your code is what you get in the resulting DOM.
 

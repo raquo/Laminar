@@ -183,6 +183,12 @@ private[laminar] object Laminar
 
   def commentNode(text: String = ""): CommentNode = new CommentNode(text)
 
+  /** A universal Modifier that does nothing */
+  val emptyMod: Mod[Node] = new Modifier[Node] {}
+
+  /** Non-breaking space character */
+  val nbsp: String = "\u00a0"
+
 
   val child: ChildReceiver.type = ChildReceiver
 
