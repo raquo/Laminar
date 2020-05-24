@@ -67,14 +67,12 @@ Make sure you're reading the docs for the right version:
 | **[v0.9.1](https://github.com/raquo/Laminar/blob/v0.9.1/docs/Documentation.md)** | **[v0.9.0](https://github.com/raquo/Airstream/blob/v0.9.0/README.md)** |
 | **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
 | **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
-| **[v0.7.1](https://github.com/raquo/Laminar/blob/v0.7.1/docs/Documentation.md)** | **[v0.7.1](https://github.com/raquo/Airstream/blob/v0.7.1/README.md)** |
-| **[v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md)** | **[v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md)** |
-| **[v0.5.1](https://github.com/raquo/Laminar/blob/v0.5.1/docs/Documentation.md)** | **[v0.4.1](https://github.com/raquo/Airstream/blob/v0.4.1/README.md)** |
-| **[v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md)** | **[v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md)** |
-| **[v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md)** | **[v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md)** |
-| **[v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)** | **[v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)** |
 
-The latest version of Laminar always uses the latest version of Airstream.
+For documentation of older versions, see git tags.
+
+Note: the latest version of Laminar always uses the latest version of Airstream.
+
+[Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/com/raquo/airstream/index.html)
 
 Laminar is very simple under the hood. You can see how most of it works just by using "Go to definition" functionality of your IDE. Nevertheless, the documentation provided here will help you understand how everything ties together. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.
 

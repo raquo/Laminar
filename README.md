@@ -81,14 +81,12 @@ Laminar and Airstream are well documented:
 | **[v0.9.1](https://github.com/raquo/Laminar/blob/v0.9.1/docs/Documentation.md)** | **[v0.9.0](https://github.com/raquo/Airstream/blob/v0.9.0/README.md)** |
 | **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
 | **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
-| **[v0.6](https://github.com/raquo/Laminar/blob/v0.6/docs/Documentation.md)** | **[v0.5.1](https://github.com/raquo/Airstream/blob/v0.5.1/README.md)** |
-| **[v0.5.1](https://github.com/raquo/Laminar/blob/v0.5.1/docs/Documentation.md)** | **[v0.4.1](https://github.com/raquo/Airstream/blob/v0.4.1/README.md)** |
-| **[v0.4](https://github.com/raquo/Laminar/blob/v0.4/docs/Documentation.md)** | **[v0.3](https://github.com/raquo/Airstream/blob/v0.3/README.md)** |
-| **[v0.3](https://github.com/raquo/Laminar/blob/v0.3/README.md)** | **[v0.2](https://github.com/raquo/Airstream/blob/v0.2/README.md)** |
-| **[v0.2](https://github.com/raquo/Laminar/blob/v0.2/README.md)** | **[v0.1](https://github.com/raquo/Airstream/blob/v0.1/README.md)** |
 
-The latest version of Laminar always uses the latest version of Airstream.
+For documentation of older versions, see git tags.
 
+Note: the latest version of Laminar always uses the latest version of Airstream.
+
+[Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html)
 
 
 
