@@ -749,12 +749,15 @@ Laminar lets you work with SVG elements (almost) just as well as HTML. Everythin
   ```scala
   div(
     className := "someHtmlClassName",
+    onClick --> ???,
     svg.svg(
       svg.height := "800",
       svg.width := "500",
       svg.polyline(
         svg.points := "20,20 40,25 60,40",
-        svg.className := "someSvgClassName"
+        svg.className := "someSvgClassName",
+        onClick --> ???,
+        children <-- ???
       )
     )
   )
@@ -767,12 +770,15 @@ Laminar lets you work with SVG elements (almost) just as well as HTML. Everythin
   
   L.div(
     L.className := "someHtmlClassName",
+    L.onClick --> ???,
     svg(
       height := "800",
       width := "500",
       polyline(
         points := "20,20 40,25 60,40",
-        className := "someSvgClassName"
+        className := "someSvgClassName",
+        L.onClick --> ???,
+        L.children <-- ???
       )
     )
   )
