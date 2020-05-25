@@ -23,6 +23,7 @@
 * [ClassName and Other Special Keys](#classname-and-other-special-keys)
   * [cls](#cls)
   * [Other Composite Keys](#other-composite-keys)
+  * [SVG](#svg)
 * [Event System: Emitters, Transformations, Buses](#event-system-emitters-transformations-buses)
   * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
   * [EventBus](#eventbus)
@@ -85,6 +86,8 @@ You have two import choices: `import com.raquo.laminar.api.L._` is the easiest, 
 Usually you will not need any other imports. In this documentation you will see references to Laminar types and values that are not available with just this one import because we spell out the types for the sake of explanation. Most of those are available as aliases in the `L` object. For example, `ReactiveHtmlElement[dom.html.Element]` is aliased as simply `HtmlElement`, and `Modifier[El]` as `Mod[El]`.
 
 However, you might want to avoid bringing so many values into scope, so instead you can `import com.raquo.laminar.api._`, and access Laminar and Airstream values and types with `L` and `A` prefixes respectively, e.g. `A.EventStream`, `L.div`, etc.`
+
+There are special import considerations for working with [SVG elements](#svg).
 
 Do check out the available aliases in the `L` object. It's much more pleasant to write and read `Mod[Input]` than `Modifier[ReactiveHtmlElement[dom.html.Input]]`.
 
@@ -732,6 +735,48 @@ Each `cls <-- source` modifier should deal with a set of CSS classes that does n
 **`rel`** is another space-separated attribute. Its API in Laminar is exactly identical to that of `cls` (see right above). For example `rel := ("noopener", "noreferrer")` is a Modifier that makes the `a` element it applies to [safer](https://mathiasbynens.github.io/rel-noopener/) without removing existing `rel` attribute value.
 
 **`role`** attribute works similarly.
+
+
+### SVG
+
+Laminar lets you work with SVG elements (almost) just as well as HTML. Everything works pretty much the same, just need to understand the required imports:
+
+* SVG elements and attributes are available in the `com.raquo.laminar.api.L.svg` object
+* Some of the attributes of SVG and HTML have the same names, for example there are two instances of the `className` attribute, one is `L.className` and is an HTML attribute, the other is `L.svg.className` and is an SVG attribute. You can only apply SVG attributes to SVG elements (and not HTML elements), and similarly for HTML attributes.
+* Therefore, you generally should **not** import both `com.raquo.laminar.api.L.svg._` and `com.raquo.laminar.api.L._` as that would cause name collisions.
+* On the other hand, event prop keys such as `com.raquo.laminar.api.L.onClick` apply universally to all elements, both HTML and SVG.
+* If you are working mostly with HTML elements in a given file, you can just import `com.raquo.laminar.api.L._` and refer to SVG elements and attributes with an `svg` prefix, like this:
+  ```scala
+  div(
+    className := "someHtmlClassName",
+    svg.svg(
+      svg.height := "800",
+      svg.width := "500",
+      svg.polyline(
+        svg.points := "20,20 40,25 60,40",
+        svg.className := "someSvgClassName"
+      )
+    )
+  )
+  ```  
+* On the other hand, if you are working mostly with SVG elements in a given file, you can use a different set of imports :
+  ```scala
+  import com.raquo.laminar.api.L.svg._ // get svg keys without the svg prefix
+  import com.raquo.laminar.api._ // get `L` and standard implicits like `textToNode`
+  // DO NOT IMPORT: com.raquo.laminar.api.L._
+  
+  L.div(
+    L.className := "someHtmlClassName",
+    svg(
+      height := "800",
+      width := "500",
+      polyline(
+        points := "20,20 40,25 60,40",
+        className := "someSvgClassName"
+      )
+    )
+  )
+  ```
 
 
 
