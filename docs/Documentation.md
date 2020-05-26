@@ -588,7 +588,7 @@ You can mix both `children <-- *` and `children.command <-- *` and any other chi
 
 ### Binding Observables
 
-By now you must have realized that `-->` and `<--` methods are main syntax to connect / bind / subscribe observables to observers in Laminar.
+By now you must have realized that `-->` and `<--` methods are the main syntax to connect / bind / subscribe observables to observers in Laminar.
 
 To be more precise, such methods always return a `Modifier` that needs to be applied to an element. And when it is applied, a dynamic subscription is created such that it activates when the element is mounted, and deactivates when the element gets unmounted. The types of such modifiers are `Binder` for those that deal with props / attributes / events / etc., and `Inserter` for those that add children to the element.
 
@@ -606,7 +606,7 @@ val observer: Observer[A] = ???
 def doSomething(value: A): Unit = ???
  
 div(observable --> observer)
-div(ovservable --> doSomething)
+div(observable --> doSomething)
 div(eventStream --> eventBus.writer)
 div(eventStream --> eventBus) // same as above
 ```

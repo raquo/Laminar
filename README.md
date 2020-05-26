@@ -51,6 +51,7 @@ I understand that the importance of some of these points might not be immediatel
   * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/36) to try things on the fly
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
   * [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8) – Laminar setup with Akka HTTP, Tailwind CSS, and a pure webpack config instead of scalajs-bundler 
+  * [b12consulting/Laminar-Play-Slick-ZIO](https://github.com/b12consulting/Laminar-Play-Slick-ZIO)
   * [sherpal/full-scala-scala-heroku](https://github.com/sherpal/full-scala-scala-heroku) – Laminar setup with Play & Heroku
   * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
   * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
