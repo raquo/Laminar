@@ -3,7 +3,7 @@ package com.raquo.laminar
 import com.raquo.airstream.core.{Observable, Observer}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.signal.{Signal, Val}
+import com.raquo.airstream.signal.{Signal, Val, Var}
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.Implicits.{RichEventStream, RichObservable, RichSignal}
@@ -144,6 +144,10 @@ object Implicits {
 
     def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
       Binder(ReactiveElement.bindFn(_, observable)(onNext))
+    }
+
+    def -->(targetVar: Var[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindObserver(_, observable)(targetVar.writer))
     }
   }
 
