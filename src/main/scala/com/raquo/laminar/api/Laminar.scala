@@ -305,20 +305,41 @@ private[laminar] object Laminar
   }
 
   /** Combines onMountCallback and onUnmountCallback for easier integration.
-    *
-    * Note that the same caveats apply as for those individual methods.
+    * - Note that the same caveats apply as for those individual methods.
+    * - See also: [[onMountUnmountCallbackWithState]]
     */
-  def onMountUnmountCallback[El <: Element](mount: MountContext[El] => Unit, unmount: El => Unit): Modifier[El] = {
+  def onMountUnmountCallback[El <: Element](
+    mount: MountContext[El] => Unit,
+    unmount: El => Unit
+  ): Modifier[El] = {
+    onMountUnmountCallbackWithState[El, Unit](mount, (el, _) => unmount(el))
+  }
+
+  /** Combines onMountCallback and onUnmountCallback for easier integration.
+    * - Note that the same caveats apply as for those individual methods.
+    * - The mount callback returns state which will be provided to the unmount callback.
+    * - The unmount callback receives an Option of the state because it's possible that
+    *   onMountUnmountCallbackWithState was called *after* the element was already mounted,
+    *   in which case the mount callback defined here wouldn't have run.
+    */
+  def onMountUnmountCallbackWithState[El <: Element, A](
+    mount: MountContext[El] => A,
+    unmount: (El, Option[A]) => Unit
+  ): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
         var ignoreNextActivation = ReactiveElement.isActive(element)
+        var state: Option[A] = None
         ReactiveElement.bindSubscription[El](element) { c =>
           if (ignoreNextActivation) {
             ignoreNextActivation = false
           } else {
-            mount(c)
+            state = Some(mount(c))
           }
-          new Subscription(c.owner, cleanup = () => unmount(element))
+          new Subscription(c.owner, cleanup = () => {
+            unmount(element, state)
+            state = None
+          })
         }
       }
     }

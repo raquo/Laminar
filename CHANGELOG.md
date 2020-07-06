@@ -2,9 +2,10 @@
 
 Breaking changes in **bold**.
 
-#### v0.10 – Jul 2020
+#### v0.9.2 – Jul 2020
 
-* New: Airstream v0.9.1, fixes throttle and adds a few convenience methods, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md).
+* New: Airstream v0.9.2, fixes throttle and adds a few convenience methods, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md).
+* New: `onMountUnmountCallbackWithState` which is like `onMountUnmountCallback` but can remember user-defined state and provide it to the unmount callback.
 * New: `observable --> var` alias for `observable --> var.writer`
 * New: `FormElement` type alias
 

@@ -6,7 +6,7 @@ import org.scalajs.dom
 import org.scalajs.dom.document
 import org.scalajs.dom.raw.Event
 
-object App extends {
+object App {
 
   def main(): Unit = {
     document.addEventListener("DOMContentLoaded", (e: Event) => {
