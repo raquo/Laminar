@@ -2,6 +2,12 @@
 
 Breaking changes in **bold**.
 
+#### v0.10 – Jul 2020
+
+* New: Airstream v0.9.1, fixes throttle and adds a few convenience methods, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md).
+* New: `observable --> var` alias for `observable --> var.writer`
+* New: `FormElement` type alias
+
 #### v0.9.1 – May 2020
 
 * **Fix: Remove one of the conflicting `amend` methods (#54)**

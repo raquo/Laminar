@@ -156,6 +156,8 @@ private[laminar] object Laminar
 
   type Input = nodes.ReactiveHtmlElement[dom.html.Input]
 
+  type FormElement = nodes.ReactiveHtmlElement[dom.html.Form]
+
   type Label = nodes.ReactiveHtmlElement[dom.html.Label]
 
   type Li = nodes.ReactiveHtmlElement[dom.html.LI]
