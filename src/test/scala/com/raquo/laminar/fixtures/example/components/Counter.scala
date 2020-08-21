@@ -1,15 +1,11 @@
 package com.raquo.laminar.fixtures.example.components
 
-import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.signal.Signal
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 class Counter private (
   val $count: Signal[Int],
-  val node: ReactiveElement.Base
+  val node: HtmlElement
 )
 
 object Counter {
@@ -19,7 +15,7 @@ object Counter {
 
     val $count = EventStream
       .merge(incClickBus.events.mapTo(1), decClickBus.events.mapTo(-1))
-      .fold(0)(_ + _)
+      .fold(initial = 0)(_ + _)
       // .debugWithLabel("$count")
 
     val node = div(
