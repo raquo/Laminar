@@ -15,7 +15,7 @@ object Counter {
 
     val $count = EventStream
       .merge(incClickBus.events.mapTo(1), decClickBus.events.mapTo(-1))
-      .fold(initial = 0)(_ + _)
+      .foldLeft(initial = 0)(_ + _)
       // .debugWithLabel("$count")
 
     val node = div(

@@ -65,6 +65,7 @@ Make sure you're reading the docs for the right version:
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
+| **[v0.10.0](https://github.com/raquo/Laminar/blob/v0.10.0/docs/Documentation.md)** | **[v0.10.0](https://github.com/raquo/Airstream/blob/v0.10.0/README.md)** |
 | **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
 | **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
 | **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
@@ -391,7 +392,7 @@ This example uses Signals, but EventStreams work similarly, and there's also `ch
 
 #### Efficiency
 
-You might notice that this is not as efficient as it could be. Any time `maybeBlogUrlSignal` emits a new value, a new element is created, even if we're moving from `Some(url1)` to `Some(url2)`. Those are real JS DOM elements too, so **if** this method is hit often we might want to optimize for that. For example, we could do this:
+You might notice that this is not as efficient as it could be. Any time `maybeBlogUrlSignal` emits a new value, a new element is created, even if we're moving from `Some(url1)` to `Some(url2)`. And those are real JS DOM elements, so **if** this method is hit often we might want to optimize for that. For example, we could do this:
 
 ```scala
 def renderBlogLink(urlSignal: Signal[String]): HtmlElement = {
@@ -564,7 +565,7 @@ One downside of ChildrenCommand is that you don't have an observable of the list
 ```scala
 val commandBus = new EventBus[ChildrenCommand]
 val commandStream = commandBus.events
-val countSignal = commandStream.fold(initial = 0)(_ + 1)
+val countSignal = commandStream.foldLeft(initial = 0)(_ + 1)
 
 div(
   "Hello, ",

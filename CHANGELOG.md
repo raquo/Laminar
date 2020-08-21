@@ -2,6 +2,10 @@
 
 Breaking changes in **bold**.
 
+#### v0.10.0 – Aug 2020
+
+* Build: Upgrade Airstream to v0.10.0: [changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
+
 #### v0.9.2 – Jul 2020
 
 * New: Airstream v0.9.2, fixes throttle and adds a few convenience methods, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md).
