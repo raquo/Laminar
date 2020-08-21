@@ -2,6 +2,11 @@
 
 Breaking changes in **bold**.
 
+#### master
+
+* New: Support custom CSS props (for Web Components)
+  * No change to Laminar API, but we're using a different method of setting and unsetting all CSS props under the hood.
+
 #### v0.10.1 – Aug 2020
 
 * New: `eventProp --> var` alias for `eventProp --> var.writer` 

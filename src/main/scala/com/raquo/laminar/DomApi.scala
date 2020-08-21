@@ -115,29 +115,41 @@ object DomApi {
   }
 
   def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+    setRefStyle(element.ref, style.cssName, cssValue(value))
   }
 
   def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: Style[_], value: String): Unit = {
-    setRefStyle(element.ref, style.name, value)
+    setRefStyle(element.ref, style.cssName, cssValue(value))
   }
 
   def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V | String): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+    setRefStyle(element.ref, style.cssName, cssValue(value))
   }
 
-  @inline private def cssValue(value: Any): js.Any = {
-    value match {
-      case str: String => str
-      case int: Int => int
-      case double: Double => double
-      case null => null // @TODO[API] Setting a style to null unsets it. Maybe have a better API for this?
-      case _ => value.toString
+  @inline private def cssValue(value: Any): String = {
+    if (value == null) {
+      null
+    } else {
+      // @TODO[Performance,Minor] not sure if converting to string is needed.
+      //  - According to the API, yes, but in practice browsers are ok with raw values too it seems.
+      value.toString
     }
+    //value match {
+    //  case str: String => str
+    //  case int: Int => int
+    //  case double: Double => double
+    //  case null => null // @TODO[API] Setting a style to null unsets it. Maybe have a better API for this?
+    //  case _ => value.toString
+    //}
   }
 
-  @inline private def setRefStyle(ref: dom.html.Element, stylePropName: String, styleValue: js.Any): Unit = {
-    ref.style.asInstanceOf[js.Dynamic].updateDynamic(stylePropName)(styleValue)
+  @inline private def setRefStyle(ref: dom.html.Element, styleCssName: String, styleValue: String): Unit = {
+    // Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
+    if (styleValue == null) {
+      ref.style.removeProperty(styleCssName)
+    } else {
+      ref.style.setProperty(styleCssName, styleValue)
+    }
   }
 
 
