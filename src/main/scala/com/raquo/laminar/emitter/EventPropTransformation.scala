@@ -3,6 +3,7 @@ package com.raquo.laminar.emitter
 import com.raquo.airstream.core.Observer
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.eventstream.EventStream
+import com.raquo.airstream.signal.Var
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.modifiers.EventPropBinder
@@ -41,6 +42,10 @@ class EventPropTransformation[Ev <: dom.Event, V](
 
   @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventPropBinder[Ev] = {
     -->(eventBus.writer)
+  }
+
+  @inline def -->[VarEv >: V, El <: ReactiveElement.Base](targetVar: Var[VarEv]): EventPropBinder[Ev] = {
+    -->(targetVar.writer)
   }
 
   /** Use capture mode (v=true) or bubble mode (v=false)

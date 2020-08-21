@@ -2,6 +2,10 @@
 
 Breaking changes in **bold**.
 
+#### v0.10.1 – Aug 2020
+
+* New: `eventProp --> var` alias for `eventProp --> var.writer` 
+
 #### v0.10.0 – Aug 2020
 
 * Build: Upgrade Airstream to v0.10.0: [changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
