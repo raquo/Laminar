@@ -54,6 +54,7 @@ trait HtmlBuilders
     new ReactiveStyle(style) := value
   }
 
+  // @TODO Make this protected in next minor version
   override def htmlTag[Ref <: dom.html.Element](tagName: String, void: Boolean): HtmlTag[Ref] = {
     new HtmlTag[Ref](tagName, void)
   }

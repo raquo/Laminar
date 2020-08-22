@@ -2,10 +2,14 @@
 
 Breaking changes in **bold**.
 
-#### master
+_You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
+
+#### v0.10.2 – Aug 2020
 
 * New: Support custom CSS props (for Web Components)
   * No change to Laminar API, but we're using a different method of setting and unsetting all CSS props under the hood.
+* New: Upgrade _Scala DOM Types_ to v0.10.1
+  * Adds `slot` attribute (for Web Components)
 
 #### v0.10.1 – Aug 2020
 
