@@ -109,7 +109,7 @@ This release is a significant improvement to both usability and safety of Lamina
     * Make sure to document `nodeToInserter` @nc
 * **API: eliminate auxiliary syntax `myElement <-- child <-- childSignal`**
   * Use the new `amend` method instead: `myElement.amend(child <-- childSignal)`
-* **API: Remove `ChildNode.isParentMounted` method. Use a similar `ChildNode.isNodeMounted` instead.
+* **API: Remove `ChildNode.isParentMounted` method. Use a similar `ChildNode.isNodeMounted` instead.**
 * **API: Move `ChildrenCommand` out of the poorly named `collection` package**
 * **API: Rename types:** `ReactiveHtmlBuilders` -> `HtmlBuilders`, `ReactiveSvgBuilders` -> `SvgBuilders`, `ReactiveRoot` -> `RootNode`, `ReactiveComment` -> `CommentNode`, `ReactiveText` -> `TextNode`, `ReactiveChildNode` -> `ChildNode`
 * New: `ReactiveElement.events(ept: EventPropTransformation)`, works the same as `ReactiveElement.events(p: ReactiveEventProp)`, returning a stream of events

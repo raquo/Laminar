@@ -10,6 +10,13 @@ Laminar is a small Scala.js library that lets you build UI components using glit
 
 
 
+## The Problem
+
+To build single page web applications you need a method to keep the user interfaces in sync with the underlying application state. This goes both ways – changes in state should effortlessly propagate to the DOM, and DOM events should trigger changes in application state.
+
+Laminar is a reactive solution to this problem, both UI and state management.
+
+
 
 ## Why Laminar
 
@@ -41,12 +48,22 @@ Laminar offers a unique blend of simplicity, expressiveness and safety.
 I understand that the importance of some of these points might not be immediately apparent. I will eventually write a more detailed blog post about these, but for now the documentation below will have to do. 
 
 
+## Sponsorships
+
+Huge thanks to our sponsors who support Laminar development with their generous donations.
+
+### GOLD Sponsors:
+
+✨ **[Iurii Malchenko](https://github.com/yurique)**
+
+Laminar is sponsored by [people like you](https://github.com/sponsors/raquo). If you enjoy using Laminar, please consider supporting the project. 🙏
+
+
 
 ## Community & Support
 
 * [Gitter](https://gitter.im/Laminar_/Lobby) for chat and random questions
 * [Github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, and more in-depth discussions
-* I also offer commercial support and consulting services for Laminar and Airstream. Ping me at [nikita@raquo.com](nikita@raquo.com).
 * **Laminar examples**
   * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/36) to try things on the fly
   * [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
@@ -89,14 +106,6 @@ For documentation of older versions, see git tags.
 Note: the latest version of Laminar always uses the latest version of Airstream.
 
 [Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html)
-
-
-
-## The Problem
-
-To build single page web applications you need a method to keep the user interfaces in sync with the underlying application state. This goes both ways – changes in state should effortlessly propagate to the DOM, and DOM events should trigger changes in application state.
-
-Laminar is a reactive solution to this problem, both UI and state management. See above: [Why Laminar](#why-laminar).
 
 
 
