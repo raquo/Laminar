@@ -223,20 +223,22 @@ input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBu
 
 The general syntax of this feature is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. In our example its type is properly inferred to be `Input`, which is why you can call `.ref.value` on it without `.asInstanceOf`.
 
-Without getting ahead of ourselves too much, `onChange.mapTo(thisNode.ref.value) --> inputStringBus)` is a Modifier that handles `onChange` events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple different ways, for example:
+Without getting ahead of ourselves too much, `onChange.mapTo(thisNode.ref.value) --> inputStringBus)` is a Modifier that handles `onChange` events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple _other_ ways, for example:
 
 ```scala
-val myInput: Input = input(onChange.mapTo(myInput.ref.value) --> inputStringBus)
+val myInput: Input = input(onChange.mapTo(myInput.ref.value) --> inputStringBus) // make sure to write out the type ascription
 ```
 
 Or
 
 ```scala
 val myInput = input()
-myInput.events(onChange).mapTo(myInput.ref.value).addObserver(inputStringBus)(owner = myInput)
+myInput.amend(
+  myInput.events(onChange).mapTo(myInput.ref.value) --> inputStringBus
+)
 ```
 
-But these can be very cumbersome in a real world application. `inContext` provides an easy, inline solution that always works.
+But these are of course rather cumbersome. `inContext` provides an easy, inline solution that always works.
 
 Note: all the unfamiliar syntax used here will be explained in other sections of this documentation. 
 
@@ -850,15 +852,17 @@ val appleObserver: Observer[Apple] = pieObserver.contramap(apple => makeApplePie
  
 def AppleComponent(observer: Observer[Apple]): Div = {
   val appleStream: EventStream[Apple] = ???
-  val node = div("Apple Component", ???)
-  appleStream.addObserver(observer)(owner = node)
-  node
+  div(
+    "Apple Component",
+    appleStream --> observer,
+    ???
+  )
 }
  
 val app = AppleComponent(appleObserver)
 ```
 
-In this pattern AppleComponent has no knowledge of pies. All it knows is how to produce apples and send them to an apple observer. Delicious culinary metaphors aside, replace pies with ajax requests and apples with todo items that need to be created, and you can see how this separation of concerns is invaluable.
+In this pattern AppleComponent has no knowledge of pies. All it knows is how to produce apples and send them to an apple observer. Delicious culinary metaphors aside, replace pies with ajax requests and apples with todo items that need to be created, and you can see how this separation of concerns is useful.
 
 If your observer is a `WriteBus` (e.g. `myEventBus.writer`), you have even more methods available to you: `filterWriter`, `contramapWriter` and (gasp) `contracomposeWriter`. 
 
@@ -869,7 +873,7 @@ Note that Airstream Observers, including `eventBus.writer`, can subscribe to mul
 
 This can be achieved either with `addSource` or `addObserver`. Basically, in terms of laziness, with `addSource` EventBus behaves like a stream that merges other streams – much like `EventStream.merge(stream1, stream2)`, but with the ability to add and remove source streams at any time. So, if you do `eventBus.writer.addSource(sourceStream)(childOwner)`, `sourceStream` will not be started until and unless `eventBus.stream` is started. Conversely, `sourceStream.addObserver(eventBus.writer)(childOwner)` will immediately start `sourceStream` even if `eventBus` does not have any observers.
 
-The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `subscription.kill` when removing a child from the list of children. `childOwner` will take care of that. Typically that would be the child's Laminar element. Laminar elements kill the subscriptions that they own when they get removed from the DOM. 
+The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `subscription.kill` when removing a child from the list of children. `childOwner` will take care of that. Typically, that would be provided by the child Laminar element, via `onMountCallback`. Such an owner kills its subscriptions when the corresponding element gets removed from the DOM.
 
 
 ### Alternative Event Listener Registration Syntax
