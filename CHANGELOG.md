@@ -12,6 +12,21 @@ _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
 * New: Easily remove composite attr values: `cls.remove("class1")`
 * New: Another `cls.set` method with varargs (same for other composite attrs)
 * New: Add pointer events to Laminar (thanks, [@doofin](https://github.com/doofin)!)
+* API: Make `separator` field on `CompositeAttr` public 
+
+---
+
+News:
+
+I published a comprehensive video introduction to Laminar, check it out: [Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q) 
+
+Iurii released initial version of [tulz-app/laminar-router](https://github.com/tulz-app/laminar-router), an alternative Laminar router with API inspired by Akka HTTP.
+
+Iurii also shared a template for server side rendering any frontend apps (including Laminar) using Puppetteer: [yurique/spa-ssr-proxy](https://github.com/yurique/spa-ssr-proxy)
+
+Anton is working on a static documentation website for Laminar (#61 #63)
+
+@uosis started work on auto-generating Laminar facades for Web Components: [uosis/laminar-web-components](https://github.com/uosis/laminar-web-components). We also have a complete example of Web Components in [laminar-examples](https://github.com/raquo/laminar-examples).
 
 ---
 
@@ -51,6 +66,8 @@ Thank you for supporting me! ❤️
 * New: `nbsp` character now available for convenience
 * New: `emptyMod` now available (a universal Modifier that does nothing)
 
+---
+
 News:
 * Check out [vic/laminar_cycle](https://github.com/vic/laminar_cycle), a small library that lets you build Laminar applications using [Cycle.js dialogue abstraction](https://cycle.js.org/dialogue.html).
 
@@ -62,6 +79,8 @@ News:
 * Build: Upgrade Airstream to v0.9.0: [changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
 * API: `ReactiveElement.amend()` returns `this` now
 * Fix: Incorrect SVG composite attributes types
+
+---
 
 News:
 * Check out [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8), a new giter8 template that sets up a full stack application with Laminar on the frontend, and uses a plain webpack config instead of scalajs-bundler.

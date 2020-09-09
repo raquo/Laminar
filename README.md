@@ -77,16 +77,17 @@ Laminar is sponsored by [people like you](https://github.com/sponsors/raquo). If
 
 ## Laminar Addons
 
-* [Waypoint](https://github.com/raquo/Waypoint) – Efficient router for Laminar
+* [Waypoint](https://github.com/raquo/Waypoint) – URL router for Laminar
+* [tulz-app/laminar-router](https://github.com/tulz-app/laminar-router) – Alternative router for Laminar with API inspired by Akka HTTP
 * [Laminar.cycle](https://github.com/vic/laminar_cycle) – Cycle.js dialogue abstraction in Laminar
 * [purgecss-laminar-webpack-plugin](https://github.com/yurique/purgecss-laminar-webpack-plugin) – Removes unused CSS from your webpack bundle
 
 
 
-## Blog Posts
+## Blog Posts & Videos
 
 * [My Four Year Quest For Perfect Scala.js UI Development](https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a)
-
+* [[VIDEO] Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q)
 
 
 ## Documentation
