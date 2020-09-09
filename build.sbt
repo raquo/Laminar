@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions")
 
-version in installJsdom := "16.2.0"
+version in installJsdom := "16.4.0"
 
 useYarn := true
 
@@ -25,6 +25,3 @@ parallelExecution in Test := false
 scalaJSUseMainModuleInitializer := true
 
 scalaJSLinkerConfig in (Compile, fastOptJS) ~= { _.withSourceMap(false) }
-
-// @Warning remove this when scalajs-bundler > 0.17 is out https://github.com/scalacenter/scalajs-bundler/issues/332#issuecomment-594401804
-Test / jsEnv := new tempfix.JSDOMNodeJSEnv(tempfix.JSDOMNodeJSEnv.Config((Test / installJsdom).value))
