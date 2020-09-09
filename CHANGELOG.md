@@ -14,21 +14,15 @@ _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
 * New: Add pointer events to Laminar (thanks, [@doofin](https://github.com/doofin)!)
 * API: Make `separator` field on `CompositeAttr` public 
 
----
+**News:**
 
-News:
+* I published a comprehensive video introduction to Laminar, check it out: [Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q) 
+* Iurii released initial version of [tulz-app/laminar-router](https://github.com/tulz-app/laminar-router), an alternative Laminar router with API inspired by Akka HTTP.
+* Iurii also shared a template for server side rendering any frontend apps (including Laminar) using Puppetteer: [yurique/spa-ssr-proxy](https://github.com/yurique/spa-ssr-proxy)
+* Anton is working on a static documentation website for Laminar (#61 #63)
+* @uosis started work on auto-generating Laminar facades for Web Components: [uosis/laminar-web-components](https://github.com/uosis/laminar-web-components). We also have a complete example of Web Components in [laminar-examples](https://github.com/raquo/laminar-examples).
 
-I published a comprehensive video introduction to Laminar, check it out: [Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q) 
-
-Iurii released initial version of [tulz-app/laminar-router](https://github.com/tulz-app/laminar-router), an alternative Laminar router with API inspired by Akka HTTP.
-
-Iurii also shared a template for server side rendering any frontend apps (including Laminar) using Puppetteer: [yurique/spa-ssr-proxy](https://github.com/yurique/spa-ssr-proxy)
-
-Anton is working on a static documentation website for Laminar (#61 #63)
-
-@uosis started work on auto-generating Laminar facades for Web Components: [uosis/laminar-web-components](https://github.com/uosis/laminar-web-components). We also have a complete example of Web Components in [laminar-examples](https://github.com/raquo/laminar-examples).
-
----
+—
 
 Laminar & Airstream development is sponsored by [people like you](https://github.com/sponsors/raquo).
 
@@ -36,6 +30,7 @@ GOLD sponsors supporting this release: ✨ **[Iurii Malchenko](https://github.co
 
 Thank you for supporting me! ❤️
 
+---
 
 #### v0.10.2 – Aug 2020
 
@@ -44,13 +39,19 @@ Thank you for supporting me! ❤️
 * New: Upgrade _Scala DOM Types_ to v0.10.1
   * Adds `slot` attribute (for Web Components)
 
+---
+
 #### v0.10.1 – Aug 2020
 
 * New: `eventProp --> var` alias for `eventProp --> var.writer` 
 
+---
+
 #### v0.10.0 – Aug 2020
 
 * Build: Upgrade Airstream to v0.10.0: [changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
+
+---
 
 #### v0.9.2 – Jul 2020
 
@@ -59,6 +60,8 @@ Thank you for supporting me! ❤️
 * New: `observable --> var` alias for `observable --> var.writer`
 * New: `FormElement` type alias
 
+---
+
 #### v0.9.1 – May 2020
 
 * **Fix: Remove one of the conflicting `amend` methods (#54)**
@@ -66,10 +69,11 @@ Thank you for supporting me! ❤️
 * New: `nbsp` character now available for convenience
 * New: `emptyMod` now available (a universal Modifier that does nothing)
 
----
+**News:**
 
-News:
 * Check out [vic/laminar_cycle](https://github.com/vic/laminar_cycle), a small library that lets you build Laminar applications using [Cycle.js dialogue abstraction](https://cycle.js.org/dialogue.html).
+
+---
 
 #### v0.9.0 – April 2020
 
@@ -80,10 +84,11 @@ News:
 * API: `ReactiveElement.amend()` returns `this` now
 * Fix: Incorrect SVG composite attributes types
 
----
+**News:**
 
-News:
 * Check out [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8), a new giter8 template that sets up a full stack application with Laminar on the frontend, and uses a plain webpack config instead of scalajs-bundler.
+
+---
 
 #### v0.8.0 – Mar 2020
 
@@ -158,9 +163,13 @@ This release is a significant improvement to both usability and safety of Lamina
 * API: `ReactiveElement` and other node types that take type params now have `type Base` defined on their companion objects containing the most generic version of that type, e.g. `ReactiveElement[dom.Element]` for `ReactiveElement`.
 * Build: Note that this release is version `0.8.0`, not `0.8` as I would have named it before.
 
+---
+
 #### v0.7.2 – Dec 2019
 
 * Build: Scala 2.13 support
+
+---
 
 #### v0.7.1 – Aug 2019
 
@@ -180,6 +189,8 @@ This release is a significant improvement to both usability and safety of Lamina
 * Misc: Move code examples from main into test fixtures to remove them from the JS bundle
 * Misc: Bump _Scala DOM Types_ to v0.9.4 
 
+---
+
 #### v0.7 – Apr 2019
 
 * **New: Airstream v0.5.1 -> v0.7 – `split`, `composeChanges`, `flatMap`, etc.**
@@ -187,14 +198,20 @@ This release is a significant improvement to both usability and safety of Lamina
 * **API: Hide `ancestorMountEvents` and `thisNodeMountEvents` (#42)**
   * Migration: use `mountEvents`, `maybeParentSignal` or `parentChangeEvents` instead
 
+---
+
 #### v0.6 – Dec 2018
 
 * **New: Airstream v0.4 -> v0.5.1 – improved Vars, no more State, etc.**
   * Big update, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md) for details and migration guide 
 
+---
+
 #### v0.5.1 – Dec 2018
 
 * Fix: Bump Airstream to v0.4.1 to fix NPE in error handling
+
+---
 
 #### v0.5 – Nov 2018
 
@@ -203,6 +220,8 @@ This release is a significant improvement to both usability and safety of Lamina
 * New: window and document event streams now available via `windowEvents` and `documentEvents` objects
 * New: `unsafeWindowOwner` that never kills its possessions (careful there, see docs)
 * **API: `api/Laminar` / `api/L` object no longer includes event props from `WindowOnlyEventProps`**  
+
+---
 
 #### v0.4 – Sep 2018
 
@@ -217,6 +236,8 @@ This release is a significant improvement to both usability and safety of Lamina
 * Misc: Move `-->` methods from `ReactiveProp` to `EventPropTransformation`
 * Docs: Add Changelog
 
+---
+
 #### v0.3 – Apr 2018
 
 * **Switch to Airstream for reactive layer (previously XStream.js)**
@@ -224,11 +245,13 @@ This release is a significant improvement to both usability and safety of Lamina
 * **Organize required imports under `api` package**
 * Write more documentation and publish laminar-examples
 
+---
 
 #### v0.2 – Dec 2017
 
 * **Multiple API improvements for a smoother developer experience**
 
+---
 
 #### v0.1 – Oct 2017
 
