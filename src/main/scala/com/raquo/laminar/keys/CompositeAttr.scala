@@ -8,12 +8,11 @@ import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
-import scala.scalajs.js.Dictionary
 
 // @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
 // @TODO[Performance] Will string splitting be faster with native JS method? How do we access it?
 
-class CompositeAttr[Attr <: Key, El <: ReactiveElement.Base](val key: Attr, separator: Char) {
+class CompositeAttr[Attr <: Key, El <: ReactiveElement.Base](val key: Attr, val separator: Char) {
 
   // @TODO[API] Should StringValueMapper be passed implicitly?
   @inline def apply(items: String): Setter[El] = {
@@ -45,6 +44,18 @@ class CompositeAttr[Attr <: Key, El <: ReactiveElement.Base](val key: Attr, sepa
     Setter { element =>
       element.ref.setAttributeNS(namespaceURI = null, qualifiedName = key.name, newItems)
     }
+  }
+
+  def set(newItems: String*): Setter[El] = {
+    set(newItems.mkString(separator.toString))
+  }
+
+  def remove(items: String*): Setter[El] = {
+    update(js.Dictionary(items.map(item => (item -> false)): _*))
+  }
+
+  def toggle(items: String*): LockedCompositeAttr[Attr, El] = {
+    new LockedCompositeAttr(this, items.toList)
   }
 
   def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[El] = {
@@ -129,13 +140,13 @@ object CompositeAttr {
   trait CompositeValueMappers {
 
     implicit object StringValueMapper extends CompositeValueMapper[String] {
-      override def toDict(item: String, separator: Char): Dictionary[Boolean] = {
+      override def toDict(item: String, separator: Char): js.Dictionary[Boolean] = {
         js.Dictionary(item -> true)
       }
     }
 
     implicit object StringSeqValueMapper extends CompositeValueMapper[collection.Seq[String]] {
-      override def toDict(items: collection.Seq[String], separator: Char): Dictionary[Boolean] = {
+      override def toDict(items: collection.Seq[String], separator: Char): js.Dictionary[Boolean] = {
         val dict = js.Dictionary.empty[Boolean]
         items.foreach(item => dict.update(item, true))
         dict
@@ -143,7 +154,7 @@ object CompositeAttr {
     }
 
     implicit object StringSeqSeqValueMapper extends CompositeValueMapper[collection.Seq[collection.Seq[String]]] {
-      override def toDict(items: collection.Seq[collection.Seq[String]], separator: Char): Dictionary[Boolean] = {
+      override def toDict(items: collection.Seq[collection.Seq[String]], separator: Char): js.Dictionary[Boolean] = {
         val dict = js.Dictionary.empty[Boolean]
         items.flatten.foreach(item => dict.update(item, true))
         dict

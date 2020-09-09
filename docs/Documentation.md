@@ -65,7 +65,7 @@ Make sure you're reading the docs for the right version:
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.10.2](https://github.com/raquo/Laminar/blob/v0.10.2/docs/Documentation.md)** | **[v0.10.0](https://github.com/raquo/Airstream/blob/v0.10.0/README.md)** |
+| **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
 | **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
 | **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
 | **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
@@ -701,8 +701,19 @@ cls(List("class1", "class2"))
 cls.set("class1")
 // SET multiple class names
 cls.set("class1 class2")
+cls.set("class1", "class2")
 // CLEAR all class names
 cls.set("")
+
+// REMOVE class names
+cls.remove("class1")
+cls.remove("class1 class2")
+cls.remove("class1", "class2")
+
+// TOGGLE class names (true = add, false = remove)
+cls.toggle("class1") := true
+cls.toggle("class1 class2") := false
+cls.toggle("class1", "class2") := true
 
 // Note: some of the := methods accept an implicit param, so you might
 // need to wrap the modifier in a `locally` to help Scala parse an
@@ -716,11 +727,13 @@ element.amend(cls := ("class1", "class2"))
 Of course, the reactive layer is similarly considerate in regard to `cls`. Consider this use case:
 
 ```scala
-val classesStream: EventStream[Seq[String]]
+val classesStream: EventStream[Seq[String]] = ???
+val boolStream: EventStream[Boolean] = ???
  
 div(
-  cls := "MyComponent"
-  cls <-- classesStream
+  cls := "MyComponent",
+  cls <-- classesStream,
+  cls.toggle("class1", "class2") <-- boolStream 
 )
 ``` 
 
@@ -1302,7 +1315,7 @@ val link = a(
 )
 ``` 
 
-In this contrived example, every time this `link` element is mounted, the callback will execute and the resulting setter will be applied to the element. So every time `link` is mounted, it will print "mount", check whether its new parent has a "-legit" CSS class name, and set the `href` attribute based on that.
+In this contrived example, every time this `link` element is mounted, the callback will execute, and the resulting setter will be applied to the element. So every time `link` is mounted, it will print "mount", check whether its new parent has a "-legit" CSS class name, and set the `href` attribute based on that.
 
 Note that when the element is unmounted, any setters applied to it this way are not un-applied. So for example if you were to apply red color to evil links like this:
 

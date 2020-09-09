@@ -147,11 +147,54 @@ class CompositeKeySpec extends UnitSpec {
     expectNode(div like (cls is "foo bar"))
 
     // Replace
+    cls.set("foo", "faa")(el)
+    expectNode(div like (cls is "foo faa"))
+
+    // Replace again
     cls.set("baz bax")(el)
     expectNode(div like (cls is "baz bax"))
 
     // Append again
     (cls := "bar")(el)
     expectNode(div like (cls is "baz bax bar"))
+  }
+
+  it("cls - remove") {
+    val el = div(cls := "foo bar baz qux")
+    mount(el)
+    expectNode(div like (cls is "foo bar baz qux"))
+
+    // Remove some
+    el.amend(cls.remove("foo baz"))
+    expectNode(div like (cls is "bar qux"))
+
+    // Remove not found
+    el.amend(cls.remove("baz", "bax"))
+    expectNode(div like (cls is "bar qux"))
+
+    // Remove one more
+    el.amend(cls.remove("bar", "bax"))
+    expectNode(div like (cls is "qux"))
+  }
+
+  it("cls - toggle") {
+    val bus = new EventBus[Boolean]
+    val el = div(
+      cls := "foo faa",
+      cls.toggle("bar bax") := true,
+      cls.toggle("foo bar") <-- bus.events,
+      cls.toggle("qux") <-- bus.events
+    )
+    mount(el)
+    expectNode(div like (cls is "foo faa bar bax"))
+
+    bus.writer.onNext(false)
+    expectNode(div like (cls is "faa bax"))
+
+    bus.writer.onNext(true)
+    expectNode(div like (cls is "faa bax foo bar qux"))
+
+    el.amend(cls.toggle("foo faa") := false)
+    expectNode(div like (cls is "bax bar qux"))
   }
 }

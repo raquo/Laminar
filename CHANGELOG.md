@@ -4,6 +4,24 @@ Breaking changes in **bold**.
 
 _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
 
+#### v0.10.3 – Sep 2020
+
+* New: Airstream v0.10.1, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
+* New: Easily toggle composite attr values
+  * e.g. `cls.toggle("class1") := true` and `cls.toggle("class1") <-- $bool`
+* New: Easily remove composite attr values: `cls.remove("class1")`
+* New: Another `cls.set` method with varargs (same for other composite attrs)
+* New: Add pointer events to Laminar (thanks, [@doofin](https://github.com/doofin)!)
+
+---
+
+Laminar & Airstream development is sponsored by [people like you](https://github.com/sponsors/raquo).
+
+GOLD sponsors supporting this release: ✨ **[Iurii Malchenko](https://github.com/yurique)**
+
+Thank you for supporting me! ❤️
+
+
 #### v0.10.2 – Aug 2020
 
 * New: Support custom CSS props (for Web Components)
