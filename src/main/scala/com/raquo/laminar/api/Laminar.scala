@@ -33,6 +33,7 @@ private[laminar] object Laminar
   with MediaEventProps[ReactiveEventProp]
   with MiscellaneousEventProps[ReactiveEventProp]
   with MouseEventProps[ReactiveEventProp]
+  with PointerEventProps[ReactiveEventProp]
   // Props
   with Props[ReactiveProp]
   // Styles
