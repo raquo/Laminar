@@ -4,6 +4,8 @@ Breaking changes in **bold**.
 
 _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
 
+---
+
 #### v0.10.3 – Sep 2020
 
 * New: Airstream v0.10.1, see [Airstream changelog](https://github.com/raquo/Airstream/blob/master/CHANGELOG.md)
@@ -19,7 +21,7 @@ _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
 * I published a comprehensive video introduction to Laminar, check it out: [Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q) 
 * Iurii released initial version of [tulz-app/laminar-router](https://github.com/tulz-app/laminar-router), an alternative Laminar router with API inspired by Akka HTTP.
 * Iurii also shared a template for server side rendering any frontend apps (including Laminar) using Puppetteer: [yurique/spa-ssr-proxy](https://github.com/yurique/spa-ssr-proxy)
-* Anton is working on a static documentation website for Laminar (#61 #63)
+* Anton is working on a static documentation website for Laminar ([#61](https://github.com/raquo/Laminar/issues/61), [#63](https://github.com/raquo/Laminar/pull/63))
 * @uosis started work on auto-generating Laminar facades for Web Components: [uosis/laminar-web-components](https://github.com/uosis/laminar-web-components). We also have a complete example of Web Components in [laminar-examples](https://github.com/raquo/laminar-examples).
 
 —
