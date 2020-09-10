@@ -1,0 +1,45 @@
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/* your custom css */
+
+@media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
+}
+
+@media only screen and (min-width: 1024px) {
+}
+
+@media only screen and (max-width: 1023px) {
+}
+
+@media only screen and (min-width: 1400px) {
+}
+
+@media only screen and (min-width: 1500px) {
+}
+
+div.mdoc-example {
+    display:inline-block;
+    width: 100%;
+}
+
+div.mdoc-example code {
+    float: left;
+    position: relative;
+    width: 55%;
+    font-size: smaller;
+    height: 300px;
+}
+
+div.mdoc-example div[id^="mdoc-html-"] {
+    float: right;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid gray;
+    width: 44%;
+    margin-left: 1px;
+}
