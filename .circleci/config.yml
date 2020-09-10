@@ -49,6 +49,9 @@ jobs:
       # run tests!
       - run: cat /dev/null | sbt +test:test
 
+      # verify that site compiles correctly
+      - run: cat /dev/null | sbt docs/docusaurusCreateSite
+
 workflows:
   version: 2
   run_build:
