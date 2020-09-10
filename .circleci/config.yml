@@ -49,6 +49,7 @@ jobs:
       - run: cat /dev/null | sbt +test:test
 
 workflows:
+  version: 2
   run_build:
     jobs:
       - build
