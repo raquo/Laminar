@@ -47,3 +47,10 @@ jobs:
 
       # run tests!
       - run: cat /dev/null | sbt +test:test
+
+workflows:
+  run_build:
+    jobs:
+      - build
+          filters:
+            branches:
