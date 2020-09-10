@@ -35,6 +35,7 @@ jobs:
           name: Save Sbt Dependencies Cache
           paths:
             - ~/.m2
+            - ~/.cache/coursier/v1
             - ~/.ivy2/cache
             - ~/.sbt
           key: sbt-deps--{{ checksum "build.sbt" }}
