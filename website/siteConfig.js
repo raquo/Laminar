@@ -86,7 +86,7 @@ const siteConfig = {
   // Open Graph and Twitter card images.
   ogImage: 'img/spiral-inverse-logo.svg',
   twitterImage: 'img/spiral-inverse-logo.svg',
-  customDocsPath: "myproject-docs/target/mdoc",
+  customDocsPath: "laminar-docs/target/mdoc",
 
 
   // For sites with a sizable amount of content, set collapsible to true.
