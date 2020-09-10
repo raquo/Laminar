@@ -1485,7 +1485,11 @@ Assuming container is present in the DOM, `render(container, contentEl)` will im
 
 ## URL Routing
 
-[Waypoint](https://github.com/raquo/Waypoint) is an efficient Laminar router.
+[Waypoint](https://github.com/raquo/Waypoint) – My URL router for Laminar.
+
+[tulz-app/laminar-router](https://github.com/tulz-app/laminar-router) – Alternative router for Laminar with API inspired by Akka HTTP
+
+These routers are designed for Laminar, but don't actually depend on it, only on Airstream, so you could potentially use them without Laminar.
 
 
 
