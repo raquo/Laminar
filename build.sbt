@@ -1,6 +1,6 @@
 
 // @TODO[Security] Is this a good idea to leave this here long term?
-// resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("snapshots")
 
 
 val Scala212 = "2.12.10"
@@ -26,7 +26,8 @@ lazy val docs = project
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
   .settings(
     mdocJS := Some(jsdocs),
-    skip in publish := true
+    skip in publish := true,
+    resolvers += Resolver.sonatypeRepo("snapshots")
   )
 
 lazy val laminar = project.in(file("."))
