@@ -1,4 +1,3 @@
-resolvers += Resolver.sonatypeRepo("snapshots")
 
 logLevel := Level.Warn
 
@@ -12,4 +11,4 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.8")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.8.1")
 
-addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.7+2-dc6e53c3-SNAPSHOT" )
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.8" )
