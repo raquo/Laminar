@@ -1,4 +1,5 @@
 
+These examples are built using Laminar **v@VERSION@** and Scala @SCALA_VERSION@
 
 ## Basic interactivity
 
@@ -7,7 +8,7 @@
 ```scala mdoc:js
 import com.raquo.laminar.api.L._
 import org.scalajs.dom
- 
+
 val nameBus = new EventBus[String]
 val colorStream: EventStream[String] = nameBus.events.map { name =>
   if (name == "Sébastien") "red" else "unset" // make Sébastien feel special
@@ -24,7 +25,7 @@ def Hello(
     child.text <-- helloNameStream // dynamic child (text node in this case)
   )
 }
- 
+
 val appDiv: Div = div(
   strong("User Welcomer 9000"),
   div(
@@ -32,7 +33,7 @@ val appDiv: Div = div(
     input(
       typ := "text",
       // extract text entered into this input node whenever the user types in it
-      inContext(thisNode => onInput.mapTo(thisNode.ref.value) --> nameBus) 
+      inContext(thisNode => onInput.mapTo(thisNode.ref.value) --> nameBus)
     )
   ),
   div(
@@ -56,7 +57,7 @@ import org.scalajs.dom
 
 val diffBus = new EventBus[Int]
 dom.window.setInterval(
-  () =>  diffBus.writer.onNext(scala.util.Random.nextInt), 
+  () =>  diffBus.writer.onNext(scala.util.Random.nextInt),
   1000
 )
 

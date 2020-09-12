@@ -50,7 +50,7 @@ jobs:
       - run: cat /dev/null | sbt +test:test
 
       # verify that site compiles correctly
-      - run: cat /dev/null | sbt docs/docusaurusCreateSite
+      - run: cat /dev/null | sbt ++2.12.10 docs/docusaurusCreateSite
 
 workflows:
   version: 2

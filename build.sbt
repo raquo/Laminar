@@ -27,6 +27,10 @@ lazy val docs = project
   .settings(
     mdocJS := Some(jsdocs),
     skip in publish := true,
+    mdocVariables := Map(
+      "VERSION" -> version.value.replace("-SNAPSHOT", ""),
+      "SCALA_VERSION" -> scalaVersion.value
+    )
   )
 
 lazy val laminar = project.in(file("."))
@@ -57,7 +61,7 @@ lazy val laminar = project.in(file("."))
     name := "Laminar",
     normalizedName := "laminar",
     organization := "com.raquo",
-    scalaVersion := Scala212,
+    scalaVersion := Scala213,
     crossScalaVersions := scalaVersions,
     homepage := Some(url("https://github.com/raquo/Laminar")),
     licenses += ("MIT", url("https://github.com/raquo/Laminar/blob/master/LICENSE.md")),
