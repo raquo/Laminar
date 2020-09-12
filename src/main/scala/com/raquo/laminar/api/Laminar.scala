@@ -189,7 +189,11 @@ private[laminar] object Laminar
   /** A universal Modifier that does nothing */
   val emptyMod: Mod[Node] = new Modifier[Node] {}
 
-  /** Non-breaking space character */
+  /** Non-breaking space character
+    *
+    * Note: In Laminar you don't need to use html entities, you can just
+    * insert the actual character you want, e.g. "»" instead of "&raquo;"
+    */
   val nbsp: String = "\u00a0"
 
 

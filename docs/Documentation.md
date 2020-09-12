@@ -168,6 +168,19 @@ Notice that the code snippet above does not require you to HTML-escape `"&"` or 
 Note: this section of documentation only explained how to render **static** data. You will learn to render dynamic data and lists of children in [Reactive Data](#reactive-data) section. 
 
 
+### HTML Entities
+
+Laminar does not attempt to parse your strings as HTML, so there is no need to use [HTML entities](https://developer.mozilla.org/en-US/docs/Glossary/Entity) like `"&nbsp;"` or `"&amp;"`. Instead, you just insert the actual character into your Scala strings.
+
+Laminar actually provides a shorthand for non-breaking space – `nbsp`, and for any other special characters you can just use them verbatim, e.g. `"»"` instead of  or `"&raquo;"`.
+
+```scala
+div(s"${date}${nbsp}${time}")
+div(b("Posts"), "»", categoryName) // `»` instead of `&raquo;`
+div("Features — not bugs") // `—` instead of `&emdash;`
+```
+
+
 ### Empty Nodes
 
 Thanks to the `optionToModifier` implicit mentioned above, you can use `Option[ReactiveElement]` where a `Modifier` is expected, but in other cases you might not want to deal with Option's boxing.  
