@@ -11,15 +11,15 @@
 const siteConfig = {
   title: 'Laminar', // Title for your website.
   tagline: 'Simple, expressive, and safe UI library for Scala.js',
-  url: 'https://github.com/raquo/Laminar', // Your website URL
-  baseUrl: '/', // Base URL for your project */
+  url: 'https://raquo.github.io', // Your website URL
+  baseUrl: '/Laminar/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: 'laminar',
-  organizationName: 'facebook',
+  projectName: 'Laminar',
+  organizationName: 'raquo',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
