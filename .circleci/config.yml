@@ -50,10 +50,13 @@ jobs:
       - run: cat /dev/null | sbt +test:test
 
       # verify that site compiles correctly
-      - run: cat /dev/null | sbt ++2.12.10 docs/docusaurusCreateSite
+      - run: cat /dev/null | sbt website/docusaurusCreateSite
 
 workflows:
   version: 2
   run_build:
     jobs:
       - build
+          branches:
+            ignore:
+              - gh-pages
