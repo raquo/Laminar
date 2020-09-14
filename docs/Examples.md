@@ -1,5 +1,4 @@
-
-These examples are built using Laminar **v@VERSION@** and Scala @SCALA_VERSION@
+# Examples
 
 ## Basic interactivity
 

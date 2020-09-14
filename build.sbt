@@ -7,7 +7,7 @@ val Scala212 = "2.12.10"
 val Scala213 = "2.13.1"
 val scalaVersions = Seq(Scala212, Scala213)
 
-lazy val jsdocs = project
+lazy val websiteJS = project
   .settings(
    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0",
    scalaVersion := Scala212,
@@ -17,20 +17,20 @@ lazy val jsdocs = project
   .enablePlugins(ScalaJSPlugin)
   .dependsOn(laminar)
 
-lazy val docs = project
-  .in(file("laminar-docs"))
+lazy val website = project
   .settings(
     scalaVersion := Scala212,
     crossScalaVersions := scalaVersions
   )
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
   .settings(
-    mdocJS := Some(jsdocs),
-    skip in publish := true,
-    mdocVariables := Map(
-      "VERSION" -> version.value.replace("-SNAPSHOT", ""),
-      "SCALA_VERSION" -> scalaVersion.value
-    )
+    mdocJS := Some(websiteJS),
+    skip in publish := true
+    //mdocVariables := Map(
+    //  // Use these as @VERSION@ in mdoc-processed .md files
+    //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
+    //  "SCALA_VERSION" -> scalaVersion.value
+    //)
   )
 
 lazy val laminar = project.in(file("."))
