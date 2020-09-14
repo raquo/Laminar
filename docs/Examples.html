@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Examples · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="These examples are built using Laminar **v0.10.4** and Scala 2.12.10"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Examples · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://raquo.github.io/Laminar/"/><meta property="og:description" content="These examples are built using Laminar **v0.10.4** and Scala 2.12.10"/><meta property="og:image" content="https://raquo.github.io/Laminar/img/spiral-inverse-logo.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://raquo.github.io/Laminar/img/spiral-inverse-logo.svg"/><link rel="shortcut icon" href="/Laminar/img/spiral-logo.svg"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/Laminar/js/scrollSpy.js"></script><link rel="stylesheet" href="/Laminar/css/main.css"/><script src="/Laminar/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/Laminar/"><img class="logo" src="/Laminar/img/spiral-logo.svg" alt="Laminar"/><h2 class="headerTitleWithLogo">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/Laminar/docs/Documentation" target="_self">Docs</a></li><li class="siteNavItemActive"><a href="/Laminar/docs/Examples" target="_self">Examples</a></li><li class=""><a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html" target="_blank">Laminar API</a></li><li class=""><a href="https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html" target="_blank">Airstream API</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Examples</h1></header><article><div><span><p>These examples are built using Laminar <strong>v0.10.4</strong> and Scala 2.12.10</p>
+<h2><a class="anchor" aria-hidden="true" id="basic-interactivity"></a><a href="#basic-interactivity" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Basic interactivity</h2>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> nameBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">String</span>]
+<span class="hljs-keyword">val</span> colorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = nameBus.events.map { name =&gt;
+  <span class="hljs-keyword">if</span> (name == <span class="hljs-string">"Sébastien"</span>) <span class="hljs-string">"red"</span> <span class="hljs-keyword">else</span> <span class="hljs-string">"unset"</span> <span class="hljs-comment">// make Sébastien feel special</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Hello</span></span>(
+  helloNameStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>],
+  helloColorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>]
+): <span class="hljs-type">Div</span> = {
+  div(
+    fontSize := <span class="hljs-string">"20px"</span>, <span class="hljs-comment">// static CSS property</span>
+    color &lt;-- helloColorStream, <span class="hljs-comment">// dynamic CSS property</span>
+    strong(<span class="hljs-string">"Hello, "</span>), <span class="hljs-comment">// static child element with a grandchild text node</span>
+    child.text &lt;-- helloNameStream <span class="hljs-comment">// dynamic child (text node in this case)</span>
+  )
+}
+
+<span class="hljs-keyword">val</span> appDiv: <span class="hljs-type">Div</span> = div(
+  strong(<span class="hljs-string">"User Welcomer 9000"</span>),
+  div(
+    <span class="hljs-string">"Please enter your name:"</span>,
+    input(
+      typ := <span class="hljs-string">"text"</span>,
+      <span class="hljs-comment">// extract text entered into this input node whenever the user types in it</span>
+      inContext(thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; nameBus)
+    )
+  ),
+  div(
+    <span class="hljs-string">"Please accept our greeting: "</span>,
+    <span class="hljs-type">Hello</span>(nameBus.events, colorStream)
+  )
+)
+
+render(node, appDiv)
+</code></pre>
+<div id="mdoc-html-run0" data-mdoc-js></div>
+</div>
+<h2><a class="anchor" aria-hidden="true" id="working-with-timers"></a><a href="#working-with-timers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Working with timers</h2>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> diffBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">Int</span>]
+dom.window.setInterval(
+  () =&gt;  diffBus.writer.onNext(scala.util.<span class="hljs-type">Random</span>.nextInt),
+  <span class="hljs-number">1000</span>
+)
+
+<span class="hljs-keyword">val</span> app = div(
+  <span class="hljs-string">"Random number every second: "</span>,
+  child.text &lt;-- diffBus.events.map(_.toString)
+)
+
+render(node, app)
+</code></pre>
+<div id="mdoc-html-run1" data-mdoc-js></div>
+</div>
+<script type="text/javascript" src="assets/Examples.md.js" defer></script>
+<script type="text/javascript" src="assets/mdoc.js" defer></script>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#basic-interactivity">Basic interactivity</a></li><li><a href="#working-with-timers">Working with timers</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/Laminar/" class="nav-home"><img src="/Laminar/img/spiral-logo.svg" alt="Laminar" width="66" height="58"/></a><div><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section></footer></div></body></html>

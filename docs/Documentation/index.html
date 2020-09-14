@@ -1,0 +1,1030 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Documentation · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="# Documentation"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Documentation · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://raquo.github.io/Laminar/"/><meta property="og:description" content="# Documentation"/><meta property="og:image" content="https://raquo.github.io/Laminar/img/spiral-inverse-logo.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://raquo.github.io/Laminar/img/spiral-inverse-logo.svg"/><link rel="shortcut icon" href="/Laminar/img/spiral-logo.svg"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/Laminar/js/scrollSpy.js"></script><link rel="stylesheet" href="/Laminar/css/main.css"/><script src="/Laminar/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/Laminar/"><img class="logo" src="/Laminar/img/spiral-logo.svg" alt="Laminar"/><h2 class="headerTitleWithLogo">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavItemActive"><a href="/Laminar/docs/Documentation" target="_self">Docs</a></li><li class=""><a href="/Laminar/docs/Examples" target="_self">Examples</a></li><li class=""><a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html" target="_blank">Laminar API</a></li><li class=""><a href="https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html" target="_blank">Airstream API</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Documentation</h1></header><article><div><span><h1><a class="anchor" aria-hidden="true" id="documentation"></a><a href="#documentation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Documentation</h1>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#imports">Imports</a></li>
+<li><a href="#tags--elements">Tags &amp; Elements</a></li>
+<li><a href="#modifiers">Modifiers</a>
+<ul>
+<li><a href="#nesting-and-children">Nesting and Children</a></li>
+<li><a href="#manual-application">Manual Application</a></li>
+<li><a href="#incontext">inContext</a></li>
+<li><a href="#reusing-elements">Reusing Elements</a></li>
+<li><a href="#missing-keys">Missing Keys</a></li>
+<li><a href="#modifiers-faq">Modifiers FAQ</a></li>
+</ul></li>
+<li><a href="#reactive-data">Reactive Data</a>
+<ul>
+<li><a href="#attributes-and-properties">Attributes and Properties</a></li>
+<li><a href="#event-streams-and-signals">Event Streams and Signals</a></li>
+<li><a href="#individual-children">Individual Children</a></li>
+<li><a href="#lists-of-children">Lists of Children</a>
+<ul>
+<li><a href="#children----observableofelements"><code>children &lt;-- observableOfElements</code></a></li>
+<li><a href="#performant-children-rendering--split">Performant Children Rendering – <code>split</code></a></li>
+<li><a href="#performant-children-rendering--childrencommand">Performant Children Rendering – <code>children.command</code></a></li>
+</ul></li>
+<li><a href="#binding-observables">Binding Observables</a></li>
+<li><a href="#other-binders">Other Binders</a></li>
+</ul></li>
+<li><a href="#classname-and-other-special-keys">ClassName and Other Special Keys</a>
+<ul>
+<li><a href="#cls">cls</a></li>
+<li><a href="#other-composite-keys">Other Composite Keys</a></li>
+<li><a href="#svg">SVG</a></li>
+</ul></li>
+<li><a href="#event-system-emitters-transformations-buses">Event System: Emitters, Transformations, Buses</a>
+<ul>
+<li><a href="#registering-a-dom-event-listener">Registering a DOM Event Listener</a></li>
+<li><a href="#eventbus">EventBus</a></li>
+<li><a href="#alternative-event-listener-registration-syntax">Alternative Event Listener Registration Syntax</a></li>
+<li><a href="#multiple-event-listeners">Multiple Event Listeners</a></li>
+<li><a href="#event-transformations">Event Transformations</a>
+<ul>
+<li><a href="#preventdefault--stoppropagation">preventDefault &amp; stopPropagation</a></li>
+<li><a href="#usecapture">useCapture</a></li>
+<li><a href="#obtaining-typed-event-target">Obtaining Typed Event Target</a></li>
+</ul></li>
+<li><a href="#window--document-events">Window &amp; Document Events</a></li>
+</ul></li>
+<li><a href="#ownership">Ownership</a>
+<ul>
+<li><a href="#laminars-use-of-airstream-ownership">Laminar's Use of Airstream Ownership</a></li>
+</ul></li>
+<li><a href="#memory-management">Memory Management</a></li>
+<li><a href="#element-lifecycle-hooks">Element Lifecycle Hooks</a>
+<ul>
+<li><a href="#what-is-mounting">What Is Mounting?</a></li>
+<li><a href="#onmountcallback"><code>onMountCallback</code></a></li>
+<li><a href="#onunmountcallback--onmountunmountcallback"><code>onUnmountCallback</code> &amp; <code>onMountUnmountCallback</code></a></li>
+<li><a href="#onmountset"><code>onMountSet</code></a></li>
+<li><a href="#onmountbind"><code>onMountBind</code></a></li>
+<li><a href="#onmountinsert"><code>onMountInsert</code></a></li>
+<li><a href="#why-use-lifecycle-hooks">Why Use Lifecycle Hooks?</a></li>
+<li><a href="#lifecycle-event-timing">Lifecycle Event Timing</a></li>
+<li><a href="#how-are-mount-events-propagated">How Are Mount Events Propagated?</a></li>
+</ul></li>
+<li><a href="#url-routing">URL Routing</a></li>
+<li><a href="#special-cases">Special Cases</a></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="introduction"></a><a href="#introduction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Introduction</h2>
+<h4><a class="anchor" aria-hidden="true" id="first-see-why-laminarreadmemdwhy-laminar-and-quick-startreadmemdquick-start"></a><a href="#first-see-why-laminarreadmemdwhy-laminar-and-quick-startreadmemdquick-start" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>First, see <a href="../README.md#why-laminar">Why Laminar</a> and <a href="../README.md#quick-start">Quick Start</a>.</h4>
+<p>Make sure you're reading the docs for the right version:</p>
+<h4><a class="anchor" aria-hidden="true" id="documentation-1"></a><a href="#documentation-1" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Documentation</h4>
+<table>
+<thead>
+<tr><th style="text-align:left">Laminar</th><th style="text-align:left">Airstream</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/master/docs/Documentation.md">master</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/master/README.md">master</a></strong></td></tr>
+<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md">v0.10.3</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.10.1/README.md">v0.10.1</a></strong></td></tr>
+<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md">v0.9.2</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.9.2/README.md">v0.9.2</a></strong></td></tr>
+<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md">v0.8.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.8.0/README.md">v0.8.0</a></strong></td></tr>
+<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md">v0.7.2</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.7.2/README.md">v0.7.2</a></strong></td></tr>
+</tbody>
+</table>
+<p>For documentation of older versions, see git tags.</p>
+<p>Note: the latest version of Laminar always uses the latest version of Airstream.</p>
+<p><a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html">Laminar API doc</a> • <a href="https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/com/raquo/airstream/index.html">Airstream API doc</a></p>
+<p>Laminar is very simple under the hood. You can see how most of it works just by using &quot;Go to definition&quot; functionality of your IDE. Nevertheless, the documentation provided here will help you understand how everything ties together. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.</p>
+<h2><a class="anchor" aria-hidden="true" id="imports"></a><a href="#imports" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Imports</h2>
+<p>You have two import choices: <code>import com.raquo.laminar.api.L._</code> is the easiest, it brings everything you need from Laminar in scope. Unless indicated otherwise, this import is assumed for all code snippets in this documentation.</p>
+<p>Usually you will not need any other imports. In this documentation you will see references to Laminar types and values that are not available with just this one import because we spell out the types for the sake of explanation. Most of those are available as aliases in the <code>L</code> object. For example, <code>ReactiveHtmlElement[dom.html.Element]</code> is aliased as simply <code>HtmlElement</code>, and <code>Modifier[El]</code> as <code>Mod[El]</code>.</p>
+<p>However, you might want to avoid bringing so many values into scope, so instead you can <code>import com.raquo.laminar.api._</code>, and access Laminar and Airstream values and types with <code>L</code> and <code>A</code> prefixes respectively, e.g. <code>A.EventStream</code>, <code>L.div</code>, etc.`</p>
+<p>There are special import considerations for working with <a href="#svg">SVG elements</a>.</p>
+<p>Do check out the available aliases in the <code>L</code> object. It's much more pleasant to write and read <code>Mod[Input]</code> than <code>Modifier[ReactiveHtmlElement[dom.html.Input]]</code>.</p>
+<p>Another import you will want in some cases is <code>import org.scalajs.dom</code> – whenever you see <code>dom.X</code> in documentation, this import is assumed. This object contains <a href="https://github.com/scala-js/scala-js-dom">scala-js-dom</a> native JS DOM types. I highly recommend that you import this <code>dom</code> object and not <code>dom._</code> as the <code>dom.</code> prefix will help you distinguish native JS platform types from Laminar types.</p>
+<h2><a class="anchor" aria-hidden="true" id="tags--elements"></a><a href="#tags--elements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tags &amp; Elements</h2>
+<p>Laminar uses <a href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a> listings of typed HTML &amp; SVG tags, attributes, props, event props, etc. For example, this is how we know that <code>onClick</code> events produce <code>dom.MouseEvent</code> events and not <code>dom.KeyboardEvent</code>.</p>
+<p><code>div</code> is an <code>HtmlTag[dom.html.Div]</code>. It's a factory of div elements. <code>HtmlTag</code> extends <code>Tag</code> from <em>Scala DOM Types</em> and contains basic information needed to create such an element, such as its tag name (&quot;div&quot;).</p>
+<p><code>div()</code> is a <code>ReactiveHtmlElement[dom.html.Div]</code> (aliased as <code>Div</code>). The <code>apply</code> method created a Laminar Div element that is linked to the real JS DOM element that it represents. If you need to, you can access the underlying JS DOM element via the <code>.ref</code> property. This is useful mostly for event handlers and third party integrations.</p>
+<p><code>div()</code> is <strong>not</strong> a virtual DOM element. When you create a Laminar element, Laminar immediately creates the underlying <code>dom.Element</code> as well. That reference is immutable, so these two instances will go together for the duration of their lifetimes. In contrast, in a virtual DOM library (which Laminar is not) you typically create new instances of virtual elements when they change, and these get loosely matched to a <code>dom.Element</code> which could actually be a different element over time depending on how the updates that you're requesting and the implementation of virtual DOM's diffing algorithm.</p>
+<p>Read on for how to use this element we've created.</p>
+<h2><a class="anchor" aria-hidden="true" id="modifiers"></a><a href="#modifiers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Modifiers</h2>
+<p>The <code>div()</code> call described above creates an empty div element – no children, no attributes, nothing. Here's how to specify desired attributes:</p>
+<pre><code class="hljs css language-scala">input(typ := <span class="hljs-string">"checkbox"</span>, defaultChecked := <span class="hljs-literal">true</span>)
+</code></pre>
+<p>This creates an <code>input</code> Laminar element and sets two attributes on it. It's mostly obvious what it does, but how?</p>
+<p>As we've established before, <code>input()</code> call is actually <code>HtmlTag[El].apply(modifiers: Modifier[El]*)</code>. So, we can pass Modifiers to it. A <code>Modifier[El]</code> (aliased as <code>Mod[El]</code>) is a simple trait with an <code>apply(element: El): Unit</code> method. Conceptually, it's a function that you can apply to an element <code>El</code> to modify it in some way. In our case, <code>typ := &quot;checkbox&quot;</code> is a <code>Modifier</code> that sets the <code>type</code> attribute on an element to <code>&quot;checkbox&quot;</code>.</p>
+<p><code>typ</code> is a <code>ReactiveHtmlAttr</code>, and <code>:=</code> is simply a method on it that creates a <code>Setter</code> – a <code>Modifier</code> that sets a specific key to a specific value. You can set DOM props and CSS style props the same way (e.g. <code>backgroundColor := &quot;red&quot;</code>)</p>
+<p><code>typ</code> is coming from <em>Scala DOM Types</em> and represents the &quot;type&quot; attribute. You should consult <em>Scala DOM Types</em> documentation for a list of <a href="https://github.com/raquo/scala-dom-types#naming-differences-compared-to-native-html--dom">naming differences</a> relative to the native JS DOM API. It will also explain why the <code>checked</code> attribute is called <code>defaultChecked</code>, and why it accepts a boolean even though all HTML attributes only ever deal in strings in JS DOM (<a href="https://github.com/raquo/scala-dom-types#codecs">Codecs</a>).</p>
+<p>Note: the <code>apply</code> method on attributes and other keys is aliased to <code>:=</code> in case you prefer a slightly shorter syntax:</p>
+<pre><code class="hljs css language-scala">input(typ(<span class="hljs-string">"checkbox"</span>), defaultChecked(<span class="hljs-literal">true</span>)) <span class="hljs-comment">// 100% equivalent to the previous snippet</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="nesting-and-children"></a><a href="#nesting-and-children" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Nesting and Children</h3>
+<p>A Laminar Element like <code>input(typ := &quot;checkbox&quot;)</code> is also a Modifier, one that <strong>appends</strong> itself as a child to the element to which it is being applied. Now you can understand how nesting works in Laminar without any magic:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> inputCaption = span(<span class="hljs-string">"First &amp; last name:"</span>)
+<span class="hljs-keyword">val</span> inputMods = <span class="hljs-type">Seq</span>(typ := <span class="hljs-string">"text"</span>, defaultValue := <span class="hljs-string">"Me"</span>)  
+ 
+div(
+  h1(<span class="hljs-string">"Hello world"</span>, color := <span class="hljs-string">"red"</span>),
+  inputCaption,
+  input(inputMods, name := <span class="hljs-string">"fullName"</span>),
+  div(
+    <span class="hljs-string">"&gt;&gt;"</span>,
+    button(<span class="hljs-string">"Submit"</span>),
+    <span class="hljs-string">"&lt;&lt;"</span>
+  )
+)
+</code></pre>
+<p>Well, a tiny bit of magic – strings are not modifiers themselves, but are implicitly converted to <code>TextNode</code> (Laminar text nodes) which <em>are</em> modifiers that append plain JS text nodes with a given text to the element in question. They are not implicitly wrapped into <code>span</code> elements.</p>
+<p>For convenience, <code>Seq[Modifier[A]]</code> is also implicitly converted to a <code>Modifier[A]</code> that applies all the modifiers in the Seq: see <code>Implicits.seqToModifier</code>. This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.</p>
+<p><code>Implicits.optionToModifier</code> performs a similar conversion for <code>Option[Modifier[A]]</code>. We also have <code>emptyMod</code>, a universal Modifier that does nothing, for when you don't want to wrap your stuff in Option-s.</p>
+<p>Modifiers are applied in the order in which they're passed to the element, so in terms of children ordering what you see in your code is what you get in the resulting DOM.</p>
+<p>Notice that the code snippet above does not require you to HTML-escape <code>&quot;&amp;&quot;</code> or <code>&quot;&lt;&quot;</code>. You're just writing Scala code, you're not writing HTML (or anything that will be parsed as HTML), so don't worry about HTML escaping when using Laminar API. <strong>However</strong>, this warranty is void when you manually invoke native Javascript APIs (e.g. anything under <code>.ref</code>, or any interfaces provided by <a href="https://github.com/scala-js/scala-js-dom">scala-js-dom</a>). Then you need to know Javascript and the DOM API to know what's safe and what <a href="https://security.stackexchange.com/questions/32347/dom-based-xss-attacks-what-is-the-most-dangerous-example">isn't</a>.</p>
+<hr>
+<p>Note: this section of documentation only explained how to render <strong>static</strong> data. You will learn to render dynamic data and lists of children in <a href="#reactive-data">Reactive Data</a> section.</p>
+<h3><a class="anchor" aria-hidden="true" id="html-entities"></a><a href="#html-entities" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>HTML Entities</h3>
+<p>Laminar does not attempt to parse your strings as HTML, so there is no need to use <a href="https://developer.mozilla.org/en-US/docs/Glossary/Entity">HTML entities</a> like <code>&quot;&amp;nbsp;&quot;</code> or <code>&quot;&amp;amp;&quot;</code>. Instead, you just insert the actual character into your Scala strings.</p>
+<p>Laminar actually provides a shorthand for non-breaking space – <code>nbsp</code>, and for any other special characters you can just use them verbatim, e.g. <code>&quot;»&quot;</code> instead of  or <code>&quot;&amp;raquo;&quot;</code>.</p>
+<pre><code class="hljs css language-scala">div(<span class="hljs-string">s"<span class="hljs-subst">${date}</span><span class="hljs-subst">${nbsp}</span><span class="hljs-subst">${time}</span>"</span>)
+div(b(<span class="hljs-string">"Posts"</span>), <span class="hljs-string">"»"</span>, categoryName) <span class="hljs-comment">// `»` instead of `&amp;raquo;`</span>
+div(<span class="hljs-string">"Features — not bugs"</span>) <span class="hljs-comment">// `—` instead of `&amp;emdash;`</span>
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="empty-nodes"></a><a href="#empty-nodes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Empty Nodes</h3>
+<p>Thanks to the <code>optionToModifier</code> implicit mentioned above, you can use <code>Option[ReactiveElement]</code> where a <code>Modifier</code> is expected, but in other cases you might not want to deal with Option's boxing.</p>
+<p>And so, an empty DOM node can be created with... <code>emptyNode</code>.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> node: <span class="hljs-type">Node</span> = <span class="hljs-keyword">if</span> (foo) element <span class="hljs-keyword">else</span> emptyNode
+</code></pre>
+<p><code>emptyNode</code> outputs an empty HTML comment node, which is a <code>CommentNode</code>, not a <code>ReactiveElement</code>. Their common type is <code>ChildNode[dom.Node]</code>, aliased as simply <code>Node</code>. This distinction comes from JS world where <code>dom.Comment</code> nodes and <code>dom.Text</code> nodes can't have children, and are not <code>dom.Element</code>-s.</p>
+<h3><a class="anchor" aria-hidden="true" id="manual-application"></a><a href="#manual-application" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Manual Application</h3>
+<p>Typically you want to apply modifiers to an element when creating it: <code>div(color := &quot;red&quot;, ...)</code>.</p>
+<p>To add modifiers to an already existing element, call <code>amend</code> on it:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> el = div(<span class="hljs-string">"Hello"</span>)
+ 
+el.amend(
+  color := <span class="hljs-string">"red"</span>,
+  span(<span class="hljs-string">"a new child!"</span>)
+)
+</code></pre>
+<p>This is convenient not only to break apart your logic, but also because <code>el.amend()</code> returns <code>this</code>, it is especially useful to add arbitrary behaviour to abstracted away &quot;components&quot;. The following example uses Reactive Data that we haven't covered yet, but hopefully the pattern is clear enough:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> nameVar = <span class="hljs-type">Var</span>(<span class="hljs-string">""</span>)
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">TextInput</span></span>(): <span class="hljs-type">Input</span> = input(typ := <span class="hljs-string">"text"</span>)
+ 
+div(
+  <span class="hljs-string">"Please enter your name: "</span>,
+  <span class="hljs-type">TextInput</span>().amend(onInput --&gt; nameVar.writer)
+)
+</code></pre>
+<p>And of course, every Modifier has a public <code>apply(element: El)</code> method that you can use to manually apply it to any element, for example: <code>(color := &quot;red&quot;)(element)</code>.</p>
+<p>Using manual application is only encouraged when it's not enabling imperative coding patterns. You should learn to use <a href="#reactive-data">Reactive Data</a> effectively before you sprinkle your code with manual applications.</p>
+<h3><a class="anchor" aria-hidden="true" id="incontext"></a><a href="#incontext" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>inContext</code></h3>
+<p>Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, a common use case is needing to get the input element's <code>value</code> property in order to build a modifier that will send that property to an event bus.</p>
+<pre><code class="hljs css language-scala">input(inContext(thisNode =&gt; onChange.mapTo(thisNode.ref.value) --&gt; inputStringBus))
+</code></pre>
+<p>The general syntax of this feature is <code>inContext(El =&gt; Modifier[El]): Modifier[El]</code>. <code>thisNode</code> refers to the element to which this modifier will be applied. In our example its type is properly inferred to be <code>Input</code>, which is why you can call <code>.ref.value</code> on it without <code>.asInstanceOf</code>.</p>
+<p>Without getting ahead of ourselves too much, <code>onChange.mapTo(thisNode.ref.value) --&gt; inputStringBus)</code> is a Modifier that handles <code>onChange</code> events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple <em>other</em> ways, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myInput: <span class="hljs-type">Input</span> = input(onChange.mapTo(myInput.ref.value) --&gt; inputStringBus) <span class="hljs-comment">// make sure to write out the type ascription</span>
+</code></pre>
+<p>Or</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myInput = input()
+myInput.amend(
+  myInput.events(onChange).mapTo(myInput.ref.value) --&gt; inputStringBus
+)
+</code></pre>
+<p>But these are of course rather cumbersome. <code>inContext</code> provides an easy, inline solution that always works.</p>
+<p>Note: all the unfamiliar syntax used here will be explained in other sections of this documentation.</p>
+<h3><a class="anchor" aria-hidden="true" id="reusing-elements"></a><a href="#reusing-elements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reusing Elements</h3>
+<p><strong>Do not.</strong> An element can only have one parent element at a time, so you can't put the same element twice into the real JS DOM – instead, it will be removed from its old location and <strong>moved</strong> into its new location. That's just how the browser DOM works. Laminar does not protect you from doing this for performance reasons, so you need to avoid this on your own, or you will run into unexpected behaviour.</p>
+<p>On a related note, it <em>is</em> safe to unmount a Laminar element and then re-mount it in any location, assuming that you use Laminar methods to achieve that, and that you don't compete with any other <code>child &lt;--</code> or <code>children &lt;--</code> bindings you've set up for the same set of elements.</p>
+<h3><a class="anchor" aria-hidden="true" id="missing-keys"></a><a href="#missing-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Missing Keys</h3>
+<p>Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from <a href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a>. These definitions provide hundreds of keys, but are not exhaustive. For example, we don't have touch events like <code>touchmove</code> defined, so those are not available to be put on the left hand side of <code>:=</code> methods.</p>
+<p>To work around this, you can contribute definitions of missing keys to Scala DOM Types. It's easy – you don't even need to code any logic, just specify the names and types of the things you want to add. See the <a href="https://github.com/raquo/scala-dom-types/blob/master/CONTRIBUTING.md">Contribution Guide</a> and an <a href="https://github.com/raquo/scala-dom-types/pull/16/files">example PR</a>.</p>
+<p>Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> onTouchMove = <span class="hljs-keyword">new</span> <span class="hljs-type">ReactiveEventProp</span>[dom.<span class="hljs-type">TouchEvent</span>](<span class="hljs-string">"touchmove"</span>)
+div(onTouchMove --&gt; eventBus)
+</code></pre>
+<p>To clarify, you don't have to do this for touch events specifically as <a href="https://github.com/busti">@Busti</a> already added the superior <a href="https://github.com/raquo/scala-dom-types/pull/49">pointer-events</a> to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.</p>
+<h3><a class="anchor" aria-hidden="true" id="modifiers-faq"></a><a href="#modifiers-faq" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Modifiers FAQ</h3>
+<ol>
+<li><p>Yes, you can create custom Modifiers by simply extending the Modifier trait. You could for example define attributes or CSS props that are missing from <em>Scala DOM Types</em> by extending <code>ReactiveHtmlAttr</code> or <code>ReactiveStyle</code>, or for completely custom logic you could create a class extending the base <code>Modifier</code> trait. That way you could for example make a modifier that applies multiple other modifiers that you often use together.</p></li>
+<li><p>No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results from applying it only once. <code>Setter</code>s like <code>key := value</code> <em>are</em> idempotent, but for example a <code>Binder</code> like <code>onClick --&gt; observer</code> isn't. We will talk more about those modifier types later.</p></li>
+<li><p>Yes, Modifiers are generally reusable. The same modifier can usually be applied to multiple nodes without any conflict. But again, you have to understand what the modifier does. Setting an attribute to a particular value – sure, reusable. Adding a particular element as a child – no, not reusable – see <a href="#reusing-elements">Reusing Elements</a>. If you're writing your own Modifier and want to make it reusable, don't store element-specific state outside of its <code>apply</code> method.</p></li>
+</ol>
+<h2><a class="anchor" aria-hidden="true" id="rendering"></a><a href="#rendering" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Rendering</h2>
+<p>When you create a Laminar element, the underlying real JS DOM element (<code>.ref</code>) is created at the same time. However, it is initially detached from the DOM. That is, it does not appear in the document that the user sees. Such an element is <em>unmounted</em>.</p>
+<p>For the user to see this element we need to <em>mount</em> it into the DOM by either adding it as a Modifier to another element that is (or at some point will become) <em>mounted</em>, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to <em>render</em> it into some container <code>dom.Element</code> that already exists on the page. Said container must not be managed by Laminar.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> appContainer: dom.<span class="hljs-type">Element</span> = dom.document.querySelector(<span class="hljs-string">"#appContainer"</span>)
+<span class="hljs-keyword">val</span> appElement: <span class="hljs-type">Div</span> = div(
+  h1(<span class="hljs-string">"Hello"</span>),
+  <span class="hljs-string">"Current time is:"</span>,
+  b(<span class="hljs-string">"12:00"</span>) 
+)
+ 
+<span class="hljs-keyword">val</span> root: <span class="hljs-type">RootNode</span> = render(appContainer, appElement)
+</code></pre>
+<p>That's it. Laminar will find an element with id &quot;appContainer&quot; in the document, and append <code>appElement.ref</code> as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.</p>
+<p>Note: if <code>appContainer</code> was not present in the DOM when you called <code>render()</code>, you will need to manually call <code>root.mount()</code> to mount <code>appElement</code>. More on this in <a href="#element-lifecycle-hooks">Element Lifecycle Hooks</a>.</p>
+<p>To remove <code>appElement</code> from the DOM, simply call <code>root.unmount()</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="reactive-data"></a><a href="#reactive-data" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reactive Data</h2>
+<p>In the code snippet above we're mounting a completely static element – it will not change over time. This section is about creating elements that will one way or another change over time. All of the above were just the basic mechanics, here we're digging into the meat of Laminar, the fun parts.</p>
+<p>In a virtual DOM library like React or Snabbdom, changing an element over time is achieved by creating a new virtual element that contains the information on what the element should look like, then running a diffing algorithm on this new virtual element and the previous virtual element representing the same real JS DOM element. Said diffing algorithm will come up with a list of operations that need to be performed on the underlying JS DOM element in order to bring it to the state prescribed by the new virtual element you've created.</p>
+<p>Laminar does <strong>not</strong> work like that. We use reactive streams to represent things changing over time. Let's see how this is much simpler than any virtual DOM.</p>
+<p>Laminar uses <a href="https://github.com/raquo/Airstream">Airstream</a> observables (event streams and signals). Airstream is an integral part of Laminar, and a huge part of what makes it unique.</p>
+<p><strong>To use Laminar effectively, you need to understand the principles of conventional lazy streams, and have basic knowledge of Airstream. Please do read <a href="https://github.com/raquo/Airstream">Airstream documentation</a>, it's not scary.</strong></p>
+<h3><a class="anchor" aria-hidden="true" id="attributes-and-properties"></a><a href="#attributes-and-properties" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Attributes and Properties</h3>
+<p>Dynamic attributes / properties / css properties are the simplest use case for Laminar's reactive layer:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> prettyColorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = ???
+<span class="hljs-keyword">val</span> myDiv: <span class="hljs-type">Div</span> = div(color &lt;-- prettyColorStream, <span class="hljs-string">"Hello"</span>)
+</code></pre>
+<p>This creates a div element with the word &quot;Hello&quot; in it, and a dynamic <code>color</code> CSS property. Any time the <code>prettyColorStream</code> emits an event, this element's <code>color</code> property will be updated to the emitted value.</p>
+<p>The method <code>&lt;--</code> comes from <code>ReactiveStyle</code> (which is what <code>color</code> is). It creates a <code>Binder</code> modifier that subscribes to the given stream. This subscription is automatically enabled when the div element is added into the DOM, and automatically disabled when the div is removed from the DOM. More on that in the sections <a href="#ownership">Ownership</a> and <a href="#element-lifecycle-hooks">Element Lifecycle Hooks</a> way below. Don't worry about that for now.</p>
+<h3><a class="anchor" aria-hidden="true" id="event-streams-and-signals"></a><a href="#event-streams-and-signals" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event Streams and Signals</h3>
+<p>What happens before <code>prettyColorStream</code> emitted its first event? To understand that, we need a primer on Airstream reactive variables:</p>
+<ul>
+<li><p><strong>EventStream</strong> is a lazy Observable without current value. It represents events that happen at discrete points in time. Philosophically, there is no such thing as a &quot;current event&quot; or &quot;initial event&quot;, so streams have no initial or &quot;current&quot; value.</p></li>
+<li><p><strong>Signal</strong> are also lazy Observables, but unlike streams they do have a current value. Signal represents state – a value persisted over time. It always has a current value, and therefore it must have an initial value.</p></li>
+</ul>
+<p>The <code>&lt;--</code> method subscribes to the given observable and updates the DOM whenever the observable emits. <code>prettyColorStream</code> is an EventStream, so it will only emit if and when the next event comes in. So, until that time, laminar will not set the color property to any initial or default value.</p>
+<p>On the other hand, if <code>prettyColorStream</code> was a Signal, the subscription inside the <code>&lt;--</code> method would have set the color property to the observable's current value as soon as the element was added to the DOM, and would behave similar to stream subscription afterwards.</p>
+<p>We said that EventStreams and Signals are lazy – that means they wouldn't run without an Observer. By creating a subscription, the <code>&lt;--</code> method creates an Observer of the observable that it is given, so we know for sure that it will run (while the element is mounted into the DOM).</p>
+<h3><a class="anchor" aria-hidden="true" id="individual-children"></a><a href="#individual-children" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Individual Children</h3>
+<p>One very important takeaway from the <code>val myDiv: Div = div(color &lt;-- prettyColorStream, &quot;Hello&quot;)</code> example is that <strong><code>myDiv</code> is an element, not a stream of elements, even though it depends on a stream</strong>. Think about it: you are not creating new elements when <code>prettyColorStream</code> emits an event, you are merely setting a style property to a new value on an existing element. This is very efficient and is in stark contrast to the amount of work a virtual DOM needs to do in order to perform a simple change like this.</p>
+<p>So, <strong>Laminar elements manage themselves</strong>. A <code>ReactiveElement</code> encapsulates all the reactive updates that are happening inside. This means that you can add an element as a child without knowing how it's implemented or whether it's even static or dynamic. So a simple component could look like this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// Define your "Component"</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Caption</span></span>(caption: <span class="hljs-type">String</span>, colorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">Span</span> = {
+  span(color &lt;-- colorStream, caption)
+}
+ 
+<span class="hljs-comment">// Now use it</span>
+<span class="hljs-keyword">val</span> prettyColorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = ???
+<span class="hljs-keyword">val</span> myDiv: <span class="hljs-type">Div</span> = div(
+  <span class="hljs-string">"Hello "</span>,
+  <span class="hljs-type">Caption</span>(<span class="hljs-string">"World"</span>, prettyColorStream)
+)
+</code></pre>
+<p>This lets you to build loosely coupled applications very easily.</p>
+<p>Having a stable reference to <code>myDiv</code> also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and eliminating needless complexity is one of Laminar's most important goals.</p>
+<p>However, there <em>is</em> a use case for streams of elements. Laminar elements are tied one-to-one to real JS DOM elements, so if you need a different <em>type</em> of element displayed, you will need to re-create the Laminar element. For example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">MaybeBlogUrl</span></span>(maybeUrlSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]): <span class="hljs-type">Signal</span>[<span class="hljs-type">HtmlElement</span>] = {
+  maybeUrlSignal.map {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Some</span>(url) =&gt; a(href := url, <span class="hljs-string">"a blog"</span>)
+    <span class="hljs-keyword">case</span> <span class="hljs-type">None</span> =&gt; i(<span class="hljs-string">"no blog"</span>)
+  }
+}
+
+<span class="hljs-keyword">val</span> maybeBlogUrlSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]] = ???
+<span class="hljs-keyword">val</span> app: <span class="hljs-type">Div</span> = div(
+  <span class="hljs-string">"Hello, I have "</span>,
+  child &lt;-- <span class="hljs-type">MaybeBlogUrl</span>(maybeBlogUrlSignal),
+  <span class="hljs-string">", isn't it great?"</span>
+)
+</code></pre>
+<p>It should be pretty obvious what this does: <code>MaybeBlogUrl</code> maps input Signal to a Signal of Laminar elements, and <code>child &lt;-- MaybeBlogUrl(maybeBlogUrlSignal)</code> creates a subscription that puts these elements into the div.</p>
+<p>The elements are put in the obvious order – what you see is what you get – so, between <em>&quot;Hello, I have &quot;</em> and <em>&quot;, isn't it great?&quot;</em> text nodes. Each next emitted element replaces the previously emitted one in the DOM.</p>
+<p>This example uses Signals, but EventStreams work similarly, and there's also <code>child.maybe</code> and <code>child.text</code> receivers that have more specialized <code>&lt;--</code> methods accepting <code>Observable[Option[Node]]</code> and <code>Observable[String]</code> respectively.</p>
+<h4><a class="anchor" aria-hidden="true" id="efficiency"></a><a href="#efficiency" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Efficiency</h4>
+<p>You might notice that this is not as efficient as it could be. Any time <code>maybeBlogUrlSignal</code> emits a new value, a new element is created, even if we're moving from <code>Some(url1)</code> to <code>Some(url2)</code>. And those are real JS DOM elements, so <strong>if</strong> this method is hit often we might want to optimize for that. For example, we could do this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderBlogLink</span></span>(urlSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">HtmlElement</span> = {
+  a(href &lt;-- urlSignal, <span class="hljs-string">"a blog"</span>)
+}
+ 
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">MaybeBlogUrl</span></span>(maybeUrlSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]): <span class="hljs-type">Signal</span>[<span class="hljs-type">HtmlElement</span>] = {
+  <span class="hljs-keyword">val</span> noBlog = i(<span class="hljs-string">"no blog"</span>)
+  <span class="hljs-keyword">val</span> maybeLinkSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">HtmlElement</span>]] =
+    maybeUrlSignal.split(_ =&gt; ())((_, _, urlSignal) =&gt; renderBlogLink(urlSignal))
+  maybeLinkSignal.map(_.getOrElse(noBlog))
+}
+</code></pre>
+<p>The main hero of this pattern is Airstream's <code>split</code> operator. It's designed specifically to avoid re-rendering of elements in this kind of situation. We will explain its operation in detail when talking about performant <code>children</code> rendering below, but in short, <code>renderBlogLink</code> is called only when maybeUrlSignal switches from <code>None</code> to <code>Some(url)</code>. When it goes from <code>Some(url1)</code> to <code>Some(url2)</code>, it's <code>href &lt;-- urlSignal</code> that takes responsibility for updating the blog link.</p>
+<p>Note that we only create one <code>noBlog</code> element, and reuse it every time maybeUrlSignal emits <code>None</code>.</p>
+<hr>
+<p>You don't actually need to unmount elements in order to hide them. You can achieve a similar effect by rendering both the link and no-link elements at the same time inside a container, and hiding one of them with CSS (<code>display &lt;-- ...</code>). That way both elements will remain mounted all the time, but one of them will be hidden.</p>
+<p>When engaging in such optimizations, you have to ask yourself – is it worth it? Re-creating a JS DOM element – what we were trying to avoid in this example – is only a problem when you need to do it often (performance), or when that element needs to maintain some JS DOM state (e.g. <code>input</code> elements will lose focus if re-created). To put this in the context of our example – if <code>maybeUrlSignal</code> is expected to emit only a few times during a user session, just use the dumbest shortest version of <code>MaybeBlogUrl</code> instead of optimizing it for no reason. But if you're building some kind of BlogRoulette app that updates the blog URL a hundred times per second, or if the element being re-created is very complex (e.g. your entire app or a big section thereof) then yeah, better optimize it.</p>
+<h3><a class="anchor" aria-hidden="true" id="lists-of-children"></a><a href="#lists-of-children" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Lists of Children</h3>
+<p>Rendering dynamic lists of children efficiently is one of the most challenging parts in UI libraries, and Laminar has a few solutions for that.</p>
+<h4><a class="anchor" aria-hidden="true" id="children----observableofelements"></a><a href="#children----observableofelements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>children &lt;-- observableOfElements</code></h4>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> childrenSignal: <span class="hljs-type">Signal</span>[immutable.<span class="hljs-type">Seq</span>[<span class="hljs-type">Node</span>]] = ??? <span class="hljs-comment">// immutable only!</span>
+div(<span class="hljs-string">"Hello, "</span>, children &lt;-- childrenSignal)
+</code></pre>
+<p>If you have an Observable of desired children elements, this is the most straightforward way to subscribe to it.</p>
+<p>Internally, this <code>&lt;--</code> method keeps track of prevChildren and nextChildren. It then &quot;diffs&quot; them. The general idea here is only cosmetically similar to virtual DOM. Laminar diffing is much lighter than typical virtual DOM machinery. We only compare elements for reference equality, we do not look at any attributes / props / state / children and we do not re-render anything like React.</p>
+<p>We make a single pass through nextChildren, and detect any inconsistencies by checking that <code>nextChildren(i).ref == childrenInDom(i)</code> (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (&lt;50LoC total) but efficient.</p>
+<p>Laminar will perform absolutely minimal operations that make sense – for example if a new element needs to be inserted, that is the only thing that will happen, <em>and</em> this new element is the only element for which Laminar will spend time figuring out what to do, because all others will match. Reorderings are probably the worst case performance-wise, but still no worse than virtual DOM. You can read the full algorithm in <code>ChildrenInserter.updateChildren</code>.</p>
+<p>Note: a given DOM node can not exist in multiple locations in the DOM at the same time. Therefore, the Seq-s you provide to <code>children &lt;--</code> must not contain several references to the same element. This is on you, as Laminar does not spend CPU cycles to verify this. Generally this isn't a problem unless you're deliberately caching elements for reuse in this manner. If you <em>are</em> doing that, consider using the <code>split</code> operator explained below.</p>
+<h4><a class="anchor" aria-hidden="true" id="performant-children-rendering--split"></a><a href="#performant-children-rendering--split" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Performant Children Rendering – <code>split</code></h4>
+<p>We've now established how <code>children &lt;-- childrenObservable</code> works, but generating this <code>childrenObservable</code> easily and efficiently can be quite complicated depending on your dataflow. For maximum efficiency, you should use Airstream's <code>split</code> method. Before we dive into that, let's see what the problem is without it.</p>
+<p>Suppose you want to render a dynamic list of users. The set of users, their order, and the attributes of individual users can all change, except for user id, which uniquely identifies a user. You also know how to render an individual user element:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span>(<span class="hljs-params">id: <span class="hljs-type">String</span>, name: <span class="hljs-type">String</span>, lastModified: <span class="hljs-type">String</span></span>)</span>
+ 
+<span class="hljs-keyword">val</span> usersStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">List</span>[<span class="hljs-type">User</span>]] = ???
+   
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderUser</span></span>(user: <span class="hljs-type">User</span>): <span class="hljs-type">Div</span> = {
+  div(
+    p(<span class="hljs-string">"user id: "</span>, user.id),
+    p(<span class="hljs-string">"name: "</span>, user.name)
+  )
+}
+</code></pre>
+<p>Given this, you might be tempted to render users like this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> userElementsStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">List</span>[<span class="hljs-type">Div</span>]] =
+  usersStream.map(users =&gt; users.map(renderUser))
+ 
+div(
+  children &lt;-- userElementsStream
+)
+</code></pre>
+<p>This will work, but it is inefficient. Every time <code>usersStream</code> emits a new list of users, Laminar re-creates DOM elements for every single user in the list, and then replaces the old list of elements with this new one.</p>
+<p>This is the kind of situation that virtual DOM was designed to avoid. While this pattern is perfectly fine for small lists that don't update often (and assuming you don't care about losing DOM element state such as text in an input box), with larger lists and frequent updates there is a lot of needless work being done.</p>
+<p>So does this mean that virtual DOM is more efficient than Laminar when rendering large lists of dynamic children? Yes, if you render children <strong>as described above</strong>. This might be a surprising admission, but this default is necessary to uphold Laminar's core value: simplicity. There is no magic in Laminar. Laminar does what we tell it to do, and in this case we very explicitly tell it to create a list of elements every time the stream emits a new list of users, and then replace the old elements with brand new ones.</p>
+<p>So let's write smarter code. It's actually very easy.</p>
+<p>All we need to do is adjust our <code>renderUser</code> function to take a different set of parameters:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">newRenderUser</span></span>(userId: <span class="hljs-type">String</span>, initialUser: <span class="hljs-type">User</span>, userStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">User</span>]): <span class="hljs-type">Div</span> = {
+  div(
+    p(<span class="hljs-string">"user id: "</span> + userId),
+    p(<span class="hljs-string">"name: "</span>, child.text &lt;-- userStream.map(_.name)), 
+    p(
+      <span class="hljs-string">"user was updated: "</span>,
+      child.text &lt;-- userStream.map(_.lastModified != initialUser.lastModified)
+    ) 
+  )
+}
+</code></pre>
+<p>And with this, efficient rendering is as simple as:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> userElementsStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">List</span>[<span class="hljs-type">Div</span>]] =
+  usersStream.split(_.id)(newRenderUser)
+ 
+div(
+  children &lt;-- userElementsStream
+)
+</code></pre>
+<p>Airstream's <code>split</code> operator was designed specifically for this use case. On a high level, you need three things to use it:</p>
+<ul>
+<li><code>usersStream</code> – a stream (or signal) of <code>immutable.Seq[User]</code></li>
+<li><code>_.id</code> – a way to uniquely identify users</li>
+<li><code>newRenderUser</code> – a way to render a user into a single element given its unique key (<code>id</code>), the initial instance of that user (<code>initialUser</code>), and a stream of updates to that same user (<code>userStream</code>).</li>
+</ul>
+<p>To clarify, Airstream-provided <code>userStream</code> is a safe and performant equivalent to <code>usersStream.map(_.find(_.id == userId).get)</code>. It provides you with updates of one specific user.</p>
+<hr>
+<p>Here is how <code>split</code> works in more detail:</p>
+<ul>
+<li>As soon as a <code>User</code> with id=&quot;123&quot; first appears in <code>usersStream</code>, we call <code>newRenderUser</code> to render it. This gives us a <code>Div</code> element <strong>that we will reuse</strong> for all future versions of this user.</li>
+<li>We remember this <code>Div</code> element. Whenever <code>usersStream</code> emits a list that includes a new version of the id=&quot;123&quot; User, the <code>userStream</code> in <code>newRenderUser</code> emits this new version.</li>
+<li>Similarly, when other users are updated in <code>usersStream</code> their updates are scoped to their own invocations of <code>newRenderUser</code>. The grouping happens by <code>key</code>, which in our case is the <code>id</code> of <code>User</code>.</li>
+<li>When the list emitted by <code>usersStream</code> no longer contains a User with id=&quot;123&quot;, we remove its Div from the output and forget that we ever made it.</li>
+<li>Thus <code>userElementsStream</code> contains a list of Div elements matching one-to-one to the users in the <code>usersStream</code>.</li>
+</ul>
+<hr>
+<p>Lastly, aside from <code>split</code> there is also <code>splitIntoSignals</code>. Which one you want depends on whether you want <code>newRenderUser</code> to accept a stream or a signal. Remember that unlike streams, signals keep track of their current state, and only emit values that don't <code>==</code>-equal their current state. This might be desirable or not (or irrelevant) depending on your use case.</p>
+<h4><a class="anchor" aria-hidden="true" id="performant-children-rendering--childrencommand"></a><a href="#performant-children-rendering--childrencommand" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Performant Children Rendering – <code>children.command</code></h4>
+<p>In certain cases such as rendering live logs, it might be easier for you to tell Laminar when you want items added or removed to the list instead of giving it an entire updated list of children:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> commandBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">ChildrenCommand</span>]
+<span class="hljs-keyword">val</span> commandStream = commandBus.events
+div(<span class="hljs-string">"Hello, "</span>, children.command &lt;-- commandStream)
+</code></pre>
+<p>EventBus is an Airstream data structure that contains both an Observer (<code>.writer</code>) and an EventStream (<code>.events</code>). It's basically an event stream that you send events to by invoking the Observer. A more complete example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> commandBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">ChildrenCommand</span>]
+<span class="hljs-keyword">val</span> commandStream = commandBus.events
+<span class="hljs-keyword">var</span> counter = <span class="hljs-number">0</span>
+div(
+  <span class="hljs-string">"Hello, "</span>,
+  children.command &lt;-- commandStream,
+  button(<span class="hljs-string">"Add a child"</span>, onClick.map { _ =&gt;
+    counter += <span class="hljs-number">1</span>
+    <span class="hljs-type">CollectionCommand</span>.<span class="hljs-type">Append</span>(span(<span class="hljs-string">s"Child # <span class="hljs-subst">$counter</span>"</span>))
+  } --&gt; commandBus)
+)
+</code></pre>
+<p>We'll explain the <code>--&gt;</code> method and the rest of event handling in later sections. What's important is that in this example we're sending <code>CollectionCommand.Append(span(s&quot;Child # $counter&quot;))</code> events to <code>commandBus</code> on every button click.</p>
+<p>The ChildrenCommand approach offers the best performance on Laminar side. Since you are directly telling Laminar what to do, no logic stands between your code and Laminar executing your requests. There is no diffing involved.</p>
+<p>That said, don't go crazy trying to adapt your logic to it. Airstream's <code>split</code> operator described in the previous section offers great performance too. Choose the method that feels more natural for your needs, and micro-optimize later, if needed.</p>
+<p>One downside of ChildrenCommand is that you don't have an observable of the list of children naturally available to you, so if you want to display e.g. the number of children somewhere, you will need to create an observable for that yourself. For example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> commandBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">ChildrenCommand</span>]
+<span class="hljs-keyword">val</span> commandStream = commandBus.events
+<span class="hljs-keyword">val</span> countSignal = commandStream.foldLeft(initial = <span class="hljs-number">0</span>)(_ + <span class="hljs-number">1</span>)
+
+div(
+  <span class="hljs-string">"Hello, "</span>,
+  children.command &lt;-- commandStream,
+  button(<span class="hljs-string">"Add a child"</span>, onClick.map( _ =&gt;
+    <span class="hljs-type">CollectionCommand</span>.<span class="hljs-type">Append</span>(span(<span class="hljs-string">s"Just another child"</span>))
+  ) --&gt; commandBus),
+  div(
+    <span class="hljs-string">"Number of children: "</span>,
+    child.text &lt;-- countSignal.map(_.toString)    
+  )
+)
+</code></pre>
+<p>This would need more work if we wanted to support other actions such as removals, and you need to be careful to not overcomplicate things here, especially if you're only doing this for performance reasons. Make sure you actually have a performance problem first.</p>
+<hr>
+<p>You can mix both <code>children &lt;-- *</code> and <code>children.command &lt;-- *</code> and any other children or modifiers in any order inside one element, and they will happily coexist with no interference. Correct order of elements will be maintained even in edge cases such as showing zero elements. Laminar adds a sentinel HTML comment node into the DOM for each <code>child* &lt;-- *</code> receiver to make this possible. These nodes effectively &quot;reserve the spot&quot; for children provided by a particular receiver.</p>
+<h3><a class="anchor" aria-hidden="true" id="binding-observables"></a><a href="#binding-observables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Binding Observables</h3>
+<p>By now you must have realized that <code>--&gt;</code> and <code>&lt;--</code> methods are the main syntax to connect / bind / subscribe observables to observers in Laminar.</p>
+<p>To be more precise, such methods always return a <code>Modifier</code> that needs to be applied to an element. And when it is applied, a dynamic subscription is created such that it activates when the element is mounted, and deactivates when the element gets unmounted. The types of such modifiers are <code>Binder</code> for those that deal with props / attributes / events / etc., and <code>Inserter</code> for those that add children to the element.</p>
+<p>Inserters are special because they reserve a spot in the element's children where the children provided by the Inserter will be inserted. How does that work? When an Inserter is applied to an element, it appends a sentinel node to the element – just an empty, invisible <code>CommentNode</code>. When it's time to insert some children, the inserter either replaces the sentinel node with the next child (in case of <code>child &lt;-- childStream</code>), or inserts new children right after the sentinel node (in case of children &lt;-- <code>childrenStream</code>). That way your dynamic children will always appear where you expect them to, and you can mix and match any number of child inserters in a single parent element.</p>
+<p>So far we've talked about Binders and Inserters provided by Laminar. But what if you want to subscribe an arbitrary Observable to an arbitrary Observer? First of all, why would you even need Laminar's help in this? The answer is <a href="#ownership">Ownership</a> – in order to create an Airstream Subscription, you need an <code>Owner</code>, and in 99.9% cases you don't want to create those manually. You want to use owners provided by Laminar. In fact, what you really want is to avoid the ownership boilerplate altogether. When you sent click events to an observer using <code>onClick --&gt; observer</code>, you didn't need to think about owners. That was nice.</p>
+<p>It should come naturally then that Laminar offers a similar way to bind any observable to any observer:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> eventStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">A</span>] = ???
+<span class="hljs-keyword">val</span> eventBus: <span class="hljs-type">EventBus</span>[<span class="hljs-type">A</span>] = ???
+<span class="hljs-keyword">val</span> observable: <span class="hljs-type">Observable</span>[<span class="hljs-type">A</span>] = ???
+<span class="hljs-keyword">val</span> observer: <span class="hljs-type">Observer</span>[<span class="hljs-type">A</span>] = ???
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">doSomething</span></span>(value: <span class="hljs-type">A</span>): <span class="hljs-type">Unit</span> = ???
+ 
+div(observable --&gt; observer)
+div(observable --&gt; doSomething)
+div(eventStream --&gt; eventBus.writer)
+div(eventStream --&gt; eventBus) <span class="hljs-comment">// same as above</span>
+</code></pre>
+<p>Now, what's your intuition for how long any of these subscriptions will live? Subscriptions can't just live forever, they are leaky resources and need to be shut down. Airstream offers a way to manage this automatically using <code>Owners</code>. But you don't see any <code>Owner</code>s here (there's nothing <code>implicit</code> either).</p>
+<p>The answer was a few paragraphs ago. Subscriptions created by modifiers (and <code>observable --&gt; observer</code> is a <code>Modifier</code>, a <code>Binder</code> to be exact) are activated when the element to which that modifier is applied is mounted, and deactivated when the element is unmounted. This was entirely seamless for <code>onClick --&gt; observer</code> because users wouldn't be able to click on your element when it was unmounted anyway, but for arbitrary observables you need to be aware that their subscription is deactivated when the element is unmounted. That would mean that if <code>observable</code> doesn't have any other observers, it would stop (See Lazyness section in Airstream docs if you're not sure why).</p>
+<p>The lifecycle of subscriptions is discussed in greater detail in the <a href="#ownership">Ownership</a> section below.</p>
+<h3><a class="anchor" aria-hidden="true" id="other-binders"></a><a href="#other-binders" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Other Binders</h3>
+<h4><a class="anchor" aria-hidden="true" id="focus"></a><a href="#focus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Focus</h4>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> focusStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Boolean</span>]
+input(focus &lt;-- focusStream)
+</code></pre>
+<p>You can dynamically focus or blur an element by emitting <code>true</code> or <code>false</code> respectively. Keep in mind that this is just compositional sugar over calling <code>myInput.ref.focus()</code> or <code>myInput.ref.blur()</code> with all the same limitations – emitting <code>true</code> once will not make Laminar enforce focused state on the input until you emit <code>false</code>. If the user clicks away from the focused element, the focus will still be lost, and if you need it otherwise, you'll have to code that yourself.</p>
+<p>Speaking of focus, Laminar provides a simple <code>onMountFocus</code> modifier that focuses the element when it's mounted into the DOM. It's like the HTML <code>autoFocus</code> attribute that actually works for dynamic content.</p>
+<h2><a class="anchor" aria-hidden="true" id="classname-and-other-special-keys"></a><a href="#classname-and-other-special-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ClassName and Other Special Keys</h2>
+<p>Almost all props and attributes behave exactly the same way regarding the <code>apply</code> / <code>:=</code> / <code>&lt;--</code> methods, however a few keys are special in Laminar.</p>
+<h3><a class="anchor" aria-hidden="true" id="cls"></a><a href="#cls" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>cls</h3>
+<p>This <a href="https://github.com/raquo/scala-dom-types#reflected-attributes">reflected attribute</a> (aliased as <strong><code>className</code></strong>) contains a string with space-separated CSS class names that a given HTML or SVG element belongs to. Laminar provides a specialized API for this attribute. Consider this use case:</p>
+<pre><code class="hljs css language-css"># <span class="hljs-selector-tag">CSS</span>
+<span class="hljs-selector-class">.LabelComponent</span> {
+  <span class="hljs-attribute">font-size</span>: <span class="hljs-number">20pt</span>;
+  <span class="hljs-attribute">color</span>: red;
+}
+<span class="hljs-selector-class">.vip</span> {
+  <span class="hljs-attribute">text-transform</span>: uppercase;
+}
+</code></pre>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// Scala</span>
+<span class="hljs-keyword">val</span> veryImportant: <span class="hljs-type">Modifier</span>[<span class="hljs-type">HtmlElement</span>] = cls := <span class="hljs-string">"vip"</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Label</span></span>(caption: <span class="hljs-type">String</span>): <span class="hljs-type">HtmlElement</span> = div(
+  veryImportant,
+  cls := <span class="hljs-string">"LabelComponent"</span>,
+  caption
+)
+ 
+<span class="hljs-keyword">val</span> myLabel: <span class="hljs-type">HtmlElement</span> = <span class="hljs-type">Label</span>(<span class="hljs-string">"Hi, I'm a caption."</span>) 
+</code></pre>
+<p>Here we have a Label component that we can use to render a pretty caption, and a reusable <code>veryImportant</code> modifier that makes any element it is applied to look VERY IMPORTANT. This tasteless styling is provided by CSS class names <code>LabelComponent</code> and <code>vip</code>.</p>
+<p>The code above makes it obvious that we expect <code>myLabel</code> element to contain two CSS classes: <code>LabelComponent</code> and <code>vip</code>. However, does it? From previous documentation sections we know that the <code>:=</code> method <em>sets</em> the value of an attribute, overriding its previous value, so in this case it looks like <code>cls := &quot;LabelComponent&quot;</code> overrides <code>cls := &quot;vip&quot;</code>, leaving <code>myLabel</code> without the <code>vip</code> class.</p>
+<p>Needless to say, if <code>cls</code> behaved like that it would be really inconvenient to work with. Just imagine how much more complicated / coupled / inflexible you'd need to make the code to support this simple example of ours.</p>
+<p>And so <code>cls</code> does not behave like this. Instead of <strong>setting</strong> the list of CSS classes, <code>cls := &quot;newClass&quot;</code> <strong>appends</strong> <code>newClass</code> to the list of CSS classes already present on the element, so our example code works as intended.</p>
+<p>Here are some more <code>cls</code> tricks. All of these produce a <code>Modifier[HtmlElement]</code>:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// ADD multiple class names</span>
+cls := (<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
+cls := <span class="hljs-type">List</span>(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
+ 
+<span class="hljs-comment">// Remember that apply method is alias for :=. Below is the same as above</span>
+cls(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
+cls(<span class="hljs-type">List</span>(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))
+ 
+<span class="hljs-comment">// ADD and REMOVE class names (true=add, false=remove)</span>
+cls := (<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>)
+cls := <span class="hljs-type">Seq</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>)
+cls := (<span class="hljs-type">Seq</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>), <span class="hljs-type">Seq</span>(<span class="hljs-string">"class3"</span> -&gt; <span class="hljs-literal">true</span>))
+cls := <span class="hljs-type">Map</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>)
+ 
+<span class="hljs-comment">// As usual, all := methods are aliased as `apply`</span>
+cls(<span class="hljs-type">List</span>(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))
+ 
+<span class="hljs-comment">// SET a class name instead of ADDING it</span>
+cls.set(<span class="hljs-string">"class1"</span>)
+<span class="hljs-comment">// SET multiple class names</span>
+cls.set(<span class="hljs-string">"class1 class2"</span>)
+cls.set(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
+<span class="hljs-comment">// CLEAR all class names</span>
+cls.set(<span class="hljs-string">""</span>)
+
+<span class="hljs-comment">// REMOVE class names</span>
+cls.remove(<span class="hljs-string">"class1"</span>)
+cls.remove(<span class="hljs-string">"class1 class2"</span>)
+cls.remove(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
+
+<span class="hljs-comment">// TOGGLE class names (true = add, false = remove)</span>
+cls.toggle(<span class="hljs-string">"class1"</span>) := <span class="hljs-literal">true</span>
+cls.toggle(<span class="hljs-string">"class1 class2"</span>) := <span class="hljs-literal">false</span>
+cls.toggle(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>) := <span class="hljs-literal">true</span>
+
+<span class="hljs-comment">// Note: some of the := methods accept an implicit param, so you might</span>
+<span class="hljs-comment">// need to wrap the modifier in a `locally` to help Scala parse an</span>
+<span class="hljs-comment">// immediate application of such a modifier to an element:</span>
+locally(cls := (<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))(element)
+
+<span class="hljs-comment">// Using the `amend` method is nicer anyway:</span>
+element.amend(cls := (<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))
+</code></pre>
+<p>Of course, the reactive layer is similarly considerate in regard to <code>cls</code>. Consider this use case:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> classesStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Seq</span>[<span class="hljs-type">String</span>]] = ???
+<span class="hljs-keyword">val</span> boolStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Boolean</span>] = ???
+ 
+div(
+  cls := <span class="hljs-string">"MyComponent"</span>,
+  cls &lt;-- classesStream,
+  cls.toggle(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>) &lt;-- boolStream 
+)
+</code></pre>
+<p>Once again, we don't want the CSS class names coming in from <code>classesStream</code> to override (remove) <code>MyComponent</code> class name. We want that one to stay forever, and for the class names coming from <code>classStream</code> to <strong>override the previous values emitted by that stream</strong>. And this is exactly how Laminar behaves. The Modifier <code>cls &lt;-- classesStream</code> keeps track of the class names that it last added to the element's <code>cls</code> attribute. When a new event comes in, we remove those previously added class names and add new ones that are not already on the element.</p>
+<p>So for example, when <code>classesStream</code> emits <code>List(&quot;class1&quot;, &quot;class2&quot;)</code>, we will <em>add</em> those classes to the element. When it subsequently emits <code>List(&quot;class1&quot;, &quot;class3&quot;)</code>, we will remove <code>class2</code> and add <code>class3</code> to the element's class list.</p>
+<p>The <strong><code>&lt;--</code></strong> method can be called with Observables of <code>String</code>, <code>Seq[String]</code>, <code>Seq[(String, Boolean)]</code>, <code>Map[String, Boolean]</code>, <code>Seq[Seq[String]]</code>, <code>Seq[Seq[(String, Boolean)]]</code>. The ones involving booleans let you issue events that instruct Laminar to remove certain classes (by setting their value to <code>false</code>). Note that unless you instruct Laminar to add those classes back, they will not be added back automatically. Only previous <em>additions</em> of classes are undone in the manner described in the previous paragraph, not removals.</p>
+<p>Each <code>cls &lt;-- source</code> modifier should deal with a set of CSS classes that does not intersect with the sets used by other such modifiers. In other words, you should generally avoid adding classes to an element in one reactive modifier and then removing them in another reactive modifier. Basically, if you do this you have two competing sources of truth for whether an element should carry a class at any given time, and the latest source to emit will win. That works, but is a bad practice. Search for &quot;interference&quot; in <code>CompositeKeySpec</code> for a simple example.</p>
+<h3><a class="anchor" aria-hidden="true" id="other-composite-keys"></a><a href="#other-composite-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Other Composite Keys</h3>
+<p><strong><code>rel</code></strong> is another space-separated attribute. Its API in Laminar is exactly identical to that of <code>cls</code> (see right above). For example <code>rel := (&quot;noopener&quot;, &quot;noreferrer&quot;)</code> is a Modifier that makes the <code>a</code> element it applies to <a href="https://mathiasbynens.github.io/rel-noopener/">safer</a> without removing existing <code>rel</code> attribute value.</p>
+<p><strong><code>role</code></strong> attribute works similarly.</p>
+<h3><a class="anchor" aria-hidden="true" id="svg"></a><a href="#svg" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>SVG</h3>
+<p>Laminar lets you work with SVG elements (almost) just as well as HTML. Everything works pretty much the same, just need to understand the required imports:</p>
+<ul>
+<li>SVG elements and attributes are available in the <code>com.raquo.laminar.api.L.svg</code> object</li>
+<li>Some of the attributes of SVG and HTML have the same names, for example there are two instances of the <code>className</code> attribute, one is <code>L.className</code> and is an HTML attribute, the other is <code>L.svg.className</code> and is an SVG attribute. You can only apply SVG attributes to SVG elements (and not HTML elements), and similarly for HTML attributes.</li>
+<li>Therefore, you generally should <strong>not</strong> import both <code>com.raquo.laminar.api.L.svg._</code> and <code>com.raquo.laminar.api.L._</code> as that would cause name collisions.</li>
+<li>On the other hand, event prop keys such as <code>com.raquo.laminar.api.L.onClick</code> apply universally to all elements, both HTML and SVG.</li>
+<li>If you are working mostly with HTML elements in a given file, you can just import <code>com.raquo.laminar.api.L._</code> and refer to SVG elements and attributes with an <code>svg</code> prefix, like this:
+<pre><code class="hljs css language-scala">div(
+  className := <span class="hljs-string">"someHtmlClassName"</span>,
+  onClick --&gt; ???,
+  svg.svg(
+    svg.height := <span class="hljs-string">"800"</span>,
+    svg.width := <span class="hljs-string">"500"</span>,
+    svg.polyline(
+      svg.points := <span class="hljs-string">"20,20 40,25 60,40"</span>,
+      svg.className := <span class="hljs-string">"someSvgClassName"</span>,
+      onClick --&gt; ???,
+      children &lt;-- ???
+    )
+  )
+)
+</code></pre></li>
+<li>On the other hand, if you are working mostly with SVG elements in a given file, you can use a different set of imports :
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>.svg._ <span class="hljs-comment">// get svg keys without the svg prefix</span>
+<span class="hljs-keyword">import</span> com.raquo.laminar.api._ <span class="hljs-comment">// get `L` and standard implicits like `textToNode`</span>
+<span class="hljs-comment">// DO NOT IMPORT: com.raquo.laminar.api.L._</span>
+
+<span class="hljs-type">L</span>.div(
+  <span class="hljs-type">L</span>.className := <span class="hljs-string">"someHtmlClassName"</span>,
+  <span class="hljs-type">L</span>.onClick --&gt; ???,
+  svg(
+    height := <span class="hljs-string">"800"</span>,
+    width := <span class="hljs-string">"500"</span>,
+    polyline(
+      points := <span class="hljs-string">"20,20 40,25 60,40"</span>,
+      className := <span class="hljs-string">"someSvgClassName"</span>,
+      <span class="hljs-type">L</span>.onClick --&gt; ???,
+      <span class="hljs-type">L</span>.children &lt;-- ???
+    )
+  )
+)
+</code></pre></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="event-system-emitters-transformations-buses"></a><a href="#event-system-emitters-transformations-buses" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event System: Emitters, Transformations, Buses</h2>
+<h3><a class="anchor" aria-hidden="true" id="registering-a-dom-event-listener"></a><a href="#registering-a-dom-event-listener" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Registering a DOM Event Listener</h3>
+<p>Laminar uses native JS DOM events. We do not have a synthetic event system like React.js. There is no event pooling, no magic going on. This means there is nothing Laminar-specific to learn about events themselves. There's one exception for certain <code>onClick</code> events on checkboxes, see <a href="#special-cases">Special Cases</a>.</p>
+<p>To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, <code>EventPropBinder</code> is a <code>Modifier</code> that performs this action.</p>
+<p>This is how it's done in the simplest case:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> clickObserver = <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">MouseEvent</span>](onNext = ev =&gt; dom.console.log(ev.screenX))
+<span class="hljs-keyword">val</span> element: <span class="hljs-type">Div</span> = div(
+  onClick --&gt; clickObserver,
+  <span class="hljs-string">"Click me"</span>
+)
+</code></pre>
+<p><code>Observer</code> is an Airstream type that is typically used to perform side effects on incoming events. Usually it's used like this: <code>someStream.addObserver(someObserver)(owner)</code>. This would ensure that <code>someStream</code> runs (remember, streams are lazy), and would call <code>someObserver.onNext(ev)</code> for every new event that <code>someStream</code> emits.</p>
+<p>This <code>--&gt;</code> method simply registers an event listener on <code>element</code> which calls <code>clickObserver.onNext(ev)</code> for every click event that comes in, and then the observer prints this event's X coordinate to the console.</p>
+<h3><a class="anchor" aria-hidden="true" id="eventbus"></a><a href="#eventbus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>EventBus</h3>
+<p>The contrived example above does not feel like reactive programming at all. As shown, it's just a cumbersome way to define a simple callback. Instead, we usually want to get a stream of events from an element. To do that, we need an Observer that will expose a stream of events that it receives. In FRP terms this is usually called a &quot;Subject&quot; or a &quot;PublishSubject&quot;.</p>
+<p>In Laminar, we have an <code>EventBus</code>. Same general idea, but instead of <em>being</em> both an Observer and an Observable, it <em>contains</em> them as <code>.writer</code> and <code>.events</code> respectively. This design makes it possible to easily share write-only or read-only parts of an EventBus, with no upcasting loopholes. You should generally avoid passing the whole EventBus to child components unless you really do need the child component to both write events to the bus and read the entirety of events written to that bus (including events written by other components into that bus).</p>
+<p>Now let's see how we can use EventBus for the same logic:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> clickBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[dom.<span class="hljs-type">MouseEvent</span>]
+<span class="hljs-keyword">val</span> coordinateStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Int</span>] = clickBus.events.map(ev =&gt; ev.screenX)
+<span class="hljs-keyword">val</span> coordinateObserver = <span class="hljs-type">Observer</span>[<span class="hljs-type">Int</span>](onNext = x =&gt; dom.console.log(x))
+ 
+<span class="hljs-keyword">val</span> element: <span class="hljs-type">Div</span> = div(
+  onClick --&gt; clickBus.writer, <span class="hljs-comment">// .writer is actually optional here, for convenience</span>
+  <span class="hljs-string">"Click me"</span>,
+  coordinateStream --&gt; coordinateObserver
+)
+</code></pre>
+<p><code>onClick --&gt; clickBus.writer</code> works exactly the same as the previous example, except that <code>clickBus.writer</code> is now the Observer that we send the events to. For convenience, the <code>--&gt;</code> method will also accept the event bus itself: <code>div(onClick --&gt; clickBus, ...)</code> woudl have exactly the same effect.</p>
+<p>What's new here is how we subscribe <code>coordinateObserver</code> to <code>onClick</code> events. As we established, we first send onClick events to <code>clickBus</code>. Then we have a <code>coordinateStream</code> that maps every click event from <code>clickBus</code> to its <code>screenX</code> coordinate.</p>
+<p>Finally, we subscribe <code>coordinateObserver</code> to <code>coordinateStream</code> to print out those coordinates on every click. This completes our contrived pipeline. In real life this component might only be exposing the stream of coordinates, and consuming components would provide their own observers. Or this same component could be deriving some of its own state from the click stream, such as tracking and displaying the number of clicks.</p>
+<p>It's not a coincidence that <code>coordinateStream --&gt; coordinateObserver</code> syntax looks very similar to <code>onClick --&gt; clickBus.writer</code>. Both of these <code>--&gt;</code> methods create Modifiers that send events from the left hand side to the right hand side for as long as the element is mounted, conceptually speaking. Both methods are also provided implicitly as defined in <code>Implicits.scala</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="transforming-observers"></a><a href="#transforming-observers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Transforming Observers</h4>
+<p>You can <code>contramap</code> and <code>filter</code> Observers, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> pieObserver: <span class="hljs-type">Observer</span>[<span class="hljs-type">Pie</span>] = <span class="hljs-type">Observer</span>(onNext = bakePie)
+<span class="hljs-keyword">val</span> appleObserver: <span class="hljs-type">Observer</span>[<span class="hljs-type">Apple</span>] = pieObserver.contramap(apple =&gt; makeApplePie(apple))
+ 
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">AppleComponent</span></span>(observer: <span class="hljs-type">Observer</span>[<span class="hljs-type">Apple</span>]): <span class="hljs-type">Div</span> = {
+  <span class="hljs-keyword">val</span> appleStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Apple</span>] = ???
+  div(
+    <span class="hljs-string">"Apple Component"</span>,
+    appleStream --&gt; observer,
+    ???
+  )
+}
+ 
+<span class="hljs-keyword">val</span> app = <span class="hljs-type">AppleComponent</span>(appleObserver)
+</code></pre>
+<p>In this pattern AppleComponent has no knowledge of pies. All it knows is how to produce apples and send them to an apple observer. Delicious culinary metaphors aside, replace pies with ajax requests and apples with todo items that need to be created, and you can see how this separation of concerns is useful.</p>
+<p>If your observer is a <code>WriteBus</code> (e.g. <code>myEventBus.writer</code>), you have even more methods available to you: <code>filterWriter</code>, <code>contramapWriter</code> and (gasp) <code>contracomposeWriter</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="feeding-multiple-sources-into-eventbus"></a><a href="#feeding-multiple-sources-into-eventbus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Feeding Multiple Sources into EventBus</h4>
+<p>Note that Airstream Observers, including <code>eventBus.writer</code>, can subscribe to multiple observables. So you can for example render a dynamic list of children, each of which sends its own events to the same Observer, possibly with information included in the event needed to identify which child the event came from. You can see an example of this pattern used in <code>TaskListView.taskViewsStream</code> in <a href="https://github.com/raquo/laminar-examples">laminar-examples</a>.</p>
+<p>This can be achieved either with <code>addSource</code> or <code>addObserver</code>. Basically, in terms of laziness, with <code>addSource</code> EventBus behaves like a stream that merges other streams – much like <code>EventStream.merge(stream1, stream2)</code>, but with the ability to add and remove source streams at any time. So, if you do <code>eventBus.writer.addSource(sourceStream)(childOwner)</code>, <code>sourceStream</code> will not be started until and unless <code>eventBus.stream</code> is started. Conversely, <code>sourceStream.addObserver(eventBus.writer)(childOwner)</code> will immediately start <code>sourceStream</code> even if <code>eventBus</code> does not have any observers.</p>
+<p>The best part of this pattern is that you don't need to write custom logic to call <code>removeSource</code> or <code>subscription.kill</code> when removing a child from the list of children. <code>childOwner</code> will take care of that. Typically, that would be provided by the child Laminar element, via <code>onMountCallback</code>. Such an owner kills its subscriptions when the corresponding element gets removed from the DOM.</p>
+<h3><a class="anchor" aria-hidden="true" id="alternative-event-listener-registration-syntax"></a><a href="#alternative-event-listener-registration-syntax" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Alternative Event Listener Registration Syntax</h3>
+<p>Imagine you're building <code>TextInput</code>, a component that wraps an <code>input</code> element into a <code>div</code> with some styles added on top:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TextInput</span> <span class="hljs-title">private</span> (<span class="hljs-params">
+  val wrapperNode: <span class="hljs-type">Div</span>,
+  val inputNode: <span class="hljs-type">Input</span>
+</span>)</span>
+ 
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">TextInput</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>(caption: <span class="hljs-type">String</span>): <span class="hljs-type">TextInput</span> = {
+    <span class="hljs-keyword">val</span> inputNode = input(typ := <span class="hljs-string">"text"</span>, color := <span class="hljs-string">"grey"</span>)
+    <span class="hljs-keyword">val</span> wrapperNode = div(caption, inputNode)
+    <span class="hljs-keyword">new</span> <span class="hljs-type">TextInput</span>(wrapperNode, inputNode)
+  }
+}
+</code></pre>
+<p>This generic component does not necessarily know what events on <code>inputNode</code> the consumer will care about when using it – <code>onKeyUp</code>, <code>onKeyPress</code>, <code>onChange</code>, <code>onInput</code>, others? There's just too many possibilities. And of course you wouldn't want to clutter your <code>TextInput</code>'s API by e.g. exposing all <em>potentially</em> useful event streams as vals on the <code>TextInput</code> class.</p>
+<p>That's what <code>ReactiveElement.events(eventProp)</code> method was made for:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> textInput = <span class="hljs-type">TextInput</span>(<span class="hljs-string">"Full name:"</span>)
+<span class="hljs-keyword">val</span> changeEventStream: <span class="hljs-type">EventStream</span>[dom.<span class="hljs-type">Event</span>] =
+  textInput.inputNode.events(onChange)
+<span class="hljs-keyword">val</span> changeObserver: <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">Event</span>] = ???
+ 
+div(<span class="hljs-string">"Hello"</span>, changeEventStream --&gt; changeObserver)
+</code></pre>
+<p>Under the hood, <code>element.events(eventProp)</code> creates an EventBus, applies an <code>eventProp --&gt; eventBus</code> modifier to <code>element</code>, and returns <code>eventBus.events</code>. That's all there is to it, no magic – just alternative syntax that makes it easier to compose your components without tight coupling.</p>
+<p>The <code>events</code> method also accepts <code>EventPropTransformation</code>, not just ReactiveEventProp. This allows for very flexible composition:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// You can define this once for reusability</span>
+<span class="hljs-keyword">val</span> onEnterPress: <span class="hljs-type">EventPropTransformation</span>[dom.<span class="hljs-type">KeyboardEvent</span>, dom.<span class="hljs-type">KeyboardEvent</span>] =
+ onKeyPress.filter(_keyCode == <span class="hljs-type">KeyCodes</span>.<span class="hljs-type">Enter</span>)
+
+input(onEnterPress --&gt; observer)
+
+textArea(onEnterPress.preventDefault --&gt; observer)
+
+<span class="hljs-keyword">val</span> changeEventStream = myInputNode.events(onEnterPress)
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="multiple-event-listeners"></a><a href="#multiple-event-listeners" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Multiple Event Listeners</h3>
+<p>Just like in native JS DOM, nothing is stopping you from registering two or more event listeners for the same event type on the same element:</p>
+<pre><code class="hljs css language-scala">div(onClick --&gt; clickBus1, onClick --&gt; clickBus2, <span class="hljs-string">"Click me"</span>)
+</code></pre>
+<p>In this case, two event listeners will be registered on the DOM node, one of them sending events to <code>clickBus1</code>, the other sending the exact same events to <code>clickBus2</code>. Of course, this works the same regardless of what syntax you use to register event listeners (see previous section).</p>
+<p>In most cases you could simply add another listener to <code>clickBus.events</code> to achieve whatever you needed multiple event listeners bound to the same element for – it's easier and more performant in extreme cases (thousands of nodes, I'd guess).</p>
+<p>However, sometimes simpler composition is more important. For example, consider the <code>TextInput</code> component mentioned above. That component itself might have an internal need to listen to its own <code>onChange</code> events (e.g. for some built-in validation), and it will not interfere with any other <code>onChange</code> event listeners the end user might want to add to it.</p>
+<h3><a class="anchor" aria-hidden="true" id="event-transformations"></a><a href="#event-transformations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event Transformations</h3>
+<p>Often times you don't really need a stream of e.g. click events – you only care about the subset of the events or only parts of their data. With the Alternative Syntax described above you would just use Airstream operators to transform the stream of events, like this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> incrementButton = button(<span class="hljs-string">"more"</span>)
+<span class="hljs-keyword">val</span> decrementButton = button(<span class="hljs-string">"less"</span>)
+ 
+<span class="hljs-keyword">val</span> diffStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Int</span>] = <span class="hljs-type">EventStream</span>.merge(
+  incrementButton.events(onClick).mapTo(<span class="hljs-number">1</span>), 
+  decrementButton.events(onClick).mapTo(<span class="hljs-number">-1</span>) 
+) <span class="hljs-comment">// this stream emits 1 or -1 depending on which button was clicked</span>
+</code></pre>
+<p>Or even:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> clickObserver: <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">Event</span>] = ???
+input(inContext(_.events(onClick).delay(<span class="hljs-number">100</span>) --&gt; clickObserver))
+</code></pre>
+<p>However, when using the standard <code>onClick --&gt; eventBus</code> syntax, there is no stream that you could operate on before the events hit <code>eventBus</code>. Instead, we provide a different way to transform events:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> diffBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">Int</span>]
+<span class="hljs-keyword">val</span> incrementButton = button(<span class="hljs-string">"more"</span>, onClick.mapTo(<span class="hljs-number">1</span>) --&gt; diffBus)
+<span class="hljs-keyword">val</span> decrementButton = button(<span class="hljs-string">"less"</span>, onClick.mapTo(<span class="hljs-number">-1</span>) --&gt; diffBus)
+<span class="hljs-keyword">val</span> diffStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Int</span>] = diffBus.events <span class="hljs-comment">// emits 1 or -1</span>
+</code></pre>
+<p>This <code>mapTo</code> method is defined on <code>EventPropTransformation</code>, which <code>onClick</code> (<code>ReactiveEventProp</code>) is implicitly converted to. Also available are <code>mapToValue</code>, <code>map</code>, <code>filter</code>, <code>collect</code>, <code>preventDefault</code>, and <code>stopPropagation</code>, and you can chain them in any order.</p>
+<p>More examples:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.scalajs.dom.ext.<span class="hljs-type">KeyCode</span>
+ 
+div(<span class="hljs-string">"Click me"</span>, onClick.map(getClickCoordinates) --&gt; clickCoordinatesBus)
+ 
+div(onScroll.filter(throttle) --&gt; filteredScrollEventBus)
+ 
+form(onSubmit.preventDefault.map(getFormData) --&gt; formSubmitObserver)
+ 
+div(onClick.useCapture --&gt; captureModeClickObserver)
+ 
+input(onKeyUp.filter(_.keyCode == <span class="hljs-type">KeyCode</span>.<span class="hljs-type">Enter</span>).preventDefault --&gt; enterPressBus)
+ 
+div(onClick.collect { <span class="hljs-keyword">case</span> ev <span class="hljs-keyword">if</span> ev.clientX &gt; <span class="hljs-number">100</span> =&gt; <span class="hljs-string">"yes"</span> } --&gt; yesStringBus)
+ 
+<span class="hljs-comment">// @TODO[Docs] Come up with more relatable examples</span>
+</code></pre>
+<p>Just like <code>ReactiveEventProp</code>-s, <code>EventPropTransformation</code> instances are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.scalajs.dom.ext.<span class="hljs-type">KeyCode</span>
+ 
+<span class="hljs-keyword">val</span> onEnterKeyUp = onKeyUp.filter(_.keyCode == <span class="hljs-type">KeyCode</span>.<span class="hljs-type">Enter</span>)
+<span class="hljs-comment">// and then</span>
+input(onEnterKeyUp.preventDefault --&gt; enterPressBus)
+textArea(onEnterKeyUp.preventDefault --&gt; enterPressBus)
+</code></pre>
+<p>This kind of casual flexibility is what Laminar is all about.</p>
+<h4><a class="anchor" aria-hidden="true" id="preventdefault--stoppropagation"></a><a href="#preventdefault--stoppropagation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>preventDefault &amp; stopPropagation</h4>
+<pre><code class="hljs css language-scala">div(onScroll.stopPropagation.filter(throttle) --&gt; filteredScrollEventBus)
+form(onSubmit.preventDefault.map(getFormData) --&gt; formSubmitObserver)
+</code></pre>
+<p>These methods correspond to invocations of the corresponding native JS <code>dom.Event</code> methods. MDN docs: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault">preventDefault</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation">stopPropagation</a></p>
+<p>Importantly, these are just ordinarily transformations, and happen in the order in which you have chained them. For example, in the code snippet above <code>ev.preventDefault</code> will only be called on events that pass <code>filter(_.keyCode == KeyCode.Enter)</code>. Internally all transformations have access to both the latest processed value, and the original event, so it's fine to call the <code>.preventDefault</code> transformation even after you've used <code>.map(_.keyCode)</code>.</p>
+<h4><a class="anchor" aria-hidden="true" id="usecapture"></a><a href="#usecapture" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>useCapture</h4>
+<pre><code class="hljs css language-scala">div(onClick.useCapture --&gt; captureModeClickObserver)
+</code></pre>
+<p>JS DOM has two event modes: capture, and bubbling. Typically and by default everyone uses the latter, but capture mode is sometimes useful for event listener priority/ordering/efficiency (not specific to Laminar, standard JS DOM rules/limitations apply).</p>
+<p><code>.useBubbleMode</code> is the opposite of <code>.useCapture</code>. The former is the default, so you don't need to call it unless you're calling it on an EventPropTransformation that you've previously enabled capture mode for.</p>
+<p>See MDN <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener">addEventListener</a> page for details (see &quot;useCapture&quot; section).</p>
+<h4><a class="anchor" aria-hidden="true" id="obtaining-typed-event-target"></a><a href="#obtaining-typed-event-target" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Obtaining Typed Event Target</h4>
+<p>Due to dynamic nature of Javascript, <code>dom.Event.target</code> is typed only as <code>dom.EventTarget</code> for most events, which is not useful when you want to get <code>ev.target.value</code> from a target that is a <code>dom.html.Input</code> (but doesn't know it). So, you can't do this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// Does not work because .value is defined on dom.html.Input, but not on dom.EventTarget, which is what `ev` is :(</span>
+input(typ := <span class="hljs-string">"text"</span>, onChange().map(ev =&gt; ev.target.value) --&gt; inputStringBus)
+</code></pre>
+<p>Easiest hackiest solution would be to use <code>.map(_.target.asInstanceOf[dom.html.Input].value)</code> but you should reconsider using Scala if you aren't cringing just looking at this.</p>
+<p>You could use our Alternative Syntax for registering events (see section above) for a somewhat safer solution:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> inputNode = input(typ := <span class="hljs-string">"text"</span>)
+<span class="hljs-keyword">val</span> inputStringStream = inputNode.events(onChange).mapTo(inputNode.ref.value)
+</code></pre>
+<p>However, this is often cumbersome, and introduces the risk of referencing the wrong input node of the same type. We have a better way to get a properly typed target node:</p>
+<pre><code class="hljs css language-scala">input(inContext(thisNode =&gt; onChange.mapTo(thisNode.ref.value) --&gt; inputStringBus))
+</code></pre>
+<p>This feature is not specific to events at all. The general syntax is <code>inContext(El =&gt; Modifier[El]): Modifier[El]</code>. <code>thisNode</code> refers to the element to which this modifier will be applied. Its type is properly inferred to be <code>Input</code>, which is an alias for <code>ReactiveHtmlElement[dom.html.Input]</code>, thus its <code>.ref</code> property is precisely typed as <code>dom.html.Input</code>, which is a native JS type that has a <code>.value</code> property that holds the current text in the input.</p>
+<p>Because <code>thisNode.ref</code> refers to the element on which the event listener is <strong>registered</strong>, in JS DOM terms, it is actually equivalent to <code>dom.Event.currentTarget</code>, not <code>dom.Event.target</code> – the latter refers to the node at which the event <strong>originates</strong>. When dealing with inputs these two targets are usually the same since inputs don't have any child elements, but you need to be aware of this conceptual difference for other events. MDN docs: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/target">target</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget">currentTarget</a>.</p>
+<p>You might have noticed that some event props like <code>onClick</code> promise somewhat peculiar event types like <code>TypedTargetMouseEvent</code> instead of the expected <code>MouseEvent</code> – these refined types come from <em>Scala DOM Types</em>, and merely provide more specific types for <code>.target</code> (as much as is reasonably possible). These types are optional – if you don't care about <code>.target</code>, you can just treat such events as simple <code>MouseEvent</code>s because <code>TypedTargetMouseEvent</code> does in fact extend <code>MouseEvent</code>. <code>// @TODO [API] I don't think we need this, really</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="window--document-events"></a><a href="#window--document-events" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Window &amp; Document Events</h3>
+<p>In Javascript, <code>window</code> and <code>document</code> support their own custom sets of events. You can obtain streams of those events like this: <code>documentEvents.onDomContentLoaded.map(ev =&gt; renderApp())</code>.</p>
+<p><code>windowEvents</code> provides similar access to <code>window</code> events.</p>
+<p>These event streams specify <a href="#usecapture"><code>useCapture = false</code></a>, which is probably what you want. If you need capture mode for window or document events, you can instantiate a <code>DomEventStream</code> manually:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">new</span> <span class="hljs-type">DomEventStream</span>[<span class="hljs-type">TypedTargetEvent</span>[dom.<span class="hljs-type">Node</span>]](
+  dom.document,
+  onClick.name,
+  useCapture = <span class="hljs-literal">true</span>
+)
+</code></pre>
+<p>Depending on your desired logic, you might not have a Laminar element to act as an Owner for subscriptions of these event streams. For example, if you implement an Ajax service based on observables, you would probably want it making requests regardless of observers. For such app-wide subscriptions you can use <code>unsafeWindowOwner</code>. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar, so you will need to clean them up manually if needed.</p>
+<h2><a class="anchor" aria-hidden="true" id="ownership"></a><a href="#ownership" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Ownership</h2>
+<p>Ownership is a core Airstream concept. You <strong>really</strong> need to read about it in <a href="https://github.com/raquo/Airstream#ownership">Airstream docs</a> before proceeding with this section.</p>
+<p>Basically, Airstream does not let you create a leaky resource without specifying an Owner which will eventually kill said resource. For example, adding an Observer to an EventStream is a potential memory leak. Once a subscription is established like that, the stream in question obtains a reference to that observer, and the stream's parent stream obtains a reference to this stream, etc. Depending on how long that chain is and how it's used, there is a good chance it will either never be garbage collected or will be garbage collected much later than optimal.</p>
+<p>With other libraries you would need to eventually manually call <code>subscription.kill()</code> for every <code>addObserver</code> call you make to avoid memory leaks like that. In Airstream however, you do not need to do that. Instead, when adding an observer you need to specify not just the observer, but also the Owner of this new subscription.</p>
+<h3><a class="anchor" aria-hidden="true" id="laminars-use-of-airstream-ownership"></a><a href="#laminars-use-of-airstream-ownership" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Laminar's Use of Airstream Ownership</h3>
+<p>In Laminar versions <strong>prior to v0.8.0</strong> every Laminar element was an <code>Owner</code>. In fact, when you used <code>&lt;--</code> methods on elements or in their modifiers, the element in question was the owner of the subscription that the <code>&lt;--</code> method created. Laminar elements killed their subscriptions when they were unmounted. Sounds simple and effective enough, yet this old design had two known flaws:</p>
+<ol>
+<li><p>The subscriptions of an element that was created but never added to the DOM  would be created when the element was instantiated, but would never be killed since it was never unmounted from the DOM, so you needed to be careful to not create any elements that you weren't going to immediately put into the DOM.</p></li>
+<li><p>Once you unmounted an element, its subscriptions would be killed with no way to resurrect them. So essentially you weren't able to reuse previously unmounted elements as their subscriptions wouldn't be re-activated when the element was put back into the DOM.</p></li>
+</ol>
+<p>Laminar v0.8.0 introduced dynamic subscriptions with a new contract: an element is no longer an Owner, instead an element creates a new Owner every time it's mounted, and kills that owner and all of its subscriptions when it's unmounted. This means that the element's subscriptions are not activated until it's mounted, solving problem 1. We now also track your subscriptions in a way that allows Laminar to re-activate them after the element is re-mounted, solving problem 2.</p>
+<p>Let's see how ownership in the new Laminar works under the hood by analyzing a simple snippet. You might want to follow along by reading the source code of the methods involved.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> urlBus: <span class="hljs-type">EventBus</span>[<span class="hljs-type">String</span>] = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>
+<span class="hljs-keyword">val</span> urlStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = urlBus.events
+<span class="hljs-keyword">val</span> element = a(href &lt;-- urlStream) <span class="hljs-comment">// create the element</span>
+render(element) <span class="hljs-comment">// mount the element</span>
+</code></pre>
+<ol>
+<li><p><code>href &lt;-- urlStream</code> creates a <code>Binder</code> (see <code>ReactiveProp.&lt;--</code>)</p></li>
+<li><p>That <code>Binder</code> being a <code>Modifier</code> is applied to the <code>a</code> element immediately after it's created by the <code>a(...)</code> call..</p></li>
+<li><p>That Binder's apply method does this (see <code>ReactiveProp.&lt;--</code> again):</p>
+<pre><code class="hljs css language-scala"><span class="hljs-type">ReactiveElement</span>.bindFn(element, $value) { value =&gt;
+  <span class="hljs-type">DomApi</span>.setHtmlProperty(element, <span class="hljs-keyword">this</span>, value)
+}
+</code></pre>
+<p>Which after a few layers of abstraction resolves to:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">new</span> <span class="hljs-type">DynamicSubscription</span>(element.dynamicOwner, activate = owner =&gt; <span class="hljs-type">Some</span>(
+  <span class="hljs-keyword">val</span> subscription: <span class="hljs-type">Subscription</span> = urlStream.foreach { url =&gt;
+    <span class="hljs-type">DomApi</span>.setHtmlProperty(element, href, url)
+  } (owner)
+  subscription
+))
+</code></pre></li>
+<li><p>So when the <code>href &lt;-- urlStream</code> Binder is applied to the <code>a()</code> element, it creates a <code>DynamicSubscription</code> which in turn has an activation function that creates a regular non-Dynamic <code>Subscription</code>.</p></li>
+<li><p>Let's unravel this onion. When the element is mounted its <code>dynamicOwner</code> is activated, and in turn activates all of its <code>DynamicSubscription</code>-s including the one we see here.</p>
+<p>Note that <code>DynamicOwner</code> is not a subtype of <code>Owner</code>, and <code>DynamicSubscription</code> is not a subtype of <code>Subscription</code>. The <code>Dynamic*</code> counterparts are simply wrappers / helpers for a certain pattern.</p></li>
+<li><p>When the <code>DynamicSubscription</code> is activated, it calls its activation function <code>activate</code>. That function is provided with an <code>Owner</code> that the element's <code>DynamicOwner</code> created upon activation.</p></li>
+<li><p>This <code>Owner</code> is essentially our proof that the element is currently mounted, so the activate function uses it to create a regular non-dynamic <code>Subscription</code>.</p></li>
+<li><p>As long as this <code>Subscription</code> is alive, every time <code>urlStream</code> emits a url string, Airstream calls <code>DomApi.setHtmlProperty</code> to set the element's href property to this new url.</p></li>
+<li><p>When we eventually decide to unmount the <code>element</code>, the same process unravels in reverse:</p></li>
+<li><p>The element's dynamicOwner is deactivated. It deactivates all of its <code>DynamicSubscription</code>s including this one we're looking at.</p></li>
+<li><p>When this DynamicSubscription is deactivated, it permanently kills the <code>Subscription</code> that its activate function created (see step 6). This removes the observer from <code>urlStream</code> (and in this case stops the stream because it has no other subscriptions).</p></li>
+<li><p>Now that the element is unmounted and the <code>subscription</code> is killed, sending events to <code>urlStream</code> will not change the <code>href</code> property anymore.</p></li>
+<li><p>After the element has been unmounted for a while, we decide to mount it into the DOM again. This activates the element's <code>dynamicOwner</code>, which activates the same <code>dynamicSubscription</code>, which calls its <code>activate</code> function to create a new <code>subscription</code>, which binds <code>urlStream</code> to an observer that sets the <code>href</code> property to the new url.</p></li>
+<li><p>So in other words, on this second mounting we repeat only steps 5 to 8. Steps 1 to 4 were only taken on initial creation of the element.</p></li>
+</ol>
+<p>This was a lot of words, but hopefully I spelled it out clearly enough. The actual code of <code>DynamicSubscription</code> is much shorter than my explanation, and <code>DynamicOwner</code> is not much worse, and even then it's mostly to handle scheduling edge cases that are mostly transparent to end users.</p>
+<h2><a class="anchor" aria-hidden="true" id="memory-management"></a><a href="#memory-management" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Memory Management</h2>
+<p>Once again I assume that you have read the <a href="https://github.com/raquo/Airstream#ownership--memory-management">relevant section</a> of Airstream docs. The basic principles are as follows:</p>
+<ul>
+<li><p>Observables (streams, signals) are not garbage collected as long as they have observers or dependent observables that are not eligible for garbage collection</p></li>
+<li><p>However, if your entire observable dependency graph – everything from the original event producer to the observables that depend on it and the observers that listen to those observables – if all that becomes unreachable then all of that will be garbage collected.</p></li>
+<li><p>So none of this negates general JS garbage collection rules. We don't use WeakMap or WeakRef. I'm just giving you guidelines so that you don't need to go into Airstream and Laminar source code trying to figure out what holds references to what.</p></li>
+</ul>
+<p>With proper use of ownership, Laminar's memory management is pleasantly automatic. Nevertheless, programming is hard, so here are is the rule of thumb for preventing memory leaks in Laminar:</p>
+<ul>
+<li><p>Subscriptions should generally be owned by a Laminar element that has a lifespan that matches the desired lifespan of said subscription. In plain English, <strong>it should make sense</strong> for an element to own the subscription – the element should be the main user of that subscription. The question to ask yourself is – at which point do you want the subscription to die and release its resources? The element that makes use of the subscription and is unmounted at the same time should be its owner.</p></li>
+<li><p>Corollary: if you have a parent element which has dynamic children, for example by means of <code>children &lt;-- childrenStream</code>, each child must NOT use the parent's <code>Owner</code> to create subscriptions, because those subscriptions would only terminate when the parent is unmounted, not the individual child. So if you cycle through a lot of children you will accumulate worse-than-useless subscriptions that should have been killed when previous children were unmounted.</p>
+<p>Of course, Laminar's API does not let you do this <em>easily</em>. Also of course, Laminar's API does let you do this if you directly ask for this by getting the parent's <code>Owner</code> from an <code>onMount</code> hook and passing that owner to children. With Laminar you can always shoot yourself in the foot, but you have to explicitly ask for it. So you should prefer less manual methods: a simple <code>foo &lt;-- bar</code> instead of messing with owners manually.</p></li>
+</ul>
+<p>Lastly, a warning about <code>textContent</code> and <code>innerHTML</code>:</p>
+<ul>
+<li>You must not set <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent">textContent</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML">innerHTML</a> properties on Laminar elements that have any other children given to them by Laminar. We deliberately do not provide an API to set these properties because of their messy side effects. If you need this functionality, it is up to you to use native JS functionality available on <code>element.ref</code> to set those properties, <strong>and</strong> ensure that you either manage the contents of a particular element with Laminar, or you do it manually with <code>innerHtml</code> / <code>textContent</code>, not both. The two approaches don't mix on the same element. Needless to say, when using native JS methods including <code>innerHtml</code> you need to understand <a href="https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)">XSS</a> and other risks as well.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="element-lifecycle-hooks"></a><a href="#element-lifecycle-hooks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Element Lifecycle Hooks</h2>
+<p>Lifecycle hooks let you do stuff when the element is being mounted or unmounted, as well as obtain and use an <code>Owner</code> associated with the element when it element is mounted.</p>
+<h3><a class="anchor" aria-hidden="true" id="what-is-mounting"></a><a href="#what-is-mounting" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What Is Mounting?</h3>
+<p><strong>In JS DOM</strong> an element is said to be mounted when one of its ancestors is the document being displayed: <code>dom.document</code>. In other words, a mounted element is present in the DOM, or &quot;attached&quot; to the DOM. On the contrary, elements that are not mounted are called &quot;unmounted&quot; or &quot;detached&quot;. Those elements are not present in the DOM. They might have none, one or more ancestors, but none of them are <code>dom.document</code>, so the highest level ancestor of this element must have no parent.</p>
+<p><strong>Laminar</strong> does not get notified by the browser when elements change parents and become mounted / unmounted. Therefore technically we use a slightly different definition of mounted / unmounted elements. A Laminar element is considered mounted when one of its ancestors is a <strong>mounted</strong> Laminar <code>RootNode</code>. A <code>RootNode</code> is created with <code>val rootNode = render(containerEl, contentEl)</code>. A <code>RootNode</code> is mounted immediately if <code>containerEl</code> was present in the DOM when <code>render</code> is called. Other than that, you need to manually call <code>mount()</code> / <code>unmount()</code> methods on <code>rootNode</code> to toggle its mounted / unmounted state.</p>
+<p>In practice this distinction is only useful for integrating with third party libraries, e.g. rendering a Laminar element inside a React.js component. If you're rendering your whole app in Laminar, you're likely rendering it into some <code>&lt;div id=&quot;appContainer&quot;&gt;&lt;/div&gt;</code> element that's always present in the DOM so there is no practical difference between Laminar's definition of mounting and JS DOM definition of mounting.</p>
+<p>Laminar elements that are mounted are also called active, because the subscriptions associated with them are also active while they're mounted. Every Laminar element starts out unmounted because it has no parent. An element can become mounted if its parent becomes mounted – either if parent is changed to a different one, or if the same parent becomes mounted. The latter is a recursion that terminates at the <code>RootNode</code>.</p>
+<p>You can check if a node is mounted in JS DOM terms with <code>ChildNode.isNodeMounted</code>.</p>
+<p>You can check if a Laminar element is mounted in Laminar terms using <code>ReactiveElement.isActive</code>.</p>
+<p>Laminar offers a few helpers to react to element lifecycle events:</p>
+<h3><a class="anchor" aria-hidden="true" id="onmountcallback"></a><a href="#onmountcallback" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onMountCallback</code></h3>
+<p><strong>Don't rush to use <code>onMountCallback</code> for everything, read the docs for all lifecycle hooks first.</strong></p>
+<p>Simplest way to run some code when the element is mounted. For example:</p>
+<pre><code class="hljs css language-scala">input(onMountCallback(ctx =&gt; ctx.thisNode.ref.focus()))
+</code></pre>
+<p>This code focuses an input element every time it's mounted. This <code>onMountCallback(...)</code> modifier provides a <code>MountContext</code> to a callback, and runs that callback every time the element is mounted.</p>
+<p>Aside from <code>thisNode</code> which refers to the element to which the modifier is being applied – our input node in this case – <code>MountContext</code> also provides you with an <code>owner</code> which was just created, and which will be killed when the element is next unmounted. So you can use this owner to bind any Airstream subscriptions, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> observable: <span class="hljs-type">Observable</span>[<span class="hljs-type">Int</span>] = ???
+<span class="hljs-keyword">val</span> onNext: <span class="hljs-type">Int</span> =&gt; () = ???
+input(onMountCallback(ctx =&gt; observable.foreach(onNext)(ctx.owner)))
+</code></pre>
+<p>However, you don't need to do this. If you just need a reference to <code>thisNode</code>, you can just use <code>inContext(thisNode =&gt; modifier)</code>, or if you just need the <code>owner</code> to bind a subscription, you can just say <code>input(observable --&gt; onNext)</code> to achieve the same effect, or even combine the two approaches.</p>
+<p>The small but important difference is that <code>onMountCallback</code> will only execute the callback when the element is being mounted, so if you add the <code>onMountCallback</code> modifier to an already mounted element, the callback will not fire until the element is unmounted and then mounted again. On the other hand, the <code>observable --&gt; onNext</code> modifier would bind the subscription even if you added it after the element was mounted, like any Binder would. So for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> inputEl = input(onMountCallback(_ =&gt; println(<span class="hljs-string">"OG"</span>))) <span class="hljs-comment">// create element</span>
+<span class="hljs-keyword">val</span> rootNode = render(inputEl) <span class="hljs-comment">// mount it. This will print "OG"</span>
+<span class="hljs-keyword">val</span> printBus: <span class="hljs-type">EventBus</span>[<span class="hljs-type">String</span>] = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span> 
+
+inputEl.amend(
+  printBus.events --&gt; (str =&gt; println(<span class="hljs-string">"Mod: "</span> + str)),
+  onMountCallback { _ =&gt;
+    println(<span class="hljs-string">"New gang"</span>) <span class="hljs-comment">// this will print nothing right now</span>
+  },
+  onMountCallback { ctx =&gt;
+    printBus.events.foreach(str =&gt; <span class="hljs-string">"Mount: "</span> + str)(ctx.owner)
+  }
+)
+
+printBus.writer.onNext(<span class="hljs-string">"hello"</span>) <span class="hljs-comment">// this will print "Mod: hello"</span>
+ 
+rootNode.unmount() <span class="hljs-comment">// unmount the element</span>
+rootNode.mount() <span class="hljs-comment">// this will print both "OG" and "New gang"</span>
+
+printBus.writer.onNext(<span class="hljs-string">"hi"</span>) <span class="hljs-comment">// this will print "Mod: hi" and "Mount: hi"</span>
+</code></pre>
+<p>The bottom line is, avoid using <code>onMountCallback</code> if all you need is a reference to <code>thisNode</code> or <code>Owner</code>. Better use <code>inContext</code> or <code>amend</code> if you need <code>thisNode</code>, and binders like <code>foo &lt;-- bar</code> instead of messing with owners manually. Use <code>onMountCallback</code> when its purpose aligns with your big picture: running some code on mount. The same goes for all other helpers below.</p>
+<h3><a class="anchor" aria-hidden="true" id="onunmountcallback--onmountunmountcallback"></a><a href="#onunmountcallback--onmountunmountcallback" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onUnmountCallback</code> &amp; <code>onMountUnmountCallback</code></h3>
+<p>Works just like <code>onMountCallback</code>, same caveats.</p>
+<pre><code class="hljs css language-scala">div(
+  onUnmountCallback(thisNode =&gt; println(<span class="hljs-string">"unmounting"</span>)),
+  onMountUnmountCallback(
+    mount = ctx =&gt; println(<span class="hljs-string">"mounting"</span>),
+    unmount = thisNode =&gt; println(<span class="hljs-string">"unmounting"</span>)
+  )
+)
+</code></pre>
+<p>For easier integration with third party libraries we also have <code>onMountUnmountCallbackWithState</code> that can remember any value returned by the mounting callback:</p>
+<pre><code class="hljs css language-scala">div(
+  onMountUnmountCallbackWithState[<span class="hljs-type">Div</span>, <span class="hljs-type">State</span>]( <span class="hljs-comment">// need to provide type params explicitly</span>
+    mount = ctx =&gt; doStuffAndReturnState(),
+    unmount = (thisNode, maybeState) =&gt; maybeState.foreach(cleanupState)
+  )
+)
+</code></pre>
+<h3><a class="anchor" aria-hidden="true" id="onmountset"></a><a href="#onmountset" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onMountSet</code></h3>
+<p>As you might remember, <code>Setter</code> modifiers are idempotent, which is to say applying the same modifier N times in a row to the same element has the same effect regardless of what N is, if N &gt;= 1. We have a special helper to apply one or more Setters on mount:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> link = a(
+  <span class="hljs-string">"website"</span>,
+  onMountSet(ctx =&gt; {
+    println(<span class="hljs-string">"mount"</span>)
+    <span class="hljs-keyword">if</span> (ctx.thisNode.maybeParent.exists(_.ref.classList.contains(<span class="hljs-string">"-legit"</span>))) {
+      href := <span class="hljs-string">"http://example.com"</span>
+    } <span class="hljs-keyword">else</span> {
+      href := <span class="hljs-string">"http://evil.com"</span>
+    }
+  })
+)
+</code></pre>
+<p>In this contrived example, every time this <code>link</code> element is mounted, the callback will execute, and the resulting setter will be applied to the element. So every time <code>link</code> is mounted, it will print &quot;mount&quot;, check whether its new parent has a &quot;-legit&quot; CSS class name, and set the <code>href</code> attribute based on that.</p>
+<p>Note that when the element is unmounted, any setters applied to it this way are not un-applied. So for example if you were to apply red color to evil links like this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> link = a(
+  <span class="hljs-string">"website"</span>,
+  onMountSet(ctx =&gt; {
+    println(<span class="hljs-string">"mount"</span>)
+    <span class="hljs-keyword">if</span> (ctx.thisNode.maybeParent.exists(_.ref.classList.contains(<span class="hljs-string">"-legit"</span>))) {
+      href := <span class="hljs-string">"http://example.com"</span>
+    } <span class="hljs-keyword">else</span> {
+      <span class="hljs-type">List</span>(
+        href := <span class="hljs-string">"http://evil.com"</span>,
+        color := <span class="hljs-string">"red"</span>
+      )
+    }
+  })
+)
+</code></pre>
+<p>Once <code>link</code> was mounted and deemed evil, it would become red and never cease being red even if it was re-mounted as a non-evil link, because there is no code to unset this red color or replace it with any other color. As you might have guessed, <code>Seq[Setter[El]]</code> implicitly converts to <code>Setter[El]</code>, so all you need to do is to change <code>href := &quot;http://example.com&quot;</code> to <code>List(href := &quot;http://example.com&quot;, color := &quot;black&quot;)</code> to make the color change with the url.</p>
+<h3><a class="anchor" aria-hidden="true" id="onmountbind"></a><a href="#onmountbind" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onMountBind</code></h3>
+<p>This is a special helper for binders like <code>onClick --&gt; observer</code>, <code>attr &lt;-- stream</code>.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> observer: <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">MouseEvent</span>] = ???
+div(
+  onMountBind(ctx =&gt; {
+    doSomething(ctx) <span class="hljs-comment">// let's assume we need this for some reason </span>
+    onClick --&gt; observer
+  })
+)
+</code></pre>
+<p>It looks similar to <code>onMountCallback</code>, so why do we need a special method for this? The short answer is that <code>onMountBind</code> will permanently kill the dynamic subscription created by <code>onClick --&gt; observer</code> on unmount, ensuring that we don't accumulate N dynamic subscriptions after the element is mounted N times.</p>
+<hr>
+<p>It's not a coincidence that <code>onMountCallback</code> expects the callback to return <code>Unit</code> rather than <code>Modifier</code>. Let's say you wanted to circumvent this API design by applying the modifier manually inside the callback:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> observer: <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">MouseEvent</span>] = ???
+div(
+  onMountCallback(ctx =&gt; {
+    doSomething(ctx) <span class="hljs-comment">// let's assume we need this for some reason</span>
+    <span class="hljs-comment">// WRONG – DO NOT DO THIS!</span>
+    ctx.thisNode.amend(onClick --&gt; observer)
+  })
+)
+</code></pre>
+<p>As we know, the callback in <code>onMountCallback</code> will be executed every time the element is mounted. The first time it's called all is fine – we add an <code>onClick --&gt; observer</code> modifier to the div, and the dynamic subscription produced by this binder activates as the element mounts.</p>
+<p>Next, you unmount the div element. This deactivates the binder's dynamic subscription</p>
+<p>Finally, you mount the div element once again. This re-activates the binder's dynamic subscription. Of course you would expect that, because you expect to be able to unmount and re-mount Laminar elements, and for them to not lose any dynamic subscriptions you defined on them.</p>
+<p>However, another thing that happens on the second mount is that the callback in <code>onMountCallback</code> executes again. And what does it do? It adds another <code>onClick --&gt; observer</code> modifier to the same element. So, now we have two onClick event listeners sending events to the same <code>observer</code>, so the observer will be triggered twice for every click event. And if you re-mount the element N times, the observer will be triggered N times for every click event.</p>
+<p>In other words, while <code>Setter</code> modifiers are idempotent, <code>Binder</code> modifiers are not. They add a dynamic subscription, and if you call them N times, they add N dynamic subscriptions. Those subscriptions don't permanently go away on unmount because that would mean that your elements would become dysfunctional after being unmounted, and we don't want that.</p>
+<p><code>onMountBind</code> solves this problem by remembering the dynamic subscription returned by the binder and permanently killing it on unmount, instead of merely deactivating it. So when the element mounts again, onMountBind callback will run again, but there will be no pre-existing dynamic subscription from the previous mount left.</p>
+<p>So we know why <code>onMountCallback</code> fails us technically, but why is it failing us philosophically? Well, Laminar is just doing what we're telling it to do: &quot;Every time this element mounts, create a new click listener and add it to this element&quot;. And the reason you're even able to tell this to Laminar is: <em>what if this was what you actually wanted to do</em>? What would be a simpler way to express that? I can't think of any without introducing completely arbitrary helpers that are dependent on fleeting fashions on frontend dev.</p>
+<p>And so, <code>onMountBind</code> exists as the simplest way to do what it does, and <code>onMountCallback</code> as the simplest way to do the other thing.</p>
+<h3><a class="anchor" aria-hidden="true" id="onmountinsert"></a><a href="#onmountinsert" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>onMountInsert</code></h3>
+<p>Just like you use <code>onMountBind</code> when you need <code>MountContext</code> to bind a subscription, you use <code>onMountInsert</code> when you need <code>MountContext</code> to insert children (or if you truly need to insert children only on mount).</p>
+<pre><code class="hljs css language-scala">div(
+  <span class="hljs-string">"Hello, "</span>,
+  onMountInsert { ctx =&gt;
+    <span class="hljs-keyword">val</span> childStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Span</span>] = makeStream(ctx.owner)    
+    child &lt;-- childStream
+  },
+  <span class="hljs-string">"!"</span>
+)
+</code></pre>
+<p>Essentially <code>onMountInsert</code> is to <code>Inserter</code> what <code>onMountBind</code> is to <code>Binder</code>, and what <code>onMountSet</code> is to <code>Setter</code>, and what <code>onMountCallback</code> is to <code>() =&gt; Unit</code>.</p>
+<p>Thus the callback can return any <code>Inserter</code>, including those created by modifiers <code>children &lt;-- ???</code>, <code>children.command &lt;-- ???</code>, <code>child &lt;-- ???</code>, <code>child.maybe &lt;-- ???</code>, and <code>child.text &lt;-- ???</code>.</p>
+<p>We also have implicit conversions defined in <code>Implicits.LowPriorityImplicits</code> that let you return an individual element or a collection of elements from the onMountInsert callback – they would be converted into an Inserter.</p>
+<p>So why does <code>onMountInsert</code> need to exist, and why doesn't Laminar allow us to put <code>child &lt;-- childStream</code> into <code>onMountBind</code>?</p>
+<p><code>onMountInsert</code> offers the same deal as <code>onMountBind</code> in terms of cancelling the subscription on unmount to prevent a conflict between N <code>child &lt;-- childStream</code> modifiers after mounting the element N times. Note that cancelling this subscription does <strong>not</strong> mean that the previously inserted child is removed. If you want that, emit <code>emptyNode</code> into childStream while it's still mounted.</p>
+<p>But as you might recall Inserters like <code>child &lt;-- ...</code> and <code>children &lt;-- ...</code> reserve a stable spot in the parent element where they will insert new children. That spot is after the last child of the parent element <em>at the time of reservation</em>.</p>
+<p>This would obviously not work inside <code>onMountInsert</code> – the callback is executed only on mount, so the <code>child &lt;-- childStream</code> modifier is added only on mount, and at that point the element already has two child nodes in it: <code>div(TextNode(&quot;Hello, &quot;), TextNode(&quot;!&quot;))</code>. Therefore <code>child &lt;-- childStream</code> would have reserved a spot <strong>after</strong> &quot;!&quot;, which is not what we want, we obviously want it to reserve the spot where the <code>onMountInsert</code> modifier itself is visually located, i.e. between &quot;Hello, &quot; and &quot;!&quot;.</p>
+<p>The <code>onMountInsert</code> modifier exists to solve this – it reserves a spot when it's applied to the parent element – before any mount events are fired – and provides information about that reserved spot to the <code>Inserter</code> returned by the callback. And that reserved spot persists after mounting and unmounting, of course.</p>
+<h3><a class="anchor" aria-hidden="true" id="why-use-lifecycle-hooks"></a><a href="#why-use-lifecycle-hooks" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Why Use Lifecycle Hooks?</h3>
+<ul>
+<li><p>If you legitimately need to run arbitrary code on mount and/or on unmount, for example to integrate with a third party library.</p></li>
+<li><p>If you need your callback to run on mount <strong>but also</strong> to run immediately in case the element is already mounted, use <code>ReactiveElement.bindFn</code> / <code>bindObserver</code> / etc. methods. Generally you shouldn't need these but they might be useful for integration or extensions.</p></li>
+<li><p>If you want an <code>Owner</code> to <em>simplify</em> some code. For example, if you have a complex component where you don't want to fiddle with ownership everywhere, you can pass a parent's owner to it using <code>onMountInsert(ctx =&gt; makeComponent(ctx.owner)</code>, but you have to know what you're doing to avoid memory leaks. Read more about Ownership in Laminar and Airstream docs.</p>
+<ul>
+<li>Note: if you want an <code>Owner</code> because you're upgrading from Laminar v0.7 where each element was an Owner, this might not be the best way to achieve what you want. We've redesigned the API to reduce the need mess around with owners manually. For example, you can have modifiers like <code>stream --&gt; observer</code> now.</li>
+</ul></li>
+<li><p>If you just need a reference to <code>thisNode</code>, don't use lifecycle hooks, use <code>inContext</code> aka <code>forthis</code>.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="lifecycle-event-timing"></a><a href="#lifecycle-event-timing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Lifecycle Event Timing</h3>
+<p>Mounting and unmounting are discrete events that happen at a certain time.</p>
+<p>All mounting callbacks / effects are executed when the element has just mounted. At this point the element has its new parent already, if that changed. So pretty much equivalent to React's <code>componentDidMount</code> hook.</p>
+<p>All unmounting callbacks / effects are executed when the element is about to become unmounted. At this point the element still has its old parent, if it's being moved or detached. So like React's <code>componentWillUnmount</code> hook.</p>
+<h3><a class="anchor" aria-hidden="true" id="how-are-mount-events-propagated"></a><a href="#how-are-mount-events-propagated" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>How Are Mount Events Propagated?</h3>
+<p>Every Laminar element starts its life unmounted: <code>div(&quot;Hello&quot;)</code>. This element has no parent specified, therefore it has no ancestors, and can't have an ancestor that is a mounted RootNode. This element still exists, but it's not present in the DOM, it's detached from teh DOM.</p>
+<p>We could mount this element directly: <code>render(appContainer, div(&quot;Hello&quot;))</code> – but almost all the elements in your application are mounted indirectly, by setting their parent to an already mounted element. How do these elements know when they're being mounted, if their direct parent does not change?</p>
+<p>Consider this example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> container: dom.<span class="hljs-type">Element</span> = dom.document.querySelector(<span class="hljs-string">"#appContainer"</span>)
+<span class="hljs-keyword">val</span> nameStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = ???
+<span class="hljs-keyword">val</span> titleEl = h1(<span class="hljs-string">"Welcomer "</span>, b(<span class="hljs-string">"9000"</span>)) 
+<span class="hljs-keyword">val</span> contentEl = div(
+  titleEl,
+  child &lt;-- nameStream.map(name =&gt; span(<span class="hljs-string">"Hello "</span>, b(name)))
+)
+ 
+<span class="hljs-keyword">val</span> rootNode: <span class="hljs-type">RootNode</span> = render(container, contentEl)
+</code></pre>
+<p>Assuming container is present in the DOM, <code>render(container, contentEl)</code> will immediately mount the <code>contentEl</code> div. But if you refer to our definitions above, you'll see that the <code>h1(&quot;Welcomer 9000&quot;)</code> element must also be mounted - its parent is now contentEl, which is mounted. Let's see how this is achieved:</p>
+<ol>
+<li><p>When <code>contentEl</code> element is created, we create a <code>DynamicOwner</code> for it. This <code>DynamicOwner</code> owns all <code>DynamicSubsciption</code>-s associated with this element, and will last the lifetime of this element. It will create non-dynamic <code>Owner</code> for this element every time this element is mounted, and will kill that <code>Owner</code> every time this element is unmounted. Laminar does this for every element.</p></li>
+<li><p><code>element.dynamicOwner</code> needs to know when the element is mounted and unmounted so that it can activate and deactivate respectively at the same time.</p></li>
+<li><p>In our example the elements are mounted because the <code>RootNode</code> is being mounted. <code>rootNode.dynamicOwner</code> is controlled directly by its mount status, and it's triggered to become mounted when we called <code>render</code> as we established above. This activates <code>rootNode.dynamicOwner</code>.</p></li>
+<li><p>Unlike <code>RootNode</code>, any other element's <code>DynamicOwner</code> is controlled by its parent element. Basically, when the element's parent element is mounted, or when the element's parent is changed from an unmounted one to a mounted one, its <code>DynamicOwner</code> is activated.</p></li>
+<li><p>This is achieved by means of <code>pilotSubscription</code> that exists on each element and registers itself as a subscription on the parent element, activating the element's dynamicOwner when the parent's dynamicOwner is activated (and similarly for deactivation). This is a special <code>TransferableSubscription</code> that can change its owner from one parent to another if an element changes parents.</p></li>
+<li><p>This proceeds to happen in a cascade. When <code>contentEl</code> element is mounted, its DynamicOwner is activated, which activates <code>titleEl.pilotSubscription</code>, which activates <code>titleEl.dynamicOwner</code>, which activates the <code>DynamicSubscription</code> of the <code>b(&quot;9000&quot;)</code> element which activates its <code>dynamicOwner</code>. That last element has no children so the chain stops here in this case.</p></li>
+<li><p>But it's not just child elements that create subscriptions managed by the element's <code>DynamicOwner</code>. The <code>child &lt;-- ...</code> modifier created a subscription on <code>contentEl.dynamicOwner</code> that was activated when <code>contentEl</code> was mounted.</p></li>
+<li><p>Now that this subscription is active, if we emit &quot;Nikita&quot; into <code>nameStream</code> a <code>span(&quot;Hello &quot;, b(&quot;Nikita&quot;))</code> element will be created and inserted into <code>contentEl</code>. This will mount / activate this new <code>span</code> element, and then its child <code>b(&quot;Nikita&quot;)</code> by the same cascading logic we described above.</p></li>
+<li><p>If we then emit &quot;Ivan&quot; into <code>nameStream</code>, the parent of <code>span(&quot;Hello &quot;, b(&quot;Nikita&quot;))</code> will be set to <code>None</code>, and that will trigger an unmount / deactivation cascade for these <code>span</code> and <code>b</code> elements. A new element will then be created and mounted / activated: <code>span(&quot;Hello &quot;, b(&quot;Ivan&quot;))</code>.</p></li>
+</ol>
+<h2><a class="anchor" aria-hidden="true" id="url-routing"></a><a href="#url-routing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>URL Routing</h2>
+<p><a href="https://github.com/raquo/Waypoint">Waypoint</a> – My URL router for Laminar.</p>
+<p><a href="https://github.com/tulz-app/laminar-router">tulz-app/laminar-router</a> – Alternative router for Laminar with API inspired by Akka HTTP</p>
+<p>These routers are designed for Laminar, but don't actually depend on it, only on Airstream, so you could potentially use them without Laminar.</p>
+<h2><a class="anchor" aria-hidden="true" id="special-cases"></a><a href="#special-cases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Special Cases</h2>
+<p>Laminar is conceptually a simple layer that brings a lightweight reactive API to native Javascript DOM. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.</p>
+<p>Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.</p>
+<h4><a class="anchor" aria-hidden="true" id="checkboxonclick--eventpreventdefault--async-event-stream"></a><a href="#checkboxonclick--eventpreventdefault--async-event-stream" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>checkbox.onClick + event.preventDefault() = async event stream</h4>
+<p>All event streams in Laminar emit events synchronously – as soon as they happen – <strong>except</strong> if the stream in question is a stream of <code>onClick</code> events on an <code>input(typ := &quot;checkbox&quot;)</code> element, <strong>and</strong> you generated this stream using the <code>.preventDefault</code> method in Laminar's API.</p>
+<p>Such streams fire events after a <code>setTimeout(0)</code> instead of firing immediately after the browser triggers the event. Without this hack/magic, you would have been unable to update the <code>checked</code> property of this checkbox from a stream that is (synchronously) derived from the given stream of <code>onClick</code> events, and this is common practice when building controlled components.</p>
+<p>The underlying issue is described in <a href="https://stackoverflow.com/a/32710212/2601788">this StackOverflow answer</a>.</p>
+<p><strong>Watch out:</strong> If you are reading the <code>checked</code> property of the checkbox in an affected stream, it will contain the original, unchanged value. This behaviour could be surprising if you don't know about this stream being async, but do know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug, and better matches the commonly-expected semantics of <code>preventDefault</code>.</p>
+<p><strong>Escape hatch:</strong> instead of using Laminar's <code>preventDefault</code> option/method, call <code>ev.preventDefault()</code> manually <em>after</em> the event was passed to the observer. Then event handling will work the same way it does in native JS DOM.</p>
+<h4><a class="anchor" aria-hidden="true" id="tbody"></a><a href="#tbody" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><code>tbody</code></h4>
+<p>You might be used to writing HTML markup like this:</p>
+<pre><code class="hljs css language-html"><span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>Row1 Cell1<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>Row1 Cell2<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">tr</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>Row2 Cell1<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">td</span>&gt;</span>Row2 Cell2<span class="hljs-tag">&lt;/<span class="hljs-name">td</span>&gt;</span>
+  <span class="hljs-tag">&lt;/<span class="hljs-name">tr</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">table</span>&gt;</span>
+</code></pre>
+<p>However, this is not actually valid HTML. There needs to be a <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/tbody"><code>tbody</code></a> (or <code>thead</code> or <code>tfoot</code>) element wrapping <code>tr</code> elements – you can't nest them directly under <code>table</code>.</p>
+<p>Nevertheless, web browsers render this invalid HTML just fine, by silently inserting a <code>tbody</code> element to wrap all <code>tr</code> elements. This is a problem because the web browser will not notify Laminar about this, so Laminar's DOM tree will become incorrect.</p>
+<p>Therefore, if you're rendering a table you must make sure to wrap your <code>tr</code> elements in <code>tbody</code> (or <code>thead</code> or <code>tfoot</code>) elements.</p>
+<h2><a class="anchor" aria-hidden="true" id="fin"></a><a href="#fin" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fin</h2>
+<p>Hey, you've read all of this? Amazing. Join us in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>.</p>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#introduction">Introduction</a></li><li><a href="#imports">Imports</a></li><li><a href="#tags--elements">Tags &amp; Elements</a></li><li><a href="#modifiers">Modifiers</a><ul class="toc-headings"><li><a href="#nesting-and-children">Nesting and Children</a></li><li><a href="#html-entities">HTML Entities</a></li><li><a href="#empty-nodes">Empty Nodes</a></li><li><a href="#manual-application">Manual Application</a></li><li><a href="#incontext"><code>inContext</code></a></li><li><a href="#reusing-elements">Reusing Elements</a></li><li><a href="#missing-keys">Missing Keys</a></li><li><a href="#modifiers-faq">Modifiers FAQ</a></li></ul></li><li><a href="#rendering">Rendering</a></li><li><a href="#reactive-data">Reactive Data</a><ul class="toc-headings"><li><a href="#attributes-and-properties">Attributes and Properties</a></li><li><a href="#event-streams-and-signals">Event Streams and Signals</a></li><li><a href="#individual-children">Individual Children</a></li><li><a href="#lists-of-children">Lists of Children</a></li><li><a href="#binding-observables">Binding Observables</a></li><li><a href="#other-binders">Other Binders</a></li></ul></li><li><a href="#classname-and-other-special-keys">ClassName and Other Special Keys</a><ul class="toc-headings"><li><a href="#cls">cls</a></li><li><a href="#other-composite-keys">Other Composite Keys</a></li><li><a href="#svg">SVG</a></li></ul></li><li><a href="#event-system-emitters-transformations-buses">Event System: Emitters, Transformations, Buses</a><ul class="toc-headings"><li><a href="#registering-a-dom-event-listener">Registering a DOM Event Listener</a></li><li><a href="#eventbus">EventBus</a></li><li><a href="#alternative-event-listener-registration-syntax">Alternative Event Listener Registration Syntax</a></li><li><a href="#multiple-event-listeners">Multiple Event Listeners</a></li><li><a href="#event-transformations">Event Transformations</a></li><li><a href="#window--document-events">Window &amp; Document Events</a></li></ul></li><li><a href="#ownership">Ownership</a><ul class="toc-headings"><li><a href="#laminars-use-of-airstream-ownership">Laminar's Use of Airstream Ownership</a></li></ul></li><li><a href="#memory-management">Memory Management</a></li><li><a href="#element-lifecycle-hooks">Element Lifecycle Hooks</a><ul class="toc-headings"><li><a href="#what-is-mounting">What Is Mounting?</a></li><li><a href="#onmountcallback"><code>onMountCallback</code></a></li><li><a href="#onunmountcallback--onmountunmountcallback"><code>onUnmountCallback</code> &amp; <code>onMountUnmountCallback</code></a></li><li><a href="#onmountset"><code>onMountSet</code></a></li><li><a href="#onmountbind"><code>onMountBind</code></a></li><li><a href="#onmountinsert"><code>onMountInsert</code></a></li><li><a href="#why-use-lifecycle-hooks">Why Use Lifecycle Hooks?</a></li><li><a href="#lifecycle-event-timing">Lifecycle Event Timing</a></li><li><a href="#how-are-mount-events-propagated">How Are Mount Events Propagated?</a></li></ul></li><li><a href="#url-routing">URL Routing</a></li><li><a href="#special-cases">Special Cases</a></li><li><a href="#fin">Fin</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/Laminar/" class="nav-home"><img src="/Laminar/img/spiral-logo.svg" alt="Laminar" width="66" height="58"/></a><div><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section></footer></div></body></html>
