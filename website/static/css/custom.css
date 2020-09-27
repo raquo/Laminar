@@ -1,5 +1,7 @@
 /* your custom css */
 
+/*DE3423*/
+
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
 }
 
@@ -16,23 +18,193 @@
 }
 
 div.mdoc-example {
-    display:inline-block;
-    width: 100%;
+  display: inline-block;
+  width: 100%;
 }
 
 div.mdoc-example code {
-    float: left;
-    position: relative;
-    width: 55%;
-    font-size: smaller;
-    height: 300px;
+  float: left;
+  position: relative;
+  width: 55%;
+  font-size: smaller;
+  height: 300px;
 }
 
 div.mdoc-example div[id^="mdoc-html-"] {
-    float: right;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid gray;
-    width: 44%;
-    margin-left: 1px;
+  float: right;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  width: 44%;
+  margin-left: 1px;
 }
+
+body {
+
+}
+
+.auto-resizable-iframe {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.auto-resizable-iframe > div {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+}
+
+.auto-resizable-iframe iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* -- HOME PAGE -- */
+
+.homeContainer, .mainHomeContainer {
+  /*background: #032b36;*/
+  background: #15414c;
+  color: white;
+}
+
+.homeContainer .button {
+  margin-bottom: 12px;
+  border-color: white;
+  color: white;
+  font-weight: 600;
+  transition: none;
+}
+
+.homeContainer .button:hover {
+  border-color: #de3423;
+}
+
+.homeContainer .buttonWrapper {
+  margin: 0 4px;
+}
+
+.projectTitle {
+  margin-top: 100px;
+  font-size: 80px;
+  color: white;
+}
+
+.projectTitle small {
+  margin-top: 30px;
+  line-height: 1.3em;
+  font-size: 28px;
+  /*color: white;*/
+}
+
+@media (max-width: 370px) {
+
+  .projectTitle {
+    font-size: 70px;
+  }
+
+  .projectTitle small {
+    font-size: 24px;
+  }
+}
+
+.-homeSection {
+  padding: 60px 0 40px 0;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.x-dark {
+  /*background: #15414c;*/
+  background: #032b36;
+}
+
+.-homeSection h1 {
+  display: inline-block;
+  margin-top: 0;
+  padding: 10px 15px;
+  color: white;
+  background: #de3423;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.-homeSection h2 {
+  margin-top: 30px;
+  font-size: 1.4em;
+  color: white;
+}
+
+.-homeSection .wrapper {
+  text-align: center;
+}
+
+.-homeSection .blockContent .gridBlock {
+  font-size: 17px;
+}
+
+.-homeSection a {
+  color: white;
+  text-decoration: underline;
+}
+
+.-homeSection a:hover {
+  padding: 5px;
+  margin: -5px;
+  background: #de3423;
+}
+
+.-homeAboutSection {
+  padding-top: 50px;
+}
+
+.-homeAboutSection h1 {
+  margin-bottom: 35px;
+}
+
+.-homeAboutSection h2 {
+  margin-top: 50px;
+}
+
+.-homeCommunitySection {
+  margin: 40px auto 0 auto;
+  padding: 0 10px;
+  max-width: 700px;
+  text-align: center;
+}
+
+.-homeCommunitySection .-narrower {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 600px;
+}
+
+.-homeCommunitySection hr {
+  margin: 30px auto;
+  /*border-bottom: none;*/
+  /*border-top: 1px solid white;*/
+  max-width: calc(min(300px, 50vw));
+}
+
+.-homeCommunitySection .-emoji {
+  color: white; /* returns opacity to 100% */
+}
+
+.-homeVideo {
+  margin: 30px auto;
+}
+
+.-sponsorsList h2 {
+  /*font-size: 150%;*/
+  margin-top: 30px;
+}
+
+.-sponsorsList p {
+  position: relative;
+  left: -0.2em;
+  font-size: 130%;
+}
+

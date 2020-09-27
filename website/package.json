@@ -1,5 +1,5 @@
 {
-  "license": "See WEBSITE-LICENSE.md",
+  "license": "SEE LICENSE IN WEBSITE-LICENSE.md",
   "scripts": {
     "examples": "docusaurus-examples",
     "start": "docusaurus-start",

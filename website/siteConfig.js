@@ -26,13 +26,13 @@ const siteConfig = {
     }
   ],
 
-  headerIcon: 'img/spiral-logo.svg',
-  footerIcon: 'img/spiral-logo.svg',
-  favicon: 'img/spiral-logo.svg',
+  // headerIcon: 'img/spiral-logo.svg',
+  // footerIcon: 'img/spiral-logo.svg',
+  // favicon: 'img/spiral-logo.svg',
 
   /* Colors for website */
   colors: {
-    primaryColor: '#30887e',
+    primaryColor: '#de3423',
     secondaryColor: '#88303A',
   },
 
