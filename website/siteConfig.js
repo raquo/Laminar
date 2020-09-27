@@ -67,6 +67,7 @@ const siteConfig = {
   // No .html extensions for paths.
   cleanUrl: true,
   docsUrl: '',
+  cname: 'laminar.dev',
   // Open Graph and Twitter card images.
   ogImage: 'img/spiral-inverse-logo.svg',
   twitterImage: 'img/spiral-inverse-logo.svg',
