@@ -12,18 +12,19 @@ const siteConfig = {
   organizationName: 'raquo',
   headerLinks: [
     { doc: 'Documentation', label: 'Docs' },
-    { doc: 'Examples', label: 'Examples' },
+    { doc: 'examples/Basic', label: 'Examples' },
+    { doc: 'Resources', label: 'Resources' }
     // {doc: 'Virtual-DOM', label: 'Virtual DOM'},
-    {
-      href: 'https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html',
-      label: 'Laminar API',
-      external: true
-    },
-    {
-      href: 'https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html',
-      label: 'Airstream API',
-      external: true
-    }
+    // {
+    //   href: 'https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html',
+    //   label: 'Laminar API',
+    //   external: true
+    // },
+    // {
+    //   href: 'https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html',
+    //   label: 'Airstream API',
+    //   external: true
+    // }
   ],
 
   // headerIcon: 'img/spiral-logo.svg',
@@ -32,8 +33,8 @@ const siteConfig = {
 
   /* Colors for website */
   colors: {
-    primaryColor: '#de3423',
-    secondaryColor: '#88303A',
+    primaryColor: '#dc322f',
+    secondaryColor: '#7f0c1d',
   },
 
   /* Custom fonts for website */
@@ -65,7 +66,7 @@ const siteConfig = {
   onPageNav: 'separate',
   // No .html extensions for paths.
   cleanUrl: true,
-
+  docsUrl: '',
   // Open Graph and Twitter card images.
   ogImage: 'img/spiral-inverse-logo.svg',
   twitterImage: 'img/spiral-inverse-logo.svg',

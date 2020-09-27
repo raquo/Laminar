@@ -1,4 +1,5 @@
-# Documentation
+title: Documentation
+---
 
 * [Introduction](#introduction)
 * [Imports](#imports)

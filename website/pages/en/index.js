@@ -61,7 +61,7 @@ class HomeSplash extends React.Component {
           <PromoSection>
             <Button href="https://github.com/raquo/Laminar">Github</Button>
             <Button href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">Big Video</Button>
-            <Button href={docUrl('Examples.html')}>Interactive examples</Button>
+            <Button href={docUrl('examples/Basic.html')}>Interactive examples</Button>
             <Button href={docUrl('Documentation.html')}>Documentation</Button>
           </PromoSection>
         </div>
@@ -204,14 +204,14 @@ class Index extends React.Component {
             }
             <div className="-homeSection -homeCommunitySection x-dark">
               <h1>Community</h1>
+              <p>Our main chatroom is in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>, join us there for news, tips & support!</p>
+              <hr />
               <p>Laminar is developed by Nikita Gazarov with generous support from my <a href="https://github.com/sponsors/raquo">sponsors</a>.</p>
               <div className="-sponsorsList">
                 <h2>GOLD Sponsors:</h2>
                 <p><span className="-emoji">✨</span> <a href="https://github.com/yurique">Iurii Malchenko</a></p>
               </div>
               <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
-              <hr />
-              <p>Our main chatroom is in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>, join us there for news, tips & support!</p>
             </div>
           </div>
         </div>

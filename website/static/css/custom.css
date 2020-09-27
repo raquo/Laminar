@@ -1,7 +1,5 @@
 /* your custom css */
 
-/*DE3423*/
-
 @media only screen and (min-device-width: 360px) and (max-device-width: 736px) {
 }
 
@@ -66,7 +64,7 @@ body {
 /* -- HOME PAGE -- */
 
 .homeContainer, .mainHomeContainer {
-  /*background: #032b36;*/
+  /*background: #002b36;*/
   background: #15414c;
   color: white;
 }
@@ -80,7 +78,7 @@ body {
 }
 
 .homeContainer .button:hover {
-  border-color: #de3423;
+  border-color: #dc322f;
 }
 
 .homeContainer .buttonWrapper {
@@ -119,7 +117,7 @@ body {
 
 .x-dark {
   /*background: #15414c;*/
-  background: #032b36;
+  background: #002b36;
 }
 
 .-homeSection h1 {
@@ -127,7 +125,7 @@ body {
   margin-top: 0;
   padding: 10px 15px;
   color: white;
-  background: #de3423;
+  background: #dc322f;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -154,7 +152,7 @@ body {
 .-homeSection a:hover {
   padding: 5px;
   margin: -5px;
-  background: #de3423;
+  background: rgba(213, 49, 48, 0.6);
 }
 
 .-homeAboutSection {
