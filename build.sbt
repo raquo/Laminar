@@ -10,7 +10,7 @@ val scalaVersions = Seq(Scala212, Scala213)
 lazy val websiteJS = project
   .settings(
    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0",
-   scalaVersion := Scala212,
+   scalaVersion := Scala213,
    crossScalaVersions := scalaVersions,
    skip in publish := true
   )
@@ -19,7 +19,7 @@ lazy val websiteJS = project
 
 lazy val website = project
   .settings(
-    scalaVersion := Scala212,
+    scalaVersion := Scala213,
     crossScalaVersions := scalaVersions
   )
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
@@ -61,7 +61,7 @@ lazy val laminar = project.in(file("."))
     name := "Laminar",
     normalizedName := "laminar",
     organization := "com.raquo",
-    scalaVersion := Scala212,
+    scalaVersion := Scala213,
     crossScalaVersions := scalaVersions,
     homepage := Some(url("https://github.com/raquo/Laminar")),
     licenses += ("MIT", url("https://github.com/raquo/Laminar/blob/master/LICENSE.md")),
