@@ -6,7 +6,7 @@ const siteConfig = {
   title: 'Laminar', // Title for your website.
   tagline: 'Simple, expressive, and safe UI library for Scala.js',
   url: 'https://raquo.github.io',
-  baseUrl: '/Laminar/',
+  baseUrl: '/',
   // Used for publishing and more
   projectName: 'Laminar',
   organizationName: 'raquo',
