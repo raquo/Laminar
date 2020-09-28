@@ -1,5 +1,5 @@
 {
   "examples": {
-    "Category 1": ["examples/Basic", "examples/Timers"]
+    "Category 1": ["examples/basic", "examples/timers"]
   }
 }
