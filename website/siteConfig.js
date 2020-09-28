@@ -11,9 +11,9 @@ const siteConfig = {
   projectName: 'Laminar',
   organizationName: 'raquo',
   headerLinks: [
-    { doc: 'Documentation', label: 'Docs' },
-    { doc: 'examples/Basic', label: 'Examples' },
-    { doc: 'Resources', label: 'Resources' }
+    { doc: 'documentation', label: 'Docs' },
+    { doc: 'examples/basic', label: 'Examples' },
+    { doc: 'resources', label: 'Resources' }
     // {doc: 'Virtual-DOM', label: 'Virtual DOM'},
     // {
     //   href: 'https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html',
