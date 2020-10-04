@@ -109,6 +109,31 @@ body {
   }
 }
 
+.homeContainer .-problem {
+  margin: 24px auto;
+  max-width: 700px;
+  font-size: 18px;
+  /*text-align: left;*/
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .homeContainer .-problem {
+    /*text-align: left;*/
+  }
+}
+
+.homeContainer .-problem a {
+  color: white;
+  text-decoration: underline;
+}
+
+.homeContainer .-problem a:hover {
+  padding: 5px;
+  margin: -5px;
+  background: rgba(213, 49, 48, 0.6);
+}
+
 .-homeSection {
   padding: 60px 0 40px 0;
   font-size: 18px;
@@ -136,6 +161,17 @@ body {
   color: white;
 }
 
+@media (max-width: 600px) {
+
+  .-homeSection h1 {
+    margin-bottom: 5px;
+  }
+
+  .-homeSection h2 {
+    margin-top: 50px;
+  }
+}
+
 .-homeSection .wrapper {
   text-align: center;
 }
@@ -155,16 +191,20 @@ body {
   background: rgba(213, 49, 48, 0.6);
 }
 
-.-homeAboutSection {
+.-homeGetStartedSection {
   padding-top: 50px;
 }
 
-.-homeAboutSection h1 {
+.-homeGetStartedSection h1 {
   margin-bottom: 35px;
 }
 
-.-homeAboutSection h2 {
+.-homeGetStartedSection h2 {
   margin-top: 50px;
+}
+
+.-homeGetStartedSection .-blogLink {
+  font-size: 120%;
 }
 
 .-homeCommunitySection {

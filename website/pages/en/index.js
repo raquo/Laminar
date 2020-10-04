@@ -64,6 +64,9 @@ class HomeSplash extends React.Component {
             <Button href={docUrl('examples/basic')}>Interactive examples</Button>
             <Button href={docUrl('documentation')}>Documentation</Button>
           </PromoSection>
+          <div className="-problem">
+            Laminar lets you build web application interfaces, keeping UI state in sync with the underlying application state. Its simple yet expressive patterns build on a rock solid foundation of <a href="https://github.com/raquo/Airstream">Airstream</a> observables and the <a href="https://www.scala-js.org/">Scala.js</a> platform.
+          </div>
         </div>
       </SplashContainer>
     );
@@ -86,11 +89,11 @@ class Index extends React.Component {
               contents: [
                 {
                   title: 'Approachable',
-                  content: 'Small library, no magic, no macros, almost no implicits.'
+                  content: 'Easy to understand: no macros, no category theory, no typed effects, few implicits, etc.'
                 },
                 {
-                  title: 'Pragmatic',
-                  content: 'Easy concepts: no category theory, no typed effects, no backpressure, etc.'
+                  title: 'Scalable',
+                  content: "Simple abstractions that allow for precise control with no mental overhead, yet scale effortlessly."
                 },
                 {
                   title: 'Native Scala.js',
@@ -133,8 +136,8 @@ class Index extends React.Component {
                   content: 'Unique subscription ownership mechanism provides fully automatic memory safety without boilerplate.'
                 },
                 {
-                  title: 'Precise DOM Types',
-                  content: 'Proper types for DOM nodes and property / attribute values without macros or other complexity.'
+                  title: 'Scala.js > Typescript',
+                  content: "Scala's type system is richer, safer, and encourages better patterns than Typescript. Night and day."
                 }
               ]
             })
@@ -165,21 +168,21 @@ class Index extends React.Component {
               layout: "threeColumn",
               contents: [
                 {
-                  title: '@teknocide',
-                  content: `"Laminar has been a game changer for me. I never felt comfortable with the available Scala wrappers around React. Enter Laminar, which is lightweight and feels much more natural than what React ever did even when writing it in JavaScript." [source](https://www.reddit.com/r/scala/comments/bi7eka/laminar_v07_featuring_a_new_way_to_performantly/em2aklb/)`
+                  title: '<a target="_blank" href="https://www.reddit.com/r/scala/comments/bi7eka/laminar_v07_featuring_a_new_way_to_performantly/em2aklb/">@teknocide</a>',
+                  content: `*"Laminar has been a game changer for me. I never felt comfortable with the available Scala wrappers around React. Enter Laminar, which is lightweight and feels much more natural than what React ever did even when writing it in JavaScript."*`
                 },
                 {
-                  title: '@oeiuwq',
-                  content: `"Having used react, cycle, etc, I've to say it's a delight to have Laminar on Scala.js. It just *feels* right, kudos to @raquo for learning and rethinking things instead of blindly following others." [source](https://twitter.com/oeiuwq/status/1244844845077798912)`
+                  title: '<a target="_blank" href="https://twitter.com/oeiuwq/status/1244844845077798912">@oeiuwq</a>',
+                  content: `*"Having used react, cycle, etc, I've to say it's a delight to have Laminar on Scala.js. It just &ast;feels&ast; right, kudos to @raquo for learning and rethinking things instead of blindly following others."*`
                 },
                 {
-                  title: '@kitlangton',
-                  content: `"I've gotta say: Laminar is my favorite way of coding for the web by many miles. It's so ridiculously good!" [source](https://gitter.im/Laminar_/Lobby?at=5ea1de5d94ac2758e3033436)`
+                  title: '<a target="_blank" href="https://gitter.im/Laminar_/Lobby?at=5ea1de5d94ac2758e3033436">@kitlangton</a>',
+                  content: `*"I've gotta say: Laminar is my favorite way of coding for the web by many miles. It's so ridiculously good!"*`
                 }
               ]
             })
           }
-          <div className="-homeAboutSection x-dark">
+          <div className="-homeGetStartedSection x-dark">
             {
               this.renderSection({
                 className: "x-dark",
@@ -202,22 +205,22 @@ class Index extends React.Component {
                     </div>
                     <p>
                       Also, read about how and why Laminar came to be:<br/>
-                      <a href="https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a">My Four Year Quest For Perfect Scala.js UI Development</a>
+                      <a className="-blogLink" href="https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a">My Four Year Quest For Perfect Scala.js UI Development</a>
                     </p>
                   </React.Fragment>
                 ),
                 contents: [
                   {
-                    title: 'Live Examples',
-                    content: "TODO – This site"
+                    title: '[Live Examples](/examples/basic)',
+                    content: "Live app and its code side-by-side.<br />What sorcery is this?"
                   },
                   {
-                    title: 'Documentation',
+                    title: '[Documentation](/documentation)',
                     content: 'Always current, explaining both high level ideas and gritty details. Worth reading back-to-back.'
                   },
                   {
-                    title: 'Resources',
-                    content: 'TODO – This site'
+                    title: '[Resources](/resources)',
+                    content: 'Links to quickstart, articles, addons, starter kits, and other useful stuff.'
                   },
                 ]
               })
