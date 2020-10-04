@@ -93,7 +93,7 @@ class Index extends React.Component {
                 },
                 {
                   title: 'Scalable',
-                  content: "Simple abstractions that allow for precise control with no mental overhead, yet scale effortlessly."
+                  content: "Simple abstractions that allow for precise control with no mental overhead, yet scale effortlessly for complex apps."
                 },
                 {
                   title: 'Native Scala.js',
@@ -157,7 +157,7 @@ class Index extends React.Component {
                 },
                 {
                   title: 'Anything Else',
-                  content: "Laminar's direct API makes integrations with other DOM / streaming / etc. libraries a breeze."
+                  content: "Laminar's direct API makes integrations with other JS / DOM / streaming / etc. libraries a breeze."
                 }
               ]
             })
