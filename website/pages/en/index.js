@@ -159,6 +159,26 @@ class Index extends React.Component {
               ]
             })
           }
+          {
+            this.renderSection({
+              title: "Well Loved",
+              layout: "threeColumn",
+              contents: [
+                {
+                  title: '@teknocide',
+                  content: `"Laminar has been a game changer for me. I never felt comfortable with the available Scala wrappers around React. Enter Laminar, which is lightweight and feels much more natural than what React ever did even when writing it in JavaScript." [source](https://www.reddit.com/r/scala/comments/bi7eka/laminar_v07_featuring_a_new_way_to_performantly/em2aklb/)`
+                },
+                {
+                  title: '@oeiuwq',
+                  content: `"Having used react, cycle, etc, I've to say it's a delight to have Laminar on Scala.js. It just *feels* right, kudos to @raquo for learning and rethinking things instead of blindly following others." [source](https://twitter.com/oeiuwq/status/1244844845077798912)`
+                },
+                {
+                  title: '@kitlangton',
+                  content: `"I've gotta say: Laminar is my favorite way of coding for the web by many miles. It's so ridiculously good!" [source](https://gitter.im/Laminar_/Lobby?at=5ea1de5d94ac2758e3033436)`
+                }
+              ]
+            })
+          }
           <div className="-homeAboutSection x-dark">
             {
               this.renderSection({
