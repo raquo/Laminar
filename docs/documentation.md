@@ -17,9 +17,9 @@ title: Documentation
   * [Event Streams and Signals](#event-streams-and-signals)
   * [Individual Children](#individual-children)
   * [Lists of Children](#lists-of-children)
-    * [`children <-- observableOfElements`](#children----observableofelements)
-    * [Performant Children Rendering – `split`](#performant-children-rendering--split) 
-    * [Performant Children Rendering – `children.command`](#performant-children-rendering--childrencommand)
+    * [children <-- observableOfElements](#children----observableofelements)
+    * [Performant Children Rendering – split](#performant-children-rendering--split) 
+    * [Performant Children Rendering – children.command](#performant-children-rendering--childrencommand)
   * [Binding Observables](#binding-observables)
   * [Other Binders](#other-binders)
 * [ClassName and Other Special Keys](#classname-and-other-special-keys)
@@ -41,11 +41,11 @@ title: Documentation
 * [Memory Management](#memory-management)
 * [Element Lifecycle Hooks](#element-lifecycle-hooks)
   * [What Is Mounting?](#what-is-mounting)
-  * [`onMountCallback`](#onmountcallback)
-  * [`onUnmountCallback` & `onMountUnmountCallback`](#onunmountcallback--onmountunmountcallback)
-  * [`onMountSet`](#onmountset)
-  * [`onMountBind`](#onmountbind)
-  * [`onMountInsert`](#onmountinsert)
+  * [onMountCallback](#onmountcallback)
+  * [onUnmountCallback & onMountUnmountCallback](#onunmountcallback--onmountunmountcallback)
+  * [onMountSet](#onmountset)
+  * [onMountBind](#onmountbind)
+  * [onMountInsert](#onmountinsert)
   * [Why Use Lifecycle Hooks?](#why-use-lifecycle-hooks)
   * [Lifecycle Event Timing](#lifecycle-event-timing)
   * [How Are Mount Events Propagated?](#how-are-mount-events-propagated)
@@ -58,7 +58,18 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v0.10.3**. See [Resources](https://laminar.dev/resources) for links to previous version docs and to Airstream docs. 
+This documentation is for Laminar version **v0.10.3**. For other versions, see below.
+
+| Laminar | Airstream |
+| :--- | :--- |
+| **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
+| ↕ | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
+| **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
+| **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
+| **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
+| **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
+
+For documentation of older versions, see git tags.
 
 [Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/com/raquo/airstream/index.html)
 
@@ -216,7 +227,7 @@ And of course, every Modifier has a public `apply(element: El)` method that you 
 Using manual application is only encouraged when it's not enabling imperative coding patterns. You should learn to use [Reactive Data](#reactive-data) effectively before you sprinkle your code with manual applications.
 
 
-### `inContext`
+### inContext
 
 Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, a common use case is needing to get the input element's `value` property in order to build a modifier that will send that property to an event bus.
 
@@ -428,7 +439,7 @@ When engaging in such optimizations, you have to ask yourself – is it worth it
 Rendering dynamic lists of children efficiently is one of the most challenging parts in UI libraries, and Laminar has a few solutions for that.
 
 
-#### `children <-- observableOfElements`
+#### children <-- observableOfElements
 
 ```scala
 val childrenSignal: Signal[immutable.Seq[Node]] = ??? // immutable only!
@@ -446,7 +457,7 @@ Laminar will perform absolutely minimal operations that make sense – for examp
 Note: a given DOM node can not exist in multiple locations in the DOM at the same time. Therefore, the Seq-s you provide to `children <--` must not contain several references to the same element. This is on you, as Laminar does not spend CPU cycles to verify this. Generally this isn't a problem unless you're deliberately caching elements for reuse in this manner. If you _are_ doing that, consider using the `split` operator explained below.
 
 
-#### Performant Children Rendering – `split`
+#### Performant Children Rendering – split
 
 We've now established how `children <-- childrenObservable` works, but generating this `childrenObservable` easily and efficiently can be quite complicated depending on your dataflow. For maximum efficiency, you should use Airstream's `split` method. Before we dive into that, let's see what the problem is without it. 
 
@@ -533,7 +544,7 @@ Here is how `split` works in more detail:
 Lastly, aside from `split` there is also `splitIntoSignals`. Which one you want depends on whether you want `newRenderUser` to accept a stream or a signal. Remember that unlike streams, signals keep track of their current state, and only emit values that don't `==`-equal their current state. This might be desirable or not (or irrelevant) depending on your use case. 
 
 
-#### Performant Children Rendering – `children.command`
+#### Performant Children Rendering – children.command
 
 In certain cases such as rendering live logs, it might be easier for you to tell Laminar when you want items added or removed to the list instead of giving it an entire updated list of children:
 
@@ -1224,7 +1235,7 @@ You can check if a Laminar element is mounted in Laminar terms using `ReactiveEl
 Laminar offers a few helpers to react to element lifecycle events:
 
 
-### `onMountCallback`
+### onMountCallback
 
 **Don't rush to use `onMountCallback` for everything, read the docs for all lifecycle hooks first.**
 
@@ -1274,7 +1285,7 @@ printBus.writer.onNext("hi") // this will print "Mod: hi" and "Mount: hi"
 The bottom line is, avoid using `onMountCallback` if all you need is a reference to `thisNode` or `Owner`. Better use `inContext` or `amend` if you need `thisNode`, and binders like `foo <-- bar` instead of messing with owners manually. Use `onMountCallback` when its purpose aligns with your big picture: running some code on mount. The same goes for all other helpers below.
  
 
-### `onUnmountCallback` & `onMountUnmountCallback`
+### onUnmountCallback & onMountUnmountCallback
 
 Works just like `onMountCallback`, same caveats.
 
@@ -1300,7 +1311,7 @@ div(
 ```
 
 
-### `onMountSet`
+### onMountSet
 
 As you might remember, `Setter` modifiers are idempotent, which is to say applying the same modifier N times in a row to the same element has the same effect regardless of what N is, if N >= 1. We have a special helper to apply one or more Setters on mount:
 
@@ -1342,7 +1353,7 @@ val link = a(
 Once `link` was mounted and deemed evil, it would become red and never cease being red even if it was re-mounted as a non-evil link, because there is no code to unset this red color or replace it with any other color. As you might have guessed, `Seq[Setter[El]]` implicitly converts to `Setter[El]`, so all you need to do is to change `href := "http://example.com"` to `List(href := "http://example.com", color := "black")` to make the color change with the url.
 
 
-### `onMountBind`
+### onMountBind
 
 This is a special helper for binders like `onClick --> observer`, `attr <-- stream`.
 
@@ -1390,7 +1401,7 @@ So we know why `onMountCallback` fails us technically, but why is it failing us 
 And so, `onMountBind` exists as the simplest way to do what it does, and `onMountCallback` as the simplest way to do the other thing.
 
 
-### `onMountInsert`
+### onMountInsert
 
 Just like you use `onMountBind` when you need `MountContext` to bind a subscription, you use `onMountInsert` when you need `MountContext` to insert children (or if you truly need to insert children only on mount).
 
@@ -1503,7 +1514,7 @@ Laminar is conceptually a simple layer that brings a lightweight reactive API to
 Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.
 
 
-#### checkbox.onClick + event.preventDefault() = async event stream
+### checkbox.onClick + event.preventDefault()
 
 All event streams in Laminar emit events synchronously – as soon as they happen – **except** if the stream in question is a stream of `onClick` events on an `input(typ := "checkbox")` element, **and** you generated this stream using the `.preventDefault` method in Laminar's API.
 
@@ -1516,7 +1527,7 @@ The underlying issue is described in [this StackOverflow answer](https://stackov
 **Escape hatch:** instead of using Laminar's `preventDefault` option/method, call `ev.preventDefault()` manually _after_ the event was passed to the observer. Then event handling will work the same way it does in native JS DOM.
 
 
-#### `tbody`
+### tbody
 
 You might be used to writing HTML markup like this:
 

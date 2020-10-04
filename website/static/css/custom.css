@@ -15,27 +15,24 @@
 @media only screen and (min-width: 1500px) {
 }
 
-div.mdoc-example {
-  display: inline-block;
-  width: 100%;
+.mdoc-example {
+  margin: 20px 0 40px 0;
 }
 
-div.mdoc-example code {
-  float: left;
-  position: relative;
-  width: 55%;
-  font-size: smaller;
-  height: 300px;
+.mdoc-example code {
+  max-height: calc(max(350px, 55vh));
 }
 
-div.mdoc-example div[id^="mdoc-html-"] {
-  float: right;
-  padding: 10px;
+.mdoc-example div[id^="mdoc-html-"] {
+  margin-top: 40px;
+  padding: 15px;
   border-radius: 5px;
   border: 1px solid gray;
-  width: 44%;
-  margin-left: 1px;
 }
+
+/*.docs-prevnext {*/
+/*  margin-top: 60px;*/
+/*}*/
 
 body {
 
@@ -246,3 +243,18 @@ body {
   font-size: 130%;
 }
 
+/* Docs sidebar */
+
+.onPageNav:empty {
+  display: none;
+}
+
+@media only screen and (min-width: 1024px) {
+  .onPageNav {
+    flex: 0 0 350px;
+  }
+
+  .onPageNav .toc-headings a {
+    font-size: 13px;
+  }
+}

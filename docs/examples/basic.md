@@ -10,7 +10,7 @@ import org.scalajs.dom
 
 val nameBus = new EventBus[String]
 val colorStream: EventStream[String] = nameBus.events.map { name =>
-  if (name == "Sébastien") "red" else "unset" // make Sébastien feel special
+  if (name == "Sebastien") "red" else "unset" // make Sebastien feel special
 }
 
 def Hello(

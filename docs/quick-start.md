@@ -137,7 +137,7 @@ val nameStream = inputBox.inputNode
   .mapTo(inputBox.inputNode.ref.value) // gets the current value from the input text box (note: parameter passed by name)
  
 val colorStream = nameStream.map { name =>
-  if (name == "Sébastien") "red" else "unset" // make Sébastien feel special
+  if (name == "Sebastien") "red" else "unset" // make Sebastien feel special
 }
 
 val appDiv: Div = div(
