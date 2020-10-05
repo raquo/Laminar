@@ -47,6 +47,11 @@ body {
 
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: #888;
+}
+
 .auto-resizable-iframe {
   max-width: 700px;
   margin: 0 auto;
