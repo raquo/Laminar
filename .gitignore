@@ -12,8 +12,6 @@ project/project
 
 yarn.lock
 
-websiteJS
-
 website/node_modules
 website/build
 website/i18n/*

@@ -1,5 +1,6 @@
 {
   "examples": {
-    "Category 1": ["examples/basic", "examples/timers"]
+    "Basics": ["examples/hello-world", "examples/basic", "examples/time", "examples/todomvc"],
+    "Integrations": ["examples/web-components"]
   }
 }

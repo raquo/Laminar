@@ -12,7 +12,7 @@ const siteConfig = {
   organizationName: 'raquo',
   headerLinks: [
     { doc: 'documentation', label: 'Docs' },
-    { doc: 'examples/basic', label: 'Examples' },
+    { doc: 'examples/hello-world', label: 'Examples' },
     { doc: 'resources', label: 'Resources' }
     // {doc: 'Virtual-DOM', label: 'Virtual DOM'},
     // {
@@ -25,6 +25,11 @@ const siteConfig = {
     //   label: 'Airstream API',
     //   external: true
     // }
+  ],
+  stylesheets: [
+    // Used for Material UI web components example
+    "https://fonts.googleapis.com/css?family=Material+Icons&display=block",
+    "https://fonts.googleapis.com/css?family=Roboto:300,400,500"
   ],
 
   // headerIcon: 'img/spiral-logo.svg',

@@ -61,7 +61,7 @@ class HomeSplash extends React.Component {
           <PromoSection>
             <Button href="https://github.com/raquo/Laminar">Github</Button>
             <Button href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">Big Video</Button>
-            <Button href={docUrl('examples/basic')}>Interactive examples</Button>
+            <Button href={docUrl('examples/hello-world')}>Interactive examples</Button>
             <Button href={docUrl('documentation')}>Documentation</Button>
           </PromoSection>
           <div className="-problem">
@@ -211,7 +211,7 @@ class Index extends React.Component {
                 ),
                 contents: [
                   {
-                    title: '[Live Examples](/examples/basic)',
+                    title: '[Live Examples](/examples/hello-world)',
                     content: "Live app and its code side-by-side.<br />What sorcery is this?"
                   },
                   {
