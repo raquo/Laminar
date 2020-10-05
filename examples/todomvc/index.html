@@ -1,0 +1,282 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>TodoMVC · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="In addition to the code presented below, this example uses a fairly standard TodoMVC stylesheet, `todomvc.css`."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="TodoMVC · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://raquo.github.io/"/><meta property="og:description" content="In addition to the code presented below, this example uses a fairly standard TodoMVC stylesheet, `todomvc.css`."/><meta property="og:image" content="https://raquo.github.io/img/spiral-inverse-logo.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://raquo.github.io/img/spiral-inverse-logo.svg"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class="siteNavGroupActive"><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Basics</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Basics</h3><ul class=""><li class="navListItem"><a class="navItem" href="/examples/hello-world">Hello World</a></li><li class="navListItem"><a class="navItem" href="/examples/basic">Basic Interactivity</a></li><li class="navListItem"><a class="navItem" href="/examples/time">Time</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/examples/todomvc">TodoMVC</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Integrations</h3><ul class=""><li class="navListItem"><a class="navItem" href="/examples/web-components">Using Web Components</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">TodoMVC</h1></header><article><div><span><p>In addition to the code presented below, this example uses a fairly standard TodoMVC stylesheet, <code>todomvc.css</code>.</p>
+<div class = "mdoc-example mdoc-example-todomvc">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">TodoMvcApp</span> </span>{
+
+  <span class="hljs-comment">// This implementation is very loosely based on Outwatch TodoMVC, for comparison see</span>
+  <span class="hljs-comment">// https://github.com/clovellytech/outwatch-examples/tree/master/todomvc/src/main/scala/todomvc</span>
+
+
+  <span class="hljs-comment">// --- Models ---</span>
+
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TodoItem</span>(<span class="hljs-params">id: <span class="hljs-type">Int</span>, text: <span class="hljs-type">String</span>, completed: <span class="hljs-type">Boolean</span></span>)</span>
+
+
+  <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Filter</span>(<span class="hljs-params">val name: <span class="hljs-type">String</span>, val passes: <span class="hljs-type">TodoItem</span> =&gt; <span class="hljs-type">Boolean</span></span>)</span>
+
+  <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ShowAll</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Filter</span>(<span class="hljs-params">"<span class="hljs-type">All</span>", _ =&gt; true</span>)</span>
+
+  <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ShowActive</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Filter</span>(<span class="hljs-params">"<span class="hljs-type">Active</span>", !_.completed</span>)</span>
+
+  <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ShowCompleted</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Filter</span>(<span class="hljs-params">"<span class="hljs-type">Completed</span>", _.completed</span>)</span>
+
+  <span class="hljs-keyword">val</span> filters: <span class="hljs-type">List</span>[<span class="hljs-type">Filter</span>] = <span class="hljs-type">ShowAll</span> :: <span class="hljs-type">ShowActive</span> :: <span class="hljs-type">ShowCompleted</span> :: <span class="hljs-type">Nil</span>
+
+
+  <span class="hljs-keyword">sealed</span> <span class="hljs-class"><span class="hljs-keyword">trait</span> <span class="hljs-title">Command</span></span>
+
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Create</span>(<span class="hljs-params">itemText: <span class="hljs-type">String</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Command</span></span>
+
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UpdateText</span>(<span class="hljs-params">itemId: <span class="hljs-type">Int</span>, text: <span class="hljs-type">String</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Command</span></span>
+
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UpdateCompleted</span>(<span class="hljs-params">itemId: <span class="hljs-type">Int</span>, completed: <span class="hljs-type">Boolean</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Command</span></span>
+
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Delete</span>(<span class="hljs-params">itemId: <span class="hljs-type">Int</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Command</span></span>
+
+  <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">DeleteCompleted</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Command</span></span>
+
+
+  <span class="hljs-comment">// --- State ---</span>
+
+  <span class="hljs-comment">// Var-s are reactive state variables suitable for both local state and redux-like global stores.</span>
+  <span class="hljs-comment">// Laminar uses my library Airstream as its reactive layer https://github.com/raquo/Airstream</span>
+
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> itemsVar = <span class="hljs-type">Var</span>(<span class="hljs-type">List</span>[<span class="hljs-type">TodoItem</span>]())
+
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> filterVar = <span class="hljs-type">Var</span>[<span class="hljs-type">Filter</span>](<span class="hljs-type">ShowAll</span>)
+
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> lastId = <span class="hljs-number">1</span> <span class="hljs-comment">// just for auto-incrementing IDs</span>
+
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> commandObserver = <span class="hljs-type">Observer</span>[<span class="hljs-type">Command</span>] {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Create</span>(itemText) =&gt;
+      lastId += <span class="hljs-number">1</span>
+      <span class="hljs-keyword">if</span> (filterVar.now() == <span class="hljs-type">ShowCompleted</span>)
+        filterVar.set(<span class="hljs-type">ShowAll</span>)
+      itemsVar.update(_ :+ <span class="hljs-type">TodoItem</span>(id = lastId, text = itemText, completed = <span class="hljs-literal">false</span>))
+    <span class="hljs-keyword">case</span> <span class="hljs-type">UpdateText</span>(itemId, text) =&gt;
+      itemsVar.update(_.map(item =&gt; <span class="hljs-keyword">if</span> (item.id == itemId) item.copy(text = text) <span class="hljs-keyword">else</span> item))
+    <span class="hljs-keyword">case</span> <span class="hljs-type">UpdateCompleted</span>(itemId, completed) =&gt;
+      itemsVar.update(_.map(item =&gt; <span class="hljs-keyword">if</span> (item.id == itemId) item.copy(completed = completed) <span class="hljs-keyword">else</span> item))
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Delete</span>(itemId) =&gt;
+      itemsVar.update(_.filterNot(_.id == itemId))
+    <span class="hljs-keyword">case</span> <span class="hljs-type">DeleteCompleted</span> =&gt;
+      itemsVar.update(_.filterNot(_.completed))
+  }
+
+
+  <span class="hljs-comment">// --- Views ---</span>
+
+  <span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> node: <span class="hljs-type">HtmlElement</span> = {
+    <span class="hljs-keyword">val</span> $todoItems = itemsVar
+      .signal
+      .combineWith(filterVar.signal)
+      .map2(_ filter _.passes)  
+    div(
+      cls(<span class="hljs-string">"todoapp"</span>),
+      div(
+        cls(<span class="hljs-string">"header"</span>),
+        h1(<span class="hljs-string">"todos"</span>),
+        renderNewTodoInput,
+      ),
+      div(
+        hideIfNoItems,
+        cls(<span class="hljs-string">"main"</span>),
+        ul(
+          cls(<span class="hljs-string">"todo-list"</span>),
+          children &lt;-- $todoItems.split(_.id)(renderTodoItem)
+        )
+      ),
+      renderStatusBar
+    )
+  }
+
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderNewTodoInput</span> </span>=
+    input(
+      cls(<span class="hljs-string">"new-todo"</span>),
+      placeholder(<span class="hljs-string">"What needs to be done?"</span>),
+      autoFocus(<span class="hljs-literal">true</span>),
+      inContext { thisNode =&gt;
+        <span class="hljs-comment">// Note: mapTo below accepts parameter by-name, evaluating it on every enter key press</span>
+        onEnterPress.mapTo(thisNode.ref.value).filter(_.nonEmpty) --&gt;
+          commandObserver.contramap[<span class="hljs-type">String</span>] { text =&gt;
+            thisNode.ref.value = <span class="hljs-string">""</span> <span class="hljs-comment">// clear input</span>
+            <span class="hljs-type">Create</span>(itemText = text)
+          }
+      }
+    )
+
+  <span class="hljs-comment">// Render a single item. Note that the result is a single element: not a stream, not some virtual DOM representation.</span>
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderTodoItem</span></span>(itemId: <span class="hljs-type">Int</span>, initialTodo: <span class="hljs-type">TodoItem</span>, $item: <span class="hljs-type">Signal</span>[<span class="hljs-type">TodoItem</span>]): <span class="hljs-type">HtmlElement</span> = {
+    <span class="hljs-keyword">val</span> isEditingVar = <span class="hljs-type">Var</span>(<span class="hljs-literal">false</span>) <span class="hljs-comment">// Example of local state</span>
+    <span class="hljs-keyword">val</span> updateTextObserver = commandObserver.contramap[<span class="hljs-type">UpdateText</span>] { updateCommand =&gt;
+      isEditingVar.set(<span class="hljs-literal">false</span>)
+      updateCommand
+    }
+    li(
+      cls &lt;-- $item.map(item =&gt; <span class="hljs-type">Map</span>(<span class="hljs-string">"completed"</span> -&gt; item.completed)),
+      onDblClick.filter(_ =&gt; !isEditingVar.now()).mapTo(<span class="hljs-literal">true</span>) --&gt; isEditingVar.writer,
+      children &lt;-- isEditingVar.signal.map[<span class="hljs-type">List</span>[<span class="hljs-type">HtmlElement</span>]] {
+        <span class="hljs-keyword">case</span> <span class="hljs-literal">true</span> =&gt;
+          renderTextUpdateInput(itemId, $item, updateTextObserver) :: <span class="hljs-type">Nil</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-literal">false</span> =&gt;
+          <span class="hljs-type">List</span>(
+            renderCheckboxInput(itemId, $item),
+            label(child.text &lt;-- $item.map(_.text)),
+            button(
+              cls(<span class="hljs-string">"destroy"</span>),
+              onClick.mapTo(<span class="hljs-type">Delete</span>(itemId)) --&gt; commandObserver
+            )
+          )
+      }
+    )
+  }
+
+  <span class="hljs-comment">// Note that we pass reactive variables: `$item` for reading, `updateTextObserver` for writing</span>
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderTextUpdateInput</span></span>(
+    itemId: <span class="hljs-type">Int</span>,
+    $item: <span class="hljs-type">Signal</span>[<span class="hljs-type">TodoItem</span>],
+    updateTextObserver: <span class="hljs-type">Observer</span>[<span class="hljs-type">UpdateText</span>]
+  ) =
+    input(
+      cls(<span class="hljs-string">"edit"</span>),
+      defaultValue &lt;-- $item.map(_.text),
+      onMountFocus,
+      inContext { thisNode =&gt;
+        <span class="hljs-meta">@inline</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">updateText</span> </span>= <span class="hljs-type">UpdateText</span>(itemId, thisNode.ref.value)
+
+        <span class="hljs-type">List</span>(
+          onEnterPress.mapTo(updateText) --&gt; updateTextObserver,
+          onBlur.mapTo(updateText) --&gt; updateTextObserver
+        )
+      }
+    )
+
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderCheckboxInput</span></span>(itemId: <span class="hljs-type">Int</span>, $item: <span class="hljs-type">Signal</span>[<span class="hljs-type">TodoItem</span>]) =
+    input(
+      cls(<span class="hljs-string">"toggle"</span>),
+      typ(<span class="hljs-string">"checkbox"</span>),
+      checked &lt;-- $item.map(_.completed),
+      inContext { thisNode =&gt;
+        onInput.mapTo(
+          <span class="hljs-type">UpdateCompleted</span>(itemId, completed = thisNode.ref.checked)
+        ) --&gt; commandObserver
+      }
+    )
+
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderStatusBar</span> </span>=
+    footer(
+      hideIfNoItems,
+      cls(<span class="hljs-string">"footer"</span>),
+      span(
+        cls(<span class="hljs-string">"todo-count"</span>),
+        child.text &lt;-- itemsVar.signal
+          .map(_.count(!_.completed))
+          .map(pluralize(_, <span class="hljs-string">"item left"</span>, <span class="hljs-string">"items left"</span>)),
+      ),
+      ul(
+        cls(<span class="hljs-string">"filters"</span>),
+        filters.map(filter =&gt; li(renderFilterButton(filter)))
+      ),
+      child.maybe &lt;-- itemsVar.signal.map { items =&gt;
+        <span class="hljs-keyword">if</span> (items.exists(<span class="hljs-type">ShowCompleted</span>.passes)) <span class="hljs-type">Some</span>(
+          button(
+            cls(<span class="hljs-string">"clear-completed"</span>),
+            <span class="hljs-string">"Clear completed"</span>,
+            onClick.map(_ =&gt; <span class="hljs-type">DeleteCompleted</span>) --&gt; commandObserver
+          )
+        ) <span class="hljs-keyword">else</span> <span class="hljs-type">None</span>
+      }
+    )
+
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderFilterButton</span></span>(filter: <span class="hljs-type">Filter</span>) =
+    a(
+      cls.toggle(<span class="hljs-string">"selected"</span>) &lt;-- filterVar.signal.map(_ == filter),
+      onClick.preventDefault.mapTo(filter) --&gt; filterVar.writer,
+      filter.name
+    )
+
+  <span class="hljs-comment">// Every little thing in Laminar can be abstracted away</span>
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">hideIfNoItems</span></span>: <span class="hljs-type">Mod</span>[<span class="hljs-type">HtmlElement</span>] =
+    display &lt;-- itemsVar.signal.map { items =&gt;
+      <span class="hljs-keyword">if</span> (items.nonEmpty) <span class="hljs-string">""</span> <span class="hljs-keyword">else</span> <span class="hljs-string">"none"</span>
+    }
+
+
+  <span class="hljs-comment">// --- Generic helpers ---</span>
+
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">pluralize</span></span>(num: <span class="hljs-type">Int</span>, singular: <span class="hljs-type">String</span>, plural: <span class="hljs-type">String</span>): <span class="hljs-type">String</span> =
+    <span class="hljs-string">s"<span class="hljs-subst">$num</span> <span class="hljs-subst">${if (num == 1) singular else plural}</span>"</span>
+
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> onEnterPress = onKeyPress.filter(_.keyCode == dom.ext.<span class="hljs-type">KeyCode</span>.<span class="hljs-type">Enter</span>)
+}
+
+
+<span class="hljs-comment">// Render app</span>
+
+render(containerNode, <span class="hljs-type">TodoMvcApp</span>.node)
+</code></pre>
+<div id="mdoc-html-run0" data-mdoc-js></div>
+</div>
+<script type="text/javascript" src="../assets/examples/websitejs-opt-library.js" defer></script>
+<script type="text/javascript" src="../assets/examples/websitejs-opt-loader.js" defer></script>
+<script type="text/javascript" src="../assets/examples/todomvc.md.js" defer></script>
+<script type="text/javascript" src="../assets/examples/mdoc.js" defer></script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/examples/time"><span class="arrow-prev">← </span><span>Time</span></a><a class="docs-next button" href="/examples/web-components"><span>Using Web Components</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section></footer></div></body></html>

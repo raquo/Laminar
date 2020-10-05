@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Time · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;h2&gt;Basic Interval Stream&lt;/h2&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Time · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://raquo.github.io/"/><meta property="og:description" content="&lt;h2&gt;Basic Interval Stream&lt;/h2&gt;"/><meta property="og:image" content="https://raquo.github.io/img/spiral-inverse-logo.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://raquo.github.io/img/spiral-inverse-logo.svg"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class="siteNavGroupActive"><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Basics</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Basics</h3><ul class=""><li class="navListItem"><a class="navItem" href="/examples/hello-world">Hello World</a></li><li class="navListItem"><a class="navItem" href="/examples/basic">Basic Interactivity</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/examples/time">Time</a></li><li class="navListItem"><a class="navItem" href="/examples/todomvc">TodoMVC</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Integrations</h3><ul class=""><li class="navListItem"><a class="navItem" href="/examples/web-components">Using Web Components</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Time</h1></header><article><div><span><p><h2>Basic Interval Stream</h2></p>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> $tick = <span class="hljs-type">EventStream</span>.periodic(<span class="hljs-number">1000</span>)
+
+<span class="hljs-keyword">val</span> app = div(
+  div(
+    <span class="hljs-string">"Tick #: "</span>,
+    child.text &lt;-- $tick.map(_.toString)
+  ),
+  div(
+    <span class="hljs-string">"Random #: "</span>,
+    child.text &lt;-- $tick.mapTo((scala.util.<span class="hljs-type">Random</span>.nextInt() % <span class="hljs-number">100</span>).toString)
+  ) 
+)
+
+render(containerNode, app)
+</code></pre>
+<div id="mdoc-html-run0" data-mdoc-js></div>
+</div>
+<p><h2>Delay</h2></p>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> clickBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">Unit</span>]
+
+<span class="hljs-keyword">val</span> $maybeAlert = <span class="hljs-type">EventStream</span>.merge(
+  clickBus.events.mapTo(<span class="hljs-type">Some</span>(span(<span class="hljs-string">"Just clicked!"</span>))),
+  clickBus.events.flatMap { _ =&gt;
+    <span class="hljs-type">EventStream</span>.fromValue(<span class="hljs-type">None</span>, emitOnce = <span class="hljs-literal">true</span>).delay(<span class="hljs-number">500</span>)
+  }
+)
+
+<span class="hljs-keyword">val</span> app = div(
+  button(onClick.mapTo(()) --&gt; clickBus, <span class="hljs-string">"Click me"</span>),
+  child.maybe &lt;-- $maybeAlert
+)
+
+render(containerNode, app)
+</code></pre>
+<div id="mdoc-html-run1" data-mdoc-js></div>
+</div>
+<p><h2>Debounce</h2></p>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">emailError</span></span>(email: <span class="hljs-type">String</span>): <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>] =
+  <span class="hljs-keyword">if</span> (email.isEmpty)
+    <span class="hljs-type">Some</span>(<span class="hljs-string">"Please fill out email"</span>)
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!email.contains('@'))
+    <span class="hljs-type">Some</span>(<span class="hljs-string">"Invalid email!"</span>)
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-type">None</span>
+
+<span class="hljs-keyword">val</span> inputBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">String</span>]
+
+<span class="hljs-keyword">val</span> $debouncedError: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]] = 
+  inputBus.events
+    .debounce(<span class="hljs-number">1000</span>)
+    .map(emailError)
+
+<span class="hljs-keyword">val</span> app = div(
+  div(
+    label(<span class="hljs-string">"Your email: "</span>),
+    input(
+      value &lt;-- inputBus.events,
+      inContext { thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; inputBus }
+    ),
+  ),
+  child &lt;-- $debouncedError.map {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">Some</span>(err) =&gt; span(cls(<span class="hljs-string">"-error"</span>), <span class="hljs-string">"Error: "</span> + err)
+    <span class="hljs-keyword">case</span> <span class="hljs-type">None</span>      =&gt; span(cls(<span class="hljs-string">"-success"</span>), <span class="hljs-string">"Email ok!"</span>)
+  }
+)
+
+render(containerNode, app)
+</code></pre>
+<div id="mdoc-html-run2" data-mdoc-js></div>
+</div>
+<script type="text/javascript" src="../assets/examples/websitejs-opt-library.js" defer></script>
+<script type="text/javascript" src="../assets/examples/websitejs-opt-loader.js" defer></script>
+<script type="text/javascript" src="../assets/examples/time.md.js" defer></script>
+<script type="text/javascript" src="../assets/examples/mdoc.js" defer></script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/examples/basic"><span class="arrow-prev">← </span><span>Basic Interactivity</span></a><a class="docs-next button" href="/examples/todomvc"><span class="function-name-prevnext">TodoMVC</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section></footer></div></body></html>

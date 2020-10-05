@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Quick Start · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Laminar&#x27;s most obvious building block are elements:"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Quick Start · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://raquo.github.io/"/><meta property="og:description" content="Laminar&#x27;s most obvious building block are elements:"/><meta property="og:image" content="https://raquo.github.io/img/spiral-inverse-logo.svg"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://raquo.github.io/img/spiral-inverse-logo.svg"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Quick Start</h1></header><article><div><span><p>Laminar's most obvious building block are elements:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+ 
+<span class="hljs-keyword">val</span> streamOfNames: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = ???
+<span class="hljs-keyword">val</span> helloDiv: <span class="hljs-type">Div</span> = div(<span class="hljs-string">"Hello, "</span>, child.text &lt;-- streamOfNames)
+</code></pre>
+<p><code>helloDiv</code> is a Laminar Div element that contains the text &quot;Hello, <code>&lt;Name&gt;</code>&quot;, where <code>&lt;Name&gt;</code> is the latest value emitted by <code>streamOfNames</code>. As you see, <code>helloDiv</code> is <strong>self-contained</strong>. It depends on a stream, but is not a stream itself. It manages itself, abstracting away the reactive complexity of its innards from the rest of your program.</p>
+<p>Laminar does not use virtual DOM, and a Laminar element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element (available as <code>.ref</code>). That means that if you want something about that element to be dynamic, you should define it <strong>inside</strong> the element like we did with <code>child &lt;-- nameStream</code> above. This allows for precision DOM updates instead of <a href="https://github.com/raquo/Laminar/blob/master/docs/Virtual-DOM.md">inefficient virtual DOM diffing</a>.</p>
+<p>With that out of the way, here is what a pretty simple Laminar &quot;component&quot; could look like:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Hello</span></span>(
+  helloNameStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>],
+  helloColorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>]
+): <span class="hljs-type">Div</span> = {
+  div(
+    fontSize := <span class="hljs-string">"20px"</span>, <span class="hljs-comment">// static CSS property</span>
+    color &lt;-- helloColorStream, <span class="hljs-comment">// dynamic CSS property</span>
+    strong(<span class="hljs-string">"Hello, "</span>), <span class="hljs-comment">// static child element with a grandchild text node</span>
+    child.text &lt;-- helloNameStream <span class="hljs-comment">// dynamic child (text node in this case)</span>
+  )
+}
+</code></pre>
+<p>Almost the same as what we had before, but now with dynamic color and a bit of styling, and more importantly – abstracted away inside a function. Here's how you use it in your app:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+ 
+<span class="hljs-keyword">val</span> nameStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = ???
+<span class="hljs-keyword">val</span> colorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = ???
+ 
+<span class="hljs-keyword">val</span> appDiv: <span class="hljs-type">Div</span> = div(
+  h1(<span class="hljs-string">"User Welcomer 9000"</span>),
+  div(
+    <span class="hljs-string">"Please accept our greeting: "</span>,
+    <span class="hljs-type">Hello</span>(nameStream, colorStream) <span class="hljs-comment">// Inserts the Laminar div element here</span>
+  )
+)
+
+<span class="hljs-comment">// Mount the application into a pre-existing container</span>
+render(dom.document.querySelector(<span class="hljs-string">"#appContainer"</span>), appDiv)
+</code></pre>
+<p>Easy, eh? But wait a minute, the streams are coming out of thin air! Fair enough, let's add an input text box for users to type their name into, and get the name from there:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+ 
+<span class="hljs-keyword">val</span> nameBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">String</span>]
+<span class="hljs-keyword">val</span> colorStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">String</span>] = nameBus.events.map { name =&gt;
+  <span class="hljs-keyword">if</span> (name == <span class="hljs-string">"Sebastien"</span>) <span class="hljs-string">"red"</span> <span class="hljs-keyword">else</span> <span class="hljs-string">"unset"</span> <span class="hljs-comment">// make Sebastien feel special</span>
+}
+ 
+<span class="hljs-keyword">val</span> appDiv: <span class="hljs-type">Div</span> = div(
+  h1(<span class="hljs-string">"User Welcomer 9000"</span>),
+  div(
+    <span class="hljs-string">"Please enter your name:"</span>,
+    input(
+      typ := <span class="hljs-string">"text"</span>,
+      inContext(thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; nameBus) <span class="hljs-comment">// extract text entered into this input node whenever the user types in it</span>
+    )
+  ),
+  div(
+    <span class="hljs-string">"Please accept our greeting: "</span>,
+    <span class="hljs-type">Hello</span>(nameBus.events, colorStream)
+  )
+)
+
+render(dom.document.querySelector(<span class="hljs-string">"#appContainer"</span>), appDiv)
+</code></pre>
+<p>That's a lot to take in, so let's explain some new features we're using:</p>
+<p>Inside the <code>input</code> node we're registering an event listener for the <code>onInput</code> event, and apply some transformations to grab the input's current text value. Then we pass those text values into <code>nameBus</code> using <code>--&gt;</code>. <code>nameBus</code> is an <code>EventBus</code>, a special Subject-like object (in FRP terms) that can grab events from a source like this and re-emit them as a stream of <code>events</code>. All this flow is explained in detail in the documentation.</p>
+<p><code>colorStream</code> is now derived entirely out of the event stream provided by <code>nameBus</code>.</p>
+<p>For extra clarity: <code>nameBus.events</code> is a stream of all values passed to <code>nameBus</code>. In this case we wired it to contain a stream of values from the input text box. Whenever the user types into the text box, this stream emits an updated name.</p>
+<p><code>mapTo</code> here might seem like magic, but all it does is grab the current value of a mutable DOM reference using a <a href="https://docs.scala-lang.org/tour/by-name-parameters.html">by-name parameter</a>.</p>
+<p>We could abstract away the input box to simplify our <code>appDiv</code> code. Here's one way to do it:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">InputBox</span></span>(caption: <span class="hljs-type">String</span>, textBus: <span class="hljs-type">WriteBus</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">Div</span> = {
+  div(
+    caption,
+    input(
+      typ := <span class="hljs-string">"text"</span>,
+      inContext(thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; textBus)
+    )
+  )
+}
+</code></pre>
+<p>Then you just call <code>InputBox(&quot;Please enter your name:&quot;, nameBus)</code> instead of <code>div(&quot;Please enter your name:&quot;, input(...))</code> in <code>appDiv</code>.</p>
+<p>But this is not the only way! Being a generic component, <code>InputBox</code> should probably not assume what events the consumer is interested in (<code>onInput</code>, <code>onKeyUp</code>, <code>onChange</code>?), so instead we could write a component that simply exports the elements that it creates, letting the consumer subscribe to whatever events it cares about on those elements:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InputBox</span> <span class="hljs-title">private</span> (<span class="hljs-params"> // create instances of <span class="hljs-type">InputBox</span> using <span class="hljs-type">InputBox</span>.apply only
+  val node: <span class="hljs-type">Div</span>, // consumers should add this element into the tree
+  val inputNode: <span class="hljs-type">Input</span> // consumers can subscribe to events coming from this element
+</span>)</span>
+ 
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">InputBox</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>(caption: <span class="hljs-type">String</span>): <span class="hljs-type">InputBox</span> = {
+    <span class="hljs-keyword">val</span> inputNode = input(typ := <span class="hljs-string">"text"</span>)
+    <span class="hljs-keyword">val</span> node = div(caption, inputNode)
+    <span class="hljs-keyword">new</span> <span class="hljs-type">InputBox</span>(node, inputNode)
+  }
+}
+</code></pre>
+<p>And this is how we would use it:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+ 
+<span class="hljs-keyword">val</span> inputBox = <span class="hljs-type">InputBox</span>(<span class="hljs-string">"Please enter your name:"</span>)
+
+<span class="hljs-keyword">val</span> nameStream = inputBox.inputNode
+  .events(onInput) <span class="hljs-comment">// gets the stream of onInput events (works on any Laminar element)</span>
+  .mapTo(inputBox.inputNode.ref.value) <span class="hljs-comment">// gets the current value from the input text box (note: parameter passed by name)</span>
+ 
+<span class="hljs-keyword">val</span> colorStream = nameStream.map { name =&gt;
+  <span class="hljs-keyword">if</span> (name == <span class="hljs-string">"Sebastien"</span>) <span class="hljs-string">"red"</span> <span class="hljs-keyword">else</span> <span class="hljs-string">"unset"</span> <span class="hljs-comment">// make Sebastien feel special</span>
+}
+
+<span class="hljs-keyword">val</span> appDiv: <span class="hljs-type">Div</span> = div(
+  h1(<span class="hljs-string">"User Welcomer 9000"</span>),
+  div(
+    <span class="hljs-string">"Please enter your name:"</span>,
+    inputBox.node,
+  ),
+  div(
+    <span class="hljs-string">"Please accept our greeting: "</span>,
+    <span class="hljs-type">Hello</span>(nameStream, colorStream) <span class="hljs-comment">// Inserts the div element here</span>
+  )
+)
+
+render(dom.document.querySelector(<span class="hljs-string">"#appContainer"</span>), appDiv)
+</code></pre>
+<p>It's all the same behaviour, just different composition. In this pattern the <code>InputBox</code> component exposes two important nodes: <code>node</code> that should be included into the DOM tree, and <code>inputNode</code> that the consuming code might want to listen for events. This is a simple yet powerful pattern for generic components.</p>
+<p>As you learn more about Laminar you will see that there are even more ways to structure this same relationship.</p>
+<p>Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation explaining all of the concepts and features in much greater detail.</p>
+<p>Read the <a href="https://github.com/raquo/Laminar/blob/master/docs/Documentation.md">docs</a>, check out some <a href="https://github.com/raquo/laminar-examples">examples</a>, and join us in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>!</p>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a></div><div><h5>More</h5><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section></footer></div></body></html>
