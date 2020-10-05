@@ -1,4 +1,4 @@
-package webdocs
+package website
 
 import webcomponents.material
 
