@@ -10,7 +10,7 @@ In addition to the code presented, for these examples we use Scala.js / Laminar 
 
 ```scala mdoc:js
 import com.raquo.laminar.api.L._
-import webdocs.webcomponents.material.Button
+import website.webcomponents.material.Button
 import org.scalajs.dom
 
 val actionVar = Var("Do the thing")
@@ -54,7 +54,7 @@ val app = div(
 render(containerNode, app)
 ```
 
-The button above is a **[@material/mwc-button]("https://github.com/material-components/material-components-web-components/tree/master/packages/button")** web component, used via **[Button.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/webdocs/webcomponents/material/Button.scala)** interface.
+The button above is a **[@material/mwc-button]("https://github.com/material-components/material-components-web-components/tree/master/packages/button")** web component, used via **[Button.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Button.scala)** interface.
 
 </div>
 
@@ -65,7 +65,7 @@ The button above is a **[@material/mwc-button]("https://github.com/material-comp
 
 ```scala mdoc:js
 import com.raquo.laminar.api.L._
-import webdocs.webcomponents.material.{LinearProgressBar, Slider}
+import website.webcomponents.material.{LinearProgressBar, Slider}
 import org.scalajs.dom
 import scala.scalajs.js
 
@@ -88,7 +88,9 @@ val app = div(
            dom.console.log(ctx.thisNode.ref.layout())
          }
        }),
-      slider => inContext { thisNode => slider.onInput.mapTo(thisNode.ref.value / 20) --> progressVar }
+      slider => inContext { thisNode =>
+        slider.onInput.mapTo(thisNode.ref.value / 20) --> progressVar
+      }
     )
   ),
   p("You've selected:"),
@@ -102,8 +104,8 @@ val app = div(
 render(containerNode, app)
 ```
 
-The slider control above is a **[@material/mwc-slider]("https://github.com/material-components/material-components-web-components/tree/master/packages/slider")** web component, used via **[Slider.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/webdocs/webcomponents/material/Slider.scala)** interface.
+The slider control above is a **[@material/mwc-slider]("https://github.com/material-components/material-components-web-components/tree/master/packages/slider")** web component, used via **[Slider.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
 
-The progress bar is a **[@material/mwc-linear-progress]("https://github.com/material-components/material-components-web-components/tree/master/packages/linear-progress")** web component, used via **[LinearProgressBar.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/webdocs/webcomponents/material/Slider.scala)** interface.
+The progress bar is a **[@material/mwc-linear-progress]("https://github.com/material-components/material-components-web-components/tree/master/packages/linear-progress")** web component, used via **[LinearProgressBar.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
 
 </div>

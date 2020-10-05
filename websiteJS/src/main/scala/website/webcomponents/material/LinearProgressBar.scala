@@ -1,4 +1,4 @@
-package webdocs.webcomponents.material
+package website.webcomponents.material
 
 import com.raquo.domtypes.generic.codecs._
 import com.raquo.laminar.api.L._
