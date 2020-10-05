@@ -10,7 +10,7 @@ title: Resources
 
 * [Video Introduction to Laminar](https://www.youtube.com/watch?v=L_AHCkl6L-Q)
 
-* [Live Examples](https://laminar.dev/examples/basic)
+* [Live Examples](https://laminar.dev/examples/hello-world)
 
 
 

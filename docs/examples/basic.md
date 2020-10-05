@@ -41,7 +41,10 @@ val appDiv: Div = div(
   )
 )
 
-render(node, appDiv)
+// In most other examples, containerNode will be set to this behind the scenes
+val containerNode = dom.document.querySelector("#mdoc-html-run0")
+
+render(containerNode, appDiv)
 ```
 
 </div>

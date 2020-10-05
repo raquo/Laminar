@@ -77,7 +77,7 @@ Laminar is very simple under the hood. Don't be afraid to use "Go to definition"
 
 If you're new here, watching [the Laminar video](https://www.youtube.com/watch?v=L_AHCkl6L-Q) will be time well spent – it's a good introduction to Laminar, covering both the inner workings and the big ideas.
 
-See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https://laminar.dev/examples/basic).
+See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https://laminar.dev/examples/hello-world).
 
 
 

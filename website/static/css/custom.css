@@ -16,18 +16,27 @@
 }
 
 .mdoc-example {
-  margin: 20px 0 40px 0;
+  margin: 20px 0 70px 0;
 }
 
 .mdoc-example code {
-  max-height: calc(max(350px, 55vh));
+  max-height: calc(min(700px, max(350px, 50vh)));
 }
 
 .mdoc-example div[id^="mdoc-html-"] {
   margin-top: 40px;
+  margin-bottom: 30px;
   padding: 15px;
   border-radius: 5px;
   border: 1px solid gray;
+}
+
+.mdoc-example .-error {
+  color: red;
+}
+
+.mdoc-example .-success {
+  color: green;
 }
 
 /*.docs-prevnext {*/
@@ -206,7 +215,7 @@ body {
 
 .-homeCommunitySection {
   margin: 40px auto 0 auto;
-  padding: 0 10px;
+  padding: 0 10px 80px 10px;
   max-width: 700px;
   text-align: center;
 }
