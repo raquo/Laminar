@@ -6,6 +6,8 @@ import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
+import scala.util.Try
+
 class MountHooksSpec extends UnitSpec {
 
   it ("onMountCallback infers precise type and provides implicit owner") {
@@ -389,5 +391,67 @@ class MountHooksSpec extends UnitSpec {
     )
 
     mount(el)
+  }
+
+  it ("Element lifecycle owners can not be used after unmount") {
+
+    var cleanedCounter = 0
+
+    var log = List[Int]()
+    val bus = new EventBus[Int]
+    val observer = Observer[Int](ev => log = log :+ ev)
+
+    var internalOwner: Owner = null
+
+    val el = section(
+      idAttr := "fullSection",
+      main(
+        div(
+          "Hello",
+          className := "divClass",
+          span(
+            idAttr := "someSpan",
+            className := "spanClass",
+            onMountCallback(ctx => {
+              internalOwner = ctx.owner
+              bus.events.addObserver(observer)(ctx.owner)
+            })
+          )
+        )
+      )
+    )
+
+    mount(el)
+
+    log shouldBe Nil
+
+    // --
+
+    bus.writer.onNext(1)
+    log shouldBe List(1)
+
+    bus.writer.onNext(2)
+    log shouldBe List(1, 2)
+
+    log = Nil
+
+    // --
+
+    unmount("unmount el")
+
+    bus.writer.onNext(3)
+
+    log shouldBe Nil
+
+    // --
+
+    val caught = intercept[Exception] {
+      bus.events.addObserver(observer)(internalOwner)
+    }
+    assert(caught.getMessage == "Attempting to use owner of unmounted element: section#fullSection > main > div.divClass > span#someSpan")
+
+    bus.writer.onNext(4)
+
+    log shouldBe Nil
   }
 }
