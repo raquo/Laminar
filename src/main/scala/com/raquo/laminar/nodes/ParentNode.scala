@@ -8,7 +8,10 @@ import scala.collection.mutable
 
 trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
-  private[nodes] val dynamicOwner: DynamicOwner = new DynamicOwner
+  private[nodes] val dynamicOwner: DynamicOwner = new DynamicOwner(() => {
+    val path = DomApi.debugPath(ref).mkString(" > ")
+    throw new Exception(s"Attempting to use owner of unmounted element: $path")
+  })
 
   // @TODO[Performance] We should get rid of this.
   //  - The only place where we need this is ReplaceAll functionality of ChildrenCommand API

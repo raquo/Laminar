@@ -1,11 +1,12 @@
 package com.raquo.laminar
 
 import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement, ReactiveHtmlElement, ParentNode, ReactiveSvgElement, TextNode}
+import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
 import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
 import org.scalajs.dom.DOMException
 
+import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.{JavaScriptException, |}
 
@@ -201,4 +202,35 @@ object DomApi {
     node.ref.textContent = text
   }
 
+
+  /** Random utils */
+
+  /** @return hierarchical path describing the position and identity of this node, starting with the root. */
+  @tailrec def debugPath(element: dom.Node, initial: List[String] = Nil): List[String] = {
+    element match {
+      case null => initial
+      case _ => debugPath(element.parentNode, debugNodeDescription(element) :: initial)
+    }
+  }
+
+  /** @return e.g. a, div#mainSection, span.sideNote.sizeSmall */
+  def debugNodeDescription(node: dom.Node): String = {
+    node match {
+      case el: dom.html.Element =>
+        val id = el.id
+        val suffixStr = if (id.nonEmpty) {
+          "#" + id
+        } else {
+          val classes = el.className
+          if (classes.nonEmpty) {
+            "." + classes.replace(' ', '.')
+          } else {
+            ""
+          }
+        }
+        el.tagName.toLowerCase + suffixStr
+
+      case _ => node.nodeName
+    }
+  }
 }

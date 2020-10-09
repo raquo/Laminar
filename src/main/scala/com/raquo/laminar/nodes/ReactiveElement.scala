@@ -9,8 +9,8 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropTransformation
-import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
-import com.raquo.laminar.modifiers.{Binder, EventPropBinder, Inserter, Setter}
+import com.raquo.laminar.lifecycle.MountContext
+import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -105,7 +105,7 @@ trait ReactiveElement[+Ref <: dom.Element]
 
     // @Warning[Fragile] I had issues with clearOwner requiring a hasOwner check but that should not be necessary anymore.
     //  - If exceptions crop up caused by this, need to find the root cause before rushing to patch this here.
-    maybeNextParent.fold(pilotSubscription.clearOwner) { nextParent =>
+    maybeNextParent.fold(pilotSubscription.clearOwner()) { nextParent =>
       pilotSubscription.setOwner(nextParent.dynamicOwner)
     }
   }
