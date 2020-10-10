@@ -12,6 +12,8 @@ title: Documentation
   * [Reusing Elements](#reusing-elements)
   * [Missing Keys](#missing-keys)
   * [Modifiers FAQ](#modifiers-faq)
+* [Rendering](#rendering)
+  * [Application Initialization](#application-initialization)
 * [Reactive Data](#reactive-data)
   * [Attributes and Properties](#attributes-and-properties)
   * [Event Streams and Signals](#event-streams-and-signals)
@@ -78,6 +80,8 @@ Laminar is very simple under the hood. Don't be afraid to use "Go to definition"
 If you're new here, watching [the Laminar video](https://www.youtube.com/watch?v=L_AHCkl6L-Q) will be time well spent – it's a good introduction to Laminar, covering both the inner workings and the big ideas.
 
 See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https://laminar.dev/examples/hello-world).
+
+If you want to follow along with an IDE, download one of the starter kit projects from the [Resources](https://laminar.dev/resources) page, or learn how to render your app in the [Rendering](#rendering) section.
 
 
 
@@ -166,7 +170,7 @@ Notice that the code snippet above does not require you to HTML-escape `"&"` or 
 
 ---
 
-Note: this section of documentation only explained how to render **static** data. You will learn to render dynamic data and lists of children in [Reactive Data](#reactive-data) section. 
+Note: this section of documentation only explained how to render **static** data. You will learn to render dynamic data including dynamic lists of children in [Reactive Data](#reactive-data) section. 
 
 
 ### HTML Entities
@@ -312,6 +316,29 @@ That's it. Laminar will find an element with id "appContainer" in the document, 
 Note: if `appContainer` was not present in the DOM when you called `render()`, you will need to manually call `root.mount()` to mount `appElement`. More on this in [Element Lifecycle Hooks](#element-lifecycle-hooks).
 
 To remove `appElement` from the DOM, simply call `root.unmount()`.
+
+
+### Application Initialization
+
+When and where should you call Laminar's render method? Assuming you want your entire application to be powered by Laminar, you want to render your application as soon as the web page containing it loads.
+
+However, what does "loads" mean, exactly? If you just put your code in your Scala.js app's `main` method, it will execute right after the `<script>` tag containing your Scala.js bundle was downloaded. At this point, accessing `dom.document.querySelector("#appContainer")`, will probably not work, because the browser hasn't parsed that HTML element yet (script downloads and execution block DOM parsing).
+
+So, you probably want to render your application in response to the browser firing the [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event) event:
+ 
+```scala
+object App {
+  def main(args: Array[String]): Unit = {
+    documentEvents.onDomContentLoaded.foreach { _ =>
+      val appContainer = dom.document.querySelector("#appContainer")
+      val appElement = div(h1("Hello world"))
+      render(appContainer, appElement)
+    }(unsafeWindowOwner)
+  }
+}
+```
+
+If you want to also wait for images and stylesheets to load, you can use the [window.load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event) event, so just replace `documentEvents.onDomContentLoaded` with `windowEvents.onLoad`. 
 
 
 
