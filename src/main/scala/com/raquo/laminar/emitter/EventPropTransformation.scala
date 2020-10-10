@@ -88,7 +88,7 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation
     *
     * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
-    * So for example, you can [[filter]] events before applying this, preventing default action only for certain events.
+    * So for example, you can [[filter]] events before applying this, propagation will be stopped only for certain events.
     *
     * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
     */
@@ -96,6 +96,27 @@ class EventPropTransformation[Ev <: dom.Event, V](
     withNewProcessor(ev => {
       processor(ev).map { value =>
         ev.stopPropagation()
+        value
+      }
+    })
+  }
+
+  /** This method prevents other listeners of the same event from being called.
+    * If several listeners are attached to the same element for the same event type,
+    * they are called in the order in which they were added. If stopImmediatePropagation()
+    * is invoked during one such call, no remaining listeners will be called.
+    *
+    * MDN https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation
+    *
+    * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
+    * So for example, you can [[filter]] events before applying this, propagation will be stopped only for certain events.
+    *
+    * Example: `div(onClick.filter(isGoodClick).stopImmediatePropagation --> goodClickBus)`
+    */
+  def stopImmediatePropagation: EventPropTransformation[Ev, V] = {
+    withNewProcessor(ev => {
+      processor(ev).map { value =>
+        ev.stopImmediatePropagation()
         value
       }
     })

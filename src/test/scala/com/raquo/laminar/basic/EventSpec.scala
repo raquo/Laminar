@@ -63,4 +63,63 @@ class EventSpec extends UnitSpec {
 
     log = Nil
   }
+
+  it("filter works with stopImmediatePropagation") {
+
+    // Shadow ScalaTest's `value`
+    val value = L.value
+
+    var log: List[String] = Nil
+    var pass: Boolean = true
+
+    val inner = span(
+      onClick
+        .map(_ => log = log :+ "pre-transform")
+        .filter(_ => pass)
+        .stopImmediatePropagation
+        .map(_ => log = log :+ "post-transform") --> (_ => log = log :+ "observer"),
+      onClick --> (_ => log = log :+ "other-listener")
+    )
+
+    mount(div(
+      onClick --> (_ => log = log :+ "parent-listener"),
+      inner
+    ))
+
+    log shouldBe Nil
+
+    // --
+
+    simulateClick(inner.ref)
+
+    log shouldBe List("pre-transform", "post-transform", "observer")
+
+    log = Nil
+
+    // --
+
+    pass = false
+
+    simulateClick(inner.ref)
+
+    log shouldBe List("pre-transform", "other-listener", "parent-listener")
+    log = Nil
+
+    // --
+
+    simulateClick(inner.ref)
+
+    log shouldBe List("pre-transform", "other-listener", "parent-listener")
+    log = Nil
+
+    // --
+
+    pass = true
+
+    simulateClick(inner.ref)
+
+    log shouldBe List("pre-transform", "post-transform", "observer")
+
+    log = Nil
+  }
 }

@@ -41,7 +41,8 @@ trait ReactiveElement[+Ref <: dom.Element]
     eventProp: EventProp[Ev],
     useCapture: Boolean = false,
     stopPropagation: Boolean = false,
-    preventDefault: Boolean = false
+    preventDefault: Boolean = false,
+    stopImmediatePropagation: Boolean = false // This argument was added later, so it's last in the list to reduce breakage
   ): EventStream[Ev] = {
     val eventBus = new EventBus[Ev]
     val setter = EventPropBinder[Ev, Ev, this.type](
@@ -50,6 +51,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       useCapture,
       processor = ev => {
         if (stopPropagation) ev.stopPropagation()
+        if (stopImmediatePropagation) ev.stopImmediatePropagation()
         if (preventDefault) ev.preventDefault()
         Some(ev)
       }
