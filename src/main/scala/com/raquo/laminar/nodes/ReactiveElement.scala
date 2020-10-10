@@ -40,15 +40,19 @@ trait ReactiveElement[+Ref <: dom.Element]
   def events[Ev <: dom.Event](
     eventProp: EventProp[Ev],
     useCapture: Boolean = false,
-    stopPropagation: Boolean = false, // @TODO[API] This is inconsistent with EventPropTransformation API. Fix or ok?
-    preventDefault: Boolean = false // @TODO[API] This is inconsistent with EventPropTransformation API. Fix or ok?
+    stopPropagation: Boolean = false,
+    preventDefault: Boolean = false
   ): EventStream[Ev] = {
     val eventBus = new EventBus[Ev]
     val setter = EventPropBinder[Ev, Ev, this.type](
       eventBus.writer,
       eventProp,
       useCapture,
-      processor = Some(_)
+      processor = ev => {
+        if (stopPropagation) ev.stopPropagation()
+        if (preventDefault) ev.preventDefault()
+        Some(ev)
+      }
     )
     setter(this)
     eventBus.events
