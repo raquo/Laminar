@@ -76,10 +76,11 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * Example: `input(onKeyUp().filter(ev => ev.keyCode == KeyCode.Tab).preventDefault --> tabKeyUpBus)`
     */
   def preventDefault: EventPropTransformation[Ev, V] = {
-    copy(newProcessor = ev => {
-      val value = processor(ev)
-      ev.preventDefault()
-      value
+    withNewProcessor(ev => {
+      processor(ev).map { value =>
+        ev.preventDefault()
+        value
+      }
     })
   }
 
@@ -92,36 +93,36 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
     */
   def stopPropagation: EventPropTransformation[Ev, V] = {
-    copy(newProcessor = ev => {
-      val value = processor(ev)
-      ev.stopPropagation()
-      value
+    withNewProcessor(ev => {
+      processor(ev).map { value =>
+        ev.stopPropagation()
+        value
+      }
     })
   }
 
   /** Values that do not pass will not propagate down the chain and into the emitter. */
   def filter(passes: V => Boolean): EventPropTransformation[Ev, V] = {
-    copy(newProcessor = ev => processor(ev).filter(passes))
+    withNewProcessor(ev => processor(ev).filter(passes))
   }
 
   def map[V2](project: V => V2): EventPropTransformation[Ev, V2] = {
-    copy(newProcessor = ev => processor(ev).map(project))
+    withNewProcessor(ev => processor(ev).map(project))
   }
 
   def mapTo[V2](value: => V2): EventPropTransformation[Ev, V2] = {
-    copy(newProcessor = ev => processor(ev).map(_ => value))
+    withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
   def mapToValue[V2](value: V2): EventPropTransformation[Ev, V2] = {
-    copy(newProcessor = ev => processor(ev).map(_ => value))
+    withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
   def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2] = {
-    copy(newProcessor = ev => processor(ev).collect(pf))
+    withNewProcessor(ev => processor(ev).collect(pf))
   }
 
-  // Don't need the extra codegen overhead of a case class
-  private def copy[V2](newProcessor: Ev => Option[V2]): EventPropTransformation[Ev, V2] = {
+  private def withNewProcessor[V2](newProcessor: Ev => Option[V2]): EventPropTransformation[Ev, V2] = {
     new EventPropTransformation[Ev, V2](eventProp, shouldUseCapture, newProcessor)
   }
 }
