@@ -39,6 +39,20 @@
   color: green;
 }
 
+.mdoc-example select,
+.mdoc-example input:not([type]),
+.mdoc-example input[type=text],
+.mdoc-example input[type=email],
+.mdoc-example input[type=number] {
+  margin: 0 5px;
+  padding: 5px;
+}
+
+.mdoc-example button {
+  margin: 0 5px;
+  padding: 5px;
+}
+
 /*.docs-prevnext {*/
 /*  margin-top: 60px;*/
 /*}*/
