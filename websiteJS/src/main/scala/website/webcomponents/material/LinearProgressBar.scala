@@ -22,8 +22,8 @@ object LinearProgressBar {
   @JSImport("@material/mwc-linear-progress", JSImport.Default)
   object RawImport extends js.Object
 
-  // object-s are lazy so you need to actually use them in your code
-  private val _ = RawImport
+  // object-s are lazy so you need to actually use them in your code to prevent dead code elimination
+  RawImport
 
   type Ref = dom.html.Element with RawElement
   type ModFunction = LinearProgressBar.type => Mod[ReactiveHtmlElement[Ref]]

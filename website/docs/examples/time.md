@@ -83,7 +83,7 @@ val $debouncedError: EventStream[Option[String]] =
     .map(emailError)
 
 val app = div(
-  div(
+  span(
     label("Your email: "),
     input(
       value <-- inputBus.events,

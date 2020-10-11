@@ -5,7 +5,7 @@
 const siteConfig = {
   title: 'Laminar', // Title for your website.
   tagline: 'Simple, expressive, and safe UI library for Scala.js',
-  url: 'https://raquo.github.io',
+  url: 'https://laminar.dev',
   baseUrl: '/',
   // Used for publishing and more
   projectName: 'Laminar',
@@ -13,24 +13,15 @@ const siteConfig = {
   headerLinks: [
     { doc: 'documentation', label: 'Docs' },
     { doc: 'examples/hello-world', label: 'Examples' },
-    { doc: 'resources', label: 'Resources' }
-    // {doc: 'Virtual-DOM', label: 'Virtual DOM'},
-    // {
-    //   href: 'https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html',
-    //   label: 'Laminar API',
-    //   external: true
-    // },
-    // {
-    //   href: 'https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html',
-    //   label: 'Airstream API',
-    //   external: true
-    // }
+    { doc: 'resources', label: 'Resources' },
+    { blog: true, label: 'News' }
   ],
   stylesheets: [
     // Used for Material UI web components example
     "https://fonts.googleapis.com/css?family=Material+Icons&display=block",
     "https://fonts.googleapis.com/css?family=Roboto:300,400,500"
   ],
+  blogSidebarTitle: { default: 'Recent News', all: 'All News' },
 
   // headerIcon: 'img/spiral-logo.svg',
   // footerIcon: 'img/spiral-logo.svg',
@@ -74,8 +65,8 @@ const siteConfig = {
   docsUrl: '',
   cname: 'laminar.dev',
   // Open Graph and Twitter card images.
-  ogImage: 'img/spiral-inverse-logo.svg',
-  twitterImage: 'img/spiral-inverse-logo.svg',
+  // ogImage: 'img/spiral-inverse-logo.svg',
+  // twitterImage: 'img/spiral-inverse-logo.svg',
 
   customDocsPath: "website/target/mdoc",
 
@@ -91,7 +82,8 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  repoUrl: 'https://github.com/raquo/Laminar',
+  laminarRepoUrl: 'https://github.com/raquo/Laminar',
+  airstreamRepoUrl: 'https://github.com/raquo/Airstream',
 };
 
 module.exports = siteConfig;

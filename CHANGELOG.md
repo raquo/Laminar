@@ -1,8 +1,12 @@
-# Changelog
+# Changelog (pre-v0.11.0)
 
 Breaking changes in **bold**.
 
 _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
+
+---
+
+#### For versions v0.11.0 and up, see [laminar.dev/blog](https://laminar.dev/blog)
 
 ---
 

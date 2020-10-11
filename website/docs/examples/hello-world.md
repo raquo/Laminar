@@ -13,7 +13,9 @@ import com.raquo.laminar.api.L._
 val nameVar = Var(initial = "world")
 
 val rootElement = div(
+  label("Your name: "),
   input(
+    onMountFocus,
     placeholder := "Enter your name here",
     inContext { thisNode => onInput.map(_ => thisNode.ref.value) --> nameVar }
   ),
