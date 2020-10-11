@@ -23,8 +23,8 @@ object Slider {
   @JSImport("@material/mwc-slider", JSImport.Default)
   object RawImport extends js.Object
 
-  // object-s are lazy so you need to actually use them in your code
-  private val _ = RawImport
+  // object-s are lazy so you need to actually use them in your code to prevent dead code elimination
+  RawImport
 
   type Ref = dom.html.Element with RawElement
   type El = ReactiveHtmlElement[Ref]

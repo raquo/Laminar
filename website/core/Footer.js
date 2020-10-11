@@ -1,16 +1,16 @@
 const React = require('react');
 
 class Footer extends React.Component {
-  docUrl(doc) {
+  docUrl (doc) {
     const baseUrl = this.props.config.baseUrl;
     const docsUrl = this.props.config.docsUrl;
     const docsPart = `${docsUrl ? `${docsUrl}/` : ''}`;
     return `${baseUrl}${docsPart}${doc}`;
   }
 
-  
 
-  render() {
+
+  render () {
     return (
       <footer className="nav-footer" id="footer">
         <section className="sitemap">
@@ -24,22 +24,44 @@ class Footer extends React.Component {
               />
             )}
           </a>
-          <div>
+          <div className="community-column">
             <h5>Community</h5>
             <a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a>
+            <a href="https://github.com/sponsors/raquo">Sponsor the project</a>
           </div>
-          <div>
-            <h5>More</h5>
-            <a
-              className="github-button"
-              href={this.props.config.repoUrl}
-              data-icon="octicon-star"
-              data-count-href="/raquo/Laminar/stargazers"
-              data-show-count="true"
-              data-count-aria-label="# stargazers on GitHub"
-              aria-label="Star this project on GitHub">
-              Star
-            </a>
+          <div className="github-column">
+            <h5>Github</h5>
+            <p>
+              <a
+                className="github-button"
+                data-icon="octicon"
+                href={this.props.config.laminarRepoUrl}
+              >
+                Laminar
+              </a>
+            </p>
+            <p>
+              <a
+                className="github-button"
+                data-icon="octicon"
+                href={this.props.config.airstreamRepoUrl}
+              >
+                Airstream
+              </a>
+            </p>
+            <p>
+              <a
+                className="github-button"
+                href={this.props.config.laminarRepoUrl}
+                data-icon="octicon-star"
+                data-count-href="/raquo/Laminar/stargazers"
+                data-show-count="true"
+                data-count-aria-label="# stargazers on GitHub"
+                aria-label="Star this project on GitHub"
+              >
+                Star
+              </a>
+            </p>
           </div>
         </section>
         <section className="copyright">{this.props.config.copyright}</section>

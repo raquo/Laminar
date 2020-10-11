@@ -257,10 +257,48 @@ textarea::placeholder {
   font-size: 130%;
 }
 
+/* Header */
+
+.nav-site a {
+  font-weight: 500 !important;
+}
+
+/* Blog posts */
+
+.posts .post {
+  margin-bottom: 50px !important;
+}
+
+/* Blog post */
+
+.post .postHeader .post-meta {
+  display: inline-block;
+  font-size: 14px;
+  color: #999;
+}
+
+.post .postHeader .authorBlock {
+  position: relative;
+  display: inline-block;
+  margin-left: 25px;
+  font-size: 14px;
+}
+
+.post .postHeader .authorBlock:before {
+  content: "by";
+  position: absolute;
+  left: -20px;
+  color: #999;
+}
+
 /* Docs sidebar */
 
 .onPageNav:empty {
   display: none;
+}
+
+.tocToggler {
+  display: none; /* normally it shows up (only) on example page for some reason, but it's empty */
 }
 
 @media only screen and (min-width: 1024px) {
@@ -271,4 +309,10 @@ textarea::placeholder {
   .onPageNav .toc-headings a {
     font-size: 13px;
   }
+}
+
+/* Footer */
+
+.nav-footer .github-column p {
+  margin: 5px 0;
 }
