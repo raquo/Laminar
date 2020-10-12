@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v0.11.0 &amp; New Website · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="I am pleased to announce the release of Laminar v0.11.0, Airstream v0.11.0, and our new website."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v0.11.0 &amp; New Website · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2020/10/12/laminar-v0.11.0"/><meta property="og:description" content="I am pleased to announce the release of Laminar v0.11.0, Airstream v0.11.0, and our new website."/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2020/10/12/laminar-v0.11.0">Laminar v0.11.0 &amp; New Website</a></li><li class="navListItem"><a class="navItem" href="/blog/2020/10/10/hello">Previous News &amp; Release Notes</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2020/10/12/laminar-v0.11.0">Laminar v0.11.0 &amp; New Website</a></h1><p class="post-meta">October 12, 2020</p><div class="authorBlock"><p class="post-authorName"><a href="http://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>I am pleased to announce the release of Laminar v0.11.0, Airstream v0.11.0, and our new website.</p>
+<p>This release improves transaction scheduling in Airstream, fixes several bugs, and takes away a few obscure footguns from users.</p>
+<!--truncate-->
+<p>Breaking changes in <strong>bold</strong>.</p>
+<p><h2>New Website!</h2></p>
+<p><h3>👉 <a href="https://laminar.dev">laminar.dev</a></h3></p>
+<ul>
+<li>A flashy marketing home page in the best Scala colors. New to Laminar? Start there.</li>
+<li>Laminar <a href="https://laminar.dev/documentation">documentation</a> with a nice sidebar for navigation
+<ul>
+<li>Note: documentation is still available in github source, but the file moved to <code>website/docs/documentation.md</code>.</li>
+</ul></li>
+<li>Live, <a href="https://laminar.dev/examples">interactive examples</a>, including <a href="https://laminar.dev/examples/todomvc">TodoMVC</a> and <a href="https://laminar.dev/examples/web-components">Web Components</a> that I brought over from the old laminar-examples repo.
+<ul>
+<li>I will be adding more eventually, and you can add your favourite patterns too! This should become a comprehensive book of Laminar recipes.</li>
+</ul></li>
+<li>Release announcements and changelogs will now be posted on this blog.</li>
+</ul>
+<p><h2>Airstream v0.11.0</h2></p>
+<ul>
+<li><strong>New: Improve transaction scheduling to fix undesired Var glitch (<a href="https://github.com/raquo/Airstream/issues/39">#39</a>, <a href="https://github.com/raquo/Airstream/pull/40">#40</a>)</strong>
+<ul>
+<li>Consider the following situation:
+<ul>
+<li>Transaction A is currently running. You schedule transactions B and C (e.g. two separate updates to a <code>Var</code>, inside a <code>stream.foreach</code>).</li>
+<li>Transaction A finishes, transaction B is now executed. So far so good. Now, execution of transaction B causes transactions D and E to be scheduled (same pattern as before, could be other <code>Var</code> updates or <code>EventBus</code> emits).</li>
+<li>Transaction B finishes. Under old logic, transaction C would now execute, because it was scheduled earlier than D and E. This would cause the full propagation of transaction B to be incomplete by the time C is executed, as D and E haven't executed yet.</li>
+<li>So with new logic, transaction D would now execute instead of C, because D is considered to be the &quot;child&quot; of transaction B that just finished. And if D created yet more child transactions, they would execute before E.</li>
+</ul></li>
+<li>So, transaction scheduling is now following a depth-first hierarchy traversal instead of linear FIFO. The new logic makes more intuitive sense, and also happens to fix a whole class of glitches.</li>
+<li>This can potentially cause breakage if you rely on the pre-v0.11.0 FIFO behaviour, but it's pretty unlikely. Nobody who tried the v0.11.0-M1 release reported any problems.
+<ul>
+<li>As a reminder, new transactions are created when you fire events into Var, EventBus, EventStream.merge, as well as flatMap and flatten methods. Basically whenever you <em>manually</em> fire events, or any functionality that lets you <em>potentially</em> create an observable loop, i.e. an observable that depends on itself.</li>
+<li>Remember that transactions are entirely synchronous, so none of this affects transactions that are scheduled after an asynchronous delay, e.g. <code>delay(ms)</code> or <code>js.timers.setTimeout(ms)</code>. Those are executed at the same as before because their scheduling is guaranteed to happen when there are zero pending transactions, so they are executed immediately upon being scheduled.</li>
+<li>If you used any patterns similar to those described in <a href="https://github.com/raquo/Airstream/issues/39">#39</a>, check those usages at runtime to be sure.</li>
+</ul></li>
+</ul></li>
+<li><strong>Fix: <code>Var#update</code>, <code>Var#tryUpdate</code>, <code>Var.update</code>, and <code>Var.tryUpdate</code> methods now evaluate their <code>mod</code> input functions only when their transaction has started executing</strong>
+<ul>
+<li>Previously, if you called <code>myVar.update(mod)</code>, Airstream would immediately evaluate <code>mod(myVar.now())</code>, but if you were inside a transaction, which is usually the case, the propagation of the new Var's value would be scheduled for later, because that requires a new transaction.</li>
+<li>As a result, this allowed for a window of time when a previously scheduled transaction could have updated this Var's value, meaning that our <code>mod</code> was actually operating on a stale value. This bit us in our soft behinds.</li>
+<li>Now, <code>mod</code> will only be called when we are ready to propagate its output, nothing else will be able to update this Var in between. Together with the change in transaction scheduling, this can potentially introduce some breakage if you were relying on reading stale values from your Var-s using <code>update</code> or <code>tryUpdate</code>.</li>
+</ul></li>
+<li><strong>Fix: Var.set, EventBus.emit, and similar methods do not accept inputs with duplicate Vars / EventBuses anymore</strong>
+<ul>
+<li>That is, you can't do <code>Var.set(var1 -&gt; foo, var1 -&gt; bar)</code>. This was never intended to be possible, and will now throw, because doing this violates Airstream basic transaction contract that an observable can emit at most once per transaction.</li>
+</ul></li>
+<li><strong>Fix: DynamicOwner uses OneTimeOwner now</strong>
+<ul>
+<li>Users can no longer accidentally create subscription with owners created by DynamicOwner after DynamicOwner kills those owners. Such usages will now throw.</li>
+<li>Also see Laminar release notes below.</li>
+</ul></li>
+<li><strong>Fix: hide <code>Owner#onKilledExternally</code> method</strong>
+<ul>
+<li>It was never supposed to be public, you probably aren't using it.</li>
+</ul></li>
+<li><strong>Naming: <code>Signal#fold</code> -&gt; <code>Signal#foldLeft</code>, <code>Signal#foldRecover</code> -&gt; <code>Signal#foldLeftRecover</code></strong></li>
+<li>New: <code>Observable#toSignal(initialIfStream)</code> and <code>Observable#toStreamOrSignalChanges</code>
+<ul>
+<li>Convenience methods to refine Observables into EventStream of Signal, useful to be able to write logic that accepts Observable but still wants to do something useful with it.</li>
+</ul></li>
+</ul>
+<p><h2>Laminar v0.11.0</h2></p>
+<ul>
+<li><strong>New: Upgrade to Airstream v0.11.0 (see above)</strong></li>
+<li><strong>Fix: Laminar-provided Owners are now perma-killed after they are unmounted (<a href="https://github.com/raquo/Laminar/issues/67">#67</a>).</strong>
+<ul>
+<li>In Laminar you can manually get an element's current Owner from a method like <code>onMounCallback</code>. Previously you could create subscriptions with that owner at any time, including after the element was unmounted. Which would be unwise, because after unmount, Laminar kills and discards the owner, so if you keep adding subscriptions to the owner after that, they would never be killed.</li>
+<li>From now on, Laminar elements use <code>OneTimeOwner</code>-s which cannot be used after they are killed. So now if you try to create a subscription with a manually obtained Owner after the element you got it from was unmounted, the subscription will be immediately killed, and the subscription creation code will throw with information about which element's owner is at fault.</li>
+<li>It is unlikely that you will run into this. This requires very specific, very manual, and very wrong usage.</li>
+</ul></li>
+<li><strong>Fix: ReactiveElement#events no longer ignores <code>stopPropagation</code> and <code>preventDefault</code> options (<a href="https://github.com/raquo/Laminar/issues/68">#68</a>)</strong>
+<ul>
+<li>This only applies to syntax like <code>element.events(onClick, stopPropagation = true) --&gt; ...</code>, not the more common <code>onClick.stopPropagation --&gt; ...</code></li>
+<li>If you were using the <code>events</code> method with either of those options, this release will actually enable them, which could potentially break the handling of those events for you.</li>
+</ul></li>
+<li><strong>Fix: Filter transformation now applies to subsequent stopPropagation and preventDefault transformations (<a href="https://github.com/raquo/Laminar/issues/58">#58</a>)</strong>
+<ul>
+<li>Consider this example: <code>onKeyPress.filter(_.keyCode == KeyCodes.Enter).preventDefault.mapTo(thisNode.ref.value) --&gt; observer</code></li>
+<li>As intended, <code>observer</code> only fires if <code>filter</code> passes. However, <code>preventDefault</code> would previously fire on all keypress events, even if <code>filter</code> didn't pass. Same for <code>stopPropagation</code>.</li>
+<li>Other transformations were properly conditional, and now these two are fixed such that in this example, <code>preventDefault</code> would only fire if <code>filter</code> passes (because it's to the right of it, not to the left where it would have been unconditional).</li>
+<li>Check your usages of <code>preventDefault</code> and <code>stopPropagation</code> that are behind a filter, and move them to be before the filter if you want them to be unconditional.</li>
+<li>This only applies to Laminar-provided <code>preventDefault</code> and <code>stopPropagation</code> helpers, not the JS native methods on <code>dom.Event</code> of the same name.</li>
+</ul></li>
+<li>New: <code>stopImmediatePropagation</code> helpers (<a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation">MDN</a>)
+<ul>
+<li>Laminar API similar to that of <code>stopPropagation</code></li>
+</ul></li>
+<li>New: <code>child.int</code> receiver for convenience, similar to <code>child.text</code>
+<ul>
+<li>You can now say <code>child.int &lt;-- observableOfInt</code></li>
+</ul></li>
+<li>New: <code>intToNode</code> implicit conversion, similar to <code>textToNode</code>
+<ul>
+<li>You can now print integers without toString: <code>div(usersCount, &quot; users&quot;)</code></li>
+</ul></li>
+</ul>
+<p><h2>Thank You</h2></p>
+<p>Laminar &amp; Airstream development is sponsored by people like you.</p>
+<p>GOLD sponsors supporting this release: ✨ <strong><a href="https://github.com/yurique">Iurii Malchenko</a></strong></p>
+<p>Thank you for supporting me! ❤️</p>
+<hr>
+<p>Thanks to <a href="https://github.com/keynmol">Anton</a> for kick-starting the website effort, configuring mdoc and docusaurus! 🚀</p>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section><script>
+          <!-- Basic Woopra analytics -->
+          (function(){
+            var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call","trackForm","trackClick"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
+          })("woopra");
+          woopra.config({
+            domain: 'laminar.dev'
+          });
+          woopra.track();
+          
+        </script></footer></div></body></html>

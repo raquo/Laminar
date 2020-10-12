@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Laminar Blog</title>
+        <link>https://laminar.dev/blog</link>
+        <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
+        <lastBuildDate>Mon, 12 Oct 2020 06:00:00 GMT</lastBuildDate>
+        <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
+        <generator>https://github.com/jpmonette/feed</generator>
+        <image>
+            <title>Laminar Blog</title>
+            <url>https://laminar.dev/undefined</url>
+            <link>https://laminar.dev/blog</link>
+        </image>
+        <copyright>Copyright © 2020 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v0.11.0 & New Website]]></title>
+            <link>https://laminar.dev/blog/2020/10/12/laminar-v0.11.0.html</link>
+            <guid>https://laminar.dev/blog/2020/10/12/laminar-v0.11.0.html</guid>
+            <pubDate>Mon, 12 Oct 2020 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>I am pleased to announce the release of Laminar v0.11.0, Airstream v0.11.0, and our new website.</p>
+<p>This release improves transaction scheduling in Airstream, fixes several bugs, and takes away a few obscure footguns from users.</p>
+]]></description>
+        </item>
+        <item>
+            <title><![CDATA[Previous News & Release Notes]]></title>
+            <link>https://laminar.dev/blog/2020/10/10/hello.html</link>
+            <guid>https://laminar.dev/blog/2020/10/10/hello.html</guid>
+            <pubDate>Sat, 10 Oct 2020 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>Before this website went up, Changelog was hosted <a href="https://github.com/raquo/Laminar/blob/master/CHANGELOG.md">on github</a>. It's still there, with release notes up to and including v0.10.3.</p> <p>Other previous posts and content of interest:</p> <ul> <li><p><a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">[VIDEO] Laminar – Smooth UI Development with Scala.js</a></p></li> <li><p><a href="https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a">My Four Year Quest For...</a></p></li></ul>]]></description>
+        </item>
+    </channel>
+</rss>
