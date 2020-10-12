@@ -6,7 +6,7 @@
 
 Laminar is a small library that lets you build web application interfaces, keeping UI state in sync with the underlying application state. Its simple yet expressive patterns build on a rock solid foundation of [Airstream](https://github.com/raquo/Airstream) observables and the [Scala.js](https://www.scala-js.org/) platform.
 
-    "com.raquo" %%% "laminar" % "0.10.3"   // Scala.js 1.x only 
+    "com.raquo" %%% "laminar" % "0.11.0"   // Scala.js 1.x only 
 
 ## Where Are The Docs and Everything?
 
