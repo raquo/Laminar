@@ -52,12 +52,13 @@ jobs:
       # verify that site compiles correctly
       - run: cat /dev/null | sbt website/docusaurusCreateSite
 
-workflows:
-  version: 2
-  run_build:
-    jobs:
-      - build:
-          filters:
-            branches:
-              ignore:
-                - gh-pages
+# This doesn't work because docusaurus deletes this config file from gh-pages branch, and that's where circleci reads it from.
+#workflows:
+#  version: 2
+#  run_build:
+#    jobs:
+#      - build:
+#          filters:
+#            branches:
+#              ignore:
+#                - gh-pages

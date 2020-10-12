@@ -1,0 +1,20 @@
+# No-op config to make Circle stop complaining about
+# builds failing on the gh-pages branch due to lack of config.yml
+# (docusaurus deletes the main circleci config)
+#
+version: 2.1
+
+jobs:
+  noop:
+    docker:
+      - image: cimg/python:3.7
+    steps:
+      - run: echo "Nothing to do on gh-pages branch. See website/static/.circleci/config.yml"
+
+workflows:
+  noop:
+    jobs:
+      - noop:
+          filters:
+            branches:
+              ignore: /.*/
