@@ -15,6 +15,10 @@
 @media only screen and (min-width: 1500px) {
 }
 
+.mdoc-example h1 {
+  margin-top: 0;
+}
+
 .mdoc-example {
   margin: 20px 0 70px 0;
 }

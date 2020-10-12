@@ -33,6 +33,10 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     new TextNode(text)
   }
 
+  @inline implicit def intToNode(int: Int): TextNode = {
+    new TextNode(int.toString)
+  }
+
   /** Create a setter that applies each of the setters in a seq */
   implicit def seqToSetter[El <: ReactiveElement.Base](setters: scala.collection.Seq[Setter[El]]): Setter[El] = {
     Setter(element => setters.foreach(_.apply(element)))
