@@ -2,8 +2,8 @@
 // @TODO[Security] Is this a good idea to leave this here long term?
 // resolvers += Resolver.sonatypeRepo("snapshots")
 
-val Scala212 = "2.12.10"
-val Scala213 = "2.13.1"
+val Scala212 = "2.12.11"
+val Scala213 = "2.13.3"
 val scalaVersions = Seq(Scala212, Scala213)
 
 lazy val websiteJS = project
@@ -38,6 +38,7 @@ lazy val website = project
   )
   .enablePlugins(MdocPlugin, DocusaurusPlugin)
   .settings(
+    mdocIn := file("website/docs"),
     mdocJS := Some(websiteJS),
     mdocJSLibraries := webpack.in(websiteJS, Compile, fullOptJS).value,
     skip in publish := true,
@@ -53,10 +54,10 @@ lazy val laminar = project.in(file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "com.raquo" %%% "airstream" % "0.10.1",
+      "com.raquo" %%% "airstream" % "0.11.0",
       "com.raquo" %%% "domtypes" % "0.10.1",
       "com.raquo" %%% "domtestutils" % "0.12.0" % Test,
-      "org.scalatest" %%% "scalatest" % "3.1.1" % Test,
+      "org.scalatest" %%% "scalatest" % "3.2.0" % Test,
     ),
 
     scalacOptions ++= Seq("-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions"),
@@ -81,7 +82,7 @@ lazy val laminar = project.in(file("."))
     organization := "com.raquo",
     scalaVersion := Scala213,
     crossScalaVersions := scalaVersions,
-    homepage := Some(url("https://github.com/raquo/Laminar")),
+    homepage := Some(url("https://laminar.dev")),
     licenses += ("MIT", url("https://github.com/raquo/Laminar/blob/master/LICENSE.md")),
     scmInfo := Some(
       ScmInfo(
