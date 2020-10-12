@@ -74,7 +74,7 @@
       select(
         value &lt;-- stepVar.signal.map(_.toString),
         inContext { thisNode =&gt;
-          onChange.mapTo(thisNode.ref.value.toDouble.toInt) --&gt; stepVar
+          onChange.mapTo(thisNode.ref.value.toInt) --&gt; stepVar
         },
         allowedSteps.map { step =&gt;
           option(value := step.toString, step)
