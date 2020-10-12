@@ -60,12 +60,13 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v0.10.3**. For other versions, see below.
+This documentation is for Laminar version **v0.11.0**. For other versions, see below.
 
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| ↕ | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
+| **[v0.11.0](https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
+| – | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
 | **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
 | **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
 | **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
@@ -430,7 +431,7 @@ It should be pretty obvious what this does: `MaybeBlogUrl` maps input Signal to 
 
 The elements are put in the obvious order – what you see is what you get – so, between _"Hello, I have "_ and _", isn't it great?"_ text nodes. Each next emitted element replaces the previously emitted one in the DOM.
 
-This example uses Signals, but EventStreams work similarly, and there's also `child.maybe` and `child.text` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]` and `Observable[String]` respectively.
+This example uses Signals, but EventStreams work similarly, and there are also `child.maybe`, `child.text`, and `child.int` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]`, `Observable[String]`, and `Observable[Int]` respectively.
 
 
 #### Efficiency
@@ -1064,11 +1065,16 @@ This kind of casual flexibility is what Laminar is all about.
 #### preventDefault & stopPropagation
 
 ```scala
-div(onScroll.stopPropagation.filter(throttle) --> filteredScrollEventBus)
 form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
+div(onScroll.stopPropagation.filter(throttle) --> filteredScrollEventBus)
+div(
+  onClick.stopImmediatePropagation --> theOnlyClickObserver,
+  onClick --> ignoredObserver
+)
+
 ```
 
-These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation)
+These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation), [stopImmediatePropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation)
 
 Importantly, these are just ordinarily transformations, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == KeyCode.Enter)`. Internally all transformations have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` transformation even after you've used `.map(_.keyCode)`.
 
