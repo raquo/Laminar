@@ -28,11 +28,25 @@
 }
 
 .mdoc-example div[id^="mdoc-html-"] {
+  position: relative;
   margin-top: 40px;
   margin-bottom: 30px;
-  padding: 15px;
+  padding: 30px 15px 15px 15px;
   border-radius: 5px;
   border: 1px solid gray;
+}
+
+.mdoc-example div[id^="mdoc-html-"]:before {
+  content: "LIVE DEMO";
+  position: absolute;
+  top: -13px;
+  left: 15px;
+  background: white;
+  border: 1px solid gray;
+  border-radius: 3px;
+  padding: 2px 6px;
+  letter-spacing: 0.01em;
+  font-size: 13px;
 }
 
 .mdoc-example .-error {

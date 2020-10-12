@@ -24,7 +24,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
       select(
         value <-- stepVar.signal.map(_.toString),
         inContext { thisNode =>
-          onChange.mapTo(thisNode.ref.value.toDouble.toInt) --> stepVar
+          onChange.mapTo(thisNode.ref.value.toInt) --> stepVar
         },
         allowedSteps.map { step =>
           option(value := step.toString, step)
