@@ -11,6 +11,8 @@ object ChildReceiver {
 
   val text: TextChildReceiver.type = TextChildReceiver
 
+  val int: IntChildReceiver.type = IntChildReceiver
+
   def <--($node: Observable[Child]): Inserter[ReactiveElement.Base] = {
     ChildInserter[ReactiveElement.Base](_ => $node, initialInsertContext = None)
   }
