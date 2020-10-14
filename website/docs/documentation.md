@@ -65,7 +65,7 @@ This documentation is for Laminar version **v0.11.0**. For other versions, see b
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.11.0](https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
+| **[v0.11.0](https://laminar.dev/documentation)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
 | – | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
 | **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
 | **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
