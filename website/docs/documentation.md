@@ -3,6 +3,7 @@ title: Documentation
 ---
 
 * [Introduction](#introduction)
+* [Dependencies](#dependencies)
 * [Imports](#imports)
 * [Tags & Elements](#tags--elements)
 * [Modifiers](#modifiers)
@@ -84,6 +85,20 @@ See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https:
 
 If you want to follow along with an IDE, download one of the starter kit projects from the [Resources](https://laminar.dev/resources) page, or learn how to render your app in the [Rendering](#rendering) section.
 
+
+## Dependencies
+
+Add Laminar to `libraryDependencies` of your Scala.js project in `build.sbt`:
+
+    "com.raquo" %%% "laminar" % "0.11.0"  // Requires Scala.js >= 1.1.0
+
+Laminar depends on Airstream. Every Laminar version includes the latest version of Airstream that was available at the time it was published. Look at the table above, if you are using the latest published version of Laminar, you can always use the latest published version of Airstream, even if your version of Laminar came with a slightly older version of Airstream. To do this, add Airstream to your `build.sbt` as well:
+
+    "com.raquo" %%% "airstream" % "<version>"
+
+As you can see, Laminar and Airstream versions can diverge slightly, so don't use a single `LaminarVersion` variable to for both.
+
+Laminar also uses [scala-js-dom](http://scala-js.github.io/scala-js-dom/). As it is a very thin interface to native JS types, you can generally use a higher version of scala-js-dom than what Laminar uses without any issue.
 
 
 ## Imports
