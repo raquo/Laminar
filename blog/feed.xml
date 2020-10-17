@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Mon, 12 Oct 2020 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 17 Oct 2020 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,6 +13,13 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2020 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Airstream v0.11.1]]></title>
+            <link>https://laminar.dev/blog/2020/10/17/airstream-v0.11.1.html</link>
+            <guid>https://laminar.dev/blog/2020/10/17/airstream-v0.11.1.html</guid>
+            <pubDate>Sat, 17 Oct 2020 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>I have just released a bugfix for Airstream which fixes <a href="https://github.com/raquo/Airstream/issues/42">#45</a>.</p> <p>If you used <code>SwitchStreamStrategy</code> or <code>SwitchFutureStrategy</code> when <code>flatMap</code>-ping observables (see docs for when exactly each is used), or used <code>SwitchEventStream</code> directly, the output stream was no...</p>]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v0.11.0 & New Website]]></title>
             <link>https://laminar.dev/blog/2020/10/12/laminar-v0.11.0.html</link>
