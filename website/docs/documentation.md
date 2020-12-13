@@ -238,7 +238,33 @@ def TextInput(): Input = input(typ := "text")
  
 div(
   "Please enter your name: ",
-  TextInput().amend(onInput --> nameVar.writer)
+  TextInput().amend(onInput --> nameVar)
+)
+```
+
+`amendThis` is another variation of `amend` that provides access to `thisNode` similar to `inContext`, for the sake of reducing boilerplate:
+
+```scala
+val nameVar = Var("")
+def TextInput(): Input = input(typ := "text")
+
+div(
+  TextInput().amendThis { thisNode =>
+    onInput.mapTo(thisNode.ref.value) --> nameVar  
+  }
+  // ^^ vv These are identical
+  TextInput().amend { inContext { thisNode =>
+    onInput.mapTo(thisNode.ref.value) --> nameVar
+  }}
+)
+
+div(
+  // List[Mod[El]] is implicitly converted to Mod[El]
+  // so you can specify several modifiers like this:
+  TextInput().amendThis { thisNode => List(
+    onInput.mapTo(thisNode.ref.value) --> nameVar,
+    thisNode.events(onClick).delay(0) --> clickObserver  
+  )}
 )
 ```
 
