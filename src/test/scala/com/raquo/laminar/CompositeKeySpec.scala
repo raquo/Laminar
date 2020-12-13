@@ -177,7 +177,7 @@ class CompositeKeySpec extends UnitSpec {
     expectNode(div like (cls is "qux"))
   }
 
-  it("cls - toggle") {
+  it("cls - toggle - eventbus") {
     val bus = new EventBus[Boolean]
     val el = div(
       cls := "foo faa",
