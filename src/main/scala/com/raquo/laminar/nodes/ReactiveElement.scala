@@ -75,6 +75,12 @@ trait ReactiveElement[+Ref <: dom.Element]
     this
   }
 
+  def amendThis(makeMod: this.type => Modifier[this.type]): this.type = {
+    val mod = makeMod(this)
+    mod(this)
+    this
+  }
+
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     //println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 

@@ -176,12 +176,12 @@ class SyntaxSpec extends UnitSpec {
     el.amend(signal --> ((num: Int) => num * 5))
     el.amend(stream --> ((num: Int) => num * 5))
 
-    el.amend(stream --> bus.writer)
+    el.amendThis(_ => stream --> bus.writer)
 
     mount(el)
   }
 
-  it("amend on inlined element") {
+  it("amend and amendThis on inlined element") {
     // https://github.com/raquo/Laminar/issues/54
 
     div().amend(
@@ -192,6 +192,11 @@ class SyntaxSpec extends UnitSpec {
       cls := "foo",
       cls := "bar"
     )
+
+    div().amendThis { thisNode =>
+      thisNode: Div // assert
+      cls := "foo"
+    }
   }
 
 }
