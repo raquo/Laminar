@@ -57,7 +57,7 @@ title: Resources
 ## Addons & Extensions
 
 * [Waypoint](https://github.com/raquo/Waypoint) – URL router for Laminar
-* [tulz-app/laminar-router](https://github.com/tulz-app/laminar-router) – Alternative router for Laminar with API inspired by Akka HTTP
+* [tulz-app/frontroute](https://github.com/tulz-app/frontroute) – Alternative router for Laminar with API inspired by Akka HTTP
 * [Laminar.cycle](https://github.com/vic/laminar_cycle) – Cycle.js dialogue abstraction in Laminar
 * [purgecss-laminar-webpack-plugin](https://github.com/yurique/purgecss-laminar-webpack-plugin) – Removes unused CSS from your webpack bundle
 
