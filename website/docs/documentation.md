@@ -792,12 +792,21 @@ Of course, the reactive layer is similarly considerate in regard to `cls`. Consi
 
 ```scala
 val classesStream: EventStream[Seq[String]] = ???
-val boolStream: EventStream[Boolean] = ???
+val $isSelected: Signal[Boolean] = ???
  
 div(
   cls := "MyComponent",
   cls <-- classesStream,
-  cls.toggle("class1", "class2") <-- boolStream 
+  cls.toggle("class1", "class2") <-- $isSelected
+  cls <-- boolSignal.map { isSelected =>
+    if (isSelected) "always x-selected" else "always"
+  },
+  cls <-- $isSelected.map { isSelected =>
+    List("always" -> true, "x-selected" -> isSelected)
+  },
+  cls <-- $isSelected.map { isSelected =>
+    Map("always" -> true, "x-selected" -> isSelected)
+  } 
 )
 ``` 
 
