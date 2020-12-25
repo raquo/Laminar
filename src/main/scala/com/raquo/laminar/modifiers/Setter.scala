@@ -16,7 +16,6 @@ trait Setter[-El <: ReactiveElement.Base] extends Modifier[El]
 
 object Setter {
 
-  // @TODO[API] do we need this?
   val noop: Setter[ReactiveElement.Base] = Setter(_ => ())
 
   def apply[El <: ReactiveElement.Base](fn: El => Unit): Setter[El] = {

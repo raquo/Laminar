@@ -8,7 +8,7 @@ import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.Implicits.{RichEventStream, RichObservable, RichSignal}
 import com.raquo.laminar.emitter.EventPropTransformation
-import com.raquo.laminar.keys.CompositeAttr.CompositeValueMappers
+import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveStyle}
 import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
