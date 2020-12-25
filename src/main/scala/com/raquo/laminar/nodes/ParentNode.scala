@@ -27,7 +27,7 @@ object ParentNode {
 
   type Base = ParentNode[dom.Element]
 
-  // @Note End users, you should achieve your DOM manipulation goals using the many of <-- and --> methods that Laminar offers.
+  // @Note End users, you should achieve your DOM manipulation goals using the many <-- and --> methods that Laminar offers.
   //  Those arrow methods are in fact very flexible. Only use the methods below when really needed, and even then, very carefully.
   //  The methods below are safe to use IFF you're not doing crazy stuff.
   //  - For example, don't mess with nodes managed by any other Laminar code such as `child <-- ...` or `children <-- ...`.

@@ -97,6 +97,11 @@ object DomApi {
     dom.document.createElement(element.tag.name).asInstanceOf[Ref]
   }
 
+  def getHtmlAttribute[V, DomV](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V]): Option[V] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    Option(domValue).map(attr.codec.decode)
+  }
+
   def setHtmlAttribute[V](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V], value: V): Unit = {
     val domValue = attr.codec.encode(value)
     if (domValue == null) { // End users should use `removeAttribute` instead. This is to support boolean attributes.
@@ -108,6 +113,16 @@ object DomApi {
 
   def removeHtmlAttribute(element: ReactiveHtmlElement.Base, attr: HtmlAttr[_]): Unit = {
     element.ref.removeAttribute(attr.name)
+  }
+
+  /** #Note not sure if this is completely safe. Could this return null? */
+  def getHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: Prop[V, DomV]): V = {
+    val domValue = element.ref.asInstanceOf[js.Dynamic].selectDynamic(prop.name).asInstanceOf[DomV]
+    if (domValue != null) {
+      prop.codec.decode(domValue)
+    } else {
+      null.asInstanceOf[V]
+    }
   }
 
   def setHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: Prop[V, DomV], value: V): Unit = {
@@ -162,6 +177,11 @@ object DomApi {
     dom.document
       .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = element.tag.name)
       .asInstanceOf[Ref]
+  }
+
+  def getSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V]): Option[V] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.name)
+    Option(domValue).map(attr.codec.decode)
   }
 
   def setSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V], value: V): Unit = {

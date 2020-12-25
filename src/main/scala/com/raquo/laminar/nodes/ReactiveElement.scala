@@ -6,9 +6,10 @@ import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, TransferableSubscription}
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.keys.EventProp
+import com.raquo.domtypes.generic.keys.{EventProp, Key}
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropTransformation
+import com.raquo.laminar.keys.{CompositeKey, ReactiveProp}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
@@ -35,6 +36,79 @@ trait ReactiveElement[+Ref <: dom.Element]
     activate = dynamicOwner.activate,
     deactivate = dynamicOwner.deactivate
   )
+
+  /** This structure keeps track of reasons for including a given item for a given composite key.
+    * For example, this remembers which modifiers have previously added which className.
+    *
+    * We need this to avoid interference in cases when two modifiers want to add the same
+    * class name (e.g.) and one of those subsequently does not want to add that class name
+    * anymore. Without this structure, the element would end up without that class name even
+    * though one modifier still wants it added.
+    *
+    * Structure:
+    *
+    * Map(
+    *   cls: List(
+    *     "always" -> null,
+    *     "present" -> null,
+    *     "classes" -> null,
+    *     "class1" -> modThatWantsClass1Set,
+    *     "class1" -> anotherModThatWantsClass1Set,
+    *     "class2" -> modThatWantsClass2Set
+    *   ),
+    *   rel: List( ... ),
+    *   role: List( ... )
+    * )
+    *
+    * Note that `mod` key can be null if the mod is not reactive, e.g. in the simple case of `cls` := "always"
+    * This is to avoid keeping the mod in memory after it has served its purpose.
+    *
+    * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
+    */
+  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier[this.type])]] =
+    Map.empty
+
+  private[laminar] def compositeValueItems(
+    prop: CompositeKey[_, this.type],
+    reason: Modifier[this.type]
+  ): List[String] = {
+    _compositeValues
+      .getOrElse(prop, Nil)
+      .collect { case (item, r) if r == reason => item }
+  }
+
+  private[laminar] def updateCompositeValue(
+    key: CompositeKey[_, this.type],
+    reason: Modifier[this.type],
+    addItems: List[String],
+    removeItems: List[String]
+  ): Unit = {
+    val itemHasAnotherReason = (item: String) => {
+      // #Note null reason is shared among all static modifiers to avoid keeping a reference to them
+      _compositeValues
+        .getOrElse(key, Nil)
+        .exists(t => t._1 == item && (t._2 != reason || reason == null))
+    }
+
+    val itemsToAdd = addItems.distinct
+    val itemsToRemove = removeItems.filterNot(itemHasAnotherReason)
+    val newItems = _compositeValues
+      .getOrElse(key, Nil)
+      .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
+
+    val domValues = key.getDomValue(this)
+
+    val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
+
+    // 1. Update Laminar's internal structure
+    _compositeValues = _compositeValues.updated(key, newItems)
+
+    // 2. Write desired state to the DOM
+    // #Note this logic is compatible with third parties setting classes on Laminar elements
+    //  using raw JS methods as long as they don't remove classes managed by Laminar or add
+    //  classes that were also added by Laminar.
+    key.setDomValue(this, nextDomValues)
+  }
 
   /** Create and get a stream of events on this node */
   def events[Ev <: dom.Event](
