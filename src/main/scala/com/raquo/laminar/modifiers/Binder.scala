@@ -26,4 +26,10 @@ object Binder {
       override def bind(element: El): DynamicSubscription = fn(element)
     }
   }
+
+  def withSelf[El <: ReactiveElement.Base](fn: (El, Binder[El]) => DynamicSubscription) = {
+    new Binder[El] {
+      override def bind(element: El): DynamicSubscription = fn(element, this)
+    }
+  }
 }

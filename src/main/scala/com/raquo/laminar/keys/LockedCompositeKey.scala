@@ -1,14 +1,13 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
-import com.raquo.domtypes.generic.keys.Key
-import com.raquo.laminar.api.{StringBooleanSeqValueMapper, StringSeqSeqValueMapper}
+import com.raquo.laminar.api.{StringSeqSeqValueMapper, StringSeqValueMapper}
 import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Laminar key specific to a particular set of CompositeAttr values */
-class LockedCompositeAttr[Attr <: Key, El <: ReactiveElement.Base](
-  val key: CompositeAttr[Attr, El],
+class LockedCompositeKey[Key, -El <: ReactiveElement.Base](
+  val key: CompositeKey[Key, El],
   val items: List[String]
 ) {
 
@@ -20,12 +19,12 @@ class LockedCompositeAttr[Attr <: Key, El <: ReactiveElement.Base](
     if (include) {
       key := items
     } else {
-      key.remove(items.mkString(key.separator.toString))
+      Setter.noop
     }
   }
 
   /** If $include emits true, items will be added, if false, they will be removed. */
   def <--($include: Observable[Boolean]): Binder[El] = {
-    key <-- $include.map(include => items.map(item => (item, include)))
+    key <-- $include.map(include => if (include) items else Nil)
   }
 }
