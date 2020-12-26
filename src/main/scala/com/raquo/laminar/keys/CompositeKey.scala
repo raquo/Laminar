@@ -7,9 +7,9 @@ import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
+import scala.scalajs.js.JSStringOps._
 
 // @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
-// @TODO[Performance] Will string splitting be faster with native JS method? How do we access it?
 
 class CompositeKey[
   Key,
@@ -18,7 +18,7 @@ class CompositeKey[
   val key: Key,
   private[laminar] val getDomValue: El => List[String],
   private[laminar] val setDomValue: (El, List[String]) => Unit,
-  val separator: Char
+  val separator: String
 ) { self =>
 
   // @TODO[API] Should StringValueMapper be passed implicitly?
@@ -91,67 +91,67 @@ object CompositeKey {
     *
     * @return individual values. Note that normalization does NOT ensure that the items are unique.
     */
-  def normalize(items: String, separator: Char): List[String] = {
+  def normalize(items: String, separator: String): List[String] = {
     if (items.isEmpty) {
       Nil
     } else {
-      items.split(separator).filter(_.nonEmpty).toList
+      items.jsSplit(separator).filter(_.nonEmpty).toList
     }
   }
 
   trait CompositeValueMapper[-V] {
 
     /** Note: normalization does not include deduplication */
-    def toNormalizedList(value: V, separator: Char): List[String]
+    def toNormalizedList(value: V, separator: String): List[String]
   }
 
   trait CompositeValueMappers {
 
     implicit object StringValueMapper extends CompositeValueMapper[String] {
 
-      override def toNormalizedList(item: String, separator: Char): List[String] = {
+      override def toNormalizedList(item: String, separator: String): List[String] = {
         normalize(item, separator)
       }
     }
 
     implicit object StringSeqValueMapper extends CompositeValueMapper[collection.Seq[String]] {
 
-      override def toNormalizedList(items: collection.Seq[String], separator: Char): List[String] = {
+      override def toNormalizedList(items: collection.Seq[String], separator: String): List[String] = {
         items.toList.flatMap(normalize(_, separator))
       }
     }
 
     implicit object StringSeqSeqValueMapper extends CompositeValueMapper[collection.Seq[collection.Seq[String]]] {
 
-      override def toNormalizedList(items: collection.Seq[collection.Seq[String]], separator: Char): List[String] = {
+      override def toNormalizedList(items: collection.Seq[collection.Seq[String]], separator: String): List[String] = {
         items.toList.flatten.flatMap(normalize(_, separator))
       }
     }
 
     implicit object StringBooleanSeqValueMapper extends CompositeValueMapper[collection.Seq[(String, Boolean)]] {
 
-      override def toNormalizedList(items: collection.Seq[(String, Boolean)], separator: Char): List[String] = {
+      override def toNormalizedList(items: collection.Seq[(String, Boolean)], separator: String): List[String] = {
         items.filter(_._2).map(_._1).toList.flatMap(normalize(_, separator))
       }
     }
 
     implicit object StringBooleanSeqSeqValueMapper extends CompositeValueMapper[collection.Seq[collection.Seq[(String, Boolean)]]] {
 
-      override def toNormalizedList(items: collection.Seq[collection.Seq[(String, Boolean)]], separator: Char): List[String] = {
+      override def toNormalizedList(items: collection.Seq[collection.Seq[(String, Boolean)]], separator: String): List[String] = {
         items.toList.flatten.filter(_._2).map(_._1).flatMap(normalize(_, separator))
       }
     }
 
     implicit object MapValueMapper extends CompositeValueMapper[Map[String, Boolean]] {
 
-      override def toNormalizedList(items: Map[String, Boolean], separator: Char): List[String] = {
+      override def toNormalizedList(items: Map[String, Boolean], separator: String): List[String] = {
         items.filter(_._2).keys.toList.flatMap(normalize(_, separator))
       }
     }
 
     implicit object JsDictionaryValueMapper extends CompositeValueMapper[js.Dictionary[Boolean]] {
 
-      override def toNormalizedList(items: js.Dictionary[Boolean], separator: Char): List[String] = {
+      override def toNormalizedList(items: js.Dictionary[Boolean], separator: String): List[String] = {
         items.filter(_._2).keys.toList.flatMap(normalize(_, separator))
       }
     }
