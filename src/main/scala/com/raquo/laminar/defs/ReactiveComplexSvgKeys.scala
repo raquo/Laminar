@@ -13,9 +13,9 @@ trait ReactiveComplexSvgKeys extends ComplexSvgKeys[
   CompositeSvgAttr[String]
 ] { this: SvgAttrBuilder[ReactiveSvgAttr] =>
 
-  override lazy val className: CompositeSvgAttr[String] = stringCompositeSvgAttr("class", separator = ' ')
+  override lazy val className: CompositeSvgAttr[String] = stringCompositeSvgAttr("class", separator = " ")
 
-  protected def stringCompositeSvgAttr(name: String, separator: Char): CompositeSvgAttr[String] = {
+  protected def stringCompositeSvgAttr(name: String, separator: String): CompositeSvgAttr[String] = {
     val attr = new SvgAttr(name, StringAsIsCodec, namespace = None)
     new CompositeKey(
       key = attr,
@@ -23,9 +23,9 @@ trait ReactiveComplexSvgKeys extends ComplexSvgKeys[
         CompositeKey.normalize(DomApi.getSvgAttribute(el, attr).getOrElse(""), separator)
       },
       setDomValue = (el, value) => {
-        DomApi.setSvgAttribute(el, attr, value.mkString(separator.toString))
+        DomApi.setSvgAttribute(el, attr, value.mkString(separator))
       },
-      separator = separator: Char
+      separator = separator
     )
   }
 }

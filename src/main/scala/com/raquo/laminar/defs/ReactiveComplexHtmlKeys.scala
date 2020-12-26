@@ -18,17 +18,17 @@ trait ReactiveComplexHtmlKeys extends ComplexHtmlKeys[
   ReactiveProp[String, String]
 ] { this: HtmlAttrBuilder[ReactiveHtmlAttr] =>
 
-  override lazy val className: CompositeProp[String] = stringCompositeProp("className", separator = ' ')
+  override lazy val className: CompositeProp[String] = stringCompositeProp("className", separator = " ")
 
-  override lazy val rel: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("rel", separator = ' ')
+  override lazy val rel: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("rel", separator = " ")
 
-  override lazy val role: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("role", separator = ' ')
+  override lazy val role: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("role", separator = " ")
 
   override def dataAttr(suffix: String): ReactiveHtmlAttr[String] = stringHtmlAttr(s"data-$suffix")
 
   override lazy val styleAttr: ReactiveHtmlAttr[String] = stringHtmlAttr("style")
 
-  protected def stringCompositeProp(name: String, separator: Char): CompositeProp[String] = {
+  protected def stringCompositeProp(name: String, separator: String): CompositeProp[String] = {
     val prop = new Prop(name, StringAsIsCodec)
     new CompositeKey(
       key = prop,
@@ -36,13 +36,13 @@ trait ReactiveComplexHtmlKeys extends ComplexHtmlKeys[
         CompositeKey.normalize(DomApi.getHtmlProperty(el, prop), separator)
       },
       setDomValue = (el, value) => {
-        DomApi.setHtmlProperty(el, prop, value.mkString(separator.toString))
+        DomApi.setHtmlProperty(el, prop, value.mkString(separator))
       },
-      separator = separator: Char
+      separator = separator
     )
   }
 
-  protected def stringCompositeHtmlAttr(name: String, separator: Char): CompositeHtmlAttr[String] = {
+  protected def stringCompositeHtmlAttr(name: String, separator: String): CompositeHtmlAttr[String] = {
     val attr = new HtmlAttr(name, StringAsIsCodec)
     new CompositeKey(
       key = attr,
@@ -52,7 +52,7 @@ trait ReactiveComplexHtmlKeys extends ComplexHtmlKeys[
       setDomValue = (el, value) => {
         DomApi.setHtmlAttribute(el, attr, value.mkString(separator.toString))
       },
-      separator = separator: Char
+      separator = separator
     )
   }
 }
