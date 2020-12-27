@@ -22,11 +22,11 @@ class SyntaxSpec extends UnitSpec {
 
     mount(div(strings, nodes, nodesBuffer, jsNodes, mixed))
 
-    expectNode(div like (
+    expectNode(div.of(
       "a", "b",
-      span like "ya", article like "yo",
-      span like "boo",
-      span like "js",
+      span of "ya", article of "yo",
+      span of "boo",
+      span of "js",
       "c", input
     ))
   }
@@ -194,7 +194,7 @@ class SyntaxSpec extends UnitSpec {
     )
 
     div().amendThis { thisNode =>
-      thisNode: Div // assert
+      val node = thisNode: Div // assert
       cls := "foo"
     }
   }

@@ -31,7 +31,7 @@ class EventSpec extends UnitSpec {
 
     // --
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "post-transform", "observer")
 
@@ -41,14 +41,14 @@ class EventSpec extends UnitSpec {
 
     pass = false
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "propagated")
     log = Nil
 
     // --
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "propagated")
     log = Nil
@@ -57,7 +57,7 @@ class EventSpec extends UnitSpec {
 
     pass = true
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "post-transform", "observer")
 
@@ -90,7 +90,7 @@ class EventSpec extends UnitSpec {
 
     // --
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "post-transform", "observer")
 
@@ -100,14 +100,14 @@ class EventSpec extends UnitSpec {
 
     pass = false
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "other-listener", "parent-listener")
     log = Nil
 
     // --
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "other-listener", "parent-listener")
     log = Nil
@@ -116,7 +116,7 @@ class EventSpec extends UnitSpec {
 
     pass = true
 
-    simulateClick(inner.ref)
+    inner.ref.click()
 
     log shouldBe List("pre-transform", "post-transform", "observer")
 

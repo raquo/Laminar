@@ -47,10 +47,10 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
       unmount()
       mount(div(alt := "unmounted"))
-      expectNode(div like (alt is "unmounted"))
+      expectNode(div.of(alt is "unmounted"))
 
       bus.writer.onNext(values(3))
-      expectNode(div like (alt is "unmounted"))
+      expectNode(div.of(alt is "unmounted"))
       counter shouldBe 3
     }
   }
@@ -143,12 +143,12 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
       mount(div(alt := "unmounted"))
 
-      expectNode(div like (alt is "unmounted"))
+      expectNode(div.of(alt is "unmounted"))
 
       busA.writer.onNext(values(3))
       busB.writer.onNext(values(3))
       childBus.writer.onNext(childA)
-      expectNode(div like (alt is "unmounted"))
+      expectNode(div.of(alt is "unmounted"))
       counterA shouldBe 1
       counterB shouldBe 2
       childCounter shouldBe 2
@@ -165,66 +165,66 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
   it("PARENT UNMOUNT: title reflectedAttr")(SimpleTest[String](
     makeElement = $title => span(title <-- $title, "Hello"),
-    emptyExpectedNode = span like(title.isEmpty, "Hello"),
-    makeExpectedNode = expectedTitle => span like(title is expectedTitle, "Hello"),
+    emptyExpectedNode = span.of(title.isEmpty, "Hello"),
+    makeExpectedNode = expectedTitle => span.of(title is expectedTitle, "Hello"),
     values = Seq("Title 1", "Title 2", "Title 3", "Title 4").map(randomString(_))
   ).run())
 
   it("PARENT UNMOUNT: heightAttr integer attribute")(SimpleTest[Int](
     makeElement = $height => span(heightAttr <-- $height, "Hello"),
-    emptyExpectedNode = span like(heightAttr.isEmpty, "Hello"),
-    makeExpectedNode = expectedHeight => span like(heightAttr is expectedHeight, "Hello"),
+    emptyExpectedNode = span.of(heightAttr.isEmpty, "Hello"),
+    makeExpectedNode = expectedHeight => span.of(heightAttr is expectedHeight, "Hello"),
     values = Seq(10, 20, 30, 40)
   ).run())
 
   it("PARENT UNMOUNT: checked boolean property")(SimpleTest[Boolean](
     makeElement = $checked => input(checked <-- $checked, "Hello"),
-    emptyExpectedNode = input like(checked is false, "Hello"),
-    makeExpectedNode = expectedChecked => input like(checked is expectedChecked, "Hello"),
+    emptyExpectedNode = input.of(checked is false, "Hello"),
+    makeExpectedNode = expectedChecked => input.of(checked is expectedChecked, "Hello"),
     values = Seq(false, true, false, true)
   ).run())
 
   it("PARENT UNMOUNT: color CSS rule")(SimpleTest[String](
     makeElement = $color => div(color <-- $color, "Hello"),
-    emptyExpectedNode = div like(color is "", "Hello"),
-    makeExpectedNode = expectedColor => div like(color is expectedColor, "Hello"),
+    emptyExpectedNode = div.of(color is "", "Hello"),
+    makeExpectedNode = expectedColor => div.of(color is expectedColor, "Hello"),
     values = Seq("red", "orange", "blue", "cyan")
   ).run())
 
   // @Note href property reflection is apparently slightly broken in jsdom environment so I changed this test to use title
   it("GRANDPARENT UNMOUNT: title reflectedAttr")(SimpleTest[String](
     makeElement = $title => span(L.a(title <-- $title, "Hello")),
-    emptyExpectedNode = span like (L.a like(title.isEmpty, "Hello")),
-    makeExpectedNode = expectedTitle => span like (L.a like(title is expectedTitle, "Hello")),
+    emptyExpectedNode = span.of(L.a.of(title.isEmpty, "Hello")),
+    makeExpectedNode = expectedTitle => span.of(L.a.of(title is expectedTitle, "Hello")),
     values = Seq("title 1", "title 2", "title 3", "title 4").map(randomString(_))
   ).run())
 
   // @TODO[Test] Also test that removing only one subscription does not unsubscribe the other one
   it("GRANDPARENT UNMOUNT: title reflectedAttr (two subscriptions for the same stream)")(SimpleTest[String](
     makeElement = $str => div(span(title <-- $str, href <-- $str, "Hello")),
-    emptyExpectedNode = div like (span like(title.isEmpty, href.isEmpty, "Hello")),
-    makeExpectedNode = expectedTitle => div like (span like(title is expectedTitle, href is expectedTitle, "Hello")),
+    emptyExpectedNode = div.of(span.of(title.isEmpty, href.isEmpty, "Hello")),
+    makeExpectedNode = expectedTitle => div.of(span.of(title is expectedTitle, href is expectedTitle, "Hello")),
     values = Seq("Str 1", "Str 2", "Str 3", "Str 4").map(randomString(_))
   ).run())
 
   it("GRANDPARENT UNMOUNT: heightAttr integer attribute")(SimpleTest[Int](
     makeElement = $height => div(span(heightAttr <-- $height, "Hello")),
-    emptyExpectedNode = div like (span like(heightAttr.isEmpty, "Hello")),
-    makeExpectedNode = expectedHeight => div like (span like(heightAttr is expectedHeight, "Hello")),
+    emptyExpectedNode = div.of(span.of(heightAttr.isEmpty, "Hello")),
+    makeExpectedNode = expectedHeight => div.of(span.of(heightAttr is expectedHeight, "Hello")),
     values = Seq(10, 20, 30, 40)
   ).run())
 
   it("GRANDPARENT UNMOUNT: checked boolean property")(SimpleTest[Boolean](
     makeElement = $checked => form(input(checked <-- $checked, "Hello")),
-    emptyExpectedNode = form like (input like(checked is false, "Hello")),
-    makeExpectedNode = expectedChecked => form like (input like(checked is expectedChecked, "Hello")),
+    emptyExpectedNode = form.of(input.of(checked is false, "Hello")),
+    makeExpectedNode = expectedChecked => form.of(input.of(checked is expectedChecked, "Hello")),
     values = Seq(false, true, false, true)
   ).run())
 
   it("GRANDPARENT UNMOUNT: color CSS rule")(SimpleTest[String](
     makeElement = $color => span(div(color <-- $color, "Hello")),
-    emptyExpectedNode = span like (div like(color is "", "Hello")),
-    makeExpectedNode = expectedColor => span like (div like(color is expectedColor, "Hello")),
+    emptyExpectedNode = span.of(div.of(color is "", "Hello")),
+    makeExpectedNode = expectedColor => span.of(div.of(color is expectedColor, "Hello")),
     values = Seq("red", "orange", "blue", "cyan")
   ).run())
 
@@ -232,11 +232,11 @@ class SubscriptionLifecycleSpec extends UnitSpec {
     makeElement = $child => span(child <-- $child, "Hello"),
     makeChildA = $testTitle => L.a(title <-- $testTitle),
     makeChildB = $testTitle => b(title <-- $testTitle),
-    emptyExpectedNode = span like(ExpectedNode.comment(), "Hello"), // @TODO[API] We should not need to reference EN.comment here like this (it's a sentinel node, and we should use implicit conversion)
-    emptyExpectedNodeA = span like(L.a like (title.isEmpty), "Hello"),
-    emptyExpectedNodeB = span like(b like (title.isEmpty), "Hello"),
-    makeExpectedNodeA = expectedTitle => span like(L.a like (title is expectedTitle), "Hello"),
-    makeExpectedNodeB = expectedTitle => span like(b like (title is expectedTitle), "Hello"),
+    emptyExpectedNode = span.of(ExpectedNode.comment, "Hello"), // @TODO[API] We should not need to reference EN.comment here of this (it's a sentinel node, and we should use implicit conversion)
+    emptyExpectedNodeA = span.of(L.a.of(title.isEmpty), "Hello"),
+    emptyExpectedNodeB = span.of(b.of(title.isEmpty), "Hello"),
+    makeExpectedNodeA = expectedTitle => span.of(L.a.of(title is expectedTitle), "Hello"),
+    makeExpectedNodeB = expectedTitle => span.of(b.of(title is expectedTitle), "Hello"),
     values = Seq("Title 1", "Title 2", "Title 3", "Title 4").map(randomString(_))
   ).run())
 }

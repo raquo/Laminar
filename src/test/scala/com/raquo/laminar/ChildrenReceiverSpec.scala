@@ -45,49 +45,49 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     childrenBus.writer.onNext(Vector())
 
     childrenBus.writer.onNext(Vector(span0))
-    expectChildren("append #1:", span like text0)
+    expectChildren("append #1:", span of text0)
 
     childrenBus.writer.onNext(Vector(span0, span1))
-    expectChildren("append #2:", span like text0, span like text1)
+    expectChildren("append #2:", span of text0, span of text1)
 
     childrenBus.writer.onNext(Vector(div2, span0, span1))
-    expectChildren("prepend:", div like text2, span like text0, span like text1)
+    expectChildren("prepend:", div of text2, span of text0, span of text1)
 
     childrenBus.writer.onNext(Vector(div2, span1))
-    expectChildren("remove:", div like text2, span like text1)
+    expectChildren("remove:", div of text2, span of text1)
 
     childrenBus.writer.onNext(Vector(div2, div3))
-    expectChildren("replace:", div like text2, div like text3)
+    expectChildren("replace:", div of text2, div of text3)
 
     childrenBus.writer.onNext(Vector(span1, span0))
-    expectChildren("replaceAll:", span like text1, span like text0)
+    expectChildren("replaceAll:", span of text1, span of text0)
 
     childrenBus.writer.onNext(Vector(span0, span1))
-    expectChildren("switch places:", span like text0, span like text1)
+    expectChildren("switch places:", span of text0, span of text1)
 
     childrenBus.writer.onNext(Vector(span1, span0, span4))
-    expectChildren("switch places & append:", span like text1, span like text0, span like text4)
+    expectChildren("switch places & append:", span of text1, span of text0, span of text4)
 
     childrenBus.writer.onNext(Vector(span1, span0, span5, span4))
-    expectChildren("insert:", span like text1, span like text0, span like text5, span like text4)
+    expectChildren("insert:", span of text1, span of text0, span of text5, span of text4)
 
     childrenBus.writer.onNext(Vector(span5, span4))
-    expectChildren("remove #2:", span like text5, span like text4)
+    expectChildren("remove #2:", span of text5, span of text4)
 
     childrenBus.writer.onNext(Vector(span1, span5, span4))
-    expectChildren("prepend #2:", span like text1, span like text5, span like text4)
+    expectChildren("prepend #2:", span of text1, span of text5, span of text4)
 
     childrenBus.writer.onNext(Vector(span1, span5, span4, span0, div2, div3))
-    expectChildren("insert #2:", span like text1, span like text5, span like text4, span like text0, div like text2, div like text3)
+    expectChildren("insert #2:", span of text1, span of text5, span of text4, span of text0, div of text2, div of text3)
 
     childrenBus.writer.onNext(Vector(span1, span5, span4, span0))
-    expectChildren("remove #3:", span like text1, span like text5, span like text4, span like text0)
+    expectChildren("remove #3:", span of text1, span of text5, span of text4, span of text0)
 
     childrenBus.writer.onNext(Vector(span0, span1, div2, div3, span4))
-    expectChildren("mix:", span like text0, span like text1, div like text2, div like text3, span like text4)
+    expectChildren("mix:", span of text0, span of text1, div of text2, div of text3, span of text4)
 
     childrenBus.writer.onNext(Vector(div3, div2, span1, span4, span0))
-    expectChildren("reorder:", div like text3, div like text2, span like text1, span like text4, span like text0)
+    expectChildren("reorder:", div of text3, div of text2, span of text1, span of text4, span of text0)
 
     childrenBus.writer.onNext(Vector())
     expectChildren("clear:")
@@ -95,11 +95,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
         val first: Rule = "Hello"
-        val last: Rule = article like "World"
-        val sentinelNode: Rule = ExpectedNode.comment()
+        val last: Rule = article of "World"
+        val sentinelNode: Rule = ExpectedNode.comment
         val rules: Seq[Rule] = sentinelNode +: childRules
 
-        expectNode(main like (rules: _*))
+        expectNode(main.of(rules: _*))
       }
     }
   }
