@@ -29,37 +29,37 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     expectChildren("none")
 
     commandBus.writer.onNext(Append(span0))
-    expectChildren("append #1:", span like text0)
+    expectChildren("append #1:", span of text0)
 
     commandBus.writer.onNext(Append(span1))
-    expectChildren("append #2:", span like text0, span like text1)
+    expectChildren("append #2:", span of text0, span of text1)
 
     commandBus.writer.onNext(Prepend(div(text2)))
-    expectChildren("prepend:", div like text2, span like text0, span like text1)
+    expectChildren("prepend:", div of text2, span of text0, span of text1)
 
     commandBus.writer.onNext(Remove(span0))
-    expectChildren("remove:", div like text2, span like text1)
+    expectChildren("remove:", div of text2, span of text1)
 
     commandBus.writer.onNext(Replace(span1, div(text3)))
-    expectChildren("replace:", div like text2, div like text3)
+    expectChildren("replace:", div of text2, div of text3)
 
     commandBus.writer.onNext(ReplaceAll(mutable.Buffer(span1, span0)))
-    expectChildren("replaceAll:", span like text1, span like text0)
+    expectChildren("replaceAll:", span of text1, span of text0)
 
     commandBus.writer.onNext(Append(span(text4)))
-    expectChildren("append #3:", span like text1, span like text0, span like text4)
+    expectChildren("append #3:", span of text1, span of text0, span of text4)
 
     commandBus.writer.onNext(Insert(span(text5), atIndex = 2))
-    expectChildren("insert:", span like text1, span like text0, span like text5, span like text4)
+    expectChildren("insert:", span of text1, span of text0, span of text5, span of text4)
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
         val first: Rule = "Hello"
-        val last: Rule = div like "World"
-        val sentinelNode: Rule = ExpectedNode.comment()
+        val last: Rule = div of "World"
+        val sentinelNode: Rule = ExpectedNode.comment
         val rules: Seq[Rule] = first +: sentinelNode +: childRules :+ last
 
-        expectNode(div like(rules: _*))
+        expectNode(div.of(rules: _*))
       }
     }
   }

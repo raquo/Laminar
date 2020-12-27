@@ -177,7 +177,7 @@ class MountHooksSpec extends UnitSpec {
     )
 
     withClue("before first mount:") {
-      expectNode(el.ref, div like("Hello ", ExpectedNode.comment(), ExpectedNode.comment(), " world"))
+      expectNode(el.ref, div.of("Hello ", ExpectedNode.comment, ExpectedNode.comment, " world"))
 
       assert(numMountCalls == 0) // important part of API. We reserve the spot but don't call the hook yet.
     }
@@ -186,7 +186,7 @@ class MountHooksSpec extends UnitSpec {
 
       mount(el)
 
-      expectNode(div like("Hello ", span like ("Nikita"), ExpectedNode.comment(), " world"))
+      expectNode(div.of("Hello ", span.of("Nikita"), ExpectedNode.comment, " world"))
       assert(numMountCalls == 1)
 
       numMountCalls = 0
@@ -195,7 +195,7 @@ class MountHooksSpec extends UnitSpec {
     withClue("first mounted event:") {
       nameVar.writer.onNext("Yan")
 
-      expectNode(div like("Hello ", span like ("Yan"), div like ("Yan"), " world"))
+      expectNode(div.of("Hello ", span.of("Yan"), div.of("Yan"), " world"))
       assert(numMountCalls == 0)
     }
 
@@ -205,7 +205,7 @@ class MountHooksSpec extends UnitSpec {
 
       nameVar.writer.onNext("Igor") // Var updates, but element won't be populated until re-mounted
 
-      expectNode(el.ref, div like("Hello ", span like ("Yan"), div like ("Yan"), " world"), "unmounted")
+      expectNode(el.ref, div.of("Hello ", span.of("Yan"), div.of("Yan"), " world"), "unmounted")
       assert(numMountCalls == 0)
     }
 
@@ -218,7 +218,7 @@ class MountHooksSpec extends UnitSpec {
       nameVar.writer.onNext("Igor2") // this value will be resurrected when remounting, and DOM nodes will be fine
       owner.killSubscriptions()
 
-      expectNode(el.ref, div like("Hello ", span like ("Yan"), div like ("Yan"), " world"), "unmounted")
+      expectNode(el.ref, div.of("Hello ", span.of("Yan"), div.of("Yan"), " world"), "unmounted")
       assert(numMountCalls == 0)
       assert(signal.now() == "Igor2")
     }
@@ -227,7 +227,7 @@ class MountHooksSpec extends UnitSpec {
 
       mount(el)
 
-      expectNode(div like("Hello ", span like ("Igor2"), div like ("Yan"), " world"))
+      expectNode(div.of("Hello ", span.of("Igor2"), div.of("Yan"), " world"))
       assert(numMountCalls == 1)
 
       numMountCalls = 0
@@ -236,7 +236,7 @@ class MountHooksSpec extends UnitSpec {
     withClue("first event after re-mounting:") {
       nameVar.writer.onNext("Elan")
 
-      expectNode(div like("Hello ", span like ("Elan"), div like ("Elan"), " world"))
+      expectNode(div.of("Hello ", span.of("Elan"), div.of("Elan"), " world"))
       assert(numMountCalls == 0)
     }
   }

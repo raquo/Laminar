@@ -37,16 +37,16 @@ class WeirdCasesSpec extends UnitSpec {
     )
 
     // @TODO[Test] we should not need to specify this sentinel comment node here. Gotta find a way to ignore those.
-    expectNode(div like ("hello", ExpectedNode.comment()))
+    expectNode(div.of("hello", ExpectedNode.comment))
 
     bus.writer.onNext(1)
 
     expectNode(
-      div like(
+      div.of(
         "hello",
-        span like(
+        span.of(
           "num: 1",
-          article like "innerNum: 1"
+          article of "innerNum: 1"
         )
       )
     )
@@ -54,11 +54,11 @@ class WeirdCasesSpec extends UnitSpec {
     bus.writer.onNext(2)
 
     expectNode(
-      div like(
+      div.of(
         "hello",
-        span like(
+        span.of(
           "num: 2",
-          article like "innerNum: 2"
+          article of "innerNum: 2"
         )
       )
     )
@@ -81,9 +81,9 @@ class WeirdCasesSpec extends UnitSpec {
       )
     )
 
-    expectNode(div like ("hello", span like(
+    expectNode(div.of("hello", span.of(
       "num: 0",
-      article like "innerNum: 0"
+      article of "innerNum: 0"
     )))
 
     // --
@@ -91,11 +91,11 @@ class WeirdCasesSpec extends UnitSpec {
     bus.writer.onNext(1)
 
     expectNode(
-      div like(
+      div.of(
         "hello",
-        span like(
+        span.of(
           "num: 1",
-          article like "innerNum: 1"
+          article of "innerNum: 1"
         )
       )
     )
@@ -105,11 +105,11 @@ class WeirdCasesSpec extends UnitSpec {
     bus.writer.onNext(2)
 
     expectNode(
-      div like(
+      div.of(
         "hello",
-        span like(
+        span.of(
           "num: 2",
-          article like "innerNum: 2"
+          article of "innerNum: 2"
         )
       )
     )
@@ -132,18 +132,18 @@ class WeirdCasesSpec extends UnitSpec {
       )
     )
 
-    expectNode(div like ("hello", ExpectedNode.comment()))
+    expectNode(div.of("hello", ExpectedNode.comment))
 
     // --
 
     bus.writer.onNext(1)
 
     expectNode(
-      div like(
+      div.of(
         "hello",
-        span like(
+        span.of(
           "num: 1",
-          article like "innerNum: 1"
+          article of "innerNum: 1"
         )
       )
     )
@@ -153,11 +153,11 @@ class WeirdCasesSpec extends UnitSpec {
     bus.writer.onNext(2)
 
     expectNode(
-      div like(
+      div.of(
         "hello",
-        span like(
+        span.of(
           "num: 2",
-          article like "innerNum: 2"
+          article of "innerNum: 2"
         )
       )
     )
@@ -189,9 +189,9 @@ class WeirdCasesSpec extends UnitSpec {
     )
 
     withClue("before first mount:") {
-      expectNode(el.ref, div like(
+      expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment(),
+        ExpectedNode.comment,
         " world"
       ))
     }
@@ -202,10 +202,10 @@ class WeirdCasesSpec extends UnitSpec {
     withClue("first mount:") {
       mount(el)
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Nikita"),
+        ExpectedNode.comment,
+        span.of("Nikita"),
         " world"
       ))
 
@@ -222,14 +222,14 @@ class WeirdCasesSpec extends UnitSpec {
     withClue("first mounted event:") {
       nameVar.writer.onNext(alpha :: bravo :: charlie :: delta :: eagle :: Nil)
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
         " world")
       )
 
@@ -254,14 +254,14 @@ class WeirdCasesSpec extends UnitSpec {
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
-      expectNode(el.ref, div like(
+      expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
         " world")
       )
 
@@ -280,14 +280,14 @@ class WeirdCasesSpec extends UnitSpec {
 
       mount(el, "re-mount...")
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("John"),
-        span like ("Alpha"),
-        span like ("Delta"),
-        span like ("Bravo"),
-        span like ("Tor"),
+        ExpectedNode.comment,
+        span.of("John"),
+        span.of("Alpha"),
+        span.of("Delta"),
+        span.of("Bravo"),
+        span.of("Tor"),
         " world")
       )
 
@@ -308,15 +308,15 @@ class WeirdCasesSpec extends UnitSpec {
 
       nameVar.writer.onNext(tor :: delta :: bravo :: alpha :: elan :: john :: Nil)
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Tor"),
-        span like ("Delta"),
-        span like ("Bravo"),
-        span like ("Alpha"),
-        span like ("Elan"),
-        span like ("John"),
+        ExpectedNode.comment,
+        span.of("Tor"),
+        span.of("Delta"),
+        span.of("Bravo"),
+        span.of("Alpha"),
+        span.of("Elan"),
+        span.of("John"),
         " world")
       )
     }
@@ -335,13 +335,13 @@ class WeirdCasesSpec extends UnitSpec {
 
   it("TransferableSubscription.setOwner but more elaborate") {
 
-    // This is like the other TransferableSubscription.setOwner test, but with more confounding stuff
+    // This is of the other TransferableSubscription.setOwner test, but with more confounding stuff
     // - Ultimately it tests for the same problem, just more painfully
 
     // @Note these tests detected more activation / deactivation bugs,
     //   so DO NOT REMOVE THESE TESTS even if the immediate subscription issue becomes irrelevant.
 
-    // @Note if this test fails with cryptic mount / unmount related errors, add isActive assertions like in
+    // @Note if this test fails with cryptic mount / unmount related errors, add isActive assertions of in
 
     val nikita = span("Nikita")
 
@@ -362,10 +362,10 @@ class WeirdCasesSpec extends UnitSpec {
     )
 
     withClue("before first mount:") {
-      expectNode(el.ref, div like(
+      expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        ExpectedNode.comment(),
+        ExpectedNode.comment,
+        ExpectedNode.comment,
         " world"
       ))
     }
@@ -376,11 +376,11 @@ class WeirdCasesSpec extends UnitSpec {
     withClue("first mount:") {
       mount(el)
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Nikita"),
-        ExpectedNode.comment(),
+        ExpectedNode.comment,
+        span.of("Nikita"),
+        ExpectedNode.comment,
         " world"
       ))
 
@@ -397,20 +397,20 @@ class WeirdCasesSpec extends UnitSpec {
     withClue("first mounted event:") {
       nameVar.writer.onNext(alpha :: bravo :: charlie :: delta :: eagle :: Nil)
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
         " world")
       )
 
@@ -437,20 +437,20 @@ class WeirdCasesSpec extends UnitSpec {
       // Var updates, but element won't be populated until re-mounted
       nameVar.writer.onNext(axel :: alpha :: delta :: dick :: bravo :: eric :: Nil)
 
-      expectNode(el.ref, div like(
+      expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
         " world")
       )
 
@@ -474,20 +474,20 @@ class WeirdCasesSpec extends UnitSpec {
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
-      expectNode(el.ref, div like(
+      expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
-        ExpectedNode.comment(),
-        span like ("Alpha"),
-        span like ("Bravo"),
-        span like ("Charlie"),
-        span like ("Delta"),
-        span like ("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
+        ExpectedNode.comment,
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
         " world")
       )
 
@@ -506,15 +506,15 @@ class WeirdCasesSpec extends UnitSpec {
 
       mount(el, "re-mount...")
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("John"),
-        span like ("Alpha"),
-        span like ("Delta"),
-        span like ("Bravo"),
-        span like ("Tor"),
-        ExpectedNode.comment(),
+        ExpectedNode.comment,
+        span.of("John"),
+        span.of("Alpha"),
+        span.of("Delta"),
+        span.of("Bravo"),
+        span.of("Tor"),
+        ExpectedNode.comment,
         " world")
       )
 
@@ -538,22 +538,22 @@ class WeirdCasesSpec extends UnitSpec {
 
       nameVar.writer.onNext(tor :: delta :: bravo :: alpha :: elan :: john :: Nil)
 
-      expectNode(div like(
+      expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment(),
-        span like ("Tor"),
-        span like ("Delta"),
-        span like ("Bravo"),
-        span like ("Alpha"),
-        span like ("Elan"),
-        span like ("John"),
-        ExpectedNode.comment(),
-        span like ("Tor"),
-        span like ("Delta"),
-        span like ("Bravo"),
-        span like ("Alpha"),
-        span like ("Elan"),
-        span like ("John"),
+        ExpectedNode.comment,
+        span.of("Tor"),
+        span.of("Delta"),
+        span.of("Bravo"),
+        span.of("Alpha"),
+        span.of("Elan"),
+        span.of("John"),
+        ExpectedNode.comment,
+        span.of("Tor"),
+        span.of("Delta"),
+        span.of("Bravo"),
+        span.of("Alpha"),
+        span.of("Elan"),
+        span.of("John"),
         " world")
       )
     }

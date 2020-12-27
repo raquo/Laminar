@@ -13,7 +13,7 @@ class StyleSpec extends UnitSpec {
     val expectedWidth = s"${15 + Random.nextInt(7)}px"
 
     mount("div", div(display.block))
-    expectNode(div like (display is expectedDisplay))
+    expectNode(div.of(display is expectedDisplay))
     unmount()
 
     mount("div [width, height]", div(
@@ -21,7 +21,7 @@ class StyleSpec extends UnitSpec {
       height := expectedHeight
     ))
     expectNode(
-      div like (
+      div.of(
         width is expectedWidth,
         height is expectedHeight
       )
