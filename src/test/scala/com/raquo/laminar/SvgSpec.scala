@@ -13,13 +13,15 @@ class SvgSpec extends UnitSpec {
 
     var clickCount = 0
 
+    val clickMod = L.onClick --> (_ => clickCount += 1)
+
     val polylineEl = polyline(
       points := "20,20 40,25 60,40 80,120 120,140 200,180",
       fill := "none",
       stroke := "black",
       className := "classy",
       strokeWidth <-- strokeWidthVar.signal,
-      L.onClick --> (_ => clickCount += 1)
+      clickMod
     )
 
     val el = svg(
@@ -74,7 +76,7 @@ class SvgSpec extends UnitSpec {
       )
     )))
 
-    polylineEl.maybeEventListeners.get.length shouldBe 1
+    polylineEl.eventListeners shouldBe List(clickMod)
     clickCount shouldBe 0
 
     // One event listener added

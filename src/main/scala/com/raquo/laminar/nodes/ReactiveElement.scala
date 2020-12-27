@@ -14,7 +14,7 @@ import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
 
-import scala.collection.mutable
+import scala.scalajs.js
 
 trait ReactiveElement[+Ref <: dom.Element]
   extends ChildNode[Ref]
@@ -22,10 +22,9 @@ trait ReactiveElement[+Ref <: dom.Element]
   with domtypes.generic.nodes.Element {
 
   // @TODO[Naming] We reuse EventPropSetter to represent an active event listener. Makes for a bit confusing naming.
-  private[ReactiveElement] var _maybeEventListeners: Option[mutable.Buffer[EventPropBinder[_]]] = None
+  private[ReactiveElement] var _maybeEventListeners: js.UndefOr[js.Array[EventPropBinder[_]]] = js.undefined
 
-  @deprecated("ReactiveElement.maybeEventListeners will be removed in a future version of Laminar.", "0.8")
-  @inline def maybeEventListeners: Option[List[EventPropBinder[_]]] = _maybeEventListeners.map(_.toList)
+  def eventListeners: List[EventPropBinder[_]] = _maybeEventListeners.map(_.toList).getOrElse(Nil)
 
   // @Warning[Fragile] deactivate should not need an isActive guard.
   //  If Laminar starts to cause exceptions here, we need to find the root cause.
@@ -209,10 +208,10 @@ object ReactiveElement {
     if (shouldAddListener) {
       // 1. Update this node
       if (element._maybeEventListeners.isEmpty) {
-        element._maybeEventListeners = Some(mutable.Buffer(listener))
+        element._maybeEventListeners = js.defined(js.Array(listener))
       } else {
         element._maybeEventListeners.foreach { eventListeners =>
-          eventListeners += listener
+          eventListeners.push(listener)
         }
       }
       // 2. Update the DOM
@@ -227,7 +226,9 @@ object ReactiveElement {
     val shouldRemoveListener = index != -1
     if (shouldRemoveListener) {
       // 1. Update this node
-      element._maybeEventListeners.foreach(eventListeners => eventListeners.remove(index))
+      element._maybeEventListeners.foreach { eventListeners =>
+        eventListeners.splice(index, deleteCount = 1)
+      }
       // 2. Update the DOM
       DomApi.removeEventListener(element, listener)
     }
@@ -236,25 +237,10 @@ object ReactiveElement {
 
   /** @return -1 if not found */
   def indexOfEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Int = {
-    // Note: Ugly for performance.
-    //  - We want to reduce usage of Scala's collections and anonymous functions
-    //  - js.Array is unaware of Scala's `equals` method
-    val notFoundIndex = -1
-    if (element._maybeEventListeners.isEmpty) {
-      notFoundIndex
+    if (element._maybeEventListeners.nonEmpty) {
+      element._maybeEventListeners.get.indexOf(listener)
     } else {
-      var found = false
-      var index = 0
-      element._maybeEventListeners.foreach { listeners =>
-        while (!found && index < listeners.length) {
-          if (listener equals listeners(index)) {
-            found = true
-          } else {
-            index += 1
-          }
-        }
-      }
-      if (found) index else notFoundIndex
+      -1
     }
   }
 
