@@ -41,10 +41,9 @@ class ReactiveEventPropSpec extends UnitSpec {
       )
     )
 
-    // @TODO[Test] Verify exact values in Node.maybeEventListeners. Can not easily do that because of "isArray__Z" Scala.js bug
     // @TODO[Test] Split between testing Element methods and EventPropSetter methods?
 
-    clickableDiv.maybeEventListeners.get.length shouldBe 1
+    clickableDiv.eventListeners shouldBe List(clickSetter1)
     clickCount1 shouldBe 0
 
     // One event listener added
@@ -53,8 +52,8 @@ class ReactiveEventPropSpec extends UnitSpec {
     clickCount2 shouldBe 0
 
     // Add a new event listener on the same event type ("click")
-    clickSetter2(clickableDiv)
-    clickableDiv.maybeEventListeners.get.length shouldBe 2
+    clickableDiv.amend(clickSetter2)
+    clickableDiv.eventListeners shouldBe List(clickSetter1, clickSetter2)
     clickCount1 shouldBe 1
     clickCount2 shouldBe 0
 
@@ -64,21 +63,21 @@ class ReactiveEventPropSpec extends UnitSpec {
 
     // Remove that new event listener
     ReactiveElement.removeEventListener(clickableDiv, clickSetter2)
-    clickableDiv.maybeEventListeners.get.length shouldBe 1
+    clickableDiv.eventListeners shouldBe List(clickSetter1)
 
     clickableDiv.ref.click()
     clickCount1 shouldBe 3
     clickCount2 shouldBe 1
 
     // Add a duplicate of the original event listener (duplicate should be ignored)
-    clickSetter1(clickableDiv)
-    clickableDiv.maybeEventListeners.get.length shouldBe 1
+    clickableDiv.amend(clickSetter1)
+    clickableDiv.eventListeners shouldBe List(clickSetter1)
     clickableDiv.ref.click()
     clickCount1 shouldBe 4
 
     // Add a listener to an unrelated event
-    scrollSetter2(clickableDiv)
-    clickableDiv.maybeEventListeners.get.length shouldBe 2
+    clickableDiv.amend(scrollSetter2)
+    clickableDiv.eventListeners shouldBe List(clickSetter1, scrollSetter2)
 
     clickableDiv.ref.click()
     clickCount1 shouldBe 5
@@ -90,10 +89,10 @@ class ReactiveEventPropSpec extends UnitSpec {
 
     // Remove all event listeners
     ReactiveElement.removeEventListener(clickableDiv, clickSetter1)
-    clickableDiv.maybeEventListeners.get.length shouldBe 1
+    clickableDiv.eventListeners shouldBe List(scrollSetter2)
 
     ReactiveElement.removeEventListener(clickableDiv, scrollSetter2)
-    clickableDiv.maybeEventListeners.get.length shouldBe 0
+    clickableDiv.eventListeners shouldBe Nil
 
     clickableDiv.ref.click()
     simulateScroll(clickableDiv.ref)
