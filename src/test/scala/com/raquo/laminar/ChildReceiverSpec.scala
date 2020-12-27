@@ -27,34 +27,34 @@ class ChildReceiverSpec extends UnitSpec {
     withClue("Signal:") {
       test(
         makeObservable = _.toSignal(span(text0)),
-        expectedInitialChild = span like text0
+        expectedInitialChild = span of text0
       )
     }
 
     def test(
       makeObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
-      expectedInitialChild: ExpectedNode = ExpectedNode.comment()
+      expectedInitialChild: ExpectedNode = ExpectedNode.comment
     ): Unit = {
 
       val childBus = new EventBus[ChildNode[dom.Element]]
       val $child = makeObservable(childBus.events)
 
       mount(div("Hello, ", child <-- $child))
-      expectNode(div like("Hello, ", expectedInitialChild))
+      expectNode(div.of("Hello, ", expectedInitialChild))
 
       withClue("First event:") {
         childBus.writer.onNext(span(text1))
-        expectNode(div like("Hello, ", span like text1))
+        expectNode(div.of("Hello, ", span of text1))
       }
 
       withClue("Second event, changing node type (span->div):") {
         childBus.writer.onNext(div(text2))
-        expectNode(div like("Hello, ", div like text2))
+        expectNode(div.of("Hello, ", div of text2))
       }
 
       withClue("Third event:") {
         childBus.writer.onNext(div(text3))
-        expectNode(div like("Hello, ", div like text3))
+        expectNode(div.of("Hello, ", div of text3))
       }
 
       unmount()
@@ -73,56 +73,56 @@ class ChildReceiverSpec extends UnitSpec {
       test(
         makeFooObservable = _.toSignal(span(text0)),
         makeBarObservable = _.toSignal(span(text00)),
-        initialFooChild = span like text0,
-        initialBarChild = span like text00
+        initialFooChild = span of text0,
+        initialBarChild = span of text00
       )
     }
 
     def test(
       makeFooObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
       makeBarObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
-      initialFooChild: ExpectedNode = ExpectedNode.comment(),
-      initialBarChild: ExpectedNode = ExpectedNode.comment()
+      initialFooChild: ExpectedNode = ExpectedNode.comment,
+      initialBarChild: ExpectedNode = ExpectedNode.comment
     ): Unit = {
       val fooChildBus = new EventBus[ChildNode[dom.Element]]
       val barChildBus = new EventBus[ChildNode[dom.Element]]
 
       mount(div(child <-- makeFooObservable(fooChildBus.events), child <-- makeBarObservable(barChildBus.events)))
-      expectNode(div like(initialFooChild, initialBarChild))
+      expectNode(div.of(initialFooChild, initialBarChild))
 
       withClue("1. foo event:") {
         fooChildBus.writer.onNext(span(text1))
-        expectNode(div like(span like text1, initialBarChild))
+        expectNode(div.of(span of text1, initialBarChild))
       }
 
       withClue("2. bar event:") {
         barChildBus.writer.onNext(span(text4))
-        expectNode(div like(span like text1, span like text4))
+        expectNode(div.of(span of text1, span of text4))
       }
 
       withClue("3. another bar event:") {
         barChildBus.writer.onNext(span(text5))
-        expectNode(div like(span like text1, span like text5))
+        expectNode(div.of(span of text1, span of text5))
       }
 
       withClue("4. foo switch to div:") {
         fooChildBus.writer.onNext(div(text2))
-        expectNode(div like(div like text2, span like text5))
+        expectNode(div.of(div of text2, span of text5))
       }
 
       withClue("5. another foo event:") {
         fooChildBus.writer.onNext(div(text3))
-        expectNode(div like(div like text3, span like text5))
+        expectNode(div.of(div of text3, span of text5))
       }
 
       withClue("6. another bar event:") {
         barChildBus.writer.onNext(span(text6))
-        expectNode(div like(div like text3, span like text6))
+        expectNode(div.of(div of text3, span of text6))
       }
 
       withClue("7. yet another bar event:") {
         barChildBus.writer.onNext(span(text7))
-        expectNode(div like(div like text3, span like text7))
+        expectNode(div.of(div of text3, span of text7))
       }
 
       unmount()
@@ -178,7 +178,7 @@ class ChildReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div like (L.a like (href is "http://blog1.com/", "a blog"))
+      div.of(L.a.of(href is "http://blog1.com/", "a blog"))
     )
 
     numCreateLinkCalls shouldBe 1
@@ -189,7 +189,7 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(Some(2))
 
     expectNode(
-      div like (L.a like (href is "http://blog2.com/", "a blog"))
+      div.of(L.a.of(href is "http://blog2.com/", "a blog"))
     )
 
     numCreateLinkCalls shouldBe 0
@@ -202,7 +202,7 @@ class ChildReceiverSpec extends UnitSpec {
 
     expectNode(
       el.ref,
-      div like (L.a like (href is "http://blog2.com/", "a blog"))
+      div.of(L.a.of(href is "http://blog2.com/", "a blog"))
     )
 
     numCreateLinkCalls shouldBe 0
@@ -212,7 +212,7 @@ class ChildReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div like (L.a like (href is "http://blog2.com/", "a blog"))
+      div.of(L.a.of(href is "http://blog2.com/", "a blog"))
     )
 
     numCreateLinkCalls shouldBe 0
@@ -222,7 +222,7 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(Some(4))
 
     expectNode(
-      div like (L.a like (href is "http://blog4.com/", "a blog"))
+      div.of(L.a.of(href is "http://blog4.com/", "a blog"))
     )
 
     // Previous unmounting stopped the split stream, which cleared the memory of memoized elements
@@ -234,7 +234,7 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(None)
 
     expectNode(
-      div like (i like ("no blog"))
+      div.of(i.of("no blog"))
     )
 
     // --
@@ -242,7 +242,7 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(None)
 
     expectNode(
-      div like (i like ("no blog"))
+      div.of(i.of("no blog"))
     )
 
     numCreateLinkCalls shouldBe 0
@@ -252,7 +252,7 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(Some(5))
 
     expectNode(
-      div like (L.a like (href is "http://blog5.com/", "a blog"))
+      div.of(L.a.of(href is "http://blog5.com/", "a blog"))
     )
 
     numCreateLinkCalls shouldBe 1

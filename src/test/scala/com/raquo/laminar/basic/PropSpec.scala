@@ -12,23 +12,23 @@ class PropSpec extends UnitSpec {
     val value = L.value
 
     mount("input:checkbox", input(typ := "checkbox", checked := true))
-    expectNode(input like (typ is "checkbox", checked is true))
+    expectNode(input.of(typ is "checkbox", checked is true))
     unmount()
 
     mount("input:text", input(value := "yolo"))
-    expectNode(input like(value is "yolo"))
+    expectNode(input.of(value is "yolo"))
     unmount()
 
     mount("option=true", option(selected := true, value := "12"))
-    expectNode(option like(selected is true, value is "12"))
+    expectNode(option.of(selected is true, value is "12"))
     unmount()
 
     mount("option=false", option(selected := false, value := "12"))
-    expectNode(option like(selected is false, value is "12"))
+    expectNode(option.of(selected is false, value is "12"))
     unmount()
 
     mount("nested input:text", div("foo", input(value := "yolo")))
-    expectNode(div like ("foo", input like(value is "yolo")))
+    expectNode(div.of("foo", input.of(value is "yolo")))
 
     unmount()
   }

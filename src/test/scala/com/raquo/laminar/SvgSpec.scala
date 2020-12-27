@@ -30,10 +30,10 @@ class SvgSpec extends UnitSpec {
 
     mount(L.div(el))
 
-    expectNode(L.div like (svg like(
+    expectNode(L.div.of(svg.of(
       height is "800",
       width is "500",
-      polyline like(
+      polyline.of(
         points is "20,20 40,25 60,40 80,120 120,140 200,180",
         fill is "none",
         stroke is "black",
@@ -46,10 +46,10 @@ class SvgSpec extends UnitSpec {
 
     (stroke := "red").apply(polylineEl)
 
-    expectNode(L.div like (svg like(
+    expectNode(L.div.of(svg.of(
       height is "800",
       width is "500",
-      polyline like(
+      polyline.of(
         points is "20,20 40,25 60,40 80,120 120,140 200,180",
         fill is "none",
         stroke is "red", // <-- the change
@@ -62,10 +62,10 @@ class SvgSpec extends UnitSpec {
 
     strokeWidthVar.writer.onNext("4")
 
-    expectNode(L.div like (svg like(
+    expectNode(L.div.of(svg.of(
       height is "800",
       width is "500",
-      polyline like(
+      polyline.of(
         points is "20,20 40,25 60,40 80,120 120,140 200,180",
         fill is "none",
         stroke is "red", // <-- the change
@@ -100,13 +100,13 @@ class SvgSpec extends UnitSpec {
       )
     )
 
-    expectNode(L.div like (
+    expectNode(L.div.of(
       L.className is "htmlClass",
-      svg like(
+      svg.of(
         className is "svgClass",
         height is "800",
         width is "500",
-        text like "Hello"
+        text of "Hello"
       )
     ))
   }
