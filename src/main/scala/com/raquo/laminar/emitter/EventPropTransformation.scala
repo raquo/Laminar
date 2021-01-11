@@ -1,9 +1,8 @@
 package com.raquo.laminar.emitter
 
-import com.raquo.airstream.core.Observer
+import com.raquo.airstream.core.{EventStream, Observer}
 import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.signal.Var
+import com.raquo.airstream.state.Var
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.modifiers.EventPropBinder

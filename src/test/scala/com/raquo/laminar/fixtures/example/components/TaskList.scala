@@ -1,7 +1,5 @@
 package com.raquo.laminar.fixtures.example.components
 
-import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.signal.Signal
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.CollectionCommand.Append
 

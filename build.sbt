@@ -54,7 +54,7 @@ lazy val laminar = project.in(file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "com.raquo" %%% "airstream" % "0.11.0",
+      "com.raquo" %%% "airstream" % "0.11.2-SNAPSHOT",
       "com.raquo" %%% "domtypes" % "0.11.0",
       "com.raquo" %%% "domtestutils" % "0.13.0" % Test,
       "org.scalatest" %%% "scalatest" % "3.2.0" % Test,

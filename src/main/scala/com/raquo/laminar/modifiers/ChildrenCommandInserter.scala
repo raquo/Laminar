@@ -1,6 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.airstream.eventstream.EventStream
+import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.CollectionCommand
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.modifiers.ChildrenInserter.Child
