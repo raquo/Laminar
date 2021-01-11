@@ -1,6 +1,6 @@
 package com.raquo.laminar.fixtures.example.components
 
-import com.raquo.airstream.eventstream.EventStream
+import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveElement
 

@@ -1,15 +1,14 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{Observable, Observer}
+import com.raquo.airstream.core.{EventStream, Observable, Observer}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
-import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, TransferableSubscription}
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.keys.{EventProp, Key}
+import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropTransformation
-import com.raquo.laminar.keys.{CompositeKey, ReactiveProp}
+import com.raquo.laminar.keys.CompositeKey
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
