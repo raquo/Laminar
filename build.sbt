@@ -3,7 +3,7 @@
 // resolvers += Resolver.sonatypeRepo("snapshots")
 
 val Scala212 = "2.12.11"
-val Scala213 = "2.13.3"
+val Scala213 = "2.13.4"
 val scalaVersions = Seq(Scala212, Scala213)
 
 lazy val websiteJS = project
@@ -55,8 +55,8 @@ lazy val laminar = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % "0.11.0",
-      "com.raquo" %%% "domtypes" % "0.10.1",
-      "com.raquo" %%% "domtestutils" % "0.12.0" % Test,
+      "com.raquo" %%% "domtypes" % "0.11.0",
+      "com.raquo" %%% "domtestutils" % "0.13.0" % Test,
       "org.scalatest" %%% "scalatest" % "3.2.0" % Test,
     ),
 
