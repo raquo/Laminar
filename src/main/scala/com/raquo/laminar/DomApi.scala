@@ -73,7 +73,7 @@ object DomApi {
     eventPropSetter: EventPropBinder[Ev]
   ): Unit = {
     element.ref.addEventListener(
-      `type` = eventPropSetter.key.domName,
+      `type` = eventPropSetter.key.name,
       listener = eventPropSetter.domValue,
       useCapture = eventPropSetter.useCapture
     )
@@ -84,7 +84,7 @@ object DomApi {
     eventPropSetter: EventPropBinder[Ev]
   ): Unit = {
     element.ref.removeEventListener(
-      `type` = eventPropSetter.key.domName,
+      `type` = eventPropSetter.key.name,
       listener = eventPropSetter.domValue,
       useCapture = eventPropSetter.useCapture
     )
