@@ -199,8 +199,6 @@ object ReactiveElement {
 
   type Base = ReactiveElement[dom.Element]
 
-  private class PilotSubscriptionOwner extends Owner
-
   /** @return Whether listener was added (false if such a listener has already been present) */
   def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {
     val shouldAddListener = indexOfEventListener(element, listener) == -1
