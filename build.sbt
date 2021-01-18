@@ -51,14 +51,14 @@ lazy val website = project
 lazy val laminar = project.in(file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
+    name := "Laminar",
+
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % "0.12.0-SNAPSHOT",
       ("com.raquo" %%% "domtypes" % "0.11.0").withDottyCompat(scalaVersion.value),
       ("com.raquo" %%% "domtestutils" % "0.13.0" % Test).withDottyCompat(scalaVersion.value),
       ("org.scalatest" %%% "scalatest" % "3.2.0" % Test).withDottyCompat(scalaVersion.value),
     ),
-
-    scalacOptions ++= Seq("-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions"),
 
     version in installJsdom := "16.4.0",
 
@@ -70,37 +70,34 @@ lazy val laminar = project.in(file("."))
 
     scalaJSUseMainModuleInitializer := true,
 
-    scalaJSLinkerConfig in(Compile, fastOptJS) ~= {
-      _.withSourceMap(false)
-    }
-  )
-  .settings(
-    name := "Laminar",
-    normalizedName := "laminar",
-    organization := "com.raquo",
+    scalaJSLinkerConfig in(Compile, fastOptJS) ~= (_.withSourceMap(false)),
+
     scalaVersion := ScalaVersions.v213,
+
     crossScalaVersions := scalaVersions,
-    homepage := Some(url("https://laminar.dev")),
-    licenses += ("MIT", url("https://github.com/raquo/Laminar/blob/master/LICENSE.md")),
-    scmInfo := Some(
-      ScmInfo(
-        url("https://github.com/raquo/Laminar"),
-        "scm:git@github.com/raquo/Laminar.git"
+
+    scalacOptions ~= (_.filterNot(Set(
+      "-Wunused:params",
+      "-Ywarn-unused:params",
+      "-Wunused:explicits"
+    ))),
+    scalacOptions in (Compile, doc) ~= (_.filterNot(
+      Set(
+        "-scalajs",
+        "-deprecation",
+        "-explain-types",
+        "-explain",
+        "-feature",
+        "-language:existentials,experimental.macros,higherKinds,implicitConversions",
+        "-unchecked",
+        "-Xfatal-warnings",
+        "-Ykind-projector",
+        "-from-tasty",
+        "-encoding",
+        "utf8",
       )
-    ),
-    developers := List(
-      Developer(
-        id = "raquo",
-        name = "Nikita Gazarov",
-        email = "nikita@raquo.com",
-        url = url("http://raquo.com")
-      )
-    ),
-    sonatypeProfileName := "com.raquo",
-    publishMavenStyle := true,
-    publishArtifact in Test := false,
-    publishTo := sonatypePublishTo.value,
-    releaseCrossBuild := true,
-    pomIncludeRepository := { _ => false },
-    releasePublishArtifactsAction := PgpKeys.publishSigned.value
+    )),
+    scalacOptions in (Compile, doc) ++= Seq(
+      "-no-link-warnings", // Suppress scaladoc "Could not find any member to link for" warnings
+    )
   )

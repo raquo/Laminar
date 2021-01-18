@@ -23,7 +23,7 @@ class LockedCompositeKey[Key, -El <: ReactiveElement.Base](
     }
   }
 
-  /** If $include emits true, items will be added, if false, they will be removed. */
+  /** If $$include emits true, items will be added, if false, they will be removed. */
   def <--($include: Observable[Boolean]): Binder[El] = {
     key <-- $include.map(include => if (include) items else Nil)
   }

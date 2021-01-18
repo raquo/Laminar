@@ -2,7 +2,7 @@ package com.raquo.laminar.nodes
 
 import com.raquo.airstream.core.{EventStream, Observable, Observer}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
-import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, TransferableSubscription}
+import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
@@ -198,8 +198,6 @@ trait ReactiveElement[+Ref <: dom.Element]
 object ReactiveElement {
 
   type Base = ReactiveElement[dom.Element]
-
-  private class PilotSubscriptionOwner extends Owner
 
   /** @return Whether listener was added (false if such a listener has already been present) */
   def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {

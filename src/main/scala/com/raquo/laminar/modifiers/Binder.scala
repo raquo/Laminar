@@ -15,7 +15,7 @@ trait Binder[-El <: ReactiveElement.Base] extends Modifier[El] {
   def bind(element: El): DynamicSubscription
 
   override def apply(element: El): Unit = {
-    bind(element)
+    val _ = bind(element)
   }
 }
 

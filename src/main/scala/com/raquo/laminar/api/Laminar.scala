@@ -281,7 +281,7 @@ private[laminar] object Laminar
     new Modifier[El] {
       override def apply(element: El): Unit = {
         var ignoreNextActivation = ReactiveElement.isActive(element)
-        ReactiveElement.bindCallback[El](element) { c =>
+        val _ = ReactiveElement.bindCallback[El](element) { c =>
           if (ignoreNextActivation) {
             ignoreNextActivation = false
           } else {
@@ -302,7 +302,7 @@ private[laminar] object Laminar
   def onUnmountCallback[El <: Element](fn: El => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = {
-        ReactiveElement.bindSubscription(element) { c =>
+        val _ = ReactiveElement.bindSubscription(element) { c =>
           new Subscription(c.owner, cleanup = () => fn(element))
         }
       }
@@ -335,7 +335,7 @@ private[laminar] object Laminar
       override def apply(element: El): Unit = {
         var ignoreNextActivation = ReactiveElement.isActive(element)
         var state: Option[A] = None
-        ReactiveElement.bindSubscription[El](element) { c =>
+        val _ = ReactiveElement.bindSubscription[El](element) { c =>
           if (ignoreNextActivation) {
             ignoreNextActivation = false
           } else {

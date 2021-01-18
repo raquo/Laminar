@@ -38,7 +38,7 @@ class Inserter[-El <: ReactiveElement.Base] (
   }
 
   override def apply(element: El): Unit = {
-    bind(element)
+    val _ = bind(element)
   }
 
   /** Call this to get a copy of Inserter with a context locked to a certain element.

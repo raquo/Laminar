@@ -162,7 +162,7 @@ object DomApi {
   @inline private def setRefStyle(ref: dom.html.Element, styleCssName: String, styleValue: String): Unit = {
     // Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
     if (styleValue == null) {
-      ref.style.removeProperty(styleCssName)
+      val _ = ref.style.removeProperty(styleCssName)
     } else {
       ref.style.setProperty(styleCssName, styleValue)
     }

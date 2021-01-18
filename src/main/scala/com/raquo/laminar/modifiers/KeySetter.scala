@@ -1,6 +1,5 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Key
 import com.raquo.laminar.nodes.ReactiveElement
 

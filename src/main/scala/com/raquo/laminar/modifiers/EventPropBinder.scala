@@ -30,7 +30,7 @@ class EventPropBinder[Ev <: dom.Event](
     ReactiveElement.bindSubscription(element){ c =>
       ReactiveElement.addEventListener(element, this)
       new Subscription(c.owner, cleanup = () => {
-        ReactiveElement.removeEventListener(element, this)
+        val _ = ReactiveElement.removeEventListener(element, this)
       })
     }
   }
