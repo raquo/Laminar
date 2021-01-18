@@ -2,73 +2,61 @@
 // @TODO[Security] Is this a good idea to leave this here long term?
 // resolvers += Resolver.sonatypeRepo("snapshots")
 
-val Scala212 = "2.12.11"
-val Scala213 = "2.13.4"
-val Scala3 = "3.0.0-RC1-bin-20210113-8345078-NIGHTLY"
+val scalaVersions = Seq(ScalaVersions.v3RC1, ScalaVersions.v3M3, ScalaVersions.v213, ScalaVersions.v212)
 
-val scalaVersions = Seq(Scala212, Scala213, Scala3)
+lazy val websiteJS = project
+  .in(file("websiteJS"))
+  .settings(
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0",
+    scalaVersion := ScalaVersions.v213,
+    crossScalaVersions := scalaVersions,
+    skip in publish := true,
+    webpackBundlingMode := BundlingMode.LibraryOnly(),
+    //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.CommonJSModule)
+    },
+    scalaJSLinkerConfig ~= {
+      _.withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
+    },
+    scalaJSUseMainModuleInitializer := true,
+    npmDependencies in Compile ++= Seq(
+      "@material/mwc-button" -> "0.18.0",
+      "@material/mwc-linear-progress" -> "0.18.0",
+      "@material/mwc-slider" -> "0.18.0"
+    )
+  )
+  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .dependsOn(laminar)
 
-//lazy val websiteJS = project
-//  .in(file("websiteJS"))
-//  .settings(
-//    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.1.0",
-//    scalaVersion := Scala213,
-//    crossScalaVersions := scalaVersions,
-//    skip in publish := true,
-//    webpackBundlingMode := BundlingMode.LibraryOnly(),
-//    //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
-//    scalaJSLinkerConfig ~= {
-//      _.withModuleKind(ModuleKind.CommonJSModule)
-//    },
-//    scalaJSLinkerConfig ~= {
-//      _.withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
-//    },
-//    scalaJSUseMainModuleInitializer := true,
-//    npmDependencies in Compile ++= Seq(
-//      "@material/mwc-button" -> "0.18.0",
-//      "@material/mwc-linear-progress" -> "0.18.0",
-//      "@material/mwc-slider" -> "0.18.0"
-//    )
-//  )
-//  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
-//  .dependsOn(laminar)
-
-//lazy val website = project
-//  .settings(
-//    scalaVersion := Scala213,
-//    crossScalaVersions := scalaVersions
-//  )
-//  .enablePlugins(MdocPlugin, DocusaurusPlugin)
-//  .settings(
-//    mdocIn := file("website/docs"),
-//    mdocJS := Some(websiteJS),
-//    mdocJSLibraries := webpack.in(websiteJS, Compile, fullOptJS).value,
-//    skip in publish := true,
-//    mdocVariables := Map(
-//      "js-mount-node" -> "containerNode"
-//      //  // Use these as @VERSION@ in mdoc-processed .md files
-//      //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
-//      //  "SCALA_VERSION" -> scalaVersion.value
-//    )
-//  )
+lazy val website = project
+  .settings(
+    scalaVersion := ScalaVersions.v213,
+    crossScalaVersions := scalaVersions
+  )
+  .enablePlugins(MdocPlugin, DocusaurusPlugin)
+  .settings(
+    mdocIn := file("website/docs"),
+    mdocJS := Some(websiteJS),
+    mdocJSLibraries := webpack.in(websiteJS, Compile, fullOptJS).value,
+    skip in publish := true,
+    mdocVariables := Map(
+      "js-mount-node" -> "containerNode"
+      //  // Use these as @VERSION@ in mdoc-processed .md files
+      //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
+      //  "SCALA_VERSION" -> scalaVersion.value
+    )
+  )
 
 lazy val laminar = project.in(file("."))
-  .enablePlugins(ScalaJSPlugin/*, ScalaJSBundlerPlugin*/)
+  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
-    libraryDependencies ++=
-      (CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, _)) => Seq(
-          "com.raquo" %%% "airstream" % "0.12.0.3M3-SNAPSHOT",
-          "com.raquo" %%% "domtypes" % "0.11.0",
-          "com.raquo" %%% "domtestutils" % "0.13.0" % Test,
-          "org.scalatest" %%% "scalatest" % "3.2.0" % Test,
-        )
-        case Some((3, _)) => Seq(
-          "com.raquo" %%% "airstream" % "0.12.0.3M3-SNAPSHOT",
-          "com.raquo" %%% "domtypes" % "0.12.3RC1-SNAPSHOT",
-        )
-        case _            => Seq()
-      }),
+    libraryDependencies ++= Seq(
+      "com.raquo" %%% "airstream" % "0.12.0-SNAPSHOT",
+      ("com.raquo" %%% "domtypes" % "0.11.0").withDottyCompat(scalaVersion.value),
+      ("com.raquo" %%% "domtestutils" % "0.13.0" % Test).withDottyCompat(scalaVersion.value),
+      ("org.scalatest" %%% "scalatest" % "3.2.0" % Test).withDottyCompat(scalaVersion.value),
+    ),
 
     scalacOptions ++= Seq("-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions"),
 
@@ -90,7 +78,7 @@ lazy val laminar = project.in(file("."))
     name := "Laminar",
     normalizedName := "laminar",
     organization := "com.raquo",
-    scalaVersion := Scala213,
+    scalaVersion := ScalaVersions.v213,
     crossScalaVersions := scalaVersions,
     homepage := Some(url("https://laminar.dev")),
     licenses += ("MIT", url("https://github.com/raquo/Laminar/blob/master/LICENSE.md")),
