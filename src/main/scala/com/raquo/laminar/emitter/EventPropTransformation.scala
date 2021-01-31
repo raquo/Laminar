@@ -134,7 +134,7 @@ class EventPropTransformation[Ev <: dom.Event, V](
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
-  def mapToValue[V2](value: V2): EventPropTransformation[Ev, V2] = {
+  def mapToStrict[V2](value: V2): EventPropTransformation[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 

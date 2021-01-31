@@ -1057,7 +1057,7 @@ val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
 val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToValue`, `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
+This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
 
 More examples:
 
