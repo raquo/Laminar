@@ -79,7 +79,7 @@ object TodoMvcApp {
     val $todoItems = itemsVar
       .signal
       .combineWith(filterVar.signal)
-      .map2(_ filter _.passes)  
+      .mapN(_ filter _.passes)  
     div(
       cls("todoapp"),
       div(
