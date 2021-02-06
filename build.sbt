@@ -1,4 +1,3 @@
-
 // @TODO[Security] Is this a good idea to leave this here long term?
 // resolvers += Resolver.sonatypeRepo("snapshots")
 
@@ -43,7 +42,8 @@ lazy val website = project
     mdocJSLibraries := webpack.in(websiteJS, Compile, fullOptJS).value,
     skip in publish := true,
     mdocVariables := Map(
-      "js-mount-node" -> "containerNode"
+      "js-mount-node" -> "containerNode",
+      "js-batch-mode" -> "true"
       //  // Use these as @VERSION@ in mdoc-processed .md files
       //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
       //  "SCALA_VERSION" -> scalaVersion.value
