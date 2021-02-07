@@ -11,4 +11,4 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
 
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.5")
 
-addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.16" )
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.17")
