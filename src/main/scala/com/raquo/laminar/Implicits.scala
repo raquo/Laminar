@@ -1,14 +1,13 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.{Observable, Observer}
+import com.raquo.airstream.core.{EventStream, Observable, Observer, Signal}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
-import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.signal.{Signal, Val, Var}
+import com.raquo.airstream.state.{Val, Var}
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.Implicits.{RichEventStream, RichObservable, RichSignal}
 import com.raquo.laminar.emitter.EventPropTransformation
-import com.raquo.laminar.keys.CompositeAttr.CompositeValueMappers
+import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveStyle}
 import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}

@@ -1,9 +1,8 @@
 package com.raquo.laminar.emitter
 
-import com.raquo.airstream.core.Observer
+import com.raquo.airstream.core.{EventStream, Observer}
 import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.signal.Var
+import com.raquo.airstream.state.Var
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.modifiers.EventPropBinder
@@ -135,7 +134,7 @@ class EventPropTransformation[Ev <: dom.Event, V](
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
-  def mapToValue[V2](value: V2): EventPropTransformation[Ev, V2] = {
+  def mapToStrict[V2](value: V2): EventPropTransformation[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 

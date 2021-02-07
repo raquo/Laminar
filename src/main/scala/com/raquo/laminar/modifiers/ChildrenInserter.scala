@@ -1,8 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.airstream.core.Observable
-import com.raquo.airstream.eventstream.EventStream
-import com.raquo.airstream.signal.Signal
+import com.raquo.airstream.core.{EventStream, Observable, Signal}
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom

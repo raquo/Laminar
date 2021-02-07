@@ -4,6 +4,7 @@ import com.raquo.domtypes.generic.Modifier
 import org.scalajs.dom
 
 import scala.annotation.tailrec
+import scala.scalajs.js
 
 trait ChildNode[+Ref <: dom.Node]
   extends ReactiveNode[Ref]
@@ -51,7 +52,14 @@ object ChildNode {
 
   @tailrec final def isDescendantOf(node: dom.Node, ancestor: dom.Node): Boolean = {
     // @TODO[Performance] Maybe use https://developer.mozilla.org/en-US/docs/Web/API/Node/contains instead (but IE only supports it for Elements)
-    node.parentNode match {
+    // For children of shadow roots, parentNode is null, but the host property contains a reference to the shadow root
+    val effectiveParentNode = if (node.parentNode != null) {
+      node.parentNode
+    } else {
+      val maybeShadowHost = node.asInstanceOf[js.Dynamic].selectDynamic("host").asInstanceOf[js.UndefOr[dom.Node]]
+      maybeShadowHost.orNull
+    }
+    effectiveParentNode match {
       case null => false
       case `ancestor` => true
       case intermediateParent => isDescendantOf(intermediateParent, ancestor)

@@ -30,42 +30,42 @@ class ElementSpec extends UnitSpec {
 
   it("renders a comment") {
     mount(div(commentNode("yolo")), "")
-    expectNode(div like (ExpectedNode.comment() like "yolo"))
+    expectNode(div.of(ExpectedNode.comment of "yolo"))
     unmount()
   }
 
   it("renders elements with text Content") {
     mount("span", span(text1))
-    expectNode(span like text1)
+    expectNode(span of text1)
     unmount()
 
     mount("article (fancy element from Tags2)", article(text1))
-    expectNode(article like text1)
+    expectNode(article of text1)
     unmount()
   }
 
   it("renders two text nodes") {
     mount(article(text1, text2))
-    expectNode(article like (text1, text2))
+    expectNode(article.of(text1, text2))
   }
 
   it("renders nested elements") {
     mount("div > span", div(span(text1)))
-    expectNode(div like (span like text1))
+    expectNode(div.of(span of text1))
     unmount()
 
     mount(
       "div > span, p",
       div(span(text1), p(text2))
     )
-    expectNode(div like(span like text1, p like text2))
+    expectNode(div.of(span of text1, p of text2))
     unmount()
 
     mount(
       "div > span, p, p",
       div(span(text1), p(text2), p(text3))
     )
-    expectNode(div like(span like text1, p like text2, p like text3))
+    expectNode(div.of(span of text1, p of text2, p of text3))
     unmount()
 
     mount(
@@ -77,9 +77,9 @@ class ElementSpec extends UnitSpec {
       )
     )
 
-    expectNode(div like(
-      span like text1,
-      p like (text2, span like text2, span like text3),
+    expectNode(div.of(
+      span of text1,
+      p.of(text2, span of text2, span of text3),
       hr
     ))
     unmount()

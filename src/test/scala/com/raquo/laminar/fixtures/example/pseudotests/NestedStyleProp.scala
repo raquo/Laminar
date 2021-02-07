@@ -1,6 +1,6 @@
 package com.raquo.laminar.fixtures.example.pseudotests
 
-import com.raquo.airstream.eventstream.EventStream
+import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.api._
 import com.raquo.laminar.fixtures.example.components.Toggle
 import com.raquo.laminar.nodes.ReactiveElement

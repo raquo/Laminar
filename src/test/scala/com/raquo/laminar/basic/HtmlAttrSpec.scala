@@ -13,7 +13,7 @@ class HtmlAttrSpec extends UnitSpec {
     val expectedRowSpan = 15 + Random.nextInt(7)
 
     mount("div", div(title := expectedTitle))
-    expectNode(div like (title is expectedTitle))
+    expectNode(div.of(title is expectedTitle))
     unmount()
 
     mount("td [colSpan, rowSpan]", td(
@@ -21,7 +21,7 @@ class HtmlAttrSpec extends UnitSpec {
       rowSpan := expectedRowSpan
     ))
     expectNode(
-      td like(
+      td.of(
         colSpan is expectedColSpan,
         rowSpan is expectedRowSpan,
         title.isEmpty
@@ -32,18 +32,18 @@ class HtmlAttrSpec extends UnitSpec {
 
   it("sets boolean attrs") {
     mount("[contentEditable=false]", div(contentEditable := false))
-    expectNode(div like(contentEditable is false, colSpan.isEmpty))
+    expectNode(div.of(contentEditable is false, colSpan.isEmpty))
     unmount()
 
     mount("[contentEditable=true]", div(contentEditable := true))
-    expectNode(div like(contentEditable is true, colSpan.isEmpty))
+    expectNode(div.of(contentEditable is true, colSpan.isEmpty))
     unmount()
   }
 
   it("sets integer attrs") {
     val expectedHeight = Random.nextInt(10)
     mount("expectedHeight", td(heightAttr := expectedHeight))
-    expectNode(td like(heightAttr is expectedHeight, selected.isEmpty))
+    expectNode(td.of(heightAttr is expectedHeight, selected.isEmpty))
     unmount()
   }
 }

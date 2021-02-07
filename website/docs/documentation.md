@@ -238,7 +238,33 @@ def TextInput(): Input = input(typ := "text")
  
 div(
   "Please enter your name: ",
-  TextInput().amend(onInput --> nameVar.writer)
+  TextInput().amend(onInput --> nameVar)
+)
+```
+
+`amendThis` is another variation of `amend` that provides access to `thisNode` similar to `inContext`, for the sake of reducing boilerplate:
+
+```scala
+val nameVar = Var("")
+def TextInput(): Input = input(typ := "text")
+
+div(
+  TextInput().amendThis { thisNode =>
+    onInput.mapTo(thisNode.ref.value) --> nameVar  
+  }
+  // ^^ vv These are identical
+  TextInput().amend { inContext { thisNode =>
+    onInput.mapTo(thisNode.ref.value) --> nameVar
+  }}
+)
+
+div(
+  // List[Mod[El]] is implicitly converted to Mod[El]
+  // so you can specify several modifiers like this:
+  TextInput().amendThis { thisNode => List(
+    onInput.mapTo(thisNode.ref.value) --> nameVar,
+    thisNode.events(onClick).delay(0) --> clickObserver  
+  )}
 )
 ```
 
@@ -705,6 +731,7 @@ This [reflected attribute](https://github.com/raquo/scala-dom-types#reflected-at
 
 ```css
 # CSS
+
 .LabelComponent {
   font-size: 20pt;
   color: red;
@@ -716,7 +743,9 @@ This [reflected attribute](https://github.com/raquo/scala-dom-types#reflected-at
 
 ```scala
 // Scala
+
 val veryImportant: Modifier[HtmlElement] = cls := "vip"
+
 def Label(caption: String): HtmlElement = div(
   veryImportant,
   cls := "LabelComponent",
@@ -737,7 +766,9 @@ And so `cls` does not behave like this. Instead of **setting** the list of CSS c
 Here are some more `cls` tricks. All of these produce a `Modifier[HtmlElement]`:
 
 ```scala
-// ADD multiple class names
+val someBoolean: Boolean = ???
+
+// Add multiple class names
 cls := ("class1", "class2")
 cls := List("class1", "class2")
  
@@ -745,52 +776,37 @@ cls := List("class1", "class2")
 cls("class1", "class2")
 cls(List("class1", "class2"))
  
-// ADD and REMOVE class names (true=add, false=remove)
+// Add class name conditionally (true = add, false = do nothing)
 cls := ("class1" -> true, "class2" -> false)
-cls := Seq("class1" -> true, "class2" -> false)
-cls := (Seq("class1" -> true, "class2" -> false), Seq("class3" -> true))
+cls := Seq("class1" -> true, "class2" -> someBoolean)
+cls := (Seq("class1" -> true, "class2" -> someBoolean), Seq("class3" -> someBoolean))
 cls := Map("class1" -> true, "class2" -> false)
  
-// As usual, all := methods are aliased as `apply`
-cls(List("class1", "class2"))
- 
-// SET a class name instead of ADDING it
-cls.set("class1")
-// SET multiple class names
-cls.set("class1 class2")
-cls.set("class1", "class2")
-// CLEAR all class names
-cls.set("")
-
-// REMOVE class names
-cls.remove("class1")
-cls.remove("class1 class2")
-cls.remove("class1", "class2")
-
-// TOGGLE class names (true = add, false = remove)
+// Add class names conditionally (true = add, false = do nothing)
 cls.toggle("class1") := true
-cls.toggle("class1 class2") := false
+cls.toggle("class1 class2") := someBoolean
 cls.toggle("class1", "class2") := true
-
-// Note: some of the := methods accept an implicit param, so you might
-// need to wrap the modifier in a `locally` to help Scala parse an
-// immediate application of such a modifier to an element:
-locally(cls := ("class1", "class2"))(element)
-
-// Using the `amend` method is nicer anyway:
-element.amend(cls := ("class1", "class2"))
 ```
 
 Of course, the reactive layer is similarly considerate in regard to `cls`. Consider this use case:
 
 ```scala
 val classesStream: EventStream[Seq[String]] = ???
-val boolStream: EventStream[Boolean] = ???
+val $isSelected: Signal[Boolean] = ???
  
 div(
   cls := "MyComponent",
   cls <-- classesStream,
-  cls.toggle("class1", "class2") <-- boolStream 
+  cls.toggle("class1", "class2") <-- $isSelected
+  cls <-- boolSignal.map { isSelected =>
+    if (isSelected) "always x-selected" else "always"
+  },
+  cls <-- $isSelected.map { isSelected =>
+    List("always" -> true, "x-selected" -> isSelected)
+  },
+  cls <-- $isSelected.map { isSelected =>
+    Map("always" -> true, "x-selected" -> isSelected)
+  } 
 )
 ``` 
 
@@ -798,9 +814,9 @@ Once again, we don't want the CSS class names coming in from `classesStream` to 
 
 So for example, when `classesStream` emits `List("class1", "class2")`, we will _add_ those classes to the element. When it subsequently emits `List("class1", "class3")`, we will remove `class2` and add `class3` to the element's class list.
 
-The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes (by setting their value to `false`). Note that unless you instruct Laminar to add those classes back, they will not be added back automatically. Only previous _additions_ of classes are undone in the manner described in the previous paragraph, not removals.
+The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls.toggle("foo") <-- $shouldUseFoo` or similar dynamic modifiers. (Note: prior to v0.12.0, `cls` behaved differently. See release notes).
 
-Each `cls <-- source` modifier should deal with a set of CSS classes that does not intersect with the sets used by other such modifiers. In other words, you should generally avoid adding classes to an element in one reactive modifier and then removing them in another reactive modifier. Basically, if you do this you have two competing sources of truth for whether an element should carry a class at any given time, and the latest source to emit will win. That works, but is a bad practice. Search for "interference" in `CompositeKeySpec` for a simple example.
+If you (or a third party library you're using) are adding or removing class names without Laminar, using native JS APIs like `ref.className = ???` and `ref.classList.add(???)`, and you are **also** using `cls` modifiers on this **same** element, you must take care to avoid manually adding or removing the same classes as you're setting using the `cls` modifiers. Doing so may cause unexpected behaviour. Basically, **a given class name on a given element should be managed either via Laminar `cls` modifiers or externally via JS APIs, but not both**. See the `cls - third party interference` test in `CompositeKeySpec` for a simple example.
 
 
 ### Other Composite Keys
@@ -1041,7 +1057,7 @@ val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
 val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToValue`, `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
+This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
 
 More examples:
 

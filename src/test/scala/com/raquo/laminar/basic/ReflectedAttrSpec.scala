@@ -13,7 +13,7 @@ class ReflectedAttrSpec extends UnitSpec {
     val expectedAlt = randomString("alt_")
 
     mount("div", div(rel := expectedRel))
-    expectNode(div like (rel is expectedRel))
+    expectNode(div.of(rel is expectedRel))
     unmount()
 
     mount("td [colSpan, rowSpan]", td(
@@ -21,7 +21,7 @@ class ReflectedAttrSpec extends UnitSpec {
       alt := expectedAlt
     ))
     expectNode(
-      td like(
+      td.of(
         href is expectedHref,
         alt is expectedAlt,
         rel.isEmpty
@@ -32,16 +32,16 @@ class ReflectedAttrSpec extends UnitSpec {
 
   it("sets non-string reflected attrs") {
     mount("input [disabled=false]", input(disabled := false))
-    expectNode(input like(disabled is false, colSpan.isEmpty))
+    expectNode(input.of(disabled is false, colSpan.isEmpty))
     unmount()
 
     mount("input [disabled=true]", input(disabled := true))
-    expectNode(input like(disabled is true, colSpan.isEmpty))
+    expectNode(input.of(disabled is true, colSpan.isEmpty))
     unmount()
 
     val expectedColSpan = 1 + Random.nextInt(10)
     mount("td [colSpan]", td(colSpan := expectedColSpan))
-    expectNode(td like(colSpan is expectedColSpan, disabled.isEmpty))
+    expectNode(td.of(colSpan is expectedColSpan, disabled.isEmpty))
     unmount()
   }
 
@@ -49,10 +49,10 @@ class ReflectedAttrSpec extends UnitSpec {
     val expectedHref = randomString("href_")
     val expectedTitle = randomString("title_")
     val expectedText = randomString("text_")
-    val expected = div like(
+    val expected = div.of(
       href is expectedHref,
       title is expectedTitle,
-      span like expectedText
+      span of expectedText
     )
 
     val setHref = href := expectedHref
@@ -101,16 +101,16 @@ class ReflectedAttrSpec extends UnitSpec {
     )
 
     expectNode(
-      td like(
+      td.of(
         colSpan is expectedColSpan,
         rowSpan is expectedRowSpan,
         rel.isEmpty,
-        span like(
+        span.of(
           rel is expectedRel1,
           colSpan.isEmpty,
           rowSpan.isEmpty,
           expectedText1,
-          span like(
+          span.of(
             rel is expectedRel2,
             colSpan.isEmpty,
             rowSpan.isEmpty,

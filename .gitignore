@@ -5,6 +5,7 @@ target
 
 .metals
 .bloop
+.bsp
 
 project/metals.sbt
 project/.bloop

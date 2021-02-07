@@ -1,4 +1,4 @@
-package com.raquo.laminar.static
+package com.raquo.laminar.basic
 
 import com.raquo.domtestutils.scalatest.DomEnvSpec
 

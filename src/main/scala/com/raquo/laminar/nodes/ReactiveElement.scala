@@ -1,19 +1,19 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{Observable, Observer}
+import com.raquo.airstream.core.{EventStream, Observable, Observer}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
-import com.raquo.airstream.eventstream.EventStream
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription, TransferableSubscription}
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.emitter.EventPropTransformation
+import com.raquo.laminar.keys.CompositeKey
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
 
-import scala.collection.mutable
+import scala.scalajs.js
 
 trait ReactiveElement[+Ref <: dom.Element]
   extends ChildNode[Ref]
@@ -21,10 +21,9 @@ trait ReactiveElement[+Ref <: dom.Element]
   with domtypes.generic.nodes.Element {
 
   // @TODO[Naming] We reuse EventPropSetter to represent an active event listener. Makes for a bit confusing naming.
-  private[ReactiveElement] var _maybeEventListeners: Option[mutable.Buffer[EventPropBinder[_]]] = None
+  private[ReactiveElement] var _maybeEventListeners: js.UndefOr[js.Array[EventPropBinder[_]]] = js.undefined
 
-  @deprecated("ReactiveElement.maybeEventListeners will be removed in a future version of Laminar.", "0.8")
-  @inline def maybeEventListeners: Option[List[EventPropBinder[_]]] = _maybeEventListeners.map(_.toList)
+  def eventListeners: List[EventPropBinder[_]] = _maybeEventListeners.map(_.toList).getOrElse(Nil)
 
   // @Warning[Fragile] deactivate should not need an isActive guard.
   //  If Laminar starts to cause exceptions here, we need to find the root cause.
@@ -35,6 +34,79 @@ trait ReactiveElement[+Ref <: dom.Element]
     activate = dynamicOwner.activate,
     deactivate = dynamicOwner.deactivate
   )
+
+  /** This structure keeps track of reasons for including a given item for a given composite key.
+    * For example, this remembers which modifiers have previously added which className.
+    *
+    * We need this to avoid interference in cases when two modifiers want to add the same
+    * class name (e.g.) and one of those subsequently does not want to add that class name
+    * anymore. Without this structure, the element would end up without that class name even
+    * though one modifier still wants it added.
+    *
+    * Structure:
+    *
+    * Map(
+    *   cls: List(
+    *     "always" -> null,
+    *     "present" -> null,
+    *     "classes" -> null,
+    *     "class1" -> modThatWantsClass1Set,
+    *     "class1" -> anotherModThatWantsClass1Set,
+    *     "class2" -> modThatWantsClass2Set
+    *   ),
+    *   rel: List( ... ),
+    *   role: List( ... )
+    * )
+    *
+    * Note that `mod` key can be null if the mod is not reactive, e.g. in the simple case of `cls` := "always"
+    * This is to avoid keeping the mod in memory after it has served its purpose.
+    *
+    * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
+    */
+  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier[this.type])]] =
+    Map.empty
+
+  private[laminar] def compositeValueItems(
+    prop: CompositeKey[_, this.type],
+    reason: Modifier[this.type]
+  ): List[String] = {
+    _compositeValues
+      .getOrElse(prop, Nil)
+      .collect { case (item, r) if r == reason => item }
+  }
+
+  private[laminar] def updateCompositeValue(
+    key: CompositeKey[_, this.type],
+    reason: Modifier[this.type],
+    addItems: List[String],
+    removeItems: List[String]
+  ): Unit = {
+    val itemHasAnotherReason = (item: String) => {
+      // #Note null reason is shared among all static modifiers to avoid keeping a reference to them
+      _compositeValues
+        .getOrElse(key, Nil)
+        .exists(t => t._1 == item && (t._2 != reason || reason == null))
+    }
+
+    val itemsToAdd = addItems.distinct
+    val itemsToRemove = removeItems.filterNot(itemHasAnotherReason)
+    val newItems = _compositeValues
+      .getOrElse(key, Nil)
+      .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
+
+    val domValues = key.getDomValue(this)
+
+    val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
+
+    // 1. Update Laminar's internal structure
+    _compositeValues = _compositeValues.updated(key, newItems)
+
+    // 2. Write desired state to the DOM
+    // #Note this logic is compatible with third parties setting classes on Laminar elements
+    //  using raw JS methods as long as they don't remove classes managed by Laminar or add
+    //  classes that were also added by Laminar.
+    key.setDomValue(this, nextDomValues)
+  }
 
   /** Create and get a stream of events on this node */
   def events[Ev <: dom.Event](
@@ -72,6 +144,12 @@ trait ReactiveElement[+Ref <: dom.Element]
   //  - not a big deal but lame
   def amend(mods: Modifier[this.type]*): this.type = {
     mods.foreach(mod => mod(this))
+    this
+  }
+
+  def amendThis(makeMod: this.type => Modifier[this.type]): this.type = {
+    val mod = makeMod(this)
+    mod(this)
     this
   }
 
@@ -121,18 +199,16 @@ object ReactiveElement {
 
   type Base = ReactiveElement[dom.Element]
 
-  private class PilotSubscriptionOwner extends Owner
-
   /** @return Whether listener was added (false if such a listener has already been present) */
   def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {
     val shouldAddListener = indexOfEventListener(element, listener) == -1
     if (shouldAddListener) {
       // 1. Update this node
       if (element._maybeEventListeners.isEmpty) {
-        element._maybeEventListeners = Some(mutable.Buffer(listener))
+        element._maybeEventListeners = js.defined(js.Array(listener))
       } else {
         element._maybeEventListeners.foreach { eventListeners =>
-          eventListeners += listener
+          eventListeners.push(listener)
         }
       }
       // 2. Update the DOM
@@ -147,7 +223,9 @@ object ReactiveElement {
     val shouldRemoveListener = index != -1
     if (shouldRemoveListener) {
       // 1. Update this node
-      element._maybeEventListeners.foreach(eventListeners => eventListeners.remove(index))
+      element._maybeEventListeners.foreach { eventListeners =>
+        eventListeners.splice(index, deleteCount = 1)
+      }
       // 2. Update the DOM
       DomApi.removeEventListener(element, listener)
     }
@@ -156,25 +234,10 @@ object ReactiveElement {
 
   /** @return -1 if not found */
   def indexOfEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Int = {
-    // Note: Ugly for performance.
-    //  - We want to reduce usage of Scala's collections and anonymous functions
-    //  - js.Array is unaware of Scala's `equals` method
-    val notFoundIndex = -1
-    if (element._maybeEventListeners.isEmpty) {
-      notFoundIndex
+    if (element._maybeEventListeners.nonEmpty) {
+      element._maybeEventListeners.get.indexOf(listener)
     } else {
-      var found = false
-      var index = 0
-      element._maybeEventListeners.foreach { listeners =>
-        while (!found && index < listeners.length) {
-          if (listener equals listeners(index)) {
-            found = true
-          } else {
-            index += 1
-          }
-        }
-      }
-      if (found) index else notFoundIndex
+      -1
     }
   }
 
