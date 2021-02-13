@@ -72,6 +72,7 @@ object DomApi {
     element: ReactiveElement.Base,
     eventPropSetter: EventPropBinder[Ev]
   ): Unit = {
+    //println(s"> Adding listener on ${DomApi.debugNodeDescription(element.ref)} for `${eventPropSetter.key.name}` with useCapture=${eventPropSetter.useCapture}")
     element.ref.addEventListener(
       `type` = eventPropSetter.key.name,
       listener = eventPropSetter.domValue,
@@ -220,6 +221,95 @@ object DomApi {
 
   def setTextNodeText(node: TextNode, text: String): Unit = {
     node.ref.textContent = text
+  }
+
+
+  /** Custom Elements */
+
+  def isCustomElement(element: dom.Element): Boolean = {
+    element.tagName.contains('-')
+  }
+
+
+  /** Input related stuff */
+
+  def getChecked(element: dom.Element): js.UndefOr[Boolean] = {
+    element match {
+      case input: dom.html.Input if input.`type` == "checkbox" || input.`type` == "radio" =>
+        js.defined(input.checked)
+      case el if isCustomElement(el) =>
+        el.asInstanceOf[js.Dynamic]
+          .selectDynamic("checked")
+          .asInstanceOf[js.UndefOr[Any]]
+          .collect { case b: Boolean => b }
+      case _ =>
+        js.undefined
+    }
+  }
+
+  /** @return whether the operation succeeded */
+  def setChecked(element: dom.Element, checked: Boolean): Boolean = {
+    element match {
+      case input: dom.html.Input if input.`type` == "checkbox" || input.`type` == "radio" =>
+        input.checked = checked // @nc will this work with different mod order?
+        true
+      case el if isCustomElement(el) =>
+        el.asInstanceOf[js.Dynamic].updateDynamic("checked")(checked)
+        true
+      case _ =>
+        false
+    }
+  }
+
+  def getValue(element: dom.Element): js.UndefOr[String] = {
+    element match {
+      case input: dom.html.Input =>
+        // @TODO[API,Warn] is there a legitimate use case for this on checkbox / radio inputs?
+        js.defined(input.value)
+      case textarea: dom.html.TextArea =>
+        js.defined(textarea.value)
+      case select: dom.html.Select =>
+        js.defined(select.value)
+      case button: dom.html.Button =>
+        js.defined(button.value)
+      case option: dom.html.Option =>
+        js.defined(option.value)
+      case el if isCustomElement(el) =>
+        el.asInstanceOf[js.Dynamic]
+          .selectDynamic("value")
+          .asInstanceOf[js.UndefOr[Any]]
+          .collect { case s: String => s }
+      case _ =>
+        js.undefined
+    }
+  }
+
+  /** @return whether the operation succeeded */
+  def setValue(element: dom.Element, value: String): Boolean = {
+    element match {
+      case input: dom.html.Input =>
+        // @TODO[API,Warn] is there a legitimate use case for this on checkbox / radio inputs?
+        input.value = value
+        true
+      case textarea: dom.html.TextArea =>
+        textarea.value = value
+        true
+      case select: dom.html.Select =>
+        select.value = value
+        true
+      case button: dom.html.Button =>
+        button.value = value
+        true
+      case option: dom.html.Option =>
+        option.value = value
+        true
+      case el if isCustomElement(el) =>
+        el.asInstanceOf[js.Dynamic]
+          .updateDynamic("value")(value)
+        true
+      case _ =>
+        false
+    }
   }
 
 

@@ -1,11 +1,12 @@
-package com.raquo.laminar.emitter
+package com.raquo.laminar.inputs
 
 import com.raquo.airstream.core.{EventStream, Observer}
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.state.Var
 import com.raquo.domtypes.generic.keys.EventProp
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.DomApi
 import com.raquo.laminar.modifiers.EventPropBinder
+import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 /**
@@ -75,12 +76,12 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * Example: `input(onKeyUp().filter(ev => ev.keyCode == KeyCode.Tab).preventDefault --> tabKeyUpBus)`
     */
   def preventDefault: EventPropTransformation[Ev, V] = {
-    withNewProcessor(ev => {
+    withNewProcessor { ev =>
       processor(ev).map { value =>
         ev.preventDefault()
         value
       }
-    })
+    }
   }
 
   /** Propagation here refers to DOM Event bubbling or capture propagation.
@@ -92,12 +93,12 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
     */
   def stopPropagation: EventPropTransformation[Ev, V] = {
-    withNewProcessor(ev => {
+    withNewProcessor { ev =>
       processor(ev).map { value =>
         ev.stopPropagation()
         value
       }
-    })
+    }
   }
 
   /** This method prevents other listeners of the same event from being called.
@@ -113,12 +114,12 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * Example: `div(onClick.filter(isGoodClick).stopImmediatePropagation --> goodClickBus)`
     */
   def stopImmediatePropagation: EventPropTransformation[Ev, V] = {
-    withNewProcessor(ev => {
+    withNewProcessor { ev =>
       processor(ev).map { value =>
         ev.stopImmediatePropagation()
         value
       }
-    })
+    }
   }
 
   /** Values that do not pass will not propagate down the chain and into the emitter. */
@@ -126,20 +127,74 @@ class EventPropTransformation[Ev <: dom.Event, V](
     withNewProcessor(ev => processor(ev).filter(passes))
   }
 
+  def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2] = {
+    withNewProcessor(ev => processor(ev).collect(pf))
+  }
+
   def map[V2](project: V => V2): EventPropTransformation[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(project))
   }
 
+  /** Same as `map(_ => value)`
+    *
+    * Note: `value` will be re-evaluated every time the event is fired
+    */
   def mapTo[V2](value: => V2): EventPropTransformation[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
+  /** Like mapTo, but with strict evaluation of the value */
   def mapToStrict[V2](value: V2): EventPropTransformation[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
-  def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2] = {
-    withNewProcessor(ev => processor(ev).collect(pf))
+  /** Get the original event. You might want to call this in a chain, after some other processing. */
+  def mapToEvent: EventPropTransformation[Ev, Ev] = {
+    withNewProcessor(ev => processor(ev).map(_ => ev))
+  }
+
+  /** Get the value of `event.target.value` */
+  def mapToValue: EventPropTransformation[Ev, String] = {
+    withNewProcessor { ev =>
+      processor(ev).map { _ =>
+        // @TODO[Warn] Throw or console.log a warning here if using on the wrong element type
+        DomApi.getValue(ev.target.asInstanceOf[dom.Element]).getOrElse("")
+      }
+    }
+  }
+
+  /** Get the value of `event.target.checked` */
+  def mapToChecked: EventPropTransformation[Ev, Boolean] = {
+    withNewProcessor { ev =>
+      processor(ev).map { _ =>
+        // @TODO[Warn] Throw or console.log a warning here if using on the wrong element type
+        DomApi.getChecked(ev.target.asInstanceOf[dom.Element]).getOrElse(false)
+      }
+    }
+  }
+
+  /** (originalEvent, accumulatedValue) => newAccumulatedValue
+    *
+    * Unlike other transformations, this one will fire regardless of .filter-s up the chain.
+    * Instead, if the event was filtered, project will receive None as accumulatedValue.
+    * The output of project should be Some(newValue), or None if you want to filter out this event.
+    */
+  def mapRaw[V2](project: (Ev, Option[V]) => Option[V2]): EventPropTransformation[Ev, V2] = {
+    withNewProcessor { ev =>
+      project(ev, processor(ev))
+    }
+  }
+
+  /** Write the resulting string into `event.target.value` */
+  def setAsValue(implicit stringEvidence: V =:= String): EventPropTransformation[Ev, V] = {
+    withNewProcessor { ev =>
+      processor(ev).map { value =>
+        val nextInputValue = stringEvidence(value)
+        // @TODO[Warn] Console.log a warning here if using on the wrong element type
+        DomApi.setValue(ev.target.asInstanceOf[dom.Element], nextInputValue)
+        value
+      }
+    }
   }
 
   private def withNewProcessor[V2](newProcessor: Ev => Option[V2]): EventPropTransformation[Ev, V2] = {

@@ -6,12 +6,14 @@ import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
 import com.raquo.domtypes.jsdom.defs.eventProps._
+import com.raquo.domtypes.jsdom.defs.events.{TypedTargetEvent, TypedTargetMouseEvent}
 import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
+import com.raquo.laminar.inputs
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.{Implicits, lifecycle, modifiers, nodes}
 import org.scalajs.dom
@@ -20,55 +22,55 @@ import org.scalajs.dom
 
 private[laminar] object Laminar
   extends Airstream
-  with ReactiveComplexHtmlKeys
-  // Reflected Attrs
-  with ReflectedHtmlAttrs[ReactiveProp]
-  // Attrs
-  with HtmlAttrs[ReactiveHtmlAttr]
-  // Event Props
-  with ClipboardEventProps[ReactiveEventProp]
-  with ErrorEventProps[ReactiveEventProp]
-  with FormEventProps[ReactiveEventProp]
-  with KeyboardEventProps[ReactiveEventProp]
-  with MediaEventProps[ReactiveEventProp]
-  with MiscellaneousEventProps[ReactiveEventProp]
-  with MouseEventProps[ReactiveEventProp]
-  with PointerEventProps[ReactiveEventProp]
-  // Props
-  with Props[ReactiveProp]
-  // Styles
-  with Styles[StyleSetter]
-  with Styles2[StyleSetter]
-  // Tags
-  with DocumentTags[HtmlTag]
-  with EmbedTags[HtmlTag]
-  with FormTags[HtmlTag]
-  with GroupingTags[HtmlTag]
-  with MiscTags[HtmlTag]
-  with SectionTags[HtmlTag]
-  with TableTags[HtmlTag]
-  with TextTags[HtmlTag]
-  // Other things
-  with HtmlBuilders
-  with Implicits {
+    with ReactiveComplexHtmlKeys
+    // Reflected Attrs
+    with ReflectedHtmlAttrs[ReactiveProp]
+    // Attrs
+    with HtmlAttrs[ReactiveHtmlAttr]
+    // Event Props
+    with ClipboardEventProps[ReactiveEventProp]
+    with ErrorEventProps[ReactiveEventProp]
+    with FormEventProps[ReactiveEventProp]
+    with KeyboardEventProps[ReactiveEventProp]
+    with MediaEventProps[ReactiveEventProp]
+    with MiscellaneousEventProps[ReactiveEventProp]
+    with MouseEventProps[ReactiveEventProp]
+    with PointerEventProps[ReactiveEventProp]
+    // Props
+    with Props[ReactiveProp]
+    // Styles
+    with Styles[StyleSetter]
+    with Styles2[StyleSetter]
+    // Tags
+    with DocumentTags[HtmlTag]
+    with EmbedTags[HtmlTag]
+    with FormTags[HtmlTag]
+    with GroupingTags[HtmlTag]
+    with MiscTags[HtmlTag]
+    with SectionTags[HtmlTag]
+    with TableTags[HtmlTag]
+    with TextTags[HtmlTag]
+    // Other things
+    with HtmlBuilders
+    with Implicits {
 
   object aria
     extends AriaAttrs[ReactiveHtmlAttr]
-    with HtmlBuilders
+      with HtmlBuilders
 
   object svg
     extends SvgTags[SvgTag]
-    with ReactiveComplexSvgKeys
-    with SvgAttrs[ReactiveSvgAttr]
-    with SvgBuilders
+      with ReactiveComplexSvgKeys
+      with SvgAttrs[ReactiveSvgAttr]
+      with SvgBuilders
 
   object documentEvents
     extends DomEventStreamPropBuilder(dom.document)
-    with DocumentEventProps[EventStream]
+      with DocumentEventProps[EventStream]
 
   object windowEvents
     extends DomEventStreamPropBuilder(dom.window)
-    with WindowEventProps[EventStream]
+      with WindowEventProps[EventStream]
 
   /** An owner that never kills its possessions.
     *
@@ -117,6 +119,11 @@ private[laminar] object Laminar
   val Binder: modifiers.Binder.type = modifiers.Binder
 
   type Inserter[-El <: Element] = modifiers.Inserter[El]
+
+
+  // Events
+
+  type EventPropTransformation[Ev <: dom.Event, V] = inputs.EventPropTransformation[Ev, V]
 
 
   // Lifecycle
@@ -324,8 +331,8 @@ private[laminar] object Laminar
     * - Note that the same caveats apply as for those individual methods.
     * - The mount callback returns state which will be provided to the unmount callback.
     * - The unmount callback receives an Option of the state because it's possible that
-    *   onMountUnmountCallbackWithState was called *after* the element was already mounted,
-    *   in which case the mount callback defined here wouldn't have run.
+    * onMountUnmountCallbackWithState was called *after* the element was already mounted,
+    * in which case the mount callback defined here wouldn't have run.
     */
   def onMountUnmountCallbackWithState[El <: Element, A](
     mount: MountContext[El] => A,
@@ -358,8 +365,107 @@ private[laminar] object Laminar
     }
   }
 
+  @deprecated("Use `inContext` instead of `forthis` alias", "0.12.0")
   @inline def forthis[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
     inContext(makeModifier)
   }
 
+  type EventTransformer[Ev <: dom.Event, V] = EventPropTransformation[Ev, V] => EventPropTransformation[Ev, V]
+
+  type StringTransformer = EventTransformer[TypedTargetEvent[dom.html.Element], String]
+
+  type BooleanTransformer = EventTransformer[TypedTargetMouseEvent[dom.Element], Boolean]
+
+  def controlledValue(
+    source: EventBus[String]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledValue(source.events, processInput = identity, source.writer)
+  }
+
+  def controlledValue(
+    source: EventBus[String],
+    processInput: StringTransformer
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledValue(source.events, processInput, source.writer)
+  }
+
+  def controlledValue(
+    source: Var[String]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledValue(source.signal, processInput = identity, source.writer)
+  }
+
+  def controlledValue(
+    source: Var[String],
+    processInput: StringTransformer
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledValue(source.signal, processInput, source.writer)
+  }
+
+  def controlledValue(
+    source: Observable[String],
+    observer: Observer[String]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledValue(source, processInput = identity, observer)
+  }
+
+  def controlledValue(
+    source: Observable[String],
+    processInput: StringTransformer,
+    observer: Observer[String]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    new Modifier[Input] {
+      override def apply(element: Input): Unit = {
+        element.setValueController(source, processInput, observer)
+      }
+    }
+  }
+
+
+
+
+  def controlledChecked(
+    source: EventBus[Boolean]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledChecked(source.events, processInput = identity, source.writer)
+  }
+
+  def controlledChecked(
+    source: EventBus[Boolean],
+    processInput: BooleanTransformer
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledChecked(source.events, processInput, source.writer)
+  }
+
+  def controlledChecked(
+    source: Var[Boolean]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledChecked(source.signal, processInput = identity, source.writer)
+  }
+
+  def controlledChecked(
+    source: Var[Boolean],
+    processInput: BooleanTransformer
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledChecked(source.signal, processInput, source.writer)
+  }
+
+  def controlledChecked(
+    source: Observable[Boolean],
+    observer: Observer[Boolean]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    controlledChecked(source, processInput = identity, observer)
+  }
+
+  def controlledChecked(
+    source: Observable[Boolean],
+    processInput: BooleanTransformer,
+    observer: Observer[Boolean]
+  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
+    new Modifier[Input] {
+      override def apply(element: Input): Unit = {
+        element.setCheckedController(source, processInput, observer)
+      }
+    }
+  }
 }
