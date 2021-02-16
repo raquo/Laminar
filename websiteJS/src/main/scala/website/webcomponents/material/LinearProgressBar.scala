@@ -3,7 +3,7 @@ package website.webcomponents.material
 import com.raquo.domtypes.generic.codecs._
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.builders.HtmlTag
-import com.raquo.laminar.keys.{ReactiveHtmlAttr, ReactiveProp, ReactiveStyle}
+import com.raquo.laminar.keys.ReactiveStyle
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom
 
@@ -28,18 +28,16 @@ object LinearProgressBar {
   type Ref = dom.html.Element with RawElement
   type ModFunction = LinearProgressBar.type => Mod[ReactiveHtmlElement[Ref]]
 
-  private val tag = new HtmlTag[Ref]("mwc-linear-progress", void = false)
+  private val tag: HtmlTag[Ref] = customHtmlTag("mwc-linear-progress")
 
-  val indeterminate = new ReactiveProp("indeterminate", BooleanAsIsCodec)
-  val reverse = new ReactiveProp("reverse", BooleanAsIsCodec)
-  val closed = new ReactiveProp("closed", BooleanAsIsCodec)
-  val progress = new ReactiveProp("progress", DoubleAsIsCodec)
-  val buffer = new ReactiveProp("buffer", DoubleAsIsCodec)
+  val indeterminate: Prop[Boolean] = customProp("indeterminate", BooleanAsIsCodec)
+  val reverse: Prop[Boolean]       = customProp("reverse", BooleanAsIsCodec)
+  val closed: Prop[Boolean]        = customProp("closed", BooleanAsIsCodec)
+  val progress: Prop[Double]       = customProp("progress", DoubleAsIsCodec)
+  val buffer: Prop[Double]         = customProp("buffer", DoubleAsIsCodec)
 
   object styles {
-    import com.raquo.domtypes.generic.keys.Style // Laminar aliases ReactiveStyle as Style, but we want the original underlying type here
-
-    val mdcThemePrimary = new ReactiveStyle(new Style("--mdc-theme-primary", "--mdc-theme-primary"))
+    val mdcThemePrimary: ReactiveStyle[String] = customStyle("--mdc-theme-primary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

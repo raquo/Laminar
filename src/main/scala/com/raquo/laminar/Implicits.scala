@@ -6,9 +6,8 @@ import com.raquo.airstream.state.{Val, Var}
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.Implicits.{RichEventStream, RichObservable, RichSignal}
-import com.raquo.laminar.inputs.EventPropTransformation
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
-import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveStyle}
+import com.raquo.laminar.keys.{EventProcessor, ReactiveEventProp, ReactiveStyle}
 import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 import org.scalajs.dom
@@ -18,10 +17,8 @@ import scala.scalajs.js.|
 
 trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMappers {
 
-  implicit def eventPropToEventPropTransformation[Ev <: dom.Event, El <: ReactiveElement.Base](
-    eventProp: ReactiveEventProp[Ev]
-  ): EventPropTransformation[Ev, Ev] = {
-    new EventPropTransformation(eventProp, shouldUseCapture = false, processor = Some(_))
+  @inline implicit def eventPropToProcessor[Ev <: dom.Event](eventProp: ReactiveEventProp[Ev]): EventProcessor[Ev, Ev] = {
+    EventProcessor.empty(eventProp)
   }
 
   @inline implicit def styleToReactiveStyle[V](style: Style[V]): ReactiveStyle[V] = {

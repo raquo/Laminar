@@ -1,10 +1,13 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{Observable, Observer}
+import com.raquo.airstream.core.Observable
+import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar.{BooleanTransformer, StringTransformer}
+import com.raquo.laminar.api.Laminar
 import com.raquo.laminar.builders.HtmlTag
-import com.raquo.laminar.inputs.{CheckedController, ValueController}
+import com.raquo.laminar.inputs.ValueController
+import com.raquo.laminar.keys.ReactiveProp
+import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -16,34 +19,58 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
 
   // -- `value` prop controller
 
-  private[this] var valueController: js.UndefOr[ValueController] = js.undefined
+  private[this] var valueController: js.UndefOr[ValueController[_, _]] = js.undefined
 
   private[laminar] def hasValueController: Boolean = valueController.nonEmpty
 
+  private[laminar] def hasOtherValueController(thisController: ValueController[_, _]): Boolean = {
+    valueController.exists(_ != thisController)
+  }
+
   private[laminar] var hasValueBinder: Boolean = false
 
-  private[laminar] def setValueController(
-    source: Observable[String],
-    processInput: StringTransformer,
-    observer: Observer[String]
-  ): Unit = {
-    valueController = js.defined(new ValueController(this, source, processInput, observer))
+  private[laminar] def setValueController[A](
+    updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[String, _], String],
+    listener: EventListener[_ <: dom.Event, A]
+  ): DynamicSubscription = {
+    val controller = new ValueController(
+      initialValue = "",
+      setDomValue = DomApi.setValue,
+      element = this,
+      updater,
+      listener
+    )
+    val dynSub = controller.bind()
+    valueController = js.defined(controller)
+    dynSub
   }
 
   // -- `checked` prop controller
 
-  private[this] var checkedController: js.UndefOr[CheckedController] = js.undefined
+  private[this] var checkedController: js.UndefOr[ValueController[_, _]] = js.undefined
 
   private[laminar] def hasCheckedController: Boolean = checkedController.nonEmpty
 
+  private[laminar] def hasOtherCheckedController(thisController: ValueController[_, _]): Boolean = {
+    checkedController.exists(_ != thisController)
+  }
+
   private[laminar] var hasCheckedBinder: Boolean = false
 
-  private[laminar] def setCheckedController(
-    source: Observable[Boolean],
-    processInput: BooleanTransformer,
-    observer: Observer[Boolean]
-  ): Unit = {
-    checkedController = js.defined(new CheckedController(this, source, processInput, observer))
+  private[laminar] def setCheckedController[A](
+    updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[Boolean, _], Boolean],
+    listener: EventListener[_ <: dom.Event, A]
+  ): DynamicSubscription = {
+    val controller = new ValueController(
+      initialValue = false,
+      setDomValue = DomApi.setChecked,
+      element = this,
+      updater,
+      listener
+    )
+    val dynSub = controller.bind()
+    checkedController = js.defined(controller)
+    dynSub
   }
 
   // --

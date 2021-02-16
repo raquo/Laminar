@@ -26,6 +26,8 @@ Huge thanks to our sponsors who support Laminar development with their generous 
 
 ✨ **[Iurii Malchenko](https://github.com/yurique)**
 
+✨ **[Tawasal](https://tawasal.ae)** – a secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.
+
 Laminar is sponsored by [people like you](https://github.com/sponsors/raquo). If you enjoy using Laminar, please consider supporting the project. 🙏
 
 

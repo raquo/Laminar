@@ -1,17 +1,16 @@
-package com.raquo.laminar.inputs
+package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.{EventStream, Observer}
+import com.raquo.airstream.core.Observer
 import com.raquo.airstream.eventbus.EventBus
 import com.raquo.airstream.state.Var
-import com.raquo.domtypes.generic.keys.EventProp
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.modifiers.EventPropBinder
+import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 /**
-  * This class represents a set of transformations that can be applied to events feeding into an [[EventPropBinder]]
-  * EventPropTransformation-s are immutable, so can be reused by multiple setters.
+  * This class represents a sequence of transformations that are applied to events feeding into an [[EventListener]]
+  * EventProcessor-s are immutable, so can be reused by multiple setters.
   *
   * Example syntax: `input(onChange().preventDefault.mapTo(true) --> myBooleanWriteBus)`
   *
@@ -19,12 +18,12 @@ import org.scalajs.dom
   *
   * @param shouldUseCapture (false means using bubble mode)
   *                         See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
-  * @param processor
-  *          Processes incoming events before they're passed to the next processor or to the listening EventBus.
-  *          Returns an Option of the processed value. If None, the value should not passed down the chain.
+  *
+  * @param processor        Processes incoming events before they're passed to the next processor or to the listening EventBus.
+  *                         Returns an Option of the processed value. If None, the value should not passed down the chain.
   */
-class EventPropTransformation[Ev <: dom.Event, V](
-  protected val eventProp: EventProp[Ev],
+class EventProcessor[Ev <: dom.Event, V](
+  protected val eventProp: ReactiveEventProp[Ev],
   protected val shouldUseCapture: Boolean = false,
   protected val processor: Ev => Option[V]
 ) {
@@ -32,19 +31,19 @@ class EventPropTransformation[Ev <: dom.Event, V](
   // @TODO[Performance,Elegance] Is it possible to move these --> methods to ReactiveEventProp?
   // We can't have them in both places, because then type inference does not work
 
-  @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventPropBinder[Ev] = {
-    EventPropBinder(observer, eventProp, shouldUseCapture, processor)
+  @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventListener[Ev, V] = {
+    new EventListener[Ev, V](this, observer.onNext)
   }
 
-  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventPropBinder[Ev] = {
+  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventListener[Ev, V] = {
     -->(Observer(onNext))
   }
 
-  @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventPropBinder[Ev] = {
+  @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventListener[Ev, V] = {
     -->(eventBus.writer)
   }
 
-  @inline def -->[VarEv >: V, El <: ReactiveElement.Base](targetVar: Var[VarEv]): EventPropBinder[Ev] = {
+  @inline def -->[VarEv >: V, El <: ReactiveElement.Base](targetVar: Var[VarEv]): EventListener[Ev, V] = {
     -->(targetVar.writer)
   }
 
@@ -55,27 +54,27 @@ class EventPropTransformation[Ev <: dom.Event, V](
     *
     * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
     */
-  def useCapture: EventPropTransformation[Ev, V] = {
-    new EventPropTransformation(eventProp, shouldUseCapture = true, processor = processor)
+  def useCapture: EventProcessor[Ev, V] = {
+    new EventProcessor(eventProp, shouldUseCapture = true, processor = processor)
   }
 
   /** Use standard bubble propagation mode. You don't need to call this unless you set `useCapture` previously.
     *
     * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
     */
-  def useBubbleMode: EventPropTransformation[Ev, V] = {
-    new EventPropTransformation(eventProp, shouldUseCapture = false, processor = processor)
+  def useBubbleMode: EventProcessor[Ev, V] = {
+    new EventProcessor(eventProp, shouldUseCapture = false, processor = processor)
   }
 
   /** Prevent default browser action for the given event (e.g. following the link when it is clicked)
     * https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault
     *
-    * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
+    * Note: this is just a standard processor, so it will be fired in whatever order you have applied it.
     * So for example, you can [[filter]] events before applying this, preventing default action only for certain events.
     *
     * Example: `input(onKeyUp().filter(ev => ev.keyCode == KeyCode.Tab).preventDefault --> tabKeyUpBus)`
     */
-  def preventDefault: EventPropTransformation[Ev, V] = {
+  def preventDefault: EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { value =>
         ev.preventDefault()
@@ -92,7 +91,7 @@ class EventPropTransformation[Ev <: dom.Event, V](
     *
     * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
     */
-  def stopPropagation: EventPropTransformation[Ev, V] = {
+  def stopPropagation: EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { value =>
         ev.stopPropagation()
@@ -113,7 +112,7 @@ class EventPropTransformation[Ev <: dom.Event, V](
     *
     * Example: `div(onClick.filter(isGoodClick).stopImmediatePropagation --> goodClickBus)`
     */
-  def stopImmediatePropagation: EventPropTransformation[Ev, V] = {
+  def stopImmediatePropagation: EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { value =>
         ev.stopImmediatePropagation()
@@ -123,15 +122,15 @@ class EventPropTransformation[Ev <: dom.Event, V](
   }
 
   /** Values that do not pass will not propagate down the chain and into the emitter. */
-  def filter(passes: V => Boolean): EventPropTransformation[Ev, V] = {
+  def filter(passes: V => Boolean): EventProcessor[Ev, V] = {
     withNewProcessor(ev => processor(ev).filter(passes))
   }
 
-  def collect[V2](pf: PartialFunction[V, V2]): EventPropTransformation[Ev, V2] = {
+  def collect[V2](pf: PartialFunction[V, V2]): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).collect(pf))
   }
 
-  def map[V2](project: V => V2): EventPropTransformation[Ev, V2] = {
+  def map[V2](project: V => V2): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(project))
   }
 
@@ -139,22 +138,22 @@ class EventPropTransformation[Ev <: dom.Event, V](
     *
     * Note: `value` will be re-evaluated every time the event is fired
     */
-  def mapTo[V2](value: => V2): EventPropTransformation[Ev, V2] = {
+  def mapTo[V2](value: => V2): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
   /** Like mapTo, but with strict evaluation of the value */
-  def mapToStrict[V2](value: V2): EventPropTransformation[Ev, V2] = {
+  def mapToStrict[V2](value: V2): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
   /** Get the original event. You might want to call this in a chain, after some other processing. */
-  def mapToEvent: EventPropTransformation[Ev, Ev] = {
+  def mapToEvent: EventProcessor[Ev, Ev] = {
     withNewProcessor(ev => processor(ev).map(_ => ev))
   }
 
   /** Get the value of `event.target.value` */
-  def mapToValue: EventPropTransformation[Ev, String] = {
+  def mapToValue: EventProcessor[Ev, String] = {
     withNewProcessor { ev =>
       processor(ev).map { _ =>
         // @TODO[Warn] Throw or console.log a warning here if using on the wrong element type
@@ -164,12 +163,29 @@ class EventPropTransformation[Ev <: dom.Event, V](
   }
 
   /** Get the value of `event.target.checked` */
-  def mapToChecked: EventPropTransformation[Ev, Boolean] = {
+  def mapToChecked: EventProcessor[Ev, Boolean] = {
     withNewProcessor { ev =>
       processor(ev).map { _ =>
         // @TODO[Warn] Throw or console.log a warning here if using on the wrong element type
         DomApi.getChecked(ev.target.asInstanceOf[dom.Element]).getOrElse(false)
       }
+    }
+  }
+
+  /** Evaluate `f` if the value was filtered out up the chain. For example:
+    *
+    *     onClick.filter(isRightClick).orElseEval(_.preventDefault()) --> observer
+    *
+    * This observer will fire only on right clicks, and for events that aren't right
+    * clicks, ev.preventDefault() will be called instead.
+    */
+  def orElseEval(f: Ev => Unit): EventProcessor[Ev, V] = {
+    withNewProcessor { ev =>
+      val result = processor(ev)
+      if (result.isEmpty) {
+        f(ev)
+      }
+      result
     }
   }
 
@@ -179,14 +195,16 @@ class EventPropTransformation[Ev <: dom.Event, V](
     * Instead, if the event was filtered, project will receive None as accumulatedValue.
     * The output of project should be Some(newValue), or None if you want to filter out this event.
     */
-  def mapRaw[V2](project: (Ev, Option[V]) => Option[V2]): EventPropTransformation[Ev, V2] = {
+  def mapRaw[V2](project: (Ev, Option[V]) => Option[V2]): EventProcessor[Ev, V2] = {
     withNewProcessor { ev =>
       project(ev, processor(ev))
     }
   }
 
-  /** Write the resulting string into `event.target.value` */
-  def setAsValue(implicit stringEvidence: V =:= String): EventPropTransformation[Ev, V] = {
+  /** Write the resulting string into `event.target.value`.
+    * You can only do this on elements that have a value property - input, textarea, select
+    */
+  def setAsValue(implicit stringEvidence: V =:= String): EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { value =>
         val nextInputValue = stringEvidence(value)
@@ -197,22 +215,39 @@ class EventPropTransformation[Ev <: dom.Event, V](
     }
   }
 
-  private def withNewProcessor[V2](newProcessor: Ev => Option[V2]): EventPropTransformation[Ev, V2] = {
-    new EventPropTransformation[Ev, V2](eventProp, shouldUseCapture, newProcessor)
+  /** Write the resulting boolean into `event.target.checked`.
+    * You can only do this on checkbox or radio button elements.
+    *
+    * Warning: if using this, do not use preventDefault. You will regret it. // @nc link to details
+    */
+  def setAsChecked(implicit boolEvidence: V =:= Boolean): EventProcessor[Ev, V] = {
+    withNewProcessor { ev =>
+      processor(ev).map { value =>
+        val nextChecked = boolEvidence(value)
+        // @TODO[Warn] Console.log a warning here if using on the wrong element type
+        DomApi.setChecked(ev.target.asInstanceOf[dom.Element], nextChecked)
+        value
+      }
+    }
+  }
+
+  private def withNewProcessor[V2](newProcessor: Ev => Option[V2]): EventProcessor[Ev, V2] = {
+    new EventProcessor[Ev, V2](eventProp, shouldUseCapture, newProcessor)
   }
 }
 
-object EventPropTransformation {
+object EventProcessor {
 
-  // This method lives in companion object so that I don't have to expose EPT's protected vals.
-  // They don't need to be public, and would have polluted autocomplete with confusing names.
-  def toEventStream[Ev <: dom.Event, V](
-    ept: EventPropTransformation[Ev, V],
-    element: ReactiveElement.Base
-  ): EventStream[V] = {
-    element
-      .events(ept.eventProp, useCapture = ept.shouldUseCapture)
-      .map(ept.processor)
-      .collect { case Some(ev) => ev } // @TODO[Performance] Can I eliminate this second EventStream instance?
+  def empty[Ev <: dom.Event](eventProp: ReactiveEventProp[Ev], shouldUseCapture: Boolean = false): EventProcessor[Ev, Ev] = {
+    new EventProcessor(eventProp, shouldUseCapture, Some(_))
   }
+
+  // These methods are only exposed publicly via companion object
+  // to avoid polluting autocomplete when chaining EventProcessor-s
+
+  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): ReactiveEventProp[Ev] = prop.eventProp
+
+  @inline def shouldUseCapture(prop: EventProcessor[_, _]): Boolean = prop.shouldUseCapture
+
+  @inline def processor[Ev <: dom.Event, Out](prop: EventProcessor[Ev, Out]): Ev => Option[Out] = prop.processor
 }

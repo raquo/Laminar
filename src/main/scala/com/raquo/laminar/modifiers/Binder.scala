@@ -14,9 +14,7 @@ trait Binder[-El <: ReactiveElement.Base] extends Modifier[El] {
   /** This method is used by onMountBind to cancel this subscription on unmount */
   def bind(element: El): DynamicSubscription
 
-  override def apply(element: El): Unit = {
-    bind(element)
-  }
+  final override def apply(element: El): Unit = bind(element)
 }
 
 object Binder {
@@ -27,7 +25,7 @@ object Binder {
     }
   }
 
-  def withSelf[El <: ReactiveElement.Base](fn: (El, Binder[El]) => DynamicSubscription) = {
+  def withSelf[El <: ReactiveElement.Base](fn: (El, Binder[El]) => DynamicSubscription): Binder[El] = {
     new Binder[El] {
       override def bind(element: El): DynamicSubscription = fn(element, this)
     }

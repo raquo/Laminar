@@ -5,12 +5,9 @@ import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.keys.EventProp
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.inputs.EventPropTransformation
-import com.raquo.laminar.keys.CompositeKey
+import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
 import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.modifiers.EventPropBinder
+import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -19,11 +16,6 @@ trait ReactiveElement[+Ref <: dom.Element]
   extends ChildNode[Ref]
   with ParentNode[Ref]
   with domtypes.generic.nodes.Element {
-
-  // @TODO[Naming] We reuse EventPropSetter to represent an active event listener. Makes for a bit confusing naming.
-  private[ReactiveElement] var _maybeEventListeners: js.UndefOr[js.Array[EventPropBinder[_]]] = js.undefined
-
-  def eventListeners: List[EventPropBinder[_]] = _maybeEventListeners.map(_.toList).getOrElse(Nil)
 
   // @Warning[Fragile] deactivate should not need an isActive guard.
   //  If Laminar starts to cause exceptions here, we need to find the root cause.
@@ -34,6 +26,34 @@ trait ReactiveElement[+Ref <: dom.Element]
     activate = dynamicOwner.activate,
     deactivate = dynamicOwner.deactivate
   )
+
+  private[this] var maybeEventListeners: js.UndefOr[js.Array[EventListenerSubscription]] = js.undefined
+
+  private[laminar] def eventSubscriptions: List[EventListenerSubscription] = maybeEventListeners.map(_.toList).getOrElse(Nil)
+
+  /** Note: Only call this after checking that this element doesn't already have this listener */
+  private[laminar] def addEventSubscription(
+    listenerSub: EventListenerSubscription,
+    unsafePrepend: Boolean
+  ): Unit = {
+    if (maybeEventListeners.isEmpty) {
+      maybeEventListeners = js.defined(js.Array(listenerSub))
+    } else if (unsafePrepend) {
+      maybeEventListeners.get.unshift(listenerSub)
+    } else {
+      maybeEventListeners.get.push(listenerSub)
+    }
+  }
+
+  /** Note: Only call this after checking that this element currently has this listener */
+  private[laminar] def removeEventSubscription(index: Int): Unit = {
+    maybeEventListeners.foreach { eventListeners =>
+      eventListeners.splice(index, deleteCount = 1)
+    }
+  }
+
+  /** @return -1 if not found */
+  private[laminar] def indexOfEventListener(listener: EventListener.Any): Int = eventListeners.indexOf(listener)
 
   /** This structure keeps track of reasons for including a given item for a given composite key.
     * For example, this remembers which modifiers have previously added which className.
@@ -108,34 +128,19 @@ trait ReactiveElement[+Ref <: dom.Element]
     key.setDomValue(this, nextDomValues)
   }
 
-  /** Create and get a stream of events on this node */
-  def events[Ev <: dom.Event](
-    eventProp: EventProp[Ev],
-    useCapture: Boolean = false,
-    stopPropagation: Boolean = false,
-    preventDefault: Boolean = false,
-    stopImmediatePropagation: Boolean = false // This argument was added later, so it's last in the list to reduce breakage
-  ): EventStream[Ev] = {
-    val eventBus = new EventBus[Ev]
-    val setter = EventPropBinder[Ev, Ev, this.type](
-      eventBus.writer,
-      eventProp,
-      useCapture,
-      processor = ev => {
-        if (stopPropagation) ev.stopPropagation()
-        if (stopImmediatePropagation) ev.stopImmediatePropagation()
-        if (preventDefault) ev.preventDefault()
-        Some(ev)
-      }
-    )
-    setter(this)
-    eventBus.events
-  }
+  def eventListeners: List[EventListener.Any] = maybeEventListeners.map(_.map(_.listener).toList).getOrElse(Nil)
 
-  @inline def events[Ev <: dom.Event, V](
-    t: EventPropTransformation[Ev, V]
-  ): EventStream[V] = {
-    EventPropTransformation.toEventStream(t, this)
+  /** Create and get a stream of events on this node */
+  def events[Ev <: dom.Event, Out](
+    prop: EventProcessor[Ev, Out]
+  ): EventStream[Out] = {
+    val eventBus = new EventBus[Out]
+    val listener = new EventListener[Ev, Out](
+      prop,
+      eventBus.writer.onNext
+    )
+    listener(this)
+    eventBus.events
   }
 
   // @TODO[Performance] Review scala.js generated code for single-element use case.
@@ -199,48 +204,6 @@ object ReactiveElement {
 
   type Base = ReactiveElement[dom.Element]
 
-  /** @return Whether listener was added (false if such a listener has already been present) */
-  def addEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {
-    val shouldAddListener = indexOfEventListener(element, listener) == -1
-    if (shouldAddListener) {
-      // 1. Update this node
-      if (element._maybeEventListeners.isEmpty) {
-        element._maybeEventListeners = js.defined(js.Array(listener))
-      } else {
-        element._maybeEventListeners.foreach { eventListeners =>
-          eventListeners.push(listener)
-        }
-      }
-      // 2. Update the DOM
-      DomApi.addEventListener(element, listener)
-    }
-    shouldAddListener
-  }
-
-  /** @return Whether listener was removed (false if such a listener was not found) */
-  def removeEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Boolean = {
-    val index = indexOfEventListener(element, listener)
-    val shouldRemoveListener = index != -1
-    if (shouldRemoveListener) {
-      // 1. Update this node
-      element._maybeEventListeners.foreach { eventListeners =>
-        eventListeners.splice(index, deleteCount = 1)
-      }
-      // 2. Update the DOM
-      DomApi.removeEventListener(element, listener)
-    }
-    shouldRemoveListener
-  }
-
-  /** @return -1 if not found */
-  def indexOfEventListener[Ev <: dom.Event](element: ReactiveElement.Base, listener: EventPropBinder[Ev]): Int = {
-    if (element._maybeEventListeners.nonEmpty) {
-      element._maybeEventListeners.get.indexOf(listener)
-    } else {
-      -1
-    }
-  }
-
   @inline def bindFn[V](
     element: ReactiveElement.Base,
     observable: Observable[V]
@@ -286,6 +249,20 @@ object ReactiveElement {
     DynamicSubscription.subscribeCallback(element.dynamicOwner, owner => {
       activate(new MountContext[El](element, owner))
     })
+  }
+
+  /** Bind subscription such that it will appear first in the list of dynamicOwner's subscriptions.
+    * Be careful, use wisely. If you're using this for events, make sure that the listeners in the
+    * DOM (and also the `maybeEventListeners` array) are in the same order.
+    */
+  private[laminar] def unsafeBindPrependSubscription[El <: ReactiveElement.Base](
+    element: El
+  )(
+    subscribe: MountContext[El] => Subscription
+  ): DynamicSubscription = {
+    DynamicSubscription(element.dynamicOwner, { owner =>
+      subscribe(new MountContext[El](element, owner))
+    }, prepend = true)
   }
 
   // @TODO Maybe later. Wanted to make a seqToBinder.

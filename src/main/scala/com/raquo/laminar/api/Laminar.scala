@@ -6,16 +6,15 @@ import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
 import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
 import com.raquo.domtypes.jsdom.defs.eventProps._
-import com.raquo.domtypes.jsdom.defs.events.{TypedTargetEvent, TypedTargetMouseEvent}
 import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
-import com.raquo.laminar.inputs
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
+import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.receivers._
-import com.raquo.laminar.{Implicits, lifecycle, modifiers, nodes}
+import com.raquo.laminar.{Implicits, keys, lifecycle, modifiers, nodes}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -123,7 +122,10 @@ private[laminar] object Laminar
 
   // Events
 
-  type EventPropTransformation[Ev <: dom.Event, V] = inputs.EventPropTransformation[Ev, V]
+  @deprecated("EventPropTransformation class was renamed to EventProcessor", "0.12.0")
+  type EventPropTransformation[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
+
+  type EventProcessor[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
 
 
   // Lifecycle
@@ -139,7 +141,7 @@ private[laminar] object Laminar
 
   type HtmlAttr[V] = ReactiveHtmlAttr[V]
 
-  type Prop[V, DomV] = ReactiveProp[V, DomV]
+  type Prop[V] = ReactiveProp[V, _]
 
   type Style[V] = ReactiveStyle[V]
 
@@ -370,101 +372,19 @@ private[laminar] object Laminar
     inContext(makeModifier)
   }
 
-  type EventTransformer[Ev <: dom.Event, V] = EventPropTransformation[Ev, V] => EventPropTransformation[Ev, V]
-
-  type StringTransformer = EventTransformer[TypedTargetEvent[dom.html.Element], String]
-
-  type BooleanTransformer = EventTransformer[TypedTargetMouseEvent[dom.Element], Boolean]
-
-  def controlledValue(
-    source: EventBus[String]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledValue(source.events, processInput = identity, source.writer)
-  }
-
-  def controlledValue(
-    source: EventBus[String],
-    processInput: StringTransformer
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledValue(source.events, processInput, source.writer)
-  }
-
-  def controlledValue(
-    source: Var[String]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledValue(source.signal, processInput = identity, source.writer)
-  }
-
-  def controlledValue(
-    source: Var[String],
-    processInput: StringTransformer
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledValue(source.signal, processInput, source.writer)
-  }
-
-  def controlledValue(
-    source: Observable[String],
-    observer: Observer[String]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledValue(source, processInput = identity, observer)
-  }
-
-  def controlledValue(
-    source: Observable[String],
-    processInput: StringTransformer,
-    observer: Observer[String]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    new Modifier[Input] {
-      override def apply(element: Input): Unit = {
-        element.setValueController(source, processInput, observer)
-      }
-    }
-  }
-
-
-
-
-  def controlledChecked(
-    source: EventBus[Boolean]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledChecked(source.events, processInput = identity, source.writer)
-  }
-
-  def controlledChecked(
-    source: EventBus[Boolean],
-    processInput: BooleanTransformer
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledChecked(source.events, processInput, source.writer)
-  }
-
-  def controlledChecked(
-    source: Var[Boolean]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledChecked(source.signal, processInput = identity, source.writer)
-  }
-
-  def controlledChecked(
-    source: Var[Boolean],
-    processInput: BooleanTransformer
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledChecked(source.signal, processInput, source.writer)
-  }
-
-  def controlledChecked(
-    source: Observable[Boolean],
-    observer: Observer[Boolean]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    controlledChecked(source, processInput = identity, observer)
-  }
-
-  def controlledChecked(
-    source: Observable[Boolean],
-    processInput: BooleanTransformer,
-    observer: Observer[Boolean]
-  ): Modifier[ReactiveHtmlElement[dom.html.Input]] = {
-    new Modifier[Input] {
-      override def apply(element: Input): Unit = {
-        element.setCheckedController(source, processInput, observer)
+  def controlled[El <: HtmlElement, Ev <: dom.Event, V](
+    updater: KeyUpdater[El, ReactiveProp[V, _], V],
+    listener: EventListener[Ev, _]
+  ): Binder[El] = {
+    Binder[El] { element =>
+      // @TODO[Elegance] Clean up the whole ValueController structure later
+      // @TODO[Integrity] Not sure if there's a good way to avoid asInstanceOf here
+      if (updater.key == value) {
+        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, ReactiveProp[String, _], String]], listener)
+      } else if (updater.key == checked) {
+        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, ReactiveProp[Boolean, _], Boolean]], listener)
+      } else {
+        throw new Exception(s"Can not add a controller for property `${updater.key}` – only `value` and `checked` can be controlled this way. See docs on controlled inputs for details.")
       }
     }
   }

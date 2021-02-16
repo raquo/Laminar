@@ -27,15 +27,13 @@ object Button {
   type Ref = dom.html.Element with RawElement
   type ModFunction = Button.type => Mod[ReactiveHtmlElement[Ref]]
 
-  private val tag = new HtmlTag[Ref]("mwc-button", void = false)
+  private val tag: HtmlTag[Ref] = customHtmlTag("mwc-button")
 
   val id: ReactiveProp[String, String] = idAttr
 
-  val label = new ReactiveHtmlAttr[String]("label", StringAsIsCodec)
-
-  val raised = new ReactiveHtmlAttr[Boolean]("raised", BooleanAsAttrPresenceCodec)
-
-  val icon = new ReactiveHtmlAttr[String]("icon", StringAsIsCodec)
+  val label: ReactiveHtmlAttr[String]   = customHtmlAttr("label", StringAsIsCodec)
+  val raised: ReactiveHtmlAttr[Boolean] = customHtmlAttr("raised", BooleanAsAttrPresenceCodec)
+  val icon: ReactiveHtmlAttr[String]    = customHtmlAttr("icon", StringAsIsCodec)
 
   val onMouseOver = new EventProp[dom.MouseEvent]("mouseover")
 
@@ -44,9 +42,7 @@ object Button {
   }
 
   object styles {
-    import com.raquo.domtypes.generic.keys.Style // Laminar aliases ReactiveStyle as Style, but we want the original underlying type here
-
-    val mdcThemePrimary = new ReactiveStyle(new Style("--mdc-theme-primary", "--mdc-theme-primary"))
+    val mdcThemePrimary: ReactiveStyle[String] = customStyle("--mdc-theme-primary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

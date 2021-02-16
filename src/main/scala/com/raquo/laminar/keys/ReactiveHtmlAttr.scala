@@ -5,8 +5,8 @@ import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.HtmlAttr
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
-import com.raquo.laminar.modifiers.{Binder, KeySetter, Setter}
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.modifiers.KeyUpdater.HtmlAttrUpdater
+import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
 class ReactiveHtmlAttr[V](
   override val name: String,
@@ -25,12 +25,12 @@ class ReactiveHtmlAttr[V](
     new KeySetter[ReactiveHtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
   }
 
-  def <--($value: Observable[V]): Binder[HtmlElement] = {
-    Binder { element =>
-      ReactiveElement.bindFn(element, $value) { value =>
-        DomApi.setHtmlAttribute(element, this, value)
-      }
-    }
+  def <--($value: Observable[V]): HtmlAttrUpdater[V] = {
+    new KeyUpdater[HtmlElement, ReactiveHtmlAttr[V], V](
+      this,
+      $value,
+      (el, v) => DomApi.setHtmlAttribute(el, this, v)
+    )
   }
 
 }
