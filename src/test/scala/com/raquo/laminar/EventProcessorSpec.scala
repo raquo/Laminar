@@ -1,10 +1,9 @@
 package com.raquo.laminar
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
-class ReactiveEventPropSpec extends UnitSpec {
+class EventProcessorSpec extends UnitSpec {
 
   it("adds and removes event listeners as instructed") {
 
@@ -30,9 +29,10 @@ class ReactiveEventPropSpec extends UnitSpec {
 
     val clickableDiv = div(
       className := "clickable",
-      clickSetter1,
       "world"
     )
+
+    val sub1 = clickSetter1.bind(clickableDiv)
 
     mount(
       div(
@@ -52,7 +52,7 @@ class ReactiveEventPropSpec extends UnitSpec {
     clickCount2 shouldBe 0
 
     // Add a new event listener on the same event type ("click")
-    clickableDiv.amend(clickSetter2)
+    val sub2 = clickSetter2.bind(clickableDiv)
     clickableDiv.eventListeners shouldBe List(clickSetter1, clickSetter2)
     clickCount1 shouldBe 1
     clickCount2 shouldBe 0
@@ -62,7 +62,7 @@ class ReactiveEventPropSpec extends UnitSpec {
     clickCount2 shouldBe 1
 
     // Remove that new event listener
-    ReactiveElement.removeEventListener(clickableDiv, clickSetter2)
+    sub2.kill()
     clickableDiv.eventListeners shouldBe List(clickSetter1)
 
     clickableDiv.ref.click()
@@ -76,7 +76,7 @@ class ReactiveEventPropSpec extends UnitSpec {
     clickCount1 shouldBe 4
 
     // Add a listener to an unrelated event
-    clickableDiv.amend(scrollSetter2)
+    val sub3 = scrollSetter2.bind(clickableDiv)
     clickableDiv.eventListeners shouldBe List(clickSetter1, scrollSetter2)
 
     clickableDiv.ref.click()
@@ -88,10 +88,10 @@ class ReactiveEventPropSpec extends UnitSpec {
     scrollCount shouldBe 1
 
     // Remove all event listeners
-    ReactiveElement.removeEventListener(clickableDiv, clickSetter1)
+    sub1.kill()
     clickableDiv.eventListeners shouldBe List(scrollSetter2)
 
-    ReactiveElement.removeEventListener(clickableDiv, scrollSetter2)
+    sub3.kill()
     clickableDiv.eventListeners shouldBe Nil
 
     clickableDiv.ref.click()

@@ -29,12 +29,12 @@ title: Documentation
   * [cls](#cls)
   * [Other Composite Keys](#other-composite-keys)
   * [SVG](#svg)
-* [Event System: Emitters, Transformations, Buses](#event-system-emitters-transformations-buses)
+* [Event System: Emitters, Processors, Buses](#event-system-emitters-proocessors-buses)
   * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
   * [EventBus](#eventbus)
   * [Alternative Event Listener Registration Syntax](#alternative-event-listener-registration-syntax)
   * [Multiple Event Listeners](#multiple-event-listeners)
-  * [Event Transformations](#event-transformations)
+  * [Event Processors](#event-processors)
     * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
     * [useCapture](#usecapture)
     * [Obtaining Typed Event Target](#obtaining-typed-event-target)
@@ -249,13 +249,18 @@ val nameVar = Var("")
 def TextInput(): Input = input(typ := "text")
 
 div(
-  TextInput().amendThis { thisNode =>
-    onInput.mapTo(thisNode.ref.value) --> nameVar  
-  }
-  // ^^ vv These are identical
+  // Traditional style
   TextInput().amend { inContext { thisNode =>
     onInput.mapTo(thisNode.ref.value) --> nameVar
   }}
+  // Use amendThis to reduce inContext boilerplate
+  TextInput().amendThis { thisNode =>
+    onInput.mapTo(thisNode.ref.value) --> nameVar  
+  }
+  // But for `ref.value` specifically, just do this:
+  TextInput().amend(
+    onInput.mapToValue --> nameVar
+  )
 )
 
 div(
@@ -275,32 +280,40 @@ Using manual application is only encouraged when it's not enabling imperative co
 
 ### inContext
 
-Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, a common use case is needing to get the input element's `value` property in order to build a modifier that will send that property to an event bus.
+Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, a common use case is getting dimensions or coordinates in response to some event.
 
 ```scala
-input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBus))
+div(inContext(thisNode => onClick.mapTo(getCoordinates(thisNode)) --> bus))
 ```
 
 The general syntax of this feature is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. In our example its type is properly inferred to be `Input`, which is why you can call `.ref.value` on it without `.asInstanceOf`.
 
-Without getting ahead of ourselves too much, `onChange.mapTo(thisNode.ref.value) --> inputStringBus)` is a Modifier that handles `onChange` events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple _other_ ways, for example:
+Without getting ahead of ourselves too much, `onClick.mapTo(getCoordinates(thisNode)) --> bus)` is a Modifier that handles `onClick` events on an element, but as you see it needs a reference to that element. You could get that reference in a couple _other_ ways, for example:
 
 ```scala
-val myInput: Input = input(onChange.mapTo(myInput.ref.value) --> inputStringBus) // make sure to write out the type ascription
+val myDiv: Div = div(onClick.mapTo(getCoordinates(thisNode)) --> bus) // make sure to write out the type ascription
 ```
 
 Or
 
 ```scala
-val myInput = input()
-myInput.amend(
-  myInput.events(onChange).mapTo(myInput.ref.value) --> inputStringBus
+val myDiv = div()
+myDiv.amend(
+  myDiv.events(onClick).mapTo(getCoordinates(thisNode)) --> bus
 )
 ```
 
 But these are of course rather cumbersome. `inContext` provides an easy, inline solution that always works.
 
 Note: all the unfamiliar syntax used here will be explained in other sections of this documentation. 
+
+#### When not to use `inContext`
+
+You don't need to use `inContext` to get an input element's current value: use the `mapToValue` processor, e.g. `input(onInput.mapToValue --> stringBus)`.
+
+Similarly, don't use `inContext` to get a checkbox's `checked` status, use the `mapToChecked`, e.g. `input(typ := "checkbox", onClick.mapToValue --> stringBus)`.
+
+Under the hood, `mapToValue` and `mapToChecked` look at `event.target.value` and `event.target.checked`.
 
 
 ### Reusing Elements
@@ -319,11 +332,18 @@ To work around this, you can contribute definitions of missing keys to Scala DOM
 Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:
 
 ```scala
-val onTouchMove = new ReactiveEventProp[dom.TouchEvent]("touchmove")
-div(onTouchMove --> eventBus)
+val superValue: Prop[String] = customProp("superValue", StringAsIsCodec) // imaginary prop
+val onTouchMove: ReactiveEventProp[dom.TouchEvent] = customEventProp("touchmove")
+
+div(
+  superValue := "imaginary prop example",
+  onTouchMove --> eventBus
+)
 ```
 
-To clarify, you don't have to do this for touch events specifically as [@Busti](https://github.com/busti) already added the superior [pointer-events](https://github.com/raquo/scala-dom-types/pull/49) to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
+And similarly with `customStyle`, `customHtmlAttr`, `customHtmlTag`, `customSvgAttr`, `customSvgTag`. 
+
+To clarify, you don't have to do this for touch events specifically, because [@Busti](https://github.com/busti) already added the superior [pointer-events](https://github.com/raquo/scala-dom-types/pull/49) to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
 
 
 ### Modifiers FAQ
@@ -875,14 +895,14 @@ Laminar lets you work with SVG elements (almost) just as well as HTML. Everythin
 
 
 
-## Event System: Emitters, Transformations, Buses 
+## Event System: Emitters, Processors, Buses 
 
 
 ### Registering a DOM Event Listener
 
 Laminar uses native JS DOM events. We do not have a synthetic event system like React.js. There is no event pooling, no magic going on. This means there is nothing Laminar-specific to learn about events themselves. There's one exception for certain `onClick` events on checkboxes, see [Special Cases](#special-cases).
 
-To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, `EventPropBinder` is a `Modifier` that performs this action.
+To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, `EventListener` is a `Modifier` that performs this action.
 
 This is how it's done in the simplest case:
 
@@ -996,12 +1016,12 @@ div("Hello", changeEventStream --> changeObserver)
 
 Under the hood, `element.events(eventProp)` creates an EventBus, applies an `eventProp --> eventBus` modifier to `element`, and returns `eventBus.events`. That's all there is to it, no magic – just alternative syntax that makes it easier to compose your components without tight coupling.
 
-The `events` method also accepts `EventPropTransformation`, not just ReactiveEventProp. This allows for very flexible composition:
+The `events` method also accepts `EventProcessor`, not just `ReactiveEventProp`. This allows for very flexible composition:
  
  ```scala
 // You can define this once for reusability
-val onEnterPress: EventPropTransformation[dom.KeyboardEvent, dom.KeyboardEvent] =
-  onKeyPress.filter(_keyCode == KeyCodes.Enter)
+val onEnterPress: EventProcessor[dom.KeyboardEvent, dom.KeyboardEvent] =
+  onKeyPress.filter(_.keyCode == KeyCodes.Enter)
  
 input(onEnterPress --> observer)
  
@@ -1027,7 +1047,7 @@ In most cases you could simply add another listener to `clickBus.events` to achi
 However, sometimes simpler composition is more important. For example, consider the `TextInput` component mentioned above. That component itself might have an internal need to listen to its own `onChange` events (e.g. for some built-in validation), and it will not interfere with any other `onChange` event listeners the end user might want to add to it.
 
 
-### Event Transformations
+### Event Processors
 
 Often times you don't really need a stream of e.g. click events – you only care about the subset of the events or only parts of their data. With the Alternative Syntax described above you would just use Airstream operators to transform the stream of events, like this:
 
@@ -1057,7 +1077,7 @@ val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
 val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-This `mapTo` method is defined on `EventPropTransformation`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `preventDefault`, and `stopPropagation`, and you can chain them in any order.
+This `mapTo` method is defined on `EventProcessor`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order.
 
 More examples:
 
@@ -1079,7 +1099,7 @@ div(onClick.collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
 // @TODO[Docs] Come up with more relatable examples
 ```
 
-Just like `ReactiveEventProp`-s, `EventPropTransformation` instances are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:
+Just like `ReactiveEventProp`-s, `EventProcessor`-s are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:
 
 ```scala
 import org.scalajs.dom.ext.KeyCode
@@ -1107,7 +1127,7 @@ div(
 
 These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation), [stopImmediatePropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation)
 
-Importantly, these are just ordinarily transformations, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == KeyCode.Enter)`. Internally all transformations have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` transformation even after you've used `.map(_.keyCode)`.
+Importantly, these are just ordinary processors, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == KeyCode.Enter)`. Internally all processors have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` processor even after you've used `.map(_.keyCode)`.
 
 
 #### useCapture
@@ -1118,7 +1138,7 @@ div(onClick.useCapture --> captureModeClickObserver)
 
 JS DOM has two event modes: capture, and bubbling. Typically and by default everyone uses the latter, but capture mode is sometimes useful for event listener priority/ordering/efficiency (not specific to Laminar, standard JS DOM rules/limitations apply).
 
-`.useBubbleMode` is the opposite of `.useCapture`. The former is the default, so you don't need to call it unless you're calling it on an EventPropTransformation that you've previously enabled capture mode for.
+`.useBubbleMode` is the opposite of `.useCapture`. The former is the default, so you don't need to call it unless you're calling it on an EventProcessor that you've previously enabled capture mode for.
 
 See MDN [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) page for details (see "useCapture" section).
 
@@ -1507,7 +1527,7 @@ The `onMountInsert` modifier exists to solve this – it reserves a spot when it
 
   * Note: if you want an `Owner` because you're upgrading from Laminar v0.7 where each element was an Owner, this might not be the best way to achieve what you want. We've redesigned the API to reduce the need mess around with owners manually. For example, you can have modifiers like `stream --> observer` now.
 
-* If you just need a reference to `thisNode`, don't use lifecycle hooks, use `inContext` aka `forthis`.
+* If you just need a reference to `thisNode`, don't use lifecycle hooks, use `inContext`.
 
 
 ### Lifecycle Event Timing

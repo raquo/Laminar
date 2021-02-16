@@ -8,9 +8,9 @@ object Versions {
 
   val ScalaJsDom = "1.1.0"
 
-  val ScalaDomTypes = "0.12.1"
+  val ScalaDomTypes = "0.13.0"
 
-  val Airstream = "0.12.0-M2"
+  val Airstream = "0.12.0-SNAPSHOT"
 
   // Testing
 
@@ -18,5 +18,5 @@ object Versions {
 
   val JsDom = "16.4.0"
 
-  val ScalaDomTestUtils = "0.14.2"
+  val ScalaDomTestUtils = "0.14.3-SNAPSHOT"
 }

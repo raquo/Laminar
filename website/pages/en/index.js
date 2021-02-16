@@ -233,6 +233,7 @@ class Index extends React.Component {
               <div className="-sponsorsList">
                 <h2>GOLD Sponsors:</h2>
                 <p><span className="-emoji">✨</span> <a href="https://github.com/yurique">Iurii Malchenko</a></p>
+                <p><span className="-emoji">✨</span> <a href="https://tawasal.ae">Tawasal</a> – a secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</p>
               </div>
               <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
             </div>

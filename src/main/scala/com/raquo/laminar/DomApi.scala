@@ -1,8 +1,9 @@
 package com.raquo.laminar
 
 import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
+import com.raquo.laminar.keys.EventProcessor
+import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
-import com.raquo.laminar.modifiers.EventPropBinder
 import org.scalajs.dom
 import org.scalajs.dom.DOMException
 
@@ -70,24 +71,24 @@ object DomApi {
 
   def addEventListener[Ev <: dom.Event](
     element: ReactiveElement.Base,
-    eventPropSetter: EventPropBinder[Ev]
+    listener: EventListener[Ev, _]
   ): Unit = {
     //println(s"> Adding listener on ${DomApi.debugNodeDescription(element.ref)} for `${eventPropSetter.key.name}` with useCapture=${eventPropSetter.useCapture}")
     element.ref.addEventListener(
-      `type` = eventPropSetter.key.name,
-      listener = eventPropSetter.domValue,
-      useCapture = eventPropSetter.useCapture
+      `type` = EventProcessor.eventProp(listener.eventProcessor).name,
+      listener = listener.domCallback,
+      useCapture = EventProcessor.shouldUseCapture(listener.eventProcessor)
     )
   }
 
   def removeEventListener[Ev <: dom.Event](
     element: ReactiveElement.Base,
-    eventPropSetter: EventPropBinder[Ev]
+    listener: EventListener[Ev, _]
   ): Unit = {
     element.ref.removeEventListener(
-      `type` = eventPropSetter.key.name,
-      listener = eventPropSetter.domValue,
-      useCapture = eventPropSetter.useCapture
+      `type` = EventProcessor.eventProp(listener.eventProcessor).name,
+      listener = listener.domCallback,
+      useCapture = EventProcessor.shouldUseCapture(listener.eventProcessor)
     )
   }
 
@@ -132,15 +133,15 @@ object DomApi {
   }
 
   def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V): Unit = {
-    setRefStyle(element.ref, style.cssName, cssValue(value))
+    setRefStyle(element.ref, style.name, cssValue(value))
   }
 
   def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: Style[_], value: String): Unit = {
-    setRefStyle(element.ref, style.cssName, cssValue(value))
+    setRefStyle(element.ref, style.name, cssValue(value))
   }
 
   def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V | String): Unit = {
-    setRefStyle(element.ref, style.cssName, cssValue(value))
+    setRefStyle(element.ref, style.name, cssValue(value))
   }
 
   @inline private def cssValue(value: Any): String = {
