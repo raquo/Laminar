@@ -28,9 +28,6 @@ class EventProcessor[Ev <: dom.Event, V](
   protected val processor: Ev => Option[V]
 ) {
 
-  // @TODO[Performance,Elegance] Is it possible to move these --> methods to ReactiveEventProp?
-  // We can't have them in both places, because then type inference does not work
-
   @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventListener[Ev, V] = {
     new EventListener[Ev, V](this, observer.onNext)
   }
@@ -86,7 +83,7 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Propagation here refers to DOM Event bubbling or capture propagation.
     * https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation
     *
-    * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
+    * Note: this is just a standard processor, so it will be fired in whatever order you have applied it.
     * So for example, you can [[filter]] events before applying this, propagation will be stopped only for certain events.
     *
     * Example: `div(onClick.filter(isGoodClick).stopPropagation --> goodClickBus)`
@@ -107,7 +104,7 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * MDN https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation
     *
-    * Note: this is just a standard transformation, so it will be fired in whatever order you have applied it.
+    * Note: this is just a standard processor, so it will be fired in whatever order you have applied it.
     * So for example, you can [[filter]] events before applying this, propagation will be stopped only for certain events.
     *
     * Example: `div(onClick.filter(isGoodClick).stopImmediatePropagation --> goodClickBus)`
@@ -191,7 +188,7 @@ class EventProcessor[Ev <: dom.Event, V](
 
   /** (originalEvent, accumulatedValue) => newAccumulatedValue
     *
-    * Unlike other transformations, this one will fire regardless of .filter-s up the chain.
+    * Unlike other processors, this one will fire regardless of .filter-s up the chain.
     * Instead, if the event was filtered, project will receive None as accumulatedValue.
     * The output of project should be Some(newValue), or None if you want to filter out this event.
     */
@@ -218,7 +215,7 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Write the resulting boolean into `event.target.checked`.
     * You can only do this on checkbox or radio button elements.
     *
-    * Warning: if using this, do not use preventDefault. You will regret it. // @nc link to details
+    * Warning: if using this, do not use preventDefault. The browser may override the value you set here.
     */
   def setAsChecked(implicit boolEvidence: V =:= Boolean): EventProcessor[Ev, V] = {
     withNewProcessor { ev =>

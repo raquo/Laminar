@@ -372,6 +372,20 @@ private[laminar] object Laminar
     inContext(makeModifier)
   }
 
+  /** Use this when you need to apply stream operators on this element's events, e.g.:
+    *
+    *     div(composeEvents(onScroll)(_.throttle(100)) --> observer)
+    *
+    *     a(composeEvents(onClick.preventDefault)(_.delay(100)) --> observer)
+    */
+  def composeEvents[Ev <: dom.Event, In, Out](
+    event: EventProcessor[Ev, In]
+  )(
+    composer: EventStream[In] => Observable[Out]
+  ): LockedEventKey[Ev, In, Out] = {
+    new LockedEventKey(event, composer)
+  }
+
   def controlled[El <: HtmlElement, Ev <: dom.Event, V](
     updater: KeyUpdater[El, ReactiveProp[V, _], V],
     listener: EventListener[Ev, _]
