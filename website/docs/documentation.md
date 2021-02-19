@@ -32,7 +32,8 @@ title: Documentation
 * [Event System: Emitters, Processors, Buses](#event-system-emitters-proocessors-buses)
   * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
   * [EventBus](#eventbus)
-  * [Alternative Event Listener Registration Syntax](#alternative-event-listener-registration-syntax)
+  * [composeEvents](#composeevents)
+  * [element.events](#elementevents)
   * [Multiple Event Listeners](#multiple-event-listeners)
   * [Event Processors](#event-processors)
     * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
@@ -280,7 +281,7 @@ Using manual application is only encouraged when it's not enabling imperative co
 
 ### inContext
 
-Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, a common use case is getting dimensions or coordinates in response to some event.
+Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, one use case is getting dimensions or coordinates in response to some event.
 
 ```scala
 div(inContext(thisNode => onClick.mapTo(getCoordinates(thisNode)) --> bus))
@@ -307,13 +308,34 @@ But these are of course rather cumbersome. `inContext` provides an easy, inline 
 
 Note: all the unfamiliar syntax used here will be explained in other sections of this documentation. 
 
+
 #### When not to use `inContext`
+
+`inContext` is rarely needed in modern Laminar. 
 
 You don't need to use `inContext` to get an input element's current value: use the `mapToValue` processor, e.g. `input(onInput.mapToValue --> stringBus)`.
 
 Similarly, don't use `inContext` to get a checkbox's `checked` status, use the `mapToChecked`, e.g. `input(typ := "checkbox", onClick.mapToValue --> stringBus)`.
 
 Under the hood, `mapToValue` and `mapToChecked` look at `event.target.value` and `event.target.checked`.
+
+You also don't need `inContext` to apply stream operators to events. In older versions of Laminar if you wanted to delay an event, you would need to do this:
+
+```scala
+div(inContext { _.events(onClick).delay(10) --> observer })
+```
+
+Whereas today you can use the `composeEvents` method:
+
+```scala
+div(composeEvents(onClick)(_.delay(10)) --> observer)
+```
+
+Or even `delay` on the observer side:
+
+```scala
+div(onClick --> observer.delay(10))
+```
 
 
 ### Reusing Elements
@@ -982,7 +1004,32 @@ This can be achieved either with `addSource` or `addObserver`. Basically, in ter
 The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `subscription.kill` when removing a child from the list of children. `childOwner` will take care of that. Typically, that would be provided by the child Laminar element, via `onMountCallback`. Such an owner kills its subscriptions when the corresponding element gets removed from the DOM.
 
 
-### Alternative Event Listener Registration Syntax
+
+### composeEvents
+
+The `div(onClick --> observer)` syntax for listening to events is simple but limited. On the left hand side you can apply EventProcessor operations to `onClick` such as map, filter, preventDefault, etc. And on the right hand side you can apply Observer operations like `contramap`, `filter`, and `delay`.
+
+However, observables have a richer set of operators than either of these. For example, you might want to throttle the events, or propagate an event only if a certain other signal contains `true`. This is easy to achieve with the `composeEvents` method:
+
+```scala
+val $allowClick: Signal[Boolean] = ???
+ 
+div(composeEvents(onScroll)(_.throttle(100)) --> scrollObserver)
+ 
+a(
+  composeEvents(
+    onClick.preventDefault
+  )(
+    _.withCurrentValueOf($allowClick).collect { case (ev, true) => ev } 
+  ) --> eventObserver
+)
+```
+
+As you see `composeEvents` accepts two argument lists: an EventProcessor which lets you conveniently perform DOM event related tasks such as preventDefault, and a composer function that translates the stream of values emitted by the EventProcessor into any other observable, even a signal.
+
+
+
+### element.events
 
 Imagine you're building `TextInput`, a component that wraps an `input` element into a `div` with some styles added on top:
 
@@ -1049,7 +1096,7 @@ However, sometimes simpler composition is more important. For example, consider 
 
 ### Event Processors
 
-Often times you don't really need a stream of e.g. click events – you only care about the subset of the events or only parts of their data. With the Alternative Syntax described above you would just use Airstream operators to transform the stream of events, like this:
+Often times you don't really need a stream of e.g. click events – you only care about parts of the event data, or only a subset of emitted events. With the `events` and `composeEvents` methods described above you would just use Airstream operators to transform the stream of events, like this:
 
 ```scala
 val incrementButton = button("more")
@@ -1065,7 +1112,7 @@ Or even:
 
 ```scala
 val clickObserver: Observer[dom.Event] = ???
-input(inContext(_.events(onClick).delay(100) --> clickObserver))
+input(composeEvents(onClick)(_.delay(100)) --> clickObserver)
 ```
 
 However, when using the standard `onClick --> eventBus` syntax, there is no stream that you could operate on before the events hit `eventBus`. Instead, we provide a different way to transform events:
@@ -1077,16 +1124,18 @@ val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
 val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-This `mapTo` method is defined on `EventProcessor`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order.
+This `mapTo` method is defined on `EventProcessor`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order. See the API docs for these methods [here](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/kets/EventProcessor.html).
 
 More examples:
 
 ```scala
 import org.scalajs.dom.ext.KeyCode
  
-div("Click me", onClick.map(getClickCoordinates) --> clickCoordinatesBus)
+input(onInput.mapToValue --> textObserver)
  
-div(onScroll.filter(throttle) --> filteredScrollEventBus)
+input(typ := "checkbox", onClick.mapToChecked --> textObserver)
+ 
+div("Click me", onClick.map(getClickCoordinates) --> clickCoordinatesBus)
  
 form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
  
@@ -1152,16 +1201,15 @@ Due to dynamic nature of Javascript, `dom.Event.target` is typed only as `dom.Ev
 input(typ := "text", onChange().map(ev => ev.target.value) --> inputStringBus)
 ```
 
-Easiest hackiest solution would be to use `.map(_.target.asInstanceOf[dom.html.Input].value)` but you should reconsider using Scala if you aren't cringing just looking at this.
-
-You could use our Alternative Syntax for registering events (see section above) for a somewhat safer solution:
+Instead, use `mapToValue`, which essentially gives you `ev.target.value`:
 
 ```scala
-val inputNode = input(typ := "text")
-val inputStringStream = inputNode.events(onChange).mapTo(inputNode.ref.value)
+input(typ := "text", onChange.mapToValue --> inputStringBus)
 ```
 
-However, this is often cumbersome, and introduces the risk of referencing the wrong input node of the same type. We have a better way to get a properly typed target node:
+There's `mapToChecked` for checkboxes too by the way.
+
+For a more general solution, you can use `inContext`:
 
 ```scala
 input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBus))
@@ -1596,19 +1644,6 @@ These routers are designed for Laminar, but don't actually depend on it, only on
 Laminar is conceptually a simple layer that brings a lightweight reactive API to native Javascript DOM. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
 
 Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.
-
-
-### checkbox.onClick + event.preventDefault()
-
-All event streams in Laminar emit events synchronously – as soon as they happen – **except** if the stream in question is a stream of `onClick` events on an `input(typ := "checkbox")` element, **and** you generated this stream using the `.preventDefault` method in Laminar's API.
-
-Such streams fire events after a `setTimeout(0)` instead of firing immediately after the browser triggers the event. Without this hack/magic, you would have been unable to update the `checked` property of this checkbox from a stream that is (synchronously) derived from the given stream of `onClick` events, and this is common practice when building controlled components.
-
-The underlying issue is described in [this StackOverflow answer](https://stackoverflow.com/a/32710212/2601788).
-
-**Watch out:** If you are reading the `checked` property of the checkbox in an affected stream, it will contain the original, unchanged value. This behaviour could be surprising if you don't know about this stream being async, but do know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug, and better matches the commonly-expected semantics of `preventDefault`.
-
-**Escape hatch:** instead of using Laminar's `preventDefault` option/method, call `ev.preventDefault()` manually _after_ the event was passed to the observer. Then event handling will work the same way it does in native JS DOM.
 
 
 ### tbody

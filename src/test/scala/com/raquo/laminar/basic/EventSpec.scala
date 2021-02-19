@@ -2,7 +2,10 @@ package com.raquo.laminar.basic
 
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.utils.UnitSpec
+
+import scala.collection.mutable
 
 class EventSpec extends UnitSpec {
 
@@ -121,5 +124,66 @@ class EventSpec extends UnitSpec {
     log shouldBe List("pre-transform", "post-transform", "observer")
 
     log = Nil
+  }
+
+  it("LockedEventKey") {
+
+    val effects = mutable.Buffer[Effect[Int]]()
+
+    var eventCount = 0
+
+    val observer = Effect.logObserver("obs", effects)
+
+    val childEl = span(
+      composeEvents(onClick.preventDefault.map { ev =>
+        eventCount += 1
+        effects += Effect("processor", eventCount)
+        eventCount
+      })(_.map(_ * 100).startWith(-1)) --> observer
+    )
+
+    val el = div(childEl)
+
+    assert(eventCount == 0)
+    assert(effects.isEmpty)
+
+    // --
+
+    mount(el)
+
+    assert(eventCount == 0)
+    assert(effects.toList == List(
+      Effect("obs", -1)
+    ))
+    effects.clear()
+
+    // --
+
+    childEl.ref.click()
+
+    assert(eventCount == 1)
+    assert(effects.toList == List(
+      Effect("processor", 1),
+      Effect("obs", 100)
+    ))
+    effects.clear()
+
+    // --
+
+    el.ref.click()
+
+    assert(eventCount == 1)
+    assert(effects.isEmpty)
+
+    // --
+
+    childEl.ref.click()
+
+    assert(eventCount == 2)
+    assert(effects.toList == List(
+      Effect("processor", 2),
+      Effect("obs", 200)
+    ))
+
   }
 }
