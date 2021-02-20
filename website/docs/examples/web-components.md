@@ -54,7 +54,7 @@ val app = div(
 render(containerNode, app)
 ```
 
-The button above is a **[@material/mwc-button]("https://github.com/material-components/material-components-web-components/tree/master/packages/button")** web component, used via **[Button.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Button.scala)** interface.
+The button above is a **[@material/mwc-button](https://github.com/material-components/material-components-web-components/tree/master/packages/button)** web component, used via **[Button.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Button.scala)** interface.
 
 </div>
 
@@ -104,8 +104,8 @@ val app = div(
 render(containerNode, app)
 ```
 
-The slider control above is a **[@material/mwc-slider]("https://github.com/material-components/material-components-web-components/tree/master/packages/slider")** web component, used via **[Slider.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
+The slider control above is a **[@material/mwc-slider](https://github.com/material-components/material-components-web-components/tree/master/packages/slider)** web component, used via **[Slider.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
 
-The progress bar is a **[@material/mwc-linear-progress]("https://github.com/material-components/material-components-web-components/tree/master/packages/linear-progress")** web component, used via **[LinearProgressBar.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
+The progress bar is a **[@material/mwc-linear-progress](https://github.com/material-components/material-components-web-components/tree/master/packages/linear-progress)** web component, used via **[LinearProgressBar.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
 
 </div>
