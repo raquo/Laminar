@@ -514,7 +514,7 @@ It should be pretty obvious what this does: `MaybeBlogUrl` maps input Signal to 
 
 The elements are put in the obvious order – what you see is what you get – so, between _"Hello, I have "_ and _", isn't it great?"_ text nodes. Each next emitted element replaces the previously emitted one in the DOM.
 
-This example uses Signals, but EventStreams work similarly, and there are also `child.maybe`, `child.text`, and `child.int` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]`, `Observable[String]`, and `Observable[Int]` respectively.
+This example uses Signals, but EventStreams work similarly, and there are also `child.maybe` and `child.text` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]` and `Observable[V]` given `implicit ev: V => TextNode`, respectively.
 
 
 #### Efficiency

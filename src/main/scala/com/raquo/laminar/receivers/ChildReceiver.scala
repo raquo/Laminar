@@ -11,7 +11,8 @@ object ChildReceiver {
 
   val text: TextChildReceiver.type = TextChildReceiver
 
-  val int: IntChildReceiver.type = IntChildReceiver
+  @deprecated("Use child.text instead of child.int, it can handle integers too now.", "0.12.0")
+  val int: TextChildReceiver.type = TextChildReceiver
 
   def <--($node: Source[Child]): Inserter[ReactiveElement.Base] = {
     ChildInserter[ReactiveElement.Base](

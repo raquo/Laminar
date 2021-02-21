@@ -33,7 +33,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
     ),
     p(
       label + ": ",
-      b(child.int <-- $count),
+      b(child.text <-- $count),
       " ",
       // Two different ways to get stepVar's value:
       button(

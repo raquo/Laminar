@@ -212,6 +212,8 @@ class SyntaxSpec extends UnitSpec {
     val boolFn = (a: Boolean) => ()
     val boolObs = Observer.empty[Boolean]
 
+    val doubleBus = new EventBus[Double]
+
     val textStream = EventStream.fromValue("")
     val textSignal: Signal[String] = Signal.fromValue("")
     val textVal: Val[String] = Signal.fromValue("")
@@ -269,6 +271,9 @@ class SyntaxSpec extends UnitSpec {
       child.maybe <-- divFuture,
       child.maybe <-- divPromise,
       child.int <-- periodicInt,
+      child.text <-- periodicInt,
+      child.text <-- boolBus,
+      child.text <-- doubleBus.events,
       children <-- childrenObs,
       children <-- childrenObs.map(c => c),
       children <-- childrenStream,
