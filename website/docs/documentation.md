@@ -40,6 +40,7 @@ title: Documentation
     * [useCapture](#usecapture)
     * [Obtaining Typed Event Target](#obtaining-typed-event-target)
   * [Window & Document Events](#window--document-events)
+* [Controlled Inputs](#controlled-inputs)
 * [Ownership](#ownership)
   * [Laminar's Use of Airstream Ownership](#laminars-use-of-airstream-ownership)
 * [Memory Management](#memory-management)
@@ -1242,6 +1243,108 @@ new DomEventStream[TypedTargetEvent[dom.Node]](
 ```
 
 Depending on your desired logic, you might not have a Laminar element to act as an Owner for subscriptions of these event streams. For example, if you implement an Ajax service based on observables, you would probably want it making requests regardless of observers. For such app-wide subscriptions you can use `unsafeWindowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar, so you will need to clean them up manually if needed.
+
+
+
+## Controlled Inputs
+
+Controlled input is an HTML element whose `value` property (or `checked` property in case of checkboxes) is **locked** to a certain observable. You might be familiar with this concept from [React.js](https://reactjs.org/docs/forms.html#controlled-components). Here is how you do this in Laminar:
+
+```scala
+val zipVar = Var("")
+val zipValueSignal = zipVar.signal
+val zipInputObserver = zipVar.writer
+input(
+  placeholder := "Enter zip code: ",
+  controlled(
+    value <-- zipValueSignal,
+    onInput.mapToValue --> zipValueObserver
+  )
+)
+```
+
+You need to put both the event listener and value reader inside a `controlled` block. This is how Laminar knows where the interaction loop for this input is described, and enables Laminar to make sure that the value property follows the current value of `zipVar`.
+
+This leads us to the main requirement of controlled inputs: your logic must respond to `onInput` events by making `zipVarSignal` emit the new value. In our example we do exactly that – `onInput` we write the new text (`mapToValue` grabs the user's input from `event.target.value`) to `zipVar`, and we make value listen to `zipVar`'s signal.
+
+This is the simplest loop possible, but we can complicate it using all normal Laminar functionality. For example, we could disallow non-digit inputs:
+
+```scala
+input(
+  placeholder := "Enter zip code: ",
+  controlled(
+    value <-- zipValueSignal,
+    onInput.mapToValue.map(_.filter(Character.isDigit)) --> zipValueObserver
+  )
+)
+```
+
+We could also route the `onInput` event in any other way, we could even update zipVar asynchronously. When Laminar detects that `onInput` event happened and you didn't synchronously update the observable that the `value` is locked to, `zipValueSignal` in this case, we set the value property to the previous value emitted by `zipValueSignal`. This happens synchronously, so the user will feel as if their input was ignored, they will not even see it flash.
+
+Then if your logic updates the `value` prop at some point in the future, the it will work as you'd expect. Your updates to `zipValueSignal` don't actually need to come exclusively from user input, you can emit a value into that observable any time, and the `value` prop will update to match.
+
+Note that Laminar can't do anything if you manually set the element's value, either via `inputEl.ref.value = "newValue"` or using the `setAsValue` EventProcessor. You should not use either of these methods with controlled inputs. Speaking of, you shouldn't call `preventDefault` on controlled events either, even on events that are cancelable (`onInput` is not), because for example for checkboxes the rollback of checked state happens **after** the event listener has finished executing, potentially undoing Laminar's changes to the `checked` property and de-syncing it from the controlling observable.
+
+
+### Life Without Controlled Inputs
+
+You can however use `setAsValue` when you don't need the input to be controlled. The point of having controlled inputs is being able to update their `value` from two sources: user input, and by updating the observable you're locking the value into. We solve the conflicts between these two sources by requiring that user input updates the observable to which value is locked if you want such user input to be allowed. 
+
+But if you only care about user input, and don't need to lock the value to an observable, you can achieve the same without controlled inputs, for example:
+
+```scala
+input(
+  placeholder := "Enter zip code: ",
+  onInput
+    .mapToValue
+    .map(_.filter(Character.isDigit))
+    .setAsValue --> zipValueObserver
+)
+```
+
+And we only need `setAsValue` in this case because we want to transform the user's input. If we didn't need to filter for digits, we wouldn't need setAsValue as the browser would do the job for us.
+
+One limitation of this approach is that we can't "undo" invalid user input because the `onInput` event is not `cancelable`. Well, you could do ugly-hack it, but you'd be reinventing controlled inputs to some extent. So, `setAsValue` is limited to **transforming** inputs. 
+
+
+### Why controlled inputs, again?
+
+So, how is **not** using the `controlled` block different from controlled inputs?
+
+```scala
+input(
+  placeholder := "Enter zip code: ",
+  value <-- zipValueSignal,
+  onInput.mapToValue.map(_.filter(Character.isDigit)) --> zipValueObserver
+)
+```
+
+This might look and often work a lot like controlled inputs, but it doesn't give you the guarantees that you want, and because of this you can run into issues. For example, without the `controlled` block, `value` is not actually locked to `zipValueSignal`. All that happens is that when `zipValueSignal` emits, we update the element's value to the emitted value. Ok, so what if the user types "123", and then later types another "a"? You'd expect "a" to be filtered out and the input to contain "123" after all this, but it will actually contain "123a", despite the Var containing "123". This is because `zipVar` never contained "123a", this value was transformed into "123" before it reached the Var, and so the Var has nothing new to emit (in this particular case it's because signals don't emit values that `==` the previous value, but there can be other similar situations using `filter` etc.). But at the same time, the user did type "123a" and so that's what you see in the input box. And before you can think of using `preventDefault` to solve this, `onInput` events are not cancelable. There's a more elaborate explanation in [#79](https://github.com/raquo/Laminar/issues/79).
+
+So, bottom line is, if you need to transform or filter user input, use either controlled inputs or `setAsValue`.
+
+
+### Types of Controlled Inputs 
+
+Our example used `onInput` event and `value` property. Certainly would be nice if `onInput` worked on all input types, but that's not the case in Internet Explorer (of course).
+
+So here are the events that work in all browsers of interest:
+
+| Element type | Input Prop | Controlled Prop | Comment |
+|-|:-:|:-:|-|
+| input[type=text,email,etc.] | onInput | value |  |
+| input[type=checkbox,radio] | onClick | checked | Do NOT use preventDefault on this |
+| textarea | onInput | value |  |
+| select | onChange | value | Does not work with multi-select |
+
+### Controlled Inputs Caveats
+
+* You can't have conflicting `controlled` blocks on the same element. You also can't have a `value <-- ???` binder outside of a controlled block on an element that already has `value` controlled. Trying to do that will throw and exception. The `controlled` block defines the sole source of truth for the `value` prop.
+
+* The `onInput` (or `onClick` etc.) event listener defined inside of the controlled block will be run before any other event listeners on this element, even if you registered those other listeners before adding the controlled block. If the controlled block is added to an element after it has already been mounted, under the hood this is achieved by removing all the Laminar listeners from the element and re-adding them in the same relative order, but **after** the . This is done to ensure that other event listeners do not interfere with the controlled input functionality (e.g. by stopping propagation of the event).
+
+* Remember that Laminar's `controlled` block sets the input's `value` (or `checked`, whichever you use) property to the controlling observable's last emitted value after each input event. This means that all other input event listeners will not see the user's real input, they will see whatever input value was set by the controlled block. This is because the event itself doesn't carry the information about the user's input, it's only stored in the input element's `value` property. So as Laminar updates that property to match the controlled observable, there is no chance for other event listeners to see the user's raw input.
+
 
 
 
