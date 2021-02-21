@@ -278,6 +278,10 @@ textarea::placeholder {
   margin: 30px auto;
 }
 
+.-sponsorsList {
+  margin-bottom: 40px;
+}
+
 .-sponsorsList h2 {
   /*font-size: 150%;*/
   margin-top: 30px;

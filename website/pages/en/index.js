@@ -116,7 +116,7 @@ class Index extends React.Component {
                   content: 'First-class streams and state variables in one integrated system – [Airstream](https://github.com/raquo/Airstream).'
                 },
                 {
-                  title: 'Many Building Blocks',
+                  title: 'Diverse Building Blocks',
                   content: 'Everything is abstractable and composable – elements, attributes, attribute-value pairs, events, state, etc.'
                 }
               ]
@@ -137,7 +137,7 @@ class Index extends React.Component {
                 },
                 {
                   title: 'Scala.js > Typescript',
-                  content: "Scala's type system is richer, safer, and encourages better patterns than Typescript. Night and day."
+                  content: "Scala's type system is richer, safer, and encourages better patterns than Typescript. [Night and day](https://www.youtube.com/watch?v=kLZr87CGY-U)."
                 }
               ]
             })
@@ -220,7 +220,7 @@ class Index extends React.Component {
                   },
                   {
                     title: '[Resources](/resources)',
-                    content: 'Links to quickstart, articles, addons, starter kits, and other useful stuff.'
+                    content: 'Quickstart, articles & videos, addons, starter kits, and other useful stuff.'
                   },
                 ]
               })
