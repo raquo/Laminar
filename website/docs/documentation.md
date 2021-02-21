@@ -947,6 +947,8 @@ The contrived example above does not feel like reactive programming at all. As s
 
 In Laminar, we have an `EventBus`. Same general idea, but instead of _being_ both an Observer and an Observable, it _contains_ them as `.writer` and `.events` respectively. This design makes it possible to easily share write-only or read-only parts of an EventBus, with no upcasting loopholes. You should generally avoid passing the whole EventBus to child components unless you really do need the child component to both write events to the bus and read the entirety of events written to that bus (including events written by other components into that bus).
 
+See also: [Sources & Sinks](https://github.com/raquo/Airstream/#sources--sinks) in Airstream docs.
+
 Now let's see how we can use EventBus for the same logic:
 
 ```scala
@@ -961,7 +963,7 @@ val element: Div = div(
 )
 ```
 
-`onClick --> clickBus.writer` works exactly the same as the previous example, except that `clickBus.writer` is now the Observer that we send the events to. For convenience, the `-->` method will also accept the event bus itself: `div(onClick --> clickBus, ...)` woudl have exactly the same effect.
+`onClick --> clickBus.writer` works exactly the same as the previous example, except that `clickBus.writer` is now the Observer that we send the events to. For convenience, the `-->` method will also accept the event bus itself: `div(onClick --> clickBus, ...)` would have exactly the same effect.
 
 What's new here is how we subscribe `coordinateObserver` to `onClick` events. As we established, we first send onClick events to `clickBus`. Then we have a `coordinateStream` that maps every click event from `clickBus` to its `screenX` coordinate.
 
@@ -1510,6 +1512,7 @@ val observer: Observer[dom.MouseEvent] = ???
 div(
   onMountCallback(ctx => {
     doSomething(ctx) // let's assume we need this for some reason
+ 
     // WRONG – DO NOT DO THIS!
     ctx.thisNode.amend(onClick --> observer)
   })

@@ -177,7 +177,7 @@ class CompositeKeySpec extends UnitSpec {
     val el = div(
       cls := "foo faa",
       cls.toggle("bar bax") := true,
-      cls.toggle("foo baz") <-- bus.signal
+      cls.toggle("foo baz") <-- bus
     )
     mount(el)
     expectNode(div.of(cls is "foo faa bar bax")) // Var starts with false

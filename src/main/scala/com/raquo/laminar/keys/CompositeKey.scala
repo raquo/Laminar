@@ -1,6 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Observable
+import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.Laminar.{MapValueMapper, StringValueMapper}
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMapper
 import com.raquo.laminar.modifiers.{Binder, Setter}
@@ -50,9 +51,9 @@ class CompositeKey[
     new LockedCompositeKey(this, items.toList)
   }
 
-  def <--[V]($items: Observable[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[El] = {
+  def <--[V]($items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[El] = {
     Binder.withSelf[El] { (element, thisBinder) =>
-      ReactiveElement.bindFn(element, $items) { nextRawItems =>
+      ReactiveElement.bindFn(element, $items.toObservable) { nextRawItems =>
         val currentNormalizedItems = element.compositeValueItems(self, thisBinder)
         val nextNormalizedItems = valueMapper.toNormalizedList(nextRawItems, separator)
 

@@ -1,6 +1,6 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Observable
+import com.raquo.airstream.core.Source
 import com.raquo.domtypes
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.DomApi
@@ -26,10 +26,10 @@ class ReactiveSvgAttr[V](
     new KeySetter[ReactiveSvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
   }
 
-  def <--($value: Observable[V]): SvgAttrUpdater[V] = {
+  def <--($value: Source[V]): SvgAttrUpdater[V] = {
     new KeyUpdater[SvgElement, ReactiveSvgAttr[V], V](
       this,
-      $value,
+      $value.toObservable,
       (el, v) => DomApi.setSvgAttribute(el, this, v)
     )
   }

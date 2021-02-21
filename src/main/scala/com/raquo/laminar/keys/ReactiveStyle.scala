@@ -1,6 +1,6 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Observable
+import com.raquo.airstream.core.Source
 import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
@@ -34,10 +34,10 @@ class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
     new KeySetter[Style[V], String, HtmlElement](style, value, DomApi.setHtmlStringStyle)
   }
 
-  def <--($value: Observable[V | String]): StyleUpdater[V] = {
+  def <--[A]($value: Source[A])(implicit ev: A => V | String): StyleUpdater[V] = {
     new KeyUpdater[HtmlElement, Style[V], V | String](
       style,
-      $value,
+      $value.asInstanceOf[Source[V | String]].toObservable,
       (el, v) => DomApi.setHtmlAnyStyle(el, style, v)
     )
   }

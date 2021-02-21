@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{EventStream, Observable, Observer}
+import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.domtypes
@@ -220,6 +220,15 @@ object ReactiveElement {
     observer: Observer[V]
   ): DynamicSubscription = {
     DynamicSubscription.subscribeObserver(element.dynamicOwner, observable, observer)
+  }
+
+  @inline def bindSink[V](
+    element: ReactiveElement.Base,
+    observable: Observable[V]
+  )(
+    sink: Sink[V]
+  ): DynamicSubscription = {
+    DynamicSubscription.subscribeSink(element.dynamicOwner, observable, sink)
   }
 
   @inline def bindBus[V](
