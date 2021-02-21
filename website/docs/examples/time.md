@@ -32,6 +32,8 @@ render(containerNode, app)
 
 <h2>Delay</h2>
 
+Asynchrony works naturally with observables. In this example, on every click, we render a "Just clicked" message, and also schedule its removal 500ms later. When such a component is unmounted, its streams are stopped automatically, no need for manual cleanup or isMounted checks.
+
 <div class = "mdoc-example">
 
 ```scala mdoc:js

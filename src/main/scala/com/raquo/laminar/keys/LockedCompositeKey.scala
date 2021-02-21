@@ -1,7 +1,7 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Observable
-import com.raquo.laminar.api.{StringSeqSeqValueMapper, StringSeqValueMapper}
+import com.raquo.airstream.core.Source
+import com.raquo.laminar.api.StringSeqValueMapper
 import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
@@ -17,14 +17,14 @@ class LockedCompositeKey[Key, -El <: ReactiveElement.Base](
 
   def :=(include: Boolean): Setter[El] = {
     if (include) {
-      key := items
+      key := (items: _*)
     } else {
       Setter.noop
     }
   }
 
   /** If \$include emits true, items will be added, if false, they will be removed. */
-  def <--($include: Observable[Boolean]): Binder[El] = {
-    key <-- $include.map(include => if (include) items else Nil)
+  def <--($include: Source[Boolean]): Binder[El] = {
+    key <-- $include.toObservable.map(include => if (include) items else Nil)
   }
 }

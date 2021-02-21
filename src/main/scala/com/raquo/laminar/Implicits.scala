@@ -1,11 +1,10 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.{EventStream, Observable, Observer, Signal}
-import com.raquo.airstream.eventbus.{EventBus, WriteBus}
-import com.raquo.airstream.state.{Val, Var}
+import com.raquo.airstream.core.{Observable, Sink, Source}
+import com.raquo.airstream.state.Val
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style
-import com.raquo.laminar.Implicits.{RichEventStream, RichObservable, RichSignal}
+import com.raquo.laminar.Implicits.RichSource
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{EventProcessor, ReactiveEventProp, ReactiveStyle}
 import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Setter}
@@ -13,7 +12,6 @@ import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 import org.scalajs.dom
 
 import scala.scalajs.js
-import scala.scalajs.js.|
 
 trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMappers {
 
@@ -92,26 +90,8 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   }
 
   /** Add --> methods on Observables */
-  @inline implicit def enrichObservable[A](observable: Observable[A]): RichObservable[A] = {
-    new RichObservable(observable)
-  }
-
-  /** Add --> methods on EventStreams */
-  @inline implicit def enrichEventStream[A](eventStream: EventStream[A]): RichEventStream[A] = {
-    new RichEventStream(eventStream)
-  }
-
-  /** Add --> methods on Signals */
-  @inline implicit def enrichSignal[A](observable: Signal[A]): RichSignal[A] = {
-    new RichSignal(observable)
-  }
-
-  // @TODO[IDE] This implicit conversion is only needed to make the Scala plugin for IntelliJ 2019.3 happy.
-  //  - this kind of type signature is relevant to Style props which often expect Observable[Int | String] or something like that.
-  //  - note that even though this conversion is not required for your code to work, it might get called when it's available,
-  //    but it's an @inline noop, so it should have no effect on runtime.
-  @inline implicit def intellijObservableOfOrConversion[A](stringStream: Observable[A]): Observable[A | String] = {
-    stringStream.asInstanceOf[Observable[A | String]]
+  @inline implicit def enrichSource[A](source: Source[A]): RichSource[A] = {
+    new RichSource(source)
   }
 }
 
@@ -136,48 +116,16 @@ object Implicits {
 
   /** Some of these methods are redundant, but we need them for type inference to work. */
 
-  class RichObservable[A](val observable: Observable[A]) extends AnyVal {
+  class RichSource[A](val source: Source[A]) extends AnyVal {
 
-    def -->(observer: Observer[A]): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindObserver(_, observable)(observer))
+    def -->(sink: Sink[A]): Binder[ReactiveElement.Base] = {
+      Binder(ReactiveElement.bindSink(_, source.toObservable)(sink))
     }
 
     def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindFn(_, observable)(onNext))
+      Binder(ReactiveElement.bindFn(_, source.toObservable)(onNext))
     }
 
-    def -->(targetVar: Var[A]): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindObserver(_, observable)(targetVar.writer))
-    }
   }
 
-  class RichSignal[A](val signal: Signal[A]) extends AnyVal {
-
-    def -->(observer: Observer[A]): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindObserver(_, signal)(observer))
-    }
-
-    def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindFn(_, signal)(onNext))
-    }
-  }
-
-  class RichEventStream[A](val eventStream: EventStream[A]) extends AnyVal {
-
-    def -->(observer: Observer[A]): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindObserver(_, eventStream)(observer))
-    }
-
-    def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindFn(_, eventStream)(onNext))
-    }
-
-    def -->(writeBus: WriteBus[A]): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindBus(_, eventStream)(writeBus))
-    }
-
-    def -->(eventBus: EventBus[A]): Binder[ReactiveElement.Base] = {
-      Binder(ReactiveElement.bindBus(_, eventStream)(eventBus.writer))
-    }
-  }
 }

@@ -1,8 +1,6 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Observer
-import com.raquo.airstream.eventbus.EventBus
-import com.raquo.airstream.state.Var
+import com.raquo.airstream.core.Sink
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.ReactiveElement
@@ -28,20 +26,12 @@ class EventProcessor[Ev <: dom.Event, V](
   protected val processor: Ev => Option[V]
 ) {
 
-  @inline def -->[El <: ReactiveElement.Base](observer: Observer[V]): EventListener[Ev, V] = {
-    new EventListener[Ev, V](this, observer.onNext)
+  @inline def -->(sink: Sink[V]): EventListener[Ev, V] = {
+    -->(sink.toObserver.onNext(_))
   }
 
   @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventListener[Ev, V] = {
-    -->(Observer(onNext))
-  }
-
-  @inline def -->[BusEv >: V, El <: ReactiveElement.Base](eventBus: EventBus[BusEv]): EventListener[Ev, V] = {
-    -->(eventBus.writer)
-  }
-
-  @inline def -->[VarEv >: V, El <: ReactiveElement.Base](targetVar: Var[VarEv]): EventListener[Ev, V] = {
-    -->(targetVar.writer)
+    new EventListener[Ev, V](this, onNext)
   }
 
   /** Use capture mode (v=true) or bubble mode (v=false)
@@ -201,7 +191,7 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Write the resulting string into `event.target.value`.
     * You can only do this on elements that have a value property - input, textarea, select
     */
-  def setAsValue(implicit stringEvidence: V =:= String): EventProcessor[Ev, V] = {
+  def setAsValue(implicit stringEvidence: V <:< String): EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { value =>
         val nextInputValue = stringEvidence(value)
@@ -217,7 +207,7 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * Warning: if using this, do not use preventDefault. The browser may override the value you set here.
     */
-  def setAsChecked(implicit boolEvidence: V =:= Boolean): EventProcessor[Ev, V] = {
+  def setAsChecked(implicit boolEvidence: V <:< Boolean): EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { value =>
         val nextChecked = boolEvidence(value)

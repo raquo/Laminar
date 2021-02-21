@@ -1,6 +1,6 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Observable
+import com.raquo.airstream.core.Source
 import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.domtypes.generic.keys.HtmlAttr
 import com.raquo.laminar.DomApi
@@ -25,10 +25,10 @@ class ReactiveHtmlAttr[V](
     new KeySetter[ReactiveHtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
   }
 
-  def <--($value: Observable[V]): HtmlAttrUpdater[V] = {
+  def <--($value: Source[V]): HtmlAttrUpdater[V] = {
     new KeyUpdater[HtmlElement, ReactiveHtmlAttr[V], V](
       this,
-      $value,
+      $value.toObservable,
       (el, v) => DomApi.setHtmlAttribute(el, this, v)
     )
   }

@@ -1,9 +1,9 @@
 package com.raquo.laminar.receivers
 
-import com.raquo.airstream.core.Observable
-import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.modifiers.{ChildInserter, Inserter}
+import com.raquo.airstream.core.Source
 import com.raquo.laminar.modifiers.ChildrenInserter.Child
+import com.raquo.laminar.modifiers.{ChildInserter, Inserter}
+import com.raquo.laminar.nodes.ReactiveElement
 
 object ChildReceiver {
 
@@ -13,7 +13,10 @@ object ChildReceiver {
 
   val int: IntChildReceiver.type = IntChildReceiver
 
-  def <--($node: Observable[Child]): Inserter[ReactiveElement.Base] = {
-    ChildInserter[ReactiveElement.Base](_ => $node, initialInsertContext = None)
+  def <--($node: Source[Child]): Inserter[ReactiveElement.Base] = {
+    ChildInserter[ReactiveElement.Base](
+      _ => $node.toObservable,
+      initialInsertContext = None
+    )
   }
 }
