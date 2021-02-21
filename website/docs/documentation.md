@@ -29,7 +29,7 @@ title: Documentation
   * [cls](#cls)
   * [Other Composite Keys](#other-composite-keys)
   * [SVG](#svg)
-* [Event System: Emitters, Processors, Buses](#event-system-emitters-proocessors-buses)
+* [Event System: Emitters, Processors, Buses](#event-system-emitters-processors-buses)
   * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
   * [EventBus](#eventbus)
   * [composeEvents](#composeevents)
@@ -62,12 +62,13 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v0.11.0**. For other versions, see below.
+This documentation is for Laminar version **v0.12.0**. For other versions, see below.
 
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.11.0](https://laminar.dev/documentation)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
+| **[v0.12.0](https://laminar.dev/documentation)** | **[v0.12.0](https://github.com/raquo/Airstream/blob/v0.12.0/README.md)** |
+| **[v0.11.0](https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
 | – | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
 | **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
 | **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
@@ -1636,7 +1637,7 @@ Assuming container is present in the DOM, `render(container, contentEl)` will im
 
 [Waypoint](https://github.com/raquo/Waypoint) – My URL router for Laminar.
 
-[tulz-app/laminar-router](https://github.com/tulz-app/laminar-router) – Alternative router for Laminar with API inspired by Akka HTTP
+[frountroute](https://github.com/tulz-app/frontroute) – Alternative router for Laminar with API inspired by Akka HTTP
 
 These routers are designed for Laminar, but don't actually depend on it, only on Airstream, so you could potentially use them without Laminar.
 

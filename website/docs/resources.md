@@ -24,6 +24,14 @@ title: Resources
 
 
 
+## Videos & Conference Talks
+
+* [Video Introduction to Laminar](https://www.youtube.com/watch?v=L_AHCkl6L-Q)
+
+* [Kit Langton – Stockholm Syndrome Escape Velocity](https://www.youtube.com/watch?v=kLZr87CGY-U)
+
+
+
 ## Community & Support
 
 * [Gitter](https://gitter.im/Laminar_/Lobby) for support, advice, showing off your Laminar projects, etc.
@@ -38,7 +46,7 @@ title: Resources
 
 * [Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/36) to try things on the fly
 
-* [Laminar TodoMVC](https://github.com/raquo/laminar-examples) – example implementation of a standard todo list app
+  * Note: the Laminar version there is a bit old, but most things work exactly the same
 
 * [keynmol/http4s-laminar-stack](https://github.com/keynmol/http4s-laminar-stack) – Laminar setup with http4s, sttp, docker, and other niceties
 
@@ -52,12 +60,18 @@ title: Resources
 
 * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
 
+* [keynmol/laminar-static-gh-pages](https://github.com/keynmol/laminar-static-gh-pages/) – Template for publishing a static site with Laminar
+
+* [yurique/laminar-snowpack-example](https://github.com/yurique/laminar-snowpack-example) - Laminar setup with [Snowpack](https://www.snowpack.dev/) (instead of Webpack) and [frontroute](https://github.com/tulz-app/frontroute)
+
+* [raquo/laminar-examples](https://github.com/raquo/laminar-examples) – an old repo with some Laminar examples, most of which you can see on this website already.
+
 
 
 ## Addons & Extensions
 
 * [Waypoint](https://github.com/raquo/Waypoint) – URL router for Laminar
-* [tulz-app/frontroute](https://github.com/tulz-app/frontroute) – Alternative router for Laminar with API inspired by Akka HTTP
+* [frontroute](https://github.com/tulz-app/frontroute) – Alternative router for Laminar with API inspired by Akka HTTP
 * [Laminar.cycle](https://github.com/vic/laminar_cycle) – Cycle.js dialogue abstraction in Laminar
 * [purgecss-laminar-webpack-plugin](https://github.com/yurique/purgecss-laminar-webpack-plugin) – Removes unused CSS from your webpack bundle
 
@@ -74,5 +88,3 @@ title: Resources
 ## Other Related Projects
 
 * [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles
-
-* [Scala DOM TestUtils](https://github.com/raquo/scala-dom-testutils) – Test that your Javascript DOM nodes match your expectations
