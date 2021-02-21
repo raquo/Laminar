@@ -19,17 +19,15 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     EventProcessor.empty(eventProp)
   }
 
-  @inline implicit def styleToReactiveStyle[V](style: Style[V]): ReactiveStyle[V] = {
-    new ReactiveStyle[V](style)
-  }
+  @inline implicit def styleToReactiveStyle[V](style: Style[V]): ReactiveStyle[V] = new ReactiveStyle[V](style)
 
-  @inline implicit def textToNode(text: String): TextNode = {
-    new TextNode(text)
-  }
+  @inline implicit def textToNode(text: String): TextNode = new TextNode(text)
 
-  @inline implicit def intToNode(int: Int): TextNode = {
-    new TextNode(int.toString)
-  }
+  @inline implicit def boolToNode(bool: Boolean): TextNode = new TextNode(bool.toString)
+
+  @inline implicit def intToNode(int: Int): TextNode = new TextNode(int.toString)
+
+  @inline implicit def doubleToNode(double: Double): TextNode = new TextNode(double.toString)
 
   /** Create a setter that applies each of the setters in a seq */
   implicit def seqToSetter[El <: ReactiveElement.Base](setters: scala.collection.Seq[Setter[El]]): Setter[El] = {

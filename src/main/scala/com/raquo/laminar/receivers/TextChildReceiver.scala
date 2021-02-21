@@ -6,9 +6,9 @@ import com.raquo.laminar.nodes.{ReactiveElement, TextNode}
 
 object TextChildReceiver {
 
-  def <--($node: Source[String]): Inserter[ReactiveElement.Base] = {
+  def <--[T]($node: Source[T])(implicit ev: T => TextNode): Inserter[ReactiveElement.Base] = {
     ChildInserter[ReactiveElement.Base](
-      _ => $node.toObservable.map(new TextNode(_)),
+      _ => $node.toObservable.map(ev(_)),
       initialInsertContext = None
     )
   }
