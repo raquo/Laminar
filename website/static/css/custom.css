@@ -278,20 +278,54 @@ textarea::placeholder {
   margin: 30px auto;
 }
 
+.-homeSection .-sponsorsList {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .-sponsorsList {
   margin-bottom: 40px;
+  max-width: 400px;
 }
 
 .-sponsorsList h2 {
   /*font-size: 150%;*/
   margin-top: 30px;
+  margin-bottom: 30px;
 }
 
-.-sponsorsList p {
+.-sponsorsList .-sponsor {
   position: relative;
   left: -0.2em;
+  display: flex;
+  margin: 20px 0;
+}
+
+.-sponsorsList .-logo {
+  position: relative;
+  top: 4px;
+  width: 90px;
+  height: 90px;
+  margin-right: 20px;
+}
+
+.-sponsorsList .-logo.x-rounded {
+  border-radius: 17px;
+}
+
+.-sponsorsList .-text {
+  text-align: left;
+}
+
+.-sponsorsList .-name {
   font-size: 130%;
 }
+
+.-sponsorsList .-description {
+  font-size: 90%;
+}
+
+
 
 /* Header */
 

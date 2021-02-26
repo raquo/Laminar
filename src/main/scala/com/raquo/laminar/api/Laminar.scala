@@ -111,11 +111,11 @@ private[laminar] object Laminar
 
   type Setter[-El <: Element] = modifiers.Setter[El]
 
-  val Setter: modifiers.Setter.type = modifiers.Setter
+  @inline def Setter: modifiers.Setter.type = modifiers.Setter
 
   type Binder[-El <: Element] = modifiers.Binder[El]
 
-  val Binder: modifiers.Binder.type = modifiers.Binder
+  @inline def Binder: modifiers.Binder.type = modifiers.Binder
 
   type Inserter[-El <: Element] = modifiers.Inserter[El]
 

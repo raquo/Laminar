@@ -232,8 +232,19 @@ class Index extends React.Component {
               <p>Laminar is developed by Nikita Gazarov with generous support from my <a href="https://github.com/sponsors/raquo">sponsors</a>.</p>
               <div className="-sponsorsList">
                 <h2>GOLD Sponsors:</h2>
-                <p><span className="-emoji">✨</span> <a href="https://github.com/yurique">Iurii Malchenko</a></p>
-                <p><span className="-emoji">✨</span> <a href="https://tawasal.ae">Tawasal</a> – a secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</p>
+                <div className="-sponsor">
+                  <img className="-logo x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+                  <div className="-text">
+                    <div className="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+                  </div>
+                </div>
+                <div className="-sponsor">
+                  <img className="-logo" src="/img/sponsors/tawasal.png" alt="" />
+                  <div className="-text">
+                    <div className="-name"><a href="https://tawasal.ae">Tawasal</a></div>
+                    <div className="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+                  </div>
+                </div>
               </div>
               <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
             </div>
