@@ -154,7 +154,7 @@ This release is a significant improvement to both usability and safety of Lamina
   * ReactiveElement.maybeChildren is not mutable anymore (was never intended to be)
   * subscribe\* methods renamed and moved to ReactiveElement companion object
     * **Migration**: use the new `observable --> observer` modifier, or the new onMount* hooks, and/or the new `element.amend` method.
-    * Make sure to document `nodeToInserter` @nc
+    * Make sure to document `nodeToInserter`
 * **API: eliminate auxiliary syntax `myElement <-- child <-- childSignal`**
   * Use the new `amend` method instead: `myElement.amend(child <-- childSignal)`
 * **API: Remove `ChildNode.isParentMounted` method. Use a similar `ChildNode.isNodeMounted` instead.**

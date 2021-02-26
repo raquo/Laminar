@@ -1265,7 +1265,7 @@ input(
 
 You need to put both the event listener and value reader inside a `controlled` block. This is how Laminar knows where the interaction loop for this input is described, and enables Laminar to make sure that the value property follows the current value of `zipVar`.
 
-This leads us to the main requirement of controlled inputs: your logic must respond to `onInput` events by making `zipVarSignal` emit the new value. In our example we do exactly that – `onInput` we write the new text (`mapToValue` grabs the user's input from `event.target.value`) to `zipVar`, and we make value listen to `zipVar`'s signal.
+This leads us to the main requirement of controlled inputs: your logic must respond to `onInput` events by making `zipValueSignal` emit the new value. In our example we do exactly that – `onInput` we write the new text (`mapToValue` grabs the user's input from `event.target.value`) to `zipVar`, and we make value listen to `zipVar`'s signal.
 
 This is the simplest loop possible, but we can complicate it using all normal Laminar functionality. For example, we could disallow non-digit inputs:
 
