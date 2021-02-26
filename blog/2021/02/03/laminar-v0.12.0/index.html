@@ -1,0 +1,473 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v0.12.0, Laminext, Material UI &amp; more! · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Laminar v0.12.0 and Airstream v0.12.0 are out! 🎉"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v0.12.0, Laminext, Material UI &amp; more! · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2021/02/03/laminar-v0.12.0"/><meta property="og:description" content="Laminar v0.12.0 and Airstream v0.12.0 are out! 🎉"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2021/02/03/laminar-v0.12.0">Laminar v0.12.0, Laminext, Material UI &amp; more!</a></li><li class="navListItem"><a class="navItem" href="/blog/2020/10/17/airstream-v0.11.1">Airstream v0.11.1</a></li><li class="navListItem"><a class="navItem" href="/blog/2020/10/12/laminar-v0.11.0">Laminar v0.11.0 &amp; New Website</a></li><li class="navListItem"><a class="navItem" href="/blog/2020/10/10/hello">Previous News &amp; Release Notes</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2021/02/03/laminar-v0.12.0">Laminar v0.12.0, Laminext, Material UI &amp; more!</a></h1><p class="post-meta">February 3, 2021</p><div class="authorBlock"><p class="post-authorName"><a href="http://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>Laminar v0.12.0 and Airstream v0.12.0 are out! 🎉</p>
+<p>This is a big release packed with new features and ergonomics improvements. Ctrl+F for &quot;migration&quot; in this post for directions on breaking changes. Don't worry, the &quot;breaking&quot; stuff is minor and mostly concerns previous misbehaviours in edge cases. Existing users, make sure to read the new / updated parts of the docs as linked below.</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a native Scala.js library for building web application interfaces. Learn more in <a href="https://laminar.dev/">one short page</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one hour long video</a>.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="0-news"></a><a href="#0-news" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>0. News</h2>
+<h3><a class="anchor" aria-hidden="true" id="laminext-"></a><a href="#laminext-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Laminext 🎉</h3>
+<p>Announcing the first release of <a href="https://laminext.dev/">laminext</a>, Iurii's collection of components, utilities and helpers for Laminar and Airstream; including a websockets client, form validation utils, and a set of Laminar components designed with Tailwind CSS.</p>
+<h3><a class="anchor" aria-hidden="true" id="laminar-web-components-"></a><a href="#laminar-web-components-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Laminar Web Components 🎉</h3>
+<p><a href="https://github.com/uosis">Uosis</a> published the first version of <a href="https://github.com/uosis/laminar-web-components">Material UI Web Components</a> for Laminar. Welcome news for those looking for prebuilt Laminar components!</p>
+<h3><a class="anchor" aria-hidden="true" id="kits-great-talk-on-scalajs-laminar--other-goodies-"></a><a href="#kits-great-talk-on-scalajs-laminar--other-goodies-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Kit's great talk on Scala.js, Laminar &amp; other goodies 🎉</h3>
+<p><a href="https://www.youtube.com/watch?v=kLZr87CGY-U">Stockholm Syndrome Escape Velocity – Kit Langton, Functional Scala 2020</a></p>
+<h3><a class="anchor" aria-hidden="true" id="tawasal-"></a><a href="#tawasal-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Tawasal 🎉</h3>
+<p>Check out our new GOLD sponsor, <strong><a href="https://tawasal.ae">Tawasal</a></strong> – a secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</p>
+<h3><a class="anchor" aria-hidden="true" id="and-more-"></a><a href="#and-more-" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>And more 🎉</h3>
+<ul>
+<li><p>Iurii rebranded his laminar-router as <a href="https://github.com/tulz-app/frontroute">frontroute</a> and added more docs and features.</p></li>
+<li><p>Other com.raquo releases: Waypoint 0.3.0, Scala DOM Types 0.14.0</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="1-laminar-changes"></a><a href="#1-laminar-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>1. Laminar Changes</h2>
+<h3><a class="anchor" aria-hidden="true" id="new-eventprocessor--eventproptransformation-operators"></a><a href="#new-eventprocessor--eventproptransformation-operators" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New EventProcessor / EventPropTransformation operators</h3>
+<p>The concept of EventPropTransformation was renamed to EventProcessor.</p>
+<p>EventProcessor got several new <a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/keys/EventProcessor.html">operators</a>, most importantly <code>mapToValue</code> and <code>mapToChecked</code>, which significantly reduce boilerplate when trying to get the input's value or the checkbox's checked status.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// BEFORE</span>
+input(inContext { thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; textObserver })
+
+<span class="hljs-comment">// AFTER</span>
+input(onInput.mapToValue --&gt; textObserver)
+</code></pre>
+<p>As you might know, pre-v0.12.0 Laminar already had a <code>mapToValue[V](v: V)</code> operator which acted like a strict version of <code>mapTo[V](v: =&gt; V)</code>. This operator was renamed to <code>mapToStrict</code> in this version.</p>
+<p>Other notable new operators are <code>setAsValue</code> and <code>setAsChecked</code>. They are only available on event processors that emit strings and booleans respectively, and set the value prop (or the checked prop) to the emitted value. This is an alternative to filtering / processing user inputs without using controlled inputs.</p>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>Find usages of <code>EventPropTransformation</code> type and change them to <code>EventProcessor</code>, and fix imports if necessary</li>
+<li>Find usages of old <code>mapToValue</code> methods and change them to <code>mapToStrict</code></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="new-api-for-controlled-inputs-79httpsgithubcomraquolaminarissues79"></a><a href="#new-api-for-controlled-inputs-79httpsgithubcomraquolaminarissues79" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New API for controlled inputs (<a href="https://github.com/raquo/Laminar/issues/79">#79</a>)</h3>
+<p>Previously, you could implement controlled inputs in Laminar like this:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> inputState = <span class="hljs-type">Var</span>(<span class="hljs-string">""</span>)
+input(
+  value &lt;-- inputState.signal,
+  inContext { thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; inputState },
+  <span class="hljs-comment">// other mods, if any</span>
+)
+</code></pre>
+<p>This usually worked well enough, and continues to work exactly as before in 0.12.0. However, this approach has a fundamental problem: the input's value isn't actually locked to the output of <code>inputState.signal</code>, it's simply updated every time <code>inputState.signal</code> emits.  <a href="https://github.com/raquo/Laminar/issues/79">#79</a> explains the technicalities of how the signal's value and the input value could diverge in previous versions of Laminar.</p>
+<p>We now offer a new way to do controlled inputs: simply wrap your value updater and input listener into <code>controlled</code>, e.g.:</p>
+<pre><code class="hljs css language-scala">input(
+  controlled(
+    value &lt;-- inputState.signal,
+    inContext { thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; inputState }
+  ),
+  <span class="hljs-comment">// ... other mods, if any</span>
+)
+</code></pre>
+<p>But actually, due to unrelated improvements in 0.12.0 (see below), this can be shortened to:</p>
+<pre><code class="hljs css language-scala">input(
+  controlled(
+    value &lt;-- inputState,
+    onInput.mapToValue --&gt; inputState
+  ),
+  <span class="hljs-comment">// ... other mods, if any</span>
+)
+</code></pre>
+<p>This works similarly with all input types that can be controlled including checkboxes and radio buttons (using <code>checked</code> and <code>onClick</code>) and <code>&lt;select&gt;</code> elements (using <code>value</code> and <code>onChange</code>).</p>
+<p>The new controlled input API ensures that the input's <code>value</code> stays in sync with the observable it's listening to, so it behaves slightly differently, but 95% of the time, this new way is a drop-in replacement for the old way of doing things (which is still supported).</p>
+<p>Make sure to read the new <a href="https://laminar.dev/documentation#controlled-inputs">Controlled Inputs</a> section of the docs as there are important caveats to this new API.</p>
+<h3><a class="anchor" aria-hidden="true" id="new-way-to-stream-events-composeevents"></a><a href="#new-way-to-stream-events-composeevents" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New way to stream events: composeEvents</h3>
+<p>With the usual <code>div(onClick.preventDefault --&gt; eventObserver)</code> syntax you can only apply a limited set of EventProcessor operators like <code>map</code>, <code>filter</code>, <code>preventDefault</code> to each event (and also Observer operators like <code>contramap</code> and <code>delay</code> on the right hand side), but sometimes you want full palette of stream operators. Previously you would need to use <code>inContext</code> to achieve this:</p>
+<pre><code class="hljs css language-scala">div(
+  inContext { _.events(onClick).throttle(<span class="hljs-number">0</span>) --&gt; eventObserver }
+)
+</code></pre>
+<p>Now you can skip the curly braces and just use <code>composeEvents</code>:</p>
+<pre><code class="hljs css language-scala">div(
+  composeEvents(onClick)(_.throttle(<span class="hljs-number">0</span>)) --&gt; eventObserver
+)
+</code></pre>
+<p>This approach is inspired by <code>thisEvents</code> from Laminext by the way.</p>
+<p><code>composeEvents</code> is particularly nice when you want to apply both EventProcessor and stream operators, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> $allowClick: <span class="hljs-type">Signal</span>[<span class="hljs-type">Boolean</span>] = ???
+ 
+a(
+  composeEvents(onClick.preventDefault) {
+    _.withCurrentValueOf($allowClick)
+      .collect { <span class="hljs-keyword">case</span> (ev, <span class="hljs-literal">true</span>) =&gt; ev }
+  } --&gt; eventObserver
+)
+</code></pre>
+<p>Thanks to <code>mapToValue</code> / <code>mapToChecked</code> and <code>composeEvents</code>, you will barely ever need <code>inContext</code> now.</p>
+<h3><a class="anchor" aria-hidden="true" id="eliminate-interference-between-overlapping-cls-modifiers-71httpsgithubcomraquolaminarissues71"></a><a href="#eliminate-interference-between-overlapping-cls-modifiers-71httpsgithubcomraquolaminarissues71" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Eliminate interference between overlapping cls modifiers (<a href="https://github.com/raquo/Laminar/issues/71">#71</a>)</h3>
+<p>In Laminar, you can attach several <code>cls</code> modifiers to the same element, for example:</p>
+<pre><code class="hljs css language-scala">input(
+  cls := <span class="hljs-string">"TextInput"</span>,
+  cls &lt;-- streamOfClasses
+)
+</code></pre>
+<p>This generally works just fine: <code>streamOfClasses</code> adds class names that it emits, replacing any class names it emitted previously, while the &quot;TextInput&quot; class name remains on the input element throughout all this.</p>
+<p>However, prior to this release, users needed to make sure that <code>streamOfClasses</code> does not emit a class name added by another <code>cls</code> modifier, such as &quot;TextInput&quot; in this case. If this happened, and then <code>streamOfClasses</code> emitted another event without that class name, Laminar would remove the &quot;TextInput&quot; class name, whereas the user might expect it to remain on the input element indefinitely, as indicated by <code>cls := &quot;TextInput&quot;</code>.</p>
+<p>This interference was documented, but was still undesirable.</p>
+<p>Starting with 0.12.0, Laminar behaves as expected in this case. Elements now keep track of which <code>cls</code> modifiers want to keep which class names, and only remove a class name if <strong>none</strong> of the modifiers want it anymore, so in the example above the &quot;TextInput&quot; class name would indeed never be removed from the input element even if <code>streamOfClasses</code> is not disciplined about what it emits.</p>
+<p>This applies to other composite attributes such as <code>rel</code> just as well.</p>
+<p>See the updated <a href="https://laminar.dev/documentation#cls">cls</a> section of Laminar docs for details.</p>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li><p>A given class name on a given element must be managed <strong>either</strong> by Laminar (via <code>cls</code> modifiers) <strong>or</strong> externally (using native JS <code>className</code> or <code>classList</code> properties), <strong>but not both</strong>. Doing so will cause unexpected behaviour. Same goes for other composite attributes.</p>
+<ul>
+<li>Note: you can still manage class names on the same element using both Laminar and native JS methods as long as those two subsets of class names <strong>don't overlap</strong>.</li>
+</ul></li>
+<li><p><code>cls</code> and other composite attributes no longer offer <code>set</code> or <code>remove</code> methods. You'll need to use the <code>&lt;--</code> method to achieve that.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="easier-way-to-build-custom-dom-events-attrs-props-etc"></a><a href="#easier-way-to-build-custom-dom-events-attrs-props-etc" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Easier way to build custom DOM events, attrs, props, etc.</h3>
+<p>Laminar gets its DOM type definitions from <a href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a>: things like <code>div</code>, <code>onClick</code>, <code>backgroundColor</code> are all defined there.</p>
+<p>So when you find some DOM event or CSS prop missing, it's a good idea to add it to Scala DOM Types. But you could also always create instances of <code>ReactiveProp</code> / <code>ReactiveEventProp</code> / etc. for missing keys manually. We now provide easier syntax for this, which comes especially handy to reduce the boilerplate of defining Laminar interfaces to third party web components:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// BEFORE:</span>
+<span class="hljs-keyword">val</span> superValue: <span class="hljs-type">ReactiveProp</span>[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>] = <span class="hljs-keyword">new</span> <span class="hljs-type">ReactiveProp</span>(<span class="hljs-string">"superValue"</span>, <span class="hljs-type">StringAsIsCodec</span>)
+<span class="hljs-keyword">val</span> onWhatever: <span class="hljs-type">ReactiveEventProp</span>[dom.<span class="hljs-type">WhateverEvent</span>] = <span class="hljs-keyword">new</span> <span class="hljs-type">ReactiveEventProp</span>(<span class="hljs-string">"whatever"</span>)
+<span class="hljs-keyword">val</span> innerColor: <span class="hljs-type">ReactiveStyle</span>[<span class="hljs-type">String</span>] = <span class="hljs-keyword">new</span> <span class="hljs-type">ReactiveStyle</span>(<span class="hljs-keyword">new</span> generic.<span class="hljs-type">Style</span>[<span class="hljs-type">String</span>](<span class="hljs-string">"innerColor"</span>, <span class="hljs-string">"inner-color"</span>))
+
+<span class="hljs-comment">// AFTER:</span>
+<span class="hljs-keyword">val</span> superValue: <span class="hljs-type">ReactiveProp</span>[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>] = customProp(<span class="hljs-string">"superValue"</span>, <span class="hljs-type">StringAsIsCodec</span>)
+<span class="hljs-keyword">val</span> onWhatever: <span class="hljs-type">ReactiveEventProp</span>[dom.<span class="hljs-type">WhateverEvent</span>] = customEventProp(<span class="hljs-string">"whatever"</span>)
+<span class="hljs-keyword">val</span> innerColor: <span class="hljs-type">ReactiveStyle</span>[<span class="hljs-type">String</span>] = customStyle(<span class="hljs-string">"inner-color"</span>)
+</code></pre>
+<p><strong>Migration notes – Style class</strong></p>
+<ul>
+<li>If you have defined custom style props in your project, this is relevant to you:</li>
+<li><code>Style</code> class from <em>Scala DOM Types</em> does not have a camelCased name param anymore. The kebab-cased param that used to be called <code>cssName</code> is now called <code>name</code>, and the old camelCased <code>name</code> param was removed. So in the very unlikely case that you are accessing the style's old <code>name</code> property, you'll need to provide your own replacement for that. But the camelCased version is not actually needed for anything in the DOM, so make sure that you shouldn't be using the kebab-case version instead. <a href="https://github.com/raquo/scala-dom-types/pull/67">scala-dom-types/#67</a>.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="reduce-api-surface"></a><a href="#reduce-api-surface" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reduce API surface</h3>
+<ul>
+<li><p>Laminar doesn't try to save you from yourself when you use <code>onClick.preventDefault</code> on checkboxes anymore. Previously if you registered a click listener on a checkbox and used the EventPropTransformation preventDefault operator on it, Laminar would call your observer <strong>asynchronously</strong> to make sure that the browser resets the checkbox state before your observer is run.</p>
+<ul>
+<li>See details of the issue <a href="https://github.com/raquo/Laminar/blob/v0.11.0/website/docs/documentation.md#checkboxonclick--eventpreventdefault">here</a></li>
+<li>Basically, if you want to <code>preventDefault</code> checkbox clicks, you're on your own. The Laminar way is to use the new controlled inputs or the new <code>setAsChecked</code> operator instead.</li>
+<li><strong>Migration:</strong> find usages like this in your code: <code>input(typ := &quot;checkbox&quot;, onClick.preventDefault --&gt; observer)</code> and check if it still works as expected.</li>
+</ul></li>
+<li><p><code>events</code> method only accepts a single param now, an EventProcessor.</p>
+<ul>
+<li><strong>Migration:</strong> use EventProcessor operators to achieve what the optional params would, e.g. <code>events(onClick.useCapture)</code> instead of <code>events(onClick, useCapture = true)</code>.</li>
+</ul></li>
+<li><p>Removed <code>ReactiveElement.addEventListener</code> / <code>removeEventListener</code> / <code>indexOfEventListener</code> methods.
+<strong>Migration:</strong> If you want the plain JS versions, use <code>DomApi</code>. Otherwise, use <code>EventListener#bind</code> to add, and <code>kill</code> on the resulting <code>DynamicSubscription</code> to remove the listener.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="misc-laminar-changes"></a><a href="#misc-laminar-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Misc Laminar changes</h3>
+<p>You might need a <strong>migration</strong> for some of these. Hopefully the steps are obvious.</p>
+<ul>
+<li><p>New: <code>node.amendThis(thisNode =&gt; mod)</code> method that works similar to <code>amend</code>, but provides a reference to the element it's being called on.</p></li>
+<li><p>API: Removed <code>DomV</code> type param from <code>Prop[V, DomV]</code> type alias in the <code>L</code> object.</p>
+<ul>
+<li><strong>Migration:</strong> Remove that type param from your type signatures, you're most probably not using it. If you are, use the underlying <code>ReactiveProp[V, DomV]</code> type.</li>
+</ul></li>
+<li><p>Fix: Don't lowercase Web Component event names (<a href="https://github.com/raquo/Laminar/issues/77">#77</a>)</p></li>
+<li><p>Fix: Laminar can now render the app into shadow DOM (<a href="https://github.com/raquo/Laminar/issues/84">#84</a>)</p></li>
+<li><p>API: Reduce the number of <code>&lt;--</code> and <code>--&gt;</code> methods using new <a href="https://github.com/raquo/Airstream/#sources--sinks">Source &amp; Sink</a> types (this expands the functionality, old usages are ok).</p></li>
+<li><p>API: Replace deprecated <code>maybeEventListeners: Option[List[...]]</code> with <code>eventListeners: List[...]</code></p></li>
+<li><p>API: <code>DomEventStream</code> class moved from Laminar into Airstream.</p>
+<ul>
+<li><strong>Migration:</strong> just update the import if you're using it manually (you probably aren't).</li>
+</ul></li>
+<li><p>API: <code>key &lt;-- source</code> returns a more specific type now, KeyUpdater. It's still a Binder, so not a breaking change. Might be useful for better type safety.</p></li>
+<li><p>API: <code>Binder#apply</code> is now final. You should be overriding the <code>bind</code> method instead.</p></li>
+<li><p>API: <code>child.int</code> is now deprecated. Use <code>child.text</code> to render observables of String, Boolean, Int, Double, or any other type for which you define an implicit conversion to <code>TextNode</code>.</p></li>
+<li><p>Misc: <em>Scala DOM Types</em> upgraded from 0.11.0 to 0.14.0. See <a href="https://github.com/raquo/scala-dom-types/blob/master/CHANGELOG.md">changelog</a>.</p></li>
+<li><p>Naming: <code>EventPropTransformation</code> -&gt; <code>EventProcessor</code></p></li>
+<li><p>Naming: <code>EventPropBinder</code> -&gt; <code>EventListener</code></p></li>
+<li><p>Naming: <code>mapToValue</code> -&gt; <code>mapToStrict</code></p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="2-airstream-changes"></a><a href="#2-airstream-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>2. Airstream Changes</h2>
+<p><a href="github.com/raquo/Airstream">Airstream</a> is the reactive core of Laminar</p>
+<h3><a class="anchor" aria-hidden="true" id="new-operators-to-combine--sample--withcurrentvalueof-n-observables"></a><a href="#new-operators-to-combine--sample--withcurrentvalueof-n-observables" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New operators to combine / sample / withCurrentValueOf N observables</h3>
+<p>Airstream always had a <code>streamOfA.combineWith(streamOfB)</code> method that produced a stream of <code>(A, B)</code> tuples. Now, you can combine more than two observables at the same time, e.g. <code>streamOfA.combineWith(streamOfB, streamOfC)</code> results in a stream of <code>(A, B, C)</code>.</p>
+<p>Moreover, whereas <code>streamOfA.combineWith(streamOfB).combineWith(streamOfC)</code> previously resulted in a stream of <code>((A, B), C)</code>, in the new version it results in a stream of <code>(A, B, C)</code>, which is much more useful.</p>
+<p>The operators <code>sample</code> and <code>withCurrentValueOf</code> received a similar upgrade, allowing you to peek at more than one signal at a time.</p>
+<p>If you want to combine observable values into something more specific than a tuple, just use the new <code>combineWithFn</code> operator instead of <code>combineWith</code>: <code>streamOfX.combineWithFn(streamOfY)(Point)</code>.</p>
+<p>There's more. Observables of <code>(A, B)</code> used to have a <code>map2((a, b) =&gt; ???)</code> operator available for convenience, but now we have similar <code>mapN</code> and also <code>filterN</code> operators that work for observables of tuples of higher arities too.</p>
+<p>One last thing. Thanks to new <a href="https://github.com/raquo/Airstream/#sources--sinks">Source &amp; Sink</a> types, you can now pass Vars directly into methods that used to require a Signal, for example you can now say <code>signal.combineWith(myVar)</code> instead of having to spell out <code>signal.combineWith(myVar.signal)</code>.</p>
+<p>Huge thanks to <a href="https://github.com/yurique">Iurii</a> for his contribution of TupleN-capable code generators and his <a href="https://github.com/tulz-app/tuplez#Composition">tuplez.Composition</a> utility that we now use to flatten tuples in chained <code>combineWith</code> calls.</p>
+<p>See the new <a href="https://github.com/raquo/Airstream#n-arity-operators">N-arity Operators</a> section of Airstream docs for details.</p>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>Chained <code>combineWith</code> and <code>withCurrentValueOf</code> operators result in a different type now! Check all usages.</li>
+<li>Rename <code>map2</code> -&gt; <code>mapN</code></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="new-web-platform-features"></a><a href="#new-web-platform-features" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New web platform features</h3>
+<ul>
+<li><p>New: <code>AjaxEventStream</code>. A simple helper to manage Ajax requests idiomatically in Airstream. Thanks to <a href="https://github.com/ajaychandran">Ajay</a> for working on it!</p>
+<p>See the new <a href="https://github.com/raquo/Airstream/#ajax">Ajax</a> section of Airstream docs for usage details.</p></li>
+<li><p>Move: <code>DomEventStream</code> was moved from Laminar to Airstream</p></li>
+</ul>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>Import <code>DomEventStream</code> from <code>com.raquo.airstream.web</code> if you use that type</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="new-ways-to-create-callback-driven-streams"></a><a href="#new-ways-to-create-callback-driven-streams" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New ways to create callback-driven streams</h3>
+<p>Up until this point, <code>EventBus</code> was the go-to mechanism for creating streams fed by callbacks / observers. Now we have a few alternative ways that might be more visually familiar to users of React hooks. Rest assured however that there is exactly zero magic going on (as usual), the similarity with React is only cosmetic. For example, here is the full implementation of <code>EventStream.withCallback</code>:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">withCallback</span></span>[<span class="hljs-type">A</span>]: (<span class="hljs-type">EventStream</span>[<span class="hljs-type">A</span>], <span class="hljs-type">A</span> =&gt; <span class="hljs-type">Unit</span>) = {
+  <span class="hljs-keyword">val</span> bus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">A</span>]
+  (bus.events, bus.writer.onNext)
+}
+</code></pre>
+<p>And here is how you might want to use these:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> (stream1, callback) = <span class="hljs-type">EventStream</span>.withCallback[<span class="hljs-type">String</span>]
+<span class="hljs-keyword">val</span> (stream2, jsCallback) = <span class="hljs-type">EventStream</span>.withJsCallback[<span class="hljs-type">String</span>]
+<span class="hljs-keyword">val</span> (stream3, observer) = <span class="hljs-type">EventStream</span>.withObserver[<span class="hljs-type">String</span>]
+
+callback(<span class="hljs-string">"1"</span>) <span class="hljs-comment">// Make `stream1` emit `1`. Similarly for other pairs.</span>
+
+div(
+  onMountCallback(_ =&gt; callback(<span class="hljs-string">"Mounted!"</span>)),
+  <span class="hljs-type">ReactJsButtonComponent</span>.<span class="hljs-type">Props</span>(
+    caption = <span class="hljs-string">"Click 2"</span>,
+    onClick = jsCallback <span class="hljs-comment">// js.Function1[String, Unit]</span>
+  ).render,
+  button(<span class="hljs-string">"Click 3"</span>, onClick.mapTo(<span class="hljs-string">"Clicked!"</span>) --&gt; observer),
+  div(<span class="hljs-string">"stream1: "</span>, child.text &lt;-- stream1),
+  div(<span class="hljs-string">"stream2: "</span>, child.text &lt;-- stream2),
+  div(<span class="hljs-string">"stream3: "</span>, child.text &lt;-- stream3)
+)
+</code></pre>
+<p>See <a href="https://github.com/raquo/Airstream#eventstreamwithcallback-and-withobserver">the relevant section</a> of Airstream docs for more details.</p>
+<h3><a class="anchor" aria-hidden="true" id="new-way-to-create-custom-sources-of-events"></a><a href="#new-way-to-create-custom-sources-of-events" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New way to create custom sources of events</h3>
+<p>If you want to bring events into Airstream from a third party library that <strong>requires initialization and the subsequent cleanup of the event source</strong>, such as <code>ZIO</code> or <code>d3</code> or even the DOM itself, <code>EventStream.withCallback</code> and <code>EventBus</code> are not going to cut it as they do not provide a way to specify onStart / onStop callbacks.</p>
+<p>So, previously you had to subclass <code>EventStream</code> or <code>Signal</code> to achieve this. That's not actually hard, but it's intimidating, and that way the full palette of Airstream internals is available to you for abuse.</p>
+<p>Now, you can use the new <code>CustomSource</code> functionality which provides the hooks necessary to achieve this, and nothing more. In fact, <code>DomEventStream</code> is implemented this way:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">apply</span></span>[<span class="hljs-type">Ev</span> &lt;: dom.<span class="hljs-type">Event</span>](
+  eventTarget: dom.<span class="hljs-type">EventTarget</span>,
+  eventKey: <span class="hljs-type">String</span>,
+  useCapture: <span class="hljs-type">Boolean</span> = <span class="hljs-literal">false</span>
+): <span class="hljs-type">EventStream</span>[<span class="hljs-type">Ev</span>] = {
+
+  <span class="hljs-type">CustomStreamSource</span>[<span class="hljs-type">Ev</span>]( (fireValue, fireError, getStartIndex, getIsStarted) =&gt; {
+
+    <span class="hljs-keyword">val</span> eventHandler: js.<span class="hljs-type">Function1</span>[<span class="hljs-type">Ev</span>, <span class="hljs-type">Unit</span>] = fireValue
+
+    <span class="hljs-type">CustomSource</span>.<span class="hljs-type">Config</span>(
+      onStart = () =&gt; {
+        eventTarget.addEventListener(eventKey, eventHandler, useCapture)
+      },
+      onStop = () =&gt; {
+        eventTarget.removeEventListener(eventKey, eventHandler, useCapture)
+      }
+    )
+  })
+}
+</code></pre>
+<p>See the new <a href="https://github.com/raquo/Airstream#custom-event-sources">Custom Event Sources</a> section of Airstream docs for details.</p>
+<h3><a class="anchor" aria-hidden="true" id="derived-vars"></a><a href="#derived-vars" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Derived Vars</h3>
+<p>Given <code>A =&gt; B</code>, you can map <code>Signal[A]</code> to <code>Signal[B]</code>, and given <code>B =&gt; A</code>, you can contramap <code>Observer[A]</code> to <code>Observer[B]</code>.</p>
+<p>But Var is just a bundle of <code>Signal[A]</code> and <code>Observer[A]</code>. So given both <code>A =&gt; B</code> and <code>B =&gt; A</code>, why can't you <code>varA.zoom(aToB)(bToA)</code> to get a <code>Var[B]</code>?</p>
+<p>Well, because the <code>Signal</code> in <code>Var</code> is actually a <code>StrictSignal</code>, that is, it's not lazy. Only lazy signals can be mapped like this. Strict signals can only be mapped to a lazy signal unless you provide an <a href="https://github.com/raquo/Airstream#ownership">owner</a>. This limitation is for memory safety. It would be all too easy to cause memory leaks otherwise. Airstream actually used to have a strict <code>State[A]</code> type that did this a long time ago, but we <a href="https://github.com/raquo/Laminar/issues/37">got rid of it</a> for this reason.</p>
+<p>Well ok, couldn't we just zoom into a Var having <code>A =&gt; B</code>, <code>B =&gt; A</code>, and an <code>owner</code>? Why yes, as of 0.12.0, we can!</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">implicit</span> <span class="hljs-keyword">val</span> owner: <span class="hljs-type">Owner</span> <span class="hljs-comment">// usually you get this from ctx in Laminar's onMount* methods</span>
+<span class="hljs-keyword">val</span> oneBasedIndex = <span class="hljs-type">Var</span>(<span class="hljs-number">1</span>)
+<span class="hljs-keyword">val</span> zeroBasedIndex = oneBasedIndex.zoom(_ - <span class="hljs-number">1</span>)(_ + <span class="hljs-number">1</span>)(owner)
+
+oneBasedIndex.set(<span class="hljs-number">10</span>)
+oneBasedIndex.now() <span class="hljs-comment">// 10</span>
+zeroBasedIndex.now() <span class="hljs-comment">// 9</span>
+
+zeroBasedIndex.set(<span class="hljs-number">20</span>)
+oneBasedIndex.now() <span class="hljs-comment">// 20</span>
+zeroBasedIndex.now() <span class="hljs-comment">// 19</span>
+</code></pre>
+<p>This can be useful to reduce boilerplate when implementing forms. You could zoom <code>Var[MyFormState]</code> into vars for every field and pass them down to the corresponding input components.</p>
+<p>See the new <a href="https://github.com/raquo/Airstream#derived-vars">Derived Vars</a> section of Airstream docs for details.</p>
+<h3><a class="anchor" aria-hidden="true" id="new-debugging-functionality"></a><a href="#new-debugging-functionality" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New debugging functionality</h3>
+<p>Debugging featues were significantly improved in Airstream. You can now:</p>
+<ul>
+<li><p>Debug not just events, but also errors flowing through observables, as well as observable starts, stops, and the evaluation of signals' initial value.</p></li>
+<li><p>Debug <strong>observers</strong> similarly to observables.</p></li>
+<li><p>Name your observables and observers. These names will be used by <code>toString</code> and as a prefix when log-debugging.</p></li>
+<li><p>Check an observable's topoRank using <code>debugTopoRank</code> method.</p></li>
+</ul>
+<p>See the updated <a href="https://github.com/raquo/Airstream#debugging">Debugging</a> section of Airstream docs for details.</p>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li><code>debug*</code> methods were renamed and some accept different params now, see docs for details.</li>
+<li><code>debug*</code> methods are now available via implicit classes rather than directly on the Observable type. This just FYI. Usage syntax is the same, and they are available automatically, no need to import anything.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="observers-now-handle-their-own-errors-by-default"></a><a href="#observers-now-handle-their-own-errors-by-default" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Observers now handle their own errors by default</h3>
+<p>Previously, an exception thrown inside an Observer's user-provided <code>onNext</code> callback resulted in Airstream reporting an unhandled error. Now, if this happens, the observer's own <code>onError</code> callback will be invoked first to try and handle the error. If such a callback was not provided by the user, the parent observer's <code>onError</code> callback will be invoked, as usual.</p>
+<p>Errors caused by observers are wrapped into <code>ObserverError</code>.</p>
+<p>This new behaviour only affects observers created using Observer factories like <code>Observer.apply</code> and <code>Observer.fromTry</code>. If you manually extend the <code>Observer</code> trait, you're on your own.</p>
+<p>See the updated <a href="https://github.com/raquo/Airstream#handling-errors-using-observers">Handling Errors Using Observers</a> section of Airstream docs.</p>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>This changes observer error propagation behaviour. Errors will now propagate up the chain of observers instead of being reported as unhandled. They might still end up being reported as unhandled if the last observer in the chain does not handle the error, but that's not a given, and the timing will be different.</li>
+<li>Observer factories have a new <code>handleObserverErrors</code> param that you can set to <code>false</code> to restore previous behaviour in cases where you rely on it.</li>
+<li><code>ObserverError</code> is a new subclass of AirstreamError, if you pattern match on that type, make sure to account for it.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="various-new-operators-and-observable-factories"></a><a href="#various-new-operators-and-observable-factories" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Various new operators and observable factories</h3>
+<ul>
+<li><p><code>sample</code> and <code>withCurrentValueOf</code> operators are now available on Signals too, not just streams.</p></li>
+<li><p><code>EventStream.sequence</code> aka <code>combineSeq</code> to transform <code>Seq[EventStream[A]] =&gt; EventStream[Seq[A]]</code></p></li>
+<li><p><code>Signal.sequence</code> aka <code>combineSeq</code> to transform <code>Seq[Signal[A]] =&gt; Signal[Seq[A]]</code></p></li>
+<li><p><code>EventStream.mergeSeq</code>, which is just <code>merge</code> that accepts a Seq instead of varargs.</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="various-new-var-eventbus-and-observer-related-helpers"></a><a href="#various-new-var-eventbus-and-observer-related-helpers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Various new Var, EventBus and Observer related helpers</h3>
+<ul>
+<li><p>EventBus now has <code>emit</code> and <code>emitTry</code> methods that are aliases for <code>eventBus.writer.onNext</code> and <code>eventBus.writer.onTry</code>. This complements Var's <code>set</code> and <code>setTry</code> methods.</p></li>
+<li><p><code>observer.contramapSome</code> makes an <code>Observer[A]</code> from <code>Observer[Option[A]]</code></p></li>
+<li><p><code>observer.contramapTry</code></p></li>
+<li><p>Similarly, <code>myVar.someWriter</code> is an <code>Observer[A]</code> for <code>Var[Option[A]]</code></p></li>
+<li><p>New method <code>observer.delay(ms = 100)</code> creates an observer that calls the original observer after a delay</p></li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="observable-conversion-methods-moved--renamed"></a><a href="#observable-conversion-methods-moved--renamed" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Observable conversion methods moved / renamed</h3>
+<ul>
+<li><p>New methods on Observable: <code>toSignalIfStream</code>, <code>toStreamIfSignal</code></p>
+<p>Example usage: <code>observable.toSignalIfStream(ifStream = _.startWith(0))</code></p></li>
+<li><p><code>toWeakSignal</code> method is now available on Observable, not just EventStream</p></li>
+<li><p>Moved <code>toSignal(initial)</code> method from Observable to EventStream. Use <code>observable.toSignalIfStream(_.startWith(initial))</code> as replacement.</p></li>
+<li><p>Removed <code>toStreamOrSignalChanges</code> method. Use <code>toStreamIfSignal(_.changes)</code> instead.</p></li>
+</ul>
+<p><strong>Migration notes:</strong></p>
+<p>Change usages of <code>observable.toSignal</code> and <code>toStreamOrSignalChanges</code> as noted above. Note that <code>toSignal</code> is still available on streams.</p>
+<h3><a class="anchor" aria-hidden="true" id="assorted-fixes-and-improved-behaviour"></a><a href="#assorted-fixes-and-improved-behaviour" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Assorted fixes and improved behaviour</h3>
+<ul>
+<li><p>Fix: Bug in JsPriorityQueue implementation that produced glitches in complex cases.</p>
+<p>Specifically, when two or more observables were pending in the same transaction at the same time, if one of them actually synchronously depended on the other, it could fire ahead of the observable that it depended on, causing a glitch. Whether this actually happened also depended on the order of (internal) observers in the observable graph, so you could avoid this bug just by luck. This bug could affect nested combineWith or delaySync observables, resulting in extraneous events (glitches) in case of combineWith, or observables firing in the wrong order (in case of delaySync).</p>
+<p>See <a href="https://gitter.im/Laminar_/Lobby?at=6007655b36db01248a8bf5a9">gitter</a> for the original bug report.</p>
+<p>Unless you were facing unexplained glitches, it seems pretty unlikely that this bugfix would affect you, but watch out for changes in emitted events if you have deeply nested combined or delaySynced observables.</p></li>
+<li><p>Fix: <code>delay</code> and <code>debounce</code> operators now clear the pending events after being stopped.</p>
+<p>Previously, if you stopped the delayed stream and then immediately re-started it, delayed events scheduled before the stream was stopped would fire after it was re-started if their delays did not complete while the stream was stopped. This could lead to unexpected behaviour. No more.</p></li>
+<li><p>API: <code>Var.update</code> and <code>Var.updater</code> now report exceptions as unhandled instead of throwing inside a transaction</p>
+<p>Throwing inside a transaction has unpredictable results, because you do not know when the transaction will actually execute. If you try to <code>update</code> a failed var outside a transaction, e.g. in your app's main method, the transaction will run immediately and will throw. But if you call <code>myVar.update</code> while a transaction is running (e.g. in an Observer callback), the transaction will only be executed after the current transaction has finished, so your <code>var.update</code> call will not throw.</p>
+<p>New behaviour is consistent – <code>var.update</code> will not throw when trying to update a failed var, but will instead report the exception to Airstream's registered <code>unhandled</code> callback.</p></li>
+<li><p>API: Introduced new types: <a href="https://github.com/raquo/Airstream/#sources--sinks">Sources &amp; Sinks</a></p></li>
+<li><p>Fix: Avoid redundant re-starting in flattened switch observables. Fixes <a href="https://github.com/raquo/Airstream/issues/55">#55</a>.</p></li>
+<li><p>Fix: Make throttle operator behave in a standard way. Fixes <a href="https://github.com/raquo/Airstream/issues/66">#66</a>.</p></li>
+<li><p>API: <code>SwitchFutureStrategy</code> is now the implicit default for flattening <code>Observable[Future[A]]</code></p>
+<p>Previously you needed to choose a flattening strategy explicitly for this type. New default is consistent with other types' implicits.</p></li>
+<li><p>API: <code>emitOnce</code> parameter now defaults to <code>false</code> in <code>EventStream.{fromSeq, fromValue, fromTry}</code> methods.</p></li>
+<li><p>API: Provide custom <code>toString</code> implementations for <code>AirstreamError</code> subclasses</p></li>
+<li><p>API: We now encode <code>Observable#Self</code> type differently, using a type param on the new <code>BaseObservable</code> trait. The previous encoding as a type member field was (rarely but annoyingly) causing issues with type inference and IntelliJ Scala plugin.</p>
+<ul>
+<li><strong>Migration:</strong> This shouldn't affect end users: you should continue using the <code>Observable</code> trait in your own code as usual. You'll need to rewire your types to use <code>BaseObservable</code> if you used the old <code>Observable#Self</code> type member.</li>
+</ul></li>
+<li><p>Build: We require Scala.js 1.3.1 now</p></li>
+<li><p>Docs: See the new <a href="https://github.com/raquo/Airstream#var-transactino-delay">Var Transaction Delay</a> section of Airstream docs. No change here, just new docs.</p></li>
+</ul>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>All of these changes are potentially breaking to various degrees. Hopefully the required mitigation for each is clear.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="moved-packages-and-renamed-classes"></a><a href="#moved-packages-and-renamed-classes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Moved packages and renamed classes</h3>
+<p>Most Airstream classes were moved around in this release. They retained their names, but were moved into a different package, now grouped by functionality rather than type of observable.</p>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>Most Airstream types that you're using are imported via aliases defined in <code>com.raquo.laminar.api.L</code>, so you won't need to do anything for those.</li>
+<li>For other Airstream types you'll need to change your imports. Since the names of the classes are the same, your IDE should be able to help you out. Otherwise just use the code search on the github repo to find the new locations, or read the relevant parts of the <a href="https://github.com/raquo/Airstream/pull/48/commits">commit log</a>.</li>
+<li><code>StrictSignal</code>'s kill method was renamed to <code>killOriginalSubscription</code> and moved to the new subclass of <code>StrictSignal</code> called <code>OwnedSignal</code>. And so, <code>signal.observe(owner)</code> now returns an OwnedSignal. Unless you actually used the kill method, you shouldn't need to change anything.</li>
+</ul>
+<h3><a class="anchor" aria-hidden="true" id="other-breaking-changes"></a><a href="#other-breaking-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Other breaking changes</h3>
+<p><strong>Migration notes:</strong></p>
+<ul>
+<li>Renamed various params for time-related operators and classes. Changes should be obvious from compilation errors, but here's the <a href="https://github.com/raquo/Airstream/pull/48/commits/3d435abb56b6a627a7fea86f665d4ae2e15d288f">diff</a></li>
+<li>Renamed <code>mapToValue</code> operator to <code>mapToStrict</code></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="3-waypoint-changes"></a><a href="#3-waypoint-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>3. Waypoint Changes</h2>
+<p><a href="https://github.com/raquo/Waypoint">Waypoint</a> is an optional URL router for Laminar.</p>
+<ul>
+<li><p>New: Routes can match types partially now (thanks, <a href="https://github.com/pbuszka">@pbuszka</a>!)</p>
+<ul>
+<li>New route creation methods with PF suffix</li>
+<li><strong>Migration:</strong> <code>route.argsFromPage</code> returns an Option now</li>
+</ul></li>
+<li><p>New: Customizable error handling</p>
+<ul>
+<li>You can now specify fallbacks for URLs and page states that fail to match</li>
+<li>You can now force-render a page without changing URL (useful for rendering full page error screens)</li>
+<li><strong>Migration:</strong> <code>Router</code> constructor arguments have changed and are now spread across two argument lists, and some arguments have defaults now</li>
+</ul></li>
+<li><p>New: ContextRouteBuilder (thanks, <a href="https://github.com/pbuszka">@pbuszka</a>!)</p>
+<ul>
+<li>Provides a convenient way to encode URL params like &quot;lang&quot; or &quot;version&quot; that are shared among a set of pages &amp; routes</li>
+</ul></li>
+<li><p>API: Use <code>PatternArgs</code> alias for URL DSL's <code>UlrMatching</code> type</p></li>
+<li><p>Build: Update <a href="https://github.com/sherpal/url-dsl"><code>url-dsl</code></a> to <code>0.3.2</code></p>
+<ul>
+<li>New features: matching URL #fragments. See also: <a href="https://github.com/sherpal/url-dsl#moving-from-020-to-03x">URL-DSL migration notes</a>
+<ul>
+<li>Note that Waypoint takes care of most URL-DSL imports for you.</li>
+</ul></li>
+</ul></li>
+</ul>
+<hr>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank You</h2>
+<p>Huge thanks to the contributors to this release:</p>
+<ul>
+<li><a href="https://github.com/yurique">Iurii Malchenko</a>: N-arity combine operators, code generators &amp; tuplez</li>
+<li><a href="https://github.com/ajaychandran">Ajay Chandran</a>: AjaxEventStream</li>
+<li><a href="https://github.com/pbuszka">Piotr Buszka</a>: Waypoint partial and context routes</li>
+<li><a href="https://github.com/ngbinh">Binh Nguyen</a>: Build cleanup</li>
+<li><a href="https://github.com/andrelfpinto">André L. F. Pinto</a>: Fixes in docs</li>
+</ul>
+<p>Special thanks to <a href="github.com/kitlangton/">Kit Langton</a> for the amazing Scala.js &amp; Laminar talk!</p>
+<p>Laminar &amp; Airstream development is sponsored by <a href="https://github.com/sponsors/raquo">people like you</a>.</p>
+<p>GOLD sponsors supporting this release:</p>
+<div class="-sponsorsList">
+  <div class="-sponsor">
+    <img class="-logo x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor">
+    <img class="-logo" src="/img/sponsors/tawasal.png" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://tawasal.ae">Tawasal</a></div>
+      <div class="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+    </div>
+  </div>
+</div>
+<p>Thank you for supporting me! ❤️</p>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#0-news">0. News</a><ul class="toc-headings"><li><a href="#laminext-">Laminext 🎉</a></li><li><a href="#laminar-web-components-">Laminar Web Components 🎉</a></li><li><a href="#kits-great-talk-on-scalajs-laminar--other-goodies-">Kit's great talk on Scala.js, Laminar &amp; other goodies 🎉</a></li><li><a href="#tawasal-">Tawasal 🎉</a></li><li><a href="#and-more-">And more 🎉</a></li></ul></li><li><a href="#1-laminar-changes">1. Laminar Changes</a><ul class="toc-headings"><li><a href="#new-eventprocessor--eventproptransformation-operators">New EventProcessor / EventPropTransformation operators</a></li><li><a href="#new-api-for-controlled-inputs-79httpsgithubcomraquolaminarissues79">New API for controlled inputs (<a href="https://github.com/raquo/Laminar/issues/79">#79</a>)</a></li><li><a href="#new-way-to-stream-events-composeevents">New way to stream events: composeEvents</a></li><li><a href="#eliminate-interference-between-overlapping-cls-modifiers-71httpsgithubcomraquolaminarissues71">Eliminate interference between overlapping cls modifiers (<a href="https://github.com/raquo/Laminar/issues/71">#71</a>)</a></li><li><a href="#easier-way-to-build-custom-dom-events-attrs-props-etc">Easier way to build custom DOM events, attrs, props, etc.</a></li><li><a href="#reduce-api-surface">Reduce API surface</a></li><li><a href="#misc-laminar-changes">Misc Laminar changes</a></li></ul></li><li><a href="#2-airstream-changes">2. Airstream Changes</a><ul class="toc-headings"><li><a href="#new-operators-to-combine--sample--withcurrentvalueof-n-observables">New operators to combine / sample / withCurrentValueOf N observables</a></li><li><a href="#new-web-platform-features">New web platform features</a></li><li><a href="#new-ways-to-create-callback-driven-streams">New ways to create callback-driven streams</a></li><li><a href="#new-way-to-create-custom-sources-of-events">New way to create custom sources of events</a></li><li><a href="#derived-vars">Derived Vars</a></li><li><a href="#new-debugging-functionality">New debugging functionality</a></li><li><a href="#observers-now-handle-their-own-errors-by-default">Observers now handle their own errors by default</a></li><li><a href="#various-new-operators-and-observable-factories">Various new operators and observable factories</a></li><li><a href="#various-new-var-eventbus-and-observer-related-helpers">Various new Var, EventBus and Observer related helpers</a></li><li><a href="#observable-conversion-methods-moved--renamed">Observable conversion methods moved / renamed</a></li><li><a href="#assorted-fixes-and-improved-behaviour">Assorted fixes and improved behaviour</a></li><li><a href="#moved-packages-and-renamed-classes">Moved packages and renamed classes</a></li><li><a href="#other-breaking-changes">Other breaking changes</a></li></ul></li><li><a href="#3-waypoint-changes">3. Waypoint Changes</a></li><li><a href="#thank-you">Thank You</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2021 Nikita Gazarov</section></footer></div></body></html>

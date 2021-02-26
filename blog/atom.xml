@@ -2,12 +2,25 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://laminar.dev/blog</id>
     <title>Laminar Blog</title>
-    <updated>2020-10-17T06:00:00.000Z</updated>
+    <updated>2021-02-03T06:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://laminar.dev/blog"/>
     <subtitle>The best place to stay up-to-date with the latest Laminar news and events.</subtitle>
     <logo>https://laminar.dev/undefined</logo>
-    <rights>Copyright © 2020 Nikita Gazarov</rights>
+    <rights>Copyright © 2021 Nikita Gazarov</rights>
+    <entry>
+        <title type="html"><![CDATA[Laminar v0.12.0, Laminext, Material UI & more!]]></title>
+        <id>https://laminar.dev/blog/2021/02/03/laminar-v0.12.0.html</id>
+        <link href="https://laminar.dev/blog/2021/02/03/laminar-v0.12.0.html"/>
+        <updated>2021-02-03T06:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>Laminar v0.12.0 and Airstream v0.12.0 are out! 🎉</p>
+<p>This is a big release packed with new features and ergonomics improvements. Ctrl+F for &quot;migration&quot; in this post for directions on breaking changes. Don't worry, the &quot;breaking&quot; stuff is minor and mostly concerns previous misbehaviours in edge cases. Existing users, make sure to read the new / updated parts of the docs as linked below.</p>
+]]></summary>
+        <author>
+            <name>Nikita</name>
+            <uri>http://twitter.com/raquo</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Airstream v0.11.1]]></title>
         <id>https://laminar.dev/blog/2020/10/17/airstream-v0.11.1.html</id>

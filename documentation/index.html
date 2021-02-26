@@ -36,13 +36,14 @@
 <li><a href="#other-composite-keys">Other Composite Keys</a></li>
 <li><a href="#svg">SVG</a></li>
 </ul></li>
-<li><a href="#event-system-emitters-transformations-buses">Event System: Emitters, Transformations, Buses</a>
+<li><a href="#event-system-emitters-processors-buses">Event System: Emitters, Processors, Buses</a>
 <ul>
 <li><a href="#registering-a-dom-event-listener">Registering a DOM Event Listener</a></li>
 <li><a href="#eventbus">EventBus</a></li>
-<li><a href="#alternative-event-listener-registration-syntax">Alternative Event Listener Registration Syntax</a></li>
+<li><a href="#composeevents">composeEvents</a></li>
+<li><a href="#elementevents">element.events</a></li>
 <li><a href="#multiple-event-listeners">Multiple Event Listeners</a></li>
-<li><a href="#event-transformations">Event Transformations</a>
+<li><a href="#event-processors">Event Processors</a>
 <ul>
 <li><a href="#preventdefault--stoppropagation">preventDefault &amp; stopPropagation</a></li>
 <li><a href="#usecapture">useCapture</a></li>
@@ -50,6 +51,7 @@
 </ul></li>
 <li><a href="#window--document-events">Window &amp; Document Events</a></li>
 </ul></li>
+<li><a href="#controlled-inputs">Controlled Inputs</a></li>
 <li><a href="#ownership">Ownership</a>
 <ul>
 <li><a href="#laminars-use-of-airstream-ownership">Laminar's Use of Airstream Ownership</a></li>
@@ -71,14 +73,15 @@
 <li><a href="#special-cases">Special Cases</a></li>
 </ul>
 <h2><a class="anchor" aria-hidden="true" id="introduction"></a><a href="#introduction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Introduction</h2>
-<p>This documentation is for Laminar version <strong>v0.11.0</strong>. For other versions, see below.</p>
+<p>This documentation is for Laminar version <strong>v0.12.0</strong>. For other versions, see below.</p>
 <table>
 <thead>
 <tr><th style="text-align:left">Laminar</th><th style="text-align:left">Airstream</th></tr>
 </thead>
 <tbody>
 <tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/master/docs/Documentation.md">master</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/master/README.md">master</a></strong></td></tr>
-<tr><td style="text-align:left"><strong><a href="https://laminar.dev/documentation">v0.11.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.11.0/README.md">v0.11.0</a></strong></td></tr>
+<tr><td style="text-align:left"><strong><a href="https://laminar.dev/documentation">v0.12.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.12.0/README.md">v0.12.0</a></strong></td></tr>
+<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md">v0.11.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.11.0/README.md">v0.11.0</a></strong></td></tr>
 <tr><td style="text-align:left">–</td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.10.2/README.md">v0.10.2</a></strong></td></tr>
 <tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md">v0.10.3</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.10.1/README.md">v0.10.1</a></strong></td></tr>
 <tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md">v0.9.2</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.9.2/README.md">v0.9.2</a></strong></td></tr>
@@ -96,7 +99,7 @@
 <p>Add Laminar to <code>libraryDependencies</code> of your Scala.js project in <code>build.sbt</code>:</p>
 <pre><code class="hljs">&quot;com.raquo&quot; %%% &quot;laminar&quot; % &quot;0.11.0&quot;  // Requires Scala.js &gt;= 1.1.0
 </code></pre>
-<p>Laminar depends on Airstream. Every Laminar version includes the latest version of Airstream that was available at the time it was published. Look at the table above, if you are using the latest published version of Laminar, you can always use the latest published version of Airstream, even if your version of Laminar came with a slightly older version of Airstream. To do this, add airstream to your <code>build.sbt</code> as well:</p>
+<p>Laminar depends on Airstream. Every Laminar version includes the latest version of Airstream that was available at the time it was published. Look at the table above, if you are using the latest published version of Laminar, you can always use the latest published version of Airstream, even if your version of Laminar came with a slightly older version of Airstream. To do this, add Airstream to your <code>build.sbt</code> as well:</p>
 <pre><code class="hljs">&quot;com.raquo&quot; %%% &quot;airstream&quot; % &quot;&lt;version&gt;&quot;
 </code></pre>
 <p>As you can see, Laminar and Airstream versions can diverge slightly, so don't use a single <code>LaminarVersion</code> variable to for both.</p>
@@ -177,27 +180,69 @@ el.amend(
  
 div(
   <span class="hljs-string">"Please enter your name: "</span>,
-  <span class="hljs-type">TextInput</span>().amend(onInput --&gt; nameVar.writer)
+  <span class="hljs-type">TextInput</span>().amend(onInput --&gt; nameVar)
+)
+</code></pre>
+<p><code>amendThis</code> is another variation of <code>amend</code> that provides access to <code>thisNode</code> similar to <code>inContext</code>, for the sake of reducing boilerplate:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> nameVar = <span class="hljs-type">Var</span>(<span class="hljs-string">""</span>)
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">TextInput</span></span>(): <span class="hljs-type">Input</span> = input(typ := <span class="hljs-string">"text"</span>)
+
+div(
+  <span class="hljs-comment">// Traditional style</span>
+  <span class="hljs-type">TextInput</span>().amend { inContext { thisNode =&gt;
+    onInput.mapTo(thisNode.ref.value) --&gt; nameVar
+  }}
+  <span class="hljs-comment">// Use amendThis to reduce inContext boilerplate</span>
+  <span class="hljs-type">TextInput</span>().amendThis { thisNode =&gt;
+    onInput.mapTo(thisNode.ref.value) --&gt; nameVar  
+  }
+  <span class="hljs-comment">// But for `ref.value` specifically, just do this:</span>
+  <span class="hljs-type">TextInput</span>().amend(
+    onInput.mapToValue --&gt; nameVar
+  )
+)
+
+div(
+  <span class="hljs-comment">// List[Mod[El]] is implicitly converted to Mod[El]</span>
+  <span class="hljs-comment">// so you can specify several modifiers like this:</span>
+  <span class="hljs-type">TextInput</span>().amendThis { thisNode =&gt; <span class="hljs-type">List</span>(
+    onInput.mapTo(thisNode.ref.value) --&gt; nameVar,
+    thisNode.events(onClick).delay(<span class="hljs-number">0</span>) --&gt; clickObserver  
+  )}
 )
 </code></pre>
 <p>And of course, every Modifier has a public <code>apply(element: El)</code> method that you can use to manually apply it to any element, for example: <code>(color := &quot;red&quot;)(element)</code>.</p>
 <p>Using manual application is only encouraged when it's not enabling imperative coding patterns. You should learn to use <a href="#reactive-data">Reactive Data</a> effectively before you sprinkle your code with manual applications.</p>
 <h3><a class="anchor" aria-hidden="true" id="incontext"></a><a href="#incontext" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>inContext</h3>
-<p>Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, a common use case is needing to get the input element's <code>value</code> property in order to build a modifier that will send that property to an event bus.</p>
-<pre><code class="hljs css language-scala">input(inContext(thisNode =&gt; onChange.mapTo(thisNode.ref.value) --&gt; inputStringBus))
+<p>Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, one use case is getting dimensions or coordinates in response to some event.</p>
+<pre><code class="hljs css language-scala">div(inContext(thisNode =&gt; onClick.mapTo(getCoordinates(thisNode)) --&gt; bus))
 </code></pre>
 <p>The general syntax of this feature is <code>inContext(El =&gt; Modifier[El]): Modifier[El]</code>. <code>thisNode</code> refers to the element to which this modifier will be applied. In our example its type is properly inferred to be <code>Input</code>, which is why you can call <code>.ref.value</code> on it without <code>.asInstanceOf</code>.</p>
-<p>Without getting ahead of ourselves too much, <code>onChange.mapTo(thisNode.ref.value) --&gt; inputStringBus)</code> is a Modifier that handles <code>onChange</code> events on an input element, but as you see it needs a reference to this input element. You could get that reference in a couple <em>other</em> ways, for example:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myInput: <span class="hljs-type">Input</span> = input(onChange.mapTo(myInput.ref.value) --&gt; inputStringBus) <span class="hljs-comment">// make sure to write out the type ascription</span>
+<p>Without getting ahead of ourselves too much, <code>onClick.mapTo(getCoordinates(thisNode)) --&gt; bus)</code> is a Modifier that handles <code>onClick</code> events on an element, but as you see it needs a reference to that element. You could get that reference in a couple <em>other</em> ways, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myDiv: <span class="hljs-type">Div</span> = div(onClick.mapTo(getCoordinates(thisNode)) --&gt; bus) <span class="hljs-comment">// make sure to write out the type ascription</span>
 </code></pre>
 <p>Or</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myInput = input()
-myInput.amend(
-  myInput.events(onChange).mapTo(myInput.ref.value) --&gt; inputStringBus
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myDiv = div()
+myDiv.amend(
+  myDiv.events(onClick).mapTo(getCoordinates(thisNode)) --&gt; bus
 )
 </code></pre>
 <p>But these are of course rather cumbersome. <code>inContext</code> provides an easy, inline solution that always works.</p>
 <p>Note: all the unfamiliar syntax used here will be explained in other sections of this documentation.</p>
+<h4><a class="anchor" aria-hidden="true" id="when-not-to-use-incontext"></a><a href="#when-not-to-use-incontext" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>When not to use <code>inContext</code></h4>
+<p><code>inContext</code> is rarely needed in modern Laminar.</p>
+<p>You don't need to use <code>inContext</code> to get an input element's current value: use the <code>mapToValue</code> processor, e.g. <code>input(onInput.mapToValue --&gt; stringBus)</code>.</p>
+<p>Similarly, don't use <code>inContext</code> to get a checkbox's <code>checked</code> status, use the <code>mapToChecked</code>, e.g. <code>input(typ := &quot;checkbox&quot;, onClick.mapToValue --&gt; stringBus)</code>.</p>
+<p>Under the hood, <code>mapToValue</code> and <code>mapToChecked</code> look at <code>event.target.value</code> and <code>event.target.checked</code>.</p>
+<p>You also don't need <code>inContext</code> to apply stream operators to events. In older versions of Laminar if you wanted to delay an event, you would need to do this:</p>
+<pre><code class="hljs css language-scala">div(inContext { _.events(onClick).delay(<span class="hljs-number">10</span>) --&gt; observer })
+</code></pre>
+<p>Whereas today you can use the <code>composeEvents</code> method:</p>
+<pre><code class="hljs css language-scala">div(composeEvents(onClick)(_.delay(<span class="hljs-number">10</span>)) --&gt; observer)
+</code></pre>
+<p>Or even <code>delay</code> on the observer side:</p>
+<pre><code class="hljs css language-scala">div(onClick --&gt; observer.delay(<span class="hljs-number">10</span>))
+</code></pre>
 <h3><a class="anchor" aria-hidden="true" id="reusing-elements"></a><a href="#reusing-elements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Reusing Elements</h3>
 <p><strong>Do not.</strong> An element can only have one parent element at a time, so you can't put the same element twice into the real JS DOM – instead, it will be removed from its old location and <strong>moved</strong> into its new location. That's just how the browser DOM works. Laminar does not protect you from doing this for performance reasons, so you need to avoid this on your own, or you will run into unexpected behaviour.</p>
 <p>On a related note, it <em>is</em> safe to unmount a Laminar element and then re-mount it in any location, assuming that you use Laminar methods to achieve that, and that you don't compete with any other <code>child &lt;--</code> or <code>children &lt;--</code> bindings you've set up for the same set of elements.</p>
@@ -205,10 +250,16 @@ myInput.amend(
 <p>Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from <a href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a>. These definitions provide hundreds of keys, but are not exhaustive. For example, we don't have touch events like <code>touchmove</code> defined, so those are not available to be put on the left hand side of <code>:=</code> methods.</p>
 <p>To work around this, you can contribute definitions of missing keys to Scala DOM Types. It's easy – you don't even need to code any logic, just specify the names and types of the things you want to add. See the <a href="https://github.com/raquo/scala-dom-types/blob/master/CONTRIBUTING.md">Contribution Guide</a> and an <a href="https://github.com/raquo/scala-dom-types/pull/16/files">example PR</a>.</p>
 <p>Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> onTouchMove = <span class="hljs-keyword">new</span> <span class="hljs-type">ReactiveEventProp</span>[dom.<span class="hljs-type">TouchEvent</span>](<span class="hljs-string">"touchmove"</span>)
-div(onTouchMove --&gt; eventBus)
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> superValue: <span class="hljs-type">Prop</span>[<span class="hljs-type">String</span>] = customProp(<span class="hljs-string">"superValue"</span>, <span class="hljs-type">StringAsIsCodec</span>) <span class="hljs-comment">// imaginary prop</span>
+<span class="hljs-keyword">val</span> onTouchMove: <span class="hljs-type">ReactiveEventProp</span>[dom.<span class="hljs-type">TouchEvent</span>] = customEventProp(<span class="hljs-string">"touchmove"</span>)
+
+div(
+  superValue := <span class="hljs-string">"imaginary prop example"</span>,
+  onTouchMove --&gt; eventBus
+)
 </code></pre>
-<p>To clarify, you don't have to do this for touch events specifically as <a href="https://github.com/busti">@Busti</a> already added the superior <a href="https://github.com/raquo/scala-dom-types/pull/49">pointer-events</a> to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.</p>
+<p>And similarly with <code>customStyle</code>, <code>customHtmlAttr</code>, <code>customHtmlTag</code>, <code>customSvgAttr</code>, <code>customSvgTag</code>.</p>
+<p>To clarify, you don't have to do this for touch events specifically, because <a href="https://github.com/busti">@Busti</a> already added the superior <a href="https://github.com/raquo/scala-dom-types/pull/49">pointer-events</a> to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.</p>
 <h3><a class="anchor" aria-hidden="true" id="modifiers-faq"></a><a href="#modifiers-faq" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Modifiers FAQ</h3>
 <ol>
 <li><p>Yes, you can create custom Modifiers by simply extending the Modifier trait. You could for example define attributes or CSS props that are missing from <em>Scala DOM Types</em> by extending <code>ReactiveHtmlAttr</code> or <code>ReactiveStyle</code>, or for completely custom logic you could create a class extending the base <code>Modifier</code> trait. That way you could for example make a modifier that applies multiple other modifiers that you often use together.</p></li>
@@ -301,7 +352,7 @@ div(onTouchMove --&gt; eventBus)
 </code></pre>
 <p>It should be pretty obvious what this does: <code>MaybeBlogUrl</code> maps input Signal to a Signal of Laminar elements, and <code>child &lt;-- MaybeBlogUrl(maybeBlogUrlSignal)</code> creates a subscription that puts these elements into the div.</p>
 <p>The elements are put in the obvious order – what you see is what you get – so, between <em>&quot;Hello, I have &quot;</em> and <em>&quot;, isn't it great?&quot;</em> text nodes. Each next emitted element replaces the previously emitted one in the DOM.</p>
-<p>This example uses Signals, but EventStreams work similarly, and there are also <code>child.maybe</code>, <code>child.text</code>, and <code>child.int</code> receivers that have more specialized <code>&lt;--</code> methods accepting <code>Observable[Option[Node]]</code>, <code>Observable[String]</code>, and <code>Observable[Int]</code> respectively.</p>
+<p>This example uses Signals, but EventStreams work similarly, and there are also <code>child.maybe</code> and <code>child.text</code> receivers that have more specialized <code>&lt;--</code> methods accepting <code>Observable[Option[Node]]</code> and <code>Observable[V]</code> given <code>implicit ev: V =&gt; TextNode</code>, respectively.</p>
 <h4><a class="anchor" aria-hidden="true" id="efficiency"></a><a href="#efficiency" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Efficiency</h4>
 <p>You might notice that this is not as efficient as it could be. Any time <code>maybeBlogUrlSignal</code> emits a new value, a new element is created, even if we're moving from <code>Some(url1)</code> to <code>Some(url2)</code>. And those are real JS DOM elements, so <strong>if</strong> this method is hit often we might want to optimize for that. For example, we could do this:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderBlogLink</span></span>(urlSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">HtmlElement</span> = {
@@ -469,6 +520,7 @@ input(focus &lt;-- focusStream)
 <h3><a class="anchor" aria-hidden="true" id="cls"></a><a href="#cls" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>cls</h3>
 <p>This <a href="https://github.com/raquo/scala-dom-types#reflected-attributes">reflected attribute</a> (aliased as <strong><code>className</code></strong>) contains a string with space-separated CSS class names that a given HTML or SVG element belongs to. Laminar provides a specialized API for this attribute. Consider this use case:</p>
 <pre><code class="hljs css language-css"># <span class="hljs-selector-tag">CSS</span>
+
 <span class="hljs-selector-class">.LabelComponent</span> {
   <span class="hljs-attribute">font-size</span>: <span class="hljs-number">20pt</span>;
   <span class="hljs-attribute">color</span>: red;
@@ -478,7 +530,9 @@ input(focus &lt;-- focusStream)
 }
 </code></pre>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// Scala</span>
+
 <span class="hljs-keyword">val</span> veryImportant: <span class="hljs-type">Modifier</span>[<span class="hljs-type">HtmlElement</span>] = cls := <span class="hljs-string">"vip"</span>
+
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">Label</span></span>(caption: <span class="hljs-type">String</span>): <span class="hljs-type">HtmlElement</span> = div(
   veryImportant,
   cls := <span class="hljs-string">"LabelComponent"</span>,
@@ -492,7 +546,9 @@ input(focus &lt;-- focusStream)
 <p>Needless to say, if <code>cls</code> behaved like that it would be really inconvenient to work with. Just imagine how much more complicated / coupled / inflexible you'd need to make the code to support this simple example of ours.</p>
 <p>And so <code>cls</code> does not behave like this. Instead of <strong>setting</strong> the list of CSS classes, <code>cls := &quot;newClass&quot;</code> <strong>appends</strong> <code>newClass</code> to the list of CSS classes already present on the element, so our example code works as intended.</p>
 <p>Here are some more <code>cls</code> tricks. All of these produce a <code>Modifier[HtmlElement]</code>:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-comment">// ADD multiple class names</span>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> someBoolean: <span class="hljs-type">Boolean</span> = ???
+
+<span class="hljs-comment">// Add multiple class names</span>
 cls := (<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
 cls := <span class="hljs-type">List</span>(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
  
@@ -500,55 +556,40 @@ cls := <span class="hljs-type">List</span>(<span class="hljs-string">"class1"</s
 cls(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
 cls(<span class="hljs-type">List</span>(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))
  
-<span class="hljs-comment">// ADD and REMOVE class names (true=add, false=remove)</span>
+<span class="hljs-comment">// Add class name conditionally (true = add, false = do nothing)</span>
 cls := (<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>)
-cls := <span class="hljs-type">Seq</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>)
-cls := (<span class="hljs-type">Seq</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>), <span class="hljs-type">Seq</span>(<span class="hljs-string">"class3"</span> -&gt; <span class="hljs-literal">true</span>))
+cls := <span class="hljs-type">Seq</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; someBoolean)
+cls := (<span class="hljs-type">Seq</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; someBoolean), <span class="hljs-type">Seq</span>(<span class="hljs-string">"class3"</span> -&gt; someBoolean))
 cls := <span class="hljs-type">Map</span>(<span class="hljs-string">"class1"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"class2"</span> -&gt; <span class="hljs-literal">false</span>)
  
-<span class="hljs-comment">// As usual, all := methods are aliased as `apply`</span>
-cls(<span class="hljs-type">List</span>(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))
- 
-<span class="hljs-comment">// SET a class name instead of ADDING it</span>
-cls.set(<span class="hljs-string">"class1"</span>)
-<span class="hljs-comment">// SET multiple class names</span>
-cls.set(<span class="hljs-string">"class1 class2"</span>)
-cls.set(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
-<span class="hljs-comment">// CLEAR all class names</span>
-cls.set(<span class="hljs-string">""</span>)
-
-<span class="hljs-comment">// REMOVE class names</span>
-cls.remove(<span class="hljs-string">"class1"</span>)
-cls.remove(<span class="hljs-string">"class1 class2"</span>)
-cls.remove(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>)
-
-<span class="hljs-comment">// TOGGLE class names (true = add, false = remove)</span>
+<span class="hljs-comment">// Add class names conditionally (true = add, false = do nothing)</span>
 cls.toggle(<span class="hljs-string">"class1"</span>) := <span class="hljs-literal">true</span>
-cls.toggle(<span class="hljs-string">"class1 class2"</span>) := <span class="hljs-literal">false</span>
+cls.toggle(<span class="hljs-string">"class1 class2"</span>) := someBoolean
 cls.toggle(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>) := <span class="hljs-literal">true</span>
-
-<span class="hljs-comment">// Note: some of the := methods accept an implicit param, so you might</span>
-<span class="hljs-comment">// need to wrap the modifier in a `locally` to help Scala parse an</span>
-<span class="hljs-comment">// immediate application of such a modifier to an element:</span>
-locally(cls := (<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))(element)
-
-<span class="hljs-comment">// Using the `amend` method is nicer anyway:</span>
-element.amend(cls := (<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>))
 </code></pre>
 <p>Of course, the reactive layer is similarly considerate in regard to <code>cls</code>. Consider this use case:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> classesStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Seq</span>[<span class="hljs-type">String</span>]] = ???
-<span class="hljs-keyword">val</span> boolStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Boolean</span>] = ???
+<span class="hljs-keyword">val</span> $isSelected: <span class="hljs-type">Signal</span>[<span class="hljs-type">Boolean</span>] = ???
  
 div(
   cls := <span class="hljs-string">"MyComponent"</span>,
   cls &lt;-- classesStream,
-  cls.toggle(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>) &lt;-- boolStream 
+  cls.toggle(<span class="hljs-string">"class1"</span>, <span class="hljs-string">"class2"</span>) &lt;-- $isSelected
+  cls &lt;-- boolSignal.map { isSelected =&gt;
+    <span class="hljs-keyword">if</span> (isSelected) <span class="hljs-string">"always x-selected"</span> <span class="hljs-keyword">else</span> <span class="hljs-string">"always"</span>
+  },
+  cls &lt;-- $isSelected.map { isSelected =&gt;
+    <span class="hljs-type">List</span>(<span class="hljs-string">"always"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"x-selected"</span> -&gt; isSelected)
+  },
+  cls &lt;-- $isSelected.map { isSelected =&gt;
+    <span class="hljs-type">Map</span>(<span class="hljs-string">"always"</span> -&gt; <span class="hljs-literal">true</span>, <span class="hljs-string">"x-selected"</span> -&gt; isSelected)
+  } 
 )
 </code></pre>
 <p>Once again, we don't want the CSS class names coming in from <code>classesStream</code> to override (remove) <code>MyComponent</code> class name. We want that one to stay forever, and for the class names coming from <code>classStream</code> to <strong>override the previous values emitted by that stream</strong>. And this is exactly how Laminar behaves. The Modifier <code>cls &lt;-- classesStream</code> keeps track of the class names that it last added to the element's <code>cls</code> attribute. When a new event comes in, we remove those previously added class names and add new ones that are not already on the element.</p>
 <p>So for example, when <code>classesStream</code> emits <code>List(&quot;class1&quot;, &quot;class2&quot;)</code>, we will <em>add</em> those classes to the element. When it subsequently emits <code>List(&quot;class1&quot;, &quot;class3&quot;)</code>, we will remove <code>class2</code> and add <code>class3</code> to the element's class list.</p>
-<p>The <strong><code>&lt;--</code></strong> method can be called with Observables of <code>String</code>, <code>Seq[String]</code>, <code>Seq[(String, Boolean)]</code>, <code>Map[String, Boolean]</code>, <code>Seq[Seq[String]]</code>, <code>Seq[Seq[(String, Boolean)]]</code>. The ones involving booleans let you issue events that instruct Laminar to remove certain classes (by setting their value to <code>false</code>). Note that unless you instruct Laminar to add those classes back, they will not be added back automatically. Only previous <em>additions</em> of classes are undone in the manner described in the previous paragraph, not removals.</p>
-<p>Each <code>cls &lt;-- source</code> modifier should deal with a set of CSS classes that does not intersect with the sets used by other such modifiers. In other words, you should generally avoid adding classes to an element in one reactive modifier and then removing them in another reactive modifier. Basically, if you do this you have two competing sources of truth for whether an element should carry a class at any given time, and the latest source to emit will win. That works, but is a bad practice. Search for &quot;interference&quot; in <code>CompositeKeySpec</code> for a simple example.</p>
+<p>The <strong><code>&lt;--</code></strong> method can be called with Observables of <code>String</code>, <code>Seq[String]</code>, <code>Seq[(String, Boolean)]</code>, <code>Map[String, Boolean]</code>, <code>Seq[Seq[String]]</code>, <code>Seq[Seq[(String, Boolean)]]</code>. The ones involving booleans let you issue events that instruct Laminar to remove certain classes <strong>that were previously added by this same modifier</strong> (by setting their value to <code>false</code>). <strong>Importantly, cls modifiers never remove classes added by other modifiers.</strong> So if you said <code>cls := &quot;foo&quot;</code> somewhere, no other modifier can later remove this <code>foo</code> class. If you need to add and remove <code>foo</code> over time, use <code>cls.toggle(&quot;foo&quot;) &lt;-- $shouldUseFoo</code> or similar dynamic modifiers. (Note: prior to v0.12.0, <code>cls</code> behaved differently. See release notes).</p>
+<p>If you (or a third party library you're using) are adding or removing class names without Laminar, using native JS APIs like <code>ref.className = ???</code> and <code>ref.classList.add(???)</code>, and you are <strong>also</strong> using <code>cls</code> modifiers on this <strong>same</strong> element, you must take care to avoid manually adding or removing the same classes as you're setting using the <code>cls</code> modifiers. Doing so may cause unexpected behaviour. Basically, <strong>a given class name on a given element should be managed either via Laminar <code>cls</code> modifiers or externally via JS APIs, but not both</strong>. See the <code>cls - third party interference</code> test in <code>CompositeKeySpec</code> for a simple example.</p>
 <h3><a class="anchor" aria-hidden="true" id="other-composite-keys"></a><a href="#other-composite-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Other Composite Keys</h3>
 <p><strong><code>rel</code></strong> is another space-separated attribute. Its API in Laminar is exactly identical to that of <code>cls</code> (see right above). For example <code>rel := (&quot;noopener&quot;, &quot;noreferrer&quot;)</code> is a Modifier that makes the <code>a</code> element it applies to <a href="https://mathiasbynens.github.io/rel-noopener/">safer</a> without removing existing <code>rel</code> attribute value.</p>
 <p><strong><code>role</code></strong> attribute works similarly.</p>
@@ -596,10 +637,10 @@ div(
 )
 </code></pre></li>
 </ul>
-<h2><a class="anchor" aria-hidden="true" id="event-system-emitters-transformations-buses"></a><a href="#event-system-emitters-transformations-buses" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event System: Emitters, Transformations, Buses</h2>
+<h2><a class="anchor" aria-hidden="true" id="event-system-emitters-processors-buses"></a><a href="#event-system-emitters-processors-buses" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event System: Emitters, Processors, Buses</h2>
 <h3><a class="anchor" aria-hidden="true" id="registering-a-dom-event-listener"></a><a href="#registering-a-dom-event-listener" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Registering a DOM Event Listener</h3>
 <p>Laminar uses native JS DOM events. We do not have a synthetic event system like React.js. There is no event pooling, no magic going on. This means there is nothing Laminar-specific to learn about events themselves. There's one exception for certain <code>onClick</code> events on checkboxes, see <a href="#special-cases">Special Cases</a>.</p>
-<p>To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, <code>EventPropBinder</code> is a <code>Modifier</code> that performs this action.</p>
+<p>To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, <code>EventListener</code> is a <code>Modifier</code> that performs this action.</p>
 <p>This is how it's done in the simplest case:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> clickObserver = <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">MouseEvent</span>](onNext = ev =&gt; dom.console.log(ev.screenX))
 <span class="hljs-keyword">val</span> element: <span class="hljs-type">Div</span> = div(
@@ -612,6 +653,7 @@ div(
 <h3><a class="anchor" aria-hidden="true" id="eventbus"></a><a href="#eventbus" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>EventBus</h3>
 <p>The contrived example above does not feel like reactive programming at all. As shown, it's just a cumbersome way to define a simple callback. Instead, we usually want to get a stream of events from an element. To do that, we need an Observer that will expose a stream of events that it receives. In FRP terms this is usually called a &quot;Subject&quot; or a &quot;PublishSubject&quot;.</p>
 <p>In Laminar, we have an <code>EventBus</code>. Same general idea, but instead of <em>being</em> both an Observer and an Observable, it <em>contains</em> them as <code>.writer</code> and <code>.events</code> respectively. This design makes it possible to easily share write-only or read-only parts of an EventBus, with no upcasting loopholes. You should generally avoid passing the whole EventBus to child components unless you really do need the child component to both write events to the bus and read the entirety of events written to that bus (including events written by other components into that bus).</p>
+<p>See also: <a href="https://github.com/raquo/Airstream/#sources--sinks">Sources &amp; Sinks</a> in Airstream docs.</p>
 <p>Now let's see how we can use EventBus for the same logic:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> clickBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[dom.<span class="hljs-type">MouseEvent</span>]
 <span class="hljs-keyword">val</span> coordinateStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Int</span>] = clickBus.events.map(ev =&gt; ev.screenX)
@@ -623,7 +665,7 @@ div(
   coordinateStream --&gt; coordinateObserver
 )
 </code></pre>
-<p><code>onClick --&gt; clickBus.writer</code> works exactly the same as the previous example, except that <code>clickBus.writer</code> is now the Observer that we send the events to. For convenience, the <code>--&gt;</code> method will also accept the event bus itself: <code>div(onClick --&gt; clickBus, ...)</code> woudl have exactly the same effect.</p>
+<p><code>onClick --&gt; clickBus.writer</code> works exactly the same as the previous example, except that <code>clickBus.writer</code> is now the Observer that we send the events to. For convenience, the <code>--&gt;</code> method will also accept the event bus itself: <code>div(onClick --&gt; clickBus, ...)</code> would have exactly the same effect.</p>
 <p>What's new here is how we subscribe <code>coordinateObserver</code> to <code>onClick</code> events. As we established, we first send onClick events to <code>clickBus</code>. Then we have a <code>coordinateStream</code> that maps every click event from <code>clickBus</code> to its <code>screenX</code> coordinate.</p>
 <p>Finally, we subscribe <code>coordinateObserver</code> to <code>coordinateStream</code> to print out those coordinates on every click. This completes our contrived pipeline. In real life this component might only be exposing the stream of coordinates, and consuming components would provide their own observers. Or this same component could be deriving some of its own state from the click stream, such as tracking and displaying the number of clicks.</p>
 <p>It's not a coincidence that <code>coordinateStream --&gt; coordinateObserver</code> syntax looks very similar to <code>onClick --&gt; clickBus.writer</code>. Both of these <code>--&gt;</code> methods create Modifiers that send events from the left hand side to the right hand side for as long as the element is mounted, conceptually speaking. Both methods are also provided implicitly as defined in <code>Implicits.scala</code>.</p>
@@ -649,7 +691,23 @@ div(
 <p>Note that Airstream Observers, including <code>eventBus.writer</code>, can subscribe to multiple observables. So you can for example render a dynamic list of children, each of which sends its own events to the same Observer, possibly with information included in the event needed to identify which child the event came from. You can see an example of this pattern used in <code>TaskListView.taskViewsStream</code> in <a href="https://github.com/raquo/laminar-examples">laminar-examples</a>.</p>
 <p>This can be achieved either with <code>addSource</code> or <code>addObserver</code>. Basically, in terms of laziness, with <code>addSource</code> EventBus behaves like a stream that merges other streams – much like <code>EventStream.merge(stream1, stream2)</code>, but with the ability to add and remove source streams at any time. So, if you do <code>eventBus.writer.addSource(sourceStream)(childOwner)</code>, <code>sourceStream</code> will not be started until and unless <code>eventBus.stream</code> is started. Conversely, <code>sourceStream.addObserver(eventBus.writer)(childOwner)</code> will immediately start <code>sourceStream</code> even if <code>eventBus</code> does not have any observers.</p>
 <p>The best part of this pattern is that you don't need to write custom logic to call <code>removeSource</code> or <code>subscription.kill</code> when removing a child from the list of children. <code>childOwner</code> will take care of that. Typically, that would be provided by the child Laminar element, via <code>onMountCallback</code>. Such an owner kills its subscriptions when the corresponding element gets removed from the DOM.</p>
-<h3><a class="anchor" aria-hidden="true" id="alternative-event-listener-registration-syntax"></a><a href="#alternative-event-listener-registration-syntax" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Alternative Event Listener Registration Syntax</h3>
+<h3><a class="anchor" aria-hidden="true" id="composeevents"></a><a href="#composeevents" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>composeEvents</h3>
+<p>The <code>div(onClick --&gt; observer)</code> syntax for listening to events is simple but limited. On the left hand side you can apply EventProcessor operations to <code>onClick</code> such as map, filter, preventDefault, etc. And on the right hand side you can apply Observer operations like <code>contramap</code>, <code>filter</code>, and <code>delay</code>.</p>
+<p>However, observables have a richer set of operators than either of these. For example, you might want to throttle the events, or propagate an event only if a certain other signal contains <code>true</code>. This is easy to achieve with the <code>composeEvents</code> method:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> $allowClick: <span class="hljs-type">Signal</span>[<span class="hljs-type">Boolean</span>] = ???
+ 
+div(composeEvents(onScroll)(_.throttle(<span class="hljs-number">100</span>)) --&gt; scrollObserver)
+ 
+a(
+  composeEvents(
+    onClick.preventDefault
+  )(
+    _.withCurrentValueOf($allowClick).collect { <span class="hljs-keyword">case</span> (ev, <span class="hljs-literal">true</span>) =&gt; ev } 
+  ) --&gt; eventObserver
+)
+</code></pre>
+<p>As you see <code>composeEvents</code> accepts two argument lists: an EventProcessor which lets you conveniently perform DOM event related tasks such as preventDefault, and a composer function that translates the stream of values emitted by the EventProcessor into any other observable, even a signal.</p>
+<h3><a class="anchor" aria-hidden="true" id="elementevents"></a><a href="#elementevents" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>element.events</h3>
 <p>Imagine you're building <code>TextInput</code>, a component that wraps an <code>input</code> element into a <code>div</code> with some styles added on top:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TextInput</span> <span class="hljs-title">private</span> (<span class="hljs-params">
   val wrapperNode: <span class="hljs-type">Div</span>,
@@ -674,10 +732,10 @@ div(
 div(<span class="hljs-string">"Hello"</span>, changeEventStream --&gt; changeObserver)
 </code></pre>
 <p>Under the hood, <code>element.events(eventProp)</code> creates an EventBus, applies an <code>eventProp --&gt; eventBus</code> modifier to <code>element</code>, and returns <code>eventBus.events</code>. That's all there is to it, no magic – just alternative syntax that makes it easier to compose your components without tight coupling.</p>
-<p>The <code>events</code> method also accepts <code>EventPropTransformation</code>, not just ReactiveEventProp. This allows for very flexible composition:</p>
+<p>The <code>events</code> method also accepts <code>EventProcessor</code>, not just <code>ReactiveEventProp</code>. This allows for very flexible composition:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// You can define this once for reusability</span>
-<span class="hljs-keyword">val</span> onEnterPress: <span class="hljs-type">EventPropTransformation</span>[dom.<span class="hljs-type">KeyboardEvent</span>, dom.<span class="hljs-type">KeyboardEvent</span>] =
- onKeyPress.filter(_keyCode == <span class="hljs-type">KeyCodes</span>.<span class="hljs-type">Enter</span>)
+<span class="hljs-keyword">val</span> onEnterPress: <span class="hljs-type">EventProcessor</span>[dom.<span class="hljs-type">KeyboardEvent</span>, dom.<span class="hljs-type">KeyboardEvent</span>] =
+ onKeyPress.filter(_.keyCode == <span class="hljs-type">KeyCodes</span>.<span class="hljs-type">Enter</span>)
 
 input(onEnterPress --&gt; observer)
 
@@ -692,8 +750,8 @@ textArea(onEnterPress.preventDefault --&gt; observer)
 <p>In this case, two event listeners will be registered on the DOM node, one of them sending events to <code>clickBus1</code>, the other sending the exact same events to <code>clickBus2</code>. Of course, this works the same regardless of what syntax you use to register event listeners (see previous section).</p>
 <p>In most cases you could simply add another listener to <code>clickBus.events</code> to achieve whatever you needed multiple event listeners bound to the same element for – it's easier and more performant in extreme cases (thousands of nodes, I'd guess).</p>
 <p>However, sometimes simpler composition is more important. For example, consider the <code>TextInput</code> component mentioned above. That component itself might have an internal need to listen to its own <code>onChange</code> events (e.g. for some built-in validation), and it will not interfere with any other <code>onChange</code> event listeners the end user might want to add to it.</p>
-<h3><a class="anchor" aria-hidden="true" id="event-transformations"></a><a href="#event-transformations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event Transformations</h3>
-<p>Often times you don't really need a stream of e.g. click events – you only care about the subset of the events or only parts of their data. With the Alternative Syntax described above you would just use Airstream operators to transform the stream of events, like this:</p>
+<h3><a class="anchor" aria-hidden="true" id="event-processors"></a><a href="#event-processors" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Event Processors</h3>
+<p>Often times you don't really need a stream of e.g. click events – you only care about parts of the event data, or only a subset of emitted events. With the <code>events</code> and <code>composeEvents</code> methods described above you would just use Airstream operators to transform the stream of events, like this:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> incrementButton = button(<span class="hljs-string">"more"</span>)
 <span class="hljs-keyword">val</span> decrementButton = button(<span class="hljs-string">"less"</span>)
  
@@ -704,7 +762,7 @@ textArea(onEnterPress.preventDefault --&gt; observer)
 </code></pre>
 <p>Or even:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> clickObserver: <span class="hljs-type">Observer</span>[dom.<span class="hljs-type">Event</span>] = ???
-input(inContext(_.events(onClick).delay(<span class="hljs-number">100</span>) --&gt; clickObserver))
+input(composeEvents(onClick)(_.delay(<span class="hljs-number">100</span>)) --&gt; clickObserver)
 </code></pre>
 <p>However, when using the standard <code>onClick --&gt; eventBus</code> syntax, there is no stream that you could operate on before the events hit <code>eventBus</code>. Instead, we provide a different way to transform events:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> diffBus = <span class="hljs-keyword">new</span> <span class="hljs-type">EventBus</span>[<span class="hljs-type">Int</span>]
@@ -712,13 +770,15 @@ input(inContext(_.events(onClick).delay(<span class="hljs-number">100</span>) --
 <span class="hljs-keyword">val</span> decrementButton = button(<span class="hljs-string">"less"</span>, onClick.mapTo(<span class="hljs-number">-1</span>) --&gt; diffBus)
 <span class="hljs-keyword">val</span> diffStream: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Int</span>] = diffBus.events <span class="hljs-comment">// emits 1 or -1</span>
 </code></pre>
-<p>This <code>mapTo</code> method is defined on <code>EventPropTransformation</code>, which <code>onClick</code> (<code>ReactiveEventProp</code>) is implicitly converted to. Also available are <code>mapToValue</code>, <code>map</code>, <code>filter</code>, <code>collect</code>, <code>preventDefault</code>, and <code>stopPropagation</code>, and you can chain them in any order.</p>
+<p>This <code>mapTo</code> method is defined on <code>EventProcessor</code>, which <code>onClick</code> (<code>ReactiveEventProp</code>) is implicitly converted to. Also available are <code>mapToStrict</code>, <code>map</code>, <code>filter</code>, <code>collect</code>, <code>orElse</code>,<code>preventDefault</code>, <code>stopPropagation</code>, <code>mapToEvent</code>, <code>mapToValue</code>, <code>mapToChecked</code>,  etc. and you can chain them in any order. See the API docs for these methods <a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/kets/EventProcessor.html">here</a>.</p>
 <p>More examples:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.scalajs.dom.ext.<span class="hljs-type">KeyCode</span>
  
-div(<span class="hljs-string">"Click me"</span>, onClick.map(getClickCoordinates) --&gt; clickCoordinatesBus)
+input(onInput.mapToValue --&gt; textObserver)
  
-div(onScroll.filter(throttle) --&gt; filteredScrollEventBus)
+input(typ := <span class="hljs-string">"checkbox"</span>, onClick.mapToChecked --&gt; textObserver)
+ 
+div(<span class="hljs-string">"Click me"</span>, onClick.map(getClickCoordinates) --&gt; clickCoordinatesBus)
  
 form(onSubmit.preventDefault.map(getFormData) --&gt; formSubmitObserver)
  
@@ -730,7 +790,7 @@ div(onClick.collect { <span class="hljs-keyword">case</span> ev <span class="hlj
  
 <span class="hljs-comment">// @TODO[Docs] Come up with more relatable examples</span>
 </code></pre>
-<p>Just like <code>ReactiveEventProp</code>-s, <code>EventPropTransformation</code> instances are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:</p>
+<p>Just like <code>ReactiveEventProp</code>-s, <code>EventProcessor</code>-s are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> org.scalajs.dom.ext.<span class="hljs-type">KeyCode</span>
  
 <span class="hljs-keyword">val</span> onEnterKeyUp = onKeyUp.filter(_.keyCode == <span class="hljs-type">KeyCode</span>.<span class="hljs-type">Enter</span>)
@@ -749,24 +809,23 @@ div(
 
 </code></pre>
 <p>These methods correspond to invocations of the corresponding native JS <code>dom.Event</code> methods. MDN docs: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault">preventDefault</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation">stopPropagation</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation">stopImmediatePropagation</a></p>
-<p>Importantly, these are just ordinarily transformations, and happen in the order in which you have chained them. For example, in the code snippet above <code>ev.preventDefault</code> will only be called on events that pass <code>filter(_.keyCode == KeyCode.Enter)</code>. Internally all transformations have access to both the latest processed value, and the original event, so it's fine to call the <code>.preventDefault</code> transformation even after you've used <code>.map(_.keyCode)</code>.</p>
+<p>Importantly, these are just ordinary processors, and happen in the order in which you have chained them. For example, in the code snippet above <code>ev.preventDefault</code> will only be called on events that pass <code>filter(_.keyCode == KeyCode.Enter)</code>. Internally all processors have access to both the latest processed value, and the original event, so it's fine to call the <code>.preventDefault</code> processor even after you've used <code>.map(_.keyCode)</code>.</p>
 <h4><a class="anchor" aria-hidden="true" id="usecapture"></a><a href="#usecapture" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>useCapture</h4>
 <pre><code class="hljs css language-scala">div(onClick.useCapture --&gt; captureModeClickObserver)
 </code></pre>
 <p>JS DOM has two event modes: capture, and bubbling. Typically and by default everyone uses the latter, but capture mode is sometimes useful for event listener priority/ordering/efficiency (not specific to Laminar, standard JS DOM rules/limitations apply).</p>
-<p><code>.useBubbleMode</code> is the opposite of <code>.useCapture</code>. The former is the default, so you don't need to call it unless you're calling it on an EventPropTransformation that you've previously enabled capture mode for.</p>
+<p><code>.useBubbleMode</code> is the opposite of <code>.useCapture</code>. The former is the default, so you don't need to call it unless you're calling it on an EventProcessor that you've previously enabled capture mode for.</p>
 <p>See MDN <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener">addEventListener</a> page for details (see &quot;useCapture&quot; section).</p>
 <h4><a class="anchor" aria-hidden="true" id="obtaining-typed-event-target"></a><a href="#obtaining-typed-event-target" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Obtaining Typed Event Target</h4>
 <p>Due to dynamic nature of Javascript, <code>dom.Event.target</code> is typed only as <code>dom.EventTarget</code> for most events, which is not useful when you want to get <code>ev.target.value</code> from a target that is a <code>dom.html.Input</code> (but doesn't know it). So, you can't do this:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-comment">// Does not work because .value is defined on dom.html.Input, but not on dom.EventTarget, which is what `ev` is :(</span>
 input(typ := <span class="hljs-string">"text"</span>, onChange().map(ev =&gt; ev.target.value) --&gt; inputStringBus)
 </code></pre>
-<p>Easiest hackiest solution would be to use <code>.map(_.target.asInstanceOf[dom.html.Input].value)</code> but you should reconsider using Scala if you aren't cringing just looking at this.</p>
-<p>You could use our Alternative Syntax for registering events (see section above) for a somewhat safer solution:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> inputNode = input(typ := <span class="hljs-string">"text"</span>)
-<span class="hljs-keyword">val</span> inputStringStream = inputNode.events(onChange).mapTo(inputNode.ref.value)
+<p>Instead, use <code>mapToValue</code>, which essentially gives you <code>ev.target.value</code>:</p>
+<pre><code class="hljs css language-scala">input(typ := <span class="hljs-string">"text"</span>, onChange.mapToValue --&gt; inputStringBus)
 </code></pre>
-<p>However, this is often cumbersome, and introduces the risk of referencing the wrong input node of the same type. We have a better way to get a properly typed target node:</p>
+<p>There's <code>mapToChecked</code> for checkboxes too by the way.</p>
+<p>For a more general solution, you can use <code>inContext</code>:</p>
 <pre><code class="hljs css language-scala">input(inContext(thisNode =&gt; onChange.mapTo(thisNode.ref.value) --&gt; inputStringBus))
 </code></pre>
 <p>This feature is not specific to events at all. The general syntax is <code>inContext(El =&gt; Modifier[El]): Modifier[El]</code>. <code>thisNode</code> refers to the element to which this modifier will be applied. Its type is properly inferred to be <code>Input</code>, which is an alias for <code>ReactiveHtmlElement[dom.html.Input]</code>, thus its <code>.ref</code> property is precisely typed as <code>dom.html.Input</code>, which is a native JS type that has a <code>.value</code> property that holds the current text in the input.</p>
@@ -783,6 +842,76 @@ input(typ := <span class="hljs-string">"text"</span>, onChange().map(ev =&gt; ev
 )
 </code></pre>
 <p>Depending on your desired logic, you might not have a Laminar element to act as an Owner for subscriptions of these event streams. For example, if you implement an Ajax service based on observables, you would probably want it making requests regardless of observers. For such app-wide subscriptions you can use <code>unsafeWindowOwner</code>. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar, so you will need to clean them up manually if needed.</p>
+<h2><a class="anchor" aria-hidden="true" id="controlled-inputs"></a><a href="#controlled-inputs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Controlled Inputs</h2>
+<p>Controlled input is an HTML element whose <code>value</code> property (or <code>checked</code> property in case of checkboxes) is <strong>locked</strong> to a certain observable. You might be familiar with this concept from <a href="https://reactjs.org/docs/forms.html#controlled-components">React.js</a>. Here is how you do this in Laminar:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> zipVar = <span class="hljs-type">Var</span>(<span class="hljs-string">""</span>)
+<span class="hljs-keyword">val</span> zipValueSignal = zipVar.signal
+<span class="hljs-keyword">val</span> zipInputObserver = zipVar.writer
+input(
+  placeholder := <span class="hljs-string">"Enter zip code: "</span>,
+  controlled(
+    value &lt;-- zipValueSignal,
+    onInput.mapToValue --&gt; zipValueObserver
+  )
+)
+</code></pre>
+<p>You need to put both the event listener and value reader inside a <code>controlled</code> block. This is how Laminar knows where the interaction loop for this input is described, and enables Laminar to make sure that the value property follows the current value of <code>zipVar</code>.</p>
+<p>This leads us to the main requirement of controlled inputs: your logic must respond to <code>onInput</code> events by making <code>zipValueSignal</code> emit the new value. In our example we do exactly that – <code>onInput</code> we write the new text (<code>mapToValue</code> grabs the user's input from <code>event.target.value</code>) to <code>zipVar</code>, and we make value listen to <code>zipVar</code>'s signal.</p>
+<p>This is the simplest loop possible, but we can complicate it using all normal Laminar functionality. For example, we could disallow non-digit inputs:</p>
+<pre><code class="hljs css language-scala">input(
+  placeholder := <span class="hljs-string">"Enter zip code: "</span>,
+  controlled(
+    value &lt;-- zipValueSignal,
+    onInput.mapToValue.map(_.filter(<span class="hljs-type">Character</span>.isDigit)) --&gt; zipValueObserver
+  )
+)
+</code></pre>
+<p>We could also route the <code>onInput</code> event in any other way, we could even update zipVar asynchronously. When Laminar detects that <code>onInput</code> event happened and you didn't synchronously update the observable that the <code>value</code> is locked to, <code>zipValueSignal</code> in this case, we set the value property to the previous value emitted by <code>zipValueSignal</code>. This happens synchronously, so the user will feel as if their input was ignored, they will not even see it flash.</p>
+<p>Then if your logic updates the <code>value</code> prop at some point in the future, the it will work as you'd expect. Your updates to <code>zipValueSignal</code> don't actually need to come exclusively from user input, you can emit a value into that observable any time, and the <code>value</code> prop will update to match.</p>
+<p>Note that Laminar can't do anything if you manually set the element's value, either via <code>inputEl.ref.value = &quot;newValue&quot;</code> or using the <code>setAsValue</code> EventProcessor. You should not use either of these methods with controlled inputs. Speaking of, you shouldn't call <code>preventDefault</code> on controlled events either, even on events that are cancelable (<code>onInput</code> is not), because for example for checkboxes the rollback of checked state happens <strong>after</strong> the event listener has finished executing, potentially undoing Laminar's changes to the <code>checked</code> property and de-syncing it from the controlling observable.</p>
+<h3><a class="anchor" aria-hidden="true" id="life-without-controlled-inputs"></a><a href="#life-without-controlled-inputs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Life Without Controlled Inputs</h3>
+<p>You can however use <code>setAsValue</code> when you don't need the input to be controlled. The point of having controlled inputs is being able to update their <code>value</code> from two sources: user input, and by updating the observable you're locking the value into. We solve the conflicts between these two sources by requiring that user input updates the observable to which value is locked if you want such user input to be allowed.</p>
+<p>But if you only care about user input, and don't need to lock the value to an observable, you can achieve the same without controlled inputs, for example:</p>
+<pre><code class="hljs css language-scala">input(
+  placeholder := <span class="hljs-string">"Enter zip code: "</span>,
+  onInput
+    .mapToValue
+    .map(_.filter(<span class="hljs-type">Character</span>.isDigit))
+    .setAsValue --&gt; zipValueObserver
+)
+</code></pre>
+<p>And we only need <code>setAsValue</code> in this case because we want to transform the user's input. If we didn't need to filter for digits, we wouldn't need setAsValue as the browser would do the job for us.</p>
+<p>One limitation of this approach is that we can't &quot;undo&quot; invalid user input because the <code>onInput</code> event is not <code>cancelable</code>. Well, you could do ugly-hack it, but you'd be reinventing controlled inputs to some extent. So, <code>setAsValue</code> is limited to <strong>transforming</strong> inputs.</p>
+<h3><a class="anchor" aria-hidden="true" id="why-controlled-inputs-again"></a><a href="#why-controlled-inputs-again" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Why controlled inputs, again?</h3>
+<p>So, how is <strong>not</strong> using the <code>controlled</code> block different from controlled inputs?</p>
+<pre><code class="hljs css language-scala">input(
+  placeholder := <span class="hljs-string">"Enter zip code: "</span>,
+  value &lt;-- zipValueSignal,
+  onInput.mapToValue.map(_.filter(<span class="hljs-type">Character</span>.isDigit)) --&gt; zipValueObserver
+)
+</code></pre>
+<p>This might look and often work a lot like controlled inputs, but it doesn't give you the guarantees that you want, and because of this you can run into issues. For example, without the <code>controlled</code> block, <code>value</code> is not actually locked to <code>zipValueSignal</code>. All that happens is that when <code>zipValueSignal</code> emits, we update the element's value to the emitted value. Ok, so what if the user types &quot;123&quot;, and then later types another &quot;a&quot;? You'd expect &quot;a&quot; to be filtered out and the input to contain &quot;123&quot; after all this, but it will actually contain &quot;123a&quot;, despite the Var containing &quot;123&quot;. This is because <code>zipVar</code> never contained &quot;123a&quot;, this value was transformed into &quot;123&quot; before it reached the Var, and so the Var has nothing new to emit (in this particular case it's because signals don't emit values that <code>==</code> the previous value, but there can be other similar situations using <code>filter</code> etc.). But at the same time, the user did type &quot;123a&quot; and so that's what you see in the input box. And before you can think of using <code>preventDefault</code> to solve this, <code>onInput</code> events are not cancelable. There's a more elaborate explanation in <a href="https://github.com/raquo/Laminar/issues/79">#79</a>.</p>
+<p>So, bottom line is, if you need to transform or filter user input, use either controlled inputs or <code>setAsValue</code>.</p>
+<h3><a class="anchor" aria-hidden="true" id="types-of-controlled-inputs"></a><a href="#types-of-controlled-inputs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Types of Controlled Inputs</h3>
+<p>Our example used <code>onInput</code> event and <code>value</code> property. Certainly would be nice if <code>onInput</code> worked on all input types, but that's not the case in Internet Explorer (of course).</p>
+<p>So here are the events that work in all browsers of interest:</p>
+<table>
+<thead>
+<tr><th>Element type</th><th style="text-align:center">Input Prop</th><th style="text-align:center">Controlled Prop</th><th>Comment</th></tr>
+</thead>
+<tbody>
+<tr><td>input[type=text,email,etc.]</td><td style="text-align:center">onInput</td><td style="text-align:center">value</td><td></td></tr>
+<tr><td>input[type=checkbox,radio]</td><td style="text-align:center">onClick</td><td style="text-align:center">checked</td><td>Do NOT use preventDefault on this</td></tr>
+<tr><td>textarea</td><td style="text-align:center">onInput</td><td style="text-align:center">value</td><td></td></tr>
+<tr><td>select</td><td style="text-align:center">onChange</td><td style="text-align:center">value</td><td>Does not work with multi-select</td></tr>
+</tbody>
+</table>
+<h3><a class="anchor" aria-hidden="true" id="controlled-inputs-caveats"></a><a href="#controlled-inputs-caveats" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Controlled Inputs Caveats</h3>
+<ul>
+<li><p>You can't have conflicting <code>controlled</code> blocks on the same element. You also can't have a <code>value &lt;-- ???</code> binder outside of a controlled block on an element that already has <code>value</code> controlled. Trying to do that will throw and exception. The <code>controlled</code> block defines the sole source of truth for the <code>value</code> prop.</p></li>
+<li><p>The <code>onInput</code> (or <code>onClick</code> etc.) event listener defined inside of the controlled block will be run before any other event listeners on this element, even if you registered those other listeners before adding the controlled block. If the controlled block is added to an element after it has already been mounted, under the hood this is achieved by removing all the Laminar listeners from the element and re-adding them in the same relative order, but <strong>after</strong> the . This is done to ensure that other event listeners do not interfere with the controlled input functionality (e.g. by stopping propagation of the event).</p></li>
+<li><p>Remember that Laminar's <code>controlled</code> block sets the input's <code>value</code> (or <code>checked</code>, whichever you use) property to the controlling observable's last emitted value after each input event. This means that all other input event listeners will not see the user's real input, they will see whatever input value was set by the controlled block. This is because the event itself doesn't carry the information about the user's input, it's only stored in the input element's <code>value</code> property. So as Laminar updates that property to match the controlled observable, there is no chance for other event listeners to see the user's raw input.</p></li>
+</ul>
 <h2><a class="anchor" aria-hidden="true" id="ownership"></a><a href="#ownership" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Ownership</h2>
 <p>Ownership is a core Airstream concept. You <strong>really</strong> need to read about it in <a href="https://github.com/raquo/Airstream#ownership">Airstream docs</a> before proceeding with this section.</p>
 <p>Basically, Airstream does not let you create a leaky resource without specifying an Owner which will eventually kill said resource. For example, adding an Observer to an EventStream is a potential memory leak. Once a subscription is established like that, the stream in question obtains a reference to that observer, and the stream's parent stream obtains a reference to this stream, etc. Depending on how long that chain is and how it's used, there is a good chance it will either never be garbage collected or will be garbage collected much later than optimal.</p>
@@ -959,6 +1088,7 @@ div(
 div(
   onMountCallback(ctx =&gt; {
     doSomething(ctx) <span class="hljs-comment">// let's assume we need this for some reason</span>
+ 
     <span class="hljs-comment">// WRONG – DO NOT DO THIS!</span>
     ctx.thisNode.amend(onClick --&gt; observer)
   })
@@ -999,7 +1129,7 @@ div(
 <ul>
 <li>Note: if you want an <code>Owner</code> because you're upgrading from Laminar v0.7 where each element was an Owner, this might not be the best way to achieve what you want. We've redesigned the API to reduce the need mess around with owners manually. For example, you can have modifiers like <code>stream --&gt; observer</code> now.</li>
 </ul></li>
-<li><p>If you just need a reference to <code>thisNode</code>, don't use lifecycle hooks, use <code>inContext</code> aka <code>forthis</code>.</p></li>
+<li><p>If you just need a reference to <code>thisNode</code>, don't use lifecycle hooks, use <code>inContext</code>.</p></li>
 </ul>
 <h3><a class="anchor" aria-hidden="true" id="lifecycle-event-timing"></a><a href="#lifecycle-event-timing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Lifecycle Event Timing</h3>
 <p>Mounting and unmounting are discrete events that happen at a certain time.</p>
@@ -1033,17 +1163,11 @@ div(
 </ol>
 <h2><a class="anchor" aria-hidden="true" id="url-routing"></a><a href="#url-routing" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>URL Routing</h2>
 <p><a href="https://github.com/raquo/Waypoint">Waypoint</a> – My URL router for Laminar.</p>
-<p><a href="https://github.com/tulz-app/laminar-router">tulz-app/laminar-router</a> – Alternative router for Laminar with API inspired by Akka HTTP</p>
+<p><a href="https://github.com/tulz-app/frontroute">frountroute</a> – Alternative router for Laminar with API inspired by Akka HTTP</p>
 <p>These routers are designed for Laminar, but don't actually depend on it, only on Airstream, so you could potentially use them without Laminar.</p>
 <h2><a class="anchor" aria-hidden="true" id="special-cases"></a><a href="#special-cases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Special Cases</h2>
 <p>Laminar is conceptually a simple layer that brings a lightweight reactive API to native Javascript DOM. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.</p>
 <p>Please let me know via github issues if any of this magic caused you grief. It's supposed to be almost universally helpful.</p>
-<h3><a class="anchor" aria-hidden="true" id="checkboxonclick--eventpreventdefault"></a><a href="#checkboxonclick--eventpreventdefault" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>checkbox.onClick + event.preventDefault()</h3>
-<p>All event streams in Laminar emit events synchronously – as soon as they happen – <strong>except</strong> if the stream in question is a stream of <code>onClick</code> events on an <code>input(typ := &quot;checkbox&quot;)</code> element, <strong>and</strong> you generated this stream using the <code>.preventDefault</code> method in Laminar's API.</p>
-<p>Such streams fire events after a <code>setTimeout(0)</code> instead of firing immediately after the browser triggers the event. Without this hack/magic, you would have been unable to update the <code>checked</code> property of this checkbox from a stream that is (synchronously) derived from the given stream of <code>onClick</code> events, and this is common practice when building controlled components.</p>
-<p>The underlying issue is described in <a href="https://stackoverflow.com/a/32710212/2601788">this StackOverflow answer</a>.</p>
-<p><strong>Watch out:</strong> If you are reading the <code>checked</code> property of the checkbox in an affected stream, it will contain the original, unchanged value. This behaviour could be surprising if you don't know about this stream being async, but do know about the native DOM behaviour of temporarily updating this value and then resetting it back. This is deemed a smaller problem than the original issue because it's easier to debug, and better matches the commonly-expected semantics of <code>preventDefault</code>.</p>
-<p><strong>Escape hatch:</strong> instead of using Laminar's <code>preventDefault</code> option/method, call <code>ev.preventDefault()</code> manually <em>after</em> the event was passed to the observer. Then event handling will work the same way it does in native JS DOM.</p>
 <h3><a class="anchor" aria-hidden="true" id="tbody"></a><a href="#tbody" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>tbody</h3>
 <p>You might be used to writing HTML markup like this:</p>
 <pre><code class="hljs css language-html"><span class="hljs-tag">&lt;<span class="hljs-name">table</span>&gt;</span>
@@ -1062,14 +1186,4 @@ div(
 <p>Therefore, if you're rendering a table you must make sure to wrap your <code>tr</code> elements in <code>tbody</code> (or <code>thead</code> or <code>tfoot</code>) elements.</p>
 <h2><a class="anchor" aria-hidden="true" id="fin"></a><a href="#fin" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fin</h2>
 <p>Hey, you've read all of this? Amazing. Join us in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>.</p>
-</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#introduction">Introduction</a></li><li><a href="#dependencies">Dependencies</a></li><li><a href="#imports">Imports</a></li><li><a href="#tags--elements">Tags &amp; Elements</a></li><li><a href="#modifiers">Modifiers</a><ul class="toc-headings"><li><a href="#nesting-and-children">Nesting and Children</a></li><li><a href="#html-entities">HTML Entities</a></li><li><a href="#empty-nodes">Empty Nodes</a></li><li><a href="#manual-application">Manual Application</a></li><li><a href="#incontext">inContext</a></li><li><a href="#reusing-elements">Reusing Elements</a></li><li><a href="#missing-keys">Missing Keys</a></li><li><a href="#modifiers-faq">Modifiers FAQ</a></li></ul></li><li><a href="#rendering">Rendering</a><ul class="toc-headings"><li><a href="#application-initialization">Application Initialization</a></li></ul></li><li><a href="#reactive-data">Reactive Data</a><ul class="toc-headings"><li><a href="#attributes-and-properties">Attributes and Properties</a></li><li><a href="#event-streams-and-signals">Event Streams and Signals</a></li><li><a href="#individual-children">Individual Children</a></li><li><a href="#lists-of-children">Lists of Children</a></li><li><a href="#binding-observables">Binding Observables</a></li><li><a href="#other-binders">Other Binders</a></li></ul></li><li><a href="#classname-and-other-special-keys">ClassName and Other Special Keys</a><ul class="toc-headings"><li><a href="#cls">cls</a></li><li><a href="#other-composite-keys">Other Composite Keys</a></li><li><a href="#svg">SVG</a></li></ul></li><li><a href="#event-system-emitters-transformations-buses">Event System: Emitters, Transformations, Buses</a><ul class="toc-headings"><li><a href="#registering-a-dom-event-listener">Registering a DOM Event Listener</a></li><li><a href="#eventbus">EventBus</a></li><li><a href="#alternative-event-listener-registration-syntax">Alternative Event Listener Registration Syntax</a></li><li><a href="#multiple-event-listeners">Multiple Event Listeners</a></li><li><a href="#event-transformations">Event Transformations</a></li><li><a href="#window--document-events">Window &amp; Document Events</a></li></ul></li><li><a href="#ownership">Ownership</a><ul class="toc-headings"><li><a href="#laminars-use-of-airstream-ownership">Laminar's Use of Airstream Ownership</a></li></ul></li><li><a href="#memory-management">Memory Management</a></li><li><a href="#element-lifecycle-hooks">Element Lifecycle Hooks</a><ul class="toc-headings"><li><a href="#what-is-mounting">What Is Mounting?</a></li><li><a href="#onmountcallback">onMountCallback</a></li><li><a href="#onunmountcallback--onmountunmountcallback">onUnmountCallback &amp; onMountUnmountCallback</a></li><li><a href="#onmountset">onMountSet</a></li><li><a href="#onmountbind">onMountBind</a></li><li><a href="#onmountinsert">onMountInsert</a></li><li><a href="#why-use-lifecycle-hooks">Why Use Lifecycle Hooks?</a></li><li><a href="#lifecycle-event-timing">Lifecycle Event Timing</a></li><li><a href="#how-are-mount-events-propagated">How Are Mount Events Propagated?</a></li></ul></li><li><a href="#url-routing">URL Routing</a></li><li><a href="#special-cases">Special Cases</a><ul class="toc-headings"><li><a href="#checkboxonclick--eventpreventdefault">checkbox.onClick + event.preventDefault()</a></li><li><a href="#tbody">tbody</a></li></ul></li><li><a href="#fin">Fin</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2020 Nikita Gazarov</section><script>
-          <!-- Basic Woopra analytics -->
-          (function(){
-            var t,i,e,n=window,o=document,a=arguments,s="script",r=["config","track","identify","visit","push","call","trackForm","trackClick"],c=function(){var t,i=this;for(i._e=[],t=0;r.length>t;t++)(function(t){i[t]=function(){return i._e.push([t].concat(Array.prototype.slice.call(arguments,0))),i}})(r[t])};for(n._w=n._w||{},t=0;a.length>t;t++)n._w[a[t]]=n[a[t]]=n[a[t]]||new c;i=o.createElement(s),i.async=1,i.src="//static.woopra.com/js/w.js",e=o.getElementsByTagName(s)[0],e.parentNode.insertBefore(i,e)
-          })("woopra");
-          woopra.config({
-            domain: 'laminar.dev'
-          });
-          woopra.track();
-          
-        </script></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#introduction">Introduction</a></li><li><a href="#dependencies">Dependencies</a></li><li><a href="#imports">Imports</a></li><li><a href="#tags--elements">Tags &amp; Elements</a></li><li><a href="#modifiers">Modifiers</a><ul class="toc-headings"><li><a href="#nesting-and-children">Nesting and Children</a></li><li><a href="#html-entities">HTML Entities</a></li><li><a href="#empty-nodes">Empty Nodes</a></li><li><a href="#manual-application">Manual Application</a></li><li><a href="#incontext">inContext</a></li><li><a href="#reusing-elements">Reusing Elements</a></li><li><a href="#missing-keys">Missing Keys</a></li><li><a href="#modifiers-faq">Modifiers FAQ</a></li></ul></li><li><a href="#rendering">Rendering</a><ul class="toc-headings"><li><a href="#application-initialization">Application Initialization</a></li></ul></li><li><a href="#reactive-data">Reactive Data</a><ul class="toc-headings"><li><a href="#attributes-and-properties">Attributes and Properties</a></li><li><a href="#event-streams-and-signals">Event Streams and Signals</a></li><li><a href="#individual-children">Individual Children</a></li><li><a href="#lists-of-children">Lists of Children</a></li><li><a href="#binding-observables">Binding Observables</a></li><li><a href="#other-binders">Other Binders</a></li></ul></li><li><a href="#classname-and-other-special-keys">ClassName and Other Special Keys</a><ul class="toc-headings"><li><a href="#cls">cls</a></li><li><a href="#other-composite-keys">Other Composite Keys</a></li><li><a href="#svg">SVG</a></li></ul></li><li><a href="#event-system-emitters-processors-buses">Event System: Emitters, Processors, Buses</a><ul class="toc-headings"><li><a href="#registering-a-dom-event-listener">Registering a DOM Event Listener</a></li><li><a href="#eventbus">EventBus</a></li><li><a href="#composeevents">composeEvents</a></li><li><a href="#elementevents">element.events</a></li><li><a href="#multiple-event-listeners">Multiple Event Listeners</a></li><li><a href="#event-processors">Event Processors</a></li><li><a href="#window--document-events">Window &amp; Document Events</a></li></ul></li><li><a href="#controlled-inputs">Controlled Inputs</a><ul class="toc-headings"><li><a href="#life-without-controlled-inputs">Life Without Controlled Inputs</a></li><li><a href="#why-controlled-inputs-again">Why controlled inputs, again?</a></li><li><a href="#types-of-controlled-inputs">Types of Controlled Inputs</a></li><li><a href="#controlled-inputs-caveats">Controlled Inputs Caveats</a></li></ul></li><li><a href="#ownership">Ownership</a><ul class="toc-headings"><li><a href="#laminars-use-of-airstream-ownership">Laminar's Use of Airstream Ownership</a></li></ul></li><li><a href="#memory-management">Memory Management</a></li><li><a href="#element-lifecycle-hooks">Element Lifecycle Hooks</a><ul class="toc-headings"><li><a href="#what-is-mounting">What Is Mounting?</a></li><li><a href="#onmountcallback">onMountCallback</a></li><li><a href="#onunmountcallback--onmountunmountcallback">onUnmountCallback &amp; onMountUnmountCallback</a></li><li><a href="#onmountset">onMountSet</a></li><li><a href="#onmountbind">onMountBind</a></li><li><a href="#onmountinsert">onMountInsert</a></li><li><a href="#why-use-lifecycle-hooks">Why Use Lifecycle Hooks?</a></li><li><a href="#lifecycle-event-timing">Lifecycle Event Timing</a></li><li><a href="#how-are-mount-events-propagated">How Are Mount Events Propagated?</a></li></ul></li><li><a href="#url-routing">URL Routing</a></li><li><a href="#special-cases">Special Cases</a><ul class="toc-headings"><li><a href="#tbody">tbody</a></li></ul></li><li><a href="#fin">Fin</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2021 Nikita Gazarov</section></footer></div></body></html>
