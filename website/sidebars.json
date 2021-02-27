@@ -1,6 +1,6 @@
 {
   "examples": {
     "Basics": ["examples/hello-world", "examples/counter", "examples/time", "examples/todomvc"],
-    "Integrations": ["examples/web-components"]
+    "Integrations": ["examples/ajax", "examples/web-components"]
   }
 }
