@@ -1,5 +1,5 @@
 ---
-title: Using Web Components
+title: Web Components
 ---
 
 In addition to the code presented, for these examples we use Scala.js / Laminar interfaces for Material UI linked below, and also we load the font files required by those web components by means of `siteConfig.js` for this website. And of course we add the material UI packages as npm dependencies in `build.sbt`.
@@ -56,6 +56,8 @@ render(containerNode, app)
 
 The button above is a **[@material/mwc-button](https://github.com/material-components/material-components-web-components/tree/master/packages/button)** web component, used via **[Button.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Button.scala)** interface.
 
+This web component is available as part of the **[Laminar Web Components](https://github.com/uosis/laminar-web-components)** library.
+
 </div>
 
 
@@ -107,5 +109,7 @@ render(containerNode, app)
 The slider control above is a **[@material/mwc-slider](https://github.com/material-components/material-components-web-components/tree/master/packages/slider)** web component, used via **[Slider.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
 
 The progress bar is a **[@material/mwc-linear-progress](https://github.com/material-components/material-components-web-components/tree/master/packages/linear-progress)** web component, used via **[LinearProgressBar.scala](https://github.com/raquo/Laminar/blob/master/websiteJS/src/main/scala/website/webcomponents/material/Slider.scala)** interface.
+
+These web components are available as part of the **[Laminar Web Components](https://github.com/uosis/laminar-web-components)** library.
 
 </div>

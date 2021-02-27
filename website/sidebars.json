@@ -1,6 +1,7 @@
 {
   "examples": {
     "Basics": ["examples/hello-world", "examples/counter", "examples/time", "examples/todomvc"],
+    "Forms": ["examples/uncontrolled-inputs", "examples/controlled-inputs", "examples/form-state"],
     "Integrations": ["examples/ajax", "examples/web-components"]
   }
 }

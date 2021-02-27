@@ -49,6 +49,11 @@
   font-size: 13px;
 }
 
+.mdoc-example .x-hasError input,
+.mdoc-example .x-hasError textarea {
+  border-color: red;
+}
+
 .mdoc-example .-error {
   color: red;
 }
