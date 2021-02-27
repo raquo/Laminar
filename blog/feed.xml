@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Wed, 03 Feb 2021 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 26 Feb 2021 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,6 +13,14 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2021 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v0.12.1]]></title>
+            <link>https://laminar.dev/blog/2021/02/26/laminar-v0.12.1.html</link>
+            <guid>https://laminar.dev/blog/2021/02/26/laminar-v0.12.1.html</guid>
+            <pubDate>Fri, 26 Feb 2021 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>Tiny release to remove debug logging for controlled inputs that I accidentally left in the production build of Laminar 0.12.0. No breaking changes unless this broke your heart.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v0.12.0, Laminext, Material UI & more!]]></title>
             <link>https://laminar.dev/blog/2021/02/03/laminar-v0.12.0.html</link>

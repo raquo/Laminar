@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Uncontrolled Inputs · Laminar</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;h2&gt;Listening to User Input&lt;/h2&gt;"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Uncontrolled Inputs · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/"/><meta property="og:description" content="&lt;h2&gt;Listening to User Input&lt;/h2&gt;"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class="siteNavGroupActive"><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class=""><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Forms</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Basics</h3><ul class=""><li class="navListItem"><a class="navItem" href="/examples/hello-world">Hello World</a></li><li class="navListItem"><a class="navItem" href="/examples/counter">Counter</a></li><li class="navListItem"><a class="navItem" href="/examples/time">Time</a></li><li class="navListItem"><a class="navItem" href="/examples/todomvc">TodoMVC</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Forms</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/examples/uncontrolled-inputs">Uncontrolled Inputs</a></li><li class="navListItem"><a class="navItem" href="/examples/controlled-inputs">Controlled Inputs</a></li><li class="navListItem"><a class="navItem" href="/examples/form-state">Form State &amp; Validation</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Integrations</h3><ul class=""><li class="navListItem"><a class="navItem" href="/examples/ajax">Ajax</a></li><li class="navListItem"><a class="navItem" href="/examples/web-components">Web Components</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Uncontrolled Inputs</h1></header><article><div><span><p><h2>Listening to User Input</h2></p>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> inputTextVar = <span class="hljs-type">Var</span>(<span class="hljs-string">""</span>)
+
+<span class="hljs-keyword">val</span> checkedVar = <span class="hljs-type">Var</span>(<span class="hljs-literal">false</span>)
+
+<span class="hljs-keyword">val</span> app = div(
+  p(
+    label(<span class="hljs-string">"Name: "</span>),
+    input(
+      onInput.mapToValue --&gt; inputTextVar
+    )
+  ),
+  p(
+    <span class="hljs-string">"You typed: "</span>,
+    child.text &lt;-- inputTextVar
+  ),
+  p(
+    label(<span class="hljs-string">"I like to check boxes: "</span>),
+    input(
+      typ(<span class="hljs-string">"checkbox"</span>),
+      onInput.mapToChecked --&gt; checkedVar
+    )
+  ),
+  p(
+    <span class="hljs-string">"You checked the box: "</span>,
+    child.text &lt;-- checkedVar
+  )
+)
+
+render(containerNode, app)
+</code></pre>
+<div id="mdoc-html-run0" data-mdoc-js></div>
+</div>
+<p><h2>Transforming User Input</h2></p>
+<p>In other UI libraries if you want to <strong>transform</strong> user input you need to use controlled components. We have that too, but for relatively simple cases you can use <code>setAsValue</code> and <code>setAsChecked</code> event processor operators instead.</p>
+<p>The way it works is simple: when the event processor reaches the <code>setAsValue</code> operator, it writes the string provided to it into <code>event.target.value</code>. For this reason you  shouldn't use the <code>filter</code> event processor operator before <code>setAsValue</code>: <code>setAsValue</code> will not be called if the predicate doesn't match. Note that we use the <code>map</code> operator here, not <code>filter</code>. The <code>filter</code> we use is actually a method we call on String to transform it.</p>
+<p>If you want to <strong>filter</strong> user input, for example if you want to <strong>prevent</strong> any input containing non-digits (as opposed to stripping out non-digits from such input), you should use Laminar <a href="https://laminar.dev/examples/controlled-inputs">controlled inputs</a> instead.</p>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> zipVar = <span class="hljs-type">Var</span>(<span class="hljs-string">""</span>)
+
+<span class="hljs-keyword">val</span> app = div(
+  p(
+    label(<span class="hljs-string">"Zip code: "</span>),
+    input(
+      placeholder(<span class="hljs-string">"12345"</span>),
+      maxLength(<span class="hljs-number">5</span>), <span class="hljs-comment">// HTML can help block some undesired input</span>
+      onInput
+        .mapToValue
+        .map(_.filter(<span class="hljs-type">Character</span>.isDigit))
+        .setAsValue --&gt; zipVar
+    )
+  ),
+  p(
+    <span class="hljs-string">"Your zip code: "</span>,
+    child.text &lt;-- zipVar
+  ),
+  button(
+    onClick.mapTo(zipVar.now()) --&gt; (zip =&gt; dom.window.alert(zip)),
+    <span class="hljs-string">"Submit"</span>
+  )
+)
+
+render(containerNode, app)
+</code></pre>
+<div id="mdoc-html-run1" data-mdoc-js></div>
+</div>
+<p><h2>Forms Without Vars</h2></p>
+<p>You don't need to keep track of state in Vars. It is often useful, and more complex code tends to need that for auxiliary reasons, but you can fetch the state from the DOM instead:</p>
+<div class = "mdoc-example">
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<span class="hljs-keyword">import</span> org.scalajs.dom
+
+<span class="hljs-keyword">val</span> inputEl = input(
+  placeholder(<span class="hljs-string">"12345"</span>),
+  maxLength(<span class="hljs-number">5</span>), <span class="hljs-comment">// HTML can help block some undesired input</span>
+  onInput
+    .mapToValue
+    .map(_.filter(<span class="hljs-type">Character</span>.isDigit))
+    .setAsValue --&gt; <span class="hljs-type">Observer</span>.empty
+)
+
+<span class="hljs-keyword">val</span> app = div(
+  form(
+    onSubmit
+      .preventDefault
+      .mapTo(inputEl.ref.value) --&gt; (zip =&gt; dom.window.alert(zip)),
+    p(
+      label(<span class="hljs-string">"Zip code: "</span>),
+      inputEl
+    ),
+    p(
+      button(typ(<span class="hljs-string">"submit"</span>), <span class="hljs-string">"Submit"</span>)
+    )
+  )
+)
+
+render(containerNode, app)
+</code></pre>
+<div id="mdoc-html-run2" data-mdoc-js></div>
+</div>
+<script type="text/javascript" src="../assets/examples/websitejs-opt-library.js" defer></script>
+<script type="text/javascript" src="../assets/examples/websitejs-opt-loader.js" defer></script>
+<script type="text/javascript" src="../assets/examples/uncontrolled-inputs.md.js" defer></script>
+<script type="text/javascript" src="../assets/examples/mdoc.js" defer></script>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/examples/todomvc"><span class="arrow-prev">← </span><span class="function-name-prevnext">TodoMVC</span></a><a class="docs-next button" href="/examples/controlled-inputs"><span>Controlled Inputs</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2021 Nikita Gazarov</section></footer></div></body></html>
