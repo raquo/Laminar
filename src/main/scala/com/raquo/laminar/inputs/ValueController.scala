@@ -57,8 +57,9 @@ class ValueController[A, B](
       // This needs to run after the event fired into `observer` has finished propagating
       // Browser events are always fired outside of the transaction, so wrapping this in Transaction is not required
       setValue(latestSourceValue.getOrElse(prevValue))
-    }.setDisplayName("resetObserver").debugLog()
-    Observer.combine(Observer(listener.callback).setDisplayName("listener.callback observer").debugLog(), resetObserver).setDisplayName("combinedObserver").debugLog()
+    }
+
+    Observer.combine(Observer(listener.callback), resetObserver)
   }
 
   private[laminar] def bind(): DynamicSubscription = {

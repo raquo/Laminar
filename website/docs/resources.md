@@ -36,7 +36,9 @@ title: Resources
 
 * [Gitter](https://gitter.im/Laminar_/Lobby) for support, advice, showing off your Laminar projects, etc.
 
-* [Github issues](https://github.com/raquo/laminar/issues) for bugs, feature requests, and more in-depth discussions
+* [Github discussions](https://github.com/raquo/laminar/discussions) for how-tos, whys, and any questions or discussions that other people would benefit from easily finding.
+
+* [Github issues](https://github.com/raquo/laminar/issues) for bugs and feature requests
 
 * Please consider [supporting the project](https://github.com/sponsors/raquo) on github!
 
