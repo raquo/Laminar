@@ -54,7 +54,19 @@ lazy val laminar = project.in(file("."))
       "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
     ),
 
-    scalacOptions ++= Seq("-deprecation", "-feature", "-language:higherKinds", "-language:implicitConversions"),
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-feature",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      {
+        val localSourcesPath = baseDirectory.value.toURI
+        val remoteSourcesPath = s"https://raw.githubusercontent.com/raquo/Laminar/${git.gitHeadCommit.value.get}/"
+        val sourcesOptionName = if (scalaVersion.value.startsWith("2.")) "-P:scalajs:mapSourceURI" else "-scalajs-mapSourceURI"
+
+        s"${sourcesOptionName}:$localSourcesPath->$remoteSourcesPath"
+      }
+    ),
 
     version in installJsdom := Versions.JsDom,
 
