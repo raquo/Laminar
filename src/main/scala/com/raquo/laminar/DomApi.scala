@@ -191,7 +191,9 @@ object DomApi {
     if (domValue == null) { // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
       removeSvgAttribute(element, attr)
     } else {
-      element.ref.setAttributeNS(namespaceURI = attr.namespace.orNull, qualifiedName = attr.name, value = domValue)
+      attr.namespace.fold(element.ref.setAttribute(attr.name,domValue)){ns=>
+        element.ref.setAttributeNS(namespaceURI = ns, qualifiedName = attr.name, value = domValue)
+      }  
     }
   }
 
