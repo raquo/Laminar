@@ -186,6 +186,15 @@ private[laminar] object Laminar
     new RootNode(container, rootNode)
   }
 
+  @inline def renderOnDomContentLoaded(
+    container: => dom.Element,
+    rootNode: => nodes.ReactiveElement.Base
+  ): Unit = {
+    documentEvents.onDomContentLoaded.foreach { _ =>
+      new RootNode(container, rootNode)
+    }(unsafeWindowOwner)
+  }
+
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
     * This is a bit annoying, I know, but we kinda have to follow the native JS DOM API on this.

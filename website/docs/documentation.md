@@ -68,7 +68,7 @@ This documentation is for Laminar version **v0.12.1**. For other versions, see b
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.12.1](https://laminar.dev/documentation)** | **[v0.12.0](https://github.com/raquo/Airstream/blob/v0.12.0/README.md)** |
+| **[v0.12.2](https://laminar.dev/documentation)** | **[v0.12.2](https://github.com/raquo/Airstream/blob/v0.12.2/README.md)** |
 | **[v0.11.0](https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
 | – | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
 | **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
@@ -402,6 +402,11 @@ That's it. Laminar will find an element with id "appContainer" in the document, 
 Note: if `appContainer` was not present in the DOM when you called `render()`, you will need to manually call `root.mount()` to mount `appElement`. More on this in [Element Lifecycle Hooks](#element-lifecycle-hooks).
 
 To remove `appElement` from the DOM, simply call `root.unmount()`.
+
+
+### Waiting for the DOM to load
+
+Laminar's `render()` method expects the container element to be present in the DOM already. However, this might not be the case if your script is executed before the browser has finished building the DOM. To work around this, you need to call the `render` method after the browser has fired the `DOMContentLoaded` event. You can do this manually with native JS `addEventListener`, or less manually using Laminar's `documentEvents.onDOMContentLoaded` stream, or – preferably – just call Laminar's `renderOnDomContentLoaded` method instead of `render`.
 
 
 ### Application Initialization
