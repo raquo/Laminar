@@ -182,6 +182,7 @@ object DomApi {
   }
 
   def getSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V]): Option[V] = {
+    // @TODO[Integrity] We're passing fully qualified name instead of local name. Seems to work though?
     val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.name)
     Option(domValue).map(attr.codec.decode)
   }

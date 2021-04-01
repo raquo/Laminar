@@ -12,8 +12,8 @@ import webcomponents.material
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val _ = material.Button
-    val _ = material.LinearProgressBar
-    val _ = material.Slider
+    material.Button
+    material.LinearProgressBar
+    material.Slider
   }
 }

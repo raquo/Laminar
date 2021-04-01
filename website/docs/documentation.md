@@ -63,7 +63,7 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v0.12.1**. For other versions, see below.
+This documentation is for Laminar version **v0.12.2**. For other versions, see below.
 
 | Laminar | Airstream |
 | :--- | :--- |

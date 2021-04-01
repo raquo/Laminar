@@ -60,6 +60,8 @@ title: Resources
 
 * [keynmol/laminar-static-gh-pages](https://github.com/keynmol/laminar-static-gh-pages/) – Template for publishing a static site with Laminar
 
+* [kitlangton/formula-example](https://github.com/kitlangton/formula-example) – Example of deriving Laminar components with Magnolia
+
 * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
 
 * [raquo/laminar-examples](https://github.com/raquo/laminar-examples) – an old repo with some Laminar examples, most of which you can see on this website already.
@@ -95,6 +97,11 @@ title: Resources
 * [[VIDEO] Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q)
 
 * [[VIDEO] Stockholm Syndrome Escape Velocity](https://www.youtube.com/watch?v=kLZr87CGY-U)
+
+* [[VIDEO] Deriving the Frontend – Form Combinator Fun with Scala.js](https://www.youtube.com/watch?v=JHriftPO62I)
+
+  * See [updated repo](https://github.com/kitlangton/formula-example) for safe management of Owner-s
+
 
 
 ## Other Related Projects
