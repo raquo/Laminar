@@ -2,12 +2,24 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://laminar.dev/blog</id>
     <title>Laminar Blog</title>
-    <updated>2021-02-26T06:00:00.000Z</updated>
+    <updated>2021-04-01T06:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://laminar.dev/blog"/>
     <subtitle>The best place to stay up-to-date with the latest Laminar news and events.</subtitle>
     <logo>https://laminar.dev/undefined</logo>
     <rights>Copyright © 2021 Nikita Gazarov</rights>
+    <entry>
+        <title type="html"><![CDATA[Laminar v0.12.2]]></title>
+        <id>https://laminar.dev/blog/2021/04/01/laminar-v0.12.2.html</id>
+        <link href="https://laminar.dev/blog/2021/04/01/laminar-v0.12.2.html"/>
+        <updated>2021-04-01T06:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>Bug fixes for source maps, SVG xmlns, and XHR headers. A couple new convenience methods. Requires Scala.js 1.5.0.</p>
+]]></summary>
+        <author>
+            <name>Nikita</name>
+            <uri>http://twitter.com/raquo</uri>
+        </author>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Laminar v0.12.1]]></title>
         <id>https://laminar.dev/blog/2021/02/26/laminar-v0.12.1.html</id>
