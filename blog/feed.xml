@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Thu, 01 Apr 2021 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 26 Feb 2021 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,14 +13,6 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2021 Nikita Gazarov</copyright>
-        <item>
-            <title><![CDATA[Laminar v0.12.2]]></title>
-            <link>https://laminar.dev/blog/2021/04/01/laminar-v0.12.2.html</link>
-            <guid>https://laminar.dev/blog/2021/04/01/laminar-v0.12.2.html</guid>
-            <pubDate>Thu, 01 Apr 2021 06:00:00 GMT</pubDate>
-            <description><![CDATA[<p>Bug fixes for source maps, SVG xmlns, and XHR headers. A couple new convenience methods. Requires Scala.js 1.5.0.</p>
-]]></description>
-        </item>
         <item>
             <title><![CDATA[Laminar v0.12.1]]></title>
             <link>https://laminar.dev/blog/2021/02/26/laminar-v0.12.1.html</link>
