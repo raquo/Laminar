@@ -21,6 +21,7 @@ const siteConfig = {
     "https://fonts.googleapis.com/css?family=Material+Icons&display=block",
     "https://fonts.googleapis.com/css?family=Roboto:300,400,500"
   ],
+  ogImage: "img/brand/laminar-opengraph-opt.png",
   blogSidebarTitle: { default: 'Recent News', all: 'All News' },
 
   // headerIcon: 'img/spiral-logo.svg',
