@@ -4,13 +4,13 @@ object Versions {
 
   val Scala_2_12 = "2.12.12"
 
-  val Scala_3_RC1 = "3.0.0-RC1"
+  val Scala_3_RC2 = "3.0.0-RC2"
 
   val ScalaJsDom = "1.1.0"
 
-  val ScalaDomTypes = "0.13.0"
+  val ScalaDomTypes = "0.14.2"
 
-  val Airstream = "0.12.0"
+  val Airstream = "0.12.2"
 
   // Testing
 
@@ -18,5 +18,5 @@ object Versions {
 
   val JsDom = "16.4.0"
 
-  val ScalaDomTestUtils = "0.14.3"
+  val ScalaDomTestUtils = "0.14.5"
 }
