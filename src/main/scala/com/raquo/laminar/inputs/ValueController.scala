@@ -10,9 +10,10 @@ import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 import org.scalajs.dom
 
 // @TODO[Elegance,Cleanup] There's some redundancy between prop / getDomValue / setDomValue / updater. Clean up later.
-//  - Also maybe this shouldn't be a class... or shouuld be a Binder, or something
+//  - Also maybe this shouldn't be a class... or should be a Binder, or something
 class ValueController[A, B](
   initialValue: A,
+  getDomValue: dom.html.Element => A,
   setDomValue: (dom.html.Element, A) => Unit,
   element: ReactiveHtmlElement.Base,
   updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[A, _], A],
@@ -27,18 +28,17 @@ class ValueController[A, B](
     setValue(prevValue)
   }
 
-  // Override the `defaultValue` prop.
+  // Force-override the `defaultValue` prop.
   // If updater.$value is Signal, its initial value will in turn override this,
   // but if it's a stream, this will remain the effective initial value.
-  setValue(initialValue) // this also sets prevValue
+  setValue(initialValue, force = true) // this also sets prevValue
 
-  private def setValue(nextValue: A): Unit = {
-    // Don't add a currValue != nextValue check here for no reason
-    // - Needless updates do not seem to affect cursor
-    // - Having this check prevents setValue above from setting an empty value, thus
-    //   failing to override defaultValue if that attribute is added after the controller
-    setDomValue(element.ref, nextValue)
-    prevValue = nextValue
+  private def setValue(nextValue: A, force: Boolean = false): Unit = {
+    // Checking against current DOM value prevents cursor position reset in Safari
+    if (force || nextValue != getDomValue(element.ref)) {
+      setDomValue(element.ref, nextValue)
+      prevValue = nextValue
+    }
   }
 
   private def combinedObserver(owner: Owner): Observer[B] = {

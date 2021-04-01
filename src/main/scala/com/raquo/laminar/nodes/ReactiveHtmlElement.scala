@@ -33,8 +33,9 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
     updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[String, _], String],
     listener: EventListener[_ <: dom.Event, A]
   ): DynamicSubscription = {
-    val controller = new ValueController(
+    val controller = new ValueController[String, A](
       initialValue = "",
+      getDomValue = DomApi.getValue(_).getOrElse(""),
       setDomValue = DomApi.setValue,
       element = this,
       updater,
@@ -61,8 +62,9 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
     updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[Boolean, _], Boolean],
     listener: EventListener[_ <: dom.Event, A]
   ): DynamicSubscription = {
-    val controller = new ValueController(
+    val controller = new ValueController[Boolean, A](
       initialValue = false,
+      getDomValue = DomApi.getChecked(_).getOrElse(false),
       setDomValue = DomApi.setChecked,
       element = this,
       updater,
