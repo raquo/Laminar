@@ -1,6 +1,5 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Observable
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.Laminar.{MapValueMapper, StringValueMapper}
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMapper

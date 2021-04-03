@@ -139,13 +139,13 @@ class SyntaxSpec extends UnitSpec {
     )
 
     el.amend(
-      onMountBind(_ => observable --> ((num: Int) => num * 5)),
-      onMountBind(_ => signal --> ((num: Int) => num * 5)),
-      onMountBind(_ => stream --> ((num: Int) => num * 5))
+      onMountBind(_ => observable --> ((num: Int) => println(num * 5))),
+      onMountBind(_ => signal --> ((num: Int) => println(num * 5))),
+      onMountBind(_ => stream --> ((num: Int) => println(num * 5)))
     )
 
     el.amend(
-      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => num * 5)) // @Note "Div" type param is required only in scala 2.12
+      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => println(num * 5))) // @Note "Div" type param is required only in scala 2.12
     )
 
     el.amend(
@@ -177,9 +177,9 @@ class SyntaxSpec extends UnitSpec {
     el.amend(onClick --> Observer[dom.MouseEvent](ev => ()))
     el.amend(onClick.mapTo(1) --> Observer[Int](num => num * 5))
 
-    el.amend(observable --> ((num: Int) => num * 5))
-    el.amend(signal --> ((num: Int) => num * 5))
-    el.amend(stream --> ((num: Int) => num * 5))
+    el.amend(observable --> ((num: Int) => println(num * 5)))
+    el.amend(signal --> ((num: Int) => println(num * 5)))
+    el.amend(stream --> ((num: Int) => println(num * 5)))
 
     el.amendThis(_ => stream --> bus.writer)
 
@@ -245,7 +245,8 @@ class SyntaxSpec extends UnitSpec {
 
 
 
-    "focus <-- boolSignal" shouldNot typeCheck
+    // @TODO[Test] this should be `"..." shouldNot typeCheck` but https://github.com/scalatest/scalatest/issues/1947
+    assertDoesNotCompile("focus <-- boolSignal")
 
     //implicit def xxxx[A](obs: Observable[_]#Self[A]): Source[A] = obs: Observable[A]
 

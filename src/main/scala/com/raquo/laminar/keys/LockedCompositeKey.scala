@@ -17,7 +17,7 @@ class LockedCompositeKey[Key, -El <: ReactiveElement.Base](
 
   def :=(include: Boolean): Setter[El] = {
     if (include) {
-      key := (items: _*)
+      key.:=(items: _*)
     } else {
       Setter.noop
     }

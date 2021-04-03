@@ -3,13 +3,13 @@
 
 ThisBuild / scalaVersion := Versions.Scala_2_13
 
-ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13)
+ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3_RC2)
 
 lazy val websiteJS = project
   .in(file("websiteJS"))
   .settings(
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % Versions.ScalaJsDom,
-    skip in publish := true,
+    (publish / skip) := true,
     webpackBundlingMode := BundlingMode.LibraryOnly(),
     //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
     scalaJSLinkerConfig ~= {
@@ -19,7 +19,7 @@ lazy val websiteJS = project
       _.withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
     },
     scalaJSUseMainModuleInitializer := true,
-    npmDependencies in Compile ++= Seq(
+    (Compile / npmDependencies) ++= Seq(
       "@material/mwc-button" -> "0.18.0",
       "@material/mwc-linear-progress" -> "0.18.0",
       "@material/mwc-slider" -> "0.18.0"
@@ -33,8 +33,8 @@ lazy val website = project
   .settings(
     mdocIn := file("website/docs"),
     mdocJS := Some(websiteJS),
-    mdocJSLibraries := webpack.in(websiteJS, Compile, fullOptJS).value,
-    skip in publish := true,
+    mdocJSLibraries := (websiteJS / Compile / fullOptJS / webpack).value,
+    (publish / skip) := true,
     mdocVariables := Map(
       "js-mount-node" -> "containerNode",
       "js-batch-mode" -> "true"
@@ -68,17 +68,17 @@ lazy val laminar = project.in(file("."))
       }
     ),
 
-    version in installJsdom := Versions.JsDom,
+    (installJsdom / version) := Versions.JsDom,
 
     useYarn := true,
 
-    requireJsDomEnv in Test := true,
+    (Test / requireJsDomEnv) := true,
 
-    parallelExecution in Test := false,
+    (Test / parallelExecution) := false,
 
     scalaJSUseMainModuleInitializer := true,
 
-    scalaJSLinkerConfig in(Compile, fastOptJS) ~= {
+    (Compile / fastOptJS / scalaJSLinkerConfig) ~= {
       _.withSourceMap(false)
     }
   )
@@ -104,7 +104,7 @@ lazy val laminar = project.in(file("."))
     ),
     sonatypeProfileName := "com.raquo",
     publishMavenStyle := true,
-    publishArtifact in Test := false,
+    (Test / publishArtifact) := false,
     publishTo := sonatypePublishToBundle.value,
     releaseCrossBuild := true,
     pomIncludeRepository := { _ => false },
