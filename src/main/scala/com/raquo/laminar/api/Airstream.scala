@@ -14,6 +14,14 @@ trait Airstream {
 
   type Observer[-A] = airstream.core.Observer[A]
 
+  type EventSource[+A] = airstream.core.Source.EventSource[A]
+
+  type SignalSource[+A] = airstream.core.Source.SignalSource[A]
+
+  type Source[+A] = airstream.core.Source[A]
+
+  type Sink[-A] = airstream.core.Sink[A]
+
   val EventStream: airstream.core.EventStream.type = airstream.core.EventStream
 
   val Signal: airstream.core.Signal.type = airstream.core.Signal
