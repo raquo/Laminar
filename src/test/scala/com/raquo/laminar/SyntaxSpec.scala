@@ -271,7 +271,7 @@ class SyntaxSpec extends UnitSpec {
       child.maybe <-- divObservable.map(Some(_)),
       child.maybe <-- divFuture,
       child.maybe <-- divPromise,
-      child.int <-- periodicInt,
+      //child.int <-- periodicInt,
       child.text <-- periodicInt,
       child.text <-- boolBus,
       child.text <-- doubleBus.events,

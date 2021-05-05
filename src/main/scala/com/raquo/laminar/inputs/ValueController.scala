@@ -183,18 +183,21 @@ object ValueController {
         }
 
       case _: dom.html.TextArea =>
-        Some(Laminar.value, Laminar.onInput)
+        Some((Laminar.value, Laminar.onInput))
 
       case _: dom.html.Select =>
         // @TODO Allow onInput? it's the same but not all browsers support it.
         // Note: onChange browser event emits only when the selected value actually changes
         //       (clicking the same option doesn't trigger the event)
-        Some(Laminar.value, Laminar.onChange)
+        Some((Laminar.value, Laminar.onChange))
 
       case el if DomApi.isCustomElement(el) =>
         // @TODO Not sure if custom elements can actually work that way.
         //  I think yes, if they fire onInput events and have a value prop. But is that how they usually work?
-        Some(Laminar.value, Laminar.onInput)
+        Some((Laminar.value, Laminar.onInput))
+
+      case _ =>
+        None
     }
   }
 }

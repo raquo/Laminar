@@ -1,6 +1,6 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.{Observable, Sink, Source}
+import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.airstream.state.Val
 import com.raquo.domtypes.generic.Modifier
 import com.raquo.domtypes.generic.keys.Style

@@ -1,9 +1,7 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar
 import com.raquo.laminar.builders.HtmlTag
 import com.raquo.laminar.inputs.ValueController
 import com.raquo.laminar.keys.ReactiveProp

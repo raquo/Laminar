@@ -23,7 +23,7 @@ class AsyncUnitSpec
 
   def delay[V](millis: Int)(value: => V): Future[V] = {
     val promise = Promise[V]()
-    js.timers.setTimeout(millis) {
+    js.timers.setTimeout(millis.toDouble) {
       promise.complete(Try(value))
     }
     promise.future

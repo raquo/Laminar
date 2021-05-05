@@ -54,18 +54,50 @@ lazy val laminar = project.in(file("."))
       "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
     ),
 
-    scalacOptions ++= Seq(
-      "-deprecation",
-      "-feature",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      {
-        val localSourcesPath = baseDirectory.value.toURI
-        val remoteSourcesPath = s"https://raw.githubusercontent.com/raquo/Laminar/${git.gitHeadCommit.value.get}/"
-        val sourcesOptionName = if (scalaVersion.value.startsWith("2.")) "-P:scalajs:mapSourceURI" else "-scalajs-mapSourceURI"
+    scalacOptions ~= { options: Seq[String] =>
+      options.filterNot(Set(
+        "-Ywarn-value-discard",
+        "-Wvalue-discard"
+      ))
+    },
 
-        s"${sourcesOptionName}:$localSourcesPath->$remoteSourcesPath"
+    scalacOptions += {
+      val localSourcesPath = baseDirectory.value.toURI
+      val remoteSourcesPath = s"https://raw.githubusercontent.com/raquo/Laminar/${git.gitHeadCommit.value.get}/"
+      val sourcesOptionName = if (scalaVersion.value.startsWith("2.")) "-P:scalajs:mapSourceURI" else "-scalajs-mapSourceURI"
+
+      s"${sourcesOptionName}:$localSourcesPath->$remoteSourcesPath"
+    },
+
+    // @TODO[Build,Scala 2.12] This should only be disabled for tests, but I can't figure out how to make @unused work in 2.12
+    //  We do have the stub defined in Airstream, but it throws deprecation errors in Laminar for some reason as if
+    //  the unused value is in fact used, but that doesn't seem right.
+    //(Test / scalacOptions) ~= { options: Seq[String] =>
+    scalacOptions ~= { options: Seq[String] =>
+      options.filterNot { o =>
+        o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
       }
+    },
+
+    (Compile / doc / scalacOptions) ~= (_.filterNot(
+      Set(
+        "-scalajs",
+        "-deprecation",
+        "-explain-types",
+        "-explain",
+        "-feature",
+        "-language:existentials,experimental.macros,higherKinds,implicitConversions",
+        "-unchecked",
+        "-Xfatal-warnings",
+        "-Ykind-projector",
+        "-from-tasty",
+        "-encoding",
+        "utf8",
+      )
+    )),
+
+    (Compile / doc / scalacOptions) ++= Seq(
+      "-no-link-warnings" // Suppress scaladoc "Could not find any member to link for" warnings
     ),
 
     (installJsdom / version) := Versions.JsDom,

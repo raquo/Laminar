@@ -25,6 +25,7 @@ object ChildrenInserter {
       val childrenSignal = $children(mountContext) match {
         case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
         case signal: Signal[Children @unchecked] => signal
+        case _ => throw new Exception("Unknown kind of observable")
       }
 
       childrenSignal.foreach { newChildren =>

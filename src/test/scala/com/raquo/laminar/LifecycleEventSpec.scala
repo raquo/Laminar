@@ -188,8 +188,8 @@ class LifecycleEventSpec extends UnitSpec {
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
       node.amend(
-        onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeDidMount)),
-        onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ (node, NodeWillUnmount))
+        onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ ((node, NodeDidMount))),
+        onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ ((node, NodeWillUnmount)))
       )
     }
 
