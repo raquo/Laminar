@@ -74,10 +74,11 @@ title: Resources
 
 * [yurique/scala-js-laminar-starter.g8](https://github.com/yurique/scala-js-laminar-starter.g8) – Laminar setup with Akka HTTP, Tailwind CSS, [Waypoint](https://github.com/raquo/Waypoint/), and a pure webpack config instead of scalajs-bundler 
 
+* [kitlangton/zio-app](https://github.com/kitlangton/zio-app) – Quickly create apps with ZIO and Laminar
+
 * [yurique/laminar-vite2-example](https://github.com/yurique/laminar-vite2-example) – Example of a [Vite](https://vitejs.dev/) build for a Scala.js + Laminar + [frontroute](https://github.com/tulz-app/frontroute/) app.
 
 * [yurique/laminar-snowpack-example](https://github.com/yurique/laminar-snowpack-example) - Laminar setup with [Snowpack](https://www.snowpack.dev/) (instead of Webpack) and [frontroute](https://github.com/tulz-app/frontroute)
-
 
 
 ## Addons & Extensions
