@@ -23,7 +23,12 @@ lazy val websiteJS = project
       "@material/mwc-button" -> "0.18.0",
       "@material/mwc-linear-progress" -> "0.18.0",
       "@material/mwc-slider" -> "0.18.0"
-    )
+    ),
+    scalacOptions ~= { options: Seq[String] =>
+      options.filterNot { o =>
+        o.startsWith("-Wvalue-discard") || o.startsWith("-Ywarn-value-discard") || o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
+      }
+    },
   )
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .dependsOn(laminar)
