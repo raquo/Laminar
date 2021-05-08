@@ -94,7 +94,7 @@
 <li><p>Fix: When initializing the router, do not update the initial URL to the canonical URL of the initial page</p>
 <ul>
 <li><p>Keep the original URL with whatever extraneous query params it might have, to give any third party tools you might be using a chance to look at them</p></li>
-<li><p><strong>Migration:</strong> If you are relying on this, call <code>router.replaceState(router.$currentPage.now())</code> on page load.</p></li>
+<li><p><strong>Migration:</strong> If you are relying on previous behaviour, call <code>router.replaceState(router.$currentPage.now())</code> on page load (after initializing the router) to accomplish the same in the new version.</p></li>
 </ul></li>
 <li><p>Fix: Respond to <code>hashChange</code> events properly</p></li>
 </ul>
