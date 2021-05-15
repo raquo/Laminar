@@ -3,7 +3,7 @@
 
 ThisBuild / scalaVersion := Versions.Scala_2_13
 
-ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3_RC2, Versions.Scala_3_RC3)
+ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
 
 lazy val websiteJS = project
   .in(file("websiteJS"))
@@ -56,7 +56,7 @@ lazy val laminar = project.in(file("."))
       "com.raquo" %%% "airstream" % Versions.Airstream,
       "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes,
       "com.raquo" %%% "domtestutils" % Versions.ScalaDomTestUtils % Test,
-      "org.scalatest" %%% "scalatest" % (if (scalaVersion.value == Versions.Scala_3_RC2) "3.2.7" else "3.2.8") % Test,
+      "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
     ),
 
     scalacOptions ~= { options: Seq[String] =>

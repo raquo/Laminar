@@ -107,11 +107,11 @@ Laminar also uses [scala-js-dom](http://scala-js.github.io/scala-js-dom/). As it
 
 ## Imports
 
-You have two import choices: `import com.raquo.laminar.api.L._` is the easiest, it brings everything you need from Laminar in scope. Unless indicated otherwise, this import is assumed for all code snippets in this documentation.
+You have two import choices: `import com.raquo.laminar.api.L._` (or `L.{*, given}` in Scala 3) is the easiest, it brings everything you need from Laminar in scope. Unless indicated otherwise, this import is assumed for all code snippets in this documentation.
 
 Usually you will not need any other imports. In this documentation you will see references to Laminar types and values that are not available with just this one import because we spell out the types for the sake of explanation. Most of those are available as aliases in the `L` object. For example, `ReactiveHtmlElement[dom.html.Element]` is aliased as simply `HtmlElement`, and `Modifier[El]` as `Mod[El]`.
 
-However, you might want to avoid bringing so many values into scope, so instead you can `import com.raquo.laminar.api._`, and access Laminar and Airstream values and types with `L` and `A` prefixes respectively, e.g. `A.EventStream`, `L.div`, etc.`
+However, you might want to avoid bringing so many values into scope, so instead you can `import com.raquo.laminar.api._` (or `api.{*, given}` in Scala 3), and access Laminar and Airstream values and types with `L` and `A` prefixes respectively, e.g. `A.EventStream`, `L.div`, etc.`
 
 There are special import considerations for working with [SVG elements](#svg).
 
