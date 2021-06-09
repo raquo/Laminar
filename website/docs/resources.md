@@ -80,8 +80,12 @@ title: Resources
 
 * [yurique/laminar-snowpack-example](https://github.com/yurique/laminar-snowpack-example) - Laminar setup with [Snowpack](https://www.snowpack.dev/) (instead of Webpack) and [frontroute](https://github.com/tulz-app/frontroute)
 
+Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results in bigger JS bundle sizes than usual because Scala.js is unable to use gcc in this case. [Scala.js #3893](https://github.com/scala-js/scala-js/issues/3893)
+
 
 ## Addons & Extensions
+
+* [Laminext](https://laminext.dev/) – A collection of useful extensions, utilities and components for Laminar and Airstream
 
 * [Waypoint](https://github.com/raquo/Waypoint) – URL router for Laminar
 

@@ -102,6 +102,8 @@ Laminar depends on Airstream. Every Laminar version includes the latest version 
 
 As you can see, Laminar and Airstream versions can diverge slightly, so don't use a single `LaminarVersion` variable to for both.
 
+The html/svg tags, attributes, props, styles, and event names in Laminar come from [Scala DOM Types](https://github.com/raquo/scala-dom-types). If there's a missing prop, consider contributing it there.
+
 Laminar also uses [scala-js-dom](http://scala-js.github.io/scala-js-dom/). As it is a very thin interface to native JS types, you can generally use a higher version of scala-js-dom than what Laminar uses without any issue.
 
 
