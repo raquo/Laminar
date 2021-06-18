@@ -1264,7 +1264,7 @@ input(
   placeholder := "Enter zip code: ",
   controlled(
     value <-- zipValueSignal,
-    onInput.mapToValue --> zipValueObserver
+    onInput.mapToValue --> zipInputObserver
   )
 )
 ```
