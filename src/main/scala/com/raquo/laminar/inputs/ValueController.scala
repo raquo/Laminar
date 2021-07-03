@@ -37,8 +37,10 @@ class ValueController[A, B](
     // Checking against current DOM value prevents cursor position reset in Safari
     if (force || nextValue != getDomValue(element.ref)) {
       setDomValue(element.ref, nextValue)
-      prevValue = nextValue
     }
+    // We need to update prevValue regardless of the above condition (duh, it was only introduced to deal with a Safari DOM bug).
+    // Otherwise, inputting *filtered out* values will clear the input value: https://github.com/raquo/Laminar/issues/100
+    prevValue = nextValue
   }
 
   private def combinedObserver(owner: Owner): Observer[B] = {
