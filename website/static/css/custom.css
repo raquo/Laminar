@@ -324,6 +324,7 @@ textarea::placeholder {
 
 .-sponsorsList .-name {
   font-size: 130%;
+  white-space: nowrap; /* Fix for Firefox, which splits the name on focus due to margin-right being -5px for some reason */
 }
 
 .-sponsorsList .-description {
