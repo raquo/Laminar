@@ -60,7 +60,7 @@ title: Resources
 
 * [keynmol/laminar-static-gh-pages](https://github.com/keynmol/laminar-static-gh-pages/) – Template for publishing a static site with Laminar
 
-* [kitlangton/formula-example](https://github.com/kitlangton/formula-example) – Example of deriving Laminar components with Magnolia
+* [Quafadas/cask-laminar](https://github.com/Quafadas/cask-laminar) – Laminar with [Cask](https://com-lihaoyi.github.io/cask/) setup, based on keynmol/http4s-laminar-stack
 
 * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
 
@@ -93,6 +93,8 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 * [Laminar Web Components](https://github.com/uosis/laminar-web-components) – Material Web Components for Laminar
 
+* [Formula](https://github.com/kitlangton/formula) – Derive functional, reactive, Laminar forms at compile-time with this type-safe, composable form combinator library
+
 * [Laminar.cycle](https://github.com/vic/laminar_cycle) – Cycle.js dialogue abstraction in Laminar
 
 * [purgecss-laminar-webpack-plugin](https://github.com/yurique/purgecss-laminar-webpack-plugin) – Removes unused CSS from your webpack bundle
@@ -109,7 +111,11 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 * [[VIDEO] Deriving the Frontend – Form Combinator Fun with Scala.js](https://www.youtube.com/watch?v=JHriftPO62I)
 
-  * See [updated repo](https://github.com/kitlangton/formula-example) for safe management of Owner-s
+  * See [updated repo](https://github.com/kitlangton/formula) for safe management of Owner-s
+
+* [Cross-Platform Mobile dev with Scala and Capacitor](https://medium.com/geekculture/cross-platform-mobile-dev-with-scala-and-capacitor-54e69b62b50c)
+
+* [Hands-on Laminar](https://blog.softwaremill.com/hands-on-laminar-354ddcc536a9?gi=167c9cdb6442) (includes form validation, and integration with ScalaCSS and Monocle)
 
 
 

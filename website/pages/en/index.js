@@ -238,13 +238,6 @@ class Index extends React.Component {
                     <div className="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
                   </div>
                 </div>
-                <div className="-sponsor">
-                  <img className="-logo" src="/img/sponsors/tawasal.png" alt="" />
-                  <div className="-text">
-                    <div className="-name"><a href="https://tawasal.ae">Tawasal</a></div>
-                    <div className="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
-                  </div>
-                </div>
               </div>
               <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
             </div>

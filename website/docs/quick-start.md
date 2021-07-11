@@ -161,4 +161,4 @@ As you learn more about Laminar you will see that there are even more ways to st
 
 Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation explaining all of the concepts and features in much greater detail.
 
-Read the [docs](https://laminar.dev/documentation), check out some [examples](https://laminar.dev/examples), and join us in [gitter](https://gitter.im/Laminar_/Lobby)!
+Read the [docs](https://laminar.dev/documentation), check out some [examples](https://laminar.dev/examples/hello-world), and join us in [gitter](https://gitter.im/Laminar_/Lobby)!
