@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Tue, 04 May 2021 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 10 Jul 2021 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,6 +13,14 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2021 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v0.13.1 & Waypoint 0.4.2]]></title>
+            <link>https://laminar.dev/blog/2021/07/10/laminar-v-0.13.1.html</link>
+            <guid>https://laminar.dev/blog/2021/07/10/laminar-v-0.13.1.html</guid>
+            <pubDate>Sat, 10 Jul 2021 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>Fixes a regression in Laminar controlled inputs when filtering user input, and an unrelated issue with file:// URLs in Waypoint.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v0.13.0]]></title>
             <link>https://laminar.dev/blog/2021/05/04/laminar-v0.13.0.html</link>
