@@ -65,10 +65,10 @@
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AjaxOption</span>(<span class="hljs-params">name: <span class="hljs-type">String</span>, url: <span class="hljs-type">String</span></span>)</span>
 
 <span class="hljs-keyword">val</span> options = <span class="hljs-type">List</span>(
-  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"Valid Ajax request"</span>, <span class="hljs-string">"http://api.zippopotam.us/us/90210"</span>),
-  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"Download 100MB file (gives you time to abort)"</span>, <span class="hljs-string">"http://cachefly.cachefly.net/100mb.test"</span>),
-  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"URL that will fail due to invalid domain"</span>, <span class="hljs-string">"http://api.zippopotam.uxx/us/90210"</span>),
-  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"URL that will fail due to CORS restriction"</span>, <span class="hljs-string">"http://unsplash.com/photos/KDYcgCEoFcY/download?force=true"</span>)
+  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"Valid Ajax request"</span>, <span class="hljs-string">"https://api.zippopotam.us/us/90210"</span>),
+  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"Download 100MB file (gives you time to abort)"</span>, <span class="hljs-string">"https://cachefly.cachefly.net/100mb.test"</span>),
+  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"URL that will fail due to invalid domain"</span>, <span class="hljs-string">"https://api.zippopotam.uxx/us/90210"</span>),
+  <span class="hljs-type">AjaxOption</span>(<span class="hljs-string">"URL that will fail due to CORS restriction"</span>, <span class="hljs-string">"https://unsplash.com/photos/KDYcgCEoFcY/download?force=true"</span>)
 )
 <span class="hljs-keyword">val</span> selectedOptionVar = <span class="hljs-type">Var</span>(options.head)
 <span class="hljs-keyword">val</span> pendingRequestVar = <span class="hljs-type">Var</span>[<span class="hljs-type">Option</span>[dom.<span class="hljs-type">XMLHttpRequest</span>]](<span class="hljs-type">None</span>)
