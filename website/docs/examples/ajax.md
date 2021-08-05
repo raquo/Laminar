@@ -15,10 +15,10 @@ import org.scalajs.dom
 case class AjaxOption(name: String, url: String)
 
 val options = List(
-  AjaxOption("Valid Ajax request", "http://api.zippopotam.us/us/90210"),
-  AjaxOption("Download 100MB file (gives you time to abort)", "http://cachefly.cachefly.net/100mb.test"),
-  AjaxOption("URL that will fail due to invalid domain", "http://api.zippopotam.uxx/us/90210"),
-  AjaxOption("URL that will fail due to CORS restriction", "http://unsplash.com/photos/KDYcgCEoFcY/download?force=true")
+  AjaxOption("Valid Ajax request", "https://api.zippopotam.us/us/90210"),
+  AjaxOption("Download 100MB file (gives you time to abort)", "https://cachefly.cachefly.net/100mb.test"),
+  AjaxOption("URL that will fail due to invalid domain", "https://api.zippopotam.uxx/us/90210"),
+  AjaxOption("URL that will fail due to CORS restriction", "https://unsplash.com/photos/KDYcgCEoFcY/download?force=true")
 )
 val selectedOptionVar = Var(options.head)
 val pendingRequestVar = Var[Option[dom.XMLHttpRequest]](None)
