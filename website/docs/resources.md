@@ -64,6 +64,8 @@ title: Resources
 
 * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
 
+* [i10416/laika/laminar](https://github.com/i10416/laika-laminar) - Example of live markup editor using Laminar and [Laika](https://github.com/planet42/Laika) in pure Scala(without raw css nor js)! demo is at https://i10416.github.io/demo.
+
 * [raquo/laminar-examples](https://github.com/raquo/laminar-examples) – an old repo with some Laminar examples, most of which you can see on this website already.
 
 
