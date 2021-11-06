@@ -1,5 +1,4 @@
-// @TODO[Security] Is this a good idea to leave this here long term?
-// resolvers += Resolver.sonatypeRepo("snapshots")
+ThisBuild / resolvers += Resolver.sonatypeRepo("snapshots") // for mdoc (see also plugins.sbt)
 
 ThisBuild / scalaVersion := Versions.Scala_2_13
 

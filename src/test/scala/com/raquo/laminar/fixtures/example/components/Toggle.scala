@@ -5,7 +5,6 @@ import com.raquo.airstream.eventbus.EventBus
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
-import org.scalajs.dom.raw.{HTMLInputElement, MouseEvent}
 
 import scala.util.Random
 
@@ -17,8 +16,8 @@ class Toggle private (
 object Toggle {
   // @TODO how do we make this a controlled component?
   def apply(caption: String = "TOGGLE MEEEE"): Toggle = {
-    val clickBus = new EventBus[MouseEvent]
-    val $checked = clickBus.events.map(ev => ev.target.asInstanceOf[HTMLInputElement].checked)//.debug("$checked")
+    val clickBus = new EventBus[dom.MouseEvent]
+    val $checked = clickBus.events.map(ev => ev.target.asInstanceOf[dom.HTMLInputElement].checked)//.debug("$checked")
 
     // This will only be evaluated once
     val rand = Random.nextInt(99)
