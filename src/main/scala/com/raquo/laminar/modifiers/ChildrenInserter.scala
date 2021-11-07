@@ -64,7 +64,7 @@ object ChildrenInserter {
 
     nextChildren.foreach { nextChild =>
 
-      /** Desired index of `nextChild` in `liveNodeList` */
+      // Desired index of `nextChild` in `liveNodeList`
       val nextChildNodeIndex = sentinelIndex + index + 1
 
       //      dom.console.log("\nevaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if (prevChildRef == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))

@@ -18,5 +18,5 @@ object Versions {
 
   val JsDom = "16.4.0"
 
-  val ScalaDomTestUtils = "0.14.9-SNAPSHOT"
+  val ScalaDomTestUtils = "0.15.0"
 }

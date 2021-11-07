@@ -63,12 +63,13 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v0.13.1**. For other versions, see below.
+This documentation is for Laminar version **v0.14.0**. For other versions, see below.
 
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.13.1](https://laminar.dev/documentation)** | **[v0.13.0](https://github.com/raquo/Airstream/blob/v0.13.0/README.md)** |
+| **[v0.14.0](https://laminar.dev/documentation)** | **[v0.14.0](https://github.com/raquo/Airstream/blob/v0.14.0/README.md)** |
+| **[v0.13.1](https://github.com/raquo/Laminar/blob/v0.13.1/docs/Documentation.md)** | **[v0.13.0](https://github.com/raquo/Airstream/blob/v0.13.0/README.md)** |
 | **[v0.12.2](https://github.com/raquo/Laminar/blob/v0.12.2/docs/Documentation.md)** | **[v0.12.2](https://github.com/raquo/Airstream/blob/v0.12.2/README.md)** |
 | **[v0.11.0](https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
 | – | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
@@ -410,6 +411,8 @@ To remove `appElement` from the DOM, simply call `root.unmount()`.
 ### Waiting for the DOM to load
 
 Laminar's `render()` method expects the container element to be present in the DOM already. However, this might not be the case if your script is executed before the browser has finished building the DOM. To work around this, you need to call the `render` method after the browser has fired the `DOMContentLoaded` event. You can do this manually with native JS `addEventListener`, or less manually using Laminar's `documentEvents.onDOMContentLoaded` stream, or – preferably – just call Laminar's `renderOnDomContentLoaded` method instead of `render`.
+
+When calling `renderOnDomContentLoaded`, make sure the `container` parameter you pass to it is evaluated on demand only (e.g. it's provided inline, or if not, is stored in a `def` or `lazy val`, not in a `val`), otherwise you'll face the same problem.
 
 
 ### Application Initialization
