@@ -9,7 +9,7 @@ object ChildInserter {
 
   def apply[El <: ReactiveElement.Base] (
     $child: MountContext[El] => Observable[ChildNode.Base],
-    initialInsertContext: Option[InsertContext[El]]
+    initialInsertContext: Option[InsertContext[El]] // #TODO[API] This param appears to always be `None`. Didn't I make this for some edge case requiring a Some()? I think tha logic is in `Inserter`
   ): Inserter[El] = new Inserter[El](
     initialInsertContext,
     insertFn = (c, owner) => {

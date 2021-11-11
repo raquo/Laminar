@@ -1,10 +1,12 @@
 package com.raquo.laminar.nodes
 
+import com.raquo.airstream.JsArray
 import com.raquo.airstream.ownership.DynamicOwner
 import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
-import scala.collection.mutable
+import scala.scalajs.js
+import scala.scalajs.js.JSConverters._
 
 trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
@@ -17,10 +19,10 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
   //  - The only place where we need this is ReplaceAll functionality of ChildrenCommand API
   //  - We can probably track specific children affected by that API instead
   //  - That would save us mutable Buffer searches and manipulations when inserting and removing nodes
-  private var _maybeChildren: Option[mutable.Buffer[ChildNode.Base]] = None
+  private var _maybeChildren: Option[JsArray[ChildNode.Base]] = None
 
   @deprecated("ParentNode.maybeChildren will be removed in a future version of Laminar.", "0.8")
-  @inline def maybeChildren: Option[List[ChildNode.Base]] = _maybeChildren.map(_.toList)
+  @inline def maybeChildren: Option[List[ChildNode.Base]] = _maybeChildren.map(_.asInstanceOf[js.Array[ChildNode.Base]].toList)
 }
 
 object ParentNode {
@@ -52,14 +54,17 @@ object ParentNode {
 
       // 2A. Update child's current parent node
       child.maybeParent.foreach { childParent =>
-        childParent._maybeChildren.foreach(childParentChildren => childParentChildren -= child)
+        childParent._maybeChildren.foreach { children =>
+          val ix = children.indexOf(child)
+          children.splice(ix, deleteCount = 1)
+        }
       }
 
       // 2B. Update this node
       if (parent._maybeChildren.isEmpty) {
-        parent._maybeChildren = Some(mutable.Buffer(child))
+        parent._maybeChildren = Some(JsArray(child))
       } else {
-        parent._maybeChildren.foreach(children => children += child)
+        parent._maybeChildren.foreach(children => children.push(child))
       }
 
       // 3. Update child
@@ -86,7 +91,7 @@ object ParentNode {
         if (removed) {
 
           // 2. Update this node
-          children.remove(indexOfChild, count = 1)
+          children.splice(indexOfChild, deleteCount = 1)
 
           // 3. Update child
           child.setParent(None)
@@ -109,7 +114,7 @@ object ParentNode {
 
     // 0. Prep this node
     if (parent._maybeChildren.isEmpty) {
-      parent._maybeChildren = Some(mutable.Buffer())
+      parent._maybeChildren = Some(JsArray())
     }
 
     parent._maybeChildren.foreach { children =>
@@ -131,11 +136,14 @@ object ParentNode {
       if (inserted) {
         // 2A. Update child's current parent node
         child.maybeParent.foreach { childParent =>
-          childParent._maybeChildren.foreach(childParentChildren => childParentChildren -= child)
+          childParent._maybeChildren.foreach { children =>
+            val ix = children.indexOf(child)
+            children.splice(ix, deleteCount = 1)
+          }
         }
 
         // 2B. Update this node
-        children.insert(atIndex, child)
+        children.splice(atIndex, deleteCount = 0, child)
 
         // 3. Update child
         child.setParent(nextParent)
@@ -214,15 +222,17 @@ object ParentNode {
     // @TODO[Performance] introduce a reorderChildren() method to support efficient sorting?
     // @TODO[Integrity] This does not properly report failures like other methods do
 
+    val newChildrenArr = newChildren.toJSArray.asInstanceOf[JsArray[ChildNode.Base]] // #TODO
+
     // 0. Prep this node
     if (parent._maybeChildren.isEmpty) {
-      parent._maybeChildren = Some(mutable.Buffer())
+      parent._maybeChildren = Some(JsArray())
     }
 
     var replaced = false
     parent._maybeChildren.foreach { children =>
       if (
-        newChildren != children
+        newChildrenArr != children
           && fromIndex >= 0 && fromIndex < children.length
           && toIndex >= 0 && toIndex < children.length
           && fromIndex <= toIndex
@@ -239,7 +249,7 @@ object ParentNode {
 
         // B. Insert new children
         var insertedCount = 0
-        newChildren.foreach { newChild =>
+        newChildrenArr.forEach { newChild =>
           insertChild(
             parent,
             newChild,
@@ -261,7 +271,7 @@ object ParentNode {
 
     // A. Remove existing children
     parent._maybeChildren.foreach { children =>
-      children.foreach(child => removeChild(parent, child))
+      children.forEach(child => removeChild(parent, child))
     }
 
     // B. Add new children

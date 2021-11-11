@@ -1,5 +1,6 @@
 package com.raquo.laminar.modifiers
 
+import com.raquo.airstream.JsMap
 import com.raquo.airstream.core.{EventStream, Observable, Signal}
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
@@ -29,22 +30,26 @@ object ChildrenInserter {
       }
 
       childrenSignal.foreach { newChildren =>
+        val newChildrenMap = InsertContext.nodesToMap(newChildren)
         c.extraNodeCount = updateChildren(
-          prevChildren = c.extraNodes,
+          prevChildren = c.extraNodesMap,
           nextChildren = newChildren,
+          nextChildrenMap = newChildrenMap,
           parentNode = c.parentNode,
           sentinelNode = c.sentinelNode,
           c.extraNodeCount
         )
         c.extraNodes = newChildren
+        c.extraNodesMap = newChildrenMap
       }(owner)
     }
   )
 
   /** @return New child node count */
   private def updateChildren(
-    prevChildren: Children,
+    prevChildren: JsMap[dom.Node, ChildNode.Base],
     nextChildren: Children,
+    nextChildrenMap: JsMap[dom.Node, ChildNode.Base],
     parentNode: ReactiveElement.Base,
     sentinelNode: Child,
     prevChildrenCount: Int
@@ -62,7 +67,7 @@ object ChildrenInserter {
     //    dom.console.log(">>>>>>>>>>>>>>>>>")
     //    dom.console.log(">>>>>>>>>>>>>>>>>")
 
-    nextChildren.foreach { nextChild =>
+    nextChildren.foreach { nextChild => // #TODO Not sure if this is faster than iterating over a js.Map
 
       // Desired index of `nextChild` in `liveNodeList`
       val nextChildNodeIndex = sentinelIndex + index + 1
@@ -93,7 +98,7 @@ object ChildrenInserter {
         } else {
           //          dom.console.log("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
 
-          if (!prevChildren.contains(nextChild)) {
+          if (!prevChildren.has(nextChild.ref)) {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
             // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
             // @Note: DOM update
@@ -109,13 +114,13 @@ object ChildrenInserter {
             // - In `containsNode` call we only start looking at `index` because we know that all nodes before `index` are already in place.
             while (
               nextChild.ref != prevChildRef
-                && !containsRef(nextChildren, prevChildRef, startLookingAtIndex = index)
+                && !containsRefNew(nextChildrenMap, prevChildRef)
             ) {
               // prevChild should be deleted, so we remove it from the DOM, and try again with the next prevChild
               // but first we save its next sibling, which will become our next `prevChildRef`
               val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
-              val prevChild = prevChildFromRef(prevChildren, prevChildRef)
+              val prevChild = prevChildFromRefNew(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)
               // @Note: DOM update
               ParentNode.removeChild(parent = parentNode, child = prevChild)
@@ -143,7 +148,7 @@ object ChildrenInserter {
       val nextPrevChildRef = prevChildRef.nextSibling
       // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
       // @Note: DOM update
-      ParentNode.removeChild(parent = parentNode, child = prevChildFromRef(prevChildren, prevChildRef))
+      ParentNode.removeChild(parent = parentNode, child = prevChildFromRefNew(prevChildren, prevChildRef))
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1
     }
@@ -151,6 +156,15 @@ object ChildrenInserter {
     currentChildrenCount
   }
 
+  private def containsRefNew(nextChildrenMap: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Boolean = {
+    nextChildrenMap.has(ref)
+  }
+
+  private def prevChildFromRefNew(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Child = {
+    prevChildren.get(ref).get // @TODO[Integrity] Throw a meaningful error if not found (that would be unrecoverable inconsistent state)
+  }
+
+  @deprecated("0.14.1", "This is going away, see https://github.com/raquo/Laminar/issues/108")
   protected def containsRef(nextChildren: Children, ref: dom.Node, startLookingAtIndex: Int): Boolean = {
     // @TODO[Performance] This also can be optimized for different `Seq` implementations
     val childrenCount = nextChildren.size
@@ -167,11 +181,8 @@ object ChildrenInserter {
   }
 
   // @TODO[Performance] This method should not exist, I think. See how it's used, we should just have removeChildByRef method in Laminar or SDB.
+  @deprecated("0.14.1", "This is going away, see https://github.com/raquo/Laminar/issues/108")
   protected def prevChildFromRef(prevChildren: Children, ref: dom.Node): Child = {
-    //    println("> prevChildFromDomNode")
-    //    dom.console.log(prevChildren(0))
-    //    dom.console.log(prevChildren(1))
-    //    dom.console.log(ref, ref.textContent)
     prevChildren.find(_.ref == ref).get // @TODO[Integrity] Throw a more meaningful error (that would be unrecoverable inconsistent state)
   }
 }

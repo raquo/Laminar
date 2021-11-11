@@ -11,7 +11,7 @@ import com.raquo.laminar.nodes.ReactiveElement
   * When used with onMountInsert, it "immediately" reserves an insertion
   * spot and then on every mount it inserts the node(s) into the same spot.
   *
-  * Note: As a Modifier this is not idemponent, but overall
+  * Note: As a Modifier this is not idempotent, but overall
   * it behaves as you would expect. See docs for more details.
   *
   * Note: If you DO provide initialContext, its parentNode MUST always
