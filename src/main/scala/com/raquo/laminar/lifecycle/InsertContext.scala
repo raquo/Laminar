@@ -15,7 +15,7 @@ class InsertContext[+El <: ReactiveElement.Base](
   val parentNode: El,
   var sentinelNode: ChildNode.Base,
   var extraNodeCount: Int, // This is separate from `extraNodes` for performance
-  var extraNodes: immutable.Seq[ChildNode.Base] // #TODO We don't need this anymore, we only keep it for compat in 0.14.1
+  var extraNodes: immutable.Seq[ChildNode.Base] // #TODO We don't need this anymore, we only keep it for compat in 0.14.x
 ) {
 
   private[laminar] var extraNodesMap: JsMap[dom.Node, ChildNode.Base] = InsertContext.nodesToMap(extraNodes)
