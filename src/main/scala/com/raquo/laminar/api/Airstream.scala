@@ -80,9 +80,4 @@ trait Airstream {
 
   lazy val OverwriteFutureStrategy: airstream.flatten.FlattenStrategy.OverwriteFutureStrategy.type = airstream.flatten.FlattenStrategy.OverwriteFutureStrategy
 
-  // -- Utils
-
-  type Ref[+A <: AnyRef] = airstream.util.Ref[A]
-
-  lazy val Ref: airstream.util.Ref.type = airstream.util.Ref
 }
