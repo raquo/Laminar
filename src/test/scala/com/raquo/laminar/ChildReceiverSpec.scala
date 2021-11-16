@@ -225,8 +225,8 @@ class ChildReceiverSpec extends UnitSpec {
       div.of(L.a.of(href is "http://blog4.com/", "a blog"))
     )
 
-    // Previous unmounting stopped the split stream, which cleared the memory of memoized elements
-    numCreateLinkCalls shouldBe 1
+    // We don't clear memoized state when split signal is stopped anymore
+    numCreateLinkCalls shouldBe 0
     numCreateLinkCalls = 0
 
     // --

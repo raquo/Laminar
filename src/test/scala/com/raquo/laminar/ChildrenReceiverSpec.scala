@@ -2,10 +2,15 @@ package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.utils.UnitSpec
 import org.scalatest.BeforeAndAfter
 
+import scala.collection.mutable
+
 class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
+
+  case class Foo(id: String, version: Int)
 
   before {
     AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
@@ -102,5 +107,562 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
         expectNode(main.of(rules: _*))
       }
     }
+  }
+
+  it("raw split stream timing") {
+
+    val effects = mutable.Buffer[Effect[String]]()
+
+    val bus = new EventBus[List[Foo]]
+
+    var ix = 0
+
+    // #Note: `identity` instead of the `_.distinct` default
+    val splitSignal = bus.events.split(_.id, distinctCompose = identity)((id, initialFoo, fooSignal) => {
+      ix += 1
+      val thisIx = ix
+      effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
+      div(
+        "ID: " + id,
+        span(
+          child.text <-- (
+            fooSignal
+              .debugSpyEvents(foo => effects += Effect(s"fooSignal-child1-$id-$thisIx", foo.toString))
+              .map(_.id)
+          )
+        ),
+        child.text <-- (
+          fooSignal
+            .debugSpyEvents(foo => effects += Effect(s"fooSignal-child2-$id-$thisIx", foo.toString))
+            .map(_.version)
+        )
+      )
+    }).debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
+
+    // --
+
+    val el = div(
+      "Hello",
+      //onMountUnmountCallback(_ => println(s"[] MOUNTED EL"), _ => println(s"[] UNMOUNTED EL")),
+      children <-- splitSignal
+    )
+
+    mount("mount-1", el)
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal","List()")
+    )
+
+    effects.clear()
+
+    // --
+
+    bus.emit(List(Foo("a", 1), Foo("b", 10)))
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: a", span like "a", "1"),
+      div like ("ID: b", span like "b", "10")
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-a-1", "Foo(a,1)"),
+      Effect("render-b-2", "Foo(b,10)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!----></span><!----></div>, <div>ID: b<span><!----></span><!----></div>)"),
+      Effect("fooSignal-child1-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-2", "Foo(b,10)")
+    )
+
+    effects.clear()
+
+    // --
+
+    bus.emit(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: a", span like "a", "1"),
+      div like ("ID: b", span like "b", "10"),
+      div like ("ID: c", span like "c", "100")
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-c-3", "Foo(c,100)"),
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span><!----></span><!----></div>)"),
+      Effect("fooSignal-child1-c-3", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-3", "Foo(c,100)"),
+      Effect("fooSignal-child1-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-2", "Foo(b,10)")
+    )
+
+    effects.clear()
+
+    // --
+
+    unmount("unmount-1")
+
+    effects shouldEqual mutable.Buffer()
+
+    // --
+
+    mount("mount-2", el)
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-3", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-3", "Foo(c,100)")
+    )
+
+    effects.clear()
+
+    // --
+
+    unmount("unmount-2")
+
+    mount("mount-3", el)
+
+    unmount("unmount-4")
+
+    mount("mount-5", el)
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-3", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-3", "Foo(c,100)"),
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-2", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-3", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-3", "Foo(c,100)")
+    )
+
+    effects.clear()
+
+    // --
+
+    bus.emit(List(Foo("a", 1), Foo("c", 101)))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-1", "Foo(a,1)"),
+      Effect("fooSignal-child1-c-3", "Foo(c,101)"),
+      Effect("fooSignal-child2-c-3", "Foo(c,101)")
+    )
+
+    effects.clear()
+
+    // --
+
+    bus.emit(List(Foo("b", 2), Foo("c", 102)))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-b-4", "Foo(b,2)"),
+      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span>c</span>101</div>)"),
+      Effect("fooSignal-child1-b-4", "Foo(b,2)"),
+      Effect("fooSignal-child2-b-4", "Foo(b,2)"),
+      Effect("fooSignal-child1-c-3", "Foo(c,102)"),
+      Effect("fooSignal-child2-c-3", "Foo(c,102)")
+    )
+
+    effects.clear()
+
+    // --
+
+  }
+
+  it("raw split signal timing") {
+
+    val effects = mutable.Buffer[Effect[String]]()
+
+    val $var = Var(List(Foo("initial", 1)))
+
+    var ix = 0
+
+    // #Note: `identity` instead of the `_.distinct` default
+    val splitSignal = $var.signal.split(_.id, distinctCompose = identity)((id, initialFoo, fooSignal) => {
+      ix += 1
+      val thisIx = ix
+      effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
+      div(
+        "ID: " + id,
+        //onMountUnmountCallback(_ => println(s"[] mounted ${id}-${thisI}"), _ => println(s"[] unmounted ${id}-${thisI}")),
+        span(
+          child.text <-- (
+            fooSignal
+              .debugSpyEvents(foo => effects += Effect(s"fooSignal-child1-$id-$thisIx", foo.toString))
+              .map(_.id)
+            )
+        ),
+        child.text <-- (
+          fooSignal
+            .debugSpyEvents(foo => effects += Effect(s"fooSignal-child2-$id-$thisIx", foo.toString))
+            .map(_.version)
+          )
+      )
+    }).debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
+
+    // --
+
+    val el = div(
+      "Hello",
+      //onMountUnmountCallback(_ => println(s"[] MOUNTED EL"), _ => println(s"[] UNMOUNTED EL")),
+      children <-- splitSignal
+    )
+
+    mount("mount-1", el)
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: initial", span like "initial", "1"),
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-initial-1", "Foo(initial,1)"),
+      Effect("fooSignal-child1-initial-1", "Foo(initial,1)"),
+      Effect("fooSignal-child2-initial-1", "Foo(initial,1)"),
+      Effect("splitSignal","List(<div>ID: initial<span>initial</span>1</div>)"),
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("a", 1), Foo("b", 10)))
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: a", span like "a", "1"),
+      div like ("ID: b", span like "b", "10")
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-a-2", "Foo(a,1)"),
+      Effect("render-b-3", "Foo(b,10)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!----></span><!----></div>, <div>ID: b<span><!----></span><!----></div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)")
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: a", span like "a", "1"),
+      div like ("ID: b", span like "b", "10"),
+      div like ("ID: c", span like "c", "100")
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-c-4", "Foo(c,100)"),
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span><!----></span><!----></div>)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)")
+    )
+
+    effects.clear()
+
+    // --
+
+    unmount("unmount-1")
+
+    effects shouldEqual mutable.Buffer()
+
+    // --
+
+    mount("mount-2", el)
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)")
+    )
+
+    effects.clear()
+
+    // --
+
+    unmount("unmount-2")
+
+    mount("mount-3", el)
+
+    unmount("unmount-4")
+
+    mount("mount-5", el)
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)"),
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)")
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("a", 1), Foo("c", 101)))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,101)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,101)")
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("b", 2), Foo("c", 102)))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-b-5", "Foo(b,2)"),
+      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span>c</span>101</div>)"),
+      Effect("fooSignal-child1-b-5", "Foo(b,2)"),
+      Effect("fooSignal-child2-b-5", "Foo(b,2)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,102)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,102)")
+    )
+
+    effects.clear()
+
+    // --
+
+  }
+
+  it("split signal timing - with distinct") {
+
+    val effects = mutable.Buffer[Effect[String]]()
+
+    val $var = Var(List(Foo("initial", 1)))
+
+    var ix = 0
+
+    // #Note: Using `distinct` default now
+    val splitSignal = $var.signal.split(_.id)((id, initialFoo, fooSignal) => {
+      ix += 1
+      val thisIx = ix
+      effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
+      div(
+        "ID: " + id,
+        span(
+          child.text <-- (
+            fooSignal
+              .debugSpyEvents(foo => effects += Effect(s"fooSignal-child1-$id-$thisIx", foo.toString))
+              .map(_.id)
+            )
+        ),
+        child.text <-- (
+          fooSignal
+            .debugSpyEvents(foo => effects += Effect(s"fooSignal-child2-$id-$thisIx", foo.toString))
+            .map(_.version)
+          )
+      )
+    }).debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
+
+    // --
+
+    val el = div(
+      "Hello",
+      children <-- splitSignal
+    )
+
+    mount("mount-1", el)
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: initial", span like "initial", "1"),
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-initial-1", "Foo(initial,1)"),
+      Effect("fooSignal-child1-initial-1", "Foo(initial,1)"),
+      Effect("fooSignal-child2-initial-1", "Foo(initial,1)"),
+      Effect("splitSignal","List(<div>ID: initial<span>initial</span>1</div>)"),
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("a", 1), Foo("b", 10)))
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: a", span like "a", "1"),
+      div like ("ID: b", span like "b", "10")
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-a-2", "Foo(a,1)"),
+      Effect("render-b-3", "Foo(b,10)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!----></span><!----></div>, <div>ID: b<span><!----></span><!----></div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)")
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
+
+    expectNode(div like (
+      "Hello",
+      ExpectedNode.comment,
+      div like ("ID: a", span like "a", "1"),
+      div like ("ID: b", span like "b", "10"),
+      div like ("ID: c", span like "c", "100")
+    ))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-c-4", "Foo(c,100)"),
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span><!----></span><!----></div>)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)"),
+      //Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      //Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      //Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      //Effect("fooSignal-child2-b-3", "Foo(b,10)")
+    )
+
+    effects.clear()
+
+    // --
+
+    unmount("unmount-1")
+
+    effects shouldEqual mutable.Buffer()
+
+    // --
+
+    mount("mount-2", el)
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)")
+    )
+
+    effects.clear()
+
+    // --
+
+    unmount("unmount-2")
+
+    mount("mount-3", el)
+
+    unmount("unmount-4")
+
+    mount("mount-5", el)
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)"),
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child2-b-3", "Foo(b,10)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,100)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,100)")
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("a", 1), Foo("c", 101)))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
+      //Effect("fooSignal-child1-a-2", "Foo(a,1)"),
+      //Effect("fooSignal-child2-a-2", "Foo(a,1)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,101)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,101)")
+    )
+
+    effects.clear()
+
+    // --
+
+    $var.set(List(Foo("b", 2), Foo("c", 102)))
+
+    effects shouldEqual mutable.Buffer(
+      Effect("render-b-5", "Foo(b,2)"),
+      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span>c</span>101</div>)"),
+      Effect("fooSignal-child1-b-5", "Foo(b,2)"),
+      Effect("fooSignal-child2-b-5", "Foo(b,2)"),
+      Effect("fooSignal-child1-c-4", "Foo(c,102)"),
+      Effect("fooSignal-child2-c-4", "Foo(c,102)")
+    )
+
+    effects.clear()
+
+    // --
+
   }
 }
