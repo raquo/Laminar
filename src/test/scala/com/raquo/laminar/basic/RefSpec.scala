@@ -8,7 +8,7 @@ class RefSpec extends UnitSpec {
 
   it("creates ref right away") {
     val node = div()
-    node.ref shouldBe an[dom.Element]
+    node.ref.isInstanceOf[dom.Element] shouldBe true
     node.ref.parentNode shouldBe null
 
     mount(node)
