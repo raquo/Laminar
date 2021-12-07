@@ -1,15 +1,14 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.Source
 import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.airstream.web.AjaxEventStream
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
-import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
 import scala.collection.{immutable, mutable}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.scalajs.js
 
@@ -53,27 +52,27 @@ class SyntaxSpec extends UnitSpec {
 
     mount(checkbox)
 
-    events shouldEqual mutable.Buffer()
+    events shouldBe mutable.Buffer()
 
     // --
 
     checkbox.ref.click()
 
-    events shouldEqual mutable.Buffer(false)
+    events shouldBe mutable.Buffer(false)
     events.clear()
 
     // --
 
     checkbox.ref.click()
 
-    events shouldEqual mutable.Buffer(true)
+    events shouldBe mutable.Buffer(true)
     events.clear()
 
     // --
 
     checkbox.ref.click()
 
-    events shouldEqual mutable.Buffer(false)
+    events shouldBe mutable.Buffer(false)
     events.clear()
   }
 
@@ -263,14 +262,14 @@ class SyntaxSpec extends UnitSpec {
       child <-- divBus,
       child <-- divStream.map(d => d), // Tests Observable#Self type inference (note: IntelliJ might report non-existent error)
       child <-- divStream.map(d => d).map(d => d),
-      child <-- divFuture,
-      child <-- divPromise,
+      child <-- EventStream.fromFuture(divFuture),
+      child <-- EventStream.fromJsPromise(divPromise),
       child.maybe <-- divStream.map(Some(_)),
       child.maybe <-- divStream.toWeakSignal,
       child.maybe <-- divObservable.map(Option(_)),
       child.maybe <-- divObservable.map(Some(_)),
-      child.maybe <-- divFuture,
-      child.maybe <-- divPromise,
+      child.maybe <-- Signal.fromFuture(divFuture),
+      child.maybe <-- Signal.fromJsPromise(divPromise),
       //child.int <-- periodicInt,
       child.text <-- periodicInt,
       child.text <-- boolBus,

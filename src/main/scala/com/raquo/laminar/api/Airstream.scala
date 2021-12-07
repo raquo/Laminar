@@ -74,10 +74,4 @@ trait Airstream {
 
   lazy val SwitchSignalStrategy: airstream.flatten.FlattenStrategy.SwitchSignalStrategy.type = airstream.flatten.FlattenStrategy.SwitchSignalStrategy
 
-  lazy val SwitchFutureStrategy: airstream.flatten.FlattenStrategy.SwitchFutureStrategy.type = airstream.flatten.FlattenStrategy.SwitchFutureStrategy
-
-  lazy val ConcurrentFutureStrategy: airstream.flatten.FlattenStrategy.ConcurrentFutureStrategy.type = airstream.flatten.FlattenStrategy.ConcurrentFutureStrategy
-
-  lazy val OverwriteFutureStrategy: airstream.flatten.FlattenStrategy.OverwriteFutureStrategy.type = airstream.flatten.FlattenStrategy.OverwriteFutureStrategy
-
 }

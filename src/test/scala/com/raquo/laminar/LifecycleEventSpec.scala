@@ -42,21 +42,21 @@ class LifecycleEventSpec extends UnitSpec {
 
     mount(section("Hello, ", child <-- $child))
 
-    events shouldEqual mutable.Buffer()
+    events shouldBe mutable.Buffer()
     expectNode(section.of("Hello, ", ExpectedNode.comment))
 
     // --
 
     textBus.writer.onNext("blah")
 
-    events shouldEqual mutable.Buffer(NodeDidMount)
+    events shouldBe mutable.Buffer(NodeDidMount)
     expectNode(section.of("Hello, ", div.of("blah")))
 
     // --
 
     textBus.writer.onNext("world")
 
-    events shouldEqual mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
+    events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
     expectNode(section.of("Hello, ", div.of("world")))
 
   }
@@ -84,21 +84,21 @@ class LifecycleEventSpec extends UnitSpec {
 
     mount(section("Hello, ", child <-- $child))
 
-    events shouldEqual mutable.Buffer()
+    events shouldBe mutable.Buffer()
     expectNode(section.of("Hello, ", ExpectedNode.comment))
 
     // --
 
     textBus.writer.onNext("blah")
 
-    events shouldEqual mutable.Buffer(NodeDidMount)
+    events shouldBe mutable.Buffer(NodeDidMount)
     expectNode(section.of("Hello, ", div.of( span.of("blah"))))
 
     // --
 
     textBus.writer.onNext("world")
 
-    events shouldEqual mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
+    events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
     expectNode(section.of("Hello, ", div.of( span.of("world"))))
   }
 
@@ -160,8 +160,8 @@ class LifecycleEventSpec extends UnitSpec {
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
         testCase.action(child)
-        lifecycleEvents shouldEqual testCase.expectedLifecycleEvents
-        grandChildLifecycleEvents shouldEqual testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
+        lifecycleEvents shouldBe testCase.expectedLifecycleEvents
+        grandChildLifecycleEvents shouldBe testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
         lifecycleEvents = Seq()
         grandChildLifecycleEvents = Seq()
       }
@@ -198,7 +198,7 @@ class LifecycleEventSpec extends UnitSpec {
       expectedEvents: Seq[(ReactiveElement[dom.html.Element], LifecycleEvent)]
     ): Unit = {
       withClue(clue + ": ") {
-        lifecycleEvents shouldEqual expectedEvents
+        lifecycleEvents shouldBe expectedEvents
         lifecycleEvents = Nil
       }
     }

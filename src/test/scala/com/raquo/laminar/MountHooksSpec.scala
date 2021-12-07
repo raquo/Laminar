@@ -6,8 +6,6 @@ import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
-import scala.util.Try
-
 class MountHooksSpec extends UnitSpec {
 
   it ("onMountCallback infers precise type and provides implicit owner") {
@@ -245,6 +243,7 @@ class MountHooksSpec extends UnitSpec {
 
     val num = Var(1)
 
+    var numModCalls = 0
     var numBindCalls = 0
     var numSignalCalls = 0
 
@@ -255,6 +254,11 @@ class MountHooksSpec extends UnitSpec {
 
     val el = div(
       "Hello ",
+      new Modifier[Div] {
+        override def apply(element: Div): Unit = {
+          numModCalls += 1
+        }
+      },
       onMountBind { _ =>
         numBindCalls += 1
         title <-- signal
@@ -282,8 +286,9 @@ class MountHooksSpec extends UnitSpec {
     unmount()
     mount(el)
 
+    assert(numModCalls == 1)
     assert(numBindCalls == 10)
-    assert(numSignalCalls == 1)
+    assert(numSignalCalls == 10) // due to new re-evaluation semantics of signals as of 0.15.0
 
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 2 // one is onMountBind itself, the other is its payload
   }
@@ -292,6 +297,7 @@ class MountHooksSpec extends UnitSpec {
 
     val num = Var(1)
 
+    var numModCalls = 0
     var numBindCalls = 0
     var numSignalCalls = 0
 
@@ -302,6 +308,11 @@ class MountHooksSpec extends UnitSpec {
 
     val el = div(
       "Hello ",
+      new Modifier[Div] {
+        override def apply(element: Div): Unit = {
+          numModCalls += 1
+        }
+      },
       onMountInsert { _ =>
         numBindCalls += 1
         child <-- signal
@@ -329,8 +340,9 @@ class MountHooksSpec extends UnitSpec {
     unmount()
     mount(el)
 
+    assert(numModCalls == 1)
     assert(numBindCalls == 10)
-    assert(numSignalCalls == 1)
+    assert(numSignalCalls == 10) // due to new re-evaluation semantics of signals as of 0.15.0
 
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 3 // one is onMountBind itself, the other is its payload, and one more is the child's pilot subscription
   }
@@ -339,6 +351,7 @@ class MountHooksSpec extends UnitSpec {
 
     val num = Var(1)
 
+    var numModCalls = 0
     var numBindCalls = 0
     var numSignalCalls = 0
 
@@ -349,6 +362,11 @@ class MountHooksSpec extends UnitSpec {
 
     val el = div(
       "Hello ",
+      new Modifier[Div] {
+        override def apply(element: Div): Unit = {
+          numModCalls += 1
+        }
+      },
       onMountInsert { _ =>
         numBindCalls += 1
         children <-- signal
@@ -376,8 +394,9 @@ class MountHooksSpec extends UnitSpec {
     unmount()
     mount(el)
 
+    assert(numModCalls == 1)
     assert(numBindCalls == 10)
-    assert(numSignalCalls == 1)
+    assert(numSignalCalls == 10) // due to new re-evaluation semantics of signals as of 0.15.0
 
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 5 // one is onMountBind itself, the other is its payload, and three more for each child's pilot subscription
   }
