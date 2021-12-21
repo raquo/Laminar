@@ -1,6 +1,9 @@
 package com.raquo.laminar
 
+import com.raquo.domtypes.generic.builders.Tag
 import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
+import com.raquo.laminar.api.Laminar.{div, svg}
+import com.raquo.laminar.builders.{HtmlTag, SvgTag}
 import com.raquo.laminar.keys.EventProcessor
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
@@ -95,8 +98,8 @@ object DomApi {
 
   /** HTML Elements */
 
-  def createHtmlElement[Ref <: dom.html.Element](element: ReactiveHtmlElement[Ref]): Ref = {
-    dom.document.createElement(element.tag.name).asInstanceOf[Ref]
+  def createHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref]): Ref = {
+    dom.document.createElement(tag.name).asInstanceOf[Ref]
   }
 
   def getHtmlAttribute[V, DomV](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V]): Option[V] = {
@@ -175,9 +178,9 @@ object DomApi {
 
   private val svgNamespaceUri = "http://www.w3.org/2000/svg"
 
-  def createSvgElement[Ref <: dom.svg.Element](element: ReactiveSvgElement[Ref]): Ref = {
+  def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
     dom.document
-      .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = element.tag.name)
+      .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = tag.name)
       .asInstanceOf[Ref]
   }
 
@@ -315,6 +318,67 @@ object DomApi {
   }
 
 
+  /** DOM Parser */
+
+  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings. */
+  def unsafeParseHtmlString(dangerousHtmlString: String): dom.html.Element = {
+    unsafeParseElementString(htmlParserContainer, tag = js.undefined, dangerousHtmlString, "Error parsing HTML string")
+  }
+
+  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted SVG strings.
+    *
+    *  @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
+    */
+  def unsafeParseHtmlString[Ref <: dom.html.Element](tag: HtmlTag[Ref], dangerousHtmlString: String): Ref = {
+    unsafeParseElementString(htmlParserContainer, tag, dangerousHtmlString, "Error parsing HTML string")
+  }
+
+  /** #WARNING: SVG can contain Javascript code, which this function will execute blindly! Only use on trusted SVG strings. */
+  def unsafeParseSvgString(dangerousSvgString: String): dom.svg.Element = {
+    unsafeParseElementString(svgParserContainer, tag = js.undefined, dangerousSvgString, "Error parsing SVG string")
+  }
+
+  /** #WARNING: SVG can contain Javascript code, which this function will be execute blindly! Only use on trusted SVG strings.
+    *
+    * @param tag   the SVG tag you expect from parsing. Will throw exception if does not match the result.
+    */
+  def unsafeParseSvgString[Ref <: dom.svg.Element](tag: SvgTag[Ref], dangerousSvgString: String): Ref = {
+    unsafeParseElementString(svgParserContainer, tag, dangerousSvgString, "Error parsing SVG string")
+  }
+
+  private val htmlParserContainer: dom.html.Element = createHtmlElement(div)
+
+  private val svgParserContainer: dom.svg.Element = createSvgElement(svg.svg)
+
+  private def unsafeParseElementString[Ref <: dom.Element](
+    parserContainer: dom.Element,
+    tag: js.UndefOr[Tag[ReactiveElement[Ref]]],
+    dangerousHtmlOrSvgString: String,
+    clue: String
+  ): Ref = {
+    parserContainer.innerHTML = dangerousHtmlOrSvgString
+    val numChildren = parserContainer.children.length
+    if (numChildren != 1) {
+      throw new Exception(s"$clue: expected exactly 1 child in parserContainer, got $numChildren")
+    }
+    val element = parserContainer.children(0)
+    tag.foreach(DomApi.assertTagMatches(_, element, clue))
+    parserContainer.innerHTML = ""
+    element.asInstanceOf[Ref]
+  }
+
+  private[laminar] def assertTagMatches[Ref <: dom.Element](
+    tag: Tag[ReactiveElement[Ref]],
+    element: dom.Element,
+    clue: String
+  ): Unit = {
+    // #nc[ew] Use native js toLowerCase, don't need no Java locales
+    if (tag.name.toLowerCase != element.tagName.toLowerCase) {
+      throw new Exception(s"$clue: expected tag name `${tag.name}`, got `${element.tagName}`")
+    }
+  }
+
+
   /** Random utils */
 
   /** @return hierarchical path describing the position and identity of this node, starting with the root. */
@@ -345,4 +409,5 @@ object DomApi {
       case _ => node.nodeName
     }
   }
+
 }

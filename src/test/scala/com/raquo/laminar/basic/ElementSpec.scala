@@ -1,6 +1,8 @@
-package com.raquo.laminar.static
+package com.raquo.laminar.basic
 
 import com.raquo.domtestutils.matching.ExpectedNode
+import com.raquo.laminar.DomApi
+import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.utils.UnitSpec
 
@@ -83,5 +85,84 @@ class ElementSpec extends UnitSpec {
       hr
     ))
     unmount()
+  }
+
+  it("renders foreign HTML elements") {
+    mount(
+      div(
+        b("Hello"),
+        foreignHtmlElement(span, DomApi.unsafeParseHtmlString(span, "<span class='foo'>world</span>")),
+        " Eh"
+      )
+    )
+
+    expectNode(
+      div of (
+        b of "Hello",
+        span of (
+          cls is "foo",
+          "world"
+        ),
+        " Eh"
+      )
+    )
+  }
+
+  it("renders foreign SVG elements") {
+    mount(
+      div(
+        b("Hello"),
+        foreignSvgElement(DomApi.unsafeParseSvgString("<svg height=\"200\" width='400'><circle cx='200' cy='15' r='30' fill='red'></circle></svg>")),
+        " Eh"
+      )
+    )
+
+    expectNode(
+      div of (
+        b of "Hello",
+        s.svg of (
+          s.height is "200",
+          s.width is "400",
+          s.circle of (
+            s.cx is "200",
+            s.cy is "15",
+            s.r is "30",
+            s.fill is "red"
+          )
+        ),
+        " Eh"
+      )
+    )
+  }
+
+  it("renders foreign SVG sub-elements") {
+    mount(
+      div(
+        b("Hello"),
+        s.svg(
+          s.height("200"),
+          s.width("400"),
+          foreignSvgElement(svg.circle, DomApi.unsafeParseSvgString("<circle cx='200' cy='15' r='30' fill='red'></circle>")),
+        ),
+        " Eh"
+      )
+    )
+
+    expectNode(
+      div of (
+        b of "Hello",
+        s.svg of (
+          s.height is "200",
+          s.width is "400",
+          s.circle of (
+            s.cx is "200",
+            s.cy is "15",
+            s.r is "30",
+            s.fill is "red"
+          )
+        ),
+        " Eh"
+      )
+    )
   }
 }

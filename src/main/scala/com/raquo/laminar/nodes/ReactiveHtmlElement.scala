@@ -10,10 +10,10 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
-  extends ReactiveElement[Ref] {
-
-  final override val ref: Ref = DomApi.createHtmlElement(this)
+class ReactiveHtmlElement[+Ref <: dom.html.Element](
+  val tag: HtmlTag[Ref],
+  final override val ref: Ref
+) extends ReactiveElement[Ref] {
 
   // -- `value` prop controller
 

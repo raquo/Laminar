@@ -12,9 +12,9 @@ import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
-import com.raquo.laminar.{Implicits, keys, lifecycle, modifiers, nodes}
+import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -203,6 +203,26 @@ private[laminar] object Laminar
   @inline def emptyNode: CommentNode = commentNode("")
 
   def commentNode(text: String = ""): CommentNode = new CommentNode(text)
+
+  /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
+  def foreignHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref], element: Ref): ReactiveHtmlElement[Ref] = {
+    DomApi.assertTagMatches(tag, element, "Unable to init foreign element")
+    new ReactiveHtmlElement[Ref](tag, element)
+  }
+
+  /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element. */
+  def foreignSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref], element: Ref): ReactiveSvgElement[Ref] = {
+    DomApi.assertTagMatches(tag, element, "Unable to init foreign element")
+    new ReactiveSvgElement[Ref](tag, element)
+  }
+
+  /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element.
+    *
+    * Note: this method is a shorthand for the <svg> tag only, see the other version for other SVG tags.
+    */
+  def foreignSvgElement(element: dom.svg.Element): ReactiveSvgElement[dom.svg.Element] = {
+    foreignSvgElement(svg.svg, element)
+  }
 
   /** A universal Modifier that does nothing */
   val emptyMod: Mod[Node] = new Modifier[Node] {}
