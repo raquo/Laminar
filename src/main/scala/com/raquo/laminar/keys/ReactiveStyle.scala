@@ -23,7 +23,7 @@ class ReactiveStyle[V](val style: Style[V]) extends AnyVal {
   }
 
   def maybe(value: Option[V | String]): Setter[HtmlElement] = {
-    value.map(v => this := v)
+    optionToSetter(value.map(v => this := v))
   }
 
   def :=(value: V | String): Setter[HtmlElement] = {

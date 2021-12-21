@@ -7,6 +7,7 @@ import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.collection.immutable
+import scala.scalajs.js
 
 object ChildrenInserter {
 
@@ -28,19 +29,21 @@ object ChildrenInserter {
         case signal: Signal[Children @unchecked] => signal
         case _ => throw new Exception("Unknown kind of observable")
       }
-
+      var lastSeenChildren: js.UndefOr[Children] = js.undefined
       childrenSignal.foreach { newChildren =>
-        val newChildrenMap = InsertContext.nodesToMap(newChildren)
-        c.extraNodeCount = updateChildren(
-          prevChildren = c.extraNodesMap,
-          nextChildren = newChildren,
-          nextChildrenMap = newChildrenMap,
-          parentNode = c.parentNode,
-          sentinelNode = c.sentinelNode,
-          c.extraNodeCount
-        )
-        c.extraNodes = newChildren
-        c.extraNodesMap = newChildrenMap
+        if (!lastSeenChildren.exists(_ eq newChildren)) {
+          lastSeenChildren = newChildren
+          val newChildrenMap = InsertContext.nodesToMap(newChildren)
+          c.extraNodeCount = updateChildren(
+            prevChildren = c.extraNodesMap,
+            nextChildren = newChildren,
+            nextChildrenMap = newChildrenMap,
+            parentNode = c.parentNode,
+            sentinelNode = c.sentinelNode,
+            c.extraNodeCount
+          )
+          c.extraNodesMap = newChildrenMap
+        }
       }(owner)
     }
   )
@@ -113,14 +116,13 @@ object ChildrenInserter {
             // - `nextChild.ref != prevChildNode` is a performance shortcut
             // - In `containsNode` call we only start looking at `index` because we know that all nodes before `index` are already in place.
             while (
-              nextChild.ref != prevChildRef
-                && !containsRefNew(nextChildrenMap, prevChildRef)
+              nextChild.ref != prevChildRef && !containsRef(nextChildrenMap, prevChildRef)
             ) {
               // prevChild should be deleted, so we remove it from the DOM, and try again with the next prevChild
               // but first we save its next sibling, which will become our next `prevChildRef`
               val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
-              val prevChild = prevChildFromRefNew(prevChildren, prevChildRef)
+              val prevChild = prevChildFromRef(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)
               // @Note: DOM update
               ParentNode.removeChild(parent = parentNode, child = prevChild)
@@ -148,7 +150,7 @@ object ChildrenInserter {
       val nextPrevChildRef = prevChildRef.nextSibling
       // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
       // @Note: DOM update
-      ParentNode.removeChild(parent = parentNode, child = prevChildFromRefNew(prevChildren, prevChildRef))
+      ParentNode.removeChild(parent = parentNode, child = prevChildFromRef(prevChildren, prevChildRef))
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1
     }
@@ -156,33 +158,12 @@ object ChildrenInserter {
     currentChildrenCount
   }
 
-  private def containsRefNew(nextChildrenMap: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Boolean = {
+  private def containsRef(nextChildrenMap: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Boolean = {
     nextChildrenMap.has(ref)
   }
 
-  private def prevChildFromRefNew(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Child = {
+  private def prevChildFromRef(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Child = {
     prevChildren.get(ref).get // @TODO[Integrity] Throw a meaningful error if not found (that would be unrecoverable inconsistent state)
   }
 
-  @deprecated("0.14.1", "This is going away, see https://github.com/raquo/Laminar/issues/108")
-  protected def containsRef(nextChildren: Children, ref: dom.Node, startLookingAtIndex: Int): Boolean = {
-    // @TODO[Performance] This also can be optimized for different `Seq` implementations
-    val childrenCount = nextChildren.size
-    var index = startLookingAtIndex
-    var found = false
-    while (!found && index < childrenCount) {
-      if (nextChildren(index).ref == ref) {
-        found = true
-      } else {
-        index += 1
-      }
-    }
-    found
-  }
-
-  // @TODO[Performance] This method should not exist, I think. See how it's used, we should just have removeChildByRef method in Laminar or SDB.
-  @deprecated("0.14.1", "This is going away, see https://github.com/raquo/Laminar/issues/108")
-  protected def prevChildFromRef(prevChildren: Children, ref: dom.Node): Child = {
-    prevChildren.find(_.ref == ref).get // @TODO[Integrity] Throw a more meaningful error (that would be unrecoverable inconsistent state)
-  }
 }

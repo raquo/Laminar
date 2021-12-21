@@ -19,7 +19,6 @@ object ChildrenCommandInserter {
       val mountContext = new MountContext[El](thisNode = c.parentNode, owner)
 
       $command(mountContext).foreach { command =>
-        // @Note we never update c.extraNodes. This is ok because we also never read it.
         val nodeCountDiff = updateList(
           command,
           parentNode = c.parentNode,

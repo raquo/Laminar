@@ -376,11 +376,6 @@ private[laminar] object Laminar
     }
   }
 
-  @deprecated("Use `inContext` instead of `forthis` alias", "0.12.0")
-  @inline def forthis[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
-    inContext(makeModifier)
-  }
-
   /** Use this when you need to apply stream operators on this element's events, e.g.:
     *
     *     div(composeEvents(onScroll)(_.throttle(100)) --> observer)

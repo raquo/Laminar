@@ -19,7 +19,7 @@ class ReactiveSvgAttr[V](
   }
 
   def maybe(value: Option[V]): Setter[SvgElement] = {
-    value.map(v => this := v)
+    optionToSetter(value.map(v => this := v))
   }
 
   def :=(value: V): Setter[SvgElement] = {

@@ -4,6 +4,8 @@ import com.raquo.airstream.core.Observable
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
+import scala.scalajs.js
+
 // @TODO[Naming] hrm
 object ChildInserter {
 
@@ -17,9 +19,13 @@ object ChildInserter {
         thisNode = c.parentNode,
         owner = owner
       )
+      var lastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
       $child(mountContext).foreach { newChildNode =>
-        ParentNode.replaceChild(parent = c.parentNode, oldChild = c.sentinelNode, newChild = newChildNode)
-        c.sentinelNode = newChildNode
+        if (!lastSeenChild.exists(_ eq newChildNode)) {
+          lastSeenChild = newChildNode
+          ParentNode.replaceChild(parent = c.parentNode, oldChild = c.sentinelNode, newChild = newChildNode)
+          c.sentinelNode = newChildNode
+        }
       }(owner)
     }
   )

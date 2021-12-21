@@ -18,7 +18,7 @@ class ReactiveProp[V, DomV](
   }
 
   def maybe(value: Option[V]): Setter[HtmlElement] = {
-    value.map(v => this := v)
+    optionToSetter(value.map(v => this := v))
   }
 
   def :=(value: V): Setter[HtmlElement] = {

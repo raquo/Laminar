@@ -10,16 +10,13 @@ import scala.collection.immutable
 //  "Extra nodes" are more like "content nodes"
 
 // @Note only parentNode and sentinelNode are used by all Inserter-s.
-//  - Other fields may remain un-updated if they are not needed for a particular implementation.
-class InsertContext[+El <: ReactiveElement.Base](
+//  - Other fields may remain un-updated if they are not needed for a particular use case.
+final class InsertContext[+El <: ReactiveElement.Base](
   val parentNode: El,
   var sentinelNode: ChildNode.Base,
-  var extraNodeCount: Int, // This is separate from `extraNodes` for performance
-  var extraNodes: immutable.Seq[ChildNode.Base] // #TODO We don't need this anymore, we only keep it for compat in 0.14.x
-) {
-
-  private[laminar] var extraNodesMap: JsMap[dom.Node, ChildNode.Base] = InsertContext.nodesToMap(extraNodes)
-}
+  var extraNodeCount: Int, // This is separate from `extraNodesMap` for performance #TODO[Performance]: Check if this is still relevant with JsMap
+  var extraNodesMap: JsMap[dom.Node, ChildNode.Base]
+)
 
 object InsertContext {
 
@@ -33,7 +30,7 @@ object InsertContext {
       parentNode = parentNode,
       sentinelNode = sentinelNode,
       extraNodeCount = 0,
-      extraNodes = Nil
+      extraNodesMap = JsMap.empty
     )
   }
 

@@ -10,7 +10,7 @@ object Versions {
 
   val ScalaDomTypes = "0.15.0"
 
-  val Airstream = "0.14.2"
+  val Airstream = "0.14.3-SNAPSHOT"
 
   // Testing
 

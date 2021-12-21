@@ -15,14 +15,12 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
     throw new Exception(s"Attempting to use owner of unmounted element: $path")
   })
 
-  // @TODO[Performance] We should get rid of this.
-  //  - The only place where we need this is ReplaceAll functionality of ChildrenCommand API
+  // @TODO[Performance] We could get rid of this.
+  //  - The only place where we really need this is ReplaceAll functionality of ChildrenCommand API
   //  - We can probably track specific children affected by that API instead
   //  - That would save us mutable Buffer searches and manipulations when inserting and removing nodes
+  //  - I mean we could look at the real DOM nodes instead where needed. Would that be more efficient? We'd need to benchmark.
   private var _maybeChildren: Option[JsArray[ChildNode.Base]] = None
-
-  @deprecated("ParentNode.maybeChildren will be removed in a future version of Laminar.", "0.8")
-  @inline def maybeChildren: Option[List[ChildNode.Base]] = _maybeChildren.map(_.asInstanceOf[js.Array[ChildNode.Base]].toList)
 }
 
 object ParentNode {
