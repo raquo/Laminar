@@ -26,10 +26,22 @@ class ReactiveProp[V, DomV](
   }
 
   def <--($value: Source[V]): PropUpdater[V, DomV] = {
+    val update = if (name == "value") {
+      (element: HtmlElement, nextValue: V) =>
+        // Checking against current DOM value prevents cursor position reset in Safari
+        val currentDomValue = DomApi.getHtmlProperty(element, this)
+        if (nextValue != currentDomValue) {
+          DomApi.setHtmlProperty(element, this, nextValue)
+        }
+    } else {
+      (element: HtmlElement, nextValue: V) => {
+        DomApi.setHtmlProperty(element, this, nextValue)
+      }
+    }
     new KeyUpdater[HtmlElement, ReactiveProp[V, DomV], V](
       this,
       $value.toObservable,
-      (element, nextValue) => DomApi.setHtmlProperty(element, this, nextValue)
+      update
     )
   }
 
