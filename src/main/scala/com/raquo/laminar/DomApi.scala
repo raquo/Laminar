@@ -1,12 +1,10 @@
 package com.raquo.laminar
 
-import com.raquo.domtypes.generic.builders.Tag
-import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
 import com.raquo.laminar.api.Laminar.{div, svg}
-import com.raquo.laminar.builders.{HtmlTag, SvgTag}
-import com.raquo.laminar.keys.EventProcessor
+import com.raquo.laminar.keys.{EventProcessor, HtmlAttr, Prop, StyleProp, SvgAttr}
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
+import com.raquo.laminar.tags.{HtmlTag, SvgTag, Tag}
 import org.scalajs.dom
 import org.scalajs.dom.DOMException
 
@@ -135,16 +133,16 @@ object DomApi {
     element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(newValue)
   }
 
-  def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+  def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: StyleProp[V], value: V): Unit = {
+    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
-  def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: Style[_], value: String): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+  def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: StyleProp[_], value: String): Unit = {
+    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
-  def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V | String): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+  def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: StyleProp[V], value: V | String): Unit = {
+    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
   @inline private def cssValue(value: Any): String = {
@@ -164,11 +162,20 @@ object DomApi {
     //}
   }
 
-  @inline private def setRefStyle(ref: dom.html.Element, styleCssName: String, styleValue: String): Unit = {
-    // Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
+  @inline private def setRefStyle(
+    ref: dom.html.Element,
+    styleCssName: String,
+    prefixes: Seq[String],
+    styleValue: String
+  ): Unit = {
+    // #Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
     if (styleValue == null) {
+      prefixes.foreach(prefix => ref.style.removeProperty(prefix + styleCssName))
       ref.style.removeProperty(styleCssName)
     } else {
+      prefixes.foreach { prefix =>
+        ref.style.setProperty(prefix + styleCssName, styleValue)
+      }
       ref.style.setProperty(styleCssName, styleValue)
     }
   }

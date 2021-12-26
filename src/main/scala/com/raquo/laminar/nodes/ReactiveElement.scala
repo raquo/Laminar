@@ -3,19 +3,16 @@ package com.raquo.laminar.nodes
 import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
-import com.raquo.domtypes
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
 import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription}
+import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription, Modifier}
 import org.scalajs.dom
 
 import scala.scalajs.js
 
 trait ReactiveElement[+Ref <: dom.Element]
   extends ChildNode[Ref]
-  with ParentNode[Ref]
-  with domtypes.generic.nodes.Element {
+  with ParentNode[Ref] {
 
   // @Warning[Fragile] deactivate should not need an isActive guard.
   //  If Laminar starts to cause exceptions here, we need to find the root cause.

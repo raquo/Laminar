@@ -21,13 +21,13 @@ import org.scalajs.dom
   *                         Returns an Option of the processed value. If None, the value should not passed down the chain.
   */
 class EventProcessor[Ev <: dom.Event, V](
-  protected val eventProp: ReactiveEventProp[Ev],
+  protected val eventProp: EventProp[Ev],
   protected val shouldUseCapture: Boolean = false,
   protected val processor: Ev => Option[V]
 ) {
 
   @inline def -->(sink: Sink[V]): EventListener[Ev, V] = {
-    -->(sink.toObserver.onNext(_))
+    this --> (sink.toObserver.onNext(_))
   }
 
   @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventListener[Ev, V] = {
@@ -225,14 +225,14 @@ class EventProcessor[Ev <: dom.Event, V](
 
 object EventProcessor {
 
-  def empty[Ev <: dom.Event](eventProp: ReactiveEventProp[Ev], shouldUseCapture: Boolean = false): EventProcessor[Ev, Ev] = {
+  def empty[Ev <: dom.Event](eventProp: EventProp[Ev], shouldUseCapture: Boolean = false): EventProcessor[Ev, Ev] = {
     new EventProcessor(eventProp, shouldUseCapture, Some(_))
   }
 
   // These methods are only exposed publicly via companion object
   // to avoid polluting autocomplete when chaining EventProcessor-s
 
-  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): ReactiveEventProp[Ev] = prop.eventProp
+  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): EventProp[Ev] = prop.eventProp
 
   @inline def shouldUseCapture(prop: EventProcessor[_, _]): Boolean = prop.shouldUseCapture
 

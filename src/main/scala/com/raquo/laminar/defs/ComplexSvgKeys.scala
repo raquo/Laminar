@@ -1,17 +1,16 @@
 package com.raquo.laminar.defs
 
+import com.raquo.domtypes.generic
 import com.raquo.domtypes.generic.builders.SvgAttrBuilder
 import com.raquo.domtypes.generic.codecs.StringAsIsCodec
-import com.raquo.domtypes.generic.defs.complex.ComplexSvgKeys
-import com.raquo.domtypes.generic.keys.SvgAttr
-import com.raquo.laminar.keys.{CompositeKey, ReactiveSvgAttr}
-import com.raquo.laminar.nodes.ReactiveSvgElement
-import ReactiveComplexSvgKeys._
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.defs.ComplexSvgKeys._
+import com.raquo.laminar.keys.{CompositeKey, SvgAttr}
+import com.raquo.laminar.nodes.ReactiveSvgElement
 
-trait ReactiveComplexSvgKeys extends ComplexSvgKeys[
+trait ComplexSvgKeys extends generic.defs.complex.ComplexSvgKeys[
   CompositeSvgAttr[String]
-] { this: SvgAttrBuilder[ReactiveSvgAttr] =>
+] { this: SvgAttrBuilder[SvgAttr] =>
 
   override lazy val className: CompositeSvgAttr[String] = stringCompositeSvgAttr("class", separator = " ")
 
@@ -30,7 +29,7 @@ trait ReactiveComplexSvgKeys extends ComplexSvgKeys[
   }
 }
 
-object ReactiveComplexSvgKeys {
+object ComplexSvgKeys {
 
   type CompositeSvgAttr[V] = CompositeKey[SvgAttr[V], ReactiveSvgElement.Base]
 }

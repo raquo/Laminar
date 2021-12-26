@@ -1,7 +1,6 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.nodes.ReactiveElement
 

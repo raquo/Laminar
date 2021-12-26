@@ -2,9 +2,8 @@ package website.webcomponents.material
 
 import com.raquo.domtypes.generic.codecs._
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.builders.HtmlTag
-import com.raquo.laminar.keys.ReactiveStyle
 import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -37,7 +36,7 @@ object LinearProgressBar {
   val buffer: Prop[Double]         = customProp("buffer", DoubleAsIsCodec)
 
   object styles {
-    val mdcThemePrimary: ReactiveStyle[String] = customStyle("--mdc-theme-primary")
+    val mdcThemePrimary: StyleProp[String] = customStyle("--mdc-theme-primary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

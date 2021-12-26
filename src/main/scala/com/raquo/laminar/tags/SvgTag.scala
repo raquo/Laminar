@@ -1,15 +1,14 @@
-package com.raquo.laminar.builders
+package com.raquo.laminar.tags
 
-import com.raquo.domtypes.generic
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.ReactiveSvgElement
 import org.scalajs.dom
 
 class SvgTag[+Ref <: dom.svg.Element] (
   override val name: String,
   override val void: Boolean = false
-) extends generic.builders.Tag[ReactiveSvgElement[Ref]](name, void) {
+) extends Tag[ReactiveSvgElement[Ref]] {
 
   def apply(modifiers: Modifier[ReactiveSvgElement[Ref]]*): ReactiveSvgElement[Ref] = {
     val element = build()

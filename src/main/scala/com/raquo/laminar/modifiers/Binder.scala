@@ -1,7 +1,6 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.ownership.DynamicSubscription
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Binder is a Modifier that creates a subscription when invoked.

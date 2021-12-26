@@ -2,16 +2,23 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.domtypes.generic.codecs.Codec
-import com.raquo.domtypes.generic.keys.Prop
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
 import com.raquo.laminar.modifiers.KeyUpdater.PropUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
-class ReactiveProp[V, DomV](
+/**
+  * This class represents a DOM Element Property. Meaning the key that can be set, not a key-value pair.
+  *
+  * Note: following the Javascript DOM Spec, Properties are distinct from Attributes even when they share a name.
+  *
+  * @tparam V type of values that this Property can be set to
+  * @tparam DomV type of values that this Property holds in the native Javascript DOM
+  */
+class Prop[V, DomV](
   override val name: String,
-  override val codec: Codec[V, DomV]
-) extends Prop[V, DomV](name, codec) { self =>
+  val codec: Codec[V, DomV]
+) extends Key { self =>
 
   @inline def apply(value: V): Setter[HtmlElement] = {
     this := value
@@ -22,7 +29,7 @@ class ReactiveProp[V, DomV](
   }
 
   def :=(value: V): Setter[HtmlElement] = {
-    new KeySetter[ReactiveProp[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
+    new KeySetter[Prop[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
   }
 
   def <--($value: Source[V]): PropUpdater[V, DomV] = {
@@ -38,7 +45,7 @@ class ReactiveProp[V, DomV](
         DomApi.setHtmlProperty(element, this, nextValue)
       }
     }
-    new KeyUpdater[HtmlElement, ReactiveProp[V, DomV], V](
+    new KeyUpdater[HtmlElement, Prop[V, DomV], V](
       this,
       $value.toObservable,
       update

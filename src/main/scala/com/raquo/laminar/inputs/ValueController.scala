@@ -4,7 +4,7 @@ import com.raquo.airstream.core.Observer
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar
-import com.raquo.laminar.keys.{EventProcessor, ReactiveEventProp, ReactiveProp}
+import com.raquo.laminar.keys.{EventProcessor, EventProp, Prop}
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 import org.scalajs.dom
@@ -16,7 +16,7 @@ class ValueController[A, B](
   getDomValue: dom.html.Element => A,
   setDomValue: (dom.html.Element, A) => Unit,
   element: ReactiveHtmlElement.Base,
-  updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[A, _], A],
+  updater: KeyUpdater[ReactiveHtmlElement.Base, Prop[A, _], A],
   listener: EventListener[_ <: dom.Event, B]
 ) {
 
@@ -112,7 +112,7 @@ object ValueController {
     s"${DomApi.debugNodeDescription(element.ref)}$typSuffix"
   }
 
-  private def hasBinder(element: ReactiveHtmlElement.Base, prop: ReactiveProp[_, _]): Boolean = {
+  private def hasBinder(element: ReactiveHtmlElement.Base, prop: Prop[_, _]): Boolean = {
     if (prop == Laminar.value) {
       element.hasValueBinder
     } else if (prop == Laminar.checked) {
@@ -125,7 +125,7 @@ object ValueController {
   private def hasOtherController(
     thisController: ValueController[_, _],
     element: ReactiveHtmlElement.Base,
-    prop: ReactiveProp[_, _]
+    prop: Prop[_, _]
   ): Boolean = {
     if (prop == Laminar.value) {
       element.hasOtherValueController(thisController)
@@ -139,7 +139,7 @@ object ValueController {
   /** @throws Exception if you can't add such a controller to this element. */
   private def checkControllerCompatibility(
     thisController: ValueController[_, _],
-    prop: ReactiveProp[_, _],
+    prop: Prop[_, _],
     eventProcessor: EventProcessor[_ <: dom.Event, _],
     element: ReactiveHtmlElement.Base
   ): Unit = {
@@ -173,7 +173,7 @@ object ValueController {
   }
 
   /** @return Option((prop, eventProp)) */
-  def expectedControlPairing(element: ReactiveHtmlElement.Base): Option[(ReactiveProp[_, _], ReactiveEventProp[_ <: dom.Event])] = {
+  def expectedControlPairing(element: ReactiveHtmlElement.Base): Option[(Prop[_, _], EventProp[_ <: dom.Event])] = {
     element.ref match {
 
       case input: dom.html.Input =>

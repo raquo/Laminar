@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.modifiers.Modifier
 import org.scalajs.dom
 
 import scala.annotation.tailrec

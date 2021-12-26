@@ -5,7 +5,7 @@ import com.raquo.airstream.web.DomEventStream
 import com.raquo.domtypes.generic.builders.EventPropBuilder
 import org.scalajs.dom
 
-class DomEventStreamPropBuilder(
+class StreamEventPropBuilder(
   eventTarget: dom.EventTarget
 ) extends EventPropBuilder[EventStream, dom.Event] {
 

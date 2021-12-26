@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.laminar.builders.SvgTag
+import com.raquo.laminar.tags.SvgTag
 import org.scalajs.dom
 
 class ReactiveSvgElement[+Ref <: dom.svg.Element](

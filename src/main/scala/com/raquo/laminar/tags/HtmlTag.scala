@@ -1,15 +1,14 @@
-package com.raquo.laminar.builders
+package com.raquo.laminar.tags
 
-import com.raquo.domtypes.generic
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom
 
 class HtmlTag[+Ref <: dom.html.Element] (
   override val name: String,
   override val void: Boolean = false
-) extends generic.builders.Tag[ReactiveHtmlElement[Ref]](name, void) {
+) extends Tag[ReactiveHtmlElement[Ref]] {
 
   def apply(modifiers: Modifier[ReactiveHtmlElement[Ref]]*): ReactiveHtmlElement[Ref] = {
     val element = build()

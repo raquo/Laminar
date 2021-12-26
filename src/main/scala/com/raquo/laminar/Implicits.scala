@@ -2,12 +2,11 @@ package com.raquo.laminar
 
 import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.airstream.state.Val
-import com.raquo.domtypes.generic.Modifier
-import com.raquo.domtypes.generic.keys.Style
 import com.raquo.laminar.Implicits.RichSource
+import com.raquo.laminar.api.Laminar.StyleEncoder
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
-import com.raquo.laminar.keys.{EventProcessor, ReactiveEventProp, ReactiveStyle}
-import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Setter}
+import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}
+import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Modifier, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 import org.scalajs.dom
 
@@ -15,11 +14,17 @@ import scala.scalajs.js
 
 trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMappers {
 
-  @inline implicit def eventPropToProcessor[Ev <: dom.Event](eventProp: ReactiveEventProp[Ev]): EventProcessor[Ev, Ev] = {
-    EventProcessor.empty(eventProp)
+  implicit def derivedStyleIntToDouble[V](style: DerivedStyleProp[Int, V]): DerivedStyleProp[Double, V] = {
+    style.asInstanceOf[DerivedStyleProp[Double, V]] // Safe because Int-s and Double-s have identical runtime repr in SJS
   }
 
-  @inline implicit def styleToReactiveStyle[V](style: Style[V]): ReactiveStyle[V] = new ReactiveStyle[V](style)
+  implicit def styleEncoderIntToDouble[V](encoder: StyleEncoder[Int]): StyleEncoder[Double] = {
+    encoder.asInstanceOf[StyleEncoder[Double]] // Safe because Int-s and Double-s have identical runtime repr in SJS
+  }
+
+  @inline implicit def eventPropToProcessor[Ev <: dom.Event](eventProp: EventProp[Ev]): EventProcessor[Ev, Ev] = {
+    EventProcessor.empty(eventProp)
+  }
 
   @inline implicit def textToNode(text: String): TextNode = new TextNode(text)
 

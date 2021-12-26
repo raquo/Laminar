@@ -1,22 +1,21 @@
 package com.raquo.laminar.defs
 
+import com.raquo.domtypes.generic
 import com.raquo.domtypes.generic.builders.HtmlAttrBuilder
 import com.raquo.domtypes.generic.codecs.StringAsIsCodec
-import com.raquo.domtypes.generic.defs.complex.ComplexHtmlKeys
-import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop}
-import com.raquo.laminar.keys.{CompositeKey, ReactiveHtmlAttr, ReactiveProp}
-import com.raquo.laminar.nodes.ReactiveHtmlElement
-import ReactiveComplexHtmlKeys._
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.defs.ComplexHtmlKeys._
+import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, Prop}
+import com.raquo.laminar.nodes.ReactiveHtmlElement
 
-trait ReactiveComplexHtmlKeys extends ComplexHtmlKeys[
+trait ComplexHtmlKeys extends generic.defs.complex.ComplexHtmlKeys[
   CompositeProp[String],
   CompositeHtmlAttr[String],
   CompositeHtmlAttr[String],
-  ReactiveHtmlAttr[String],
-  ReactiveHtmlAttr[String],
-  ReactiveProp[String, String]
-] { this: HtmlAttrBuilder[ReactiveHtmlAttr] =>
+  HtmlAttr[String],
+  HtmlAttr[String],
+  Prop[String, String]
+] { this: HtmlAttrBuilder[HtmlAttr] =>
 
   override lazy val className: CompositeProp[String] = stringCompositeProp("className", separator = " ")
 
@@ -24,9 +23,9 @@ trait ReactiveComplexHtmlKeys extends ComplexHtmlKeys[
 
   override lazy val role: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("role", separator = " ")
 
-  override def dataAttr(suffix: String): ReactiveHtmlAttr[String] = stringHtmlAttr(s"data-$suffix")
+  override def dataAttr(suffix: String): HtmlAttr[String] = stringHtmlAttr(s"data-$suffix")
 
-  override lazy val styleAttr: ReactiveHtmlAttr[String] = stringHtmlAttr("style")
+  override lazy val styleAttr: HtmlAttr[String] = stringHtmlAttr("style")
 
   protected def stringCompositeProp(name: String, separator: String): CompositeProp[String] = {
     val prop = new Prop(name, StringAsIsCodec)
@@ -57,7 +56,7 @@ trait ReactiveComplexHtmlKeys extends ComplexHtmlKeys[
   }
 }
 
-object ReactiveComplexHtmlKeys {
+object ComplexHtmlKeys {
 
   type CompositeProp[V] = CompositeKey[Prop[V, V], ReactiveHtmlElement.Base]
 

@@ -1,6 +1,5 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** This type represents a modifier that sets a "property" of an element.

@@ -2,9 +2,8 @@ package website.webcomponents.material
 
 import com.raquo.domtypes.generic.codecs._
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.builders.HtmlTag
-import com.raquo.laminar.keys.ReactiveStyle
 import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -43,7 +42,7 @@ object Slider {
   val onChange: EventProp[dom.Event] = customEventProp("change")
 
   object styles {
-    val mdcThemeSecondary: ReactiveStyle[String] = customStyle("--mdc-theme-secondary")
+    val mdcThemeSecondary: StyleProp[String] = customStyle("--mdc-theme-secondary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

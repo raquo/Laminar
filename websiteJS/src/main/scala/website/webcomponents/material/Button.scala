@@ -2,9 +2,8 @@ package website.webcomponents.material
 
 import com.raquo.domtypes.generic.codecs.{BooleanAsAttrPresenceCodec, StringAsIsCodec}
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.builders.HtmlTag
-import com.raquo.laminar.keys.{ReactiveHtmlAttr, ReactiveProp, ReactiveStyle}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -29,11 +28,11 @@ object Button {
 
   private val tag: HtmlTag[Ref] = customHtmlTag("mwc-button")
 
-  val id: ReactiveProp[String, String] = idAttr
+  val id: Prop[String] = idAttr
 
-  val label: ReactiveHtmlAttr[String]   = customHtmlAttr("label", StringAsIsCodec)
-  val raised: ReactiveHtmlAttr[Boolean] = customHtmlAttr("raised", BooleanAsAttrPresenceCodec)
-  val icon: ReactiveHtmlAttr[String]    = customHtmlAttr("icon", StringAsIsCodec)
+  val label: HtmlAttr[String]   = customHtmlAttr("label", StringAsIsCodec)
+  val raised: HtmlAttr[Boolean] = customHtmlAttr("raised", BooleanAsAttrPresenceCodec)
+  val icon: HtmlAttr[String]    = customHtmlAttr("icon", StringAsIsCodec)
 
   val onMouseOver = new EventProp[dom.MouseEvent]("mouseover")
 
@@ -42,7 +41,7 @@ object Button {
   }
 
   object styles {
-    val mdcThemePrimary: ReactiveStyle[String] = customStyle("--mdc-theme-primary")
+    val mdcThemePrimary: StyleProp[String] = customStyle("--mdc-theme-primary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

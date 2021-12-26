@@ -1,15 +1,17 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.matching.{RuleImplicits, TestableHtmlAttr, TestableProp, TestableSvgAttr}
+import com.raquo.domtestutils.matching._
 import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.laminar.api.Laminar.CompositeSvgAttr
 import com.raquo.laminar.api._
-import com.raquo.laminar.defs.ReactiveComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
-import com.raquo.laminar.nodes.{ReactiveElement, RootNode}
+import com.raquo.laminar.defs.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
+import com.raquo.laminar.keys.{HtmlAttr, Prop, StyleProp, SvgAttr}
+import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, RootNode}
+import com.raquo.laminar.tags.Tag
 
 trait LaminarSpec
   extends MountOps
-  with RuleImplicits
+  with RuleImplicits[Tag.Base, CommentNode, Prop, HtmlAttr, SvgAttr, StyleProp]
   with EventSimulator
 {
   // === On nullable variables ===
@@ -54,15 +56,39 @@ trait LaminarSpec
     mountedElementClue = defaultMountedElementClue
   }
 
+  override implicit def makeTagTestable(tag: Tag.Base): ExpectedNode = {
+    ExpectedNode.element(tag.name)
+  }
+
+  override implicit def makeCommentBuilderTestable(commentBuilder: () => CommentNode): ExpectedNode = {
+    ExpectedNode.comment
+  }
+
+  override implicit def makeAttrTestable[V](attr: HtmlAttr[V]): TestableHtmlAttr[V] = {
+    new TestableHtmlAttr[V](attr.name, attr.codec)
+  }
+
+  override implicit def makePropTestable[V, DomV](prop: Prop[V, DomV]): TestableProp[V, DomV] = {
+    new TestableProp[V, DomV](prop.name, prop.codec)
+  }
+
+  override implicit def makeStyleTestable[V](style: StyleProp[V]): TestableStyleProp[V] = {
+    new TestableStyleProp[V](style.name)
+  }
+
+  override implicit def makeSvgAttrTestable[V](svgAttr: SvgAttr[V]): TestableSvgAttr[V] = {
+    new TestableSvgAttr[V](svgAttr.name, svgAttr.codec, svgAttr.namespace)
+  }
+
   implicit def makeCompositePropTestable[V](prop: CompositeProp[V]): TestableProp[V, V] = {
-    new TestableProp(prop.key)
+    new TestableProp(prop.key.name, prop.key.codec)
   }
 
   implicit def makeCompositeHtmlAttrTestable[V](attr: CompositeHtmlAttr[V]): TestableHtmlAttr[V] = {
-    new TestableHtmlAttr(attr.key)
+    new TestableHtmlAttr(attr.key.name, attr.key.codec)
   }
 
   implicit def makeCompositeSvgAttrTestable[V](attr: CompositeSvgAttr[V]): TestableSvgAttr[V] = {
-    new TestableSvgAttr(attr.key)
+    new TestableSvgAttr(attr.key.name, attr.key.codec, attr.key.namespace)
   }
 }

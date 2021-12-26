@@ -11,27 +11,25 @@ import scala.scalajs.js.JSStringOps._
 
 // @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
 
-class CompositeKey[
-  Key,
-  -El <: ReactiveElement.Base
-](
-  val key: Key,
+// #nc can we make this an extendable trait or something, it shouldn't contain a fake key, it should BE the key, I think...?
+// #nc the problem is that now `Key` exposes reactive interface that we don't really want
+class CompositeKey[K, -El <: ReactiveElement.Base](
+  val key: K,
   private[laminar] val getDomValue: El => List[String],
   private[laminar] val setDomValue: (El, List[String]) => Unit,
   val separator: String
 ) { self =>
 
-  // @TODO[API] Should StringValueMapper be passed implicitly?
   @inline def apply(items: String): Setter[El] = {
-    addStaticItems(StringValueMapper.toNormalizedList(items, separator))
+    this := items
   }
 
   @inline def apply(items: Map[String, Boolean]): Setter[El] = {
-    addStaticItems(MapValueMapper.toNormalizedList(items, separator))
+    this := items
   }
 
   @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[El] = {
-    addStaticItems(mapper.toNormalizedList(items, separator))
+    this.:=(items: _*)
   }
 
   @inline def :=(items: String): Setter[El] = {
@@ -46,7 +44,7 @@ class CompositeKey[
     addStaticItems(mapper.toNormalizedList(value, separator))
   }
 
-  def toggle(items: String*): LockedCompositeKey[Key, El] = {
+  def toggle(items: String*): LockedCompositeKey[K, El] = {
     new LockedCompositeKey(this, items.toList)
   }
 

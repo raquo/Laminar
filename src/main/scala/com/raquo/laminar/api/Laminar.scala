@@ -4,16 +4,19 @@ import com.raquo.domtypes
 import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
-import com.raquo.domtypes.generic.defs.styles.{Styles, Styles2}
+import com.raquo.domtypes.generic.defs.styles.Styles
+import com.raquo.domtypes.generic.defs.styles.units.{LengthUnits, UrlUnits}
 import com.raquo.domtypes.jsdom.defs.eventProps._
 import com.raquo.domtypes.jsdom.defs.tags._
 import com.raquo.laminar.builders._
 import com.raquo.laminar.defs._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
+import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
+import com.raquo.laminar.tags.{HtmlTag, SvgTag}
 import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
 import org.scalajs.dom
 
@@ -21,25 +24,24 @@ import org.scalajs.dom
 
 private[laminar] object Laminar
   extends Airstream
-    with ReactiveComplexHtmlKeys
+    with ComplexHtmlKeys
     // Reflected Attrs
-    with ReflectedHtmlAttrs[ReactiveProp]
+    with ReflectedHtmlAttrs[Prop]
     // Attrs
-    with HtmlAttrs[ReactiveHtmlAttr]
+    with HtmlAttrs[HtmlAttr]
     // Event Props
-    with ClipboardEventProps[ReactiveEventProp]
-    with ErrorEventProps[ReactiveEventProp]
-    with FormEventProps[ReactiveEventProp]
-    with KeyboardEventProps[ReactiveEventProp]
-    with MediaEventProps[ReactiveEventProp]
-    with MiscellaneousEventProps[ReactiveEventProp]
-    with MouseEventProps[ReactiveEventProp]
-    with PointerEventProps[ReactiveEventProp]
+    with ClipboardEventProps[EventProp]
+    with ErrorEventProps[EventProp]
+    with FormEventProps[EventProp]
+    with KeyboardEventProps[EventProp]
+    with MediaEventProps[EventProp]
+    with MiscellaneousEventProps[EventProp]
+    with MouseEventProps[EventProp]
+    with PointerEventProps[EventProp]
     // Props
-    with Props[ReactiveProp]
+    with Props[Prop]
     // Styles
-    with Styles[StyleSetter]
-    with Styles2[StyleSetter]
+    with Styles[StyleProp, StyleSetter, DerivedStyleProp.Base, Int]
     // Tags
     with DocumentTags[HtmlTag]
     with EmbedTags[HtmlTag]
@@ -53,22 +55,32 @@ private[laminar] object Laminar
     with HtmlBuilders
     with Implicits {
 
+  /** This marker trait is used for implicit conversions. For all intents and purposes it's just a function. */
+  trait StyleEncoder[A] extends Function1[A, String]
+
+  object style extends LengthUnits[StyleEncoder, Int] with UrlUnits[StyleEncoder] {
+
+    override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = new StyleEncoder[A] {
+      override def apply(v: A): String = encode(v)
+    }
+  }
+
   object aria
-    extends AriaAttrs[ReactiveHtmlAttr]
+    extends AriaAttrs[HtmlAttr]
       with HtmlBuilders
 
   object svg
     extends SvgTags[SvgTag]
-      with ReactiveComplexSvgKeys
-      with SvgAttrs[ReactiveSvgAttr]
+      with ComplexSvgKeys
+      with SvgAttrs[SvgAttr]
       with SvgBuilders
 
   object documentEvents
-    extends DomEventStreamPropBuilder(dom.document)
+    extends StreamEventPropBuilder(dom.document)
       with DocumentEventProps[EventStream]
 
   object windowEvents
-    extends DomEventStreamPropBuilder(dom.window)
+    extends StreamEventPropBuilder(dom.window)
       with WindowEventProps[EventStream]
 
   /** An owner that never kills its possessions.
@@ -105,9 +117,13 @@ private[laminar] object Laminar
 
   // Modifiers
 
-  type Mod[-El] = domtypes.generic.Modifier[El]
+  type Mod[-El] = modifiers.Modifier[El]
 
-  type Modifier[-El] = domtypes.generic.Modifier[El]
+  @inline def Mod: modifiers.Modifier.type = modifiers.Modifier
+
+  type Modifier[-El] = modifiers.Modifier[El]
+
+  @inline def Modifier: modifiers.Modifier.type = modifiers.Modifier
 
   type Setter[-El <: Element] = modifiers.Setter[El]
 
@@ -122,9 +138,6 @@ private[laminar] object Laminar
 
   // Events
 
-  @deprecated("EventPropTransformation class was renamed to EventProcessor", "0.12.0")
-  type EventPropTransformation[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
-
   type EventProcessor[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
 
 
@@ -137,19 +150,22 @@ private[laminar] object Laminar
 
   // Keys
 
-  type EventProp[Ev <: dom.Event] = ReactiveEventProp[Ev]
+  type EventProp[Ev <: dom.Event] = keys.EventProp[Ev]
 
-  type HtmlAttr[V] = ReactiveHtmlAttr[V]
+  type HtmlAttr[V] = keys.HtmlAttr[V]
 
-  type Prop[V] = ReactiveProp[V, _]
+  type Prop[V] = keys.Prop[V, _]
 
-  type Style[V] = ReactiveStyle[V]
+  @deprecated("Use `StyleProp` instead of `Style`", "0.15.0")
+  type Style[V] = keys.StyleProp[V]
 
-  type SvgAttr[V] = ReactiveSvgAttr[V]
+  type StyleProp[V] = keys.StyleProp[V]
 
-  type CompositeHtmlAttr[V] = ReactiveComplexHtmlKeys.CompositeHtmlAttr[V]
+  type SvgAttr[V] = keys.SvgAttr[V]
 
-  type CompositeSvgAttr[V] = ReactiveComplexSvgKeys.CompositeSvgAttr[V]
+  type CompositeHtmlAttr[V] = ComplexHtmlKeys.CompositeHtmlAttr[V]
+
+  type CompositeSvgAttr[V] = ComplexSvgKeys.CompositeSvgAttr[V]
 
 
   // Specific HTML elements
@@ -411,16 +427,16 @@ private[laminar] object Laminar
   }
 
   def controlled[El <: HtmlElement, Ev <: dom.Event, V](
-    updater: KeyUpdater[El, ReactiveProp[V, _], V],
+    updater: KeyUpdater[El, Prop[V], V],
     listener: EventListener[Ev, _]
   ): Binder[El] = {
     Binder[El] { element =>
       // @TODO[Elegance] Clean up the whole ValueController structure later
       // @TODO[Integrity] Not sure if there's a good way to avoid asInstanceOf here
       if (updater.key == value) {
-        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, ReactiveProp[String, _], String]], listener)
+        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, Prop[String], String]], listener)
       } else if (updater.key == checked) {
-        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, ReactiveProp[Boolean, _], Boolean]], listener)
+        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, Prop[Boolean], Boolean]], listener)
       } else {
         throw new Exception(s"Can not add a controller for property `${updater.key}` – only `value` and `checked` can be controlled this way. See docs on controlled inputs for details.")
       }

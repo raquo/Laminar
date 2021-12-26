@@ -2,10 +2,10 @@ package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.builders.HtmlTag
 import com.raquo.laminar.inputs.ValueController
-import com.raquo.laminar.keys.ReactiveProp
+import com.raquo.laminar.keys.Prop
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
+import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -28,7 +28,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
   private[laminar] var hasValueBinder: Boolean = false
 
   private[laminar] def setValueController[A](
-    updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[String, _], String],
+    updater: KeyUpdater[ReactiveHtmlElement.Base, Prop[String, _], String],
     listener: EventListener[_ <: dom.Event, A]
   ): DynamicSubscription = {
     val controller = new ValueController[String, A](
@@ -57,7 +57,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
   private[laminar] var hasCheckedBinder: Boolean = false
 
   private[laminar] def setCheckedController[A](
-    updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[Boolean, _], Boolean],
+    updater: KeyUpdater[ReactiveHtmlElement.Base, Prop[Boolean, _], Boolean],
     listener: EventListener[_ <: dom.Event, A]
   ): DynamicSubscription = {
     val controller = new ValueController[Boolean, A](

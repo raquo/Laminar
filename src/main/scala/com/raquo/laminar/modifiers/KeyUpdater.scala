@@ -2,8 +2,7 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
-import com.raquo.domtypes.generic.keys.{Key, Style}
-import com.raquo.laminar.keys.{ReactiveHtmlAttr, ReactiveProp, ReactiveSvgAttr}
+import com.raquo.laminar.keys.{Key, HtmlAttr, Prop, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 
 import scala.scalajs.js
@@ -29,11 +28,13 @@ class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
 
 object KeyUpdater {
 
-  type PropUpdater[V, DomV] = KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[V, DomV], V]
+  type PropUpdater[V, DomV] = KeyUpdater[ReactiveHtmlElement.Base, Prop[V, DomV], V]
 
-  type HtmlAttrUpdater[V] = KeyUpdater[ReactiveHtmlElement.Base, ReactiveHtmlAttr[V], V]
+  type HtmlAttrUpdater[V] = KeyUpdater[ReactiveHtmlElement.Base, HtmlAttr[V], V]
 
-  type SvgAttrUpdater[V] = KeyUpdater[ReactiveSvgElement.Base, ReactiveSvgAttr[V], V]
+  type SvgAttrUpdater[V] = KeyUpdater[ReactiveSvgElement.Base, SvgAttr[V], V]
 
-  type StyleUpdater[V] = KeyUpdater[ReactiveHtmlElement.Base, Style[V], V | String]
+  type StyleUpdater[V] = KeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V | String]
+
+  type DerivedStyleUpdater[InputV, StyleV] = KeyUpdater[ReactiveHtmlElement.Base, StyleProp[StyleV], InputV]
 }

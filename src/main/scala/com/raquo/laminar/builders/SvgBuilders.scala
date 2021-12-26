@@ -2,25 +2,26 @@ package com.raquo.laminar.builders
 
 import com.raquo.domtypes.generic.builders.{EventPropBuilder, SvgAttrBuilder, SvgTagBuilder}
 import com.raquo.domtypes.generic.codecs.Codec
-import com.raquo.laminar.keys.{ReactiveEventProp, ReactiveSvgAttr}
+import com.raquo.laminar.keys.{EventProp, SvgAttr}
+import com.raquo.laminar.tags.SvgTag
 import org.scalajs.dom
 import org.scalajs.dom.Event
 
 trait SvgBuilders
-  extends EventPropBuilder[ReactiveEventProp, dom.Event]
-  with SvgAttrBuilder[ReactiveSvgAttr]
+  extends EventPropBuilder[EventProp, dom.Event]
+  with SvgAttrBuilder[SvgAttr]
   with SvgTagBuilder[SvgTag, dom.svg.Element] {
 
-  override protected def eventProp[Ev <: Event](key: String): ReactiveEventProp[Ev] = {
-    new ReactiveEventProp(key)
+  override protected def eventProp[Ev <: Event](key: String): EventProp[Ev] = {
+    new EventProp(key)
   }
 
   override protected def svgAttr[V](
     key: String,
     codec: Codec[V, String],
     namespace: Option[String]
-  ): ReactiveSvgAttr[V] = {
-    new ReactiveSvgAttr(key, codec, namespace)
+  ): SvgAttr[V] = {
+    new SvgAttr(key, codec, namespace)
   }
 
   override def svgTag[Ref <: dom.svg.Element](tagName: String, void: Boolean): SvgTag[Ref] = {
@@ -31,7 +32,7 @@ trait SvgBuilders
     *
     * @tparam Ev - event type in JS, e.g. js.dom.MouseEvent
     */
-  @inline def customEventProp[Ev <: Event](key: String): ReactiveEventProp[Ev] = eventProp(key)
+  @inline def customEventProp[Ev <: Event](key: String): EventProp[Ev] = eventProp(key)
 
   /** Create custom SVG attr (Note: for HTML attrs, use L.customHtmlAttr)
     *
@@ -44,7 +45,7 @@ trait SvgBuilders
     key: String,
     codec: Codec[V, String],
     namespace: Option[String] = None
-  ): ReactiveSvgAttr[V] = {
+  ): SvgAttr[V] = {
     svgAttr(key, codec, namespace)
   }
 

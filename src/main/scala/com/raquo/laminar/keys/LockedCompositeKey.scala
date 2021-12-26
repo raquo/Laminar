@@ -6,8 +6,8 @@ import com.raquo.laminar.modifiers.{Binder, Setter}
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Laminar key specific to a particular set of CompositeAttr values */
-class LockedCompositeKey[Key, -El <: ReactiveElement.Base](
-  val key: CompositeKey[Key, El],
+class LockedCompositeKey[K, -El <: ReactiveElement.Base](
+  val key: CompositeKey[K, El],
   val items: List[String]
 ) {
 
