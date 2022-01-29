@@ -263,7 +263,7 @@ object DomApi {
   def setChecked(element: dom.Element, checked: Boolean): Boolean = {
     element match {
       case input: dom.html.Input if input.`type` == "checkbox" || input.`type` == "radio" =>
-        input.checked = checked // @nc will this work with different mod order?
+        input.checked = checked
         true
       case el if isCustomElement(el) =>
         el.asInstanceOf[js.Dynamic].updateDynamic("checked")(checked)
@@ -332,7 +332,7 @@ object DomApi {
     unsafeParseElementString(htmlParserContainer, tag = js.undefined, dangerousHtmlString, "Error parsing HTML string")
   }
 
-  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted SVG strings.
+  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings.
     *
     *  @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
     */

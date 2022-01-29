@@ -41,7 +41,7 @@ object Button {
   }
 
   object styles {
-    val mdcThemePrimary: StyleProp[String] = customStyle("--mdc-theme-primary")
+    val mdcThemePrimary: StyleProp[String] = customStyleProp("--mdc-theme-primary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

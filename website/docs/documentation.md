@@ -369,7 +369,7 @@ div(
 )
 ```
 
-And similarly with `customStyle`, `customHtmlAttr`, `customHtmlTag`, `customSvgAttr`, `customSvgTag`. 
+And similarly with `customStyleProp`, `customHtmlAttr`, `customHtmlTag`, `customSvgAttr`, `customSvgTag`. 
 
 To clarify, you don't have to do this for touch events specifically, because [@Busti](https://github.com/busti) already added the superior [pointer-events](https://github.com/raquo/scala-dom-types/pull/49) to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
 

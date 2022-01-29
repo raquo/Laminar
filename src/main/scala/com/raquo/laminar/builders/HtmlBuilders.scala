@@ -76,7 +76,10 @@ trait HtmlBuilders
     *              Note: String is always allowed regardless of the type you put here.
     *              If unsure, use String type as V.
     */
-  @inline def customStyle[V](key: String): StyleProp[V] = new StyleProp(key)
+  @inline def customStyleProp[V](key: String): StyleProp[V] = new StyleProp(key)
+
+  @deprecated("customStyle was renamed to customStyleProp", "0.15.0-RC1")
+  @inline def customStyle[V](key: String): StyleProp[V] = customStyleProp(key)
 
   /** Note: this simply creates an instance of HtmlTag.
     * - This does not create the element (to do that, call .apply on the returned tag instance)

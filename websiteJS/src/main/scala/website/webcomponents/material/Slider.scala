@@ -42,7 +42,7 @@ object Slider {
   val onChange: EventProp[dom.Event] = customEventProp("change")
 
   object styles {
-    val mdcThemeSecondary: StyleProp[String] = customStyle("--mdc-theme-secondary")
+    val mdcThemeSecondary: StyleProp[String] = customStyleProp("--mdc-theme-secondary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

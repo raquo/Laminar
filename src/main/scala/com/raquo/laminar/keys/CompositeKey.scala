@@ -11,8 +11,8 @@ import scala.scalajs.js.JSStringOps._
 
 // @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
 
-// #nc can we make this an extendable trait or something, it shouldn't contain a fake key, it should BE the key, I think...?
-// #nc the problem is that now `Key` exposes reactive interface that we don't really want
+// #TODO[API] can we make this an extendable trait or something, it shouldn't contain a fake key, it should BE the key, I think...?
+// #TODO[API] the problem is that now `Key` exposes reactive interface that we don't really want
 class CompositeKey[K, -El <: ReactiveElement.Base](
   val key: K,
   private[laminar] val getDomValue: El => List[String],
