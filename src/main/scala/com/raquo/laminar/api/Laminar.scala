@@ -442,4 +442,12 @@ private[laminar] object Laminar
       }
     }
   }
+
+  /** Just like the other `controlled` method, but with the two arguments swapped places. Works the same. */
+  @inline def controlled[El <: HtmlElement, Ev <: dom.Event, V](
+    listener: EventListener[Ev, _],
+    updater: KeyUpdater[El, Prop[V], V]
+  ): Binder[El] = {
+    controlled(updater, listener)
+  }
 }
