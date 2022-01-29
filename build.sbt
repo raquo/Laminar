@@ -85,7 +85,6 @@ lazy val laminar = project.in(file("."))
 
     (Compile / doc / scalacOptions) ~= (_.filterNot(
       Set(
-        "-scalajs",
         "-deprecation",
         "-explain-types",
         "-explain",
