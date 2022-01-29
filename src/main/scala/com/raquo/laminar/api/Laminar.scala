@@ -14,7 +14,7 @@ import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
+import com.raquo.laminar.nodes.{ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
 import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
@@ -117,11 +117,11 @@ private[laminar] object Laminar
 
   // Modifiers
 
-  type Mod[-El] = modifiers.Modifier[El]
+  type Mod[-El <: ParentNode.Base] = modifiers.Modifier[El]
 
   @inline def Mod: modifiers.Modifier.type = modifiers.Modifier
 
-  type Modifier[-El] = modifiers.Modifier[El]
+  type Modifier[-El <: ParentNode.Base] = modifiers.Modifier[El]
 
   @inline def Modifier: modifiers.Modifier.type = modifiers.Modifier
 
@@ -156,7 +156,7 @@ private[laminar] object Laminar
 
   type Prop[V] = keys.Prop[V, _]
 
-  @deprecated("Use `StyleProp` instead of `Style`", "0.15.0")
+  @deprecated("Use `StyleProp` instead of `Style`", "0.15.0-RC1")
   type Style[V] = keys.StyleProp[V]
 
   type StyleProp[V] = keys.StyleProp[V]
@@ -241,7 +241,7 @@ private[laminar] object Laminar
   }
 
   /** A universal Modifier that does nothing */
-  val emptyMod: Mod[Node] = new Modifier[Node] {}
+  val emptyMod: Modifier[ParentNode.Base] = new Modifier[ParentNode.Base] {}
 
   /** Non-breaking space character
     *

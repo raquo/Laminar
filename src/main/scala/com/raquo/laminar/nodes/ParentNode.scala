@@ -5,7 +5,6 @@ import com.raquo.airstream.ownership.DynamicOwner
 import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
-import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
