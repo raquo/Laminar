@@ -18,12 +18,10 @@ object ChildrenInserter {
   type Children = immutable.Seq[Child]
 
   def apply[El <: ReactiveElement.Base] (
-    $children: MountContext[El] => Observable[Children],
-    initialInsertContext: Option[InsertContext[El]]
+    $children: MountContext[El] => Observable[Children]
   ): Inserter[El] = new Inserter[El](
-    initialInsertContext,
-    insertFn = (c, owner) => {
-      val mountContext = new MountContext[El](thisNode = c.parentNode, owner)
+    insertFn = (ctx, owner) => {
+      val mountContext = new MountContext[El](thisNode = ctx.parentNode, owner)
       val childrenSignal = $children(mountContext) match {
         case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
         case signal: Signal[Children @unchecked] => signal
@@ -31,18 +29,18 @@ object ChildrenInserter {
       }
       var lastSeenChildren: js.UndefOr[Children] = js.undefined
       childrenSignal.foreach { newChildren =>
-        if (!lastSeenChildren.exists(_ eq newChildren)) {
+        if (!lastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
           lastSeenChildren = newChildren
           val newChildrenMap = InsertContext.nodesToMap(newChildren)
-          c.extraNodeCount = updateChildren(
-            prevChildren = c.extraNodesMap,
+          ctx.extraNodeCount = updateChildren(
+            prevChildren = ctx.extraNodesMap,
             nextChildren = newChildren,
             nextChildrenMap = newChildrenMap,
-            parentNode = c.parentNode,
-            sentinelNode = c.sentinelNode,
-            c.extraNodeCount
+            parentNode = ctx.parentNode,
+            sentinelNode = ctx.sentinelNode,
+            ctx.extraNodeCount
           )
-          c.extraNodesMap = newChildrenMap
+          ctx.extraNodesMap = newChildrenMap
         }
       }(owner)
     }

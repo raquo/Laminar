@@ -23,6 +23,4 @@ object KeySetter {
   type SvgAttrSetter[V] = KeySetter[SvgAttr[V], V, ReactiveSvgElement.Base]
 
   type StyleSetter[V] = KeySetter[StyleProp[V], String, ReactiveHtmlElement.Base]
-
-  type UnitStyleSetter[InputV, StyleV] = KeyUpdater[ReactiveHtmlElement.Base, StyleProp[StyleV], InputV]
 }

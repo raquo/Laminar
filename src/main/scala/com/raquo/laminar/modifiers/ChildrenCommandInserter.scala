@@ -11,21 +11,19 @@ object ChildrenCommandInserter {
   type ChildrenCommand = CollectionCommand[Child]
 
   def apply[El <: ReactiveElement.Base] (
-    $command: MountContext[El] => EventStream[ChildrenCommand],
-    initialInsertContext: Option[InsertContext[El]]
+    $command: MountContext[El] => EventStream[ChildrenCommand]
   ): Inserter[El] = new Inserter[El](
-    initialInsertContext,
-    insertFn = (c, owner) => {
-      val mountContext = new MountContext[El](thisNode = c.parentNode, owner)
+    insertFn = (ctx, owner) => {
+      val mountContext = new MountContext[El](thisNode = ctx.parentNode, owner)
 
       $command(mountContext).foreach { command =>
         val nodeCountDiff = updateList(
           command,
-          parentNode = c.parentNode,
-          sentinelNode = c.sentinelNode,
-          c.extraNodeCount
+          parentNode = ctx.parentNode,
+          sentinelNode = ctx.sentinelNode,
+          ctx.extraNodeCount
         )
-        c.extraNodeCount += nodeCountDiff
+        ctx.extraNodeCount += nodeCountDiff
       }(owner)
     }
   )

@@ -105,11 +105,11 @@ object Implicits {
     // Inserter implicits are needlessly expensive if we just need a Modifier, so we de-prioritize them
 
     implicit def nodeToInserter(node: ChildNode.Base): Inserter[ReactiveElement.Base] = {
-      ChildInserter[ReactiveElement.Base](_ => Val(node), initialInsertContext = None)
+      ChildInserter[ReactiveElement.Base](_ => Val(node))
     }
 
     implicit def nodesSeqToInserter(nodes: scala.collection.Seq[ChildNode.Base]): Inserter[ReactiveElement.Base] = {
-      ChildrenInserter[ReactiveElement.Base](_ => Val(nodes.toList), initialInsertContext = None)
+      ChildrenInserter[ReactiveElement.Base](_ => Val(nodes.toList))
     }
 
     @inline implicit def nodesArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter[ReactiveElement.Base] = {

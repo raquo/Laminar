@@ -17,8 +17,8 @@ import com.raquo.laminar.nodes.ReactiveElement
   * be the same `element` that you apply this Modifier to.
   */
 class Inserter[-El <: ReactiveElement.Base] (
-  initialContext: Option[InsertContext[El]],
-  insertFn: (InsertContext[El], Owner) => Subscription
+  initialContext: Option[InsertContext[El]] = None,
+  insertFn: (InsertContext[El], Owner) => Subscription,
 ) extends Modifier[El] {
 
   def bind(element: El): DynamicSubscription = {

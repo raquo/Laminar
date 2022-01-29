@@ -6,25 +6,22 @@ import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
 import scala.scalajs.js
 
-// @TODO[Naming] hrm
 object ChildInserter {
 
   def apply[El <: ReactiveElement.Base] (
-    $child: MountContext[El] => Observable[ChildNode.Base],
-    initialInsertContext: Option[InsertContext[El]] // #TODO[API] This param appears to always be `None`. Didn't I make this for some edge case requiring a Some()? I think tha logic is in `Inserter`
+    $child: MountContext[El] => Observable[ChildNode.Base]
   ): Inserter[El] = new Inserter[El](
-    initialInsertContext,
-    insertFn = (c, owner) => {
+    insertFn = (ctx, owner) => {
       val mountContext = new MountContext[El](
-        thisNode = c.parentNode,
+        thisNode = ctx.parentNode,
         owner = owner
       )
       var lastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
       $child(mountContext).foreach { newChildNode =>
-        if (!lastSeenChild.exists(_ eq newChildNode)) {
+        if (!lastSeenChild.exists(_ eq newChildNode)) { // #Note: auto-distinction
           lastSeenChild = newChildNode
-          ParentNode.replaceChild(parent = c.parentNode, oldChild = c.sentinelNode, newChild = newChildNode)
-          c.sentinelNode = newChildNode
+          ParentNode.replaceChild(parent = ctx.parentNode, oldChild = ctx.sentinelNode, newChild = newChildNode)
+          ctx.sentinelNode = newChildNode
         }
       }(owner)
     }

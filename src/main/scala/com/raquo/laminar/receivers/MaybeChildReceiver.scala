@@ -10,8 +10,7 @@ object MaybeChildReceiver {
   def <--($maybeChildNode: Source[Option[Child]]): Inserter[ReactiveElement.Base] = {
     val emptyNode = new CommentNode("")
     ChildInserter[ReactiveElement.Base](
-      _ => $maybeChildNode.toObservable.map(_.getOrElse(emptyNode)),
-      initialInsertContext = None
+      _ => $maybeChildNode.toObservable.map(_.getOrElse(emptyNode))
     )
   }
 }

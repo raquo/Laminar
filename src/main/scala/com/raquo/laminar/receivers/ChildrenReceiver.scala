@@ -10,9 +10,6 @@ object ChildrenReceiver {
   val command: ChildrenCommandReceiver.type = ChildrenCommandReceiver
 
   def <--($children: Source[Children]): Inserter[ReactiveElement.Base] = {
-    ChildrenInserter[ReactiveElement.Base](
-      _ => $children.toObservable,
-      initialInsertContext = None
-    )
+    ChildrenInserter[ReactiveElement.Base](_ => $children.toObservable)
   }
 }
