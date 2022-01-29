@@ -11,13 +11,13 @@ import scala.scalajs.js.|
 /** A modifier that updates a key from a source, e.g. `value <-- valueStream` */
 class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
   val key: K,
-  val $value: Observable[V],
+  val values: Observable[V],
   val update: (El, V) => Unit
 ) extends Binder[El] {
 
   override def bind(element: El): DynamicSubscription = {
     var lastSeenValue: js.UndefOr[V] = js.undefined
-    ReactiveElement.bindFn(element, $value) { value =>
+    ReactiveElement.bindFn(element, values) { value =>
       if (!lastSeenValue.contains(value)) { // #Note: auto-distinction
         lastSeenValue = value
         update(element, value)

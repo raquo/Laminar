@@ -50,7 +50,7 @@ class ValueController[A, B](
     //  - This is only relevant if `source` had other observers
     //  - This might be excessively hard to achieve without https://github.com/raquo/Airstream/issues/43
 
-    updater.$value.foreach { sourceValue =>
+    updater.values.foreach { sourceValue =>
       latestSourceValue = Some(sourceValue)
       setValue(sourceValue)
     }(owner)
