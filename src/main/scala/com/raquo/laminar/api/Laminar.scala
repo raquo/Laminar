@@ -418,6 +418,7 @@ private[laminar] object Laminar
     *
     *     a(composeEvents(onClick.preventDefault)(_.delay(100)) --> observer)
     */
+  @deprecated("Instead of composeEvents(a)(b), use a.compose(b)", "0.15.0-RC1")
   def composeEvents[Ev <: dom.Event, In, Out](
     event: EventProcessor[Ev, In]
   )(

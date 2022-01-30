@@ -1,6 +1,7 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Sink
+import com.raquo.airstream.core.{EventStream, Observable, Signal, Sink}
+import com.raquo.airstream.flatten.FlattenStrategy
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.ReactiveElement
@@ -157,6 +158,60 @@ class EventProcessor[Ev <: dom.Event, V](
         DomApi.getChecked(ev.target.asInstanceOf[dom.Element]).getOrElse(false)
       }
     }
+  }
+
+  /** Similar to the Airstream `compose` operator.
+    *
+    * Use this when you need to apply stream operators on this element's events, e.g.:
+    *
+    *     div(onScroll.compose(_.throttle(100)) --> observer)
+    *
+    *     a(onClick.preventDefault.compose(_.delay(100)) --> observer)
+    *
+    * Note: This method is not chainable. Put all the operations you need inside the `operator` callback.
+    */
+  def compose[Out](
+    operator: EventStream[V] => Observable[Out]
+  ): LockedEventKey[Ev, V, Out] = {
+    new LockedEventKey(this, operator)
+  }
+
+  /** Similar to the Airstream `flatMap` operator.
+    *
+    * Use this when you want to create a new stream or signal on every event, e.g.:
+    *
+    * button(onClick.preventDefault.flatMap(_ => makeAjaxRequest()) --> observer)
+    *
+    * #TODO[IDE] IntelliJ (2021.3.2) shows false errors when using this flatMap implementation,
+    *  making it annoying. Use flatMapStream or flatMapSignal to get around that.
+    *
+    * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,
+    *       or use the `compose` method instead for more flexibility
+    */
+  def flatMap[Out, Obs[_] <: Observable[_]](
+    operator: V => Obs[Out]
+  )(
+    implicit flattenStrategy: FlattenStrategy[EventStream, Obs, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    new LockedEventKey[Ev, V, Out](this, eventStream => eventStream.flatMap(operator)(flattenStrategy))
+  }
+
+  /** Similar to `flatMap`, but restricted to streams only. */
+  def flatMapStream[Out](
+    operator: V => EventStream[Out]
+  )(
+    implicit flattenStrategy: FlattenStrategy[EventStream, EventStream, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    flatMap(operator)(flattenStrategy)
+  }
+
+  /** Similar to `flatMap`, but restricted to signals only. */
+  def flatMapSignal[Out](
+    operator: V => Signal[Out]
+  )(
+    implicit flattenStrategy: FlattenStrategy[EventStream, Signal, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    flatMap(operator)(flattenStrategy)
   }
 
   /** Evaluate `f` if the value was filtered out up the chain. For example:

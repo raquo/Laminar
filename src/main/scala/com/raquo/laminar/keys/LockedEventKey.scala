@@ -5,7 +5,7 @@ import com.raquo.laminar.modifiers.Binder
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
-class LockedEventKey[Ev <: dom.Event, In, Out](
+class LockedEventKey[Ev <: dom.Event, -In, +Out](
   eventProcessor: EventProcessor[Ev, In],
   composer: EventStream[In] => Observable[Out]
 ) {

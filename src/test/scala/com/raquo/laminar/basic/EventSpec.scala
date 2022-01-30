@@ -126,7 +126,7 @@ class EventSpec extends UnitSpec {
     log = Nil
   }
 
-  it("LockedEventKey") {
+  it("LockedEventKey - compose") {
 
     val effects = mutable.Buffer[Effect[Int]]()
 
@@ -135,11 +135,13 @@ class EventSpec extends UnitSpec {
     val observer = Effect.logObserver("obs", effects)
 
     val childEl = span(
-      composeEvents(onClick.preventDefault.map { ev =>
-        eventCount += 1
-        effects += Effect("processor", eventCount)
-        eventCount
-      })(_.map(_ * 100).startWith(-1)) --> observer
+      onClick.preventDefault.compose { events =>
+        events.flatMap { _ =>
+          eventCount += 1
+          effects += Effect("processor", eventCount)
+          EventStream.fromValue(eventCount).map(_ * 100)
+        }.startWith(-1)
+      } --> observer,
     )
 
     val el = div(childEl)
@@ -182,6 +184,69 @@ class EventSpec extends UnitSpec {
     assert(eventCount == 2)
     assert(effects.toList == List(
       Effect("processor", 2),
+      Effect("obs", 200)
+    ))
+  }
+
+  it("LockedEventKey - flatMap") {
+
+    val effects = mutable.Buffer[Effect[Int]]()
+
+    var eventCount = 0
+
+    val observer = Effect.logObserver("obs", effects)
+
+    // #Note that the startWith(-1) here acts on a different observable than in case of `compose`
+
+    // #TODO[IDE] Intellij (2021.3.2) shows a fake error on flatMap usage
+    val childEl = span(
+      onClick.preventDefault.flatMap { ev =>
+        eventCount += 1
+        effects += Effect("processor", eventCount)
+        EventStream.fromValue(eventCount).map(_ * 100).startWith(-1)
+      } --> observer,
+    )
+
+    val el = div(childEl)
+
+    assert(eventCount == 0)
+    assert(effects.isEmpty)
+
+    // --
+
+    mount(el)
+
+    assert(eventCount == 0)
+    assert(effects.toList == Nil)
+    effects.clear()
+
+    // --
+
+    childEl.ref.click()
+
+    assert(eventCount == 1)
+    assert(effects.toList == List(
+      Effect("processor", 1),
+      Effect("obs", -1),
+      Effect("obs", 100)
+    ))
+    effects.clear()
+
+    // --
+
+    el.ref.click()
+
+    assert(eventCount == 1)
+    assert(effects.isEmpty)
+
+    // --
+
+    childEl.ref.click()
+
+    assert(eventCount == 2)
+    assert(effects.toList == List(
+      Effect("processor", 2),
+      Effect("obs", -1),
       Effect("obs", 200)
     ))
 
