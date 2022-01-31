@@ -1,7 +1,7 @@
 package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicOwner
-import com.raquo.ew.JsArray
+import com.raquo.ew._
 import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
@@ -219,7 +219,7 @@ object ParentNode {
     // @TODO[Performance] introduce a reorderChildren() method to support efficient sorting?
     // @TODO[Integrity] This does not properly report failures like other methods do
 
-    val newChildrenArr = newChildren.toJSArray.asInstanceOf[JsArray[ChildNode.Base]] // #TODO
+    val newChildrenArr = newChildren.toJSArray.ew
 
     // 0. Prep this node
     if (parent._maybeChildren.isEmpty) {

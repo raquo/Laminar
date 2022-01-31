@@ -142,7 +142,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   }
 
   def eventListeners: List[EventListener.Any] = {
-    maybeEventListeners.map(_.map(_.listener).asScalaJsArray.toList).getOrElse(Nil)
+    maybeEventListeners.map(_.map(_.listener).asScalaJs.toList).getOrElse(Nil)
   }
 
   /** Create and get a stream of events on this node */

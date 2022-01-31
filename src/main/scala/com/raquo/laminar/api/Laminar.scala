@@ -1,6 +1,5 @@
 package com.raquo.laminar.api
 
-import com.raquo.domtypes
 import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.domtypes.generic.defs.props.Props
 import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
@@ -58,7 +57,10 @@ private[laminar] object Laminar
   /** This marker trait is used for implicit conversions. For all intents and purposes it's just a function. */
   trait StyleEncoder[A] extends Function1[A, String]
 
-  object style extends LengthUnits[StyleEncoder, Int] with UrlUnits[StyleEncoder] {
+  object style
+    extends LengthUnits[StyleEncoder, Int]
+      with UrlUnits[StyleEncoder]
+      with DerivedStyleBuilders[StyleEncoder] {
 
     override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = new StyleEncoder[A] {
       override def apply(v: A): String = encode(v)

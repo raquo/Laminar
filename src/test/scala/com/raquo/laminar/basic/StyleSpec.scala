@@ -1,6 +1,7 @@
 package com.raquo.laminar.basic
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.builders.DerivedStyleBuilders
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.util.Random
@@ -82,6 +83,55 @@ class StyleSpec extends UnitSpec {
       )
     )
     unmount()
+  }
+
+  it("encoding of CSS values") {
+
+    // Expose methods to the public so that we can test them
+    class TestableBuilder extends DerivedStyleBuilders[StyleEncoder] {
+
+      override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = ???
+
+      override def encodeCalcValue(exp: String): String = super.encodeCalcValue(exp)
+
+      override def encodeUrlValue(url: String): String = super.encodeUrlValue(url)
+    }
+
+    assertEquals(
+      style.calc("100px + 50vh * 2%"),
+      "calc(100px + 50vh * 2%)"
+    )
+
+    assertEquals(
+      style.url("https://example.com\"\\\n); evil"),
+      "url(\"https://example.com%22%5C ); evil\")"
+    )
+
+    val x = new TestableBuilder
+      assertEquals(
+      x.encodeCalcValue("20px + 50%"),
+      "20px + 50%"
+    )
+
+    assertEquals(
+      x.encodeCalcValue("20px + 50%; \"evil"),
+      "20px + 50%   evil"
+    )
+
+    assertEquals(
+      x.encodeUrlValue("https://example.com?q=test&foo-bar"),
+      "\"https://example.com?q=test&foo-bar\""
+    )
+
+    assertEquals(
+      x.encodeUrlValue("https://example.com\"); evil"),
+      "\"https://example.com%22); evil\""
+    )
+
+    assertEquals(
+      x.encodeUrlValue("https://example.com\"\\\n); evil"),
+      "\"https://example.com%22%5C ); evil\""
+    )
   }
 
   // #TODO[Test] Safari seemed to work in practice, but jsdom does not seem to support prefixes

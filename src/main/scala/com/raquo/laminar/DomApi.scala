@@ -1,5 +1,6 @@
 package com.raquo.laminar
 
+import com.raquo.ew._
 import com.raquo.laminar.api.Laminar.{div, svg}
 import com.raquo.laminar.keys.{EventProcessor, HtmlAttr, Prop, StyleProp, SvgAttr}
 import com.raquo.laminar.modifiers.EventListener
@@ -211,9 +212,9 @@ object DomApi {
   }
 
   @inline private def localName(qualifiedName: String): String = {
-    val nsPrefixLength = qualifiedName.indexOf(':')
+    val nsPrefixLength = qualifiedName.ew.indexOf(":")
     if (nsPrefixLength > -1) {
-      qualifiedName.substring(nsPrefixLength + 1)
+      qualifiedName.ew.substr(nsPrefixLength + 1).str
     } else qualifiedName
   }
 
@@ -379,14 +380,15 @@ object DomApi {
     element: dom.Element,
     clue: String
   ): Unit = {
-    // #nc[ew] Use native js toLowerCase, don't need no Java locales
-    if (tag.name.toLowerCase != element.tagName.toLowerCase) {
+    if (tag.name.ew.toLowerCase() != element.tagName.ew.toLowerCase()) {
       throw new Exception(s"$clue: expected tag name `${tag.name}`, got `${element.tagName}`")
     }
   }
 
 
   /** Random utils */
+
+  private val classNamesSeparatorRegex = new js.RegExp(" ", flags = "g")
 
   /** @return hierarchical path describing the position and identity of this node, starting with the root. */
   @tailrec def debugPath(element: dom.Node, initial: List[String] = Nil): List[String] = {
@@ -406,12 +408,12 @@ object DomApi {
         } else {
           val classes = el.className
           if (classes.nonEmpty) {
-            "." + classes.replace(' ', '.') // #nc[ew]
+            "." + classes.ew.replace(classNamesSeparatorRegex, ".").str
           } else {
             ""
           }
         }
-        el.tagName.toLowerCase + suffixStr
+        el.tagName.ew.toLowerCase().str + suffixStr
 
       case _ => node.nodeName
     }
