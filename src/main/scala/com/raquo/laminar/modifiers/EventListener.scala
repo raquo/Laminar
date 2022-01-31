@@ -43,7 +43,7 @@ class EventListener[Ev <: dom.Event, Out](
           val listenerIndex = element.indexOfEventListener(this)
           if (listenerIndex != -1) {
             //println(s"> remove ${EventProcessor.eventProp(eventProcessor).name} listener from " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
-            element.removeEventSubscription(listenerIndex)
+            element.removeEventListener(listenerIndex)
             DomApi.removeEventListener(element, this)
           } else {
             // @TODO[Warn] Issue a warning, this isn't supposed to happen
@@ -58,7 +58,7 @@ class EventListener[Ev <: dom.Event, Out](
         ReactiveElement.bindSubscription(element)(subscribe)
       }
 
-      element.addEventSubscription(new EventListenerSubscription(this, sub), unsafePrepend)
+      element.addEventListener(new EventListenerSubscription(this, sub), unsafePrepend)
 
       sub
     } else {

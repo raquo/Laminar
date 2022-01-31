@@ -143,6 +143,9 @@ trait StyleBuilders extends StylePropBuilder[StyleProp, StyleSetter, DerivedStyl
   override protected def listStylePositionStyle(key: String): ListStylePositionStyle =
     new StyleProp[String](key) with keywords.ListStylePositionStyle[StyleSetter[String]]
 
+  override protected def listStyleTypeStyle(key: String): ListStyleTypeStyle =
+    new StyleProp[String](key) with keywords.ListStyleTypeStyle[StyleSetter[String]]
+
   override protected def overflowWrapStyle(key: String): OverflowWrapStyle =
     new StyleProp[String](key) with keywords.OverflowWrapStyle[StyleSetter[String]]
 

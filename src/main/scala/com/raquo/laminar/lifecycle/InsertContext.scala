@@ -1,6 +1,6 @@
 package com.raquo.laminar.lifecycle
 
-import com.raquo.airstream.JsMap
+import com.raquo.ew.JsMap
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
@@ -30,12 +30,12 @@ object InsertContext {
       parentNode = parentNode,
       sentinelNode = sentinelNode,
       extraNodeCount = 0,
-      extraNodesMap = JsMap.empty
+      extraNodesMap = new JsMap()
     )
   }
 
   private[laminar] def nodesToMap(nodes: immutable.Seq[ChildNode.Base]): JsMap[dom.Node, ChildNode.Base] = {
-    val acc = JsMap.empty[dom.Node, ChildNode.Base]
+    val acc = new JsMap[dom.Node, ChildNode.Base]()
     nodes.foreach { node =>
       acc.set(node.ref, node)
     }

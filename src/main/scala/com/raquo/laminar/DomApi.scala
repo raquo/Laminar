@@ -406,7 +406,7 @@ object DomApi {
         } else {
           val classes = el.className
           if (classes.nonEmpty) {
-            "." + classes.replace(' ', '.')
+            "." + classes.replace(' ', '.') // #nc[ew]
           } else {
             ""
           }

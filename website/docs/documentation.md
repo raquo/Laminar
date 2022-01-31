@@ -705,7 +705,7 @@ One downside of ChildrenCommand is that you don't have an observable of the list
 ```scala
 val commandBus = new EventBus[ChildrenCommand]
 val commandStream = commandBus.events
-val countSignal = commandStream.foldLeft(initial = 0)(_ + 1)
+val countSignal = commandStream.scanLeft(initial = 0)(_ + 1)
 
 div(
   "Hello, ",

@@ -71,13 +71,11 @@ class ValueController[A, B](
       // and doing this on bind gives the highest chance of that.
       ValueController.checkControllerCompatibility(this, updater.key, listener.eventProcessor, element)
 
-      val otherEventSubscriptions = element.eventSubscriptions
-
       // Remove existing event listeners from the DOM
       //  - This does not touch `element.maybeEventSubscriptions` or `dynamicOwner.subscriptions`
       //  - We want to maintain the same DynamicSubscription references because users might be holding them too
       //    (e.g. as a result of calling .bind() on a listener), so we shouldn't kill them
-      otherEventSubscriptions.foreach(s => DomApi.removeEventListener(element, s.listener))
+      element.foreachEventListener(sub => DomApi.removeEventListener(element, sub.listener))
 
       // Add the controller listener as the first one
       //  - `unsafePrepend` is safe here because we've just removed event listeners from the DOM
@@ -89,7 +87,7 @@ class ValueController[A, B](
       //  - After this, the order of subscriptions and listeners is the same everywhere
       //  - Note that listener caches the js.Function so we're adding the same exact listener back to the DOM.
       //    So, other than the desired side effect, this whole patch is very transparent to the users.
-      otherEventSubscriptions.foreach(s => DomApi.addEventListener(element, s.listener))
+      element.foreachEventListener(sub => DomApi.addEventListener(element, sub.listener))
 
       // @TODO[Performance] This rearrangement of listeners can be micro-optimized later, e.g.
       //  - Reduce scope of events that we're moving (we move all of them to maintain relative order between them)

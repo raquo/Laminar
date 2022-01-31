@@ -1,7 +1,7 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.JsArray
 import com.raquo.airstream.ownership.DynamicOwner
+import com.raquo.ew.JsArray
 import com.raquo.laminar.DomApi
 import org.scalajs.dom
 

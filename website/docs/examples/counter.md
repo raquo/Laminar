@@ -16,7 +16,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
 
   val diffBus = new EventBus[Int]
 
-  val $count: Signal[Int] = diffBus.events.foldLeft(initial = 0)(_ + _)
+  val $count: Signal[Int] = diffBus.events.scanLeft(initial = 0)(_ + _)
 
   div(
     p(

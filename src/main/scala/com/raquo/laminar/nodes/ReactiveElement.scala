@@ -3,6 +3,7 @@ package com.raquo.laminar.nodes
 import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
+import com.raquo.ew.JsArray
 import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription, Modifier}
@@ -24,33 +25,48 @@ trait ReactiveElement[+Ref <: dom.Element]
     deactivate = dynamicOwner.deactivate
   )
 
-  private[this] var maybeEventListeners: js.UndefOr[js.Array[EventListenerSubscription]] = js.undefined
+  private[this] var maybeEventListeners: js.UndefOr[JsArray[EventListenerSubscription]] = js.undefined
 
-  private[laminar] def eventSubscriptions: List[EventListenerSubscription] = maybeEventListeners.map(_.toList).getOrElse(Nil)
+  private[laminar] def foreachEventListener(f: EventListenerSubscription => Unit): Unit = {
+    maybeEventListeners.foreach(_.ext.forEach(f))
+  }
 
   /** Note: Only call this after checking that this element doesn't already have this listener */
-  private[laminar] def addEventSubscription(
-    listenerSub: EventListenerSubscription,
+  private[laminar] def addEventListener(
+    listener: EventListenerSubscription,
     unsafePrepend: Boolean
   ): Unit = {
     if (maybeEventListeners.isEmpty) {
-      maybeEventListeners = js.defined(js.Array(listenerSub))
+      maybeEventListeners = js.defined(JsArray(listener))
     } else if (unsafePrepend) {
-      maybeEventListeners.get.unshift(listenerSub)
+      maybeEventListeners.get.unshift(listener)
     } else {
-      maybeEventListeners.get.push(listenerSub)
+      maybeEventListeners.get.push(listener)
     }
   }
 
   /** Note: Only call this after checking that this element currently has this listener */
-  private[laminar] def removeEventSubscription(index: Int): Unit = {
+  private[laminar] def removeEventListener(index: Int): Unit = {
     maybeEventListeners.foreach { eventListeners =>
       eventListeners.splice(index, deleteCount = 1)
     }
   }
 
   /** @return -1 if not found */
-  private[laminar] def indexOfEventListener(listener: EventListener.Any): Int = eventListeners.indexOf(listener)
+  private[laminar] def indexOfEventListener(listener: EventListener.Any): Int = {
+    maybeEventListeners.fold(ifEmpty = -1) { eventListeners =>
+      var found: Boolean = false
+      var ix = 0
+      while (!found && ix < eventListeners.length) {
+        if (eventListeners(ix).listener == listener) {
+          found = true
+        } else {
+          ix += 1
+        }
+      }
+      if (found) ix else -1
+    }
+  }
 
   /** This structure keeps track of reasons for including a given item for a given composite key.
     * For example, this remembers which modifiers have previously added which className.
@@ -125,7 +141,9 @@ trait ReactiveElement[+Ref <: dom.Element]
     key.setDomValue(this, nextDomValues)
   }
 
-  def eventListeners: List[EventListener.Any] = maybeEventListeners.map(_.map(_.listener).toList).getOrElse(Nil)
+  def eventListeners: List[EventListener.Any] = {
+    maybeEventListeners.map(_.map(_.listener).asScalaJsArray.toList).getOrElse(Nil)
+  }
 
   /** Create and get a stream of events on this node */
   def events[Ev <: dom.Event, Out](

@@ -54,6 +54,7 @@ lazy val laminar = project.in(file("."))
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % Versions.Airstream,
       "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes,
+      "com.raquo" %%% "ew" % Versions.Ew,
       "com.raquo" %%% "domtestutils" % Versions.ScalaDomTestUtils % Test,
       "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
     ),
