@@ -13,7 +13,7 @@ trait DerivedStyleBuilders[T[_]] extends DerivedStylePropBuilder[T] {
       DerivedStyleBuilders.urlPattern,
       DerivedStyleBuilders.urlReplacer
     ).str
-    s"\"$escaped\"" // #Note output is wrapped in double quotes
+    s""""$escaped"""" // #Note output is wrapped in double quotes
   }
 
   override protected def encodeCalcValue(exp: String): String = {
