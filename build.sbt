@@ -135,7 +135,7 @@ lazy val laminar = project.in(file("."))
         id = "raquo",
         name = "Nikita Gazarov",
         email = "nikita@raquo.com",
-        url = url("http://raquo.com")
+        url = url("https://github.com/raquo")
       )
     ),
     sonatypeProfileName := "com.raquo",
