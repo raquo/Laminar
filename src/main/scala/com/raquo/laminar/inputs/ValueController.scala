@@ -65,7 +65,7 @@ class ValueController[A, B](
   }
 
   private[laminar] def bind(): DynamicSubscription = {
-    ReactiveElement.bindSubscription(element) { ctx =>
+    ReactiveElement.bindSubscriptionUnsafe(element) { ctx =>
 
       // This should be run when the element's type property is properly set,
       // and doing this on bind gives the highest chance of that.

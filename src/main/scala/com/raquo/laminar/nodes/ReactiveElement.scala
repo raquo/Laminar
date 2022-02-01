@@ -255,12 +255,17 @@ object ReactiveElement {
     DynamicSubscription.subscribeBus(element.dynamicOwner, eventStream, writeBus)
   }
 
-  @inline def bindSubscription[El <: ReactiveElement.Base](
+  /** #Note: Unsafe because you must make sure that the Subscription created by
+    *  the `subscribe` callback is not killed externally. Otherwise, when the
+    *  DynamicSubscription decides to kill it, the already-killed Subscription
+    *  will throw an exception.
+    */
+  @inline def bindSubscriptionUnsafe[El <: ReactiveElement.Base](
     element: El
   )(
     subscribe: MountContext[El] => Subscription
   ): DynamicSubscription = {
-    DynamicSubscription(element.dynamicOwner, { owner =>
+    DynamicSubscription.unsafe(element.dynamicOwner, { owner =>
       subscribe(new MountContext[El](element, owner))
     })
   }
@@ -284,7 +289,7 @@ object ReactiveElement {
   )(
     subscribe: MountContext[El] => Subscription
   ): DynamicSubscription = {
-    DynamicSubscription(element.dynamicOwner, { owner =>
+    DynamicSubscription.unsafe(element.dynamicOwner, { owner =>
       subscribe(new MountContext[El](element, owner))
     }, prepend = true)
   }

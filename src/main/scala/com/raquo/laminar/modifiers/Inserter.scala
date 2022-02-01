@@ -31,7 +31,7 @@ class Inserter[-El <: ReactiveElement.Base] (
     //  because it would match the state of the DOM upon reactivation.
     val insertContext = initialContext.getOrElse(InsertContext.reserveSpotContext(element))
 
-    ReactiveElement.bindSubscription(element) { mountContext =>
+    ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
       insertFn(insertContext, mountContext.owner)
     }
   }

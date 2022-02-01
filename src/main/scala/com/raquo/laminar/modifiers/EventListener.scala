@@ -55,7 +55,7 @@ class EventListener[Ev <: dom.Event, Out](
       val sub = if (unsafePrepend) {
         ReactiveElement.unsafeBindPrependSubscription(element)(subscribe)
       } else {
-        ReactiveElement.bindSubscription(element)(subscribe)
+        ReactiveElement.bindSubscriptionUnsafe(element)(subscribe)
       }
 
       element.addEventListener(new EventListenerSubscription(this, sub), unsafePrepend)
