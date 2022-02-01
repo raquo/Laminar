@@ -28,7 +28,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   private[this] var maybeEventListeners: js.UndefOr[JsArray[EventListenerSubscription]] = js.undefined
 
   private[laminar] def foreachEventListener(f: EventListenerSubscription => Unit): Unit = {
-    maybeEventListeners.foreach(_.ext.forEach(f))
+    maybeEventListeners.foreach(_.forEach(f))
   }
 
   /** Note: Only call this after checking that this element doesn't already have this listener */
