@@ -1,5 +1,3 @@
-ThisBuild / resolvers += Resolver.sonatypeRepo("snapshots") // for mdoc (see also plugins.sbt)
-
 ThisBuild / scalaVersion := Versions.Scala_2_13
 
 ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
