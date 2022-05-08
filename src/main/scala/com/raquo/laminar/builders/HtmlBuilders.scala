@@ -5,7 +5,6 @@ import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.keys._
 import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
-import org.scalajs.dom.Event
 
 trait HtmlBuilders
   extends StyleBuilders
@@ -37,7 +36,7 @@ trait HtmlBuilders
     new Prop(key, codec)
   }
 
-  override protected def eventProp[Ev <: Event](key: String): EventProp[Ev] = {
+  override protected def eventProp[Ev <: dom.Event](key: String): EventProp[Ev] = {
     new EventProp(key)
   }
 
@@ -66,7 +65,7 @@ trait HtmlBuilders
     *
     * @tparam Ev - event type in JS, e.g. js.dom.MouseEvent
     */
-  @inline def customEventProp[Ev <: Event](key: String): EventProp[Ev] = eventProp(key)
+  @inline def customEventProp[Ev <: dom.Event](key: String): EventProp[Ev] = eventProp(key)
 
   /** Create custom CSS property
     *

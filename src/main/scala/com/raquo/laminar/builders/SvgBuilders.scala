@@ -5,14 +5,13 @@ import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.keys.{EventProp, SvgAttr}
 import com.raquo.laminar.tags.SvgTag
 import org.scalajs.dom
-import org.scalajs.dom.Event
 
 trait SvgBuilders
   extends EventPropBuilder[EventProp, dom.Event]
   with SvgAttrBuilder[SvgAttr]
   with SvgTagBuilder[SvgTag, dom.svg.Element] {
 
-  override protected def eventProp[Ev <: Event](key: String): EventProp[Ev] = {
+  override protected def eventProp[Ev <: dom.Event](key: String): EventProp[Ev] = {
     new EventProp(key)
   }
 
@@ -32,7 +31,7 @@ trait SvgBuilders
     *
     * @tparam Ev - event type in JS, e.g. js.dom.MouseEvent
     */
-  @inline def customEventProp[Ev <: Event](key: String): EventProp[Ev] = eventProp(key)
+  @inline def customEventProp[Ev <: dom.Event](key: String): EventProp[Ev] = eventProp(key)
 
   /** Create custom SVG attr (Note: for HTML attrs, use L.customHtmlAttr)
     *
