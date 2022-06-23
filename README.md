@@ -28,7 +28,7 @@ Huge thanks to our sponsors who support Laminar development with their generous 
 
 ### GOLD Sponsors:
 
-[![Yurique](https://laminar.dev/img/sponsors/yurique-40px.jpg)](https://www.aurinko.io/) **[Iurii Malchenko](https://github.com/yurique)**
+[![Yurique](https://laminar.dev/img/sponsors/yurique-50px.jpg)](https://www.aurinko.io/) **[Iurii Malchenko](https://github.com/yurique)**
 
 [![Aurinko.io](https://laminar.dev/img/sponsors/aurinko-light-300px.png)](https://www.aurinko.io/)
 
