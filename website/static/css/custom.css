@@ -233,7 +233,7 @@ textarea::placeholder {
   text-decoration: underline;
 }
 
-.-homeSection a:hover {
+.-homeSection a:not(.x-noHover):hover {
   padding: 5px;
   margin: -5px;
   background: rgba(213, 49, 48, 0.6);
@@ -279,6 +279,12 @@ textarea::placeholder {
   color: white; /* returns opacity to 100% */
 }
 
+.-homeCommunitySection h2 {
+  /*font-size: 150%;*/
+  margin-top: 30px;
+  /*margin-bottom: 30px;*/
+}
+
 .-homeVideo {
   margin: 30px auto;
 }
@@ -289,14 +295,46 @@ textarea::placeholder {
 }
 
 .-sponsorsList {
+  display: flex;
   margin-bottom: 40px;
-  max-width: 400px;
 }
 
-.-sponsorsList h2 {
-  /*font-size: 150%;*/
-  margin-top: 30px;
-  margin-bottom: 30px;
+@media(max-width: 699px) {
+
+  .-sponsorsList {
+    flex-direction: column;
+    row-gap: 10px;
+    max-width: 400px;
+  }
+
+  .-sponsorsList .-sponsor.x-aurinko {
+    max-width: 300px;
+  }
+}
+
+@media(min-width: 700px) {
+
+  .-sponsorsList {
+    flex-direction: row;
+    column-gap: 40px;
+  }
+
+  .-sponsorsList.x-alignItemsStart {
+    align-items: start;
+  }
+
+  .-sponsorsList.x-alignItemsCenter {
+    align-items: center;
+  }
+
+  .-sponsorsList.x-alignItemsEnd {
+    align-items: end;
+  }
+
+  .-sponsorsList .-sponsor.x-aurinko {
+    position: relative;
+    top: 15px;
+  }
 }
 
 .-sponsorsList .-sponsor {
@@ -304,9 +342,21 @@ textarea::placeholder {
   left: -0.2em;
   display: flex;
   margin: 20px 0;
+  /*width: 400px;*/
+  /*text-align: left;*/
+  flex-grow: 1;
+  flex-basis: 0;
 }
 
-.-sponsorsList .-logo {
+.-sponsorsList .-sponsor.x-company a {
+  text-decoration: none !important;
+}
+
+.-sponsorsList .-sponsor.x-company .-tagline {
+  font-size: 90%;
+}
+
+.-sponsorsList .-sponsor.x-person .-avatar {
   position: relative;
   top: 4px;
   width: 90px;
@@ -314,20 +364,20 @@ textarea::placeholder {
   margin-right: 20px;
 }
 
-.-sponsorsList .-logo.x-rounded {
+.-sponsorsList .-sponsor.x-person .-avatar.x-rounded {
   border-radius: 17px;
 }
 
-.-sponsorsList .-text {
+.-sponsorsList .-sponsor.x-person .-text {
   text-align: left;
 }
 
-.-sponsorsList .-name {
+.-sponsorsList .-sponsor.x-person .-name {
   font-size: 130%;
   white-space: nowrap; /* Fix for Firefox, which splits the name on focus due to margin-right being -5px for some reason */
 }
 
-.-sponsorsList .-description {
+.-sponsorsList .-sponsor.x-person .-description {
   font-size: 90%;
 }
 

@@ -230,13 +230,19 @@ class Index extends React.Component {
               <p>Our main chatroom is in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>, join us there for news, tips & support!</p>
               <hr />
               <p>Laminar is developed by Nikita Gazarov with generous support from my <a href="https://github.com/sponsors/raquo">sponsors</a>.</p>
-              <div className="-sponsorsList">
-                <h2>GOLD Sponsors:</h2>
-                <div className="-sponsor">
-                  <img className="-logo x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+              <h2>GOLD Sponsors:</h2>
+              <div className="-sponsorsList x-alignItemsEnd">
+                <div className="-sponsor x-person x-yurique">
+                  <img className="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
                   <div className="-text">
                     <div className="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
                   </div>
+                </div>
+                <div className="-sponsor x-company x-aurinko">
+                  <a className="x-noHover" href="https://www.aurinko.io/">
+                    <img className="-logo" src="/img/sponsors/aurinko-dark-300px.png" alt="" />
+                    <div className="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+                  </a>
                 </div>
               </div>
               <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
