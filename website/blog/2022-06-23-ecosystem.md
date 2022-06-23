@@ -37,6 +37,7 @@ Here is a deluge of new libraries, web components, tutorials, sponsors – all t
 [Html to Scala Converter](https://simerplaha.github.io/html-to-scala-converter/) by **Simer Plaha** can now output Laminar code.
 
 
+
 ## New Apps and Demos
 
 [Twotm8](https://twotm8-web.fly.dev/login) is the Laminar Twitter clone by **Anton Sviridov** mentioned above. [Source](https://github.com/keynmol/twotm8). [Blog post](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend).
@@ -53,7 +54,6 @@ Here is a deluge of new libraries, web components, tutorials, sponsors – all t
 
 
 
-
 ## New Libraries
 
 [SAP UI5 Web Components Bindings](https://github.com/sherpal/LaminarSAPUI5Bindings) by **Antoine Doeraene** is a new alternative to Laminar [Material UI Web Components](https://github.com/uosis/laminar-web-components) bindings.
@@ -65,6 +65,8 @@ Here is a deluge of new libraries, web components, tutorials, sponsors – all t
 
 
 ## New Templates & Starter Kits
+
+[keynmol/scalajs-tauri-example](https://github.com/keynmol/scalajs-tauri-example) shows how to use Laminar with [Tauri](https://tauri.studio/) to build a Desktop application, similar to Electron.
 
 [sjrd/scalajs-sbt-vite-laminar-chartjs-example](https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example) puts together sbt, Vite, Laminar and Chart.js (via ScalablyTyped)
 

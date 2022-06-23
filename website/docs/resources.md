@@ -80,6 +80,8 @@ title: Resources
 
 * [keynmol/laminar-static-gh-pages](https://github.com/keynmol/laminar-static-gh-pages/) – Template for publishing a static site with Laminar
 
+* [keynmol/scalajs-tauri-example](https://github.com/keynmol/scalajs-tauri-example) – Example of using Laminar with [Tauri](https://tauri.studio/) to build a Desktop application, similar to Electron
+
 * [Quafadas/cask-laminar](https://github.com/Quafadas/cask-laminar) – Laminar with [Cask](https://com-lihaoyi.github.io/cask/) setup, based on keynmol/http4s-laminar-stack
 
 * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
@@ -104,6 +106,7 @@ title: Resources
 
 Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results in bigger JS bundle sizes than usual because Scala.js is unable to use gcc in this case. [Scala.js #3893](https://github.com/scala-js/scala-js/issues/3893)
 
+* [keynmol/scalajs-tauri-example](https://github.com/keynmol/scalajs-tauri-example) – Example of using Laminar with [Tauri](https://tauri.studio/) and Vite to build a Desktop application, similar to Electron
 
 
 ## Addons & Extensions
