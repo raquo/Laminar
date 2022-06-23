@@ -46,7 +46,7 @@ Here is a deluge of new libraries, web components, tutorials, sponsors – all t
 
 [Laika-Laminar](https://i10416.github.io/demo/) made by **@i10416** converts Markdown and ReStructuredText to HTML. Web app is built using Laminar, transformation is done using [Laika](https://planet42.github.io/Laika/). [Source](https://github.com/i10416/laika-laminar).
 
-[Scala.school](https://scala.school/) Laminar web app made by **Kit Langton** serves as a nice index to Zymposeum videos.
+[Scala.school](https://scala.school/) Laminar web app made by **Kit Langton** serves as a nice index to Zymposium videos.
 
 [NPC Generator](https://gitlab.com/scala-js-games/npc-generator/) by **Michel Daviot** 
 
