@@ -296,7 +296,13 @@ textarea::placeholder {
 
 .-sponsorsList {
   display: flex;
+  flex-direction: row;
+  column-gap: 40px;
   margin-bottom: 40px;
+}
+
+.post .-sponsorsList {
+  max-width: 700px;
 }
 
 @media(max-width: 699px) {
@@ -307,34 +313,64 @@ textarea::placeholder {
     max-width: 400px;
   }
 
+  .-sponsorsList.x-alignItemsStart,
+  .-sponsorsList.x-alignItemsCenter,
+  .-sponsorsList.x-alignItemsEnd
+  {
+    align-items: start !important;
+  }
+
   .-sponsorsList .-sponsor.x-aurinko {
     max-width: 300px;
+    top: 0 !important;
   }
+}
+
+@media(min-width: 1024px) and (max-width: 1399px) {
+
+  /* #Warning: should be same as above, except with .post prepended,
+   *  so that it only applies to blog posts.
+   *  This is because the right sidebar makes the content narrower, ugh.
+   */
+
+  .post .-sponsorsList {
+    flex-direction: column;
+    row-gap: 10px;
+    max-width: 400px;
+  }
+
+  .post .-sponsorsList.x-alignItemsStart,
+  .post .-sponsorsList.x-alignItemsCenter,
+  .post .-sponsorsList.x-alignItemsEnd
+  {
+    align-items: start !important;
+  }
+
+  .post .-sponsorsList .-sponsor.x-aurinko {
+    max-width: 300px;
+    top: 0 !important;
+  }
+}
+
+.-sponsorsList.x-alignItemsStart {
+  align-items: start;
+}
+
+.-sponsorsList.x-alignItemsCenter {
+  align-items: center;
+}
+
+.-sponsorsList.x-alignItemsEnd {
+  align-items: end;
 }
 
 @media(min-width: 700px) {
 
-  .-sponsorsList {
-    flex-direction: row;
-    column-gap: 40px;
+  .-homeSection .-sponsorsList {
+
   }
 
-  .-sponsorsList.x-alignItemsStart {
-    align-items: start;
-  }
 
-  .-sponsorsList.x-alignItemsCenter {
-    align-items: center;
-  }
-
-  .-sponsorsList.x-alignItemsEnd {
-    align-items: end;
-  }
-
-  .-sponsorsList .-sponsor.x-aurinko {
-    position: relative;
-    top: 15px;
-  }
 }
 
 .-sponsorsList .-sponsor {
@@ -379,6 +415,20 @@ textarea::placeholder {
 
 .-sponsorsList .-sponsor.x-person .-description {
   font-size: 90%;
+}
+
+.-sponsorsList .-sponsor.x-aurinko {
+  text-align: center;
+}
+
+.-homeSection .-sponsorsList .-sponsor.x-aurinko {
+  position: relative;
+  top: 10px;
+}
+
+.post .-sponsorsList .-sponsor.x-aurinko {
+  position: relative;
+  top: 5px;
 }
 
 
