@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>2022 Laminar Ecosystem Updates · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Here is a deluge of new libraries, web components, tutorials, sponsors – all the news that couldn&#x27;t wait until the next Laminar release. Hope I didn&#x27;t miss anything!"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="2022 Laminar Ecosystem Updates · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2022/06/23/ecosystem"/><meta property="og:description" content="Here is a deluge of new libraries, web components, tutorials, sponsors – all the news that couldn&#x27;t wait until the next Laminar release. Hope I didn&#x27;t miss anything!"/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2022/06/23/ecosystem">2022 Laminar Ecosystem Updates</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/07/10/laminar-v-0.13.1">Laminar v0.13.1 &amp; Waypoint 0.4.2</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/05/04/laminar-v0.13.0">Laminar v0.13.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/04/01/laminar-v0.12.2">Laminar v0.12.2</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/02/26/laminar-v0.12.1">Laminar v0.12.1</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2022/06/23/ecosystem">2022 Laminar Ecosystem Updates</a></h1><p class="post-meta">June 23, 2022</p><div class="authorBlock"><p class="post-authorName"><a href="http://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>Here is a deluge of new libraries, web components, tutorials, sponsors – all the news that couldn't wait until the next Laminar release. Hope I didn't miss anything!</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a native Scala.js library for building web application interfaces. Learn more in <a href="https://laminar.dev/examples/hello-world">a few short examples</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one long video</a>.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="new-gold-sponsor"></a><a href="#new-gold-sponsor" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New GOLD Sponsor</h2>
+<p><a href="https://www.aurinko.io/"><img src="/img/sponsors/aurinko-light-300px.png" alt="Aurinko logo"></a></p>
+<p><a href="https://www.aurinko.io/">Aurinko</a> is an API platform for workplace addons and integrations. They have <a href="https://twitter.com/yoxeldotcom/status/1537415506801700865">built</a> a number of apps using Laminar, for example this <a href="https://calendar.aurinko.io/aurDemo60">appointment scheduler widget</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-tutorials"></a><a href="#new-tutorials" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Tutorials</h2>
+<p><strong>Anton Sviridov</strong>'s <a href="https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend">Twotm8</a> epic walks you through creating a twitter clone in full stack Scala. The chapter on frontend explains how to use Laminar, implement routing with <a href="https://github.com/raquo/waypoint">Waypoint</a>, and styling with <a href="https://github.com/japgolly/scalacss">ScalaCSS</a>. See also the <a href="https://github.com/keynmol/twotm8">source code</a> and <a href="https://twotm8-web.fly.dev/login">demo</a>.</p>
+<p><strong>Alvin Alexander</strong>'s <a href="https://alvinalexander.com/scala/laminar-101-hello-world-example-static/">Laminar 101</a>, <a href="https://alvinalexander.com/scala/laminar-102-reactive-hello-world-example/">102</a>, and <a href="https://alvinalexander.com/scala/laminar-103-reactive-routing-example/">103</a> tutorials take you from setting up a static Laminar page to implementing a basic router.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-useful-tools"></a><a href="#new-useful-tools" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Useful Tools</h2>
+<p><a href="https://scribble.laminext.dev">Laminext Scribble</a> by <strong>Iurii Malchenko</strong> is like ScalaFiddle, but simplified and preloaded with Laminar and <a href="https://laminext.dev/">Laminext</a>. For instance, here's the <a href="https://scribble.laminext.dev/u/raquo/cqnkcloptolsneddzxifkmwkrsnr">Hello World</a> example. It's actually been around for a while, I just realized I haven't posted about it yet.</p>
+<p><a href="https://simerplaha.github.io/html-to-scala-converter/">Html to Scala Converter</a> by <strong>Simer Plaha</strong> can now output Laminar code.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-apps-and-demos"></a><a href="#new-apps-and-demos" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Apps and Demos</h2>
+<p><a href="https://twotm8-web.fly.dev/login">Twotm8</a> is the Laminar Twitter clone by <strong>Anton Sviridov</strong> mentioned above. <a href="https://github.com/keynmol/twotm8">Source</a>. <a href="https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend">Blog post</a>.</p>
+<p><a href="https://sk%C5%82able.pl">Skłable</a> is a multiplayer Scrabble-like game made by <strong>@przemekd</strong> using Laminar. <a href="https://github.com/przemekd/sklable">Source</a>.</p>
+<p><a href="https://i10416.github.io/demo/">Laika-Laminar</a> made by <strong>@i10416</strong> converts Markdown and ReStructuredText to HTML. Web app is built using Laminar, transformation is done using <a href="https://planet42.github.io/Laika/">Laika</a>. <a href="https://github.com/i10416/laika-laminar">Source</a>.</p>
+<p><a href="https://scala.school/">Scala.school</a> Laminar web app made by <strong>Kit Langton</strong> serves as a nice index to Zymposeum videos.</p>
+<p><a href="https://gitlab.com/scala-js-games/npc-generator/">NPC Generator</a> by <strong>Michel Daviot</strong></p>
+<p><a href="https://github.com/indoorvivants/hippo">Hippo</a> by <strong>Anton Sviridov</strong> is a web-based heap dump viewer made with Laminar.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-libraries"></a><a href="#new-libraries" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Libraries</h2>
+<p><a href="https://github.com/sherpal/LaminarSAPUI5Bindings">SAP UI5 Web Components Bindings</a> by <strong>Antoine Doeraene</strong> is a new alternative to Laminar <a href="https://github.com/uosis/laminar-web-components">Material UI Web Components</a> bindings.</p>
+<p><a href="https://github.com/Quafadas/dedav4s">Declarative Data Viz 4 Scala</a> by <strong>Simon Parten</strong> – a thin shim to <a href="https://vega.github.io/vega/">Vega</a>. Can work with any Scala.js UI library <a href="https://quafadas.github.io/dedav4s/ScalaVersions/scalaJS.html">including</a> Laminar.</p>
+<p><a href="https://github.com/raquo/ew">ew</a> is a set of high-performance low-usability interfaces to native JS data types that poor souls such as myself may occasionally need. The next version of Laminar uses it internally.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-templates--starter-kits"></a><a href="#new-templates--starter-kits" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Templates &amp; Starter Kits</h2>
+<p><a href="https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example">sjrd/scalajs-sbt-vite-laminar-chartjs-example</a> puts together sbt, Vite, Laminar and Chart.js (via ScalablyTyped)</p>
+<p><a href="https://github.com/Quafadas/cask-laminar">Quafadas/cask-laminar</a> shows how to use <a href="https://com-lihaoyi.github.io/cask/">Cask</a> backend with Laminar.</p>
+<h2><a class="anchor" aria-hidden="true" id="laminar-releases"></a><a href="#laminar-releases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Laminar Releases</h2>
+<p>Last fall I published Laminar and Airstream 0.14.2 which I unfortunately didn't have time to properly post about. These have two notable changes:</p>
+<ul>
+<li>Support for scala-js-dom 2.0.0 introduced in 0.14.0</li>
+<li><a href="https://github.com/raquo/Laminar/issues/108">Performance fix</a> for very large collections of elements in 0.14.2</li>
+</ul>
+<p>As mentioned above, I also released a small Scala.js library: <a href="https://github.com/raquo/ew">ew</a>.</p>
+<p>Over the winter I worked a lot on the next version of Laminar, which will be tagged 15.0.0. I will resume working on it in September, expecting a release in October. I am very excited about this upcoming release, it will be the best Laminar to date with major new features and improvements.</p>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank You</h2>
+<p>Huge thanks to everyone who helped make Laminar a richer ecosystem this year.</p>
+<p>The development of Laminar itself is kindly sponsored by <a href="https://github.com/sponsors/raquo">20 people</a> who use it in their businesses, or just for fun.</p>
+<p><strong>GOLD</strong> sponsors supporting Laminar:</p>
+<div class="-sponsorsList x-alignItemsEnd">
+  <div class="-sponsor x-person x-yurique">
+    <img class="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-300px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+</div>
+<p>Thank you for supporting me! ❤️</p>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#new-gold-sponsor">New GOLD Sponsor</a></li><li><a href="#new-tutorials">New Tutorials</a></li><li><a href="#new-useful-tools">New Useful Tools</a></li><li><a href="#new-apps-and-demos">New Apps and Demos</a></li><li><a href="#new-libraries">New Libraries</a></li><li><a href="#new-templates--starter-kits">New Templates &amp; Starter Kits</a></li><li><a href="#laminar-releases">Laminar Releases</a></li><li><a href="#thank-you">Thank You</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2022 Nikita Gazarov</section></footer></div></body></html>
