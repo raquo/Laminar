@@ -48,7 +48,7 @@ title: Resources
 
 * <del>[Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/36) to try things on the fly</del>
 
-* [Laminext Scribble](https://scribble.laminext.dev/) to try things on the fly. Example: [Hello World](https://scribble.laminext.dev/u/raquo/cqnkcloptolsneddzxifkmwkrsnr).
+* [Laminext Scribble](https://scribble.ninja/) to try things on the fly. Example: [Hello World](https://scribble.ninja/u/raquo/cqnkcloptolsneddzxifkmwkrsnr).
 
 * [Html to Scala Converter](https://simerplaha.github.io/html-to-scala-converter/) can convert HTML strings to Laminar code.
 
@@ -120,8 +120,6 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 * [Formula](https://github.com/kitlangton/formula) – Derive functional, reactive, Laminar forms at compile-time with this type-safe, composable form combinator library
 
 * [Laminar.cycle](https://github.com/vic/laminar_cycle) – Cycle.js dialogue abstraction in Laminar
-
-* [purgecss-laminar-webpack-plugin](https://github.com/yurique/purgecss-laminar-webpack-plugin) – Removes unused CSS from your webpack bundle
 
 
 
