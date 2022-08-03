@@ -125,7 +125,7 @@ render(containerNode, app)
     label(<span class="hljs-string">"Your email: "</span>),
     input(
       value &lt;-- inputBus.events,
-      inContext { thisNode =&gt; onInput.mapTo(thisNode.ref.value) --&gt; inputBus }
+      onInput.mapToValue --&gt; inputBus
     ),
   ),
   child &lt;-- $debouncedError.map {

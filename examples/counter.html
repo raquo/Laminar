@@ -73,9 +73,7 @@
       <span class="hljs-string">"Step: "</span>,
       select(
         value &lt;-- stepVar.signal.map(_.toString),
-        inContext { thisNode =&gt;
-          onChange.mapTo(thisNode.ref.value.toInt) --&gt; stepVar
-        },
+        onChange.mapToValue.map(_.toInt) --&gt; stepVar,
         allowedSteps.map { step =&gt;
           option(value := step.toString, step)
         }

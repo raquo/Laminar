@@ -214,11 +214,9 @@
       cls(<span class="hljs-string">"toggle"</span>),
       typ(<span class="hljs-string">"checkbox"</span>),
       checked &lt;-- $item.map(_.completed),
-      inContext { thisNode =&gt;
-        onInput.mapTo(
-          <span class="hljs-type">UpdateCompleted</span>(itemId, completed = thisNode.ref.checked)
-        ) --&gt; commandObserver
-      }
+      onInput.mapToChecked.map { isChecked =&gt;
+        <span class="hljs-type">UpdateCompleted</span>(itemId, completed = isChecked)
+      } --&gt; commandObserver
     )
 
   <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderStatusBar</span> </span>=

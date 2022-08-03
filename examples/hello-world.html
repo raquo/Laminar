@@ -66,7 +66,7 @@
   input(
     onMountFocus,
     placeholder := <span class="hljs-string">"Enter your name here"</span>,
-    inContext { thisNode =&gt; onInput.map(_ =&gt; thisNode.ref.value) --&gt; nameVar }
+    onInput.mapToValue --&gt; nameVar
   ),
   span(
     <span class="hljs-string">"Hello, "</span>,

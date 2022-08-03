@@ -70,17 +70,13 @@
     label(<span class="hljs-string">"Button label: "</span>),
     input(
       value &lt;-- actionVar.signal,
-      inContext { thisNode =&gt;
-        onInput.mapTo(thisNode.ref.value) --&gt; actionVar.writer
-      }
+      onInput.mapToValue --&gt; actionVar.writer
     )
   ),
   p(
     label(<span class="hljs-string">"Button icon: "</span>),
     select(
-      inContext { thisNode =&gt;
-        onChange.mapTo(thisNode.ref.value) --&gt; iconVar.writer
-      },
+      onChange.mapToValue --&gt; iconVar.writer,
       value &lt;-- iconVar.signal,
       allowedIcons.map(icon =&gt; option(value(icon), icon))
     )
