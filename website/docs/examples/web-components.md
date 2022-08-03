@@ -22,17 +22,13 @@ val app = div(
     label("Button label: "),
     input(
       value <-- actionVar.signal,
-      inContext { thisNode =>
-        onInput.mapTo(thisNode.ref.value) --> actionVar.writer
-      }
+      onInput.mapToValue --> actionVar.writer
     )
   ),
   p(
     label("Button icon: "),
     select(
-      inContext { thisNode =>
-        onChange.mapTo(thisNode.ref.value) --> iconVar.writer
-      },
+      onChange.mapToValue --> iconVar.writer,
       value <-- iconVar.signal,
       allowedIcons.map(icon => option(value(icon), icon))
     )

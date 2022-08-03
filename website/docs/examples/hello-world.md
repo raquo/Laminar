@@ -17,7 +17,7 @@ val rootElement = div(
   input(
     onMountFocus,
     placeholder := "Enter your name here",
-    inContext { thisNode => onInput.map(_ => thisNode.ref.value) --> nameVar }
+    onInput.mapToValue --> nameVar
   ),
   span(
     "Hello, ",

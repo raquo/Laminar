@@ -165,11 +165,9 @@ object TodoMvcApp {
       cls("toggle"),
       typ("checkbox"),
       checked <-- $item.map(_.completed),
-      inContext { thisNode =>
-        onInput.mapTo(
-          UpdateCompleted(itemId, completed = thisNode.ref.checked)
-        ) --> commandObserver
-      }
+      onInput.mapToChecked.map { isChecked =>
+        UpdateCompleted(itemId, completed = isChecked)
+      } --> commandObserver
     )
 
   private def renderStatusBar =

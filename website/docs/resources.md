@@ -12,6 +12,8 @@ title: Resources
 
 * [Live Examples](https://laminar.dev/examples/hello-world)
 
+* See also the "Tutorials, Videos & Blog Posts" section below.
+
 
 
 ## Documentation
@@ -30,6 +32,7 @@ title: Resources
 
 * [Kit Langton – Stockholm Syndrome Escape Velocity](https://www.youtube.com/watch?v=kLZr87CGY-U)
 
+* [Kit Langton – Deriving the Frontend](https://www.youtube.com/watch?v=JHriftPO62I)
 
 
 ## Community & Support
@@ -38,7 +41,7 @@ title: Resources
 
 * [Github discussions](https://github.com/raquo/laminar/discussions) for how-tos, whys, and any questions or discussions that other people would benefit from easily finding.
 
-* [Github issues](https://github.com/raquo/laminar/issues) for bugs and feature requests
+* [Github issues](https://github.com/raquo/laminar/issues) for bugs and feature requests.
 
 * Please consider [sponsoring Laminar development](https://github.com/sponsors/raquo) on Github.
 
@@ -46,9 +49,7 @@ title: Resources
 
 ## Useful Tools
 
-* <del>[Laminar ScalaFiddle](https://scalafiddle.io/sf/3SDr2ii/36) to try things on the fly</del>
-
-* [Laminext Scribble](https://scribble.ninja/) to try things on the fly. Example: [Hello World](https://scribble.ninja/u/raquo/cqnkcloptolsneddzxifkmwkrsnr).
+* **[Laminext Scribble](https://scribble.ninja/)** to try things on the fly.
 
 * [Html to Scala Converter](https://simerplaha.github.io/html-to-scala-converter/) can convert HTML strings to Laminar code.
 
@@ -56,7 +57,7 @@ title: Resources
 
 ## Open Source Laminar Apps
 
-* [Twotm8](https://github.com/keynmol/twotm8) – Twitter clone. See [demo](https://twotm8-web.fly.dev/login) and also the [detailed tutorial](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend).
+* **[Twotm8](https://github.com/keynmol/twotm8)** – Twitter clone. See [demo](https://twotm8-web.fly.dev/login) and also the [detailed tutorial](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend).
 
 * [Skłable](https://github.com/przemekd/sklable) – multiplayer Scrabble-like game. [Demo](https://sk%C5%82able.pl)
 
@@ -92,7 +93,7 @@ title: Resources
 
 ## Examples without Scalajs-bundler
 
-* [sjrd/scalajs-sbt-vite-laminar-chartjs-example](https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example) – Setup with [Vite](https://vitejs.dev/), Laminar and Chart.js (via [ScalablyTyped](https://scalablytyped.org/docs/readme.html))
+* **[sjrd/scalajs-sbt-vite-laminar-chartjs-example](https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example)** – Setup with [Vite](https://vitejs.dev/), Laminar and Chart.js (via [ScalablyTyped](https://scalablytyped.org/docs/readme.html))
 
 * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
 
@@ -125,7 +126,7 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 ## Component Libraries
 
-* [SAP UI5 Laminar Web Components](https://github.com/sherpal/LaminarSAPUI5Bindings)
+* **[SAP UI5 Laminar Web Components](https://github.com/sherpal/LaminarSAPUI5Bindings)**
 
 * [Material UI Laminar Web Components](https://github.com/uosis/laminar-web-components)
 
@@ -137,15 +138,15 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 * [My Four Year Quest For Perfect Scala.js UI Development](https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a) – the history and ideological foundations of Laminar
 
-* [[VIDEO] Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q) – the why and the how of building with Laminar
+* **[[VIDEO] Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q)** – the why and the how of building with Laminar
 
-* [[VIDEO] Stockholm Syndrome Escape Velocity](https://www.youtube.com/watch?v=kLZr87CGY-U) – Kit Langton sets an impossible standard in conference talk delivery
+* **[[VIDEO] Stockholm Syndrome Escape Velocity](https://www.youtube.com/watch?v=kLZr87CGY-U)** – Kit Langton sets an impossible standard in conference talk delivery
 
 * [[VIDEO] Deriving the Frontend – Form Combinator Fun with Scala.js](https://www.youtube.com/watch?v=JHriftPO62I)
 
   * See [updated repo](https://github.com/kitlangton/formula) for safe management of Owner-s
 
-* [Twotm8 – Building the Frontend](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend) walks you through creating a twitter clone in full stack Scala. The chapter on frontend explains how to use Laminar, implement routing with [Waypoint](https://github.com/raquo/waypoint), and styling with [ScalaCSS](https://github.com/japgolly/scalacss). See also the [source code](https://github.com/keynmol/twotm8) and [demo](https://twotm8-web.fly.dev/login).
+* **[Twotm8 – Building the Frontend](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend)** walks you through creating a twitter clone in full stack Scala. The chapter on frontend explains how to use Laminar, implement routing with [Waypoint](https://github.com/raquo/waypoint), and styling with [ScalaCSS](https://github.com/japgolly/scalacss). See also the [source code](https://github.com/keynmol/twotm8) and [demo](https://twotm8-web.fly.dev/login).
 
 * [Cross-Platform Mobile dev with Scala and Capacitor](https://medium.com/geekculture/cross-platform-mobile-dev-with-scala-and-capacitor-54e69b62b50c)
 
@@ -157,6 +158,8 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 ## Other Related Projects
 
-* [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles
+* [Airstream](https://github.com/raquo/Airstream/) – The reactive layer of Laminar. Its docs explain everything about streams, signals, event buses, state vars, etc.
+
+* [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles.
 
 * [ew](https://github.com/raquo/ew) – Scala.js interfaces to native JavaScript data structures (such as arrays and maps) that offer sometimes significant performance advantages by sacrificing Scala semantics (such as structural equality of case classes).

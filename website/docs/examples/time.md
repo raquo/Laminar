@@ -89,7 +89,7 @@ val app = div(
     label("Your email: "),
     input(
       value <-- inputBus.events,
-      inContext { thisNode => onInput.mapTo(thisNode.ref.value) --> inputBus }
+      onInput.mapToValue --> inputBus
     ),
   ),
   child <-- $debouncedError.map {
