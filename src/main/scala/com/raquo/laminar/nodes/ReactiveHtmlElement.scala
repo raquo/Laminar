@@ -11,7 +11,7 @@ import org.scalajs.dom
 import scala.scalajs.js
 
 class ReactiveHtmlElement[+Ref <: dom.html.Element](
-  val tag: HtmlTag[Ref],
+  override val tag: HtmlTag[Ref],
   final override val ref: Ref
 ) extends ReactiveElement[Ref] {
 

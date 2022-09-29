@@ -7,6 +7,7 @@ import com.raquo.ew.JsArray
 import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription, Modifier}
+import com.raquo.laminar.tags.Tag
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -140,6 +141,8 @@ trait ReactiveElement[+Ref <: dom.Element]
     //  classes that were also added by Laminar.
     key.setDomValue(this, nextDomValues)
   }
+
+  val tag: Tag[ReactiveElement[Ref]]
 
   def eventListeners: List[EventListener.Any] = {
     maybeEventListeners.map(_.map(_.listener).asScalaJs.toList).getOrElse(Nil)
