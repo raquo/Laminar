@@ -28,12 +28,12 @@ class RootNode(
     throw new Exception("Unable to mount Laminar RootNode into an unmounted container.")
   }
 
-  mount()
-
   /** When we create a Root, we don't want to create a new HTML Element, we want to
     * use a reference to an existing element, the container.
     */
   final override val ref: dom.Element = container
+
+  mount()
 
   /** @return Whether child was successfully mounted */
   def mount(): Boolean = {
