@@ -8,7 +8,7 @@ import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
 import scala.collection.{immutable, mutable}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.concurrent.Future
 import scala.scalajs.js
 
@@ -137,6 +137,7 @@ class SyntaxSpec extends UnitSpec {
       onMountBind(_ => onClick.mapTo(1) --> Observer[Int](num => num * 5))
     )
 
+    // #TODO[Test]: Not sure why we're printing stuff here. Two of those are polluting the test results a bit.
     el.amend(
       onMountBind(_ => observable --> ((num: Int) => println(num * 5))),
       onMountBind(_ => signal --> ((num: Int) => println(num * 5))),
