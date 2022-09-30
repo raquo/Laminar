@@ -4,6 +4,7 @@ import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.airstream.web.AjaxEventStream
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -14,22 +15,35 @@ import scala.scalajs.js
 
 class SyntaxSpec extends UnitSpec {
 
-  it("ModifierSeq implicit conversion works for both strings and nodes") {
+  it("seqToModifier, seqToNode implicit conversion works for both strings and nodes") {
 
     val strings = List("a", "b")
+    val stringsBuffer = mutable.Buffer("aa", "bb")
+    val stringsArray = Array("aaa", "bbb")
+    val stringsJsArray = js.Array("aaaa", "bbbb")
     val nodes = Vector(span("ya"), article("yo")) // seq of elements.
     val nodesBuffer = mutable.Buffer(span("boo")) // mutable.Buffer[Span] is covariant as collection.Seq
-    val jsNodes = js.Array(span("js")) // JS arrays are invariant
+    val nodesArray = Array(span("foo"), span("bar")) // Scala Arrays are not Seq-s. They are used in Scala 3 enums.
+    val nodesJsArray = js.Array(span("js")) // JS arrays are invariant
     val mixed: Seq[Mod[HtmlElement]] = Vector("c", input())
 
-    // @Note we make sure that none of the above go through expensive `nodesSeqToInserter` by absence of a sentinel comment node
+    // @Note we make sure that none of the above go through expensive `nodesSeqToInserter` by never mounting the actualNode element
+    //  - inserters require mounting to be processed.
 
-    mount(div(strings, nodes, nodesBuffer, jsNodes, mixed))
+    val actualNode = div(
+      strings, stringsBuffer, stringsArray, stringsJsArray,
+      nodes, nodesBuffer, nodesArray, nodesJsArray, mixed
+    )
 
-    expectNode(div.of(
+    expectNode(actualNode.ref, div.of(
       "a", "b",
+      "aa", "bb",
+      "aaa", "bbb",
+      "aaaa", "bbbb",
       span of "ya", article of "yo",
       span of "boo",
+      span of "foo",
+      span of "bar",
       span of "js",
       "c", input
     ))
@@ -313,6 +327,37 @@ class SyntaxSpec extends UnitSpec {
       ajaxStream --> xhrBus,
       xhrBus --> xhrBus // lol
     )
+  }
+
+  it("apply methods of various Modifier aliases compile") {
+
+    // No type param needed when in the element context
+    div(
+      Modifier { el => println(el) },
+      Setter { el => println(el) },
+      Binder { el => null.asInstanceOf[DynamicSubscription] }
+    )
+
+    // These require that the `Modifier` and other aliases defined in Laminar.scala
+    // are val-s, they can't be def-s, at least in Scala 2
+
+    Modifier[ReactiveElement.Base](el => println(el))
+    Setter[ReactiveElement.Base](el => println(el))
+    Binder[ReactiveElement.Base](el => ().asInstanceOf[DynamicSubscription])
+
+    Modifier[ReactiveElement.Base] { el => println(el) }
+    Setter[ReactiveElement.Base] { el => println(el) }
+    Binder[ReactiveElement.Base] { el => null.asInstanceOf[DynamicSubscription] }
+
+    Modifier { (el: ReactiveElement.Base) =>
+      println(el)
+    }
+    Setter { (el: ReactiveElement.Base) =>
+      println(el)
+    }
+    Binder { (el: ReactiveElement.Base) =>
+      null.asInstanceOf[DynamicSubscription]
+    }
   }
 
 }

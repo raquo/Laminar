@@ -15,7 +15,9 @@ trait Setter[-El <: ReactiveElement.Base] extends Modifier[El]
 
 object Setter {
 
-  val noop: Setter[ReactiveElement.Base] = Setter(_ => ())
+  type Base = Setter[ReactiveElement.Base]
+
+  val empty: Setter.Base = new Setter[ReactiveElement.Base] {}
 
   def apply[El <: ReactiveElement.Base](fn: El => Unit): Setter[El] = {
     new Setter[El] {

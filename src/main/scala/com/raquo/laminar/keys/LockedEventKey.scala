@@ -10,13 +10,13 @@ class LockedEventKey[Ev <: dom.Event, -In, +Out](
   composer: EventStream[In] => Observable[Out]
 ) {
 
-  def -->(sink: Sink[Out]): Binder[ReactiveElement.Base] = {
+  def -->(sink: Sink[Out]): Binder.Base = {
     Binder { el =>
       ReactiveElement.bindSink[Out](el, composer(el.events(eventProcessor)))(sink)
     }
   }
 
-  @inline def -->(onNext: Out => Unit): Binder[ReactiveElement.Base] = {
+  @inline def -->(onNext: Out => Unit): Binder.Base = {
     -->(Observer(onNext))
   }
 }

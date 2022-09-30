@@ -19,7 +19,7 @@ class LockedCompositeKey[K, -El <: ReactiveElement.Base](
     if (include) {
       key.:=(items: _*)
     } else {
-      Setter.noop
+      Setter.empty
     }
   }
 

@@ -2,6 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.airstream.state.Val
+import com.raquo.ew.ewArray
 import com.raquo.laminar.Implicits.RichSource
 import com.raquo.laminar.api.Laminar.StyleEncoder
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
@@ -39,7 +40,13 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     Setter(element => setters.foreach(_.apply(element)))
   }
 
+  /** Create a setter that applies each of the setters in an array */
+  implicit def arrayToSetter[El <: ReactiveElement.Base](setters: Array[Setter[El]]): Setter[El] = {
+    Setter(element => setters.foreach(_.apply(element)))
+  }
+
   /** Create a binder that combines several binders */
+  // This can only be implemented with significant caveats, I think. See https://gitter.im/Laminar_/Lobby?at=631a58b4cf6cfd27af7c96b4
   //implicit def seqToBinder[El <: ReactiveElement.Base](binders: scala.collection.Seq[Binder[El]]): Binder[El] = {
   //  Binder[El] { ??? }
   //}
@@ -47,29 +54,38 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   /** Create a modifier that applies each of the modifiers in a seq */
   implicit def seqToModifier[A, El <: ReactiveElement.Base](
     modifiers: scala.collection.Seq[A]
-  )(implicit
-    evidence: A => Modifier[El]
+  )(
+    implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
     // @TODO[Performance] See if we might want a separate implicit conversion for cases when we don't need `evidence`
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        modifiers.foreach(evidence(_).apply(element))
-      }
-    }
+    Modifier[El](element => modifiers.foreach(asModifier(_).apply(element)))
+  }
+
+  /** Create a modifier that applies each of the modifiers in an array */
+  implicit def arrayToModifier[A, El <: ReactiveElement.Base](
+    modifiers: Array[A]
+  )(
+    implicit asModifier: A => Modifier[El]
+  ): Modifier[El] = {
+    Modifier[El](element => modifiers.foreach(asModifier(_).apply(element)))
+  }
+
+  /** Create a modifier that applies each of the modifiers in an array */
+  implicit def jsArrayToModifier[A, El <: ReactiveElement.Base](
+    modifiers: js.Array[A]
+  )(
+    implicit asModifier: A => Modifier[El]
+  ): Modifier[El] = {
+    Modifier[El](element => modifiers.foreach(asModifier(_).apply(element)))
   }
 
   /** Create a modifier that applies the modifier in an option, if it's defined, or does nothing otherwise */
   implicit def optionToModifier[A, El <: ReactiveElement.Base](
     maybeModifier: Option[A]
   )(
-    implicit evidence: A => Modifier[El]
+    implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    // @TODO[Performance] See if we might want a separate implicit conversion for cases when we don't need `evidence`
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        maybeModifier.foreach(evidence(_).apply(element))
-      }
-    }
+    Modifier[El](element => maybeModifier.foreach(asModifier(_).apply(element)))
   }
 
   implicit def optionToSetter[El <: ReactiveElement.Base](maybeSetter: Option[Setter[El]]): Setter[El] = {
@@ -79,17 +95,19 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   /** This modifier exists to prevent collections of nodes from being converted using [[nodesSeqToInserter]],
     * which is more expensive. We have a test that will fail should the order of implicits be wrong. */
   implicit def nodesSeqToModifier(nodes: scala.collection.Seq[ChildNode.Base]): Modifier[ReactiveElement.Base] = {
-    new Modifier[ReactiveElement.Base] {
-      override def apply(element: ReactiveElement.Base): Unit = {
-        nodes.foreach(_.apply(element))
-      }
-    }
+    Modifier[ReactiveElement.Base](element => nodes.foreach(_.apply(element)))
   }
 
   /** This modifier exists to prevent collections of nodes from being converted using [[nodesArrayToInserter]],
     * which is more expensive. We have a test that will fail should the order of implicits be wrong. */
-  @inline implicit def nodesArrayToModifier[N <: ChildNode.Base](nodes: js.Array[N]): Modifier[ReactiveElement.Base] = {
-    nodesSeqToModifier(nodes)
+  @inline implicit def nodesArrayToModifier[N <: ChildNode.Base](nodes: Array[N]): Modifier[ReactiveElement.Base] = {
+    Modifier[ReactiveElement.Base](element => nodes.foreach(_.apply(element)))
+  }
+
+  /** This modifier exists to prevent collections of nodes from being converted using [[nodesJsArrayToInserter]],
+    * which is more expensive. We have a test that will fail should the order of implicits be wrong. */
+  @inline implicit def nodesJsArrayToModifier[N <: ChildNode.Base](nodes: js.Array[N]): Modifier[ReactiveElement.Base] = {
+    Modifier[ReactiveElement.Base](element => nodes.ew.forEach(_.apply(element)))
   }
 
   /** Add --> methods on Observables */
@@ -112,7 +130,11 @@ object Implicits {
       ChildrenInserter[ReactiveElement.Base](_ => Val(nodes.toList))
     }
 
-    @inline implicit def nodesArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter[ReactiveElement.Base] = {
+    implicit def nodesArrayToInserter(nodes: Array[ChildNode.Base]): Inserter[ReactiveElement.Base] = {
+      nodesSeqToInserter(nodes)
+    }
+
+    @inline implicit def nodesJsArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter[ReactiveElement.Base] = {
       nodesSeqToInserter(nodes)
     }
   }
@@ -121,11 +143,11 @@ object Implicits {
 
   class RichSource[A](val source: Source[A]) extends AnyVal {
 
-    def -->(sink: Sink[A]): Binder[ReactiveElement.Base] = {
+    def -->(sink: Sink[A]): Binder.Base = {
       Binder(ReactiveElement.bindSink(_, source.toObservable)(sink))
     }
 
-    def -->(onNext: A => Unit): Binder[ReactiveElement.Base] = {
+    def -->(onNext: A => Unit): Binder.Base = {
       Binder(ReactiveElement.bindFn(_, source.toObservable)(onNext))
     }
 

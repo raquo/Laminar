@@ -254,11 +254,7 @@ class MountHooksSpec extends UnitSpec {
 
     val el = div(
       "Hello ",
-      new Modifier[Div] {
-        override def apply(element: Div): Unit = {
-          numModCalls += 1
-        }
-      },
+      Modifier { _ => numModCalls += 1 },
       onMountBind { _ =>
         numBindCalls += 1
         title <-- signal
@@ -308,11 +304,7 @@ class MountHooksSpec extends UnitSpec {
 
     val el = div(
       "Hello ",
-      new Modifier[Div] {
-        override def apply(element: Div): Unit = {
-          numModCalls += 1
-        }
-      },
+      Modifier { _ => numModCalls += 1 },
       onMountInsert { _ =>
         numBindCalls += 1
         child <-- signal
@@ -362,11 +354,7 @@ class MountHooksSpec extends UnitSpec {
 
     val el = div(
       "Hello ",
-      new Modifier[Div] {
-        override def apply(element: Div): Unit = {
-          numModCalls += 1
-        }
-      },
+      Modifier { _ => numModCalls += 1 },
       onMountInsert { _ =>
         numBindCalls += 1
         children <-- signal

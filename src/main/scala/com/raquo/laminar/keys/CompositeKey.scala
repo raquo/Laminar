@@ -78,7 +78,7 @@ class CompositeKey[K, -El <: ReactiveElement.Base](
         )
       }
     } else {
-      Setter.noop
+      Setter.empty
     }
   }
 }

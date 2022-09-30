@@ -24,4 +24,12 @@ trait Modifier[-El <: ParentNode.Base] {
 object Modifier {
 
   type Base = Modifier[nodes.ParentNode.Base]
+
+  val empty: Modifier.Base = new Modifier[ParentNode.Base] {}
+
+  def apply[El <: ParentNode.Base](f: El => Unit): Modifier[El] = {
+    new Modifier[El] {
+      override def apply(element: El): Unit = f(element)
+    }
+  }
 }

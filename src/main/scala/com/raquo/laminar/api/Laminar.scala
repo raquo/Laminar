@@ -121,19 +121,27 @@ private[laminar] object Laminar
 
   type Mod[-El <: ParentNode.Base] = modifiers.Modifier[El]
 
-  @inline def Mod: modifiers.Modifier.type = modifiers.Modifier
+  val Mod: modifiers.Modifier.type = modifiers.Modifier
+
+  type HtmlMod = Mod[HtmlElement]
+
+  type SvgMod = Mod[SvgElement]
+
 
   type Modifier[-El <: ParentNode.Base] = modifiers.Modifier[El]
 
-  @inline def Modifier: modifiers.Modifier.type = modifiers.Modifier
+  val Modifier: modifiers.Modifier.type = modifiers.Modifier
+
 
   type Setter[-El <: Element] = modifiers.Setter[El]
 
-  @inline def Setter: modifiers.Setter.type = modifiers.Setter
+  val Setter: modifiers.Setter.type = modifiers.Setter
+
 
   type Binder[-El <: Element] = modifiers.Binder[El]
 
-  @inline def Binder: modifiers.Binder.type = modifiers.Binder
+  val Binder: modifiers.Binder.type = modifiers.Binder
+
 
   type Inserter[-El <: Element] = modifiers.Inserter[El]
 
@@ -213,6 +221,8 @@ private[laminar] object Laminar
     }(unsafeWindowOwner)
   }
 
+  /** A universal Modifier that does nothing */
+  val emptyMod: Modifier.Base = Modifier.empty
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
     * This is a bit annoying, I know, but we kinda have to follow the native JS DOM API on this.
@@ -241,9 +251,6 @@ private[laminar] object Laminar
   def foreignSvgElement(element: dom.svg.Element): ReactiveSvgElement[dom.svg.Element] = {
     foreignSvgElement(svg.svg, element)
   }
-
-  /** A universal Modifier that does nothing */
-  val emptyMod: Modifier[ParentNode.Base] = new Modifier[ParentNode.Base] {}
 
   /** Non-breaking space character
     *
@@ -301,23 +308,21 @@ private[laminar] object Laminar
     * Example usage: `onMountInsert(ctx => child <-- someObservable(ctx))`. See docs for details.
     */
   def onMountInsert[El <: Element](fn: MountContext[El] => Inserter[El]): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        var maybeSubscription: Option[DynamicSubscription] = None
-        val lockedContext = InsertContext.reserveSpotContext[El](element)
-        element.amend(
-          onMountUnmountCallback[El](
-            mount = { c =>
-              val inserter = fn(c).withContext(lockedContext)
-              maybeSubscription = Some(inserter.bind(c.thisNode))
-            },
-            unmount = { _ =>
-              maybeSubscription.foreach(_.kill())
-              maybeSubscription = None
-            }
-          )
+    Modifier[El] { element =>
+      var maybeSubscription: Option[DynamicSubscription] = None
+      val lockedContext = InsertContext.reserveSpotContext[El](element)
+      element.amend(
+        onMountUnmountCallback[El](
+          mount = { c =>
+            val inserter = fn(c).withContext(lockedContext)
+            maybeSubscription = Some(inserter.bind(c.thisNode))
+          },
+          unmount = { _ =>
+            maybeSubscription.foreach(_.kill())
+            maybeSubscription = None
+          }
         )
-      }
+      )
     }
   }
 
@@ -334,15 +339,13 @@ private[laminar] object Laminar
     * will not fire until and unless it is unmounted and mounted again.
     */
   def onMountCallback[El <: Element](fn: MountContext[El] => Unit): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        var ignoreNextActivation = ReactiveElement.isActive(element)
-        ReactiveElement.bindCallback[El](element) { c =>
-          if (ignoreNextActivation) {
-            ignoreNextActivation = false
-          } else {
-            fn(c)
-          }
+    Modifier[El] { element =>
+      var ignoreNextActivation = ReactiveElement.isActive(element)
+      ReactiveElement.bindCallback[El](element) { c =>
+        if (ignoreNextActivation) {
+          ignoreNextActivation = false
+        } else {
+          fn(c)
         }
       }
     }
@@ -356,11 +359,9 @@ private[laminar] object Laminar
     * will not fire until and unless it is mounted and then unmounted again.
     */
   def onUnmountCallback[El <: Element](fn: El => Unit): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        ReactiveElement.bindSubscriptionUnsafe(element) { c =>
-          new Subscription(c.owner, cleanup = () => fn(element))
-        }
+    Modifier[El] { element =>
+      ReactiveElement.bindSubscriptionUnsafe(element) { c =>
+        new Subscription(c.owner, cleanup = () => fn(element))
       }
     }
   }
@@ -387,21 +388,19 @@ private[laminar] object Laminar
     mount: MountContext[El] => A,
     unmount: (El, Option[A]) => Unit
   ): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = {
-        var ignoreNextActivation = ReactiveElement.isActive(element)
-        var state: Option[A] = None
-        ReactiveElement.bindSubscriptionUnsafe[El](element) { c =>
-          if (ignoreNextActivation) {
-            ignoreNextActivation = false
-          } else {
-            state = Some(mount(c))
-          }
-          new Subscription(c.owner, cleanup = () => {
-            unmount(element, state)
-            state = None
-          })
+    Modifier[El] { element =>
+      var ignoreNextActivation = ReactiveElement.isActive(element)
+      var state: Option[A] = None
+      ReactiveElement.bindSubscriptionUnsafe[El](element) { c =>
+        if (ignoreNextActivation) {
+          ignoreNextActivation = false
+        } else {
+          state = Some(mount(c))
         }
+        new Subscription(c.owner, cleanup = () => {
+          unmount(element, state)
+          state = None
+        })
       }
     }
   }
@@ -409,9 +408,7 @@ private[laminar] object Laminar
   // @TODO[Naming] Find a better name for this. We now have actual MountContext classes that this has nothing to do with.
   /** Use this when you need a reference to current element. See docs. */
   def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
-    new Modifier[El] {
-      override def apply(element: El): Unit = makeModifier(element).apply(element)
-    }
+    Modifier[El] { element => makeModifier(element).apply(element) }
   }
 
   /** Use this when you need to apply stream operators on this element's events, e.g.:

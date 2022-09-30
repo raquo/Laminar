@@ -18,6 +18,8 @@ trait Binder[-El <: ReactiveElement.Base] extends Modifier[El] {
 
 object Binder {
 
+  type Base = Binder[ReactiveElement.Base]
+
   def apply[El <: ReactiveElement.Base](fn: El => DynamicSubscription): Binder[El] = {
     new Binder[El] {
       override def bind(element: El): DynamicSubscription = fn(element)
