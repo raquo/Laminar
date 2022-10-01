@@ -665,4 +665,187 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     // --
 
   }
+
+  it("can move children from one dynamic list to another") {
+
+    val spanA = span("a")
+    val spanB = span("b")
+    val spanC = span("c")
+    val spanD = span("d")
+    val spanE = span("e")
+    val spanF = span("f")
+
+    val bus1 = new EventBus[List[HtmlElement]]
+    val bus2 = new EventBus[List[HtmlElement]]
+
+    val el = div(
+      children <-- bus1,
+      span("--"),
+      children <-- bus2,
+    )
+
+    mount(el)
+
+    // --
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "--",
+        ExpectedNode.comment
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanA, spanB, spanC),
+      bus2 -> List(spanD, spanE, spanF)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "a",
+        span of "b",
+        span of "c",
+        span of "--",
+        ExpectedNode.comment,
+        span of "d",
+        span of "e",
+        span of "f"
+      )
+    )
+
+    EventBus.emit(
+      bus1 -> List(spanA),
+      bus2 -> List(spanD)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "a",
+        span of "--",
+        ExpectedNode.comment,
+        span of "d",
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanA, spanD),
+      bus2 -> List(spanE)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "a",
+        span of "d",
+        span of "--",
+        ExpectedNode.comment,
+        span of "e",
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanA),
+      bus2 -> List(spanE, spanD)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "a",
+        span of "--",
+        ExpectedNode.comment,
+        span of "e",
+        span of "d",
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanD, spanA),
+      bus2 -> List(spanE)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "d",
+        span of "a",
+        span of "--",
+        ExpectedNode.comment,
+        span of "e",
+
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanF, spanC),
+      bus2 -> List(spanE, spanA, spanD)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "f",
+        span of "c",
+        span of "--",
+        ExpectedNode.comment,
+        span of "e",
+        span of "a",
+        span of "d",
+
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanF, spanA, spanC, spanD),
+      bus2 -> List(spanE)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "f",
+        span of "a",
+        span of "c",
+        span of "d",
+        span of "--",
+        ExpectedNode.comment,
+        span of "e",
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> List(spanE),
+      bus2 -> List(spanF, spanA, spanC, spanD)
+    )
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        span of "e",
+        span of "--",
+        ExpectedNode.comment,
+        span of "f",
+        span of "a",
+        span of "c",
+        span of "d"
+      )
+    )
+  }
 }

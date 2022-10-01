@@ -1,6 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.airstream.core.{EventStream, Observable, Signal}
+import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
 import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
@@ -22,11 +22,7 @@ object ChildrenInserter {
   ): Inserter[El] = new Inserter[El](
     insertFn = (ctx, owner) => {
       val mountContext = new MountContext[El](thisNode = ctx.parentNode, owner)
-      val childrenSignal = $children(mountContext) match {
-        case stream: EventStream[Children @unchecked] => stream.toSignal(emptyChildren)
-        case signal: Signal[Children @unchecked] => signal
-        case _ => throw new Exception("Unknown kind of observable")
-      }
+      val childrenSignal = $children(mountContext).toSignalIfStream(_.startWith(emptyChildren))
       var lastSeenChildren: js.UndefOr[Children] = js.undefined
       childrenSignal.foreach { newChildren =>
         if (!lastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
@@ -63,17 +59,17 @@ object ChildrenInserter {
     var currentChildrenCount = prevChildrenCount
     var prevChildRef = liveNodeList(sentinelIndex + 1)
 
-    // @TODO Remove all the debug comments
+    // Sorry for all the debug comments, but they really help me figure things out.
 
-    //    dom.console.log(">>>>>>>>>>>>>>>>>")
-    //    dom.console.log(">>>>>>>>>>>>>>>>>")
+    // println(">>>>>>>>>>>>>>>>>")
+    // println(s"updateChildren(nextChildren = ${nextChildren.map(_.ref.textContent)})")
 
     nextChildren.foreach { nextChild => // #TODO Not sure if this is faster than iterating over a js.Map
 
       // Desired index of `nextChild` in `liveNodeList`
       val nextChildNodeIndex = sentinelIndex + index + 1
 
-      //      dom.console.log("\nevaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if (prevChildRef == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))
+      // println("evaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if ((prevChildRef: js.UndefOr[dom.Node]) == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))
 
       // @TODO[Integrity] prevChildRef can be null or even undefined here if we reach the end, under certain circumstances. See what can be done...
 
@@ -90,20 +86,23 @@ object ChildrenInserter {
         // println("> overflow: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
         // @Note: DOM update
         ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
+        // println(s"setting prevChildRef=${nextChild.ref.textContent}")
         prevChildRef = nextChild.ref
         currentChildrenCount += 1
       } else {
         if (nextChild.ref == prevChildRef) {
-          //          dom.console.log("NODE MATCHES – " + nextChild.ref.textContent)
+          // println("NODE MATCHES – " + nextChild.ref.textContent)
           // Child nodes already match – do nothing, go to the next child
         } else {
-          //          dom.console.log("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
+          // println("NODE DOES NOT MATCH")
+          // println("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
 
           if (!prevChildren.has(nextChild.ref)) {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
             // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
             // @Note: DOM update
             ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
+            // println(s"setting prevChildRef=${nextChild.ref.textContent}")
             prevChildRef = nextChild.ref
             currentChildrenCount += 1
           } else {
@@ -118,12 +117,14 @@ object ChildrenInserter {
             ) {
               // prevChild should be deleted, so we remove it from the DOM, and try again with the next prevChild
               // but first we save its next sibling, which will become our next `prevChildRef`
+              // println(s"> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
               val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)
               // @Note: DOM update
               ParentNode.removeChild(parent = parentNode, child = prevChild)
+              // println(s"setting prevChildRef=${nextPrevChildRef.textContent}")
               prevChildRef = nextPrevChildRef
               currentChildrenCount -= 1
             }
@@ -138,17 +139,42 @@ object ChildrenInserter {
           }
         }
       }
-      prevChildRef = prevChildRef.nextSibling
+      // println(s">> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
+      // println(s"setting prevChildRef=${if (prevChildRef.nextSibling == null) "null!" else prevChildRef.nextSibling.textContent}")
+      if (prevChildRef.nextSibling == null) {
+        // This case is unexpected. It can happen when elements are removed from the DOM manually,
+        // or when they are moved from one `children <--` list to another via standard Laminar functionality.
+        // See issue: https://github.com/raquo/Laminar/issues/120
+        //
+        // At this point in the code, what we know that:
+        // - There are no more elements in the DOM – the `nextSibling` of the last element we looked at / inserted is `null`.
+        // - There are no more `nextChildren` – we've just exhausted for foreach loop above
+        // Conclusion:
+        // - We thought there would be more elements in the DOM, but they were removed (presumably externally),
+        //   and they are not found in `nextChildren`. So everything is right, but "for the wrong reasons", sort of.
+        // What we need to do:
+        // - Update `currentChildrenCount` to the accurate number, since it will be used on the next update.
+        // - `prevChildren` map will be discarded after this method runs, so we do NOT need to update that
+        currentChildrenCount = index + 1
+      } else {
+        prevChildRef = prevChildRef.nextSibling
+      }
       index += 1 // Faster than zipWithIndex
     }
 
+    // println("reached end of nextChildren")
     while (index < currentChildrenCount) {
       // We ran out of new items before we ran out of current items. Now deleting the remainder of current items.
 
+      // println(s"index=${index}, currentChildrenCount=${currentChildrenCount}")
+      // println(s">>> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
       val nextPrevChildRef = prevChildRef.nextSibling
       // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
       // @Note: DOM update
-      ParentNode.removeChild(parent = parentNode, child = prevChildFromRef(prevChildren, prevChildRef))
+      val prevChild = prevChildFromRef(prevChildren, prevChildRef)
+      // println(s"> removing(2) ${prevChild.ref.textContent}")
+      ParentNode.removeChild(parent = parentNode, child = prevChild)
+      // println(s"setting(2) prevChildRef=${if (nextPrevChildRef == null) "null!" else nextPrevChildRef.textContent}")
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1
     }
