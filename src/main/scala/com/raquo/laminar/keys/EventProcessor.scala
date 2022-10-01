@@ -135,6 +135,8 @@ class EventProcessor[Ev <: dom.Event, V](
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
+  def mapToUnit: EventProcessor[Ev, Unit] = mapToStrict(())
+
   /** Get the original event. You might want to call this in a chain, after some other processing. */
   def mapToEvent: EventProcessor[Ev, Ev] = {
     withNewProcessor(ev => processor(ev).map(_ => ev))
