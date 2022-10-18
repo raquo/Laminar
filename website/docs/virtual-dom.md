@@ -1,4 +1,6 @@
-# Virtual DOM is a Hack
+---
+title: Virtual DOM is a Hack
+---
 
 First of all, I should say that I very much appreciate all the libraries mentioned here. But I do need to explain why I think Laminar's approach is superior, so I will be making comparisons from my point of view. A lot of this is subjective. The problem at hand is too complicated for there to be the one unquestionable solution.
 

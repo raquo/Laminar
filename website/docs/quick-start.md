@@ -13,7 +13,7 @@ val helloDiv: Div = div("Hello, ", child.text <-- streamOfNames)
 
 `helloDiv` is a Laminar Div element that contains the text "Hello, `<Name>`", where `<Name>` is the latest value emitted by `streamOfNames`. As you see, `helloDiv` is **self-contained**. It depends on a stream, but is not a stream itself. It manages itself, abstracting away the reactive complexity of its innards from the rest of your program.
 
-Laminar does not use virtual DOM, and a Laminar element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element (available as `.ref`). That means that if you want something about that element to be dynamic, you should define it **inside** the element like we did with `child <-- nameStream` above. This allows for precision DOM updates instead of [inefficient virtual DOM diffing](https://github.com/raquo/Laminar/blob/master/docs/Virtual-DOM.md).
+Laminar does not use virtual DOM, and a Laminar element is not a virtual DOM node, instead it is linked one-to-one to an actual JS DOM element (available as `.ref`). That means that if you want something about that element to be dynamic, you should define it **inside** the element like we did with `child <-- nameStream` above. This allows for precision DOM updates instead of [inefficient virtual DOM diffing](https://laminar.dev/virtual-dom).
 
 With that out of the way, here is what a pretty simple Laminar "component" could look like:
 
