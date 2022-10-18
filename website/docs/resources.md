@@ -37,13 +37,15 @@ title: Resources
 
 ## Community & Support
 
-* [Gitter](https://gitter.im/Laminar_/Lobby) for support, advice, showing off your Laminar projects, etc.
+* [Discord](https://discord.gg/JTrUxhq7sj) for support, advice, feature requests, showing off your Laminar projects, posting Laminar jobs, etc.
 
-* [Github discussions](https://github.com/raquo/laminar/discussions) for how-tos, whys, and any questions or discussions that other people would benefit from easily finding.
+  * Until late 2022, our chat was in [Gitter](https://gitter.im/Laminar_/Lobby) – you might be able to find answers there, but please post new questions to Discord.
 
-* [Github issues](https://github.com/raquo/laminar/issues) for bugs and feature requests.
+* [Github discussions](https://github.com/raquo/laminar/discussions) for how-tos, whys, and any questions or discussions that other people would benefit from easily finding online.
 
-* Please consider [sponsoring Laminar development](https://github.com/sponsors/raquo) on Github.
+* [Github issues](https://github.com/raquo/laminar/issues) for bugs and buglike issues.
+
+* Please consider [sponsoring Laminar](https://github.com/sponsors/raquo) on Github to make Laminar development more sustainable.
 
 
 
@@ -126,9 +128,9 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 ## Component Libraries
 
-* **[SAP UI5 Laminar Web Components](https://github.com/sherpal/LaminarSAPUI5Bindings)**
+* **[SAP UI5 Laminar Web Components](https://github.com/sherpal/LaminarSAPUI5Bindings) – [live demo](https://sherpal.github.io/laminar-ui5-demo/)**
 
-* [Material UI Laminar Web Components](https://github.com/uosis/laminar-web-components)
+* [Material UI Laminar Web Components](https://github.com/uosis/laminar-web-components) (Note: appears to be abandoned)
 
 * Or, easily make your own interfaces: [runnable example](https://github.com/raquo/laminar-examples/tree/master/src/main/scala/webcomponents)
 

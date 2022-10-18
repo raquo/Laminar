@@ -227,7 +227,7 @@ class Index extends React.Component {
             }
             <div className="-homeSection -homeCommunitySection x-dark">
               <h1>Community</h1>
-              <p>Our main chatroom is in <a href="https://gitter.im/Laminar_/Lobby">gitter</a>, join us there for news, tips & support!</p>
+              <p>Our main chatroom is in <a href="https://discord.gg/JTrUxhq7sj">Discord</a>, join us there for news, tips & support!</p>
               <hr />
               <p>Laminar is developed by Nikita Gazarov with generous support from my <a href="https://github.com/sponsors/raquo">sponsors</a>.</p>
               <h2>GOLD Sponsors:</h2>

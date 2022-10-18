@@ -26,7 +26,7 @@ class Footer extends React.Component {
           </a>
           <div className="community-column">
             <h5>Community</h5>
-            <a href="https://gitter.im/Laminar_/Lobby">Gitter chatroom</a>
+            <a href="https://discord.gg/JTrUxhq7sj">Discord chatroom</a>
             <a href="https://github.com/sponsors/raquo">Sponsor the project</a>
           </div>
           <div className="github-column">

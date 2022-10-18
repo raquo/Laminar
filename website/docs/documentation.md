@@ -1791,4 +1791,4 @@ Therefore, if you're rendering a table you must make sure to wrap your `tr` elem
 
 ## Fin
 
-Hey, you've read all of this? Amazing. Join us in [gitter](https://gitter.im/Laminar_/Lobby).
+Hey, you've read all of this? Amazing. Join us in [Discord](https://discord.gg/JTrUxhq7sj)!
