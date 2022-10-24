@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v0.14.5, Discord and More News · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="This release was built with Scala 3.2.0, which fixes Scala.js sourcemaps on 3.x."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v0.14.5, Discord and More News · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2022/10/24/laminar-v0.14.5"/><meta property="og:description" content="This release was built with Scala 3.2.0, which fixes Scala.js sourcemaps on 3.x."/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2022/10/24/laminar-v0.14.5">Laminar v0.14.5, Discord and More News</a></li><li class="navListItem"><a class="navItem" href="/blog/2022/06/23/ecosystem">2022 Laminar Ecosystem Updates</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/07/10/laminar-v-0.13.1">Laminar v0.13.1 &amp; Waypoint 0.4.2</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/05/04/laminar-v0.13.0">Laminar v0.13.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/04/01/laminar-v0.12.2">Laminar v0.12.2</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2022/10/24/laminar-v0.14.5">Laminar v0.14.5, Discord and More News</a></h1><p class="post-meta">October 24, 2022</p><div class="authorBlock"><p class="post-authorName"><a href="http://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>This release was built with Scala 3.2.0, which fixes Scala.js sourcemaps on 3.x.</p>
+<!--truncate-->
+<h2><a class="anchor" aria-hidden="true" id="news"></a><a href="#news" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>News</h2>
+<p>Laminar chat has moved from <a href="https://gitter.im/Laminar_/Lobby">Gitter</a> to <a href="https://discord.gg/JTrUxhq7sj">Discord</a>. We've <a href="https://github.com/raquo/Laminar/discussions/114">considered</a> several options, and ultimately we're just going where most of the users are. I'm still lurking in Gitter, but most of our community's active members have moved to Discord, so please ask questions there for better visibility.</p>
+<p>People sometimes contact me looking for Laminar developers or Laminar jobs, but I am not social enough to be a good matchmaker. I made a <code>#jobs</code> channel in the new <a href="https://discord.gg/JTrUxhq7sj">Discord server</a> – everyone is welcome to post your jobs or advertise your skills for hire, as long as they relate to Laminar.</p>
+<p>Antoine's library of <a href="https://github.com/sherpal/LaminarSAPUI5Bindings">SAP UI5 bindings for Laminar</a> now has a <a href="https://sherpal.github.io/laminar-ui5-demo/">live demo</a> with all its components, and is published on Maven Central, no need for Jitpack. If you were looking for a robust collection of pre-made web components to use with Laminar, this is it.</p>
+<p>Iurii's Laminext Scribble moved to <a href="https://scribble.ninja">scribble.ninja</a>, and supports more UI libraries now.</p>
+<h2><a class="anchor" aria-hidden="true" id="laminar-changes"></a><a href="#laminar-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Laminar Changes</h2>
+<p>Laminar v0.14.5 is the same as <a href="https://laminar.dev/blog/2022/06/23/ecosystem#laminar-releases">v0.14.2</a> but rebuilt with Scala 3.2.0 and Scala.js 1.9.0 to fix Scala.js sourcemap generation in Scala 3.x (<a href="https://github.com/lampepfl/dotty/issues/14240">lampepfl/dotty#14240</a>). My understanding is that in order to make use of the fix, you need all frontend runtime dependencies to be built with Scala 3.1.3 or higher. All of Laminar's dependencies, as well as Laminext, Frontroute, Waypoint and URL-DSL have been upgraded – use their latest versions.</p>
+<h2><a class="anchor" aria-hidden="true" id="whats-next"></a><a href="#whats-next" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>What's Next</h2>
+<p>Last winter I worked a lot on Laminar 15.0.0, but have temporarily shelved everything in March. I have now resumed working on it, expecting an M1 release in a couple months. The work is being done in <code>next-0.15</code> branches of Laminar and Airstream repos.</p>
+<p>The new version comes not only with a slew of exciting new features, but also with improved behaviour, which necessitated some <a href="https://github.com/raquo/Airstream/issues/93">breaking changes</a> to Airstream semantics. These changes will require a manual review and retesting of your app, so after M1, Laminar will stay in M-releases for at least a month to give users enough time to report any undesired side effects of the changes. (Of course, a detailed changelog and migration guide will be provided as usual.) Please plan some time for this if you have a big Laminar app.</p>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank You</h2>
+<p>The development of Laminar itself is kindly sponsored by <a href="https://github.com/sponsors/raquo">people</a> who use it in their businesses and personal projects.</p>
+<p><strong>GOLD</strong> sponsors supporting Laminar:</p>
+<div class="-sponsorsList x-alignItemsEnd">
+  <div class="-sponsor x-person x-yurique">
+    <img class="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-300px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+</div>
+<p>Thank you for supporting me! ❤️</p>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#news">News</a></li><li><a href="#laminar-changes">Laminar Changes</a></li><li><a href="#whats-next">What's Next</a></li><li><a href="#thank-you">Thank You</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2022 Nikita Gazarov</section></footer></div></body></html>
