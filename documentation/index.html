@@ -222,12 +222,13 @@ div(
 </code></pre>
 <p>The general syntax of this feature is <code>inContext(El =&gt; Modifier[El]): Modifier[El]</code>. <code>thisNode</code> refers to the element to which this modifier will be applied. In our example its type is properly inferred to be <code>Input</code>, which is why you can call <code>.ref.value</code> on it without <code>.asInstanceOf</code>.</p>
 <p>Without getting ahead of ourselves too much, <code>onClick.mapTo(getCoordinates(thisNode)) --&gt; bus)</code> is a Modifier that handles <code>onClick</code> events on an element, but as you see it needs a reference to that element. You could get that reference in a couple <em>other</em> ways, for example:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myDiv: <span class="hljs-type">Div</span> = div(onClick.mapTo(getCoordinates(thisNode)) --&gt; bus) <span class="hljs-comment">// make sure to write out the type ascription</span>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// Make sure to write out the type ascription</span>
+<span class="hljs-keyword">val</span> thisNode: <span class="hljs-type">Div</span> = div(onClick.mapTo(getCoordinates(thisNode)) --&gt; bus)
 </code></pre>
 <p>Or</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> myDiv = div()
-myDiv.amend(
-  myDiv.events(onClick).mapTo(getCoordinates(thisNode)) --&gt; bus
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> thisNode = div()
+thisNode.amend(
+  thisNode.events(onClick).mapTo(getCoordinates(thisNode)) --&gt; bus
 )
 </code></pre>
 <p>But these are of course rather cumbersome. <code>inContext</code> provides an easy, inline solution that always works.</p>
@@ -339,7 +340,7 @@ div(
   <span class="hljs-type">Caption</span>(<span class="hljs-string">"World"</span>, prettyColorStream)
 )
 </code></pre>
-<p>This lets you to build loosely coupled applications very easily.</p>
+<p>This lets you build loosely coupled applications very easily.</p>
 <p>Having a stable reference to <code>myDiv</code> also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and eliminating needless complexity is one of Laminar's most important goals.</p>
 <p>However, there <em>is</em> a use case for streams of elements. Laminar elements are tied one-to-one to real JS DOM elements, so if you need a different <em>type</em> of element displayed, you will need to re-create the Laminar element. For example:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">MaybeBlogUrl</span></span>(maybeUrlSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]): <span class="hljs-type">Signal</span>[<span class="hljs-type">HtmlElement</span>] = {
