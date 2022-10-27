@@ -298,15 +298,16 @@ The general syntax of this feature is `inContext(El => Modifier[El]): Modifier[E
 Without getting ahead of ourselves too much, `onClick.mapTo(getCoordinates(thisNode)) --> bus)` is a Modifier that handles `onClick` events on an element, but as you see it needs a reference to that element. You could get that reference in a couple _other_ ways, for example:
 
 ```scala
-val myDiv: Div = div(onClick.mapTo(getCoordinates(thisNode)) --> bus) // make sure to write out the type ascription
+// Make sure to write out the type ascription
+val thisNode: Div = div(onClick.mapTo(getCoordinates(thisNode)) --> bus)
 ```
 
 Or
 
 ```scala
-val myDiv = div()
-myDiv.amend(
-  myDiv.events(onClick).mapTo(getCoordinates(thisNode)) --> bus
+val thisNode = div()
+thisNode.amend(
+  thisNode.events(onClick).mapTo(getCoordinates(thisNode)) --> bus
 )
 ```
 
@@ -501,7 +502,7 @@ val myDiv: Div = div(
 )
 ```
 
-This lets you to build loosely coupled applications very easily.
+This lets you build loosely coupled applications very easily.
 
 Having a stable reference to `myDiv` also simplifies your code significantly. If myDiv was a stream of divs instead, you'd need to engage in a potentially complex composition exercise to access the latest version of the element. Such useless complexity really adds up as your application grows, and eliminating needless complexity is one of Laminar's most important goals.
 
