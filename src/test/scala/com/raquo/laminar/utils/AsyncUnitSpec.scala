@@ -2,6 +2,7 @@ package com.raquo.laminar.utils
 
 import com.raquo.domtestutils.Utils
 import com.raquo.domtestutils.scalatest.AsyncMountSpec
+import org.scalatest.Suite
 import org.scalatest.funspec.AsyncFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -9,12 +10,16 @@ import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 import scala.util.Try
 
-class AsyncUnitSpec
-  extends AsyncFunSpec
+trait AsyncSpecLike
+  extends Suite
   with Matchers
   with LaminarSpec
   with AsyncMountSpec
-  with Utils {
+  with Utils
+
+class AsyncUnitSpec
+  extends AsyncFunSpec
+  with AsyncSpecLike {
 
   // @TODO[Test] Extract this to a more generic place
   def delay[V](value: => V): Future[V] = {
