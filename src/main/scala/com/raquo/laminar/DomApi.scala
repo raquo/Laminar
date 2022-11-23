@@ -325,6 +325,21 @@ object DomApi {
     }
   }
 
+  /** @see https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications */
+  def getFiles(element: dom.Element): js.UndefOr[List[dom.File]] = {
+    element match {
+      case input: dom.html.Input if input.`type` == "file" =>
+        var result: List[dom.File] = Nil
+        var ix = input.files.length - 1
+        while (ix >= 0) {
+          result = input.files(ix) :: result
+          ix -= 1
+        }
+        result
+      case _ => js.undefined
+    }
+  }
+
 
   /** DOM Parser */
 

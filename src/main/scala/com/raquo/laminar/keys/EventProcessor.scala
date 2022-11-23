@@ -162,6 +162,18 @@ class EventProcessor[Ev <: dom.Event, V](
     }
   }
 
+  /** Get the value of `event.target.files`
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+   */
+  def mapToFiles: EventProcessor[Ev, List[dom.File]] = {
+    withNewProcessor { ev =>
+      processor(ev).map { _ =>
+        DomApi.getFiles(ev.target.asInstanceOf[dom.Element]).getOrElse(Nil)
+      }
+    }
+  }
+
   /** Similar to the Airstream `compose` operator.
     *
     * Use this when you need to apply stream operators on this element's events, e.g.:
