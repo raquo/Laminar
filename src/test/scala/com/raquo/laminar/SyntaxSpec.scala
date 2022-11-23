@@ -392,6 +392,8 @@ class SyntaxSpec extends UnitSpec {
       i += 1
     }
 
+    def number() = 5
+
     val el = div(
       onClick --> effectReturningUnit(),
       onClick --> { effectReturningInt(); () },
@@ -405,18 +407,23 @@ class SyntaxSpec extends UnitSpec {
     )
 
     // We don't want unused (non-Unit) values to be silently swallowed by Laminar
-    assertDoesNotCompile("div(onClick --> 5)")
-    assertDoesNotCompile("div(onClick --> { 5 })")
-    assertDoesNotCompile("div(onClick --> effectReturningInt())")
-    assertDoesNotCompile("div(onClick --> i)")
-    assertDoesNotCompile("div(bus.events --> effectReturningInt())")
-    assertDoesNotCompile("div(bus.events --> i)")
-    assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> effectReturningInt())")
-    assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> i)")
+    assertTypeError("div(onClick --> 5)")
+    assertTypeError("div(onClick --> { 5 })")
+    assertTypeError("div(onClick --> number())")
+    assertTypeError("div(onClick --> effectReturningInt())")
+    assertTypeError("div(onClick --> i)")
+    assertTypeError("div(bus.events --> 5)")
+    assertTypeError("div(bus.events --> number())")
+    assertTypeError("div(bus.events --> effectReturningInt())")
+    assertTypeError("div(bus.events --> i)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> 5)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> number())")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> effectReturningInt())")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> i)")
     // Same goes for sinks that are of the wrong type
-    assertDoesNotCompile("div(onClick --> v)")
-    assertDoesNotCompile("div(bus.events --> v)")
-    assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> v)")
+    assertTypeError("div(onClick --> v)")
+    assertTypeError("div(bus.events --> v)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> v)")
 
     // --
 
