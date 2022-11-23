@@ -43,21 +43,21 @@ class LifecycleEventSpec extends UnitSpec {
     mount(section("Hello, ", child <-- $child))
 
     events shouldBe mutable.Buffer()
-    expectNode(section.of("Hello, ", ExpectedNode.comment))
+    expectNode(section.of("Hello, ", sentinel))
 
     // --
 
     textBus.writer.onNext("blah")
 
     events shouldBe mutable.Buffer(NodeDidMount)
-    expectNode(section.of("Hello, ", div.of("blah")))
+    expectNode(section.of("Hello, ", sentinel, div.of("blah")))
 
     // --
 
     textBus.writer.onNext("world")
 
     events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(section.of("Hello, ", div.of("world")))
+    expectNode(section.of("Hello, ", sentinel, div.of("world")))
 
   }
 
@@ -85,21 +85,21 @@ class LifecycleEventSpec extends UnitSpec {
     mount(section("Hello, ", child <-- $child))
 
     events shouldBe mutable.Buffer()
-    expectNode(section.of("Hello, ", ExpectedNode.comment))
+    expectNode(section.of("Hello, ", sentinel))
 
     // --
 
     textBus.writer.onNext("blah")
 
     events shouldBe mutable.Buffer(NodeDidMount)
-    expectNode(section.of("Hello, ", div.of( span.of("blah"))))
+    expectNode(section.of("Hello, ", sentinel, div.of(span.of("blah"))))
 
     // --
 
     textBus.writer.onNext("world")
 
     events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(section.of("Hello, ", div.of( span.of("world"))))
+    expectNode(section.of("Hello, ", sentinel, div.of( span.of("world"))))
   }
 
   it("Changing parent on a node fires appropriate events") {

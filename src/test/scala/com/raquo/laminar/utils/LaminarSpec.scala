@@ -8,6 +8,7 @@ import com.raquo.laminar.defs.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
 import com.raquo.laminar.keys.{HtmlAttr, Prop, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, RootNode}
 import com.raquo.laminar.tags.Tag
+import org.scalactic
 
 trait LaminarSpec
   extends MountOps
@@ -21,9 +22,13 @@ trait LaminarSpec
   // realize isn't running because it's inside a None.foreach.
   var root: RootNode = null
 
+  def sentinel: ExpectedNode = ExpectedNode.comment
+
   def mount(
     node: ReactiveElement.Base,
     clue: String = defaultMountedElementClue
+  )(
+    implicit pos: scalactic.source.Position
   ): Unit = {
     mountedElementClue = clue
     assertEmptyContainer("laminar.mount")
@@ -33,11 +38,13 @@ trait LaminarSpec
   def mount(
     clue: String,
     node: ReactiveElement.Base
+  )(
+    implicit pos: scalactic.source.Position
   ): Unit = {
-    mount(node, clue)
+    mount(node, clue)(pos)
   }
 
-  override def unmount(clue: String = "unmount"): Unit = {
+  override def unmount(clue: String = "unmount")(implicit pos: scalactic.source.Position): Unit = {
     assertRootNodeMounted("unmount:" + clue)
     doAssert(
       root != null,

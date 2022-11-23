@@ -8,6 +8,6 @@ import com.raquo.laminar.nodes.ReactiveElement
 object ChildrenCommandReceiver {
 
   def <--($command: EventSource[ChildrenCommand]): Inserter[ReactiveElement.Base] = {
-    ChildrenCommandInserter[ReactiveElement.Base](_ => $command.toObservable)
+    ChildrenCommandInserter[ReactiveElement.Base]($command.toObservable)
   }
 }

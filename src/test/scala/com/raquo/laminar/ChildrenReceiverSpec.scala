@@ -4,6 +4,7 @@ import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.utils.UnitSpec
+import org.scalajs.dom
 import org.scalatest.BeforeAndAfter
 
 import scala.collection.mutable
@@ -101,8 +102,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
       withClue(clue) {
         val first: Rule = "Hello"
         val last: Rule = article of "World"
-        val sentinelNode: Rule = ExpectedNode.comment
-        val rules: Seq[Rule] = sentinelNode +: childRules
+        val rules: Seq[Rule] = (sentinel: Rule) +: childRules
 
         expectNode(main.of(rules: _*))
       }
@@ -151,7 +151,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
@@ -166,7 +166,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: a", span like "a", "1"),
       div like ("ID: b", span like "b", "10")
     ))
@@ -189,7 +189,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: a", span like "a", "1"),
       div like ("ID: b", span like "b", "10"),
       div like ("ID: c", span like "c", "100")
@@ -335,7 +335,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: initial", span like "initial", "1"),
     ))
 
@@ -354,7 +354,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: a", span like "a", "1"),
       div like ("ID: b", span like "b", "10")
     ))
@@ -377,7 +377,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: a", span like "a", "1"),
       div like ("ID: b", span like "b", "10"),
       div like ("ID: c", span like "c", "100")
@@ -521,7 +521,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: initial", span like "initial", "1"),
     ))
 
@@ -540,7 +540,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: a", span like "a", "1"),
       div like ("ID: b", span like "b", "10")
     ))
@@ -563,7 +563,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(div like (
       "Hello",
-      ExpectedNode.comment,
+      sentinel,
       div like ("ID: a", span like "a", "1"),
       div like ("ID: b", span like "b", "10"),
       div like ("ID: c", span like "c", "100")
@@ -690,9 +690,9 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "--",
-        ExpectedNode.comment
+        sentinel
       )
     )
 
@@ -705,12 +705,12 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "a",
         span of "b",
         span of "c",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "d",
         span of "e",
         span of "f"
@@ -724,10 +724,10 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "a",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "d",
       )
     )
@@ -741,11 +741,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "a",
         span of "d",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "e",
       )
     )
@@ -759,10 +759,10 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "a",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "e",
         span of "d",
       )
@@ -777,11 +777,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "d",
         span of "a",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "e",
 
       )
@@ -796,11 +796,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "f",
         span of "c",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "e",
         span of "a",
         span of "d",
@@ -817,13 +817,13 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "f",
         span of "a",
         span of "c",
         span of "d",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "e",
       )
     )
@@ -837,14 +837,70 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         span of "e",
         span of "--",
-        ExpectedNode.comment,
+        sentinel,
         span of "f",
         span of "a",
         span of "c",
         span of "d"
+      )
+    )
+
+    // #TODO[Test]: also test for externally removing an element?
+  }
+
+  it("unmount stream") {
+
+    val bus = new EventBus[List[String]]
+
+    val el = div(
+      children <-- bus.events.map(texts => texts.map(span(_)))
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div of (
+        sentinel
+      )
+    )
+
+    // --
+
+    bus.emit(List("a", "b"))
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "a",
+        span of "b"
+      )
+    )
+
+    // --
+
+    unmount()
+
+    expectNode(
+      el.ref,
+      div of(
+        sentinel,
+        span of "a",
+        span of "b"
+      )
+    )
+
+    mount(el)
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "a",
+        span of "b"
       )
     )
   }

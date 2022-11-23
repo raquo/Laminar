@@ -2,31 +2,40 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.CollectionCommand
-import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.modifiers.ChildrenInserter.Child
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
+/**
+ * Note: this is a low level inserter. It is the fastest one, but due to
+ * its rather imperative API, its usefulness is very limited. It's good for
+ * simple but voluminous stuff, like appending new log items to a big list,
+ * but not much else.
+ *
+ * Consider using `children <-- observable.split(...)` instead, it has
+ * great performance and is much more convenient.
+ */
 object ChildrenCommandInserter {
 
   type ChildrenCommand = CollectionCommand[Child]
 
   def apply[El <: ReactiveElement.Base] (
-    $command: MountContext[El] => EventStream[ChildrenCommand]
-  ): Inserter[El] = new Inserter[El](
-    insertFn = (ctx, owner) => {
-      val mountContext = new MountContext[El](thisNode = ctx.parentNode, owner)
-
-      $command(mountContext).foreach { command =>
-        val nodeCountDiff = updateList(
-          command,
-          parentNode = ctx.parentNode,
-          sentinelNode = ctx.sentinelNode,
-          ctx.extraNodeCount
-        )
-        ctx.extraNodeCount += nodeCountDiff
-      }(owner)
-    }
-  )
+    $command: EventStream[ChildrenCommand]
+  ): Inserter[El] = {
+    new Inserter[El](
+      preferStrictMode = true,
+      insertFn = (ctx, owner) => {
+        $command.foreach { command =>
+          val nodeCountDiff = updateList(
+            command,
+            parentNode = ctx.parentNode,
+            sentinelNode = ctx.sentinelNode,
+            ctx.extraNodeCount
+          )
+          ctx.extraNodeCount += nodeCountDiff
+        }(owner)
+      }
+    )
+  }
 
   def updateList(
     command: ChildrenCommand,

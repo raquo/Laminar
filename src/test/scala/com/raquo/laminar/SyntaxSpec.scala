@@ -15,6 +15,8 @@ import scala.scalajs.js
 
 class SyntaxSpec extends UnitSpec {
 
+  def noop[A](v: A): Unit = ()
+
   it("seqToModifier, seqToNode implicit conversion works for both strings and nodes") {
 
     val strings = List("a", "b")
@@ -119,6 +121,22 @@ class SyntaxSpec extends UnitSpec {
     mount(el)
   }
 
+  it("onMountInsert with implicit renderable syntax") {
+    val el = div(
+      onMountInsert { _ =>
+        "hello"
+      },
+      onMountInsert { _ =>
+        123
+      },
+      "world"
+    )
+
+    mount(el)
+
+    expectNode(div of ("hello", "123", "world"))
+  }
+
   it("onMountBind with implicit setters syntax") {
 
     val el = div("Hello world")
@@ -151,15 +169,14 @@ class SyntaxSpec extends UnitSpec {
       onMountBind(_ => onClick.mapTo(1) --> Observer[Int](num => num * 5))
     )
 
-    // #TODO[Test]: Not sure why we're printing stuff here. Two of those are polluting the test results a bit.
     el.amend(
-      onMountBind(_ => observable --> ((num: Int) => println(num * 5))),
-      onMountBind(_ => signal --> ((num: Int) => println(num * 5))),
-      onMountBind(_ => stream --> ((num: Int) => println(num * 5)))
+      onMountBind(_ => observable --> ((num: Int) => noop(num * 5))),
+      onMountBind(_ => signal --> ((num: Int) => noop(num * 5))),
+      onMountBind(_ => stream --> ((num: Int) => noop(num * 5)))
     )
 
     el.amend(
-      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => println(num * 5))) // @Note "Div" type param is required only in scala 2.12
+      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => noop(num * 5))) // @Note "Div" type param is required only in scala 2.12
     )
 
     el.amend(
@@ -191,9 +208,9 @@ class SyntaxSpec extends UnitSpec {
     el.amend(onClick --> Observer[dom.MouseEvent](ev => ()))
     el.amend(onClick.mapTo(1) --> Observer[Int](num => num * 5))
 
-    el.amend(observable --> ((num: Int) => println(num * 5)))
-    el.amend(signal --> ((num: Int) => println(num * 5)))
-    el.amend(stream --> ((num: Int) => println(num * 5)))
+    el.amend(observable --> ((num: Int) => noop(num * 5)))
+    el.amend(signal --> ((num: Int) => noop(num * 5)))
+    el.amend(stream --> ((num: Int) => noop(num * 5)))
 
     el.amendThis(_ => stream --> bus.writer)
 
@@ -333,8 +350,8 @@ class SyntaxSpec extends UnitSpec {
 
     // No type param needed when in the element context
     div(
-      Modifier { el => println(el) },
-      Setter { el => println(el) },
+      Modifier { el => noop(el) },
+      Setter { el => noop(el) },
       Binder { el => null.asInstanceOf[DynamicSubscription] }
     )
 

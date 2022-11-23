@@ -56,8 +56,7 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
       withClue(clue) {
         val first: Rule = "Hello"
         val last: Rule = div of "World"
-        val sentinelNode: Rule = ExpectedNode.comment
-        val rules: Seq[Rule] = first +: sentinelNode +: childRules :+ last
+        val rules: Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ last
 
         expectNode(div.of(rules: _*))
       }

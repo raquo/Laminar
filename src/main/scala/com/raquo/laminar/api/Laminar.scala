@@ -310,12 +310,14 @@ private[laminar] object Laminar
   def onMountInsert[El <: Element](fn: MountContext[El] => Inserter[El]): Modifier[El] = {
     Modifier[El] { element =>
       var maybeSubscription: Option[DynamicSubscription] = None
-      val lockedContext = InsertContext.reserveSpotContext[El](element)
+      // We start the context in loose mode for performance, because it's cheaper to go from there
+      // to strict mode, than the other way. The inserters are able to handle any initial mode.
+      val lockedInsertContext = InsertContext.reserveSpotContext[El](element, strictMode = false)
       element.amend(
         onMountUnmountCallback[El](
-          mount = { c =>
-            val inserter = fn(c).withContext(lockedContext)
-            maybeSubscription = Some(inserter.bind(c.thisNode))
+          mount = { mountContext =>
+            val inserter = fn(mountContext).withContext(lockedInsertContext)
+            maybeSubscription = Some(inserter.bind(mountContext.thisNode))
           },
           unmount = { _ =>
             maybeSubscription.foreach(_.kill())
@@ -397,10 +399,13 @@ private[laminar] object Laminar
         } else {
           state = Some(mount(c))
         }
-        new Subscription(c.owner, cleanup = () => {
-          unmount(element, state)
-          state = None
-        })
+        new Subscription(
+          c.owner,
+          cleanup = () => {
+            unmount(element, state)
+            state = None
+          }
+        )
       }
     }
   }

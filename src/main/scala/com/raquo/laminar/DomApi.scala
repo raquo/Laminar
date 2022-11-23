@@ -419,4 +419,24 @@ object DomApi {
     }
   }
 
+  def debugNodeOuterHtml(node: dom.Node): String = {
+    node match {
+      case el: dom.Element => el.outerHTML
+      case el: dom.Text => s"Text(${el.textContent})"
+      case el: dom.Comment => s"Comment(${el.textContent})"
+      case null => "<null>"
+      case other => s"OtherNode(${other.toString})"
+    }
+  }
+
+  def debugNodeInnerHtml(node: dom.Node): String = {
+    node match {
+      case el: dom.Element => el.innerHTML
+      case el: dom.Text => s"Text(${el.textContent})"
+      case el: dom.Comment => s"Comment(${el.textContent})"
+      case null => "<null>"
+      case other => s"OtherNode(${other.toString})"
+    }
+  }
+
 }

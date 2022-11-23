@@ -7,7 +7,7 @@ import com.raquo.laminar.Implicits.RichSource
 import com.raquo.laminar.api.Laminar.StyleEncoder
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}
-import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildrenInserter, Inserter, Modifier, Setter}
+import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildTextInserter, ChildrenInserter, Inserter, Modifier, Renderable, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 import org.scalajs.dom
 
@@ -27,13 +27,10 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     EventProcessor.empty(eventProp)
   }
 
-  @inline implicit def textToNode(text: String): TextNode = new TextNode(text)
-
-  @inline implicit def boolToNode(bool: Boolean): TextNode = new TextNode(bool.toString)
-
-  @inline implicit def intToNode(int: Int): TextNode = new TextNode(int.toString)
-
-  @inline implicit def doubleToNode(double: Double): TextNode = new TextNode(double.toString)
+  /** Implicit [[Renderable]] instances are available for primitive types (defined in modifiers/Renderable.scala) */
+  implicit def renderableToTextNode[A](value: A)(implicit renderable: Renderable[A]): TextNode = {
+    renderable.asTextNode(value)
+  }
 
   /** Create a setter that applies each of the setters in a seq */
   implicit def seqToSetter[El <: ReactiveElement.Base](setters: scala.collection.Seq[Setter[El]]): Setter[El] = {
@@ -123,11 +120,11 @@ object Implicits {
     // Inserter implicits are needlessly expensive if we just need a Modifier, so we de-prioritize them
 
     implicit def nodeToInserter(node: ChildNode.Base): Inserter[ReactiveElement.Base] = {
-      ChildInserter[ReactiveElement.Base](_ => Val(node))
+      ChildInserter[ReactiveElement.Base](Val(node))
     }
 
     implicit def nodesSeqToInserter(nodes: scala.collection.Seq[ChildNode.Base]): Inserter[ReactiveElement.Base] = {
-      ChildrenInserter[ReactiveElement.Base](_ => Val(nodes.toList))
+      ChildrenInserter[ReactiveElement.Base](Val(nodes.toList))
     }
 
     implicit def nodesArrayToInserter(nodes: Array[ChildNode.Base]): Inserter[ReactiveElement.Base] = {
@@ -136,6 +133,10 @@ object Implicits {
 
     @inline implicit def nodesJsArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter[ReactiveElement.Base] = {
       nodesSeqToInserter(nodes)
+    }
+
+    implicit def renderableToInserter[A](value: A)(implicit renderable: Renderable[A]): Inserter[ReactiveElement.Base] = {
+      ChildTextInserter[A, ReactiveElement.Base](Val(value), renderable)
     }
   }
 

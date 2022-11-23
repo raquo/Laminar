@@ -159,12 +159,11 @@ object ParentNode {
     newChild: ChildNode.Base
   ): Boolean = {
     var replaced = false
-    parent._maybeChildren.foreach { children =>
-
-      // 0. Check precondition required for consistency of our own Tree vs real DOM
-      if (oldChild != newChild) {
-        val indexOfChild = children.indexOf(oldChild)
-        if (indexOfChild != -1) {
+    // 0. Check precondition required for consistency of our own Tree vs real DOM
+    if (oldChild != newChild) { // #TODO[API] Can we move this check outside of replaceChild? Or will something break? Sometimes this check is extraneous.
+      parent._maybeChildren.foreach { children =>
+        val indexOfOldChild = children.indexOf(oldChild)
+        if (indexOfOldChild != -1) {
           val newChildNextParent = Some(parent)
           oldChild.willSetParent(None)
           newChild.willSetParent(newChildNextParent)
@@ -176,12 +175,22 @@ object ParentNode {
             oldChild = oldChild
           )
 
-          // 2. Update this node
-          children.update(indexOfChild, newChild)
+          if (replaced) {
+            // 2A. Update new child's current parent node
+            newChild.maybeParent.foreach { childParent =>
+              childParent._maybeChildren.foreach { children =>
+                val ix = children.indexOf(newChild)
+                children.splice(ix, deleteCount = 1)
+              }
+            }
 
-          // 3. Update children
-          oldChild.setParent(None)
-          newChild.setParent(newChildNextParent)
+            // 2B. Update this node
+            children.update(indexOfOldChild, newChild)
+
+            // 3. Update children
+            oldChild.setParent(None)
+            newChild.setParent(newChildNextParent)
+          }
         }
       }
     }

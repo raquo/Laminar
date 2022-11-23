@@ -2,7 +2,7 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
-import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
+import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
@@ -11,36 +11,42 @@ import scala.scalajs.js
 
 object ChildrenInserter {
 
-  private val emptyChildren = Vector()
-
   type Child = ChildNode.Base
 
   type Children = immutable.Seq[Child]
 
-  def apply[El <: ReactiveElement.Base] (
-    $children: MountContext[El] => Observable[Children]
-  ): Inserter[El] = new Inserter[El](
-    insertFn = (ctx, owner) => {
-      val mountContext = new MountContext[El](thisNode = ctx.parentNode, owner)
-      val childrenSignal = $children(mountContext).toSignalIfStream(_.startWith(emptyChildren))
-      var lastSeenChildren: js.UndefOr[Children] = js.undefined
-      childrenSignal.foreach { newChildren =>
-        if (!lastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
-          lastSeenChildren = newChildren
-          val newChildrenMap = InsertContext.nodesToMap(newChildren)
-          ctx.extraNodeCount = updateChildren(
-            prevChildren = ctx.extraNodesMap,
-            nextChildren = newChildren,
-            nextChildrenMap = newChildrenMap,
-            parentNode = ctx.parentNode,
-            sentinelNode = ctx.sentinelNode,
-            ctx.extraNodeCount
-          )
-          ctx.extraNodesMap = newChildrenMap
+  def apply[El <: ReactiveElement.Base](
+    $children: Observable[Children]
+  ): Inserter[El] = {
+    new Inserter[El](
+      preferStrictMode = true,
+      insertFn = (ctx, owner) => {
+        if (!ctx.strictMode) {
+          ctx.forceSetStrictMode()
         }
-      }(owner)
-    }
-  )
+
+        var maybeLastSeenChildren: js.UndefOr[Children] = ctx.extraNodes
+
+        $children.foreach { newChildren =>
+          if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
+            // println(s">> ${$children}.foreach with newChildren = ${newChildren.map(_.ref).map(DomApi.debugNodeOuterHtml)}")
+            maybeLastSeenChildren = newChildren
+            val newChildrenMap = InsertContext.nodesToMap(newChildren)
+            ctx.extraNodeCount = updateChildren(
+              prevChildren = ctx.extraNodesMap,
+              nextChildren = newChildren,
+              nextChildrenMap = newChildrenMap,
+              parentNode = ctx.parentNode,
+              sentinelNode = ctx.sentinelNode,
+              ctx.extraNodeCount
+            )
+            ctx.extraNodes = newChildren
+            ctx.extraNodesMap = newChildrenMap
+          }
+        }(owner)
+      }
+    )
+  }
 
   /** @return New child node count */
   private def updateChildren(
@@ -187,7 +193,7 @@ object ChildrenInserter {
   }
 
   private def prevChildFromRef(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Child = {
-    prevChildren.get(ref).get // @TODO[Integrity] Throw a meaningful error if not found (that would be unrecoverable inconsistent state)
+    prevChildren.get(ref).getOrElse(throw new Exception(s"prevChildFromRef[children]: not found for ${ref}"))
   }
 
 }

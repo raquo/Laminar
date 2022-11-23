@@ -232,11 +232,11 @@ class SubscriptionLifecycleSpec extends UnitSpec {
     makeElement = $child => span(child <-- $child, "Hello"),
     makeChildA = $testTitle => L.a(title <-- $testTitle),
     makeChildB = $testTitle => b(title <-- $testTitle),
-    emptyExpectedNode = span.of(ExpectedNode.comment, "Hello"), // @TODO[API] We should not need to reference EN.comment here of this (it's a sentinel node, and we should use implicit conversion)
-    emptyExpectedNodeA = span.of(L.a.of(title.isEmpty), "Hello"),
-    emptyExpectedNodeB = span.of(b.of(title.isEmpty), "Hello"),
-    makeExpectedNodeA = expectedTitle => span.of(L.a.of(title is expectedTitle), "Hello"),
-    makeExpectedNodeB = expectedTitle => span.of(b.of(title is expectedTitle), "Hello"),
+    emptyExpectedNode = span.of(sentinel, "Hello"),
+    emptyExpectedNodeA = span.of(sentinel, L.a.of(title.isEmpty), "Hello"),
+    emptyExpectedNodeB = span.of(sentinel, b.of(title.isEmpty), "Hello"),
+    makeExpectedNodeA = expectedTitle => span.of(sentinel, L.a.of(title is expectedTitle), "Hello"),
+    makeExpectedNodeB = expectedTitle => span.of(sentinel, b.of(title is expectedTitle), "Hello"),
     values = Seq("Title 1", "Title 2", "Title 3", "Title 4").map(randomString(_))
   ).run())
 }
