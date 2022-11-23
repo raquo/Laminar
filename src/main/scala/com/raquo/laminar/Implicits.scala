@@ -152,6 +152,10 @@ object Implicits {
       Binder(ReactiveElement.bindFn(_, source.toObservable)(onNext))
     }
 
+    def -->(onNext: => Unit): Binder.Base = {
+      Binder(ReactiveElement.bindFn(_, source.toObservable)(_ => onNext))
+    }
+
   }
 
 }

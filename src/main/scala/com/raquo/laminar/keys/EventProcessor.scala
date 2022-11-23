@@ -35,6 +35,10 @@ class EventProcessor[Ev <: dom.Event, V](
     new EventListener[Ev, V](this, onNext)
   }
 
+  @inline def -->[El <: ReactiveElement.Base](onNext: => Unit): EventListener[Ev, V] = {
+    new EventListener[Ev, V](this, _ => onNext)
+  }
+
   /** Use capture mode (v=true) or bubble mode (v=false)
     *
     * Note that unlike `preventDefault` config which applies to individual events,
@@ -196,7 +200,7 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * button(onClick.preventDefault.flatMap(_ => makeAjaxRequest()) --> observer)
     *
-    * #TODO[IDE] IntelliJ (2021.3.2) shows false errors when using this flatMap implementation,
+    * #TODO[IDE] IntelliJ (2022.2.2) shows false errors when using this flatMap implementation,
     *  making it annoying. Use flatMapStream or flatMapSignal to get around that.
     *
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,

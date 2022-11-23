@@ -377,4 +377,65 @@ class SyntaxSpec extends UnitSpec {
     }
   }
 
+  it("unit-based binding syntax") {
+    var i = 0
+    val v = Var(0)
+
+    val bus = new EventBus[Boolean]
+
+    def effectReturningInt(): Int = {
+      i += 1
+      i
+    }
+
+    def effectReturningUnit(): Unit = {
+      i += 1
+    }
+
+    val el = div(
+      onClick --> effectReturningUnit(),
+      onClick --> { effectReturningInt(); () },
+      onClick --> v.update(_ + 5),
+      bus.events --> effectReturningUnit(),
+      bus.events --> { effectReturningInt(); () },
+      bus.events --> v.update(_ + 5),
+      onClick.flatMapStream(_ => bus.events) --> effectReturningUnit(),
+      onClick.flatMapStream(_ => bus.events) --> { effectReturningInt(); () },
+      onClick.flatMapStream(_ => bus.events) --> v.update(_ + 5),
+    )
+
+    // We don't want unused (non-Unit) values to be silently swallowed by Laminar
+    assertDoesNotCompile("div(onClick --> effectReturningInt())")
+    assertDoesNotCompile("div(onClick --> i)")
+    assertDoesNotCompile("div(bus.events --> effectReturningInt())")
+    assertDoesNotCompile("div(bus.events --> i)")
+    assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> effectReturningInt())")
+    assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> i)")
+    // Same goes for sinks that are of the wrong type
+    assertDoesNotCompile("div(onClick --> v)")
+    assertDoesNotCompile("div(bus.events --> v)")
+    assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> v)")
+
+    // --
+
+    mount(el)
+
+    assert(i == 0)
+    assert(v.now() == 0)
+
+    // --
+
+    el.ref.click()
+
+    assert(i == 2)
+    assert(v.now() == 5)
+
+    // --
+
+    bus.emit(true)
+
+    assert(i == 6)
+    assert(v.now() == 15)
+  }
+
 }
