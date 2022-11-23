@@ -405,6 +405,8 @@ class SyntaxSpec extends UnitSpec {
     )
 
     // We don't want unused (non-Unit) values to be silently swallowed by Laminar
+    assertDoesNotCompile("div(onClick --> 5)")
+    assertDoesNotCompile("div(onClick --> { 5 })")
     assertDoesNotCompile("div(onClick --> effectReturningInt())")
     assertDoesNotCompile("div(onClick --> i)")
     assertDoesNotCompile("div(bus.events --> effectReturningInt())")

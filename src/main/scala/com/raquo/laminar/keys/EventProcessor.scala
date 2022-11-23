@@ -31,11 +31,11 @@ class EventProcessor[Ev <: dom.Event, V](
     this --> (sink.toObserver.onNext(_))
   }
 
-  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventListener[Ev, V] = {
+  @inline def -->(onNext: V => Unit): EventListener[Ev, V] = {
     new EventListener[Ev, V](this, onNext)
   }
 
-  @inline def -->[El <: ReactiveElement.Base](onNext: => Unit): EventListener[Ev, V] = {
+  @inline def -->(onNext: => Unit): EventListener[Ev, V] = {
     new EventListener[Ev, V](this, _ => onNext)
   }
 
