@@ -412,18 +412,22 @@ class SyntaxSpec extends UnitSpec {
     assertTypeError("div(onClick --> number())")
     assertTypeError("div(onClick --> effectReturningInt())")
     assertTypeError("div(onClick --> i)")
+    assertTypeError("div(onClick --> { if (i > 0) 5 })")
     assertTypeError("div(bus.events --> 5)")
     assertTypeError("div(bus.events --> number())")
     assertTypeError("div(bus.events --> effectReturningInt())")
     assertTypeError("div(bus.events --> i)")
+    assertTypeError("div(bus.events --> { if (i > 0) 5 })")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> 5)")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> number())")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> effectReturningInt())")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> i)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> { if (i > 0) 5 })")
     // Same goes for sinks that are of the wrong type
     assertTypeError("div(onClick --> v)")
     assertTypeError("div(bus.events --> v)")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> v)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> { if (i > 0) v })")
 
     // --
 
