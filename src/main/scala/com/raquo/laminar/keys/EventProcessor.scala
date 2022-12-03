@@ -50,7 +50,8 @@ class EventProcessor[Ev <: dom.Event, V](
     new EventProcessor(eventProp, shouldUseCapture = true, processor = processor)
   }
 
-  /** Use standard bubble propagation mode. You don't need to call this unless you set `useCapture` previously.
+  /** Use standard bubble propagation mode.
+    * You don't need to call this unless you set `useCapture` previously, and want to revert to bubbling.
     *
     * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
     */

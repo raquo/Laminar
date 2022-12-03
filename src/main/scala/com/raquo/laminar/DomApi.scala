@@ -2,7 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.ew._
 import com.raquo.laminar.api.Laminar.{div, svg}
-import com.raquo.laminar.keys.{EventProcessor, HtmlAttr, Prop, StyleProp, SvgAttr}
+import com.raquo.laminar.keys.{AriaAttr, EventProcessor, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
 import com.raquo.laminar.tags.{HtmlTag, SvgTag, Tag}
@@ -108,10 +108,10 @@ object DomApi {
 
   def setHtmlAttribute[V](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V], value: V): Unit = {
     val domValue = attr.codec.encode(value)
-    if (domValue == null) { // End users should use `removeAttribute` instead. This is to support boolean attributes.
+    if (domValue == null) { // End users should use `removeHtmlAttribute` instead. This is to support boolean attributes.
       removeHtmlAttribute(element, attr)
     } else {
-      element.ref.setAttribute(attr.name, domValue.toString)
+      element.ref.setAttribute(attr.name, domValue)
     }
   }
 
@@ -120,7 +120,7 @@ object DomApi {
   }
 
   /** #Note not sure if this is completely safe. Could this return null? */
-  def getHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: Prop[V, DomV]): V = {
+  def getHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: HtmlProp[V, DomV]): V = {
     val domValue = element.ref.asInstanceOf[js.Dynamic].selectDynamic(prop.name).asInstanceOf[DomV]
     if (domValue != null) {
       prop.codec.decode(domValue)
@@ -129,7 +129,7 @@ object DomApi {
     }
   }
 
-  def setHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: Prop[V, DomV], value: V): Unit = {
+  def setHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: HtmlProp[V, DomV], value: V): Unit = {
     val newValue = prop.codec.encode(value).asInstanceOf[js.Any]
     element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(newValue)
   }
@@ -216,6 +216,26 @@ object DomApi {
     if (nsPrefixLength > -1) {
       qualifiedName.ew.substr(nsPrefixLength + 1).str
     } else qualifiedName
+  }
+
+  /** Aria attributes */
+
+  def getAriaAttribute[V](element: ReactiveElement.Base, attr: AriaAttr[V]): Option[V] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    Option(domValue).map(attr.codec.decode)
+  }
+
+  def setAriaAttribute[V](element: ReactiveElement.Base, attr: AriaAttr[V], value: V): Unit = {
+    val domValue = attr.codec.encode(value)
+    if (domValue == null) { // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
+      removeAriaAttribute(element, attr)
+    } else {
+      element.ref.setAttribute(attr.name, domValue)
+    }
+  }
+
+  def removeAriaAttribute(element: ReactiveElement.Base, attr: AriaAttr[_]): Unit = {
+    element.ref.removeAttribute(attr.name)
   }
 
 

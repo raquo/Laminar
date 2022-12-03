@@ -1,9 +1,9 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.domtypes.generic.codecs.Codec
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.modifiers.KeyUpdater.PropUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
@@ -15,7 +15,7 @@ import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
   * @tparam V type of values that this Property can be set to
   * @tparam DomV type of values that this Property holds in the native Javascript DOM
   */
-class Prop[V, DomV](
+class HtmlProp[V, DomV](
   override val name: String,
   val codec: Codec[V, DomV]
 ) extends Key { self =>
@@ -29,7 +29,7 @@ class Prop[V, DomV](
   }
 
   def :=(value: V): Setter[HtmlElement] = {
-    new KeySetter[Prop[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
+    new KeySetter[HtmlProp[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
   }
 
   def <--($value: Source[V]): PropUpdater[V, DomV] = {
@@ -45,7 +45,7 @@ class Prop[V, DomV](
         DomApi.setHtmlProperty(element, this, nextValue)
       }
     }
-    new KeyUpdater[HtmlElement, Prop[V, DomV], V](
+    new KeyUpdater[HtmlElement, HtmlProp[V, DomV], V](
       this,
       $value.toObservable,
       update

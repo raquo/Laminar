@@ -4,7 +4,7 @@ import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.utils.UnitSpec
 
-class PropSpec extends UnitSpec {
+class HtmlPropSpec extends UnitSpec {
 
   it("sets props") {
 

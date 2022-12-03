@@ -1,18 +1,26 @@
-package com.raquo.laminar.defs
+package com.raquo.laminar.defs.complex
 
-import com.raquo.domtypes.generic
-import com.raquo.domtypes.generic.builders.SvgAttrBuilder
-import com.raquo.domtypes.generic.codecs.StringAsIsCodec
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.defs.ComplexSvgKeys._
+import com.raquo.laminar.codecs.StringAsIsCodec
+import com.raquo.laminar.defs.complex.ComplexSvgKeys._
 import com.raquo.laminar.keys.{CompositeKey, SvgAttr}
 import com.raquo.laminar.nodes.ReactiveSvgElement
 
-trait ComplexSvgKeys extends generic.defs.complex.ComplexSvgKeys[
-  CompositeSvgAttr[String]
-] { this: SvgAttrBuilder[SvgAttr] =>
+trait ComplexSvgKeys {
 
-  override lazy val className: CompositeSvgAttr[String] = stringCompositeSvgAttr("class", separator = " ")
+  /**
+   * This attribute is a list of the classes of the element.
+   * Classes allow CSS and Javascript to select and access specific elements
+   * via the class selectors or functions like the DOM method
+   * document.getElementsByClassName
+   */
+  val className: CompositeSvgAttr[String] = stringCompositeSvgAttr("class", separator = " ")
+
+  val cls: CompositeSvgAttr[String] = className
+
+  lazy val role: CompositeSvgAttr[String] = stringCompositeSvgAttr("role", separator = " ")
+
+  // --
 
   protected def stringCompositeSvgAttr(name: String, separator: String): CompositeSvgAttr[String] = {
     val attr = new SvgAttr(name, StringAsIsCodec, namespace = None)

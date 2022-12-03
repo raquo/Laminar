@@ -9,7 +9,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 import scala.scalajs.js
 import scala.scalajs.js.JSStringOps._
 
-// @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
+// #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 
 // #TODO[API] can we make this an extendable trait or something, it shouldn't contain a fake key, it should BE the key, I think...?
 // #TODO[API] the problem is that now `Key` exposes reactive interface that we don't really want

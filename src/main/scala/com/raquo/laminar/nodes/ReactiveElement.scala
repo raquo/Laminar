@@ -54,7 +54,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   }
 
   /** @return -1 if not found */
-  private[laminar] def indexOfEventListener(listener: EventListener.Any): Int = {
+  private[laminar] def indexOfEventListener(listener: EventListener.Base): Int = {
     maybeEventListeners.fold(ifEmpty = -1) { eventListeners =>
       var found: Boolean = false
       var ix = 0
@@ -144,7 +144,7 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   val tag: Tag[ReactiveElement[Ref]]
 
-  def eventListeners: List[EventListener.Any] = {
+  def eventListeners: List[EventListener.Base] = {
     maybeEventListeners.map(_.map(_.listener).asScalaJs.toList).getOrElse(Nil)
   }
 

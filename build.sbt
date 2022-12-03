@@ -2,6 +2,12 @@ ThisBuild / scalaVersion := Versions.Scala_2_13
 
 ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
 
+lazy val precompile = taskKey[Unit]("runs Laminar-specific pre-compile tasks")
+
+precompile := DomDefsGenerator.cachedGenerate()
+
+(Compile / compile) := ((Compile / compile) dependsOn precompile).value
+
 lazy val websiteJS = project
   .in(file("websiteJS"))
   .settings(
@@ -51,7 +57,7 @@ lazy val laminar = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % Versions.Airstream,
-      "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes,
+      // "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes, #Note this is a compile-time dependency. See `project/build.sbt`
       "com.raquo" %%% "ew" % Versions.Ew,
       "com.raquo" %%% "domtestutils" % Versions.ScalaDomTestUtils % Test,
       "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,

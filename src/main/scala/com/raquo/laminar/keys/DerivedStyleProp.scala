@@ -9,18 +9,20 @@ import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 /** This class represents derived style props like `height.px` or `backgroundImage.url` */
-class DerivedStyleProp[InputV, StyleV](
-  val key: StyleProp[StyleV],
+class DerivedStyleProp[InputV](
+  val key: StyleProp[_],
   val encode: InputV => String
 ) {
 
-  @inline def apply(value: InputV): StyleSetter[StyleV] = {
+  @inline def apply(value: InputV): StyleSetter = {
     this := value
   }
 
-  def :=(value: InputV): StyleSetter[StyleV] = {
-    new KeySetter[StyleProp[StyleV], String, HtmlElement](
-      key,
+  def :=(value: InputV): StyleSetter = {
+    new KeySetter[StyleProp[_], String, HtmlElement](
+      // I think this is safe, because StyleProp[String] is essentially
+      // (but not literally) a subtype of StyleProp[V] in terms of its public API.
+      key, //.asInstanceOf[StyleProp[String]], // #nc
       encode(value),
       DomApi.setHtmlStringStyle
     )
@@ -30,16 +32,11 @@ class DerivedStyleProp[InputV, StyleV](
     optionToSetter(value.map(v => this := v))
   }
 
-  def <--($value: Source[InputV]): DerivedStyleUpdater[InputV, StyleV] = {
-    new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[StyleV], InputV](
+  def <--($value: Source[InputV]): DerivedStyleUpdater[InputV] = {
+    new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[_], InputV](
       key,
       $value.toObservable,
-      (el, v) => DomApi.setHtmlAnyStyle[StyleV](el, key, encode(v))
+      (el, v) => DomApi.setHtmlStringStyle(el, key, encode(v))
     )
   }
-}
-
-object DerivedStyleProp {
-
-  type Base[V] = DerivedStyleProp[V, _]
 }

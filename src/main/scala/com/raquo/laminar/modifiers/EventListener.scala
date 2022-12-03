@@ -82,5 +82,5 @@ class EventListener[Ev <: dom.Event, Out](
 object EventListener {
 
   /** Any kind of event listener */
-  type Any = EventListener[_ <: dom.Event, _]
+  type Base = EventListener[_ <: dom.Event, _]
 }

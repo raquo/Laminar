@@ -1,32 +1,36 @@
-package com.raquo.laminar.builders
+package com.raquo.laminar.keys
 
-import com.raquo.domtypes.generic.builders.DerivedStylePropBuilder
 import com.raquo.ew._
 
 import scala.scalajs.js
 
-trait DerivedStyleBuilders[T[_]] extends DerivedStylePropBuilder[T] {
+trait DerivedStyleBuilder[SS, DSP[_]] {
 
-  override protected def encodeUrlValue(url: String): String = {
+  protected def styleSetter(value: String): SS
+
+  // #Note: You can make this public if you wish
+  protected def derivedStyle[A](encode: (A => String)): DSP[A]
+
+  protected def encodeUrlValue(url: String): String = {
     // #TODO[Security] Review this.
     val escaped = url.ew.replace(
-      DerivedStyleBuilders.urlPattern,
-      DerivedStyleBuilders.urlReplacer
+      DerivedStyleBuilder.urlPattern,
+      DerivedStyleBuilder.urlReplacer
     ).str
     s""""$escaped"""" // #Note output is wrapped in double quotes
   }
 
-  override protected def encodeCalcValue(exp: String): String = {
+  protected def encodeCalcValue(exp: String): String = {
     // #TODO[Security] Review this.
     val escaped = exp.ew.replace(
-      DerivedStyleBuilders.calcPattern,
-      DerivedStyleBuilders.calcReplacer
+      DerivedStyleBuilder.calcPattern,
+      DerivedStyleBuilder.calcReplacer
     ).str
     s"$escaped" // #Note output is NOT wrapped in double quotes
   }
 }
 
-object DerivedStyleBuilders {
+object DerivedStyleBuilder {
 
   private val calcPattern = new js.RegExp("[\"\'\n\r\f\\\\;]", flags = "g")
 

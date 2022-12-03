@@ -1,17 +1,16 @@
 package com.raquo.laminar.api
 
-import com.raquo.domtypes.generic.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
-import com.raquo.domtypes.generic.defs.props.Props
-import com.raquo.domtypes.generic.defs.reflectedAttrs.ReflectedHtmlAttrs
-import com.raquo.domtypes.generic.defs.styles.Styles
-import com.raquo.domtypes.generic.defs.styles.units.{LengthUnits, UrlUnits}
-import com.raquo.domtypes.jsdom.defs.eventProps._
-import com.raquo.domtypes.jsdom.defs.tags._
-import com.raquo.laminar.builders._
+import com.raquo.airstream.web.DomEventStream
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.defs._
+import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
+import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
+import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
+import com.raquo.laminar.defs.props.HtmlProps
+import com.raquo.laminar.defs.styles.{StyleProps, units}
+import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import com.raquo.laminar.nodes.{ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
@@ -23,44 +22,40 @@ import org.scalajs.dom
 
 private[laminar] object Laminar
   extends Airstream
+    with HtmlTags
+    with HtmlAttrs
+    with HtmlProps
+    with GlobalEventProps
+    with StyleProps
     with ComplexHtmlKeys
-    // Reflected Attrs
-    with ReflectedHtmlAttrs[Prop]
-    // Attrs
-    with HtmlAttrs[HtmlAttr]
-    // Event Props
-    with ClipboardEventProps[EventProp]
-    with ErrorEventProps[EventProp]
-    with FormEventProps[EventProp]
-    with KeyboardEventProps[EventProp]
-    with MediaEventProps[EventProp]
-    with MiscellaneousEventProps[EventProp]
-    with MouseEventProps[EventProp]
-    with PointerEventProps[EventProp]
-    // Props
-    with Props[Prop]
-    // Styles
-    with Styles[StyleProp, StyleSetter, DerivedStyleProp.Base, Int]
-    // Tags
-    with DocumentTags[HtmlTag]
-    with EmbedTags[HtmlTag]
-    with FormTags[HtmlTag]
-    with GroupingTags[HtmlTag]
-    with MiscTags[HtmlTag]
-    with SectionTags[HtmlTag]
-    with TableTags[HtmlTag]
-    with TextTags[HtmlTag]
-    // Other things
-    with HtmlBuilders
     with Implicits {
+
+  @deprecated("customHtmlAttr was renamed to htmlAttr", "0.15.0-RC1")
+  @inline def customHtmlAttr[V](key: String, codec: Codec[V, String]): keys.HtmlAttr[V] = htmlAttr(key, codec)
+
+  @deprecated("customProp was renamed to htmlProp", "0.15.0-RC1")
+  @inline def customProp[V, DomV](key: String, codec: Codec[V, DomV]): keys.HtmlProp[V, DomV] = htmlProp(key, codec)
+
+  @deprecated("customEventProp was renamed to eventProp", "0.15.0-RC1")
+  @inline def customEventProp[Ev <: dom.Event](key: String): keys.EventProp[Ev] = eventProp(key)
+
+  @deprecated("customStyle was renamed to styleProp", "0.15.0-RC1")
+  @inline def customStyle[V](key: String): keys.StyleProp[V] = styleProp(key)
+
+  @deprecated("customHtmlTag was renamed to htmlTag", "0.15.0-RC1")
+  @inline def customHtmlTag[Ref <: dom.html.Element](tagName: String): HtmlTag[Ref] = htmlTag(tagName)
 
   /** This marker trait is used for implicit conversions. For all intents and purposes it's just a function. */
   trait StyleEncoder[A] extends Function1[A, String]
 
   object style
-    extends LengthUnits[StyleEncoder, Int]
-      with UrlUnits[StyleEncoder]
-      with DerivedStyleBuilders[StyleEncoder] {
+    extends DerivedStyleBuilder[String, StyleEncoder]
+      with units.Color[String, StyleEncoder]
+      with units.Length[StyleEncoder, Int]
+      with units.Time[StyleEncoder]
+      with units.Url[StyleEncoder] {
+
+    override protected def styleSetter(value: String): String = value
 
     override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = new StyleEncoder[A] {
       override def apply(v: A): String = encode(v)
@@ -68,22 +63,43 @@ private[laminar] object Laminar
   }
 
   object aria
-    extends AriaAttrs[HtmlAttr]
-      with HtmlBuilders
+    extends AriaAttrs
 
+  // @TODO[API] Add GlobalEventProps to SVG as well? Regular event props work fine, but they might be hard to import if you also import svg._
   object svg
-    extends SvgTags[SvgTag]
-      with ComplexSvgKeys
-      with SvgAttrs[SvgAttr]
-      with SvgBuilders
+    extends SvgTags
+      with SvgAttrs
+      with ComplexSvgKeys {
 
-  object documentEvents
-    extends StreamEventPropBuilder(dom.document)
-      with DocumentEventProps[EventStream]
+    @deprecated("customEventProp was removed from the svg scope, use eventProp in the parent scope", "0.15.0-RC1")
+    @inline def customEventProp[Ev <: dom.Event](key: String): EventProp[Ev] = eventProp(key)
 
-  object windowEvents
-    extends StreamEventPropBuilder(dom.window)
-      with WindowEventProps[EventStream]
+    @deprecated("customSvgTag was renamed to svgTag", "0.15.0-RC1")
+    @inline def customSvgAttr[V](key: String, codec: Codec[V, String], namespace: Option[String] = None): SvgAttr[V] = svgAttr(key, codec, namespace)
+
+    @deprecated("customSvgTag was renamed to svgTag", "0.15.0-RC1")
+    @inline def customSvgTag[Ref <: dom.svg.Element](tagName: String): SvgTag[Ref] = svgTag(tagName)
+  }
+
+  // -- Document & window events --
+
+  protected val documentEventProps = new GlobalEventProps with DocumentEventProps
+
+  protected val windowEventProps = new GlobalEventProps with WindowEventProps
+
+  /** Typical usage: documentEvents(_.onDomContentLoaded) */
+  def documentEvents[Ev <: dom.Event, V](events: documentEventProps.type => EventProcessor[Ev, V]): EventStream[V] = {
+    val p = events(documentEventProps)
+    DomEventStream[Ev](dom.document, EventProcessor.eventProp(p).name,  EventProcessor.shouldUseCapture(p))
+      .collectOpt(EventProcessor.processor(p))
+  }
+
+  /** Typical usage: windowEvents(_.onOffline) */
+  def windowEvents[Ev <: dom.Event, V](events: windowEventProps.type => EventProcessor[Ev, V]): EventStream[V] = {
+    val p = events(windowEventProps)
+    DomEventStream[Ev](dom.window, EventProcessor.eventProp(p).name, EventProcessor.shouldUseCapture(p))
+      .collectOpt(EventProcessor.processor(p))
+  }
 
   /** An owner that never kills its possessions.
     *
@@ -121,7 +137,7 @@ private[laminar] object Laminar
 
   type Mod[-El <: ParentNode.Base] = modifiers.Modifier[El]
 
-  val Mod: modifiers.Modifier.type = modifiers.Modifier
+  @inline def Mod: modifiers.Modifier.type = modifiers.Modifier
 
   type HtmlMod = Mod[HtmlElement]
 
@@ -164,7 +180,10 @@ private[laminar] object Laminar
 
   type HtmlAttr[V] = keys.HtmlAttr[V]
 
-  type Prop[V] = keys.Prop[V, _]
+  @deprecated("Use `HtmlProp` instead of `Prop`", "0.15.0-RC1")
+  type Prop[V] = keys.HtmlProp[V, _]
+
+  type HtmlProp[V] = keys.HtmlProp[V, _]
 
   @deprecated("Use `StyleProp` instead of `Style`", "0.15.0-RC1")
   type Style[V] = keys.StyleProp[V]
@@ -196,7 +215,7 @@ private[laminar] object Laminar
 
   type Label = nodes.ReactiveHtmlElement[dom.html.Label]
 
-  type Li = nodes.ReactiveHtmlElement[dom.html.LI]
+  type LI = nodes.ReactiveHtmlElement[dom.html.LI]
 
   type Select = nodes.ReactiveHtmlElement[dom.html.Select]
 
@@ -216,7 +235,7 @@ private[laminar] object Laminar
     container: => dom.Element,
     rootNode: => nodes.ReactiveElement.Base
   ): Unit = {
-    documentEvents.onDomContentLoaded.foreach { _ =>
+    documentEvents(_.onDomContentLoaded).foreach { _ =>
       new RootNode(container, rootNode)
     }(unsafeWindowOwner)
   }
@@ -432,16 +451,16 @@ private[laminar] object Laminar
   }
 
   def controlled[El <: HtmlElement, Ev <: dom.Event, V](
-    updater: KeyUpdater[El, Prop[V], V],
+    updater: KeyUpdater[El, HtmlProp[V], V],
     listener: EventListener[Ev, _]
   ): Binder[El] = {
     Binder[El] { element =>
       // @TODO[Elegance] Clean up the whole ValueController structure later
       // @TODO[Integrity] Not sure if there's a good way to avoid asInstanceOf here
       if (updater.key == value) {
-        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, Prop[String], String]], listener)
+        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[String], String]], listener)
       } else if (updater.key == checked) {
-        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, Prop[Boolean], Boolean]], listener)
+        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[Boolean], Boolean]], listener)
       } else {
         throw new Exception(s"Can not add a controller for property `${updater.key}` – only `value` and `checked` can be controlled this way. See docs on controlled inputs for details.")
       }
@@ -451,7 +470,7 @@ private[laminar] object Laminar
   /** Just like the other `controlled` method, but with the two arguments swapped places. Works the same. */
   @inline def controlled[El <: HtmlElement, Ev <: dom.Event, V](
     listener: EventListener[Ev, _],
-    updater: KeyUpdater[El, Prop[V], V]
+    updater: KeyUpdater[El, HtmlProp[V], V]
   ): Binder[El] = {
     controlled(updater, listener)
   }

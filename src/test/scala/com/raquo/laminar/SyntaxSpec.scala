@@ -4,6 +4,8 @@ import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.airstream.web.AjaxEventStream
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
+import com.raquo.laminar.keys.{DerivedStyleProp, SvgAttr}
+import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
@@ -16,6 +18,101 @@ import scala.scalajs.js
 class SyntaxSpec extends UnitSpec {
 
   def noop[A](v: A): Unit = ()
+
+  it("bundle sanity check") {
+
+    // Simple types
+
+    assert(div.name == "div")
+    assert(onClick.name == "click")
+    assert(value.name == "value")
+    assert(idAttr.name == "id")
+    assert(charset.name == "charset")
+    assert(display.name == "display")
+
+    // Event props
+
+    assert(onClick.name == "click") // elements - global
+    assert(onCopy.name == "copy") // elements - clipboard
+
+    documentEvents { x => // document - global
+      assert(x.onClick.name == "click")
+      x.onClick
+    }
+    documentEvents { x => // document - clipboard
+      assert(x.onCopy.name == "copy")
+      x.onCopy
+    }
+    documentEvents { x => // document
+      assert(x.onDomContentLoaded.name == "DOMContentLoaded")
+      x.onDomContentLoaded
+    }
+
+    windowEvents { x => // window - global
+      assert(x.onClick.name == "click")
+      x.onClick
+    }
+    windowEvents { x => // window - clipboard
+      assert(x.onCopy.name == "copy")
+      x.onCopy
+    }
+    windowEvents { x => // window
+      assert(x.onOffline.name == "offline")
+      x.onOffline
+    }
+
+    // SVG namespaces
+
+    assert(svg.xlinkHref.namespace.contains("xlink"))
+    assert(svg.xlinkHref.name == "xlink:href")
+    assert(SvgAttr.namespaceUrl(svg.xlinkHref.namespace.get) == "http://www.w3.org/1999/xlink")
+
+    // Aliases
+
+    assert(typ == `type`)
+    assert(typ.name == "type")
+
+    assert(svg.typ == svg.`type`)
+    assert(svg.typ.name == "type")
+
+    // Complex keys
+
+    assert(cls.name == "className")
+    // assert((cls := List("class1", "class2")).value == "class1 class2")
+
+    // CSS keywords
+
+    val s1: StyleSetter = display.none
+    val v1: String = display.none.value
+    assert(display.none.value == "none")
+
+    // Base CSS keywords
+    val s2: StyleSetter = padding.inherit
+    val v2: String = padding.inherit.value
+    assert(display.inherit.value == "inherit")
+
+    // Derived CSS props (units)
+
+    val p1: StyleProp[String] = padding
+    val p2: DerivedStyleProp[Int] = padding.px
+    assert((padding.px := 12).value == "12px")
+
+    maxHeight.calc := "12px + 20em" // Length inherits Calc
+
+    background.url: DerivedStyleProp[String]
+    (background.url := "https://laminar.dev").value == """url("https://laminar.dev")"""
+
+    assert(style.percent(55) == "55%")
+    assert(style.calc("12px + 20em") == "calc(12px + 20em)")
+
+    // Multi-parameter derived CSS props (units)
+
+    val p3: StyleProp[String] = color
+    val s3: StyleSetter = color.rgb(200, 100, 0)
+    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
+
+    assert(style.rgb(200, 100, 0) == "rgb(200, 100, 0)")
+  }
 
   it("seqToModifier, seqToNode implicit conversion works for both strings and nodes") {
 

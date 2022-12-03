@@ -1,11 +1,9 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.domtypes.generic.builders.StyleStringValueBuilder
-import com.raquo.domtypes.generic.defs.styles
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
-import com.raquo.laminar.builders.DerivedStyleBuilders
+import com.raquo.laminar.defs.styles.traits
 import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.modifiers.KeyUpdater.StyleUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
@@ -16,14 +14,14 @@ import scala.scalajs.js.|
 class StyleProp[V](
   override val name: String,
   val prefixes: Seq[String] = Nil
-) extends Key with StyleStringValueBuilder[StyleSetter[V]] with DerivedStyleBuilders[DerivedStyleProp.Base] {
+) extends Key with traits.Base with DerivedStyleBuilder[StyleSetter, DerivedStyleProp] {
 
   @inline def apply(value: V | String): Setter[HtmlElement] = {
     this := value
   }
 
-  def :=(value: V | String): StyleSetter[V] = {
-    new KeySetter[StyleProp[V], String, HtmlElement](this, value.toString, DomApi.setHtmlStringStyle)
+  def :=(value: V | String): StyleSetter = {
+    new KeySetter[StyleProp[_], String, HtmlElement](this, value.toString, DomApi.setHtmlStringStyle)
   }
 
   def maybe(value: Option[V | String]): Setter[HtmlElement] = {
@@ -39,19 +37,19 @@ class StyleProp[V](
   }
 
   /** Create a new key for this style with these prefixes */
-  def withPrefixes(ps: (styles.VendorPrefixes.type => String)*): StyleProp[V] = {
-    new StyleProp[V](name, ps.map(_ (styles.VendorPrefixes)))
+  def withPrefixes(ps: (StyleVendorPrefixes.type => String)*): StyleProp[V] = {
+    new StyleProp[V](name, ps.map(_ (StyleVendorPrefixes)))
   }
 
-  override protected def buildStringValue(value: String): StyleSetter[V] = {
+  override protected def styleSetter(value: String): StyleSetter = {
     this := value
   }
 
-  override protected def valueAsString(value: StyleSetter[V]): String = {
-    value.value
-  }
+  // override protected def valueAsString(value: StyleSetter[V]): String = {
+  //   value.value
+  // }
 
-  override protected def derivedStyle[InputV](encode: InputV => String): DerivedStyleProp[InputV, V] = {
-    new DerivedStyleProp[InputV, V](this, encode)
+  override protected def derivedStyle[InputV](encode: InputV => String): DerivedStyleProp[InputV] = {
+    new DerivedStyleProp[InputV](this, encode)
   }
 }

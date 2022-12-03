@@ -15,8 +15,8 @@ import scala.scalajs.js
 
 trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMappers {
 
-  implicit def derivedStyleIntToDouble[V](style: DerivedStyleProp[Int, V]): DerivedStyleProp[Double, V] = {
-    style.asInstanceOf[DerivedStyleProp[Double, V]] // Safe because Int-s and Double-s have identical runtime repr in SJS
+  implicit def derivedStyleIntToDouble[V](style: DerivedStyleProp[Int]): DerivedStyleProp[Double] = {
+    style.asInstanceOf[DerivedStyleProp[Double]] // Safe because Int-s and Double-s have identical runtime repr in SJS
   }
 
   implicit def styleEncoderIntToDouble[V](encoder: StyleEncoder[Int]): StyleEncoder[Double] = {

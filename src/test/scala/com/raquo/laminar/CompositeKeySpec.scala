@@ -6,7 +6,7 @@ import com.raquo.laminar.utils.UnitSpec
 class CompositeKeySpec extends UnitSpec {
 
   it("cls - simple static modifiers") {
-    val el = div(cls := "foo")
+    val el = div(className := "foo")
     mount(el)
     expectNode(div.of(cls is "foo"))
 

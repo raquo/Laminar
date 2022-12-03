@@ -1,7 +1,7 @@
 package com.raquo.laminar.basic
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.builders.DerivedStyleBuilders
+import com.raquo.laminar.keys.DerivedStyleBuilder
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.util.Random
@@ -88,9 +88,15 @@ class StyleSpec extends UnitSpec {
   it("encoding of CSS values") {
 
     // Expose methods to the public so that we can test them
-    class TestableBuilder extends DerivedStyleBuilders[StyleEncoder] {
+    class TestableBuilder extends DerivedStyleBuilder[String, StyleEncoder] {
 
-      override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = ???
+      override protected def styleSetter(value: String): String = value
+
+      override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = {
+        new StyleEncoder[A] {
+          override def apply(v: A): String = encode(v)
+        }
+      }
 
       override def encodeCalcValue(exp: String): String = super.encodeCalcValue(exp)
 
@@ -108,7 +114,7 @@ class StyleSpec extends UnitSpec {
     )
 
     val x = new TestableBuilder
-      assertEquals(
+    assertEquals(
       x.encodeCalcValue("20px + 50%"),
       "20px + 50%"
     )
