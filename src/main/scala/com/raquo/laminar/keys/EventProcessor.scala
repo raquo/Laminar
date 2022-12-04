@@ -179,6 +179,19 @@ class EventProcessor[Ev <: dom.Event, V](
     }
   }
 
+  /** Unsafe – Get the value of `event.target`, cast to a certain element type
+   *
+   * You should generally avoid this in favor of other helpers like
+   * `mapToValue` or `inContext { thisNode =>`.
+   */
+  def mapToTargetAs[Ref <: dom.EventTarget]: EventProcessor[Ev, Ref] = {
+    withNewProcessor { ev =>
+      processor(ev).map { _ =>
+        ev.target.asInstanceOf[Ref]
+      }
+    }
+  }
+
   /** Similar to the Airstream `compose` operator.
     *
     * Use this when you need to apply stream operators on this element's events, e.g.:
