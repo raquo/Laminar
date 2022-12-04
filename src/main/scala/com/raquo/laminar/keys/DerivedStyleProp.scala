@@ -20,9 +20,7 @@ class DerivedStyleProp[InputV](
 
   def :=(value: InputV): StyleSetter = {
     new KeySetter[StyleProp[_], String, HtmlElement](
-      // I think this is safe, because StyleProp[String] is essentially
-      // (but not literally) a subtype of StyleProp[V] in terms of its public API.
-      key, //.asInstanceOf[StyleProp[String]], // #nc
+      key,
       encode(value),
       DomApi.setHtmlStringStyle
     )

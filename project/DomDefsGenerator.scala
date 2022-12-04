@@ -1,7 +1,7 @@
 import com.raquo.domtypes.codegen.DefType.LazyVal
 import com.raquo.domtypes.codegen.{CanonicalCache, CanonicalDefGroups, CanonicalGenerator, CodeFormatting, SourceRepr}
 import com.raquo.domtypes.common.{HtmlTagType, SvgTagType}
-import com.raquo.domtypes.defs.styles.StyleTraits
+import com.raquo.domtypes.defs.styles.StyleTraitDefs
 
 object DomDefsGenerator {
 
@@ -27,7 +27,7 @@ object DomDefsGenerator {
   def cachedGenerate(): Unit = {
     cache.triggerIfCacheKeyUpdated(
       metaProject.BuildInfo.scalaDomTypesVersion,
-      forceOnEverySnapshot = false
+      forceOnEverySnapshot = true
     )(_ => generate())
   }
 
@@ -345,13 +345,13 @@ object DomDefsGenerator {
     // -- Style keyword traits
 
     {
-      StyleTraits.defs.foreach { styleTrait =>
+      StyleTraitDefs.defs.foreach { styleTrait =>
         val fileContent = generator.generateStyleKeywordsTrait(
           defSources = styleTrait.keywordDefGroups,
           printDefGroupComments = styleTrait.keywordDefGroups.length > 1,
           traitCommentLines = Nil,
-          traitName = styleTrait.scalaName,
-          extendsTraits = styleTrait.extendsTraits,
+          traitName = styleTrait.scalaName.replace("[_]", ""),
+          extendsTraits = styleTrait.extendsTraits.map(_.replace("[_]", "")),
           extendsUnitTraits = styleTrait.extendsUnits,
           propKind = "StyleProp",
           keywordType = "StyleSetter",
@@ -364,7 +364,7 @@ object DomDefsGenerator {
 
         generator.writeToFile(
           packagePath = generator.styleTraitsPackagePath(),
-          fileName = styleTrait.scalaName,
+          fileName = styleTrait.scalaName.replace("[_]", ""),
           fileContent = fileContent
         )
       }

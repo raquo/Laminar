@@ -1,7 +1,7 @@
 package website.webcomponents.material
 
-import com.raquo.domtypes.generic.codecs._
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.codecs.{BooleanAsIsCodec, DoubleAsIsCodec}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
@@ -28,21 +28,21 @@ object Slider {
   type El = ReactiveHtmlElement[Ref]
   type ModFunction = Slider.type => Mod[El]
 
-  private val tag: HtmlTag[Ref] = customHtmlTag("mwc-slider")
+  private val tag: HtmlTag[Ref] = htmlTag("mwc-slider")
 
-  val pin: Prop[Boolean]     = customProp("pin", BooleanAsIsCodec)
-  val markers: Prop[Boolean] = customProp("markers", BooleanAsIsCodec)
-  val value: Prop[Double]    = customProp("value", DoubleAsIsCodec)
-  val min: Prop[Double]      = customProp("min", DoubleAsIsCodec)
-  val max: Prop[Double]      = customProp("max", DoubleAsIsCodec)
-  val step: Prop[Double]     = customProp("step", DoubleAsIsCodec)
+  val pin: Prop[Boolean]     = htmlProp("pin", BooleanAsIsCodec)
+  val markers: Prop[Boolean] = htmlProp("markers", BooleanAsIsCodec)
+  val value: Prop[Double]    = htmlProp("value", DoubleAsIsCodec)
+  val min: Prop[Double]      = htmlProp("min", DoubleAsIsCodec)
+  val max: Prop[Double]      = htmlProp("max", DoubleAsIsCodec)
+  val step: Prop[Double]     = htmlProp("step", DoubleAsIsCodec)
 
 
-  val onInput: EventProp[dom.Event]  = customEventProp("input")
-  val onChange: EventProp[dom.Event] = customEventProp("change")
+  val onInput: EventProp[dom.Event]  = eventProp("input")
+  val onChange: EventProp[dom.Event] = eventProp("change")
 
   object styles {
-    val mdcThemeSecondary: StyleProp[String] = customStyleProp("--mdc-theme-secondary")
+    val mdcThemeSecondary: StyleProp[String] = styleProp("--mdc-theme-secondary")
   }
 
   def apply(mods: ModFunction*): HtmlElement = {

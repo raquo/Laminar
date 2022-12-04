@@ -3,7 +3,7 @@ package com.raquo.laminar.keys
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
-import com.raquo.laminar.defs.styles.traits
+import com.raquo.laminar.defs.styles.traits.GlobalKeywords
 import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.modifiers.KeyUpdater.StyleUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
@@ -14,7 +14,7 @@ import scala.scalajs.js.|
 class StyleProp[V](
   override val name: String,
   val prefixes: Seq[String] = Nil
-) extends Key with traits.Base with DerivedStyleBuilder[StyleSetter, DerivedStyleProp] {
+) extends Key with GlobalKeywords with DerivedStyleBuilder[StyleSetter, DerivedStyleProp] {
 
   @inline def apply(value: V | String): Setter[HtmlElement] = {
     this := value
