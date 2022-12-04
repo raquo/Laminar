@@ -40,24 +40,24 @@ class LifecycleEventSpec extends UnitSpec {
 
     // --
 
-    mount(section("Hello, ", child <-- $child))
+    mount(sectionTag("Hello, ", child <-- $child))
 
     events shouldBe mutable.Buffer()
-    expectNode(section.of("Hello, ", sentinel))
+    expectNode(sectionTag.of("Hello, ", sentinel))
 
     // --
 
     textBus.writer.onNext("blah")
 
     events shouldBe mutable.Buffer(NodeDidMount)
-    expectNode(section.of("Hello, ", sentinel, div.of("blah")))
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of("blah")))
 
     // --
 
     textBus.writer.onNext("world")
 
     events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(section.of("Hello, ", sentinel, div.of("world")))
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of("world")))
 
   }
 
@@ -82,24 +82,24 @@ class LifecycleEventSpec extends UnitSpec {
 
     // --
 
-    mount(section("Hello, ", child <-- $child))
+    mount(sectionTag("Hello, ", child <-- $child))
 
     events shouldBe mutable.Buffer()
-    expectNode(section.of("Hello, ", sentinel))
+    expectNode(sectionTag.of("Hello, ", sentinel))
 
     // --
 
     textBus.writer.onNext("blah")
 
     events shouldBe mutable.Buffer(NodeDidMount)
-    expectNode(section.of("Hello, ", sentinel, div.of(span.of("blah"))))
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of(span.of("blah"))))
 
     // --
 
     textBus.writer.onNext("world")
 
     events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(section.of("Hello, ", sentinel, div.of( span.of("world"))))
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of( span.of("world"))))
   }
 
   it("Changing parent on a node fires appropriate events") {
@@ -171,9 +171,9 @@ class LifecycleEventSpec extends UnitSpec {
   it("Nested lifecycle events") {
     val parent1 = div("parent1 ")
     val parent2 = p("parent2 ")
-    val parent3 = article("parent3 ")
-    val parent4 = article("parent4 ")
-    val parent5 = article("parent5 ")
+    val parent3 = articleTag("parent3 ")
+    val parent4 = articleTag("parent4 ")
+    val parent5 = articleTag("parent5 ")
 
     val grandChild3 = b("orly3")
 

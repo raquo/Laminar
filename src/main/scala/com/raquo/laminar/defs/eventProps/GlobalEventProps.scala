@@ -644,7 +644,7 @@ trait GlobalEventProps {
   lazy val onWaiting: EventProp[dom.Event] = eventProp("waiting")
 
 
-  // -- Misc Events --
+  // -- Animation Events --
 
 
   /**
@@ -674,6 +674,24 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/AnimationEvent
     */
   lazy val onAnimationStart: EventProp[dom.AnimationEvent] = eventProp("animationstart")
+
+
+  /**
+    * The `transitionend` event is sent to when a CSS transition completes.
+    * 
+    * Note: If the transition is removed from its target node before the transition completes execution, the
+    * `transitionend` event won't be generated. One way this can happen is by changing the value of the
+    * `transition-property` attribute which applies to the target. Another is if the `display` attribute is set to
+    * `none`.
+    * 
+    * @see [[https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/ontransitionend MDN]]
+    * 
+    * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/transitionend_event
+    */
+  lazy val onTransitionEnd: EventProp[dom.Event] = eventProp("transitionend")
+
+
+  // -- Misc Events --
 
 
   /**
@@ -720,21 +738,6 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/toggle_event
     */
   lazy val onToggle: EventProp[dom.Event] = eventProp("toggle")
-
-
-  /**
-    * The `transitionend` event is sent to when a CSS transition completes.
-    * 
-    * @note If the transition is removed from its target node before the transition completes execution, the
-    *       `transitionend` event won't be generated. One way this can happen is by changing the value of the
-    *       `transition-property` attribute which applies to the target. Another is if the `display` attribute is set to
-    *       `none`.
-    * 
-    * @see [[https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/ontransitionend MDN]]
-    * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/transitionend_event
-    */
-  lazy val onTransitionEnd: EventProp[dom.Event] = eventProp("transitionend")
 
 
   // -- Error Events --

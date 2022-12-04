@@ -41,14 +41,14 @@ class ElementSpec extends UnitSpec {
     expectNode(span of text1)
     unmount()
 
-    mount("article (fancy element from Tags2)", article(text1))
-    expectNode(article of text1)
+    mount("article (fancy element from Tags2)", articleTag(text1))
+    expectNode(articleTag of text1)
     unmount()
   }
 
   it("renders two text nodes") {
-    mount(article(text1, text2))
-    expectNode(article.of(text1, text2))
+    mount(articleTag(text1, text2))
+    expectNode(articleTag.of(text1, text2))
   }
 
   it("renders nested elements") {

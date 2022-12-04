@@ -31,7 +31,7 @@ class WeirdCasesSpec extends UnitSpec {
         child <-- bus.events.map(num =>
           span(
             s"num: $num",
-            child <-- bus.events.map(innerNum => article(s"innerNum: $innerNum"))
+            child <-- bus.events.map(innerNum => articleTag(s"innerNum: $innerNum"))
           )
         )
       )
@@ -48,7 +48,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of(
           "num: 1",
           sentinel,
-          article of "innerNum: 1"
+          articleTag of "innerNum: 1"
         )
       )
     )
@@ -62,7 +62,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of(
           "num: 2",
           sentinel,
-          article of "innerNum: 2"
+          articleTag of "innerNum: 2"
         )
       )
     )
@@ -79,7 +79,7 @@ class WeirdCasesSpec extends UnitSpec {
         child <-- signal.map(num =>
           span(
             s"num: $num",
-            child <-- signal.map(innerNum => article(s"innerNum: $innerNum"))
+            child <-- signal.map(innerNum => articleTag(s"innerNum: $innerNum"))
           )
         )
       )
@@ -88,7 +88,7 @@ class WeirdCasesSpec extends UnitSpec {
     expectNode(div.of("hello", sentinel, span.of(
       "num: 0",
       sentinel,
-      article of "innerNum: 0"
+      articleTag of "innerNum: 0"
     )))
 
     // --
@@ -102,7 +102,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of(
           "num: 1",
           sentinel,
-          article of "innerNum: 1"
+          articleTag of "innerNum: 1"
         )
       )
     )
@@ -118,7 +118,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of(
           "num: 2",
           sentinel,
-          article of "innerNum: 2"
+          articleTag of "innerNum: 2"
         )
       )
     )
@@ -135,7 +135,7 @@ class WeirdCasesSpec extends UnitSpec {
         child <-- bus.events.map(num =>
           span(
             s"num: $num",
-            child <-- signal.map(innerNum => article(s"innerNum: $innerNum"))
+            child <-- signal.map(innerNum => articleTag(s"innerNum: $innerNum"))
           )
         )
       )
@@ -154,7 +154,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of(
           "num: 1",
           sentinel,
-          article of "innerNum: 1"
+          articleTag of "innerNum: 1"
         )
       )
     )
@@ -170,7 +170,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of(
           "num: 2",
           sentinel,
-          article of "innerNum: 2"
+          articleTag of "innerNum: 2"
         )
       )
     )

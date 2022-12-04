@@ -45,7 +45,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     val span4 = span(text4)
     val span5 = span(text5)
 
-    mount(main(children <-- $children))
+    mount(mainTag(children <-- $children))
     expectChildren("none")
 
     childrenBus.writer.onNext(Vector())
@@ -101,10 +101,10 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
         val first: Rule = "Hello"
-        val last: Rule = article of "World"
+        val last: Rule = articleTag of "World"
         val rules: Seq[Rule] = (sentinel: Rule) +: childRules
 
-        expectNode(main.of(rules: _*))
+        expectNode(mainTag.of(rules: _*))
       }
     }
   }

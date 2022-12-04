@@ -30,21 +30,6 @@ private[laminar] object Laminar
     with ComplexHtmlKeys
     with Implicits {
 
-  @deprecated("customHtmlAttr was renamed to htmlAttr", "0.15.0-RC1")
-  @inline def customHtmlAttr[V](key: String, codec: Codec[V, String]): keys.HtmlAttr[V] = htmlAttr(key, codec)
-
-  @deprecated("customProp was renamed to htmlProp", "0.15.0-RC1")
-  @inline def customProp[V, DomV](key: String, codec: Codec[V, DomV]): keys.HtmlProp[V, DomV] = htmlProp(key, codec)
-
-  @deprecated("customEventProp was renamed to eventProp", "0.15.0-RC1")
-  @inline def customEventProp[Ev <: dom.Event](key: String): keys.EventProp[Ev] = eventProp(key)
-
-  @deprecated("customStyle was renamed to styleProp", "0.15.0-RC1")
-  @inline def customStyle[V](key: String): keys.StyleProp[V] = styleProp(key)
-
-  @deprecated("customHtmlTag was renamed to htmlTag", "0.15.0-RC1")
-  @inline def customHtmlTag[Ref <: dom.html.Element](tagName: String): HtmlTag[Ref] = htmlTag(tagName)
-
   /** This marker trait is used for implicit conversions. For all intents and purposes it's just a function. */
   trait StyleEncoder[A] extends Function1[A, String]
 
@@ -100,6 +85,21 @@ private[laminar] object Laminar
     DomEventStream[Ev](dom.window, EventProcessor.eventProp(p).name, EventProcessor.shouldUseCapture(p))
       .collectOpt(EventProcessor.processor(p))
   }
+
+  @deprecated("customHtmlAttr was renamed to htmlAttr", "0.15.0-RC1")
+  @inline def customHtmlAttr[V](key: String, codec: Codec[V, String]): keys.HtmlAttr[V] = htmlAttr(key, codec)
+
+  @deprecated("customProp was renamed to htmlProp", "0.15.0-RC1")
+  @inline def customProp[V, DomV](key: String, codec: Codec[V, DomV]): keys.HtmlProp[V, DomV] = htmlProp(key, codec)
+
+  @deprecated("customEventProp was renamed to eventProp", "0.15.0-RC1")
+  @inline def customEventProp[Ev <: dom.Event](key: String): keys.EventProp[Ev] = eventProp(key)
+
+  @deprecated("customStyle was renamed to styleProp", "0.15.0-RC1")
+  @inline def customStyle[V](key: String): keys.StyleProp[V] = styleProp(key)
+
+  @deprecated("customHtmlTag was renamed to htmlTag", "0.15.0-RC1")
+  @inline def customHtmlTag[Ref <: dom.html.Element](tagName: String): HtmlTag[Ref] = htmlTag(tagName)
 
   /** An owner that never kills its possessions.
     *

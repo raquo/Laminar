@@ -1074,9 +1074,9 @@ class MountHooksSpec extends UnitSpec {
 
     var internalOwner: Owner = null
 
-    val el = section(
+    val el = sectionTag(
       idAttr := "fullSection",
-      main(
+      mainTag(
         div(
           "Hello",
           className := "divClass",

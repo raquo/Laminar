@@ -20,7 +20,7 @@ class TreeSpec extends UnitSpec {
     val el0 = span("el0")
     val el10 = span("el10")
     val el11 = span("el11")
-    val el2 = article("el2")
+    val el2 = articleTag("el2")
     val el3 = L.a("el3", href := "http://example.com")
     val otherEl = div("otherEl")
 
@@ -95,7 +95,7 @@ class TreeSpec extends UnitSpec {
 
     val el0 = span("el0")
     val el10 = span("el10")
-    val el2 = article("el2")
+    val el2 = articleTag("el2")
 
     ChildNode.isNodeMounted(node = el0.ref) shouldBe false
     ChildNode.isNodeMounted(node = el10.ref) shouldBe false

@@ -67,6 +67,13 @@ class SyntaxSpec extends UnitSpec {
     assert(svg.xlinkHref.name == "xlink:href")
     assert(SvgAttr.namespaceUrl(svg.xlinkHref.namespace.get) == "http://www.w3.org/1999/xlink")
 
+    // Aria attributes
+
+    assert(aria.label.name == "aria-label")
+
+    (div(aria.label := "hello").ref.getAttribute("aria-label") == "hello")
+    (svg.circle(aria.label := "hello").ref.getAttribute("aria-label") == "hello")
+
     // Aliases
 
     assert(typ == `type`)
@@ -120,7 +127,7 @@ class SyntaxSpec extends UnitSpec {
     val stringsBuffer = mutable.Buffer("aa", "bb")
     val stringsArray = Array("aaa", "bbb")
     val stringsJsArray = js.Array("aaaa", "bbbb")
-    val nodes = Vector(span("ya"), article("yo")) // seq of elements.
+    val nodes = Vector(span("ya"), articleTag("yo")) // seq of elements.
     val nodesBuffer = mutable.Buffer(span("boo")) // mutable.Buffer[Span] is covariant as collection.Seq
     val nodesArray = Array(span("foo"), span("bar")) // Scala Arrays are not Seq-s. They are used in Scala 3 enums.
     val nodesJsArray = js.Array(span("js")) // JS arrays are invariant
@@ -139,7 +146,7 @@ class SyntaxSpec extends UnitSpec {
       "aa", "bb",
       "aaa", "bbb",
       "aaaa", "bbbb",
-      span of "ya", article of "yo",
+      span of "ya", articleTag of "yo",
       span of "boo",
       span of "foo",
       span of "bar",
