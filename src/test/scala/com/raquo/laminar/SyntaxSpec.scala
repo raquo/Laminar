@@ -369,11 +369,11 @@ class SyntaxSpec extends UnitSpec {
     def childrenSignal: Signal[List[Div]] = childrenStream.toSignal(Nil)
     def childrenObs: Observable[immutable.Seq[Div]] = childrenStream
 
-    val customSource = CustomStreamSource[String]((_, _, _, _) => CustomSource.Config(() => (), () => ()))
+    val customSource = new CustomStreamSource[String]((_, _, _, _) => CustomSource.Config(() => (), () => ()))
 
     val periodicInt = EventStream.periodic(0)
 
-    val ajaxStream = AjaxEventStream.get("")
+    val ajaxStream = AjaxStream.get("")
     val xhrBus = new EventBus[dom.XMLHttpRequest]
     val ajaxObs = Observer.empty[dom.XMLHttpRequest]
 

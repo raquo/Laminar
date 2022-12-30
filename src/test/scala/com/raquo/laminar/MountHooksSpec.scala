@@ -283,7 +283,7 @@ class MountHooksSpec extends UnitSpec {
 
     assert(numModCalls == 1)
     assert(numBindCalls == 10)
-    assert(numSignalCalls == 10) // due to new re-evaluation semantics of signals as of 0.15.0
+    assert(numSignalCalls == 1)
 
     // 2 subs:
     // - onMountBind,
@@ -337,7 +337,7 @@ class MountHooksSpec extends UnitSpec {
 
     assert(numModCalls == 1)
     assert(numBindCalls == 10)
-    assert(numSignalCalls == 10) // due to new re-evaluation semantics of signals as of 0.15.0
+    assert(numSignalCalls == 1)
 
     assert(el.ref.childNodes.length == 4) // Checks that onMountInsert properly discards of old items
 
@@ -394,7 +394,7 @@ class MountHooksSpec extends UnitSpec {
 
     assert(numModCalls == 1)
     assert(numBindCalls == 10)
-    assert(numSignalCalls == 10) // due to new re-evaluation semantics of signals as of 0.15.0
+    assert(numSignalCalls == 1)
 
     // 5 subs:
     // - onMountBind,
@@ -620,7 +620,7 @@ class MountHooksSpec extends UnitSpec {
 
     assert(numModCalls == 1)
     assert(numBindCalls == 4)
-    assert(numChildrenSignalCalls == 4) // due to new re-evaluation semantics of signals as of 0.15.0
+    assert(numChildrenSignalCalls == 3)
   }
 
   it("onMountInsert switches between different types of inserters (streams)") {

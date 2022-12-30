@@ -1,8 +1,8 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.{Sink, Source}
+import com.raquo.airstream.core.{Sink, Source, Transaction}
 import com.raquo.airstream.state.Val
-import com.raquo.ew.ewArray
+import com.raquo.ew.{JsArray, ewArray}
 import com.raquo.laminar.Implicits.RichSource
 import com.raquo.laminar.api.Laminar.StyleEncoder
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
@@ -55,7 +55,11 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
     // @TODO[Performance] See if we might want a separate implicit conversion for cases when we don't need `evidence`
-    Modifier[El](element => modifiers.foreach(asModifier(_).apply(element)))
+    Modifier[El] { element =>
+      Transaction.onStart.shared {
+        modifiers.foreach(asModifier(_).apply(element))
+      }
+    }
   }
 
   /** Create a modifier that applies each of the modifiers in an array */
@@ -64,16 +68,33 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   )(
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    Modifier[El](element => modifiers.foreach(asModifier(_).apply(element)))
+    Modifier[El] { element =>
+      Transaction.onStart.shared {
+        modifiers.foreach(asModifier(_).apply(element))
+      }
+    }
   }
 
   /** Create a modifier that applies each of the modifiers in an array */
   implicit def jsArrayToModifier[A, El <: ReactiveElement.Base](
+    modifiers: JsArray[A]
+  )(
+    implicit asModifier: A => Modifier[El]
+  ): Modifier[El] = {
+    Modifier[El] { element =>
+      Transaction.onStart.shared {
+        modifiers.forEach(asModifier(_).apply(element))
+      }
+    }
+  }
+
+  /** Create a modifier that applies each of the modifiers in an array */
+  implicit def sjsArrayToModifier[A, El <: ReactiveElement.Base](
     modifiers: js.Array[A]
   )(
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    Modifier[El](element => modifiers.foreach(asModifier(_).apply(element)))
+    jsArrayToModifier(modifiers.ew)
   }
 
   /** Create a modifier that applies the modifier in an option, if it's defined, or does nothing otherwise */

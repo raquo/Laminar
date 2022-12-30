@@ -1,7 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.nodes
-import com.raquo.laminar.nodes.ParentNode
+import com.raquo.laminar.nodes.{ParentNode, ReactiveElement}
 
 /** This type represents an operation that has a side effect on a node of type [[El]].
   *
@@ -23,7 +22,7 @@ trait Modifier[-El <: ParentNode.Base] {
 
 object Modifier {
 
-  type Base = Modifier[nodes.ParentNode.Base]
+  type Base = Modifier[ReactiveElement.Base]
 
   val empty: Modifier.Base = new Modifier[ParentNode.Base] {}
 

@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink}
+import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink, Transaction}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.ew.JsArray
@@ -166,8 +166,10 @@ trait ReactiveElement[+Ref <: dom.Element]
   //  - but then SyntaxSpec / "amend on inlined element" test will fail. Check in Dotty later.
   //  - not a big deal but lame
   def amend(mods: Modifier[this.type]*): this.type = {
-    mods.foreach(mod => mod(this))
-    this
+    Transaction.onStart.shared {
+      mods.foreach(mod => mod(this))
+      this
+    }
   }
 
   def amendThis(makeMod: this.type => Modifier[this.type]): this.type = {

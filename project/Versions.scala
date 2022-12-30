@@ -12,7 +12,7 @@ object Versions {
 
   val Airstream = "0.15.0-SNAPSHOT"
 
-  val Ew = "0.1.1"
+  val Ew = "0.1.2-SNAPSHOT"
 
   // Testing
 

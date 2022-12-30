@@ -22,9 +22,9 @@ trait Airstream {
 
   type Sink[-A] = airstream.core.Sink[A]
 
-  val EventStream: airstream.core.EventStream.type = airstream.core.EventStream
+  @inline def EventStream: airstream.core.EventStream.type = airstream.core.EventStream
 
-  val Signal: airstream.core.Signal.type = airstream.core.Signal
+  @inline def Signal: airstream.core.Signal.type = airstream.core.Signal
 
   val Observer: airstream.core.Observer.type = airstream.core.Observer
 
