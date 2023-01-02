@@ -4,6 +4,7 @@ import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.KeySetter.HtmlAttrSetter
 import com.raquo.laminar.modifiers.KeyUpdater.HtmlAttrUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
@@ -17,7 +18,7 @@ class HtmlAttr[V](
   val codec: Codec[V, String]
 ) extends Key {
 
-  @inline def apply(value: V): Setter[HtmlElement] = {
+  @inline def apply(value: V): HtmlAttrSetter[V] = {
     this := value
   }
 
@@ -25,7 +26,7 @@ class HtmlAttr[V](
     optionToSetter(value.map(v => this := v))
   }
 
-  def :=(value: V): Setter[HtmlElement] = {
+  def :=(value: V): HtmlAttrSetter[V] = {
     new KeySetter[HtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
   }
 
@@ -33,7 +34,7 @@ class HtmlAttr[V](
     new KeyUpdater[HtmlElement, HtmlAttr[V], V](
       this,
       $value.toObservable,
-      (el, v) => DomApi.setHtmlAttribute(el, this, v)
+      (el, v, _) => DomApi.setHtmlAttribute(el, this, v)
     )
   }
 

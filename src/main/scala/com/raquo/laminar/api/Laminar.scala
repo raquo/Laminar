@@ -2,7 +2,6 @@ package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.defs._
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
@@ -12,7 +11,7 @@ import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
-import com.raquo.laminar.nodes.{ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
 import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
@@ -135,7 +134,7 @@ private[laminar] object Laminar
 
   // Modifiers
 
-  type Mod[-El <: ParentNode.Base] = modifiers.Modifier[El]
+  type Mod[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
 
   @inline def Mod: modifiers.Modifier.type = modifiers.Modifier
 
@@ -144,7 +143,7 @@ private[laminar] object Laminar
   type SvgMod = Mod[SvgElement]
 
 
-  type Modifier[-El <: ParentNode.Base] = modifiers.Modifier[El]
+  type Modifier[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
 
   val Modifier: modifiers.Modifier.type = modifiers.Modifier
 
@@ -192,9 +191,9 @@ private[laminar] object Laminar
 
   type SvgAttr[V] = keys.SvgAttr[V]
 
-  type CompositeHtmlAttr[V] = ComplexHtmlKeys.CompositeHtmlAttr[V]
+  type CompositeHtmlAttr = ComplexHtmlKeys.CompositeHtmlAttr
 
-  type CompositeSvgAttr[V] = ComplexSvgKeys.CompositeSvgAttr[V]
+  type CompositeSvgAttr = ComplexSvgKeys.CompositeSvgAttr
 
 
   // Specific HTML elements
@@ -241,7 +240,7 @@ private[laminar] object Laminar
   }
 
   /** A universal Modifier that does nothing */
-  val emptyMod: Modifier.Base = Modifier.empty
+  val emptyMod: Modifier[ReactiveElement.Base] = Modifier.empty
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
     * This is a bit annoying, I know, but we kinda have to follow the native JS DOM API on this.

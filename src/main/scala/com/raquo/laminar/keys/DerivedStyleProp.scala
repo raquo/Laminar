@@ -34,7 +34,7 @@ class DerivedStyleProp[InputV](
     new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[_], InputV](
       key,
       $value.toObservable,
-      (el, v) => DomApi.setHtmlStringStyle(el, key, encode(v))
+      (el, v, _) => DomApi.setHtmlStringStyle(el, key, encode(v))
     )
   }
 }

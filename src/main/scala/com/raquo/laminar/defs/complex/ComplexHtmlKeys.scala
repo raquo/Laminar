@@ -14,9 +14,9 @@ trait ComplexHtmlKeys {
    * via the class selectors or functions like the DOM method
    * document.getElementsByClassName
    */
-  val className: CompositeProp[String] = stringCompositeProp("className", separator = " ")
+  val className: CompositeProp = stringCompositeProp("className", separator = " ")
 
-  val cls: CompositeProp[String] = className
+  val cls: CompositeProp = className
 
   /**
    * This attribute names a relationship of the linked document to the current
@@ -25,7 +25,7 @@ trait ComplexHtmlKeys {
    * external style sheet: the rel attribute is set to stylesheet, and the href
    * attribute is set to the URL of an external style sheet to format the page.
    */
-  lazy val rel: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("rel", separator = " ")
+  lazy val rel: CompositeHtmlAttr = stringCompositeHtmlAttr("rel", separator = " ")
 
   /**
    * The attribute describes the role(s) the current element plays in the
@@ -42,7 +42,7 @@ trait ComplexHtmlKeys {
    *
    * See: [[http://www.w3.org/TR/role-attribute/#s_role_module_attributes]]
    */
-  lazy val role: CompositeHtmlAttr[String] = stringCompositeHtmlAttr("role", separator = " ")
+  lazy val role: CompositeHtmlAttr = stringCompositeHtmlAttr("role", separator = " ")
 
   /**
    * This class of attributes, called custom data attributes, allows proprietary
@@ -74,30 +74,22 @@ trait ComplexHtmlKeys {
 
   // --
 
-  protected def stringCompositeProp(name: String, separator: String): CompositeProp[String] = {
+  protected def stringCompositeProp(name: String, separator: String): CompositeProp = {
     val prop = new HtmlProp(name, StringAsIsCodec)
     new CompositeKey(
-      key = prop,
-      getDomValue = el => {
-        CompositeKey.normalize(DomApi.getHtmlProperty(el, prop), separator)
-      },
-      setDomValue = (el, value) => {
-        DomApi.setHtmlProperty(el, prop, value.mkString(separator))
-      },
+      name = prop.name,
+      getRawDomValue = el => DomApi.getHtmlProperty(el, prop),
+      setRawDomValue = (el, value) => DomApi.setHtmlProperty(el, prop, value),
       separator = separator
     )
   }
 
-  protected def stringCompositeHtmlAttr(name: String, separator: String): CompositeHtmlAttr[String] = {
+  protected def stringCompositeHtmlAttr(name: String, separator: String): CompositeHtmlAttr = {
     val attr = new HtmlAttr(name, StringAsIsCodec)
     new CompositeKey(
-      key = attr,
-      getDomValue = el => {
-        CompositeKey.normalize(DomApi.getHtmlAttribute(el, attr).getOrElse(""), separator)
-      },
-      setDomValue = (el, value) => {
-        DomApi.setHtmlAttribute(el, attr, value.mkString(separator.toString))
-      },
+      name = attr.name,
+      getRawDomValue = el => DomApi.getHtmlAttribute(el, attr).getOrElse(""),
+      setRawDomValue = (el, value) => DomApi.setHtmlAttribute(el, attr, value),
       separator = separator
     )
   }
@@ -105,7 +97,7 @@ trait ComplexHtmlKeys {
 
 object ComplexHtmlKeys {
 
-  type CompositeProp[V] = CompositeKey[HtmlProp[V, V], ReactiveHtmlElement.Base]
+  type CompositeProp = CompositeKey[HtmlProp[String, String], ReactiveHtmlElement.Base]
 
-  type CompositeHtmlAttr[V] = CompositeKey[HtmlAttr[V], ReactiveHtmlElement.Base]
+  type CompositeHtmlAttr = CompositeKey[HtmlAttr[String], ReactiveHtmlElement.Base]
 }

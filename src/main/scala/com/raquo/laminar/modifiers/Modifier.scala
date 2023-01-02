@@ -1,6 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.nodes.{ParentNode, ReactiveElement}
+import com.raquo.laminar.nodes.ReactiveElement
 
 /** This type represents an operation that has a side effect on a node of type [[El]].
   *
@@ -10,7 +10,7 @@ import com.raquo.laminar.nodes.{ParentNode, ReactiveElement}
   *
   * We're defining a specific trait for this because we expect to have implicit conversions into this type.
   */
-trait Modifier[-El <: ParentNode.Base] {
+trait Modifier[-El <: ReactiveElement.Base] {
 
   /** You can count on this method being a no-op in your libraries and end user code.
     *
@@ -22,11 +22,15 @@ trait Modifier[-El <: ParentNode.Base] {
 
 object Modifier {
 
-  type Base = Modifier[ReactiveElement.Base]
+  // #TODO[API] Should there be a `Modifier.Base` type alias similar to other such type aliases?
+  //  - The problem is, `Modifier.Base` is not a supertype of all modifiers. Not sure if it's obvious enough.
+  // type Base = Modifier[ReactiveElement.Base]
 
-  val empty: Modifier.Base = new Modifier[ParentNode.Base] {}
+  type Any = Modifier[_ <: ReactiveElement.Base]
 
-  def apply[El <: ParentNode.Base](f: El => Unit): Modifier[El] = {
+  val empty: Modifier[ReactiveElement.Base] = new Modifier[ReactiveElement.Base] {}
+
+  def apply[El <: ReactiveElement.Base](f: El => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = f(element)
     }

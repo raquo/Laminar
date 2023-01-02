@@ -4,6 +4,7 @@ import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{SvgElement, optionToSetter}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.KeySetter.SvgAttrSetter
 import com.raquo.laminar.modifiers.KeyUpdater.SvgAttrUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
@@ -23,7 +24,11 @@ class SvgAttr[V](
   /** Qualified name, including namespace */
   override val name: String = namespace.map(_ + ":" + localName).getOrElse(localName)
 
-  @inline def apply(value: V): Setter[SvgElement] = {
+  def :=(value: V): SvgAttrSetter[V] = {
+    new KeySetter[SvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
+  }
+
+  @inline def apply(value: V): SvgAttrSetter[V] = {
     this := value
   }
 
@@ -31,15 +36,11 @@ class SvgAttr[V](
     optionToSetter(value.map(v => this := v))
   }
 
-  def :=(value: V): Setter[SvgElement] = {
-    new KeySetter[SvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
-  }
-
   def <--($value: Source[V]): SvgAttrUpdater[V] = {
     new KeyUpdater[SvgElement, SvgAttr[V], V](
       this,
       $value.toObservable,
-      (el, v) => DomApi.setSvgAttribute(el, this, v)
+      (el, v, _) => DomApi.setSvgAttribute(el, this, v)
     )
   }
 

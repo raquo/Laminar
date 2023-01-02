@@ -4,8 +4,9 @@ import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{HtmlElement, optionToSetter}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.KeySetter.PropSetter
 import com.raquo.laminar.modifiers.KeyUpdater.PropUpdater
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
+import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Modifier, Setter}
 
 /**
   * This class represents a DOM Element Property. Meaning the key that can be set, not a key-value pair.
@@ -20,7 +21,11 @@ class HtmlProp[V, DomV](
   val codec: Codec[V, DomV]
 ) extends Key { self =>
 
-  @inline def apply(value: V): Setter[HtmlElement] = {
+  def :=(value: V): PropSetter[V, DomV] = {
+    new KeySetter[HtmlProp[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
+  }
+
+  @inline def apply(value: V): PropSetter[V, DomV] = {
     this := value
   }
 
@@ -28,20 +33,16 @@ class HtmlProp[V, DomV](
     optionToSetter(value.map(v => this := v))
   }
 
-  def :=(value: V): Setter[HtmlElement] = {
-    new KeySetter[HtmlProp[V, DomV], V, HtmlElement](this, value, DomApi.setHtmlProperty)
-  }
-
   def <--($value: Source[V]): PropUpdater[V, DomV] = {
     val update = if (name == "value") {
-      (element: HtmlElement, nextValue: V) =>
+      (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
         // Checking against current DOM value prevents cursor position reset in Safari
         val currentDomValue = DomApi.getHtmlProperty(element, this)
         if (nextValue != currentDomValue) {
           DomApi.setHtmlProperty(element, this, nextValue)
         }
     } else {
-      (element: HtmlElement, nextValue: V) => {
+      (element: HtmlElement, nextValue: V, reason: Modifier.Any) => {
         DomApi.setHtmlProperty(element, this, nextValue)
       }
     }

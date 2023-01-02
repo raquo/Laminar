@@ -14,24 +14,20 @@ trait ComplexSvgKeys {
    * via the class selectors or functions like the DOM method
    * document.getElementsByClassName
    */
-  val className: CompositeSvgAttr[String] = stringCompositeSvgAttr("class", separator = " ")
+  val className: CompositeSvgAttr = stringCompositeSvgAttr("class", separator = " ")
 
-  val cls: CompositeSvgAttr[String] = className
+  val cls: CompositeSvgAttr = className
 
-  lazy val role: CompositeSvgAttr[String] = stringCompositeSvgAttr("role", separator = " ")
+  lazy val role: CompositeSvgAttr = stringCompositeSvgAttr("role", separator = " ")
 
   // --
 
-  protected def stringCompositeSvgAttr(name: String, separator: String): CompositeSvgAttr[String] = {
+  protected def stringCompositeSvgAttr(name: String, separator: String): CompositeSvgAttr = {
     val attr = new SvgAttr(name, StringAsIsCodec, namespace = None)
     new CompositeKey(
-      key = attr,
-      getDomValue = el => {
-        CompositeKey.normalize(DomApi.getSvgAttribute(el, attr).getOrElse(""), separator)
-      },
-      setDomValue = (el, value) => {
-        DomApi.setSvgAttribute(el, attr, value.mkString(separator))
-      },
+      name = attr.name,
+      getRawDomValue = el => DomApi.getSvgAttribute(el, attr).getOrElse(""),
+      setRawDomValue = (el, value) => DomApi.setSvgAttribute(el, attr, value),
       separator = separator
     )
   }
@@ -39,5 +35,5 @@ trait ComplexSvgKeys {
 
 object ComplexSvgKeys {
 
-  type CompositeSvgAttr[V] = CompositeKey[SvgAttr[V], ReactiveSvgElement.Base]
+  type CompositeSvgAttr = CompositeKey[SvgAttr[String], ReactiveSvgElement.Base]
 }

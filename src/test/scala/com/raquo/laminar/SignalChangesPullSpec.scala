@@ -1,6 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.mutable
@@ -411,7 +412,7 @@ class SignalChangesPullSpec extends UnitSpec {
     v.set(3)
 
     // Using the seqToModifier implicit conversion
-    val combinedMod: Modifier.Base = List(
+    val combinedMod: Modifier[ReactiveElement.Base] = List(
       combined --> _logCombined(log, "combined-amend-1"),
       combined --> _logCombined(log, "combined-amend-2"),
     )

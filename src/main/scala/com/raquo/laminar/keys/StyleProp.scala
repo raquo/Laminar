@@ -16,12 +16,12 @@ class StyleProp[V](
   val prefixes: Seq[String] = Nil
 ) extends Key with GlobalKeywords with DerivedStyleBuilder[StyleSetter, DerivedStyleProp] {
 
-  @inline def apply(value: V | String): Setter[HtmlElement] = {
-    this := value
-  }
-
   def :=(value: V | String): StyleSetter = {
     new KeySetter[StyleProp[_], String, HtmlElement](this, value.toString, DomApi.setHtmlStringStyle)
+  }
+
+  @inline def apply(value: V | String): StyleSetter = {
+    this := value
   }
 
   def maybe(value: Option[V | String]): Setter[HtmlElement] = {
@@ -32,7 +32,7 @@ class StyleProp[V](
     new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V | String](
       this,
       $value.asInstanceOf[Source[V | String]].toObservable,
-      (el, v) => DomApi.setHtmlAnyStyle(el, this, v)
+      (el, v, _) => DomApi.setHtmlAnyStyle(el, this, v)
     )
   }
 

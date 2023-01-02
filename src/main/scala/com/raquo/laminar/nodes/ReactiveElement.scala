@@ -97,12 +97,12 @@ trait ReactiveElement[+Ref <: dom.Element]
     *
     * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
     */
-  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier[this.type])]] =
+  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier.Any)]] =
     Map.empty
 
   private[laminar] def compositeValueItems(
     prop: CompositeKey[_, this.type],
-    reason: Modifier[this.type]
+    reason: Modifier.Any
   ): List[String] = {
     _compositeValues
       .getOrElse(prop, Nil)
@@ -111,7 +111,7 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   private[laminar] def updateCompositeValue(
     key: CompositeKey[_, this.type],
-    reason: Modifier[this.type],
+    reason: Modifier.Any,
     addItems: List[String],
     removeItems: List[String]
   ): Unit = {
@@ -128,7 +128,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       .getOrElse(key, Nil)
       .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
 
-    val domValues = key.getDomValue(this)
+    val domValues = key.codec.decode(key.getRawDomValue(this))
 
     val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
 
@@ -139,7 +139,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     // #Note this logic is compatible with third parties setting classes on Laminar elements
     //  using raw JS methods as long as they don't remove classes managed by Laminar or add
     //  classes that were also added by Laminar.
-    key.setDomValue(this, nextDomValues)
+    key.setRawDomValue(this, key.codec.encode(nextDomValues))
   }
 
   val tag: Tag[ReactiveElement[Ref]]

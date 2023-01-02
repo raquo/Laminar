@@ -4,6 +4,7 @@ import com.raquo.domtestutils.matching._
 import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.laminar.api.Laminar.CompositeSvgAttr
 import com.raquo.laminar.api._
+import com.raquo.laminar.codecs.StringAsIsCodec
 import com.raquo.laminar.defs.complex.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
 import com.raquo.laminar.keys.{HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, RootNode}
@@ -87,15 +88,15 @@ trait LaminarSpec
     new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespace)
   }
 
-  implicit def makeCompositePropTestable[V](prop: CompositeProp[V]): TestableProp[V, V] = {
-    new TestableProp(prop.key.name, prop.key.codec.decode)
+  implicit def makeCompositePropTestable(prop: CompositeProp): TestableProp[String, String] = {
+    new TestableProp(prop.name, StringAsIsCodec.decode)
   }
 
-  implicit def makeCompositeHtmlAttrTestable[V](attr: CompositeHtmlAttr[V]): TestableHtmlAttr[V] = {
-    new TestableHtmlAttr(attr.key.name, attr.key.codec.encode, attr.key.codec.decode)
+  implicit def makeCompositeHtmlAttrTestable(attr: CompositeHtmlAttr): TestableHtmlAttr[String] = {
+    new TestableHtmlAttr(attr.name, StringAsIsCodec.encode, StringAsIsCodec.decode)
   }
 
-  implicit def makeCompositeSvgAttrTestable[V](attr: CompositeSvgAttr[V]): TestableSvgAttr[V] = {
-    new TestableSvgAttr(attr.key.name, attr.key.codec.encode, attr.key.codec.decode, attr.key.namespace)
+  implicit def makeCompositeSvgAttrTestable(attr: CompositeSvgAttr): TestableSvgAttr[String] = {
+    new TestableSvgAttr(attr.name, StringAsIsCodec.encode, StringAsIsCodec.decode, namespace = None)
   }
 }

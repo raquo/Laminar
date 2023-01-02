@@ -4,6 +4,7 @@ import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.Laminar.{Element, optionToSetter}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.KeySetter.AriaAttrSetter
 import com.raquo.laminar.modifiers.KeyUpdater.AriaAttrUpdater
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
@@ -19,7 +20,11 @@ class AriaAttr[V](
 
   override val name: String = "aria-" + suffix
 
-  @inline def apply(value: V): Setter[Element] = {
+  def :=(value: V): AriaAttrSetter[V] = {
+    new KeySetter[AriaAttr[V], V, Element](this, value, DomApi.setAriaAttribute)
+  }
+
+  @inline def apply(value: V): AriaAttrSetter[V] = {
     this := value
   }
 
@@ -27,15 +32,11 @@ class AriaAttr[V](
     optionToSetter(value.map(v => this := v))
   }
 
-  def :=(value: V): Setter[Element] = {
-    new KeySetter[AriaAttr[V], V, Element](this, value, DomApi.setAriaAttribute)
-  }
-
   def <--($value: Source[V]): AriaAttrUpdater[V] = {
     new KeyUpdater[Element, AriaAttr[V], V](
       this,
       $value.toObservable,
-      (el, v) => DomApi.setAriaAttribute(el, this, v)
+      (el, v, _) => DomApi.setAriaAttribute(el, this, v)
     )
   }
 

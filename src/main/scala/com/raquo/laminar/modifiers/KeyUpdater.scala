@@ -8,19 +8,24 @@ import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSv
 import scala.scalajs.js
 import scala.scalajs.js.|
 
-/** A modifier that updates a key from a source, e.g. `value <-- valueStream` */
+/**
+ * A modifier that updates a key from a source, e.g. `value <-- valueStream`
+ *
+ * @param update (element, newValue, reason) => ()
+ *               The reason is used for updating CompositeKey-s.
+ */
 class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
   val key: K,
   val values: Observable[V],
-  val update: (El, V) => Unit
-) extends Binder[El] {
+  val update: (El, V, Modifier.Any) => Unit
+) extends Binder[El] { self =>
 
   override def bind(element: El): DynamicSubscription = {
     var lastSeenValue: js.UndefOr[V] = js.undefined
     ReactiveElement.bindFn(element, values) { value =>
       if (!lastSeenValue.contains(value)) { // #Note: auto-distinction
         lastSeenValue = value
-        update(element, value)
+        update(element, value, self)
       }
     }
   }
