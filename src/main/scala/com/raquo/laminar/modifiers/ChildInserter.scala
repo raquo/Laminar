@@ -8,7 +8,7 @@ import scala.scalajs.js
 object ChildInserter {
 
   def apply[El <: ReactiveElement.Base] (
-    $child: Observable[ChildNode.Base]
+    childSource: Observable[ChildNode.Base]
   ): Inserter[El] = {
     new Inserter[El](
       preferStrictMode = true,
@@ -19,7 +19,7 @@ object ChildInserter {
 
         var maybeLastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
 
-        $child.foreach { newChildNode =>
+        childSource.foreach { newChildNode =>
           var remainingOldExtraNodeCount = ctx.extraNodeCount
 
           maybeLastSeenChild

@@ -36,7 +36,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
   it("updates a list of children") {
 
     val childrenBus = new EventBus[Vector[Child]]
-    val $children = childrenBus.events
+    val childrenStream = childrenBus.events
 
     val span0 = span(text0)
     val span1 = span(text1)
@@ -45,7 +45,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     val span4 = span(text4)
     val span5 = span(text5)
 
-    mount(mainTag(children <-- $children))
+    mount(mainTag(children <-- childrenStream))
     expectChildren("none")
 
     childrenBus.writer.onNext(Vector())
@@ -296,12 +296,12 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     val effects = mutable.Buffer[Effect[String]]()
 
-    val $var = Var(List(Foo("initial", 1)))
+    val modelsVar = Var(List(Foo("initial", 1)))
 
     var ix = 0
 
     // #Note: `identity` instead of the `_.distinct` default
-    val splitSignal = $var.signal.split(_.id, distinctCompose = identity)((id, initialFoo, fooSignal) => {
+    val splitSignal = modelsVar.signal.split(_.id, distinctCompose = identity)((id, initialFoo, fooSignal) => {
       ix += 1
       val thisIx = ix
       effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
@@ -350,7 +350,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("a", 1), Foo("b", 10)))
+    modelsVar.set(List(Foo("a", 1), Foo("b", 10)))
 
     expectNode(div like (
       "Hello",
@@ -373,7 +373,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
+    modelsVar.set(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
 
     expectNode(div like (
       "Hello",
@@ -449,7 +449,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("a", 1), Foo("c", 101)))
+    modelsVar.set(List(Foo("a", 1), Foo("c", 101)))
 
     effects shouldBe mutable.Buffer(
       Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
@@ -463,7 +463,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("b", 2), Foo("c", 102)))
+    modelsVar.set(List(Foo("b", 2), Foo("c", 102)))
 
     effects shouldBe mutable.Buffer(
       Effect("render-b-5", "Foo(b,2)"),
@@ -484,12 +484,12 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     val effects = mutable.Buffer[Effect[String]]()
 
-    val $var = Var(List(Foo("initial", 1)))
+    val modelsVar = Var(List(Foo("initial", 1)))
 
     var ix = 0
 
     // #Note: Using `distinct` default now
-    val splitSignal = $var.signal.split(_.id)((id, initialFoo, fooSignal) => {
+    val splitSignal = modelsVar.signal.split(_.id)((id, initialFoo, fooSignal) => {
       ix += 1
       val thisIx = ix
       effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
@@ -536,7 +536,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("a", 1), Foo("b", 10)))
+    modelsVar.set(List(Foo("a", 1), Foo("b", 10)))
 
     expectNode(div like (
       "Hello",
@@ -559,7 +559,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
+    modelsVar.set(List(Foo("a", 1), Foo("b", 10), Foo("c", 100)))
 
     expectNode(div like (
       "Hello",
@@ -635,7 +635,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("a", 1), Foo("c", 101)))
+    modelsVar.set(List(Foo("a", 1), Foo("c", 101)))
 
     effects shouldBe mutable.Buffer(
       Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
@@ -649,7 +649,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     // --
 
-    $var.set(List(Foo("b", 2), Foo("c", 102)))
+    modelsVar.set(List(Foo("b", 2), Foo("c", 102)))
 
     effects shouldBe mutable.Buffer(
       Effect("render-b-5", "Foo(b,2)"),

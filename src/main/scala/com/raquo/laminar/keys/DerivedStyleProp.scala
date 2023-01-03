@@ -30,10 +30,10 @@ class DerivedStyleProp[InputV](
     optionToSetter(value.map(v => this := v))
   }
 
-  def <--($value: Source[InputV]): DerivedStyleUpdater[InputV] = {
+  def <--(values: Source[InputV]): DerivedStyleUpdater[InputV] = {
     new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[_], InputV](
       key,
-      $value.toObservable,
+      values.toObservable,
       (el, v, _) => DomApi.setHtmlStringStyle(el, key, encode(v))
     )
   }

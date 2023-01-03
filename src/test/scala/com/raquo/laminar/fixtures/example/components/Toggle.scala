@@ -9,7 +9,7 @@ import org.scalajs.dom
 import scala.util.Random
 
 class Toggle private (
-  val $checked: EventStream[Boolean],
+  val checkedStream: EventStream[Boolean],
   val node: ReactiveElement[dom.html.Div]
 )
 
@@ -17,7 +17,7 @@ object Toggle {
   // @TODO how do we make this a controlled component?
   def apply(caption: String = "TOGGLE MEEEE"): Toggle = {
     val clickBus = new EventBus[dom.MouseEvent]
-    val $checked = clickBus.events.map(ev => ev.target.asInstanceOf[dom.HTMLInputElement].checked)//.debug("$checked")
+    val checkedStream = clickBus.events.map(ev => ev.target.asInstanceOf[dom.HTMLInputElement].checked)//.debug("checked")
 
     // This will only be evaluated once
     val rand = Random.nextInt(99)
@@ -29,16 +29,16 @@ object Toggle {
       onClick --> clickBus.writer
     )
 
-    val $captionNode = $checked.map(checked => span(if (checked) "ON" else "off"))
+    val captionNodeStream = checkedStream.map(checked => span(if (checked) "ON" else "off"))
 
     val node = div(
       className := "Toggle",
       checkbox,
       label(forId := "toggle" + rand, caption),
       " — ",
-      child <-- $captionNode
+      child <-- captionNodeStream
     )
 
-    new Toggle($checked, node)
+    new Toggle(checkedStream, node)
   }
 }

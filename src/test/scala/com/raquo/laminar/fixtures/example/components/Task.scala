@@ -5,7 +5,7 @@ import com.raquo.laminar.api.L._
 import com.raquo.laminar.nodes.ReactiveElement
 
 class Task (
-  val $checked: EventStream[Boolean],
+  val checkedStream: EventStream[Boolean],
   val node: ReactiveElement.Base
 )
 
@@ -20,6 +20,6 @@ object Task {
       br()
     )
 
-    new Task(toggle.$checked, node)
+    new Task(toggle.checkedStream, node)
   }
 }

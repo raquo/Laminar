@@ -21,8 +21,8 @@ class LockedCompositeKey[K <: Key, -El <: ReactiveElement.Base](
     key.:=(items: _*)
   }
 
-  /** If \$include emits true, value(s) will be added, if false, they will be removed. */
-  def <--($include: Source[Boolean]): KeyUpdater[El, CompositeKey[K, El], List[String]] = {
-    key <-- $include.toObservable.map(include => if (include) items else Nil)
+  /** If the `include` observable emits true, value(s) will be added, if false, they will be removed. */
+  def <--(include: Source[Boolean]): KeyUpdater[El, CompositeKey[K, El], List[String]] = {
+    key <-- include.toObservable.map(include => if (include) items else Nil)
   }
 }

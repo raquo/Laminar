@@ -27,7 +27,7 @@ object DomDefsGenerator {
   def cachedGenerate(): Unit = {
     cache.triggerIfCacheKeyUpdated(
       metaProject.BuildInfo.scalaDomTypesVersion,
-      forceOnEverySnapshot = true
+      forceOnEverySnapshot = false
     )(_ => generate())
   }
 

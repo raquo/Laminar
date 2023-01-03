@@ -13,7 +13,7 @@ object ChildrenReceiver {
   // but if needed, I might be able to implement a version that works with
   // arrays and mutable Seq-s too.
   // Let me know if you have a compelling use case for this.
-  def <--($children: Source[Children]): Inserter[ReactiveElement.Base] = {
-    ChildrenInserter($children.toObservable)
+  def <--(childrenSource: Source[Children]): Inserter[ReactiveElement.Base] = {
+    ChildrenInserter(childrenSource.toObservable)
   }
 }

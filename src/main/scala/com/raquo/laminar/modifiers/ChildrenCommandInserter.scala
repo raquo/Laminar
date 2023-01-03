@@ -19,12 +19,12 @@ object ChildrenCommandInserter {
   type ChildrenCommand = CollectionCommand[Child]
 
   def apply[El <: ReactiveElement.Base] (
-    $command: EventStream[ChildrenCommand]
+    commands: EventStream[ChildrenCommand]
   ): Inserter[El] = {
     new Inserter[El](
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
-        $command.foreach { command =>
+        commands.foreach { command =>
           val nodeCountDiff = updateList(
             command,
             parentNode = ctx.parentNode,

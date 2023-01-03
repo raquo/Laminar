@@ -7,8 +7,8 @@ import com.raquo.laminar.nodes.{CommentNode, ReactiveElement}
 
 object ChildOptionReceiver {
 
-  def <--($maybeChildNode: Source[Option[Child]]): Inserter[ReactiveElement.Base] = {
+  def <--(maybeChildSource: Source[Option[Child]]): Inserter[ReactiveElement.Base] = {
     val emptyNode = new CommentNode("")
-    ChildInserter($maybeChildNode.toObservable.map(_.getOrElse(emptyNode)))
+    ChildInserter(maybeChildSource.toObservable.map(_.getOrElse(emptyNode)))
   }
 }

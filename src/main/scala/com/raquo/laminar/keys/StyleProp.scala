@@ -28,10 +28,10 @@ class StyleProp[V](
     optionToSetter(value.map(v => this := v))
   }
 
-  def <--[A]($value: Source[A])(implicit ev: A => V | String): StyleUpdater[V] = {
+  def <--[A](values: Source[A])(implicit ev: A => V | String): StyleUpdater[V] = {
     new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V | String](
       this,
-      $value.asInstanceOf[Source[V | String]].toObservable,
+      values.asInstanceOf[Source[V | String]].toObservable,
       (el, v, _) => DomApi.setHtmlAnyStyle(el, this, v)
     )
   }

@@ -4,15 +4,14 @@ import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.api._
 import com.raquo.laminar.fixtures.example.components.Toggle
 import com.raquo.laminar.nodes.ReactiveElement
-import org.scalajs.dom
 
 object NestedStyleProp {
 
-  def render($color: EventStream[String]): ReactiveElement.Base = {
+  def render(colorStream: EventStream[String]): ReactiveElement.Base = {
     L.div(
-      L.color <-- $color,
+      L.color <-- colorStream,
       L.span("HELLO"),
-      L.child <-- $color.map(color => L.span(color))
+      L.child <-- colorStream.map(color => L.span(color))
     )
   }
 
@@ -21,12 +20,12 @@ object NestedStyleProp {
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")
 
-    val $fontSize = toggle
-      .$checked
+    val fontSizeStream = toggle
+      .checkedStream
 //      .startWith(true)
       .map(checked => if (checked) "45px" else "30px")
-    val $fontColor = toggle2
-      .$checked
+    val fontColorStream = toggle2
+      .checkedStream
 //      .startWith(true)
       .map(checked => if (checked) "red" else "lime")
 
@@ -36,9 +35,9 @@ object NestedStyleProp {
 //      toggle.vnode,
       toggle2.node,
       L.div(
-//        color <-- $fontColor,
-//        fontSize <-- $fontSize,
-        render($fontColor)
+//        color <-- fontColorStream,
+//        fontSize <-- fontSizeStream,
+        render(fontColorStream)
       )
     )
   }

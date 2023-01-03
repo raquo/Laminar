@@ -32,10 +32,10 @@ class AriaAttr[V](
     optionToSetter(value.map(v => this := v))
   }
 
-  def <--($value: Source[V]): AriaAttrUpdater[V] = {
+  def <--(values: Source[V]): AriaAttrUpdater[V] = {
     new KeyUpdater[Element, AriaAttr[V], V](
       this,
-      $value.toObservable,
+      values.toObservable,
       (el, v, _) => DomApi.setAriaAttribute(el, this, v)
     )
   }

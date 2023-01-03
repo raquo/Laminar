@@ -49,10 +49,10 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
     new LockedCompositeKey(this, items.toList)
   }
 
-  def <--[V]($items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): KeyUpdater[El, this.type, V] = {
+  def <--[V](items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): KeyUpdater[El, this.type, V] = {
     new KeyUpdater[El, this.type, V](
       key = this,
-      values = $items.toObservable,
+      values = items.toObservable,
       update = (element, nextRawItems, thisBinder) => {
         val currentNormalizedItems = element.compositeValueItems(this, reason = thisBinder)
         val nextNormalizedItems = valueMapper.toNormalizedList(nextRawItems, separator)

@@ -11,7 +11,7 @@ object ChildReceiver {
 
   val text: ChildTextReceiver.type = ChildTextReceiver
 
-  def <--($node: Source[Child]): Inserter[ReactiveElement.Base] = {
-    ChildInserter($node.toObservable)
+  def <--(childSource: Source[Child]): Inserter[ReactiveElement.Base] = {
+    ChildInserter(childSource.toObservable)
   }
 }

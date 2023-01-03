@@ -36,10 +36,10 @@ class SvgAttr[V](
     optionToSetter(value.map(v => this := v))
   }
 
-  def <--($value: Source[V]): SvgAttrUpdater[V] = {
+  def <--(values: Source[V]): SvgAttrUpdater[V] = {
     new KeyUpdater[SvgElement, SvgAttr[V], V](
       this,
-      $value.toObservable,
+      values.toObservable,
       (el, v, _) => DomApi.setSvgAttribute(el, this, v)
     )
   }

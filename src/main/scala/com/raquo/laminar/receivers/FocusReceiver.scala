@@ -6,7 +6,7 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 object FocusReceiver {
 
-  @inline def <--($isFocused: EventSource[Boolean]): Binder[ReactiveHtmlElement.Base] = {
-    FocusBinder($isFocused.toObservable)
+  @inline def <--(isFocused: EventSource[Boolean]): Binder[ReactiveHtmlElement.Base] = {
+    FocusBinder(isFocused.toObservable)
   }
 }

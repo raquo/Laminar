@@ -30,10 +30,10 @@ class HtmlAttr[V](
     new KeySetter[HtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
   }
 
-  def <--($value: Source[V]): HtmlAttrUpdater[V] = {
+  def <--(values: Source[V]): HtmlAttrUpdater[V] = {
     new KeyUpdater[HtmlElement, HtmlAttr[V], V](
       this,
-      $value.toObservable,
+      values.toObservable,
       (el, v, _) => DomApi.setHtmlAttribute(el, this, v)
     )
   }

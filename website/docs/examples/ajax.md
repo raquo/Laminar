@@ -5,8 +5,8 @@ title: Ajax
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.airstream.web.AjaxEventStream
-import com.raquo.airstream.web.AjaxEventStream.AjaxStreamError
+import com.raquo.airstream.web.AjaxStream
+import com.raquo.airstream.web.AjaxStream.AjaxStreamError
 import com.raquo.laminar.api.L._
 import org.scalajs.dom
 
@@ -43,9 +43,9 @@ val app: HtmlElement = div(
     button(
       "Send",
       inContext { thisNode =>
-        val $click = thisNode.events(onClick).sample(selectedOptionVar.signal)
-        val $response = $click.flatMap { opt =>
-          AjaxEventStream
+        val clickStream = thisNode.events(onClick).sample(selectedOptionVar.signal)
+        val responseStream = clickStream.flatMap { opt =>
+          AjaxStream
             .get(
               url = opt.url,
               // These observers are optional, we're just using them for demo
@@ -63,8 +63,8 @@ val app: HtmlElement = div(
         }
 
         List(
-          $click.map(opt => List(s"Starting: GET ${opt.url}")) --> eventsVar,
-          $response --> eventsVar.updater[String](_ :+ _)
+          clickStream.map(opt => List(s"Starting: GET ${opt.url}")) --> eventsVar,
+          responseStream --> eventsVar.updater[String](_ :+ _)
         )
       }
     ),

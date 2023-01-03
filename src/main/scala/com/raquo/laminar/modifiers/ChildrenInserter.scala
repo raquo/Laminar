@@ -16,7 +16,7 @@ object ChildrenInserter {
   type Children = immutable.Seq[Child]
 
   def apply[El <: ReactiveElement.Base](
-    $children: Observable[Children]
+    childrenSource: Observable[Children]
   ): Inserter[El] = {
     new Inserter[El](
       preferStrictMode = true,
@@ -27,7 +27,7 @@ object ChildrenInserter {
 
         var maybeLastSeenChildren: js.UndefOr[Children] = ctx.extraNodes
 
-        $children.foreach { newChildren =>
+        childrenSource.foreach { newChildren =>
           if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
             // println(s">> ${$children}.foreach with newChildren = ${newChildren.map(_.ref).map(DomApi.debugNodeOuterHtml)}")
             maybeLastSeenChildren = newChildren

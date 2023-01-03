@@ -29,11 +29,11 @@ object LinearProgressBar {
 
   private val tag: HtmlTag[Ref] = htmlTag("mwc-linear-progress")
 
-  val indeterminate: Prop[Boolean] = htmlProp("indeterminate", BooleanAsIsCodec)
-  val reverse: Prop[Boolean]       = htmlProp("reverse", BooleanAsIsCodec)
-  val closed: Prop[Boolean]        = htmlProp("closed", BooleanAsIsCodec)
-  val progress: Prop[Double]       = htmlProp("progress", DoubleAsIsCodec)
-  val buffer: Prop[Double]         = htmlProp("buffer", DoubleAsIsCodec)
+  val indeterminate: HtmlProp[Boolean] = htmlProp("indeterminate", BooleanAsIsCodec)
+  val reverse: HtmlProp[Boolean]       = htmlProp("reverse", BooleanAsIsCodec)
+  val closed: HtmlProp[Boolean]        = htmlProp("closed", BooleanAsIsCodec)
+  val progress: HtmlProp[Double]       = htmlProp("progress", DoubleAsIsCodec)
+  val buffer: HtmlProp[Double]         = htmlProp("buffer", DoubleAsIsCodec)
 
   object styles {
     val mdcThemePrimary: StyleProp[String] = styleProp("--mdc-theme-primary")

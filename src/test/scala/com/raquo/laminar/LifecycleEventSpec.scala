@@ -36,11 +36,11 @@ class LifecycleEventSpec extends UnitSpec {
 
     def makeChild(text: String): Div = div(readLifecycleEvents, text)
 
-    val $child = textBus.events.map(makeChild)
+    val childStream = textBus.events.map(makeChild)
 
     // --
 
-    mount(sectionTag("Hello, ", child <-- $child))
+    mount(sectionTag("Hello, ", child <-- childStream))
 
     events shouldBe mutable.Buffer()
     expectNode(sectionTag.of("Hello, ", sentinel))
@@ -78,11 +78,11 @@ class LifecycleEventSpec extends UnitSpec {
 
     def makeChild(text: String): Div = div(span(readLifecycleEvents, text))
 
-    val $child = textBus.events.map(makeChild)
+    val childStream = textBus.events.map(makeChild)
 
     // --
 
-    mount(sectionTag("Hello, ", child <-- $child))
+    mount(sectionTag("Hello, ", child <-- childStream))
 
     events shouldBe mutable.Buffer()
     expectNode(sectionTag.of("Hello, ", sentinel))

@@ -37,9 +37,9 @@ class ChildReceiverSpec extends UnitSpec {
     ): Unit = {
 
       val childBus = new EventBus[ChildNode[dom.Element]]
-      val $child = makeObservable(childBus.events)
+      val childSource = makeObservable(childBus.events)
 
-      mount(div("Hello, ", child <-- $child))
+      mount(div("Hello, ", child <-- childSource))
       expectNode(div.of("Hello, ", sentinel, expectedInitialChild))
 
       withClue("First event:") {

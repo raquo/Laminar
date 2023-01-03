@@ -33,7 +33,7 @@ class HtmlProp[V, DomV](
     optionToSetter(value.map(v => this := v))
   }
 
-  def <--($value: Source[V]): PropUpdater[V, DomV] = {
+  def <--(values: Source[V]): PropUpdater[V, DomV] = {
     val update = if (name == "value") {
       (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
         // Checking against current DOM value prevents cursor position reset in Safari
@@ -48,7 +48,7 @@ class HtmlProp[V, DomV](
     }
     new KeyUpdater[HtmlElement, HtmlProp[V, DomV], V](
       this,
-      $value.toObservable,
+      values.toObservable,
       update
     )
   }

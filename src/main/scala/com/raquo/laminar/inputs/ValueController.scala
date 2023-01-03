@@ -29,7 +29,7 @@ class ValueController[A, B](
   }
 
   // Force-override the `defaultValue` prop.
-  // If updater.$value is Signal, its initial value will in turn override this,
+  // If updater.values is Signal, its initial value will in turn override this,
   // but if it's a stream, this will remain the effective initial value.
   setValue(initialValue, force = true) // this also sets prevValue
 
