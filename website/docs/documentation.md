@@ -71,12 +71,7 @@ This documentation is for Laminar version **v0.14.2**. For other versions, see b
 | **[v0.14.2](https://laminar.dev/documentation)** | **[v0.14.2](https://github.com/raquo/Airstream/blob/v0.14.2/README.md)** |
 | **[v0.13.1](https://github.com/raquo/Laminar/blob/v0.13.1/docs/Documentation.md)** | **[v0.13.0](https://github.com/raquo/Airstream/blob/v0.13.0/README.md)** |
 | **[v0.12.2](https://github.com/raquo/Laminar/blob/v0.12.2/docs/Documentation.md)** | **[v0.12.2](https://github.com/raquo/Airstream/blob/v0.12.2/README.md)** |
-| **[v0.11.0](https://github.com/raquo/Laminar/blob/v0.11.0/docs/Documentation.md)** | **[v0.11.0](https://github.com/raquo/Airstream/blob/v0.11.0/README.md)** |
-| – | **[v0.10.2](https://github.com/raquo/Airstream/blob/v0.10.2/README.md)** |
-| **[v0.10.3](https://github.com/raquo/Laminar/blob/v0.10.3/docs/Documentation.md)** | **[v0.10.1](https://github.com/raquo/Airstream/blob/v0.10.1/README.md)** |
-| **[v0.9.2](https://github.com/raquo/Laminar/blob/v0.9.2/docs/Documentation.md)** | **[v0.9.2](https://github.com/raquo/Airstream/blob/v0.9.2/README.md)** |
-| **[v0.8.0](https://github.com/raquo/Laminar/blob/v0.8.0/docs/Documentation.md)** | **[v0.8.0](https://github.com/raquo/Airstream/blob/v0.8.0/README.md)** |
-| **[v0.7.2](https://github.com/raquo/Laminar/blob/v0.7.2/docs/Documentation.md)** | **[v0.7.2](https://github.com/raquo/Airstream/blob/v0.7.2/README.md)** |
+
 
 For documentation of older versions, see git tags.
 
@@ -361,7 +356,7 @@ To work around this, you can contribute definitions of missing keys to Scala DOM
 Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:
 
 ```scala
-val superValue: Prop[String] = customProp("superValue", StringAsIsCodec) // imaginary prop
+val superValue: HtmlProp[String] = customProp("superValue", StringAsIsCodec) // imaginary prop
 val onTouchMove: ReactiveEventProp[dom.TouchEvent] = customEventProp("touchmove")
 
 div(
@@ -370,7 +365,7 @@ div(
 )
 ```
 
-And similarly with `customStyle`, `customHtmlAttr`, `customHtmlTag`, `customSvgAttr`, `customSvgTag`. 
+And similarly with `customStyleProp`, `customHtmlAttr`, `customHtmlTag`, `customSvgAttr`, `customSvgTag`. 
 
 To clarify, you don't have to do this for touch events specifically, because [@Busti](https://github.com/busti) already added the superior [pointer-events](https://github.com/raquo/scala-dom-types/pull/49) to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
 
@@ -706,7 +701,7 @@ One downside of ChildrenCommand is that you don't have an observable of the list
 ```scala
 val commandBus = new EventBus[ChildrenCommand]
 val commandStream = commandBus.events
-val countSignal = commandStream.foldLeft(initial = 0)(_ + 1)
+val countSignal = commandStream.scanLeft(initial = 0)(_ + 1)
 
 div(
   "Hello, ",
@@ -848,19 +843,19 @@ Of course, the reactive layer is similarly considerate in regard to `cls`. Consi
 
 ```scala
 val classesStream: EventStream[Seq[String]] = ???
-val $isSelected: Signal[Boolean] = ???
+val isSelectedSignal: Signal[Boolean] = ???
  
 div(
   cls := "MyComponent",
   cls <-- classesStream,
-  cls.toggle("class1", "class2") <-- $isSelected
+  cls.toggle("class1", "class2") <-- isSelectedSignal,
   cls <-- boolSignal.map { isSelected =>
     if (isSelected) "always x-selected" else "always"
   },
-  cls <-- $isSelected.map { isSelected =>
+  cls <-- isSelectedSignal.map { isSelected =>
     List("always" -> true, "x-selected" -> isSelected)
   },
-  cls <-- $isSelected.map { isSelected =>
+  cls <-- isSelectedSignal.map { isSelected =>
     Map("always" -> true, "x-selected" -> isSelected)
   } 
 )
@@ -870,7 +865,7 @@ Once again, we don't want the CSS class names coming in from `classesStream` to 
 
 So for example, when `classesStream` emits `List("class1", "class2")`, we will _add_ those classes to the element. When it subsequently emits `List("class1", "class3")`, we will remove `class2` and add `class3` to the element's class list.
 
-The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls.toggle("foo") <-- $shouldUseFoo` or similar dynamic modifiers. (Note: prior to v0.12.0, `cls` behaved differently. See release notes).
+The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls.toggle("foo") <-- shouldUseFooStream` or similar dynamic modifiers. (Note: prior to v0.12.0, `cls` behaved differently. See release notes).
 
 If you (or a third party library you're using) are adding or removing class names without Laminar, using native JS APIs like `ref.className = ???` and `ref.classList.add(???)`, and you are **also** using `cls` modifiers on this **same** element, you must take care to avoid manually adding or removing the same classes as you're setting using the `cls` modifiers. Doing so may cause unexpected behaviour. Basically, **a given class name on a given element should be managed either via Laminar `cls` modifiers or externally via JS APIs, but not both**. See the `cls - third party interference` test in `CompositeKeySpec` for a simple example.
 
@@ -1028,7 +1023,7 @@ The `div(onClick --> observer)` syntax for listening to events is simple but lim
 However, observables have a richer set of operators than either of these. For example, you might want to throttle the events, or propagate an event only if a certain other signal contains `true`. This is easy to achieve with the `composeEvents` method:
 
 ```scala
-val $allowClick: Signal[Boolean] = ???
+val allowClick: Signal[Boolean] = ???
  
 div(composeEvents(onScroll)(_.throttle(100)) --> scrollObserver)
  
@@ -1036,7 +1031,7 @@ a(
   composeEvents(
     onClick.preventDefault
   )(
-    _.withCurrentValueOf($allowClick).collect { case (ev, true) => ev } 
+    _.withCurrentValueOf(allowClick).collect { case (ev, true) => ev } 
   ) --> eventObserver
 )
 ```
@@ -1390,12 +1385,12 @@ render(element) // mount the element
 
 1. `href <-- urlStream` creates a `Binder` (see `ReactiveProp.<--`) 
 
-2. That `Binder` being a `Modifier` is applied to the `a` element immediately after it's created by the `a(...)` call..
+2. That `Binder` being a `Modifier` is applied to the `a` element immediately after it's created by the `a(...)` call.
 
 3. That Binder's apply method does this (see `ReactiveProp.<--` again):
   
     ```scala
-    ReactiveElement.bindFn(element, $value) { value =>
+    ReactiveElement.bindFn(element, valueSource) { value =>
       DomApi.setHtmlProperty(element, this, value)
     }
     ```
@@ -1404,11 +1399,12 @@ render(element) // mount the element
   
     ```scala
     new DynamicSubscription(element.dynamicOwner, activate = owner => Some(
-      val subscription: Subscription = urlStream.foreach { url =>
-        DomApi.setHtmlProperty(element, href, url)
-      } (owner)
-      subscription
-    ))
+        val subscription: Subscription = urlStream.foreach { url =>
+          DomApi.setHtmlProperty(element, href, url)
+        } (owner)
+        subscription
+      )
+    )
     ```
    
 4. So when the `href <-- urlStream` Binder is applied to the `a()` element, it creates a `DynamicSubscription` which in turn has an activation function that creates a regular non-Dynamic `Subscription`.

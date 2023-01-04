@@ -36,28 +36,28 @@ class LifecycleEventSpec extends UnitSpec {
 
     def makeChild(text: String): Div = div(readLifecycleEvents, text)
 
-    val $child = textBus.events.map(makeChild)
+    val childStream = textBus.events.map(makeChild)
 
     // --
 
-    mount(section("Hello, ", child <-- $child))
+    mount(sectionTag("Hello, ", child <-- childStream))
 
-    events shouldEqual mutable.Buffer()
-    expectNode(section.of("Hello, ", ExpectedNode.comment))
+    events shouldBe mutable.Buffer()
+    expectNode(sectionTag.of("Hello, ", sentinel))
 
     // --
 
     textBus.writer.onNext("blah")
 
-    events shouldEqual mutable.Buffer(NodeDidMount)
-    expectNode(section.of("Hello, ", div.of("blah")))
+    events shouldBe mutable.Buffer(NodeDidMount)
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of("blah")))
 
     // --
 
     textBus.writer.onNext("world")
 
-    events shouldEqual mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(section.of("Hello, ", div.of("world")))
+    events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of("world")))
 
   }
 
@@ -78,28 +78,28 @@ class LifecycleEventSpec extends UnitSpec {
 
     def makeChild(text: String): Div = div(span(readLifecycleEvents, text))
 
-    val $child = textBus.events.map(makeChild)
+    val childStream = textBus.events.map(makeChild)
 
     // --
 
-    mount(section("Hello, ", child <-- $child))
+    mount(sectionTag("Hello, ", child <-- childStream))
 
-    events shouldEqual mutable.Buffer()
-    expectNode(section.of("Hello, ", ExpectedNode.comment))
+    events shouldBe mutable.Buffer()
+    expectNode(sectionTag.of("Hello, ", sentinel))
 
     // --
 
     textBus.writer.onNext("blah")
 
-    events shouldEqual mutable.Buffer(NodeDidMount)
-    expectNode(section.of("Hello, ", div.of( span.of("blah"))))
+    events shouldBe mutable.Buffer(NodeDidMount)
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of(span.of("blah"))))
 
     // --
 
     textBus.writer.onNext("world")
 
-    events shouldEqual mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(section.of("Hello, ", div.of( span.of("world"))))
+    events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of( span.of("world"))))
   }
 
   it("Changing parent on a node fires appropriate events") {
@@ -160,8 +160,8 @@ class LifecycleEventSpec extends UnitSpec {
     testCases.zipWithIndex.foreach { case (testCase, index) =>
       withClue(s"Case index=$index:") {
         testCase.action(child)
-        lifecycleEvents shouldEqual testCase.expectedLifecycleEvents
-        grandChildLifecycleEvents shouldEqual testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
+        lifecycleEvents shouldBe testCase.expectedLifecycleEvents
+        grandChildLifecycleEvents shouldBe testCase.expectedLifecycleEvents // inheritance. assumes grandchild has no other parents and no mount events of its own
         lifecycleEvents = Seq()
         grandChildLifecycleEvents = Seq()
       }
@@ -171,9 +171,9 @@ class LifecycleEventSpec extends UnitSpec {
   it("Nested lifecycle events") {
     val parent1 = div("parent1 ")
     val parent2 = p("parent2 ")
-    val parent3 = article("parent3 ")
-    val parent4 = article("parent4 ")
-    val parent5 = article("parent5 ")
+    val parent3 = articleTag("parent3 ")
+    val parent4 = articleTag("parent4 ")
+    val parent5 = articleTag("parent5 ")
 
     val grandChild3 = b("orly3")
 
@@ -198,7 +198,7 @@ class LifecycleEventSpec extends UnitSpec {
       expectedEvents: Seq[(ReactiveElement[dom.html.Element], LifecycleEvent)]
     ): Unit = {
       withClue(clue + ": ") {
-        lifecycleEvents shouldEqual expectedEvents
+        lifecycleEvents shouldBe expectedEvents
         lifecycleEvents = Nil
       }
     }

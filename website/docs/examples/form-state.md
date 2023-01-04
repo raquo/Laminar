@@ -54,12 +54,12 @@ val submitter = Observer[FormState] { state =>
 }
 
 def renderInputRow(error: FormState => Option[String])(mods: Modifier[HtmlElement]*): HtmlElement = {
-  val $error = stateVar.signal.map(_.displayError(error))
+  val errorSignal = stateVar.signal.map(_.displayError(error))
   div(
     cls("-inputRow"),
-    cls.toggle("x-hasError") <-- $error.map(_.nonEmpty),
+    cls.toggle("x-hasError") <-- errorSignal.map(_.nonEmpty),
     p(mods),
-    child.maybe <-- $error.map(_.map(err => div(cls("-error"), err)))
+    child.maybe <-- errorSignal.map(_.map(err => div(cls("-error"), err)))
   )
 }
 

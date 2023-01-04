@@ -11,8 +11,8 @@ object MultiStyleProp {
     val toggle = Toggle("Big")
     val toggle2 = Toggle("Red")
 
-    val $fontSize = toggle.$checked.toSignal(true).map(checked => if (checked) "45px" else "30px")
-    val $fontColor = toggle2.$checked.toSignal(true).map(checked => if (checked) "red" else "lime")
+    val fontSizeSignal = toggle.checkedStream.toSignal(true).map(checked => if (checked) "45px" else "30px")
+    val fontColorSignal = toggle2.checkedStream.toSignal(true).map(checked => if (checked) "red" else "lime")
 
     L.div(
       L.className := "yolo",
@@ -20,8 +20,8 @@ object MultiStyleProp {
       toggle.node,
       toggle2.node,
       L.div(
-        L.color <-- $fontColor,
-        L.fontSize <-- $fontSize,
+        L.color <-- fontColorSignal,
+        L.fontSize <-- fontSizeSignal,
         L.span("HELLO")
       )
     )

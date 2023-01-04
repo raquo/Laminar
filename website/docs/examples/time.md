@@ -10,17 +10,17 @@ title: Time
 import com.raquo.laminar.api.L._
 import org.scalajs.dom
 
-val $tick = EventStream.periodic(1000)
+val tickStream = EventStream.periodic(1000)
 
 val app = div(
   div(
     "Tick #: ",
-    child.text <-- $tick.map(_.toString)
+    child.text <-- tickStream.map(_.toString)
   ),
   div(
     "Random #: ",
-    child.text <-- $tick.mapTo((scala.util.Random.nextInt() % 100).toString)
-  ) 
+    child.text <-- tickStream.mapTo(scala.util.Random.nextInt() % 100)
+  )
 )
 
 render(containerNode, app)
@@ -42,7 +42,7 @@ import org.scalajs.dom
 
 val clickBus = new EventBus[Unit]
 
-val $maybeAlert = EventStream.merge(
+val maybeAlertStream = EventStream.merge(
   clickBus.events.mapTo(Some(span("Just clicked!"))),
   clickBus.events.flatMap { _ =>
     EventStream.fromValue(None, emitOnce = true).delay(500)
@@ -51,7 +51,7 @@ val $maybeAlert = EventStream.merge(
 
 val app = div(
   button(onClick.mapTo(()) --> clickBus, "Click me"),
-  child.maybe <-- $maybeAlert
+  child.maybe <-- maybeAlertStream
 )
 
 render(containerNode, app)
@@ -79,7 +79,7 @@ def emailError(email: String): Option[String] =
 
 val inputBus = new EventBus[String]
 
-val $debouncedError: EventStream[Option[String]] = 
+val debouncedErrorStream: EventStream[Option[String]] = 
   inputBus.events
     .debounce(1000)
     .map(emailError)
@@ -90,9 +90,9 @@ val app = div(
     input(
       value <-- inputBus.events,
       onInput.mapToValue --> inputBus
-    ),
+    )
   ),
-  child <-- $debouncedError.map {
+  child <-- debouncedErrorStream.map {
     case Some(err) => span(cls("-error"), "Error: " + err)
     case None      => span(cls("-success"), "Email ok!")
   }

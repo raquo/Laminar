@@ -1,26 +1,65 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
-import com.raquo.laminar.lifecycle.{InsertContext, MountContext}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
-// @TODO[Naming] hrm
+import scala.scalajs.js
+
 object ChildInserter {
 
   def apply[El <: ReactiveElement.Base] (
-    $child: MountContext[El] => Observable[ChildNode.Base],
-    initialInsertContext: Option[InsertContext[El]] // #TODO[API] This param appears to always be `None`. Didn't I make this for some edge case requiring a Some()? I think tha logic is in `Inserter`
-  ): Inserter[El] = new Inserter[El](
-    initialInsertContext,
-    insertFn = (c, owner) => {
-      val mountContext = new MountContext[El](
-        thisNode = c.parentNode,
-        owner = owner
-      )
-      $child(mountContext).foreach { newChildNode =>
-        ParentNode.replaceChild(parent = c.parentNode, oldChild = c.sentinelNode, newChild = newChildNode)
-        c.sentinelNode = newChildNode
-      }(owner)
-    }
-  )
+    childSource: Observable[ChildNode.Base]
+  ): Inserter[El] = {
+    new Inserter[El](
+      preferStrictMode = true,
+      insertFn = (ctx, owner) => {
+        if (!ctx.strictMode) {
+          ctx.forceSetStrictMode()
+        }
+
+        var maybeLastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
+
+        childSource.foreach { newChildNode =>
+          var remainingOldExtraNodeCount = ctx.extraNodeCount
+
+          maybeLastSeenChild
+            .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
+            .fold {
+              // Inserting the child for the first time, OR after the previous child was externally moved / removed.
+              val sentinelNodeIndex = ParentNode.indexOfChild(ctx.parentNode, ctx.sentinelNode)
+              ParentNode.insertChild(parent = ctx.parentNode, newChildNode, atIndex = sentinelNodeIndex + 1)
+              ()
+            } { lastSeenChild =>
+              // We found the existing child in the right place in the DOM
+              // Just need to check that the new child is actually different from the old one
+              // Replace the child with new one.
+              // #Note: auto-distinction inside (lastSeenChild != newChildNode filter)
+              val replaced = ParentNode.replaceChild(
+                parent = ctx.parentNode,
+                oldChild = lastSeenChild,
+                newChild = newChildNode
+              )
+              if (replaced || lastSeenChild == newChildNode) { // #TODO[Performance,Integrity] Not liking this redundant auto-distinction
+                // The only time we DON'T decrement this is when replacing fails for unexpected reasons.
+                // - If lastSeenChild == newChildNode, then it's not an "old" node anymore, so we decrement
+                // - If replaced == true, then lastSeenChild was removed from the DOM, so we decrement
+                remainingOldExtraNodeCount -= 1
+              }
+              ()
+            }
+
+          // We've just inserted newChildNode after the sentinel, or replaced the first old node with newChildNode,
+          // so any remaining old child nodes must be directly under it.
+          ctx.removeOldChildNodesFromDOM(after = newChildNode)
+
+          ctx.extraNodesMap.clear()
+          ctx.extraNodesMap.set(newChildNode.ref, newChildNode)
+          ctx.extraNodes = newChildNode :: Nil
+          ctx.extraNodeCount = 1
+
+          maybeLastSeenChild = newChildNode
+        }(owner)
+      }
+    )
+  }
 }

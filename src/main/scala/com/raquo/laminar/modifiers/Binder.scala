@@ -1,7 +1,6 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.ownership.DynamicSubscription
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Binder is a Modifier that creates a subscription when invoked.
@@ -18,6 +17,8 @@ trait Binder[-El <: ReactiveElement.Base] extends Modifier[El] {
 }
 
 object Binder {
+
+  type Base = Binder[ReactiveElement.Base]
 
   def apply[El <: ReactiveElement.Base](fn: El => DynamicSubscription): Binder[El] = {
     new Binder[El] {

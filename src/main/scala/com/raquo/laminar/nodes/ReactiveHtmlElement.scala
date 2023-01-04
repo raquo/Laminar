@@ -2,18 +2,18 @@ package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.builders.HtmlTag
 import com.raquo.laminar.inputs.ValueController
-import com.raquo.laminar.keys.ReactiveProp
+import com.raquo.laminar.keys.HtmlProp
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
+import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
 
 import scala.scalajs.js
 
-class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
-  extends ReactiveElement[Ref] {
-
-  final override val ref: Ref = DomApi.createHtmlElement(this)
+class ReactiveHtmlElement[+Ref <: dom.html.Element](
+  override val tag: HtmlTag[Ref],
+  final override val ref: Ref
+) extends ReactiveElement[Ref] {
 
   // -- `value` prop controller
 
@@ -28,7 +28,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
   private[laminar] var hasValueBinder: Boolean = false
 
   private[laminar] def setValueController[A](
-    updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[String, _], String],
+    updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String],
     listener: EventListener[_ <: dom.Event, A]
   ): DynamicSubscription = {
     val controller = new ValueController[String, A](
@@ -57,7 +57,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](val tag: HtmlTag[Ref])
   private[laminar] var hasCheckedBinder: Boolean = false
 
   private[laminar] def setCheckedController[A](
-    updater: KeyUpdater[ReactiveHtmlElement.Base, ReactiveProp[Boolean, _], Boolean],
+    updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean],
     listener: EventListener[_ <: dom.Event, A]
   ): DynamicSubscription = {
     val controller = new ValueController[Boolean, A](

@@ -1,36 +1,154 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.Source
 import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
-import com.raquo.airstream.web.AjaxEventStream
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
-import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.keys.{DerivedStyleProp, SvgAttr}
+import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
 import scala.collection.{immutable, mutable}
+import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.concurrent.Future
 import scala.scalajs.js
 
 class SyntaxSpec extends UnitSpec {
 
-  it("ModifierSeq implicit conversion works for both strings and nodes") {
+  def noop[A](v: A): Unit = ()
+
+  it("bundle sanity check") {
+
+    // Simple types
+
+    assert(div.name == "div")
+    assert(onClick.name == "click")
+    assert(value.name == "value")
+    assert(idAttr.name == "id")
+    assert(charset.name == "charset")
+    assert(display.name == "display")
+
+    // Event props
+
+    assert(onClick.name == "click") // elements - global
+    assert(onCopy.name == "copy") // elements - clipboard
+
+    documentEvents { x => // document - global
+      assert(x.onClick.name == "click")
+      x.onClick
+    }
+    documentEvents { x => // document - clipboard
+      assert(x.onCopy.name == "copy")
+      x.onCopy
+    }
+    documentEvents { x => // document
+      assert(x.onDomContentLoaded.name == "DOMContentLoaded")
+      x.onDomContentLoaded
+    }
+
+    windowEvents { x => // window - global
+      assert(x.onClick.name == "click")
+      x.onClick
+    }
+    windowEvents { x => // window - clipboard
+      assert(x.onCopy.name == "copy")
+      x.onCopy
+    }
+    windowEvents { x => // window
+      assert(x.onOffline.name == "offline")
+      x.onOffline
+    }
+
+    // SVG namespaces
+
+    assert(svg.xlinkHref.namespace.contains("xlink"))
+    assert(svg.xlinkHref.name == "xlink:href")
+    assert(SvgAttr.namespaceUrl(svg.xlinkHref.namespace.get) == "http://www.w3.org/1999/xlink")
+
+    // Aria attributes
+
+    assert(aria.label.name == "aria-label")
+
+    (div(aria.label := "hello").ref.getAttribute("aria-label") == "hello")
+    (svg.circle(aria.label := "hello").ref.getAttribute("aria-label") == "hello")
+
+    // Aliases
+
+    assert(typ == `type`)
+    assert(typ.name == "type")
+
+    assert(svg.typ == svg.`type`)
+    assert(svg.typ.name == "type")
+
+    // Complex keys
+
+    assert(cls.name == "className")
+    // assert((cls := List("class1", "class2")).value == "class1 class2")
+
+    // CSS keywords
+
+    val s1: StyleSetter = display.none
+    val v1: String = display.none.value
+    assert(display.none.value == "none")
+
+    // Base CSS keywords
+    val s2: StyleSetter = padding.inherit
+    val v2: String = padding.inherit.value
+    assert(display.inherit.value == "inherit")
+
+    // Derived CSS props (units)
+
+    val p1: StyleProp[String] = padding
+    val p2: DerivedStyleProp[Int] = padding.px
+    assert((padding.px := 12).value == "12px")
+
+    maxHeight.calc := "12px + 20em" // Length inherits Calc
+
+    background.url: DerivedStyleProp[String]
+    (background.url := "https://laminar.dev").value == """url("https://laminar.dev")"""
+
+    assert(style.percent(55) == "55%")
+    assert(style.calc("12px + 20em") == "calc(12px + 20em)")
+
+    // Multi-parameter derived CSS props (units)
+
+    val p3: StyleProp[String] = color
+    val s3: StyleSetter = color.rgb(200, 100, 0)
+    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
+
+    assert(style.rgb(200, 100, 0) == "rgb(200, 100, 0)")
+  }
+
+  it("seqToModifier, seqToNode implicit conversion works for both strings and nodes") {
 
     val strings = List("a", "b")
-    val nodes = Vector(span("ya"), article("yo")) // seq of elements.
+    val stringsBuffer = mutable.Buffer("aa", "bb")
+    val stringsArray = Array("aaa", "bbb")
+    val stringsJsArray = js.Array("aaaa", "bbbb")
+    val nodes = Vector(span("ya"), articleTag("yo")) // seq of elements.
     val nodesBuffer = mutable.Buffer(span("boo")) // mutable.Buffer[Span] is covariant as collection.Seq
-    val jsNodes = js.Array(span("js")) // JS arrays are invariant
+    val nodesArray = Array(span("foo"), span("bar")) // Scala Arrays are not Seq-s. They are used in Scala 3 enums.
+    val nodesJsArray = js.Array(span("js")) // JS arrays are invariant
     val mixed: Seq[Mod[HtmlElement]] = Vector("c", input())
 
-    // @Note we make sure that none of the above go through expensive `nodesSeqToInserter` by absence of a sentinel comment node
+    // @Note we make sure that none of the above go through expensive `nodesSeqToInserter` by never mounting the actualNode element
+    //  - inserters require mounting to be processed.
 
-    mount(div(strings, nodes, nodesBuffer, jsNodes, mixed))
+    val actualNode = div(
+      strings, stringsBuffer, stringsArray, stringsJsArray,
+      nodes, nodesBuffer, nodesArray, nodesJsArray, mixed
+    )
 
-    expectNode(div.of(
+    expectNode(actualNode.ref, div.of(
       "a", "b",
-      span of "ya", article of "yo",
+      "aa", "bb",
+      "aaa", "bbb",
+      "aaaa", "bbbb",
+      span of "ya", articleTag of "yo",
       span of "boo",
+      span of "foo",
+      span of "bar",
       span of "js",
       "c", input
     ))
@@ -53,27 +171,27 @@ class SyntaxSpec extends UnitSpec {
 
     mount(checkbox)
 
-    events shouldEqual mutable.Buffer()
+    events shouldBe mutable.Buffer()
 
     // --
 
     checkbox.ref.click()
 
-    events shouldEqual mutable.Buffer(false)
+    events shouldBe mutable.Buffer(false)
     events.clear()
 
     // --
 
     checkbox.ref.click()
 
-    events shouldEqual mutable.Buffer(true)
+    events shouldBe mutable.Buffer(true)
     events.clear()
 
     // --
 
     checkbox.ref.click()
 
-    events shouldEqual mutable.Buffer(false)
+    events shouldBe mutable.Buffer(false)
     events.clear()
   }
 
@@ -104,6 +222,22 @@ class SyntaxSpec extends UnitSpec {
     )
 
     mount(el)
+  }
+
+  it("onMountInsert with implicit renderable syntax") {
+    val el = div(
+      onMountInsert { _ =>
+        "hello"
+      },
+      onMountInsert { _ =>
+        123
+      },
+      "world"
+    )
+
+    mount(el)
+
+    expectNode(div of ("hello", "123", "world"))
   }
 
   it("onMountBind with implicit setters syntax") {
@@ -139,13 +273,13 @@ class SyntaxSpec extends UnitSpec {
     )
 
     el.amend(
-      onMountBind(_ => observable --> ((num: Int) => println(num * 5))),
-      onMountBind(_ => signal --> ((num: Int) => println(num * 5))),
-      onMountBind(_ => stream --> ((num: Int) => println(num * 5)))
+      onMountBind(_ => observable --> ((num: Int) => noop(num * 5))),
+      onMountBind(_ => signal --> ((num: Int) => noop(num * 5))),
+      onMountBind(_ => stream --> ((num: Int) => noop(num * 5)))
     )
 
     el.amend(
-      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => println(num * 5))) // @Note "Div" type param is required only in scala 2.12
+      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => noop(num * 5))) // @Note "Div" type param is required only in scala 2.12
     )
 
     el.amend(
@@ -177,9 +311,9 @@ class SyntaxSpec extends UnitSpec {
     el.amend(onClick --> Observer[dom.MouseEvent](ev => ()))
     el.amend(onClick.mapTo(1) --> Observer[Int](num => num * 5))
 
-    el.amend(observable --> ((num: Int) => println(num * 5)))
-    el.amend(signal --> ((num: Int) => println(num * 5)))
-    el.amend(stream --> ((num: Int) => println(num * 5)))
+    el.amend(observable --> ((num: Int) => noop(num * 5)))
+    el.amend(signal --> ((num: Int) => noop(num * 5)))
+    el.amend(stream --> ((num: Int) => noop(num * 5)))
 
     el.amendThis(_ => stream --> bus.writer)
 
@@ -234,11 +368,11 @@ class SyntaxSpec extends UnitSpec {
     def childrenSignal: Signal[List[Div]] = childrenStream.toSignal(Nil)
     def childrenObs: Observable[immutable.Seq[Div]] = childrenStream
 
-    val customSource = CustomStreamSource[String]((_, _, _, _) => CustomSource.Config(() => (), () => ()))
+    val customSource = new CustomStreamSource[String]((_, _, _, _) => CustomSource.Config(() => (), () => ()))
 
     val periodicInt = EventStream.periodic(0)
 
-    val ajaxStream = AjaxEventStream.get("")
+    val ajaxStream = AjaxStream.get("")
     val xhrBus = new EventBus[dom.XMLHttpRequest]
     val ajaxObs = Observer.empty[dom.XMLHttpRequest]
 
@@ -263,14 +397,14 @@ class SyntaxSpec extends UnitSpec {
       child <-- divBus,
       child <-- divStream.map(d => d), // Tests Observable#Self type inference (note: IntelliJ might report non-existent error)
       child <-- divStream.map(d => d).map(d => d),
-      child <-- divFuture,
-      child <-- divPromise,
+      child <-- EventStream.fromFuture(divFuture),
+      child <-- EventStream.fromJsPromise(divPromise),
       child.maybe <-- divStream.map(Some(_)),
       child.maybe <-- divStream.toWeakSignal,
       child.maybe <-- divObservable.map(Option(_)),
       child.maybe <-- divObservable.map(Some(_)),
-      child.maybe <-- divFuture,
-      child.maybe <-- divPromise,
+      child.maybe <-- Signal.fromFuture(divFuture),
+      child.maybe <-- Signal.fromJsPromise(divPromise),
       //child.int <-- periodicInt,
       child.text <-- periodicInt,
       child.text <-- boolBus,
@@ -313,6 +447,111 @@ class SyntaxSpec extends UnitSpec {
       ajaxStream --> xhrBus,
       xhrBus --> xhrBus // lol
     )
+  }
+
+  it("apply methods of various Modifier aliases compile") {
+
+    // No type param needed when in the element context
+    div(
+      Modifier { el => noop(el) },
+      Setter { el => noop(el) },
+      Binder { el => null.asInstanceOf[DynamicSubscription] }
+    )
+
+    // These require that the `Modifier` and other aliases defined in Laminar.scala
+    // are val-s, they can't be def-s, at least in Scala 2
+
+    Modifier[ReactiveElement.Base](el => println(el))
+    Setter[ReactiveElement.Base](el => println(el))
+    Binder[ReactiveElement.Base](el => ().asInstanceOf[DynamicSubscription])
+
+    Modifier[ReactiveElement.Base] { el => println(el) }
+    Setter[ReactiveElement.Base] { el => println(el) }
+    Binder[ReactiveElement.Base] { el => null.asInstanceOf[DynamicSubscription] }
+
+    Modifier { (el: ReactiveElement.Base) =>
+      println(el)
+    }
+    Setter { (el: ReactiveElement.Base) =>
+      println(el)
+    }
+    Binder { (el: ReactiveElement.Base) =>
+      null.asInstanceOf[DynamicSubscription]
+    }
+  }
+
+  it("unit-based binding syntax") {
+    var i = 0
+    val v = Var(0)
+
+    val bus = new EventBus[Boolean]
+
+    def effectReturningInt(): Int = {
+      i += 1
+      i
+    }
+
+    def effectReturningUnit(): Unit = {
+      i += 1
+    }
+
+    def number() = 5
+
+    val el = div(
+      onClick --> effectReturningUnit(),
+      onClick --> { effectReturningInt(); () },
+      onClick --> v.update(_ + 5),
+      bus.events --> effectReturningUnit(),
+      bus.events --> { effectReturningInt(); () },
+      bus.events --> v.update(_ + 5),
+      onClick.flatMapStream(_ => bus.events) --> effectReturningUnit(),
+      onClick.flatMapStream(_ => bus.events) --> { effectReturningInt(); () },
+      onClick.flatMapStream(_ => bus.events) --> v.update(_ + 5),
+    )
+
+    // We don't want unused (non-Unit) values to be silently swallowed by Laminar
+    assertTypeError("div(onClick --> 5)")
+    assertTypeError("div(onClick --> { 5 })")
+    assertTypeError("div(onClick --> number())")
+    assertTypeError("div(onClick --> effectReturningInt())")
+    assertTypeError("div(onClick --> i)")
+    assertTypeError("div(onClick --> { if (i > 0) 5 })")
+    assertTypeError("div(bus.events --> 5)")
+    assertTypeError("div(bus.events --> number())")
+    assertTypeError("div(bus.events --> effectReturningInt())")
+    assertTypeError("div(bus.events --> i)")
+    assertTypeError("div(bus.events --> { if (i > 0) 5 })")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> 5)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> number())")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> effectReturningInt())")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> i)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> { if (i > 0) 5 })")
+    // Same goes for sinks that are of the wrong type
+    assertTypeError("div(onClick --> v)")
+    assertTypeError("div(bus.events --> v)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> v)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> { if (i > 0) v })")
+
+    // --
+
+    mount(el)
+
+    assert(i == 0)
+    assert(v.now() == 0)
+
+    // --
+
+    el.ref.click()
+
+    assert(i == 2)
+    assert(v.now() == 5)
+
+    // --
+
+    bus.emit(true)
+
+    assert(i == 6)
+    assert(v.now() == 15)
   }
 
 }

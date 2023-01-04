@@ -5,6 +5,7 @@ import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
+import org.scalajs.dom
 
 /** These tests verify Laminar's behaviour in weird cases.
   *
@@ -30,23 +31,24 @@ class WeirdCasesSpec extends UnitSpec {
         child <-- bus.events.map(num =>
           span(
             s"num: $num",
-            child <-- bus.events.map(innerNum => article(s"innerNum: $innerNum"))
+            child <-- bus.events.map(innerNum => articleTag(s"innerNum: $innerNum"))
           )
         )
       )
     )
 
-    // @TODO[Test] we should not need to specify this sentinel comment node here. Gotta find a way to ignore those.
-    expectNode(div.of("hello", ExpectedNode.comment))
+    expectNode(div.of("hello", sentinel))
 
     bus.writer.onNext(1)
 
     expectNode(
       div.of(
         "hello",
+        sentinel,
         span.of(
           "num: 1",
-          article of "innerNum: 1"
+          sentinel,
+          articleTag of "innerNum: 1"
         )
       )
     )
@@ -56,9 +58,11 @@ class WeirdCasesSpec extends UnitSpec {
     expectNode(
       div.of(
         "hello",
+        sentinel,
         span.of(
           "num: 2",
-          article of "innerNum: 2"
+          sentinel,
+          articleTag of "innerNum: 2"
         )
       )
     )
@@ -75,15 +79,16 @@ class WeirdCasesSpec extends UnitSpec {
         child <-- signal.map(num =>
           span(
             s"num: $num",
-            child <-- signal.map(innerNum => article(s"innerNum: $innerNum"))
+            child <-- signal.map(innerNum => articleTag(s"innerNum: $innerNum"))
           )
         )
       )
     )
 
-    expectNode(div.of("hello", span.of(
+    expectNode(div.of("hello", sentinel, span.of(
       "num: 0",
-      article of "innerNum: 0"
+      sentinel,
+      articleTag of "innerNum: 0"
     )))
 
     // --
@@ -93,9 +98,11 @@ class WeirdCasesSpec extends UnitSpec {
     expectNode(
       div.of(
         "hello",
+        sentinel,
         span.of(
           "num: 1",
-          article of "innerNum: 1"
+          sentinel,
+          articleTag of "innerNum: 1"
         )
       )
     )
@@ -107,9 +114,11 @@ class WeirdCasesSpec extends UnitSpec {
     expectNode(
       div.of(
         "hello",
+        sentinel,
         span.of(
           "num: 2",
-          article of "innerNum: 2"
+          sentinel,
+          articleTag of "innerNum: 2"
         )
       )
     )
@@ -126,13 +135,13 @@ class WeirdCasesSpec extends UnitSpec {
         child <-- bus.events.map(num =>
           span(
             s"num: $num",
-            child <-- signal.map(innerNum => article(s"innerNum: $innerNum"))
+            child <-- signal.map(innerNum => articleTag(s"innerNum: $innerNum"))
           )
         )
       )
     )
 
-    expectNode(div.of("hello", ExpectedNode.comment))
+    expectNode(div.of("hello", sentinel))
 
     // --
 
@@ -141,9 +150,11 @@ class WeirdCasesSpec extends UnitSpec {
     expectNode(
       div.of(
         "hello",
+        sentinel,
         span.of(
           "num: 1",
-          article of "innerNum: 1"
+          sentinel,
+          articleTag of "innerNum: 1"
         )
       )
     )
@@ -155,9 +166,11 @@ class WeirdCasesSpec extends UnitSpec {
     expectNode(
       div.of(
         "hello",
+        sentinel,
         span.of(
           "num: 2",
-          article of "innerNum: 2"
+          sentinel,
+          articleTag of "innerNum: 2"
         )
       )
     )
@@ -191,7 +204,7 @@ class WeirdCasesSpec extends UnitSpec {
     withClue("before first mount:") {
       expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         " world"
       ))
     }
@@ -204,7 +217,7 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Nikita"),
         " world"
       ))
@@ -224,7 +237,7 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
@@ -256,7 +269,7 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
@@ -282,7 +295,7 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("John"),
         span.of("Alpha"),
         span.of("Delta"),
@@ -310,7 +323,7 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Tor"),
         span.of("Delta"),
         span.of("Bravo"),
@@ -350,22 +363,22 @@ class WeirdCasesSpec extends UnitSpec {
     val signal = nameVar.signal
 
     // make a "copy" of each element, we can't put the same element twice into the dom
-    val stream = signal.changes.map(_.map(el => span(el.ref.textContent)))
+    val copyStream = signal.changes.map(_.map(el => span(el.ref.textContent)))
 
     val el = div(
       "Hello ",
       onMountInsert { _ =>
         children <-- signal
       },
-      onMountInsert { _ => children <-- stream},
+      onMountInsert { _ => children <-- copyStream},
       " world"
     )
 
     withClue("before first mount:") {
       expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment,
-        ExpectedNode.comment,
+        sentinel,
+        sentinel,
         " world"
       ))
     }
@@ -378,9 +391,9 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Nikita"),
-        ExpectedNode.comment,
+        sentinel,
         " world"
       ))
 
@@ -399,13 +412,13 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
@@ -439,13 +452,13 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
@@ -470,19 +483,19 @@ class WeirdCasesSpec extends UnitSpec {
       // Important, we check that updateChildren logic can handle this scenario - observable getting ahead of the DOM
       val owner = new TestableOwner
       signal.foreach(_ => ())(owner)
-      stream.foreach(_ => ())(owner)
+      copyStream.foreach(_ => ())(owner)
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
       expectNode(el.ref, div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
-        ExpectedNode.comment,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
@@ -508,13 +521,19 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("John"),
         span.of("Alpha"),
         span.of("Delta"),
         span.of("Bravo"),
         span.of("Tor"),
-        ExpectedNode.comment,
+        sentinel,
+        // remember, these are from copyStream – so those are copies.
+        span.of("Alpha"),
+        span.of("Bravo"),
+        span.of("Charlie"),
+        span.of("Delta"),
+        span.of("Eagle"),
         " world")
       )
 
@@ -540,14 +559,14 @@ class WeirdCasesSpec extends UnitSpec {
 
       expectNode(div.of(
         "Hello ",
-        ExpectedNode.comment,
+        sentinel,
         span.of("Tor"),
         span.of("Delta"),
         span.of("Bravo"),
         span.of("Alpha"),
         span.of("Elan"),
         span.of("John"),
-        ExpectedNode.comment,
+        sentinel,
         span.of("Tor"),
         span.of("Delta"),
         span.of("Bravo"),

@@ -31,7 +31,9 @@ class RootNode(
   /** When we create a Root, we don't want to create a new HTML Element, we want to
     * use a reference to an existing element, the container.
     */
-  override val ref: dom.Element = container
+  final override val ref: dom.Element = container
+
+  mount()
 
   /** @return Whether child was successfully mounted */
   def mount(): Boolean = {
@@ -45,7 +47,4 @@ class RootNode(
     ParentNode.removeChild(parent = this, child = child)
   }
 
-  if (ChildNode.isNodeMounted(container)) {
-    mount()
-  }
 }

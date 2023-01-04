@@ -16,7 +16,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
 
   val diffBus = new EventBus[Int]
 
-  val $count: Signal[Int] = diffBus.events.foldLeft(initial = 0)(_ + _)
+  val countSignal: Signal[Int] = diffBus.events.scanLeft(initial = 0)(_ + _)
 
   div(
     p(
@@ -31,7 +31,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
     ),
     p(
       label + ": ",
-      b(child.text <-- $count),
+      b(child.text <-- countSignal),
       " ",
       // Two different ways to get stepVar's value:
       button(

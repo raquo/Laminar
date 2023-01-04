@@ -1,6 +1,7 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Sink
+import com.raquo.airstream.core.{EventStream, Observable, Signal, Sink}
+import com.raquo.airstream.flatten.FlattenStrategy
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.ReactiveElement
@@ -21,17 +22,21 @@ import org.scalajs.dom
   *                         Returns an Option of the processed value. If None, the value should not passed down the chain.
   */
 class EventProcessor[Ev <: dom.Event, V](
-  protected val eventProp: ReactiveEventProp[Ev],
+  protected val eventProp: EventProp[Ev],
   protected val shouldUseCapture: Boolean = false,
   protected val processor: Ev => Option[V]
 ) {
 
   @inline def -->(sink: Sink[V]): EventListener[Ev, V] = {
-    -->(sink.toObserver.onNext(_))
+    this --> (sink.toObserver.onNext(_))
   }
 
-  @inline def -->[El <: ReactiveElement.Base](onNext: V => Unit): EventListener[Ev, V] = {
+  @inline def -->(onNext: V => Unit): EventListener[Ev, V] = {
     new EventListener[Ev, V](this, onNext)
+  }
+
+  @inline def -->(onNext: => Unit): EventListener[Ev, V] = {
+    new EventListener[Ev, V](this, _ => onNext)
   }
 
   /** Use capture mode (v=true) or bubble mode (v=false)
@@ -45,7 +50,8 @@ class EventProcessor[Ev <: dom.Event, V](
     new EventProcessor(eventProp, shouldUseCapture = true, processor = processor)
   }
 
-  /** Use standard bubble propagation mode. You don't need to call this unless you set `useCapture` previously.
+  /** Use standard bubble propagation mode.
+    * You don't need to call this unless you set `useCapture` previously, and want to revert to bubbling.
     *
     * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
     */
@@ -134,6 +140,8 @@ class EventProcessor[Ev <: dom.Event, V](
     withNewProcessor(ev => processor(ev).map(_ => value))
   }
 
+  def mapToUnit: EventProcessor[Ev, Unit] = mapToStrict(())
+
   /** Get the original event. You might want to call this in a chain, after some other processing. */
   def mapToEvent: EventProcessor[Ev, Ev] = {
     withNewProcessor(ev => processor(ev).map(_ => ev))
@@ -157,6 +165,85 @@ class EventProcessor[Ev <: dom.Event, V](
         DomApi.getChecked(ev.target.asInstanceOf[dom.Element]).getOrElse(false)
       }
     }
+  }
+
+  /** Get the value of `event.target.files`
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+   */
+  def mapToFiles: EventProcessor[Ev, List[dom.File]] = {
+    withNewProcessor { ev =>
+      processor(ev).map { _ =>
+        DomApi.getFiles(ev.target.asInstanceOf[dom.Element]).getOrElse(Nil)
+      }
+    }
+  }
+
+  /** Unsafe – Get the value of `event.target`, cast to a certain element type
+   *
+   * You should generally avoid this in favor of other helpers like
+   * `mapToValue` or `inContext { thisNode =>`.
+   */
+  def mapToTargetAs[Ref <: dom.EventTarget]: EventProcessor[Ev, Ref] = {
+    withNewProcessor { ev =>
+      processor(ev).map { _ =>
+        ev.target.asInstanceOf[Ref]
+      }
+    }
+  }
+
+  /** Similar to the Airstream `compose` operator.
+    *
+    * Use this when you need to apply stream operators on this element's events, e.g.:
+    *
+    *     div(onScroll.compose(_.throttle(100)) --> observer)
+    *
+    *     a(onClick.preventDefault.compose(_.delay(100)) --> observer)
+    *
+    * Note: This method is not chainable. Put all the operations you need inside the `operator` callback.
+    */
+  def compose[Out](
+    operator: EventStream[V] => Observable[Out]
+  ): LockedEventKey[Ev, V, Out] = {
+    new LockedEventKey(this, operator)
+  }
+
+  /** Similar to the Airstream `flatMap` operator.
+    *
+    * Use this when you want to create a new stream or signal on every event, e.g.:
+    *
+    * button(onClick.preventDefault.flatMap(_ => makeAjaxRequest()) --> observer)
+    *
+    * #TODO[IDE] IntelliJ (2022.2.2) shows false errors when using this flatMap implementation,
+    *  making it annoying. Use flatMapStream or flatMapSignal to get around that.
+    *
+    * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,
+    *       or use the `compose` method instead for more flexibility
+    */
+  def flatMap[Out, Obs[_] <: Observable[_]](
+    operator: V => Obs[Out]
+  )(
+    implicit flattenStrategy: FlattenStrategy[EventStream, Obs, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    new LockedEventKey[Ev, V, Out](this, eventStream => eventStream.flatMap(operator)(flattenStrategy))
+  }
+
+  /** Similar to `flatMap`, but restricted to streams only. */
+  def flatMapStream[Out](
+    operator: V => EventStream[Out]
+  )(
+    implicit flattenStrategy: FlattenStrategy[EventStream, EventStream, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    flatMap(operator)(flattenStrategy)
+  }
+
+  /** Similar to `flatMap`, but restricted to signals only. */
+  def flatMapSignal[Out](
+    operator: V => Signal[Out]
+  )(
+    implicit flattenStrategy: FlattenStrategy[EventStream, Signal, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    flatMap(operator)(flattenStrategy)
   }
 
   /** Evaluate `f` if the value was filtered out up the chain. For example:
@@ -225,14 +312,14 @@ class EventProcessor[Ev <: dom.Event, V](
 
 object EventProcessor {
 
-  def empty[Ev <: dom.Event](eventProp: ReactiveEventProp[Ev], shouldUseCapture: Boolean = false): EventProcessor[Ev, Ev] = {
+  def empty[Ev <: dom.Event](eventProp: EventProp[Ev], shouldUseCapture: Boolean = false): EventProcessor[Ev, Ev] = {
     new EventProcessor(eventProp, shouldUseCapture, Some(_))
   }
 
   // These methods are only exposed publicly via companion object
   // to avoid polluting autocomplete when chaining EventProcessor-s
 
-  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): ReactiveEventProp[Ev] = prop.eventProp
+  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): EventProp[Ev] = prop.eventProp
 
   @inline def shouldUseCapture(prop: EventProcessor[_, _]): Boolean = prop.shouldUseCapture
 

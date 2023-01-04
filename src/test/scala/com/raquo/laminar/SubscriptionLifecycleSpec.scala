@@ -20,12 +20,12 @@ class SubscriptionLifecycleSpec extends UnitSpec {
     def run(): Assertion = {
       val bus = new EventBus[V]
       var counter = 0
-      val $value = bus.events.map(value => {
+      val valueStream = bus.events.map(value => {
         counter += 1
         value
       })
 
-      val element = makeElement($value)
+      val element = makeElement(valueStream)
       mount(element)
       expectNode(emptyExpectedNode)
       counter shouldBe 0
@@ -74,23 +74,23 @@ class SubscriptionLifecycleSpec extends UnitSpec {
       var counterA = 0
       var counterB = 0
       var childCounter = 0
-      val $valueA = busA.events.map(value => {
+      val valueAStream = busA.events.map(value => {
         counterA += 1
         value
       })
-      val $valueB = busB.events.map(value => {
+      val valueBStream = busB.events.map(value => {
         counterB += 1
         value
       })
-      val $child = childBus.events.map(child => {
+      val childStream = childBus.events.map(child => {
         childCounter += 1
         child
       })
 
-      val childA = makeChildA($valueA)
-      val childB = makeChildB($valueB)
+      val childA = makeChildA(valueAStream)
+      val childB = makeChildB(valueBStream)
 
-      val element = makeElement($child)
+      val element = makeElement(childStream)
       mount(element)
       expectNode(emptyExpectedNode)
       counterA shouldBe 0
@@ -164,28 +164,28 @@ class SubscriptionLifecycleSpec extends UnitSpec {
   // PARENT UNMOUNT [$CHILD] = Subscriptions inside $child are active until said child is replaced with the next child
 
   it("PARENT UNMOUNT: title reflectedAttr")(SimpleTest[String](
-    makeElement = $title => span(title <-- $title, "Hello"),
+    makeElement = titleStream => span(title <-- titleStream, "Hello"),
     emptyExpectedNode = span.of(title.isEmpty, "Hello"),
     makeExpectedNode = expectedTitle => span.of(title is expectedTitle, "Hello"),
     values = Seq("Title 1", "Title 2", "Title 3", "Title 4").map(randomString(_))
   ).run())
 
   it("PARENT UNMOUNT: heightAttr integer attribute")(SimpleTest[Int](
-    makeElement = $height => span(heightAttr <-- $height, "Hello"),
+    makeElement = heightStream => span(heightAttr <-- heightStream, "Hello"),
     emptyExpectedNode = span.of(heightAttr.isEmpty, "Hello"),
     makeExpectedNode = expectedHeight => span.of(heightAttr is expectedHeight, "Hello"),
     values = Seq(10, 20, 30, 40)
   ).run())
 
   it("PARENT UNMOUNT: checked boolean property")(SimpleTest[Boolean](
-    makeElement = $checked => input(checked <-- $checked, "Hello"),
+    makeElement = checkedStream => input(checked <-- checkedStream, "Hello"),
     emptyExpectedNode = input.of(checked is false, "Hello"),
     makeExpectedNode = expectedChecked => input.of(checked is expectedChecked, "Hello"),
     values = Seq(false, true, false, true)
   ).run())
 
   it("PARENT UNMOUNT: color CSS rule")(SimpleTest[String](
-    makeElement = $color => div(color <-- $color, "Hello"),
+    makeElement = colorStream => div(color <-- colorStream, "Hello"),
     emptyExpectedNode = div.of(color is "", "Hello"),
     makeExpectedNode = expectedColor => div.of(color is expectedColor, "Hello"),
     values = Seq("red", "orange", "blue", "cyan")
@@ -193,7 +193,7 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
   // @Note href property reflection is apparently slightly broken in jsdom environment so I changed this test to use title
   it("GRANDPARENT UNMOUNT: title reflectedAttr")(SimpleTest[String](
-    makeElement = $title => span(L.a(title <-- $title, "Hello")),
+    makeElement = titleStream => span(L.a(title <-- titleStream, "Hello")),
     emptyExpectedNode = span.of(L.a.of(title.isEmpty, "Hello")),
     makeExpectedNode = expectedTitle => span.of(L.a.of(title is expectedTitle, "Hello")),
     values = Seq("title 1", "title 2", "title 3", "title 4").map(randomString(_))
@@ -201,42 +201,42 @@ class SubscriptionLifecycleSpec extends UnitSpec {
 
   // @TODO[Test] Also test that removing only one subscription does not unsubscribe the other one
   it("GRANDPARENT UNMOUNT: title reflectedAttr (two subscriptions for the same stream)")(SimpleTest[String](
-    makeElement = $str => div(span(title <-- $str, href <-- $str, "Hello")),
+    makeElement = strStream => div(span(title <-- strStream, href <-- strStream, "Hello")),
     emptyExpectedNode = div.of(span.of(title.isEmpty, href.isEmpty, "Hello")),
     makeExpectedNode = expectedTitle => div.of(span.of(title is expectedTitle, href is expectedTitle, "Hello")),
     values = Seq("Str 1", "Str 2", "Str 3", "Str 4").map(randomString(_))
   ).run())
 
   it("GRANDPARENT UNMOUNT: heightAttr integer attribute")(SimpleTest[Int](
-    makeElement = $height => div(span(heightAttr <-- $height, "Hello")),
+    makeElement = heightStream => div(span(heightAttr <-- heightStream, "Hello")),
     emptyExpectedNode = div.of(span.of(heightAttr.isEmpty, "Hello")),
     makeExpectedNode = expectedHeight => div.of(span.of(heightAttr is expectedHeight, "Hello")),
     values = Seq(10, 20, 30, 40)
   ).run())
 
   it("GRANDPARENT UNMOUNT: checked boolean property")(SimpleTest[Boolean](
-    makeElement = $checked => form(input(checked <-- $checked, "Hello")),
+    makeElement = checkedStream => form(input(checked <-- checkedStream, "Hello")),
     emptyExpectedNode = form.of(input.of(checked is false, "Hello")),
     makeExpectedNode = expectedChecked => form.of(input.of(checked is expectedChecked, "Hello")),
     values = Seq(false, true, false, true)
   ).run())
 
   it("GRANDPARENT UNMOUNT: color CSS rule")(SimpleTest[String](
-    makeElement = $color => span(div(color <-- $color, "Hello")),
+    makeElement = colorStream => span(div(color <-- colorStream, "Hello")),
     emptyExpectedNode = span.of(div.of(color is "", "Hello")),
     makeExpectedNode = expectedColor => span.of(div.of(color is expectedColor, "Hello")),
     values = Seq("red", "orange", "blue", "cyan")
   ).run())
 
   it("PARENT UNMOUNT [$CHILD]: title reflectedAttr")(NestedSubscriptionChildTest[String](
-    makeElement = $child => span(child <-- $child, "Hello"),
-    makeChildA = $testTitle => L.a(title <-- $testTitle),
-    makeChildB = $testTitle => b(title <-- $testTitle),
-    emptyExpectedNode = span.of(ExpectedNode.comment, "Hello"), // @TODO[API] We should not need to reference EN.comment here of this (it's a sentinel node, and we should use implicit conversion)
-    emptyExpectedNodeA = span.of(L.a.of(title.isEmpty), "Hello"),
-    emptyExpectedNodeB = span.of(b.of(title.isEmpty), "Hello"),
-    makeExpectedNodeA = expectedTitle => span.of(L.a.of(title is expectedTitle), "Hello"),
-    makeExpectedNodeB = expectedTitle => span.of(b.of(title is expectedTitle), "Hello"),
+    makeElement = childStream => span(child <-- childStream, "Hello"),
+    makeChildA = testTitleStream => L.a(title <-- testTitleStream),
+    makeChildB = testTitleStream => b(title <-- testTitleStream),
+    emptyExpectedNode = span.of(sentinel, "Hello"),
+    emptyExpectedNodeA = span.of(sentinel, L.a.of(title.isEmpty), "Hello"),
+    emptyExpectedNodeB = span.of(sentinel, b.of(title.isEmpty), "Hello"),
+    makeExpectedNodeA = expectedTitle => span.of(sentinel, L.a.of(title is expectedTitle), "Hello"),
+    makeExpectedNodeB = expectedTitle => span.of(sentinel, b.of(title is expectedTitle), "Hello"),
     values = Seq("Title 1", "Title 2", "Title 3", "Title 4").map(randomString(_))
   ).run())
 }

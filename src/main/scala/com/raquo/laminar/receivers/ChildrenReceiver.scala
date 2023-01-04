@@ -9,10 +9,11 @@ object ChildrenReceiver {
 
   val command: ChildrenCommandReceiver.type = ChildrenCommandReceiver
 
-  def <--($children: Source[Children]): Inserter[ReactiveElement.Base] = {
-    ChildrenInserter[ReactiveElement.Base](
-      _ => $children.toObservable,
-      initialInsertContext = None
-    )
+  // Note: currently this method requires an observable of an **immutable** Seq,
+  // but if needed, I might be able to implement a version that works with
+  // arrays and mutable Seq-s too.
+  // Let me know if you have a compelling use case for this.
+  def <--(childrenSource: Source[Children]): Inserter[ReactiveElement.Base] = {
+    ChildrenInserter(childrenSource.toObservable)
   }
 }

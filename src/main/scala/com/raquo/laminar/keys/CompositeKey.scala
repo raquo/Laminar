@@ -2,90 +2,97 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.Laminar.{MapValueMapper, StringValueMapper}
-import com.raquo.laminar.keys.CompositeKey.CompositeValueMapper
-import com.raquo.laminar.modifiers.{Binder, Setter}
+import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.keys.CompositeKey.{CompositeCodec, CompositeValueMapper}
+import com.raquo.laminar.modifiers.{CompositeKeySetter, KeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
 import scala.scalajs.js.JSStringOps._
 
-// @TODO[Performance] We can eventually use classList for className attribute instead of splitting strings. That needs IE 10+
+// #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 
-class CompositeKey[
-  Key,
-  -El <: ReactiveElement.Base
-](
-  val key: Key,
-  private[laminar] val getDomValue: El => List[String],
-  private[laminar] val setDomValue: (El, List[String]) => Unit,
+class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
+  override val name: String,
+  private[laminar] val getRawDomValue: El => String,
+  private[laminar] val setRawDomValue: (El, String) => Unit,
   val separator: String
-) { self =>
+) extends Key {
 
-  // @TODO[API] Should StringValueMapper be passed implicitly?
-  @inline def apply(items: String): Setter[El] = {
+  val codec: CompositeCodec = new CompositeCodec(separator)
+
+  def :=(items: String): CompositeKeySetter[K, El] = {
     addStaticItems(StringValueMapper.toNormalizedList(items, separator))
   }
 
-  @inline def apply(items: Map[String, Boolean]): Setter[El] = {
+  def :=(items: Map[String, Boolean]): CompositeKeySetter[K, El] = {
     addStaticItems(MapValueMapper.toNormalizedList(items, separator))
   }
 
-  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[El] = {
-    addStaticItems(mapper.toNormalizedList(items, separator))
-  }
-
-  @inline def :=(items: String): Setter[El] = {
-    addStaticItems(StringValueMapper.toNormalizedList(items, separator))
-  }
-
-  @inline def :=(items: Map[String, Boolean]): Setter[El] = {
-    addStaticItems(MapValueMapper.toNormalizedList(items, separator))
-  }
-
-  @inline def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): Setter[El] = {
+  def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[K, El] = {
     addStaticItems(mapper.toNormalizedList(value, separator))
   }
 
-  def toggle(items: String*): LockedCompositeKey[Key, El] = {
+  @inline def apply(items: String): CompositeKeySetter[K, El] = {
+    this := items
+  }
+
+  @inline def apply(items: Map[String, Boolean]): CompositeKeySetter[K, El] = {
+    this := items
+  }
+
+  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[K, El] = {
+    this.:=(items: _*)
+  }
+
+  def toggle(items: String*): LockedCompositeKey[K, El] = {
     new LockedCompositeKey(this, items.toList)
   }
 
-  def <--[V]($items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): Binder[El] = {
-    Binder.withSelf[El] { (element, thisBinder) =>
-      ReactiveElement.bindFn(element, $items.toObservable) { nextRawItems =>
-        val currentNormalizedItems = element.compositeValueItems(self, thisBinder)
+  def <--[V](items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): KeyUpdater[El, this.type, V] = {
+    new KeyUpdater[El, this.type, V](
+      key = this,
+      values = items.toObservable,
+      update = (element, nextRawItems, thisBinder) => {
+        val currentNormalizedItems = element.compositeValueItems(this, reason = thisBinder)
         val nextNormalizedItems = valueMapper.toNormalizedList(nextRawItems, separator)
 
         val itemsToAdd = nextNormalizedItems.filterNot(currentNormalizedItems.contains)
         val itemsToRemove = currentNormalizedItems.filterNot(nextNormalizedItems.contains)
 
         element.updateCompositeValue(
-          key = self,
+          key = this,
           reason = thisBinder,
           addItems = itemsToAdd,
           removeItems = itemsToRemove
         )
       }
-    }
+    )
   }
 
-  private def addStaticItems(normalizedItems: List[String]): Setter[El] = {
-    if (normalizedItems.nonEmpty) {
-      Setter { element =>
-        element.updateCompositeValue(
-          key = self,
-          reason = null, // @Note using null to avoid keeping a reference to this setter
-          addItems = normalizedItems,
-          removeItems = Nil
-        )
-      }
-    } else {
-      Setter.noop
-    }
+  private def addStaticItems(normalizedItems: List[String]): CompositeKeySetter[K, El] = {
+    new CompositeKeySetter(
+      key = this,
+      itemsToAdd = normalizedItems,
+      itemsToRemove = Nil
+    )
   }
 }
 
 object CompositeKey {
+
+  // #TODO[Perf] Consider switching `normalize` from List-s to JsArrays.
+
+  class CompositeCodec(separator: String) extends Codec[Iterable[String], String] {
+
+    override def decode(domValue: String): List[String] = {
+      CompositeKey.normalize(domValue, separator)
+    }
+
+    override def encode(scalaValue: Iterable[String]): String = {
+      scalaValue.mkString(separator)
+    }
+  }
 
   /** @param items non-normalized string with one or more items separated by `separator`
     *

@@ -1,9 +1,11 @@
 package com.raquo.laminar
 
-import com.raquo.domtypes.generic.keys.{HtmlAttr, Prop, Style, SvgAttr}
-import com.raquo.laminar.keys.EventProcessor
+import com.raquo.ew._
+import com.raquo.laminar.api.Laminar.{div, svg}
+import com.raquo.laminar.keys.{AriaAttr, EventProcessor, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
+import com.raquo.laminar.tags.{HtmlTag, SvgTag, Tag}
 import org.scalajs.dom
 import org.scalajs.dom.DOMException
 
@@ -95,8 +97,8 @@ object DomApi {
 
   /** HTML Elements */
 
-  def createHtmlElement[Ref <: dom.html.Element](element: ReactiveHtmlElement[Ref]): Ref = {
-    dom.document.createElement(element.tag.name).asInstanceOf[Ref]
+  def createHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref]): Ref = {
+    dom.document.createElement(tag.name).asInstanceOf[Ref]
   }
 
   def getHtmlAttribute[V, DomV](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V]): Option[V] = {
@@ -106,10 +108,10 @@ object DomApi {
 
   def setHtmlAttribute[V](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V], value: V): Unit = {
     val domValue = attr.codec.encode(value)
-    if (domValue == null) { // End users should use `removeAttribute` instead. This is to support boolean attributes.
+    if (domValue == null) { // End users should use `removeHtmlAttribute` instead. This is to support boolean attributes.
       removeHtmlAttribute(element, attr)
     } else {
-      element.ref.setAttribute(attr.name, domValue.toString)
+      element.ref.setAttribute(attr.name, domValue)
     }
   }
 
@@ -118,7 +120,7 @@ object DomApi {
   }
 
   /** #Note not sure if this is completely safe. Could this return null? */
-  def getHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: Prop[V, DomV]): V = {
+  def getHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: HtmlProp[V, DomV]): V = {
     val domValue = element.ref.asInstanceOf[js.Dynamic].selectDynamic(prop.name).asInstanceOf[DomV]
     if (domValue != null) {
       prop.codec.decode(domValue)
@@ -127,21 +129,21 @@ object DomApi {
     }
   }
 
-  def setHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: Prop[V, DomV], value: V): Unit = {
+  def setHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: HtmlProp[V, DomV], value: V): Unit = {
     val newValue = prop.codec.encode(value).asInstanceOf[js.Any]
     element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(newValue)
   }
 
-  def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+  def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: StyleProp[V], value: V): Unit = {
+    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
-  def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: Style[_], value: String): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+  def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: StyleProp[_], value: String): Unit = {
+    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
-  def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: Style[V], value: V | String): Unit = {
-    setRefStyle(element.ref, style.name, cssValue(value))
+  def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: StyleProp[V], value: V | String): Unit = {
+    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
   @inline private def cssValue(value: Any): String = {
@@ -161,11 +163,20 @@ object DomApi {
     //}
   }
 
-  @inline private def setRefStyle(ref: dom.html.Element, styleCssName: String, styleValue: String): Unit = {
-    // Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
+  @inline private def setRefStyle(
+    ref: dom.html.Element,
+    styleCssName: String,
+    prefixes: Seq[String],
+    styleValue: String
+  ): Unit = {
+    // #Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
     if (styleValue == null) {
+      prefixes.foreach(prefix => ref.style.removeProperty(prefix + styleCssName))
       ref.style.removeProperty(styleCssName)
     } else {
+      prefixes.foreach { prefix =>
+        ref.style.setProperty(prefix + styleCssName, styleValue)
+      }
       ref.style.setProperty(styleCssName, styleValue)
     }
   }
@@ -175,9 +186,9 @@ object DomApi {
 
   private val svgNamespaceUri = "http://www.w3.org/2000/svg"
 
-  def createSvgElement[Ref <: dom.svg.Element](element: ReactiveSvgElement[Ref]): Ref = {
+  def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
     dom.document
-      .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = element.tag.name)
+      .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = tag.name)
       .asInstanceOf[Ref]
   }
 
@@ -201,10 +212,30 @@ object DomApi {
   }
 
   @inline private def localName(qualifiedName: String): String = {
-    val nsPrefixLength = qualifiedName.indexOf(':')
+    val nsPrefixLength = qualifiedName.ew.indexOf(":")
     if (nsPrefixLength > -1) {
-      qualifiedName.substring(nsPrefixLength + 1)
+      qualifiedName.ew.substr(nsPrefixLength + 1).str
     } else qualifiedName
+  }
+
+  /** Aria attributes */
+
+  def getAriaAttribute[V](element: ReactiveElement.Base, attr: AriaAttr[V]): Option[V] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    Option(domValue).map(attr.codec.decode)
+  }
+
+  def setAriaAttribute[V](element: ReactiveElement.Base, attr: AriaAttr[V], value: V): Unit = {
+    val domValue = attr.codec.encode(value)
+    if (domValue == null) { // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
+      removeAriaAttribute(element, attr)
+    } else {
+      element.ref.setAttribute(attr.name, domValue)
+    }
+  }
+
+  def removeAriaAttribute(element: ReactiveElement.Base, attr: AriaAttr[_]): Unit = {
+    element.ref.removeAttribute(attr.name)
   }
 
 
@@ -253,7 +284,7 @@ object DomApi {
   def setChecked(element: dom.Element, checked: Boolean): Boolean = {
     element match {
       case input: dom.html.Input if input.`type` == "checkbox" || input.`type` == "radio" =>
-        input.checked = checked // @nc will this work with different mod order?
+        input.checked = checked
         true
       case el if isCustomElement(el) =>
         el.asInstanceOf[js.Dynamic].updateDynamic("checked")(checked)
@@ -314,8 +345,85 @@ object DomApi {
     }
   }
 
+  /** @see https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications */
+  def getFiles(element: dom.Element): js.UndefOr[List[dom.File]] = {
+    element match {
+      case input: dom.html.Input if input.`type` == "file" =>
+        var result: List[dom.File] = Nil
+        var ix = input.files.length - 1
+        while (ix >= 0) {
+          result = input.files(ix) :: result
+          ix -= 1
+        }
+        result
+      case _ => js.undefined
+    }
+  }
+
+
+  /** DOM Parser */
+
+  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings. */
+  def unsafeParseHtmlString(dangerousHtmlString: String): dom.html.Element = {
+    unsafeParseElementString(htmlParserContainer, tag = js.undefined, dangerousHtmlString, "Error parsing HTML string")
+  }
+
+  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings.
+    *
+    *  @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
+    */
+  def unsafeParseHtmlString[Ref <: dom.html.Element](tag: HtmlTag[Ref], dangerousHtmlString: String): Ref = {
+    unsafeParseElementString(htmlParserContainer, tag, dangerousHtmlString, "Error parsing HTML string")
+  }
+
+  /** #WARNING: SVG can contain Javascript code, which this function will execute blindly! Only use on trusted SVG strings. */
+  def unsafeParseSvgString(dangerousSvgString: String): dom.svg.Element = {
+    unsafeParseElementString(svgParserContainer, tag = js.undefined, dangerousSvgString, "Error parsing SVG string")
+  }
+
+  /** #WARNING: SVG can contain Javascript code, which this function will be execute blindly! Only use on trusted SVG strings.
+    *
+    * @param tag   the SVG tag you expect from parsing. Will throw exception if does not match the result.
+    */
+  def unsafeParseSvgString[Ref <: dom.svg.Element](tag: SvgTag[Ref], dangerousSvgString: String): Ref = {
+    unsafeParseElementString(svgParserContainer, tag, dangerousSvgString, "Error parsing SVG string")
+  }
+
+  private val htmlParserContainer: dom.html.Element = createHtmlElement(div)
+
+  private val svgParserContainer: dom.svg.Element = createSvgElement(svg.svg)
+
+  private def unsafeParseElementString[Ref <: dom.Element](
+    parserContainer: dom.Element,
+    tag: js.UndefOr[Tag[ReactiveElement[Ref]]],
+    dangerousHtmlOrSvgString: String,
+    clue: String
+  ): Ref = {
+    parserContainer.innerHTML = dangerousHtmlOrSvgString
+    val numChildren = parserContainer.children.length
+    if (numChildren != 1) {
+      throw new Exception(s"$clue: expected exactly 1 child in parserContainer, got $numChildren")
+    }
+    val element = parserContainer.children(0)
+    tag.foreach(DomApi.assertTagMatches(_, element, clue))
+    parserContainer.innerHTML = ""
+    element.asInstanceOf[Ref]
+  }
+
+  private[laminar] def assertTagMatches[Ref <: dom.Element](
+    tag: Tag[ReactiveElement[Ref]],
+    element: dom.Element,
+    clue: String
+  ): Unit = {
+    if (tag.name.ew.toLowerCase() != element.tagName.ew.toLowerCase()) {
+      throw new Exception(s"$clue: expected tag name `${tag.name}`, got `${element.tagName}`")
+    }
+  }
+
 
   /** Random utils */
+
+  private val classNamesSeparatorRegex = new js.RegExp(" ", flags = "g")
 
   /** @return hierarchical path describing the position and identity of this node, starting with the root. */
   @tailrec def debugPath(element: dom.Node, initial: List[String] = Nil): List[String] = {
@@ -335,14 +443,35 @@ object DomApi {
         } else {
           val classes = el.className
           if (classes.nonEmpty) {
-            "." + classes.replace(' ', '.')
+            "." + classes.ew.replace(classNamesSeparatorRegex, ".").str
           } else {
             ""
           }
         }
-        el.tagName.toLowerCase + suffixStr
+        el.tagName.ew.toLowerCase().str + suffixStr
 
       case _ => node.nodeName
     }
   }
+
+  def debugNodeOuterHtml(node: dom.Node): String = {
+    node match {
+      case el: dom.Element => el.outerHTML
+      case el: dom.Text => s"Text(${el.textContent})"
+      case el: dom.Comment => s"Comment(${el.textContent})"
+      case null => "<null>"
+      case other => s"OtherNode(${other.toString})"
+    }
+  }
+
+  def debugNodeInnerHtml(node: dom.Node): String = {
+    node match {
+      case el: dom.Element => el.innerHTML
+      case el: dom.Text => s"Text(${el.textContent})"
+      case el: dom.Comment => s"Comment(${el.textContent})"
+      case null => "<null>"
+      case other => s"OtherNode(${other.toString})"
+    }
+  }
+
 }

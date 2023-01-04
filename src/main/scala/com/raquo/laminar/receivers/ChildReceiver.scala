@@ -7,17 +7,11 @@ import com.raquo.laminar.nodes.ReactiveElement
 
 object ChildReceiver {
 
-  val maybe: MaybeChildReceiver.type = MaybeChildReceiver
+  val maybe: ChildOptionReceiver.type = ChildOptionReceiver
 
-  val text: TextChildReceiver.type = TextChildReceiver
+  val text: ChildTextReceiver.type = ChildTextReceiver
 
-  @deprecated("Use child.text instead of child.int, it can handle integers too now.", "0.12.0")
-  val int: TextChildReceiver.type = TextChildReceiver
-
-  def <--($node: Source[Child]): Inserter[ReactiveElement.Base] = {
-    ChildInserter[ReactiveElement.Base](
-      _ => $node.toObservable,
-      initialInsertContext = None
-    )
+  def <--(childSource: Source[Child]): Inserter[ReactiveElement.Base] = {
+    ChildInserter(childSource.toObservable)
   }
 }

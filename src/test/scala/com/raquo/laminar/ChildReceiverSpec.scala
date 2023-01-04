@@ -21,40 +21,40 @@ class ChildReceiverSpec extends UnitSpec {
 
   it("updates one child") {
     withClue("Stream:") {
-      test(makeObservable = identity)
+      test(makeObservable = identity, expectedInitialChild = None)
     }
 
     withClue("Signal:") {
       test(
         makeObservable = _.toSignal(span(text0)),
-        expectedInitialChild = span of text0
+        expectedInitialChild = Some(span of text0)
       )
     }
 
     def test(
       makeObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
-      expectedInitialChild: ExpectedNode = ExpectedNode.comment
+      expectedInitialChild: Option[ExpectedNode]
     ): Unit = {
 
       val childBus = new EventBus[ChildNode[dom.Element]]
-      val $child = makeObservable(childBus.events)
+      val childSource = makeObservable(childBus.events)
 
-      mount(div("Hello, ", child <-- $child))
-      expectNode(div.of("Hello, ", expectedInitialChild))
+      mount(div("Hello, ", child <-- childSource))
+      expectNode(div.of("Hello, ", sentinel, expectedInitialChild))
 
       withClue("First event:") {
         childBus.writer.onNext(span(text1))
-        expectNode(div.of("Hello, ", span of text1))
+        expectNode(div.of("Hello, ", sentinel, span of text1))
       }
 
       withClue("Second event, changing node type (span->div):") {
         childBus.writer.onNext(div(text2))
-        expectNode(div.of("Hello, ", div of text2))
+        expectNode(div.of("Hello, ", sentinel, div of text2))
       }
 
       withClue("Third event:") {
         childBus.writer.onNext(div(text3))
-        expectNode(div.of("Hello, ", div of text3))
+        expectNode(div.of("Hello, ", sentinel, div of text3))
       }
 
       unmount()
@@ -65,7 +65,9 @@ class ChildReceiverSpec extends UnitSpec {
     withClue("Stream:") {
       test(
         makeFooObservable = identity,
-        makeBarObservable = identity
+        makeBarObservable = identity,
+        initialFooChild = None,
+        initialBarChild = None
       )
     }
 
@@ -73,81 +75,66 @@ class ChildReceiverSpec extends UnitSpec {
       test(
         makeFooObservable = _.toSignal(span(text0)),
         makeBarObservable = _.toSignal(span(text00)),
-        initialFooChild = span of text0,
-        initialBarChild = span of text00
+        initialFooChild = Some(span of text0),
+        initialBarChild = Some(span of text00)
       )
     }
 
     def test(
       makeFooObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
       makeBarObservable: EventStream[ChildNode[dom.Element]] => Observable[ChildNode[dom.Element]],
-      initialFooChild: ExpectedNode = ExpectedNode.comment,
-      initialBarChild: ExpectedNode = ExpectedNode.comment
+      initialFooChild: Option[ExpectedNode],
+      initialBarChild: Option[ExpectedNode]
     ): Unit = {
       val fooChildBus = new EventBus[ChildNode[dom.Element]]
       val barChildBus = new EventBus[ChildNode[dom.Element]]
 
-      mount(div(child <-- makeFooObservable(fooChildBus.events), child <-- makeBarObservable(barChildBus.events)))
-      expectNode(div.of(initialFooChild, initialBarChild))
+      mount(
+        div(
+          child <-- makeFooObservable(fooChildBus.events),
+          child <-- makeBarObservable(barChildBus.events)
+        )
+      )
+      expectNode(div.of(sentinel, initialFooChild, sentinel, initialBarChild))
 
       withClue("1. foo event:") {
         fooChildBus.writer.onNext(span(text1))
-        expectNode(div.of(span of text1, initialBarChild))
+        expectNode(div.of(sentinel, span of text1, sentinel, initialBarChild))
       }
 
       withClue("2. bar event:") {
         barChildBus.writer.onNext(span(text4))
-        expectNode(div.of(span of text1, span of text4))
+        expectNode(div.of(sentinel, span of text1, sentinel, span of text4))
       }
 
       withClue("3. another bar event:") {
         barChildBus.writer.onNext(span(text5))
-        expectNode(div.of(span of text1, span of text5))
+        expectNode(div.of(sentinel, span of text1, sentinel, span of text5))
       }
 
       withClue("4. foo switch to div:") {
         fooChildBus.writer.onNext(div(text2))
-        expectNode(div.of(div of text2, span of text5))
+        expectNode(div.of(sentinel, div of text2, sentinel, span of text5))
       }
 
       withClue("5. another foo event:") {
         fooChildBus.writer.onNext(div(text3))
-        expectNode(div.of(div of text3, span of text5))
+        expectNode(div.of(sentinel, div of text3, sentinel, span of text5))
       }
 
       withClue("6. another bar event:") {
         barChildBus.writer.onNext(span(text6))
-        expectNode(div.of(div of text3, span of text6))
+        expectNode(div.of(sentinel, div of text3, sentinel, span of text6))
       }
 
       withClue("7. yet another bar event:") {
         barChildBus.writer.onNext(span(text7))
-        expectNode(div.of(div of text3, span of text7))
+        expectNode(div.of(sentinel, div of text3, sentinel, span of text7))
       }
 
       unmount()
     }
   }
-
-//  ignore("updates two children with the same stream") {
-//
-//  }
-//
-//  ignore("works when nested") {
-//
-//  }
-//
-//  ignore("works with an attr receiver on the same node") {
-//
-//  }
-//
-//  ignore("works with an attr receiver with nesting") {
-//
-//  }
-//
-//  ignore("works with an attr receiver on this node") {
-//
-//  }
 
   it("split[Option] - caching elements to change tag type") {
 
@@ -178,7 +165,10 @@ class ChildReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div.of(L.a.of(href is "http://blog1.com/", "a blog"))
+      div.of(
+        sentinel,
+        L.a.of(href is "http://blog1.com/", "a blog")
+      )
     )
 
     numCreateLinkCalls shouldBe 1
@@ -189,7 +179,10 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(Some(2))
 
     expectNode(
-      div.of(L.a.of(href is "http://blog2.com/", "a blog"))
+      div.of(
+        sentinel,
+        L.a.of(href is "http://blog2.com/", "a blog")
+      )
     )
 
     numCreateLinkCalls shouldBe 0
@@ -202,7 +195,10 @@ class ChildReceiverSpec extends UnitSpec {
 
     expectNode(
       el.ref,
-      div.of(L.a.of(href is "http://blog2.com/", "a blog"))
+      div.of(
+        sentinel,
+        L.a.of(href is "http://blog2.com/", "a blog")
+      )
     )
 
     numCreateLinkCalls shouldBe 0
@@ -212,7 +208,10 @@ class ChildReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div.of(L.a.of(href is "http://blog2.com/", "a blog"))
+      div.of(
+        sentinel,
+        L.a.of(href is "http://blog2.com/", "a blog")
+      )
     )
 
     numCreateLinkCalls shouldBe 0
@@ -222,11 +221,14 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(Some(4))
 
     expectNode(
-      div.of(L.a.of(href is "http://blog4.com/", "a blog"))
+      div.of(
+        sentinel,
+        L.a.of(href is "http://blog4.com/", "a blog")
+      )
     )
 
-    // Previous unmounting stopped the split stream, which cleared the memory of memoized elements
-    numCreateLinkCalls shouldBe 1
+    // We don't clear memoized state when split signal is stopped anymore
+    numCreateLinkCalls shouldBe 0
     numCreateLinkCalls = 0
 
     // --
@@ -234,7 +236,10 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(None)
 
     expectNode(
-      div.of(i.of("no blog"))
+      div.of(
+        sentinel,
+        i.of("no blog")
+      )
     )
 
     // --
@@ -242,7 +247,10 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(None)
 
     expectNode(
-      div.of(i.of("no blog"))
+      div.of(
+        sentinel,
+        i.of("no blog")
+      )
     )
 
     numCreateLinkCalls shouldBe 0
@@ -252,9 +260,177 @@ class ChildReceiverSpec extends UnitSpec {
     numVar.writer.onNext(Some(5))
 
     expectNode(
-      div.of(L.a.of(href is "http://blog5.com/", "a blog"))
+      div.of(
+        sentinel,
+        L.a.of(href is "http://blog5.com/", "a blog")
+      )
     )
 
     numCreateLinkCalls shouldBe 1
   }
+
+  it("can move child from one receiver to another") {
+
+    val spanA = span("a")
+    val spanB = span("b")
+    val spanC = span("c")
+    val spanD = span("d")
+    val spanE = span("e")
+
+    val bus1 = new EventBus[HtmlElement]
+    val bus2 = new EventBus[HtmlElement]
+
+    val el = div(
+      child <-- bus1,
+      child <-- bus2,
+    )
+
+    mount(el)
+
+    // --
+
+    expectNode(
+      div of(
+        sentinel,
+        sentinel
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> spanA,
+      bus2 -> spanD
+    )
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "a",
+        sentinel,
+        span of "d",
+      )
+    )
+
+    // -- Steal D from inserter #2 to inserter #1
+
+    EventBus.emit(
+      bus1 -> spanD
+    )
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "d",
+        sentinel
+      )
+    )
+
+    // -- Request invalid state (same element in both places)
+
+    EventBus.emit(
+      bus1 -> spanA,
+      bus2 -> spanA
+    )
+
+    expectNode(
+      div of(
+        sentinel,
+        sentinel,
+        span of "a"
+      )
+    )
+
+    // -- Recover from invalid state
+
+    EventBus.emit(
+      bus1 -> spanA,
+      bus2 -> spanB
+    )
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "a",
+        sentinel,
+        span of "b",
+      )
+    )
+
+    // -- Unmount and re-mount
+
+    unmount()
+
+    mount(el)
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "a",
+        sentinel,
+        span of "b",
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> spanC,
+      bus2 -> spanD
+    )
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "c",
+        sentinel,
+        span of "d"
+      )
+    )
+
+    // --
+
+    EventBus.emit(
+      bus1 -> spanD,
+      bus2 -> spanE
+    )
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "d",
+        sentinel,
+        span of "e"
+      )
+    )
+
+    // --
+
+    bus1.emit(spanD)
+    bus2.emit(spanC)
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "d",
+        sentinel,
+        span of "c"
+      )
+    )
+
+    // --
+
+    bus2.emit(spanD)
+    bus1.emit(spanC)
+
+    expectNode(
+      div of(
+        sentinel,
+        span of "c",
+        sentinel,
+        span of "d"
+      )
+    )
+  }
+
 }

@@ -9,7 +9,7 @@ class TaskList {
 
   private val showAddTaskInputBus = new EventBus[Boolean]
 
-  private val $showAddTaskInput = showAddTaskInputBus.events.toSignal(false)
+  private val showAddTaskInputSignal = showAddTaskInputBus.events.toSignal(false)
 
   private var count = 0
 
@@ -21,14 +21,14 @@ class TaskList {
   )
 
   def maybeNewTaskButton: Signal[Option[Node]] = {
-    $showAddTaskInput.map { showAddTaskInput =>
+    showAddTaskInputSignal.map { showAddTaskInput =>
       val showNewTaskButton = !showAddTaskInput
       if (showNewTaskButton) {
         count += 1
         Some(
           button(
             onClick.map(_ => Append(div("hello"))) --> taskDiffBus,
-            //        onClick --> (true, sendTo = $showAddTaskInput),
+            //        onClick --> (true, sendTo = showAddTaskInputSignal),
             "Add task"
           )
         )
@@ -39,7 +39,7 @@ class TaskList {
   }
 
   def maybeNewTask: Signal[Option[Node]] = {
-    $showAddTaskInput.map { showAddTaskInput =>
+    showAddTaskInputSignal.map { showAddTaskInput =>
       if (showAddTaskInput) {
         Some(button(
           onClick.mapTo(false) --> showAddTaskInputBus,

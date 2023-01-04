@@ -22,9 +22,9 @@ trait Airstream {
 
   type Sink[-A] = airstream.core.Sink[A]
 
-  val EventStream: airstream.core.EventStream.type = airstream.core.EventStream
+  @inline def EventStream: airstream.core.EventStream.type = airstream.core.EventStream
 
-  val Signal: airstream.core.Signal.type = airstream.core.Signal
+  @inline def Signal: airstream.core.Signal.type = airstream.core.Signal
 
   val Observer: airstream.core.Observer.type = airstream.core.Observer
 
@@ -66,23 +66,24 @@ trait Airstream {
 
   val DynamicSubscription: airstream.ownership.DynamicSubscription.type = airstream.ownership.DynamicSubscription
 
+  // -- Special streams
+
+  lazy val AjaxStream: airstream.web.AjaxStream.type = airstream.web.AjaxStream
+
+  lazy val FetchStream: airstream.web.FetchStream.type = airstream.web.FetchStream
+
   // -- Flatten
 
   type FlattenStrategy[-Outer[+_] <: Observable[_], -Inner[_], Output[+_] <: Observable[_]] = airstream.flatten.FlattenStrategy[Outer, Inner, Output]
 
   lazy val SwitchStreamStrategy: airstream.flatten.FlattenStrategy.SwitchStreamStrategy.type = airstream.flatten.FlattenStrategy.SwitchStreamStrategy
 
+  lazy val ConcurrentStreamStrategy: airstream.flatten.FlattenStrategy.ConcurrentStreamStrategy.type = airstream.flatten.FlattenStrategy.ConcurrentStreamStrategy
+
+  lazy val SwitchSignalStreamStrategy: airstream.flatten.FlattenStrategy.SwitchSignalStreamStrategy.type = airstream.flatten.FlattenStrategy.SwitchSignalStreamStrategy
+
   lazy val SwitchSignalStrategy: airstream.flatten.FlattenStrategy.SwitchSignalStrategy.type = airstream.flatten.FlattenStrategy.SwitchSignalStrategy
 
-  lazy val SwitchFutureStrategy: airstream.flatten.FlattenStrategy.SwitchFutureStrategy.type = airstream.flatten.FlattenStrategy.SwitchFutureStrategy
+  lazy val SwitchSignalObservableStrategy: airstream.flatten.FlattenStrategy.SwitchSignalObservableStrategy.type = airstream.flatten.FlattenStrategy.SwitchSignalObservableStrategy
 
-  lazy val ConcurrentFutureStrategy: airstream.flatten.FlattenStrategy.ConcurrentFutureStrategy.type = airstream.flatten.FlattenStrategy.ConcurrentFutureStrategy
-
-  lazy val OverwriteFutureStrategy: airstream.flatten.FlattenStrategy.OverwriteFutureStrategy.type = airstream.flatten.FlattenStrategy.OverwriteFutureStrategy
-
-  // -- Utils
-
-  type Ref[+A <: AnyRef] = airstream.util.Ref[A]
-
-  lazy val Ref: airstream.util.Ref.type = airstream.util.Ref
 }

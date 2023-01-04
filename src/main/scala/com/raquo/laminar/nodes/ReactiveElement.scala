@@ -1,21 +1,20 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink}
+import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink, Transaction}
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, TransferableSubscription}
-import com.raquo.domtypes
-import com.raquo.domtypes.generic.Modifier
+import com.raquo.ew.JsArray
 import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
 import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription}
+import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription, Modifier}
+import com.raquo.laminar.tags.Tag
 import org.scalajs.dom
 
 import scala.scalajs.js
 
 trait ReactiveElement[+Ref <: dom.Element]
   extends ChildNode[Ref]
-  with ParentNode[Ref]
-  with domtypes.generic.nodes.Element {
+  with ParentNode[Ref] {
 
   // @Warning[Fragile] deactivate should not need an isActive guard.
   //  If Laminar starts to cause exceptions here, we need to find the root cause.
@@ -27,33 +26,48 @@ trait ReactiveElement[+Ref <: dom.Element]
     deactivate = dynamicOwner.deactivate
   )
 
-  private[this] var maybeEventListeners: js.UndefOr[js.Array[EventListenerSubscription]] = js.undefined
+  private[this] var maybeEventListeners: js.UndefOr[JsArray[EventListenerSubscription]] = js.undefined
 
-  private[laminar] def eventSubscriptions: List[EventListenerSubscription] = maybeEventListeners.map(_.toList).getOrElse(Nil)
+  private[laminar] def foreachEventListener(f: EventListenerSubscription => Unit): Unit = {
+    maybeEventListeners.foreach(_.forEach(f))
+  }
 
   /** Note: Only call this after checking that this element doesn't already have this listener */
-  private[laminar] def addEventSubscription(
-    listenerSub: EventListenerSubscription,
+  private[laminar] def addEventListener(
+    listener: EventListenerSubscription,
     unsafePrepend: Boolean
   ): Unit = {
     if (maybeEventListeners.isEmpty) {
-      maybeEventListeners = js.defined(js.Array(listenerSub))
+      maybeEventListeners = js.defined(JsArray(listener))
     } else if (unsafePrepend) {
-      maybeEventListeners.get.unshift(listenerSub)
+      maybeEventListeners.get.unshift(listener)
     } else {
-      maybeEventListeners.get.push(listenerSub)
+      maybeEventListeners.get.push(listener)
     }
   }
 
   /** Note: Only call this after checking that this element currently has this listener */
-  private[laminar] def removeEventSubscription(index: Int): Unit = {
+  private[laminar] def removeEventListener(index: Int): Unit = {
     maybeEventListeners.foreach { eventListeners =>
       eventListeners.splice(index, deleteCount = 1)
     }
   }
 
   /** @return -1 if not found */
-  private[laminar] def indexOfEventListener(listener: EventListener.Any): Int = eventListeners.indexOf(listener)
+  private[laminar] def indexOfEventListener(listener: EventListener.Base): Int = {
+    maybeEventListeners.fold(ifEmpty = -1) { eventListeners =>
+      var found: Boolean = false
+      var ix = 0
+      while (!found && ix < eventListeners.length) {
+        if (eventListeners(ix).listener == listener) {
+          found = true
+        } else {
+          ix += 1
+        }
+      }
+      if (found) ix else -1
+    }
+  }
 
   /** This structure keeps track of reasons for including a given item for a given composite key.
     * For example, this remembers which modifiers have previously added which className.
@@ -83,12 +97,12 @@ trait ReactiveElement[+Ref <: dom.Element]
     *
     * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
     */
-  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier[this.type])]] =
+  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier.Any)]] =
     Map.empty
 
   private[laminar] def compositeValueItems(
     prop: CompositeKey[_, this.type],
-    reason: Modifier[this.type]
+    reason: Modifier.Any
   ): List[String] = {
     _compositeValues
       .getOrElse(prop, Nil)
@@ -97,7 +111,7 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   private[laminar] def updateCompositeValue(
     key: CompositeKey[_, this.type],
-    reason: Modifier[this.type],
+    reason: Modifier.Any,
     addItems: List[String],
     removeItems: List[String]
   ): Unit = {
@@ -114,7 +128,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       .getOrElse(key, Nil)
       .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
 
-    val domValues = key.getDomValue(this)
+    val domValues = key.codec.decode(key.getRawDomValue(this))
 
     val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
 
@@ -125,10 +139,14 @@ trait ReactiveElement[+Ref <: dom.Element]
     // #Note this logic is compatible with third parties setting classes on Laminar elements
     //  using raw JS methods as long as they don't remove classes managed by Laminar or add
     //  classes that were also added by Laminar.
-    key.setDomValue(this, nextDomValues)
+    key.setRawDomValue(this, key.codec.encode(nextDomValues))
   }
 
-  def eventListeners: List[EventListener.Any] = maybeEventListeners.map(_.map(_.listener).toList).getOrElse(Nil)
+  val tag: Tag[ReactiveElement[Ref]]
+
+  def eventListeners: List[EventListener.Base] = {
+    maybeEventListeners.map(_.map(_.listener).asScalaJs.toList).getOrElse(Nil)
+  }
 
   /** Create and get a stream of events on this node */
   def events[Ev <: dom.Event, Out](
@@ -148,8 +166,10 @@ trait ReactiveElement[+Ref <: dom.Element]
   //  - but then SyntaxSpec / "amend on inlined element" test will fail. Check in Dotty later.
   //  - not a big deal but lame
   def amend(mods: Modifier[this.type]*): this.type = {
-    mods.foreach(mod => mod(this))
-    this
+    Transaction.onStart.shared {
+      mods.foreach(mod => mod(this))
+      this
+    }
   }
 
   def amendThis(makeMod: this.type => Modifier[this.type]): this.type = {
@@ -240,12 +260,17 @@ object ReactiveElement {
     DynamicSubscription.subscribeBus(element.dynamicOwner, eventStream, writeBus)
   }
 
-  @inline def bindSubscription[El <: ReactiveElement.Base](
+  /** #Note: Unsafe because you must make sure that the Subscription created by
+    *  the `subscribe` callback is not killed externally. Otherwise, when the
+    *  DynamicSubscription decides to kill it, the already-killed Subscription
+    *  will throw an exception.
+    */
+  @inline def bindSubscriptionUnsafe[El <: ReactiveElement.Base](
     element: El
   )(
     subscribe: MountContext[El] => Subscription
   ): DynamicSubscription = {
-    DynamicSubscription(element.dynamicOwner, { owner =>
+    DynamicSubscription.unsafe(element.dynamicOwner, { owner =>
       subscribe(new MountContext[El](element, owner))
     })
   }
@@ -269,7 +294,7 @@ object ReactiveElement {
   )(
     subscribe: MountContext[El] => Subscription
   ): DynamicSubscription = {
-    DynamicSubscription(element.dynamicOwner, { owner =>
+    DynamicSubscription.unsafe(element.dynamicOwner, { owner =>
       subscribe(new MountContext[El](element, owner))
     }, prepend = true)
   }

@@ -1,8 +1,15 @@
-ThisBuild / resolvers += Resolver.sonatypeRepo("snapshots") // for mdoc (see also plugins.sbt)
+// Lets me depend on Maven Central artifacts immediately without waiting
+resolvers ++= Resolver.sonatypeOssRepos("public")
 
 ThisBuild / scalaVersion := Versions.Scala_2_13
 
 ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
+
+lazy val precompile = taskKey[Unit]("runs Laminar-specific pre-compile tasks")
+
+precompile := DomDefsGenerator.cachedGenerate()
+
+(Compile / compile) := ((Compile / compile) dependsOn precompile).value
 
 lazy val websiteJS = project
   .in(file("websiteJS"))
@@ -53,7 +60,8 @@ lazy val laminar = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % Versions.Airstream,
-      "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes,
+      // "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes, #Note this is a compile-time dependency. See `project/build.sbt`
+      "com.raquo" %%% "ew" % Versions.Ew,
       "com.raquo" %%% "domtestutils" % Versions.ScalaDomTestUtils % Test,
       "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
     ),
@@ -85,7 +93,6 @@ lazy val laminar = project.in(file("."))
 
     (Compile / doc / scalacOptions) ~= (_.filterNot(
       Set(
-        "-scalajs",
         "-deprecation",
         "-explain-types",
         "-explain",
@@ -104,13 +111,17 @@ lazy val laminar = project.in(file("."))
       "-no-link-warnings" // Suppress scaladoc "Could not find any member to link for" warnings
     ),
 
-    (installJsdom / version) := Versions.JsDom,
-
-    useYarn := true,
+    (Test / parallelExecution) := false,
 
     (Test / requireJsDomEnv) := true,
 
-    (Test / parallelExecution) := false,
+    (installJsdom / version) := Versions.JsDom,
+
+    (webpack / version) := Versions.Webpack,
+
+    (startWebpackDevServer / version) := Versions.WebpackDevServer,
+
+    useYarn := true,
 
     scalaJSUseMainModuleInitializer := true,
 
@@ -135,31 +146,9 @@ lazy val laminar = project.in(file("."))
         id = "raquo",
         name = "Nikita Gazarov",
         email = "nikita@raquo.com",
-        url = url("http://raquo.com")
+        url = url("https://github.com/raquo")
       )
     ),
-    sonatypeProfileName := "com.raquo",
-    publishMavenStyle := true,
     (Test / publishArtifact) := false,
-    publishTo := sonatypePublishToBundle.value,
-    releaseCrossBuild := true,
-    pomIncludeRepository := { _ => false },
-    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-    releaseProcess := {
-      import ReleaseTransformations._
-      Seq[ReleaseStep](
-        checkSnapshotDependencies,
-        inquireVersions,
-        runClean,
-        runTest,
-        setReleaseVersion,
-        commitReleaseVersion,
-        tagRelease,
-        releaseStepCommandAndRemaining("+publishSigned"),
-        releaseStepCommand("sonatypeBundleRelease"),
-        setNextVersion,
-        commitNextVersion,
-        pushChanges
-      )
-    }
+    pomIncludeRepository := { _ => false }
   )

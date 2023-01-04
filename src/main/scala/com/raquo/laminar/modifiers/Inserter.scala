@@ -1,7 +1,6 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
-import com.raquo.domtypes.generic.Modifier
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.nodes.ReactiveElement
 
@@ -18,8 +17,9 @@ import com.raquo.laminar.nodes.ReactiveElement
   * be the same `element` that you apply this Modifier to.
   */
 class Inserter[-El <: ReactiveElement.Base] (
-  initialContext: Option[InsertContext[El]],
-  insertFn: (InsertContext[El], Owner) => Subscription
+  initialContext: Option[InsertContext[El]] = None,
+  preferStrictMode: Boolean,
+  insertFn: (InsertContext[El], Owner) => Subscription,
 ) extends Modifier[El] {
 
   def bind(element: El): DynamicSubscription = {
@@ -27,12 +27,14 @@ class Inserter[-El <: ReactiveElement.Base] (
     //  - Currently this does not seem avoidable as we don't want to expose a `map` on DynSub
     //  - That would allow you to create leaky resources without having a reference to the owner
     //  - But maybe we require the user to provide proof of owner: dynSub.map(project)(owner) that must match DynSub
-    // @Note we want to remember this even after subscription is deactivated.
+    // #Note we want to remember this context even after subscription is deactivated.
     //  Yes, we expect the subscription to re-activate with this initial state
-    //  because it would match the state of the DOM upon reactivation.
-    val insertContext = initialContext.getOrElse(InsertContext.reserveSpotContext(element))
+    //  because it would match the state of the DOM upon reactivation
+    //  (unless some of the managed child elements were externally removed from the DOM,
+    //  which Laminar should be able to recover from).
+    val insertContext = initialContext.getOrElse(InsertContext.reserveSpotContext(element, strictMode = preferStrictMode))
 
-    ReactiveElement.bindSubscription(element) { mountContext =>
+    ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
       insertFn(insertContext, mountContext.owner)
     }
   }
@@ -48,6 +50,7 @@ class Inserter[-El <: ReactiveElement.Base] (
     * The arrangement is admittedly a bit weird, but is required to build a smooth end user API.
     */
   def withContext(context: InsertContext[El]): Inserter[El] = {
-    new Inserter[El](Some(context), insertFn)
+    // Note: preferStrictMode has no effect here, because initial context is defined.
+    new Inserter[El](Some(context), preferStrictMode = false, insertFn)
   }
 }

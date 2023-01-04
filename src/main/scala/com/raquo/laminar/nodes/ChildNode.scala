@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.domtypes.generic.Modifier
+import com.raquo.laminar.modifiers.Modifier
 import org.scalajs.dom
 
 import scala.annotation.tailrec
@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 trait ChildNode[+Ref <: dom.Node]
   extends ReactiveNode[Ref]
-  with Modifier[ParentNode.Base] {
+  with Modifier[ReactiveElement[dom.Element]] {
 
   private var _maybeParent: Option[ParentNode.Base] = None
 
@@ -35,7 +35,7 @@ trait ChildNode[+Ref <: dom.Node]
     */
   @inline private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
-  override def apply(parentNode: ParentNode.Base): Unit = {
+  override def apply(parentNode: ReactiveElement.Base): Unit = {
     // @TODO[Performance] Consider making ChildNode -> Modifier conversion implicit instead (but watch compile times)
     ParentNode.appendChild(parent = parentNode, child = this)
   }

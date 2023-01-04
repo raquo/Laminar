@@ -9,28 +9,28 @@ import org.scalajs.dom
 object NodeTypeChange {
 
   def boldOrItalic(
-    $useB: EventStream[Boolean],
-    $bigFont: Signal[Boolean]
+    useBStream: EventStream[Boolean],
+    bigFontSignal: Signal[Boolean]
   ): EventStream[ReactiveElement.Base] = {
-    val $fontSize = fontSizeStream($bigFont) // @TODO use remember()?
-    $useB.map { useB =>
+    val fontSizeSignal = fontSizeStream(bigFontSignal) // @TODO use remember()?
+    useBStream.map { useB =>
       dom.console.warn("useB: " + useB)
       if (useB) {
         L.b(
           "B",
-          L.fontSize <-- $fontSize
+          L.fontSize <-- fontSizeSignal
         )
       } else {
         L.i(
-          L.fontSize <-- $fontSize,
+          L.fontSize <-- fontSizeSignal,
           "I"
         )
       }
     }
   }
 
-  def fontSizeStream($big: Signal[Boolean]): Signal[String] = {
-    $big.map(ok => if (ok) {
+  def fontSizeStream(isBig: Signal[Boolean]): Signal[String] = {
+    isBig.map(big => if (big) {
       "45px"
     } else {
       "30px"
@@ -47,9 +47,9 @@ object NodeTypeChange {
       L.div(
         toggle.node,
         toggle2.node,
-        L.child <-- boldOrItalic($useB = toggle.$checked, $bigFont = toggle2.$checked.toSignal(false))
+        L.child <-- boldOrItalic(useBStream = toggle.checkedStream, bigFontSignal = toggle2.checkedStream.toSignal(false))
         //        div(
-        //          color <-- myColor(toggle.$checked),
+        //          color <-- myColor(toggle.checkedStream),
         //          b("COLOR")
         //        )
         //        counter.vNode

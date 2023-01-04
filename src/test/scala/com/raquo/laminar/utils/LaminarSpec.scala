@@ -1,15 +1,19 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.matching.{RuleImplicits, TestableHtmlAttr, TestableProp, TestableSvgAttr}
+import com.raquo.domtestutils.matching._
 import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.laminar.api.Laminar.CompositeSvgAttr
 import com.raquo.laminar.api._
-import com.raquo.laminar.defs.ReactiveComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
-import com.raquo.laminar.nodes.{ReactiveElement, RootNode}
+import com.raquo.laminar.codecs.StringAsIsCodec
+import com.raquo.laminar.defs.complex.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
+import com.raquo.laminar.keys.{HtmlAttr, HtmlProp, StyleProp, SvgAttr}
+import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, RootNode}
+import com.raquo.laminar.tags.Tag
+import org.scalactic
 
 trait LaminarSpec
   extends MountOps
-  with RuleImplicits
+  with RuleImplicits[Tag.Base, CommentNode, HtmlProp, HtmlAttr, SvgAttr, StyleProp]
   with EventSimulator
 {
   // === On nullable variables ===
@@ -19,9 +23,13 @@ trait LaminarSpec
   // realize isn't running because it's inside a None.foreach.
   var root: RootNode = null
 
+  def sentinel: ExpectedNode = ExpectedNode.comment
+
   def mount(
     node: ReactiveElement.Base,
     clue: String = defaultMountedElementClue
+  )(
+    implicit pos: scalactic.source.Position
   ): Unit = {
     mountedElementClue = clue
     assertEmptyContainer("laminar.mount")
@@ -31,11 +39,13 @@ trait LaminarSpec
   def mount(
     clue: String,
     node: ReactiveElement.Base
+  )(
+    implicit pos: scalactic.source.Position
   ): Unit = {
-    mount(node, clue)
+    mount(node, clue)(pos)
   }
 
-  override def unmount(clue: String = "unmount"): Unit = {
+  override def unmount(clue: String = "unmount")(implicit pos: scalactic.source.Position): Unit = {
     assertRootNodeMounted("unmount:" + clue)
     doAssert(
       root != null,
@@ -54,15 +64,39 @@ trait LaminarSpec
     mountedElementClue = defaultMountedElementClue
   }
 
-  implicit def makeCompositePropTestable[V](prop: CompositeProp[V]): TestableProp[V, V] = {
-    new TestableProp(prop.key)
+  override implicit def makeTagTestable(tag: Tag.Base): ExpectedNode = {
+    ExpectedNode.element(tag.name)
   }
 
-  implicit def makeCompositeHtmlAttrTestable[V](attr: CompositeHtmlAttr[V]): TestableHtmlAttr[V] = {
-    new TestableHtmlAttr(attr.key)
+  override implicit def makeCommentBuilderTestable(commentBuilder: () => CommentNode): ExpectedNode = {
+    ExpectedNode.comment
   }
 
-  implicit def makeCompositeSvgAttrTestable[V](attr: CompositeSvgAttr[V]): TestableSvgAttr[V] = {
-    new TestableSvgAttr(attr.key)
+  override implicit def makeAttrTestable[V](attr: HtmlAttr[V]): TestableHtmlAttr[V] = {
+    new TestableHtmlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
+  }
+
+  override implicit def makePropTestable[V, DomV](prop: HtmlProp[V, DomV]): TestableProp[V, DomV] = {
+    new TestableProp[V, DomV](prop.name, prop.codec.decode)
+  }
+
+  override implicit def makeStyleTestable[V](style: StyleProp[V]): TestableStyleProp[V] = {
+    new TestableStyleProp[V](style.name)
+  }
+
+  override implicit def makeSvgAttrTestable[V](svgAttr: SvgAttr[V]): TestableSvgAttr[V] = {
+    new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespace)
+  }
+
+  implicit def makeCompositePropTestable(prop: CompositeProp): TestableProp[String, String] = {
+    new TestableProp(prop.name, StringAsIsCodec.decode)
+  }
+
+  implicit def makeCompositeHtmlAttrTestable(attr: CompositeHtmlAttr): TestableHtmlAttr[String] = {
+    new TestableHtmlAttr(attr.name, StringAsIsCodec.encode, StringAsIsCodec.decode)
+  }
+
+  implicit def makeCompositeSvgAttrTestable(attr: CompositeSvgAttr): TestableSvgAttr[String] = {
+    new TestableSvgAttr(attr.name, StringAsIsCodec.encode, StringAsIsCodec.decode, namespace = None)
   }
 }
