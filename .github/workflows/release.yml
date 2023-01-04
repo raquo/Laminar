@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    branches: [publish]
+    tags: ["*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup JVM
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Tests
+        run: sbt +test
+      - name: Release
+        run: sbt ci-release
+        env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}

@@ -214,6 +214,9 @@ private[laminar] object Laminar
 
   type Label = nodes.ReactiveHtmlElement[dom.html.Label]
 
+  @deprecated("Use LI instead of Li type", "0.15.0-RC1")
+  type Li = nodes.ReactiveHtmlElement[dom.html.LI]
+
   type LI = nodes.ReactiveHtmlElement[dom.html.LI]
 
   type Select = nodes.ReactiveHtmlElement[dom.html.Select]

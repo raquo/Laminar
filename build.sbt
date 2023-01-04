@@ -1,3 +1,6 @@
+// Lets me depend on Maven Central artifacts immediately without waiting
+resolvers ++= Resolver.sonatypeOssRepos("public")
+
 ThisBuild / scalaVersion := Versions.Scala_2_13
 
 ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
@@ -108,13 +111,17 @@ lazy val laminar = project.in(file("."))
       "-no-link-warnings" // Suppress scaladoc "Could not find any member to link for" warnings
     ),
 
-    (installJsdom / version) := Versions.JsDom,
-
-    useYarn := true,
+    (Test / parallelExecution) := false,
 
     (Test / requireJsDomEnv) := true,
 
-    (Test / parallelExecution) := false,
+    (installJsdom / version) := Versions.JsDom,
+
+    (webpack / version) := Versions.Webpack,
+
+    (startWebpackDevServer / version) := Versions.WebpackDevServer,
+
+    useYarn := true,
 
     scalaJSUseMainModuleInitializer := true,
 
@@ -142,28 +149,6 @@ lazy val laminar = project.in(file("."))
         url = url("https://github.com/raquo")
       )
     ),
-    sonatypeProfileName := "com.raquo",
-    publishMavenStyle := true,
     (Test / publishArtifact) := false,
-    publishTo := sonatypePublishToBundle.value,
-    releaseCrossBuild := true,
-    pomIncludeRepository := { _ => false },
-    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-    releaseProcess := {
-      import ReleaseTransformations._
-      Seq[ReleaseStep](
-        checkSnapshotDependencies,
-        inquireVersions,
-        runClean,
-        runTest,
-        setReleaseVersion,
-        commitReleaseVersion,
-        tagRelease,
-        releaseStepCommandAndRemaining("+publishSigned"),
-        releaseStepCommand("sonatypeBundleRelease"),
-        setNextVersion,
-        commitNextVersion,
-        pushChanges
-      )
-    }
+    pomIncludeRepository := { _ => false }
   )

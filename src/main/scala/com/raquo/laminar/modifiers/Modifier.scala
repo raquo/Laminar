@@ -30,6 +30,9 @@ object Modifier {
 
   val empty: Modifier[ReactiveElement.Base] = new Modifier[ReactiveElement.Base] {}
 
+  @deprecated("Use Modifier.empty instead of Modifier.noop", "0.15.0-RC1")
+  @inline def noop: Modifier[ReactiveElement.Base] = empty
+
   def apply[El <: ReactiveElement.Base](f: El => Unit): Modifier[El] = {
     new Modifier[El] {
       override def apply(element: El): Unit = f(element)

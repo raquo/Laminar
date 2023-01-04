@@ -1,24 +1,31 @@
 object Versions {
 
-  val Scala_2_12 = "2.12.13"
+  val Scala_2_12 = "2.12.17"
 
-  val Scala_2_13 = "2.13.8"
+  val Scala_2_13 = "2.13.10"
 
   val Scala_3 = "3.2.0"
 
+  // -- Dependencies --
+
+  val Airstream = "15.0.0-M1"
+
+  val Ew = "0.1.2"
+
   val ScalaJsDom = "2.3.0"
 
-  // val ScalaDomTypes = "0.16.0-SNAPSHOT"
+  // Note: Scala DOM Types is a compile-time dependency now,
+  // see its version in project/project/ProjectVersions.scala
 
-  val Airstream = "0.15.0-SNAPSHOT"
+  // -- Test --
 
-  val Ew = "0.1.2-SNAPSHOT"
+  val ScalaDomTestUtils = "0.16.0-RC5"
 
-  // Testing
+  val ScalaTest = "3.2.14"
 
-  val ScalaTest = "3.2.10"
+  val JsDom = "20.0.3"
 
-  val JsDom = "16.4.0"
+  val Webpack = "5.75.0"
 
-  val ScalaDomTestUtils = "0.16.0-SNAPSHOT"
+  val WebpackDevServer = "4.11.1"
 }
