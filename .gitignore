@@ -9,7 +9,7 @@ target
 
 project/metals.sbt
 project/.bloop
-project/project
+project/project/target
 
 yarn.lock
 
