@@ -10,19 +10,33 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 
 trait Color { this: StyleProp[_] =>
 
+  lazy val aqua: StyleSetter = this := "aqua"
+
   lazy val black: StyleSetter = this := "black"
 
   lazy val blue: StyleSetter = this := "blue"
 
   lazy val cyan: StyleSetter = this := "cyan"
 
+  lazy val fuschia: StyleSetter = this := "fuschia"
+
   lazy val gray: StyleSetter = this := "gray"
 
   lazy val green: StyleSetter = this := "green"
 
+  lazy val lime: StyleSetter = this := "lime"
+
+  lazy val maroon: StyleSetter = this := "maroon"
+
+  lazy val navy: StyleSetter = this := "navy"
+
+  lazy val olive: StyleSetter = this := "olive"
+
   lazy val purple: StyleSetter = this := "purple"
 
   lazy val silver: StyleSetter = this := "silver"
+
+  lazy val teal: StyleSetter = this := "teal"
 
   lazy val red: StyleSetter = this := "red"
 
