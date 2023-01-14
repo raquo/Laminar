@@ -5,6 +5,7 @@ import com.raquo.airstream.state.Val
 import com.raquo.ew.{JsArray, ewArray}
 import com.raquo.laminar.Implicits.RichSource
 import com.raquo.laminar.api.Laminar.StyleEncoder
+import com.raquo.laminar.api.UnitArrowsFeature
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}
 import com.raquo.laminar.modifiers.{Binder, ChildInserter, ChildTextInserter, ChildrenInserter, Inserter, Modifier, Renderable, Setter}
@@ -173,7 +174,7 @@ object Implicits {
       Binder(ReactiveElement.bindFn(_, source.toObservable)(onNext))
     }
 
-    def -->(onNext: => Unit): Binder.Base = {
+    def -->(onNext: => Unit)(implicit evidence: UnitArrowsFeature): Binder.Base = {
       Binder(ReactiveElement.bindFn(_, source.toObservable)(_ => onNext))
     }
 

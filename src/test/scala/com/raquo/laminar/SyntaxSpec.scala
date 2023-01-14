@@ -482,7 +482,7 @@ class SyntaxSpec extends UnitSpec {
 
   it("unit-based binding syntax") {
     var i = 0
-    val v = Var(0)
+    val intVar = Var(0)
 
     def eventObserver = Observer[dom.Event](_ => ())
     def boolObserver = Observer[Boolean](_ => ())
@@ -498,30 +498,15 @@ class SyntaxSpec extends UnitSpec {
       i += 1
     }
 
-    def number() = 5
+    def conditionalEventObserver = if (i > 0) eventObserver
+
+    def conditionalBoolObserver = if (i > 0) boolObserver
 
     val el = div(
-      onClick --> effectReturningUnit(),
-      onClick --> { effectReturningInt(); () },
-      onClick --> v.update(_ + 5),
       onClick --> eventObserver,
-      bus.events --> effectReturningUnit(),
-      bus.events --> { effectReturningInt(); () },
-      bus.events --> v.update(_ + 5),
       bus.events --> boolObserver,
-      onClick.flatMapStream(_ => bus.events) --> effectReturningUnit(),
-      onClick.flatMapStream(_ => bus.events) --> { effectReturningInt(); () },
-      onClick.flatMapStream(_ => bus.events) --> v.update(_ + 5),
       onClick.flatMapStream(_ => bus.events) --> boolObserver,
     )
-
-    // #Warning: the commented assertions fail in Scala 3, because in Scala 3
-    //  the expression `if (bool) 5` does not return anything, and so is of type
-    //  `Unit`, instead of `Int | Unit`, or the common supertype of both options
-    //  – `AnyVal`, as was the case in Scala 2.
-
-    // def conditionalEventObserver = if (i > 0) eventObserver
-    // def conditionalBoolObserver = if (i > 0) boolObserver
 
     // We don't want unused (non-Unit) values to be silently swallowed by Laminar
     assertTypeError("div(onClick --> 5)")
@@ -529,47 +514,86 @@ class SyntaxSpec extends UnitSpec {
     assertTypeError("div(onClick --> number())")
     assertTypeError("div(onClick --> effectReturningInt())")
     assertTypeError("div(onClick --> i)")
-    // assertDoesNotCompile("div(onClick --> { if (i > 0) 5 })")
-    // assertDoesNotCompile("div(onClick --> conditionalEventObserver)")
+
     assertTypeError("div(bus.events --> 5)")
     assertTypeError("div(bus.events --> number())")
     assertTypeError("div(bus.events --> effectReturningInt())")
     assertTypeError("div(bus.events --> i)")
-    // assertDoesNotCompile("div(bus.events --> { if (i > 0) 5 })")
-    // assertDoesNotCompile("div(bus.events --> conditionalBoolObserver)")
+
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> 5)")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> number())")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> effectReturningInt())")
     assertTypeError("div(onClick.flatMap(_ => bus.events) --> i)")
-    // assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> { if (i > 0) 5 })")
-    // assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> conditionalBoolObserver)")
+
     // Same goes for sinks that are of the wrong type
-    assertTypeError("div(onClick --> v)")
-    assertTypeError("div(bus.events --> v)")
-    assertTypeError("div(onClick.flatMap(_ => bus.events) --> v)")
-    // assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> { if (i > 0) v })")
-    // assertDoesNotCompile("div(onClick.flatMap(_ => bus.events) --> conditionalEventObserver)")
+    assertTypeError("div(onClick --> intVar)")
+    assertTypeError("div(bus.events --> intVar)")
+    assertTypeError("div(onClick.flatMap(_ => bus.events) --> intVar)")
+
+    // --
+
+    // Make sure the unitArrow API does not work without an explicit import.
+
+    assertTypeError("div(onClick --> effectReturningUnit())")
+    assertTypeError("div(onClick --> { effectReturningInt(); () })")
+    assertTypeError("div(onClick --> intVar.update(_ + 5))")
+
+    assertTypeError("div(bus.events --> effectReturningUnit())")
+    assertTypeError("div(bus.events --> { effectReturningInt(); () })")
+    assertTypeError("div(bus.events --> intVar.update(_ + 5))")
+
+    assertTypeError("div(onClick.flatMapStream(_ => bus.events) --> effectReturningUnit())")
+    assertTypeError("div(onClick.flatMapStream(_ => bus.events) --> { effectReturningInt(); () })")
+    assertTypeError("div(onClick.flatMapStream(_ => bus.events) --> intVar.update(_ + 5))")
+
+    {
+      import com.raquo.laminar.api.features.unitArrows
+
+      el.amend(
+        onClick --> effectReturningUnit(),
+        onClick --> { effectReturningInt(); () },
+        onClick --> intVar.update(_ + 5),
+        bus.events --> effectReturningUnit(),
+        bus.events --> { effectReturningInt(); () },
+        bus.events --> intVar.update(_ + 5),
+        onClick.flatMapStream(_ => bus.events) --> effectReturningUnit(),
+        onClick.flatMapStream(_ => bus.events) --> { effectReturningInt(); () },
+        onClick.flatMapStream(_ => bus.events) --> intVar.update(_ + 5)
+      )
+
+      // The below will (undesirably) compile on Scala 3 but will (desirably) fail to compile on Scala 2.
+      // Don't really feel like asserting disappointment.
+
+      // el.amend(
+      //   bus.events --> { if (i > 0) eventObserver },
+      //   bus.events --> conditionalBoolObserver,
+      //   onClick.flatMap(_ => bus.events) --> { if (i > 0) boolObserver },
+      //   onClick.flatMap(_ => bus.events) --> conditionalBoolObserver,
+      //   onClick.flatMap(_ => bus.events) --> { if (i > 0) eventObserver },
+      //   onClick.flatMap(_ => bus.events) --> conditionalEventObserver
+      // )
+    }
 
     // --
 
     mount(el)
 
     assert(i == 0)
-    assert(v.now() == 0)
+    assert(intVar.now() == 0)
 
     // --
 
     el.ref.click()
 
     assert(i == 2)
-    assert(v.now() == 5)
+    assert(intVar.now() == 5)
 
     // --
 
     bus.emit(true)
 
     assert(i == 6)
-    assert(v.now() == 15)
+    assert(intVar.now() == 15)
   }
 
 }

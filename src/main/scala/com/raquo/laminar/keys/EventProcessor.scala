@@ -3,8 +3,8 @@ package com.raquo.laminar.keys
 import com.raquo.airstream.core.{EventStream, Observable, Signal, Sink}
 import com.raquo.airstream.flatten.FlattenStrategy
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.api.UnitArrowsFeature
 import com.raquo.laminar.modifiers.EventListener
-import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
 /**
@@ -35,7 +35,7 @@ class EventProcessor[Ev <: dom.Event, V](
     new EventListener[Ev, V](this, onNext)
   }
 
-  @inline def -->(onNext: => Unit): EventListener[Ev, V] = {
+  @inline def -->(onNext: => Unit)(implicit evidence: UnitArrowsFeature): EventListener[Ev, V] = {
     new EventListener[Ev, V](this, _ => onNext)
   }
 
