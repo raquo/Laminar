@@ -62,9 +62,9 @@ class SyntaxSpec extends UnitSpec {
 
     // SVG namespaces
 
-    assert(svg.xlinkHref.namespace.contains("xlink"))
+    assert(svg.xlinkHref.namespacePrefix.contains("xlink"))
     assert(svg.xlinkHref.name == "xlink:href")
-    assert(SvgAttr.namespaceUrl(svg.xlinkHref.namespace.get) == "http://www.w3.org/1999/xlink")
+    assert(svg.xlinkHref.namespaceUri.get == "http://www.w3.org/1999/xlink")
 
     // Aria attributes
 

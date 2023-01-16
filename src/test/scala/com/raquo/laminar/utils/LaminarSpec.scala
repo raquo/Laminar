@@ -85,7 +85,7 @@ trait LaminarSpec
   }
 
   override implicit def makeSvgAttrTestable[V](svgAttr: SvgAttr[V]): TestableSvgAttr[V] = {
-    new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespace)
+    new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespaceUri)
   }
 
   implicit def makeCompositePropTestable(prop: CompositeProp): TestableProp[String, String] = {

@@ -3,6 +3,7 @@ package com.raquo.laminar
 import com.raquo.laminar.api.A._
 import com.raquo.laminar.api.L.svg._
 import com.raquo.laminar.api._
+import com.raquo.laminar.keys.SvgAttr
 import com.raquo.laminar.utils.UnitSpec
 
 class SvgSpec extends UnitSpec {
@@ -89,6 +90,7 @@ class SvgSpec extends UnitSpec {
   it("renders el with class and svg with text") {
 
     val el = svg(
+      xmlns := SvgAttr.svgNamespaceUri,
       className := "svgClass",
       height := "800",
       width := "500",
@@ -109,6 +111,35 @@ class SvgSpec extends UnitSpec {
         height is "800",
         width is "500",
         text of "Hello"
+      )
+    ))
+  }
+
+  it("correctly sets namespaces") {
+
+    val el = svg(
+      xmlns := SvgAttr.svgNamespaceUri,
+      xmlnsXlink := SvgAttr.xlinkNamespaceUri,
+      a(
+        xlinkHref := "https://example.com"
+      )
+    )
+
+    mount(
+      L.div(
+        L.className := "htmlClass",
+        el
+      )
+    )
+
+    expectNode(L.div.of(
+      L.className is "htmlClass",
+      svg.of(
+        xmlns is SvgAttr.svgNamespaceUri,
+        xmlnsXlink is SvgAttr.xlinkNamespaceUri,
+        a of(
+          xlinkHref is "https://example.com"
+        )
       )
     ))
   }

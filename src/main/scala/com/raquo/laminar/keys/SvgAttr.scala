@@ -12,17 +12,20 @@ import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
   * This class represents an Svg Element Attribute. Meaning the key that can be set, not the whole a key-value pair.
   *
   * @param localName - Unqualified name, without the namespace prefix
+  * @param namespacePrefix - e.g. "xlink". For namespace URI, see `namespaceUri`
   *
   * @tparam V type of values that this Attribute can be set to
   */
 class SvgAttr[V](
   val localName: String,
   val codec: Codec[V, String],
-  val namespace: Option[String]
+  val namespacePrefix: Option[String]
 ) extends Key {
 
   /** Qualified name, including namespace */
-  override val name: String = namespace.map(_ + ":" + localName).getOrElse(localName)
+  override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
+
+  val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
 
   def :=(value: V): SvgAttrSetter[V] = {
     new KeySetter[SvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
@@ -48,12 +51,22 @@ class SvgAttr[V](
 
 object SvgAttr {
 
-  def namespaceUrl(namespace: String): String = {
+  // For SVG namespaces info see https://developer.mozilla.org/en-US/docs/Web/SVG/Namespaces_Crash_Course
+
+  final def namespaceUri(namespace: String): String = {
     namespace match {
-      case "svg" => "http://www.w3.org/2000/svg"
-      case "xlink" => "http://www.w3.org/1999/xlink"
-      case "xml" => "http://www.w3.org/XML/1998/namespace"
-      case "xmlns" => "http://www.w3.org/2000/xmlns/"
+      case "svg" => svgNamespaceUri
+      case "xlink" => xlinkNamespaceUri
+      case "xml" => xmlNamespaceUri
+      case "xmlns" => xmlnsNamespaceUri
     }
   }
+
+  final val svgNamespaceUri: String = "http://www.w3.org/2000/svg"
+
+  final val xlinkNamespaceUri: String = "http://www.w3.org/1999/xlink"
+
+  final val xmlNamespaceUri: String = "http://www.w3.org/XML/1998/namespace"
+
+  final val xmlnsNamespaceUri: String = "http://www.w3.org/2000/xmlns/"
 }

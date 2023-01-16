@@ -184,16 +184,14 @@ object DomApi {
 
   /** SVG Elements */
 
-  private val svgNamespaceUri = "http://www.w3.org/2000/svg"
-
   def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
     dom.document
-      .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = tag.name)
+      .createElementNS(namespaceURI = SvgAttr.svgNamespaceUri, qualifiedName = tag.name)
       .asInstanceOf[Ref]
   }
 
   def getSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V]): Option[V] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.localName)
+    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
     Option(domValue).map(attr.codec.decode)
   }
 
@@ -202,12 +200,12 @@ object DomApi {
     if (domValue == null) { // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
       removeSvgAttribute(element, attr)
     } else {
-      element.ref.setAttributeNS(namespaceURI = attr.namespace.orNull, qualifiedName = attr.name, value = domValue)
+      element.ref.setAttributeNS(namespaceURI = attr.namespaceUri.orNull, qualifiedName = attr.name, value = domValue)
     }
   }
 
   def removeSvgAttribute(element: ReactiveSvgElement.Base, attr: SvgAttr[_]): Unit = {
-    element.ref.removeAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.localName)
+    element.ref.removeAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
   }
 
   /** Aria attributes */

@@ -23,7 +23,7 @@ trait ComplexSvgKeys {
   // --
 
   protected def stringCompositeSvgAttr(name: String, separator: String): CompositeSvgAttr = {
-    val attr = new SvgAttr(name, StringAsIsCodec, namespace = None)
+    val attr = new SvgAttr(name, StringAsIsCodec, namespacePrefix = None)
     new CompositeKey(
       name = attr.name,
       getRawDomValue = el => DomApi.getSvgAttribute(el, attr).getOrElse(""),
