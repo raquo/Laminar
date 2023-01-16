@@ -215,7 +215,7 @@ class EventProcessor[Ev <: dom.Event, V](
     * button(onClick.preventDefault.flatMap(_ => makeAjaxRequest()) --> observer)
     *
     * #TODO[IDE] IntelliJ (2022.2.2) shows false errors when using this flatMap implementation,
-    *  making it annoying. Use flatMapStream or flatMapSignal to get around that.
+    *  at least with Scala 2, making it annoying. Use flatMapStream or flatMapSignal to get around that.
     *
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,
     *       or use the `compose` method instead for more flexibility
@@ -275,7 +275,22 @@ class EventProcessor[Ev <: dom.Event, V](
     }
   }
 
-  /** Write the resulting string into `event.target.value`.
+  /**
+   * Write a custom string into `event.target.value`.
+   * You can only do this on elements that have a value property - input, textarea, select
+   */
+  def setValue(nextValue: String): EventProcessor[Ev, V] = {
+    withNewProcessor { ev =>
+      processor(ev).map { result =>
+        // @TODO[Warn] Console.log a warning here if using on the wrong element type
+        DomApi.setValue(ev.target.asInstanceOf[dom.Element], nextValue)
+        result
+      }
+    }
+  }
+
+  /**
+    * Write the resulting string into `event.target.value`.
     * You can only do this on elements that have a value property - input, textarea, select
     */
   def setAsValue(implicit stringEvidence: V <:< String): EventProcessor[Ev, V] = {
@@ -285,6 +300,22 @@ class EventProcessor[Ev <: dom.Event, V](
         // @TODO[Warn] Console.log a warning here if using on the wrong element type
         DomApi.setValue(ev.target.asInstanceOf[dom.Element], nextInputValue)
         value
+      }
+    }
+  }
+
+  /**
+   * Write a custom boolean into `event.target.checked`.
+   * You can only do this on checkbox or radio button elements.
+   *
+   * Warning: if using this, do not use preventDefault. The browser may override the value you set here.
+   */
+  def setChecked(nextChecked: Boolean): EventProcessor[Ev, V] = {
+    withNewProcessor { ev =>
+      processor(ev).map { result =>
+        // @TODO[Warn] Console.log a warning here if using on the wrong element type
+        DomApi.setChecked(ev.target.asInstanceOf[dom.Element], nextChecked)
+        result
       }
     }
   }
