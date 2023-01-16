@@ -198,7 +198,7 @@ class EventSpec extends UnitSpec {
 
     // #Note that the startWith(-1) here acts on a different observable than in case of `compose`
 
-    // #TODO[IDE] Intellij (2021.3.2) shows a fake error on flatMap usage
+    // #TODO[IDE] Intellij (2021.3.2) shows a fake error on flatMap usage, at least in Scala 2.
     val childEl = span(
       onClick.preventDefault.flatMap { ev =>
         eventCount += 1

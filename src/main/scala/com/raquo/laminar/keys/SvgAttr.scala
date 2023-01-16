@@ -16,7 +16,7 @@ import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
   * @tparam V type of values that this Attribute can be set to
   */
 class SvgAttr[V](
-  localName: String,
+  val localName: String,
   val codec: Codec[V, String],
   val namespace: Option[String]
 ) extends Key {

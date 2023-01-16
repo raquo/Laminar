@@ -193,8 +193,7 @@ object DomApi {
   }
 
   def getSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V]): Option[V] = {
-    // @TODO[Integrity] We're passing fully qualified name instead of local name. Seems to work though?
-    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.name)
+    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.localName)
     Option(domValue).map(attr.codec.decode)
   }
 
@@ -208,14 +207,7 @@ object DomApi {
   }
 
   def removeSvgAttribute(element: ReactiveSvgElement.Base, attr: SvgAttr[_]): Unit = {
-    element.ref.removeAttributeNS(namespaceURI = attr.namespace.orNull, localName = localName(attr.name))
-  }
-
-  @inline private def localName(qualifiedName: String): String = {
-    val nsPrefixLength = qualifiedName.ew.indexOf(":")
-    if (nsPrefixLength > -1) {
-      qualifiedName.ew.substr(nsPrefixLength + 1).str
-    } else qualifiedName
+    element.ref.removeAttributeNS(namespaceURI = attr.namespace.orNull, localName = attr.localName)
   }
 
   /** Aria attributes */
