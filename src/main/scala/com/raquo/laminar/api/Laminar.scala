@@ -58,7 +58,7 @@ private[laminar] object Laminar
     @deprecated("customEventProp was removed from the svg scope, use eventProp in the parent scope", "0.15.0-RC1")
     @inline def customEventProp[Ev <: dom.Event](key: String): EventProp[Ev] = eventProp(key)
 
-    @deprecated("customSvgTag was renamed to svgTag", "0.15.0-RC1")
+    @deprecated("customSvgAttr was renamed to svgAttr", "0.15.0-RC1")
     @inline def customSvgAttr[V](key: String, codec: Codec[V, String], namespace: Option[String] = None): SvgAttr[V] = svgAttr(key, codec, namespace)
 
     @deprecated("customSvgTag was renamed to svgTag", "0.15.0-RC1")
