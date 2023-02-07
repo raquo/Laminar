@@ -1,5 +1,21 @@
+import VersionHelper.{versionFmt, fallbackVersion}
+
 // Lets me depend on Maven Central artifacts immediately without waiting
 resolvers ++= Resolver.sonatypeOssRepos("public")
+
+// Replace default sbt-dynver version with a simpler one for easier local development
+// ThisBuild / version ~= (_.replaceFirst("(\\+[a-z0-9-+]*-SNAPSHOT)", "-NEXT-SNAPSHOT"))
+
+// Makes sure to increment the version for local development
+ThisBuild / version := dynverGitDescribeOutput.value
+  .mkVersion(out => versionFmt(out, dynverSonatypeSnapshots.value), fallbackVersion(dynverCurrentDate.value))
+
+ThisBuild / dynver := {
+  val d = new java.util.Date
+  sbtdynver.DynVer
+    .getGitDescribeOutput(d)
+    .mkVersion(out => versionFmt(out, dynverSonatypeSnapshots.value), fallbackVersion(d))
+}
 
 ThisBuild / scalaVersion := Versions.Scala_2_13
 

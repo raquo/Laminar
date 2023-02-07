@@ -1,3 +1,5 @@
+// #Note this is /project/build.sbt – see /build.sbt for the main build config.
+
 lazy val root = (project in file("."))
   .enablePlugins(BuildInfoPlugin)
   .settings(
