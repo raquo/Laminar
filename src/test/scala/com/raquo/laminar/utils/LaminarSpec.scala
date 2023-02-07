@@ -5,7 +5,7 @@ import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.laminar.api.Laminar.CompositeSvgAttr
 import com.raquo.laminar.api._
 import com.raquo.laminar.codecs.StringAsIsCodec
-import com.raquo.laminar.defs.complex.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeProp}
+import com.raquo.laminar.defs.complex.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeHtmlProp}
 import com.raquo.laminar.keys.{HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, RootNode}
 import com.raquo.laminar.tags.Tag
@@ -88,7 +88,7 @@ trait LaminarSpec
     new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespaceUri)
   }
 
-  implicit def makeCompositePropTestable(prop: CompositeProp): TestableProp[String, String] = {
+  implicit def makeCompositePropTestable(prop: CompositeHtmlProp): TestableProp[String, String] = {
     new TestableProp(prop.name, StringAsIsCodec.decode)
   }
 

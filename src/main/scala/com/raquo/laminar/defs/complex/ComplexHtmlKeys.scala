@@ -14,9 +14,9 @@ trait ComplexHtmlKeys {
    * via the class selectors or functions like the DOM method
    * document.getElementsByClassName
    */
-  val className: CompositeProp = stringCompositeProp("className", separator = " ")
+  val className: CompositeHtmlProp = stringCompositeHtmlProp("className", separator = " ")
 
-  val cls: CompositeProp = className
+  val cls: CompositeHtmlProp = className
 
   /**
    * This attribute names a relationship of the linked document to the current
@@ -74,11 +74,11 @@ trait ComplexHtmlKeys {
 
   // --
 
-  protected def stringCompositeProp(name: String, separator: String): CompositeProp = {
+  protected def stringCompositeHtmlProp(name: String, separator: String): CompositeHtmlProp = {
     val prop = new HtmlProp(name, StringAsIsCodec)
     new CompositeKey(
       name = prop.name,
-      getRawDomValue = el => DomApi.getHtmlProperty(el, prop),
+      getRawDomValue = el => DomApi.getHtmlProperty(el, prop).getOrElse(""),
       setRawDomValue = (el, value) => DomApi.setHtmlProperty(el, prop, value),
       separator = separator
     )
@@ -97,7 +97,7 @@ trait ComplexHtmlKeys {
 
 object ComplexHtmlKeys {
 
-  type CompositeProp = CompositeKey[HtmlProp[String, String], ReactiveHtmlElement.Base]
+  type CompositeHtmlProp = CompositeKey[HtmlProp[String, String], ReactiveHtmlElement.Base]
 
   type CompositeHtmlAttr = CompositeKey[HtmlAttr[String], ReactiveHtmlElement.Base]
 }
