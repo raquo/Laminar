@@ -33,13 +33,13 @@ object ChildInserter {
               // We found the existing child in the right place in the DOM
               // Just need to check that the new child is actually different from the old one
               // Replace the child with new one.
-              // #Note: auto-distinction inside (lastSeenChild != newChildNode filter)
+              // #Note: auto-distinction inside (`lastSeenChild ne newChildNode` filter)
               val replaced = ParentNode.replaceChild(
                 parent = ctx.parentNode,
                 oldChild = lastSeenChild,
                 newChild = newChildNode
               )
-              if (replaced || lastSeenChild == newChildNode) { // #TODO[Performance,Integrity] Not liking this redundant auto-distinction
+              if (replaced || (lastSeenChild eq newChildNode)) { // #TODO[Performance,Integrity] Not liking this redundant auto-distinction
                 // The only time we DON'T decrement this is when replacing fails for unexpected reasons.
                 // - If lastSeenChild == newChildNode, then it's not an "old" node anymore, so we decrement
                 // - If replaced == true, then lastSeenChild was removed from the DOM, so we decrement

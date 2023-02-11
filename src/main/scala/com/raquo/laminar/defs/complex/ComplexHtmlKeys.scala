@@ -8,15 +8,19 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 trait ComplexHtmlKeys {
 
+  // #nc doc this change from prop to attr?
+  // #nc test performance change due to this
+  // #Note: we use attrs instead of props here because of https://github.com/raquo/Laminar/issues/136
+
   /**
    * This attribute is a list of the classes of the element.
    * Classes allow CSS and Javascript to select and access specific elements
    * via the class selectors or functions like the DOM method
    * document.getElementsByClassName
    */
-  val className: CompositeHtmlProp = stringCompositeHtmlProp("className", separator = " ")
+  val className: CompositeHtmlAttr = stringCompositeHtmlAttr("class", separator = " ")
 
-  val cls: CompositeHtmlProp = className
+  val cls: CompositeHtmlAttr = className
 
   /**
    * This attribute names a relationship of the linked document to the current
@@ -74,15 +78,15 @@ trait ComplexHtmlKeys {
 
   // --
 
-  protected def stringCompositeHtmlProp(name: String, separator: String): CompositeHtmlProp = {
-    val prop = new HtmlProp(name, StringAsIsCodec)
-    new CompositeKey(
-      name = prop.name,
-      getRawDomValue = el => DomApi.getHtmlProperty(el, prop).getOrElse(""),
-      setRawDomValue = (el, value) => DomApi.setHtmlProperty(el, prop, value),
-      separator = separator
-    )
-  }
+  // protected def stringCompositeHtmlProp(name: String, separator: String): CompositeHtmlProp = {
+  //   val prop = new HtmlProp(name, StringAsIsCodec)
+  //   new CompositeKey(
+  //     name = prop.name,
+  //     getRawDomValue = el => DomApi.getHtmlProperty(el, prop).getOrElse(""),
+  //     setRawDomValue = (el, value) => DomApi.setHtmlProperty(el, prop, value),
+  //     separator = separator
+  //   )
+  // }
 
   protected def stringCompositeHtmlAttr(name: String, separator: String): CompositeHtmlAttr = {
     val attr = new HtmlAttr(name, StringAsIsCodec)

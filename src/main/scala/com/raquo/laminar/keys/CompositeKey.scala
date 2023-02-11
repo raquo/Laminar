@@ -1,6 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
+import com.raquo.ew.ewArray
 import com.raquo.laminar.api.Laminar.{MapValueMapper, StringValueMapper}
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.keys.CompositeKey.{CompositeCodec, CompositeValueMapper}
@@ -82,6 +83,7 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
 object CompositeKey {
 
   // #TODO[Perf] Consider switching `normalize` from List-s to JsArrays.
+  //  - Not sure if this would win us anything because user-facing API is based on scala collections
 
   class CompositeCodec(separator: String) extends Codec[Iterable[String], String] {
 
@@ -102,7 +104,7 @@ object CompositeKey {
     if (items.isEmpty) {
       Nil
     } else {
-      items.jsSplit(separator).filter(_.nonEmpty).toList
+      items.jsSplit(separator).ew.filter(_.nonEmpty).asScalaJs.toList
     }
   }
 

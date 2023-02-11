@@ -105,7 +105,7 @@ class ValueController[A, B](
 object ValueController {
 
   private def nodeDescription(element: ReactiveHtmlElement.Base): String = {
-    val maybeTyp = DomApi.getHtmlAttribute(element, Laminar.typ)
+    val maybeTyp = DomApi.getHtmlAttributeRaw(element, Laminar.typ)
     val typSuffix = maybeTyp.map(t => s" [type=$t]").getOrElse("")
     s"${DomApi.debugNodeDescription(element.ref)}$typSuffix"
   }

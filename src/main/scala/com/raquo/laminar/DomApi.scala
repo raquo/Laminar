@@ -101,13 +101,42 @@ object DomApi {
     dom.document.createElement(tag.name).asInstanceOf[Ref]
   }
 
-  def getHtmlAttribute[V, DomV](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V]): Option[V] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
-    Option(domValue).map(attr.codec.decode)
+
+  /** HTML Attributes */
+
+  def getHtmlAttribute[V](
+    element: ReactiveHtmlElement.Base,
+    attr: HtmlAttr[V]
+  ): js.UndefOr[V] = {
+    getHtmlAttributeRaw(element, attr).map(attr.codec.decode)
   }
 
-  def setHtmlAttribute[V](element: ReactiveHtmlElement.Base, attr: HtmlAttr[V], value: V): Unit = {
+  def getHtmlAttributeRaw(
+    element: ReactiveHtmlElement.Base,
+    attr: HtmlAttr[_]
+  ): js.UndefOr[String] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    if (domValue != null) {
+      domValue
+    } else {
+      js.undefined
+    }
+  }
+
+  def setHtmlAttribute[V](
+    element: ReactiveHtmlElement.Base,
+    attr: HtmlAttr[V],
+    value: V
+  ): Unit = {
     val domValue = attr.codec.encode(value)
+    setHtmlAttributeRaw(element, attr, domValue)
+  }
+
+  private[laminar] def setHtmlAttributeRaw(
+    element: ReactiveHtmlElement.Base,
+    attr: HtmlAttr[_],
+    domValue: String
+  ): Unit = {
     if (domValue == null) { // End users should use `removeHtmlAttribute` instead. This is to support boolean attributes.
       removeHtmlAttribute(element, attr)
     } else {
@@ -115,38 +144,94 @@ object DomApi {
     }
   }
 
-  def removeHtmlAttribute(element: ReactiveHtmlElement.Base, attr: HtmlAttr[_]): Unit = {
+  def removeHtmlAttribute(
+    element: ReactiveHtmlElement.Base,
+    attr: HtmlAttr[_]
+  ): Unit = {
     element.ref.removeAttribute(attr.name)
   }
 
-  /** #Note not sure if this is completely safe. Could this return null? */
-  def getHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: HtmlProp[V, DomV]): V = {
-    val domValue = element.ref.asInstanceOf[js.Dynamic].selectDynamic(prop.name).asInstanceOf[DomV]
-    if (domValue != null) {
-      prop.codec.decode(domValue)
-    } else {
-      null.asInstanceOf[V]
-    }
+
+  /** HTML Properties */
+
+  /** Returns `js.undefined` when the property is missing on the element.
+    * If the element type supports this property, it should never be js.undefined.
+    */
+  def getHtmlProperty[V, DomV](
+    element: ReactiveHtmlElement.Base,
+    prop: HtmlProp[V, DomV]
+  ): js.UndefOr[V] = {
+    val domValue = getHtmlPropertyRaw(element, prop)
+    domValue.map(prop.codec.decode)
   }
 
-  def setHtmlProperty[V, DomV](element: ReactiveHtmlElement.Base, prop: HtmlProp[V, DomV], value: V): Unit = {
-    val newValue = prop.codec.encode(value).asInstanceOf[js.Any]
-    element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(newValue)
+  def getHtmlPropertyRaw[V, DomV](
+    element: ReactiveHtmlElement.Base,
+    prop: HtmlProp[V, DomV]
+  ): js.UndefOr[DomV] = {
+    element.ref.asInstanceOf[js.Dynamic].selectDynamic(prop.name).asInstanceOf[js.UndefOr[DomV]]
   }
 
-  def setHtmlStyle[V](element: ReactiveHtmlElement.Base, style: StyleProp[V], value: V): Unit = {
+  def setHtmlProperty[V, DomV](
+    element: ReactiveHtmlElement.Base,
+    prop: HtmlProp[V, DomV],
+    value: V
+  ): Unit = {
+    val domValue = prop.codec.encode(value)
+    setHtmlPropertyRaw(element, prop, domValue)
+  }
+
+  private[laminar] def setHtmlPropertyRaw[V, DomV](
+    element: ReactiveHtmlElement.Base,
+    prop: HtmlProp[V, DomV],
+    value: DomV
+  ): Unit = {
+    element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(value.asInstanceOf[js.Any])
+  }
+
+
+  /** CSS Style Properties */
+
+  /** Note: this only gets inline style values – those set via the `style` attribute, which includes
+    * all style props set by Laminar. It does not account for CSS declarations in `<style>` tags.
+    *
+    * Returns empty string if the given style property is not defined in this element's inline styles.
+    *
+    * See https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleDeclaration/getPropertyValue
+    * Contrast with https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle
+    */
+  def getHtmlStyleRaw(
+    element: ReactiveHtmlElement.Base,
+    styleProp: StyleProp[_]
+  ): String = {
+    element.ref.style.getPropertyValue(styleProp.name)
+  }
+
+  def setHtmlStyle[V](
+    element: ReactiveHtmlElement.Base,
+    styleProp: StyleProp[V],
+    value: V
+  ): Unit = {
+    setRefStyle(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
+  }
+
+  def setHtmlStringStyle(
+    element: ReactiveHtmlElement.Base,
+    styleProp: StyleProp[_],
+    value: String
+  ): Unit = {
+    setRefStyle(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
+  }
+
+  def setHtmlAnyStyle[V](
+    element: ReactiveHtmlElement.Base,
+    style: StyleProp[V],
+    value: V | String
+  ): Unit = {
     setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
   }
 
-  def setHtmlStringStyle(element: ReactiveHtmlElement.Base, style: StyleProp[_], value: String): Unit = {
-    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
-  }
-
-  def setHtmlAnyStyle[V](element: ReactiveHtmlElement.Base, style: StyleProp[V], value: V | String): Unit = {
-    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
-  }
-
-  @inline private def cssValue(value: Any): String = {
+  @inline private[laminar] def cssValue(value: Any): String = {
     if (value == null) {
       null
     } else {
@@ -163,7 +248,7 @@ object DomApi {
     //}
   }
 
-  @inline private def setRefStyle(
+  @inline private[laminar] def setRefStyle(
     ref: dom.html.Element,
     styleCssName: String,
     prefixes: Seq[String],
@@ -190,13 +275,42 @@ object DomApi {
       .asInstanceOf[Ref]
   }
 
-  def getSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V]): Option[V] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
-    Option(domValue).map(attr.codec.decode)
+
+  /** SVG Attributes */
+
+  def getSvgAttribute[V](
+    element: ReactiveSvgElement.Base,
+    attr: SvgAttr[V]
+  ): js.UndefOr[V] = {
+    getSvgAttributeRaw(element, attr).map(attr.codec.decode)
   }
 
-  def setSvgAttribute[V](element: ReactiveSvgElement.Base, attr: SvgAttr[V], value: V): Unit = {
+  def getSvgAttributeRaw(
+    element: ReactiveSvgElement.Base,
+    attr: SvgAttr[_]
+  ): js.UndefOr[String] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
+    if (domValue != null) {
+      domValue
+    } else {
+      js.undefined
+    }
+  }
+
+  def setSvgAttribute[V](
+    element: ReactiveSvgElement.Base,
+    attr: SvgAttr[V],
+    value: V
+  ): Unit = {
     val domValue = attr.codec.encode(value)
+    setSvgAttributeRaw(element, attr, domValue)
+  }
+
+  private[laminar] def setSvgAttributeRaw(
+    element: ReactiveSvgElement.Base,
+    attr: SvgAttr[_],
+    domValue: String
+  ): Unit = {
     if (domValue == null) { // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
       removeSvgAttribute(element, attr)
     } else {
@@ -204,19 +318,48 @@ object DomApi {
     }
   }
 
-  def removeSvgAttribute(element: ReactiveSvgElement.Base, attr: SvgAttr[_]): Unit = {
+  def removeSvgAttribute(
+    element: ReactiveSvgElement.Base,
+    attr: SvgAttr[_]
+  ): Unit = {
     element.ref.removeAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
   }
 
   /** Aria attributes */
 
-  def getAriaAttribute[V](element: ReactiveElement.Base, attr: AriaAttr[V]): Option[V] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
-    Option(domValue).map(attr.codec.decode)
+  def getAriaAttribute[V](
+    element: ReactiveElement.Base,
+    attr: AriaAttr[V]
+  ): js.UndefOr[V] = {
+    getAriaAttributeRaw(element, attr).map(attr.codec.decode)
   }
 
-  def setAriaAttribute[V](element: ReactiveElement.Base, attr: AriaAttr[V], value: V): Unit = {
+  def getAriaAttributeRaw(
+    element: ReactiveElement.Base,
+    attr: AriaAttr[_]
+  ): js.UndefOr[String] = {
+    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    if (domValue != null) {
+      domValue
+    } else {
+      js.undefined
+    }
+  }
+
+  def setAriaAttribute[V](
+    element: ReactiveElement.Base,
+    attr: AriaAttr[V],
+    value: V
+  ): Unit = {
     val domValue = attr.codec.encode(value)
+    setAriaAttributeRaw(element, attr, domValue)
+  }
+
+  private[laminar] def setAriaAttributeRaw(
+    element: ReactiveElement.Base,
+    attr: AriaAttr[_],
+    domValue: String
+  ): Unit = {
     if (domValue == null) { // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
       removeAriaAttribute(element, attr)
     } else {
@@ -224,7 +367,10 @@ object DomApi {
     }
   }
 
-  def removeAriaAttribute(element: ReactiveElement.Base, attr: AriaAttr[_]): Unit = {
+  def removeAriaAttribute(
+    element: ReactiveElement.Base,
+    attr: AriaAttr[_]
+  ): Unit = {
     element.ref.removeAttribute(attr.name)
   }
 
@@ -360,7 +506,7 @@ object DomApi {
 
   /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings.
     *
-    *  @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
+    * @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
     */
   def unsafeParseHtmlString[Ref <: dom.html.Element](tag: HtmlTag[Ref], dangerousHtmlString: String): Ref = {
     unsafeParseElementString(htmlParserContainer, tag, dangerousHtmlString, "Error parsing HTML string")

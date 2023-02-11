@@ -34,9 +34,9 @@ class AriaAttr[V](
 
   def <--(values: Source[V]): AriaAttrUpdater[V] = {
     new KeyUpdater[Element, AriaAttr[V], V](
-      this,
-      values.toObservable,
-      (el, v, _) => DomApi.setAriaAttribute(el, this, v)
+      key = this,
+      values = values.toObservable,
+      update = (el, v, _) => DomApi.setAriaAttribute(el, this, v)
     )
   }
 

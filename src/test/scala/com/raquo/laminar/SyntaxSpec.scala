@@ -83,7 +83,7 @@ class SyntaxSpec extends UnitSpec {
 
     // Complex keys
 
-    assert(cls.name == "className")
+    assert(cls.name == "class")
     // assert((cls := List("class1", "class2")).value == "class1 class2")
 
     // CSS keywords

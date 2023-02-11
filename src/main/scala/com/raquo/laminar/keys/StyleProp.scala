@@ -30,9 +30,9 @@ class StyleProp[V](
 
   def <--[A](values: Source[A])(implicit ev: A => V | String): StyleUpdater[V] = {
     new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V | String](
-      this,
-      values.asInstanceOf[Source[V | String]].toObservable,
-      (el, v, _) => DomApi.setHtmlAnyStyle(el, this, v)
+      key = this,
+      values = values.asInstanceOf[Source[V | String]].toObservable,
+      update = (el, v, _) => DomApi.setHtmlAnyStyle(el, this, v)
     )
   }
 

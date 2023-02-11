@@ -14,13 +14,13 @@ object ChildTextInserter {
     new Inserter[El](
       preferStrictMode = false,
       insertFn = (ctx, owner) => {
-        var maybeLastSeenChild: js.UndefOr[TextNode] = js.undefined
+        var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValue =>
-          maybeLastSeenChild.fold {
+          maybeTextNode.fold {
             // First event: inserting the child for the first time: replace sentinel comment node with new TextNode
             val newTextNode = renderable.asTextNode(newValue)
             ParentNode.replaceChild(parent = ctx.parentNode, oldChild = ctx.sentinelNode, newChild = newTextNode)
-            maybeLastSeenChild = newTextNode
+            maybeTextNode = newTextNode
 
             ctx.sentinelNode = newTextNode
             if (ctx.strictMode) {
@@ -37,12 +37,11 @@ object ChildTextInserter {
               ctx.extraNodeCount = 0
             }
             ()
-          } { lastSeenChild =>
+          } { textNode =>
             // Subsequent events: updating the textContent field of the existing TextNode (which is also the sentinel node).
-            val newText = renderable.asString(newValue)
-            if (lastSeenChild.text != newText) { // #Note: auto-distinction
-              lastSeenChild.ref.textContent = newText
-            }
+            // #Note: we do not auto-distinct here because reading the current text value
+            //  from the DOM takes more CPU time than setting it.
+            textNode.ref.textContent = renderable.asString(newValue)
           }
         }(owner)
       }

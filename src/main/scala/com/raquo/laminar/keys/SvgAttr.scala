@@ -41,9 +41,9 @@ class SvgAttr[V](
 
   def <--(values: Source[V]): SvgAttrUpdater[V] = {
     new KeyUpdater[SvgElement, SvgAttr[V], V](
-      this,
-      values.toObservable,
-      (el, v, _) => DomApi.setSvgAttribute(el, this, v)
+      key = this,
+      values = values.toObservable,
+      update = (el, v, _) => DomApi.setSvgAttribute(el, this, v)
     )
   }
 

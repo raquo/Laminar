@@ -36,7 +36,6 @@ trait ChildNode[+Ref <: dom.Node]
   @inline private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
   override def apply(parentNode: ReactiveElement.Base): Unit = {
-    // @TODO[Performance] Consider making ChildNode -> Modifier conversion implicit instead (but watch compile times)
     ParentNode.appendChild(parent = parentNode, child = this)
   }
 

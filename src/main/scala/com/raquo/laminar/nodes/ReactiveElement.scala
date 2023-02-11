@@ -115,11 +115,10 @@ trait ReactiveElement[+Ref <: dom.Element]
     addItems: List[String],
     removeItems: List[String]
   ): Unit = {
+    val keyItemsWithReason = _compositeValues.getOrElse(key, Nil)
     val itemHasAnotherReason = (item: String) => {
       // #Note null reason is shared among all static modifiers to avoid keeping a reference to them
-      _compositeValues
-        .getOrElse(key, Nil)
-        .exists(t => t._1 == item && (t._2 != reason || reason == null))
+      keyItemsWithReason.exists(t => t._1 == item && (t._2 != reason || reason == null))
     }
 
     val itemsToAdd = addItems.distinct

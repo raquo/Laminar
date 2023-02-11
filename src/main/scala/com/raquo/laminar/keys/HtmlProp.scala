@@ -36,10 +36,10 @@ class HtmlProp[V, DomV](
   def <--(values: Source[V]): PropUpdater[V, DomV] = {
     val update = if (name == "value") {
       (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
-        // Checking against current DOM value prevents cursor position reset in Safari
-        val currentDomValue = DomApi.getHtmlProperty(element, this)
-        if (nextValue != currentDomValue) {
-          DomApi.setHtmlProperty(element, this, nextValue)
+        // Deduplicating updates against current DOM value prevents cursor position reset in Safari
+        val nextDomValue = codec.encode(nextValue)
+        if (!DomApi.getHtmlPropertyRaw(element, this).contains(nextDomValue)) {
+          DomApi.setHtmlPropertyRaw(element, this, nextDomValue)
         }
     } else {
       (element: HtmlElement, nextValue: V, reason: Modifier.Any) => {
@@ -47,9 +47,9 @@ class HtmlProp[V, DomV](
       }
     }
     new KeyUpdater[HtmlElement, HtmlProp[V, DomV], V](
-      this,
-      values.toObservable,
-      update
+      key = this,
+      values = values.toObservable,
+      update = update
     )
   }
 

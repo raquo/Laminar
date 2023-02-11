@@ -28,7 +28,16 @@ object ChildrenInserter {
         var maybeLastSeenChildren: js.UndefOr[Children] = ctx.extraNodes
 
         childrenSource.foreach { newChildren =>
-          if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
+          // #TODO[Performance] Consider bringing back this eq check. Benchmark performance cost.
+          //  - Without it, we might get worse performance, as when the same list is emitted,
+          //    Laminar needs to iterate over the list of elements and check their position in the DOM.
+          //    These checks are desirable in rare cases when the list of elements is affected by other
+          //    inserters, e.g. when another inserter has removed an item from the list, and later this
+          //    inserter re-emits the same list trying to add the item back where it used to be.
+          //  - TLDR – we're choosing correctness over performance for now, but both are only a small
+          //    difference. Check that performance cost is not too bad with benchmarks.
+
+          // if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
             // println(s">> ${$children}.foreach with newChildren = ${newChildren.map(_.ref).map(DomApi.debugNodeOuterHtml)}")
             maybeLastSeenChildren = newChildren
             val newChildrenMap = InsertContext.nodesToMap(newChildren)
@@ -42,7 +51,7 @@ object ChildrenInserter {
             )
             ctx.extraNodes = newChildren
             ctx.extraNodesMap = newChildrenMap
-          }
+          // }
         }(owner)
       }
     )

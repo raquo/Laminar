@@ -160,7 +160,7 @@ object ParentNode {
   ): Boolean = {
     var replaced = false
     // 0. Check precondition required for consistency of our own Tree vs real DOM
-    if (oldChild != newChild) { // #TODO[API] Can we move this check outside of replaceChild? Or will something break? Sometimes this check is extraneous.
+    if (oldChild ne newChild) { // #TODO[API] Can we move this check outside of replaceChild? Or will something break? Sometimes this check is extraneous.
       parent._maybeChildren.foreach { children =>
         val indexOfOldChild = children.indexOf(oldChild)
         if (indexOfOldChild != -1) {

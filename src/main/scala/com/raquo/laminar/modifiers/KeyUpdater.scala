@@ -21,12 +21,8 @@ class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
 ) extends Binder[El] { self =>
 
   override def bind(element: El): DynamicSubscription = {
-    var lastSeenValue: js.UndefOr[V] = js.undefined
     ReactiveElement.bindFn(element, values) { value =>
-      if (!lastSeenValue.contains(value)) { // #Note: auto-distinction
-        lastSeenValue = value
-        update(element, value, self)
-      }
+      update(element, value, self)
     }
   }
 }
