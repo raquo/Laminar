@@ -38,7 +38,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     unsafePrepend: Boolean
   ): Unit = {
     if (maybeEventListeners.isEmpty) {
-      maybeEventListeners = js.defined(JsArray(listener))
+      maybeEventListeners = JsArray(listener)
     } else if (unsafePrepend) {
       maybeEventListeners.get.unshift(listener)
     } else {

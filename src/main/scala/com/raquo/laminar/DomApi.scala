@@ -405,7 +405,7 @@ object DomApi {
   def getChecked(element: dom.Element): js.UndefOr[Boolean] = {
     element match {
       case input: dom.html.Input if input.`type` == "checkbox" || input.`type` == "radio" =>
-        js.defined(input.checked)
+        input.checked
       case el if isCustomElement(el) =>
         el.asInstanceOf[js.Dynamic]
           .selectDynamic("checked")
@@ -434,15 +434,15 @@ object DomApi {
     element match {
       case input: dom.html.Input =>
         // @TODO[API,Warn] is there a legitimate use case for this on checkbox / radio inputs?
-        js.defined(input.value)
+        input.value
       case textarea: dom.html.TextArea =>
-        js.defined(textarea.value)
+        textarea.value
       case select: dom.html.Select =>
-        js.defined(select.value)
+        select.value
       case button: dom.html.Button =>
-        js.defined(button.value)
+        button.value
       case option: dom.html.Option =>
-        js.defined(option.value)
+        option.value
       case el if isCustomElement(el) =>
         el.asInstanceOf[js.Dynamic]
           .selectDynamic("value")

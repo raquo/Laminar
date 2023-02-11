@@ -40,7 +40,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
       listener
     )
     val dynSub = controller.bind()
-    valueController = js.defined(controller)
+    valueController = controller
     dynSub
   }
 
@@ -69,7 +69,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
       listener
     )
     val dynSub = controller.bind()
-    checkedController = js.defined(controller)
+    checkedController = controller
     dynSub
   }
 
