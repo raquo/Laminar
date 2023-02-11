@@ -5,6 +5,7 @@ import com.raquo.ew._
 import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
+import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
@@ -19,7 +20,7 @@ trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
   //  - We can probably track specific children affected by that API instead
   //  - That would save us mutable Buffer searches and manipulations when inserting and removing nodes
   //  - I mean we could look at the real DOM nodes instead where needed. Would that be more efficient? We'd need to benchmark.
-  private var _maybeChildren: Option[JsArray[ChildNode.Base]] = None
+  private var _maybeChildren: js.UndefOr[JsArray[ChildNode.Base]] = js.undefined
 }
 
 object ParentNode {
@@ -59,7 +60,7 @@ object ParentNode {
 
       // 2B. Update this node
       if (parent._maybeChildren.isEmpty) {
-        parent._maybeChildren = Some(JsArray(child))
+        parent._maybeChildren = JsArray(child)
       } else {
         parent._maybeChildren.foreach(children => children.push(child))
       }
@@ -111,7 +112,7 @@ object ParentNode {
 
     // 0. Prep this node
     if (parent._maybeChildren.isEmpty) {
-      parent._maybeChildren = Some(JsArray())
+      parent._maybeChildren = JsArray[ChildNode.Base]()
     }
 
     parent._maybeChildren.foreach { children =>
@@ -232,7 +233,7 @@ object ParentNode {
 
     // 0. Prep this node
     if (parent._maybeChildren.isEmpty) {
-      parent._maybeChildren = Some(JsArray())
+      parent._maybeChildren = JsArray[ChildNode.Base]()
     }
 
     var replaced = false
