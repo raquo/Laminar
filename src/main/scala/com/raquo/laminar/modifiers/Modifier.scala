@@ -22,12 +22,13 @@ trait Modifier[-El <: ReactiveElement.Base] {
 
 object Modifier {
 
-  // #TODO[API] Should there be a `Modifier.Base` type alias similar to other such type aliases?
-  //  - The problem is, `Modifier.Base` is not a supertype of all modifiers. Not sure if it's obvious enough.
-  // type Base = Modifier[ReactiveElement.Base]
+  /** This type is not public because it is generally useless. Consider `Base` below. */
+  private[laminar] type Any = Modifier[_ <: ReactiveElement.Base]
 
-  type Any = Modifier[_ <: ReactiveElement.Base]
+  /** Modifier that is applicable to any element */
+  type Base = Modifier[ReactiveElement.Base]
 
+  /** Modifier that does nothing */
   val empty: Modifier[ReactiveElement.Base] = new Modifier[ReactiveElement.Base] {}
 
   @deprecated("Use Modifier.empty instead of Modifier.noop", "0.15.0-RC1")
