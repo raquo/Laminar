@@ -328,7 +328,7 @@ trait GlobalEventProps {
 
 
   /**
-    * The DOM beforeinput event fires when the value of an <input>, or <textarea>
+    * The DOM beforeinput event fires when the value of an `<input>`, or `<textarea>`
     * element is about to be modified. The event also applies to elements with
     * contenteditable enabled, and to any element when designMode is turned on.
     * 
@@ -370,7 +370,7 @@ trait GlobalEventProps {
 
   /**
     * The submit event is fired when the user clicks a submit button in a form
-    * (<input type="submit"/>).
+    * (`<input type="submit"/>`).
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit_event
     */
@@ -394,7 +394,7 @@ trait GlobalEventProps {
 
 
   /**
-    * Fires when the user writes something in a search field (for <input="search">)
+    * Fires when the user writes something in a search field (for `<input="search">`)
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/search_event
     */
@@ -493,7 +493,7 @@ trait GlobalEventProps {
 
 
   /**
-    * Script to be run when the cue changes in a <track> element
+    * Script to be run when the cue changes in a `<track>` element
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextTrack/cuechange_event
     */
@@ -696,7 +696,7 @@ trait GlobalEventProps {
 
   /**
     * The onload property of the GlobalEventHandlers mixin is an event handler
-    * for the load event of a Window, XMLHttpRequest, <img> element, etc.,
+    * for the load event of a Window, XMLHttpRequest, `<img>` element, etc.,
     * which fires when the resource has loaded.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
@@ -725,7 +725,7 @@ trait GlobalEventProps {
 
 
   /**
-    * Fires when a <menu> element is shown as a context menu
+    * Fires when a `<menu>` element is shown as a context menu
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/show_event
     */
@@ -733,7 +733,7 @@ trait GlobalEventProps {
 
 
   /**
-    * Fires when the user opens or closes the <details> element
+    * Fires when the user opens or closes the `<details>` element
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/toggle_event
     */

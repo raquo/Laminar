@@ -1038,7 +1038,7 @@ trait HtmlTags {
     * Dialog box or other interactive component, such as a dismissible alert,
     * inspector, or subwindow.
     * 
-    * Note: The tabindex attribute must not be used on the <dialog> element
+    * Note: The tabindex attribute must not be used on the `<dialog>` element
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement

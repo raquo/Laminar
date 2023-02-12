@@ -166,5 +166,7 @@ lazy val laminar = project.in(file("."))
       )
     ),
     (Test / publishArtifact) := false,
-    pomIncludeRepository := { _ => false }
+    pomIncludeRepository := { _ => false },
+    sonatypeCredentialHost := "s01.oss.sonatype.org",
+    sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
   )

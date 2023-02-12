@@ -324,7 +324,7 @@ trait StyleProps {
   /**
     * The CSS animation-timing-function property specifies how a CSS animation
     * should progress over the duration of each cycle. The possible values are
-    * one or several <timing-function>.
+    * one or several `<timing-function>`.
     * 
     * For keyframed animations, the timing function applies between keyframes
     * rather than over the entire animation. In other words, the timing function
@@ -1712,7 +1712,7 @@ trait StyleProps {
 
 
   /**
-    * The table-layout CSS property sets the algorithm used to lay out <table>
+    * The table-layout CSS property sets the algorithm used to lay out `<table>`
     * cells, rows, and columns.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/table-layout
@@ -1959,7 +1959,7 @@ trait StyleProps {
 
   /**
     * The visibility CSS property shows or hides an element without changing the
-    * layout of a document. The property can also hide rows or columns in a <table>.
+    * layout of a document. The property can also hide rows or columns in a `<table>`.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/visibility
     */

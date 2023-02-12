@@ -59,7 +59,7 @@ trait HtmlProps {
 
 
   /**
-    * Indicates whether an <option> element is _currently_ selected.
+    * Indicates whether an `<option>` element is _currently_ selected.
     * This is different from `selected` _attribute_,
     * which contains the _initial_ selected status of the element.
     * More info: https://stackoverflow.com/a/6004028/2601788 (`selected` behaves similar to `value`)
@@ -159,7 +159,7 @@ trait HtmlProps {
 
 
   /**
-    * The visible width of text input or <textArea>, in average character widths.
+    * The visible width of text input or `<textArea>`, in average character widths.
     * If it is specified, it must be a positive integer.
     * If it is not specified, the default value is 20 (HTML5).
     * 
@@ -171,7 +171,7 @@ trait HtmlProps {
   /**
     * This attribute contains a non-negative integer value that indicates for
     * how many columns the cell extends. Its default value is 1; if its value
-    * is set to 0, it extends until the end of the <colgroup>, even if implicitly
+    * is set to 0, it extends until the end of the `<colgroup>`, even if implicitly
     * defined, that the cell belongs to. Values higher than 1000 will be considered
     * as incorrect and will be set to the default value (1).
     * 
@@ -182,7 +182,7 @@ trait HtmlProps {
 
   /**
     * This attribute gives the value associated with the [[name]] or [[httpEquiv]] attribute,
-    * of a <meta> element, depending on which of those attributes is defined on that element.
+    * of a `<meta>` element, depending on which of those attributes is defined on that element.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta#attr-content
     */
@@ -202,8 +202,8 @@ trait HtmlProps {
 
 
   /**
-    * Indicates whether this <option> is initially selected
-    * in an option list of a <select> element.
+    * Indicates whether this `<option>` is initially selected
+    * in an option list of a `<select>` element.
     * 
     * See [[Props.selected]]
     * 
@@ -293,17 +293,6 @@ trait HtmlProps {
 
 
   /**
-    * The `formaction` attribute provides the URL that will process the input control
-    * when the form is submitted and overrides the default `action` attribute of the
-    * `form` element. This should be used only with `input` elements of `type`
-    * submit or image.
-    * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formaction
-    */
-  lazy val formAction: HtmlProp[String, String] = stringProp("formAction")
-
-
-  /**
     * The `formenctype` attribute provides the encoding type of the form when it is
     * submitted (for forms with a method of "POST") and overrides the default
     * `enctype` attribute of the `form` element. This should be used only with the
@@ -370,20 +359,6 @@ trait HtmlProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter#attr-high
     */
   lazy val high: HtmlProp[Double, Double] = doubleProp("high")
-
-
-  /**
-    * This is the single required attribute for anchors defining a hypertext
-    * source link. It indicates the link target, either a URL or a URL fragment.
-    * A URL fragment is a name preceded by a hash mark (#), which specifies an
-    * internal target location (an ID) within the current document. URLs are not
-    * restricted to Web (HTTP)-based documents. URLs might use any protocol
-    * supported by the browser. For example, file, ftp, and mailto work in most
-    * user agents.
-    * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href
-    */
-  lazy val href: HtmlProp[String, String] = stringProp("href")
 
 
   /**
@@ -525,8 +500,8 @@ trait HtmlProps {
 
   /**
     * This Boolean attribute specifies, when present/true, that the user is allowed
-    * to enter more than one value for the <input> element for types "email" or "file".
-    * It can also be provided to the <select> element to allow selecting more than one
+    * to enter more than one value for the `<input>` element for types "email" or "file".
+    * It can also be provided to the `<select>` element to allow selecting more than one
     * option.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#multiple
@@ -546,14 +521,14 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#name
     */
-  lazy val name: HtmlProp[String, String] = stringProp("name")
+  lazy val nameAttr: HtmlProp[String, String] = stringProp("name")
 
 
   /**
     * This Boolean attribute indicates that the form is not to be validated when
     * submitted. If this attribute is not specified (and therefore the form is
     * validated), this default setting can be overridden by a formnovalidate
-    * attribute on a <button> or <input> element belonging to the form.
+    * attribute on a `<button>` or `<input>` element belonging to the form.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form#attr-novalidate
     */
@@ -623,7 +598,7 @@ trait HtmlProps {
   /**
     * This attribute contains a non-negative integer value that indicates for how many
     * rows the cell extends. Its default value is 1; if its value is set to 0, it extends
-    * until the end of the table section (<thead>, <tbody>, <tfoot>, even if implicitly
+    * until the end of the table section (`<thead>`, `<tbody>`, `<tfoot>`, even if implicitly
     * defined, that the cell belongs to. Values higher than 65534 are clipped down to 65534.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td#attr-rowspan
@@ -673,18 +648,6 @@ trait HtmlProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/spellcheck
     */
   lazy val spellCheck: HtmlProp[Boolean, Boolean] = boolProp("spellcheck")
-
-
-  /**
-    * If the value of the type attribute is image, this attribute specifies a URI
-    * for the location of an image to display on the graphical submit button;
-    * otherwise it is ignored.
-    * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-src
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#src
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src
-    */
-  lazy val src: HtmlProp[String, String] = stringProp("src")
 
 
   /**
