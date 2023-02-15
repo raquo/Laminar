@@ -7,18 +7,18 @@ import scala.scalajs.js
 
 object ChildTextInserter {
 
-  def apply[A, El <: ReactiveElement.Base] (
-    textSource: Observable[A],
-    renderable: Renderable[A]
-  ): Inserter[El] = {
-    new Inserter[El](
+  def apply[Component] (
+    textSource: Observable[Component],
+    renderable: RenderableText[Component]
+  ): Inserter.Base = {
+    new Inserter[ReactiveElement.Base](
       preferStrictMode = false,
       insertFn = (ctx, owner) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValue =>
           maybeTextNode.fold {
             // First event: inserting the child for the first time: replace sentinel comment node with new TextNode
-            val newTextNode = renderable.asTextNode(newValue)
+            val newTextNode = new TextNode(renderable.asString(newValue))
             ParentNode.replaceChild(parent = ctx.parentNode, oldChild = ctx.sentinelNode, newChild = newTextNode)
             maybeTextNode = newTextNode
 

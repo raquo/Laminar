@@ -18,8 +18,9 @@ object ChildrenCommandInserter {
 
   type ChildrenCommand = CollectionCommand[Child]
 
-  def apply[El <: ReactiveElement.Base] (
-    commands: EventStream[ChildrenCommand]
+  def apply[Component, El <: ReactiveElement.Base] (
+    commands: EventStream[CollectionCommand[Component]],
+    renderableNode: RenderableNode[Component]
   ): Inserter[El] = {
     new Inserter[El](
       preferStrictMode = true,
@@ -29,7 +30,8 @@ object ChildrenCommandInserter {
             command,
             parentNode = ctx.parentNode,
             sentinelNode = ctx.sentinelNode,
-            ctx.extraNodeCount
+            ctx.extraNodeCount,
+            renderableNode
           )
           ctx.extraNodeCount += nodeCountDiff
         }(owner)
@@ -37,36 +39,55 @@ object ChildrenCommandInserter {
     )
   }
 
-  def updateList(
-    command: ChildrenCommand,
+  def updateList[Component](
+    command: CollectionCommand[Component],
     parentNode: ReactiveElement.Base,
     sentinelNode: ChildNode.Base,
-    extraNodeCount: Int
+    extraNodeCount: Int,
+    renderableNode: RenderableNode[Component]
   ): Int = {
     var nodeCountDiff = 0
     command match {
 
       case CollectionCommand.Append(node) =>
         val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        if (ParentNode.insertChild(parent = parentNode, child = node, atIndex = sentinelIndex + extraNodeCount + 1)) {
+        val inserted = ParentNode.insertChild(
+          parent = parentNode,
+          child = renderableNode.asNode(node),
+          atIndex = sentinelIndex + extraNodeCount + 1)
+        if (inserted) {
           nodeCountDiff = 1
         }
         nodeCountDiff = 1
 
       case CollectionCommand.Prepend(node) =>
         val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        if (ParentNode.insertChild(parent = parentNode, child = node, atIndex = sentinelIndex + 1)) {
+        val inserted = ParentNode.insertChild(
+          parent = parentNode,
+          child = renderableNode.asNode(node),
+          atIndex = sentinelIndex + 1
+        )
+        if (inserted) {
           nodeCountDiff = 1
         }
 
       case CollectionCommand.Insert(node, atIndex) =>
         val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        if (ParentNode.insertChild(parent = parentNode, child = node, atIndex = sentinelIndex + atIndex + 1)) {
+        val inserted = ParentNode.insertChild(
+          parent = parentNode,
+          child = renderableNode.asNode(node),
+          atIndex = sentinelIndex + atIndex + 1
+        )
+        if (inserted) {
           nodeCountDiff = 1
         }
 
       case CollectionCommand.Remove(node) =>
-        if (ParentNode.removeChild(parent = parentNode, child = node)) {
+        val removed = ParentNode.removeChild(
+          parent = parentNode,
+          child = renderableNode.asNode(node)
+        )
+        if (removed) {
           nodeCountDiff = -1
         }
 
@@ -74,12 +95,16 @@ object ChildrenCommandInserter {
         // @TODO same as Insert.
         // @TODO Should we also add a MoveToEnd method?
         val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        if (ParentNode.insertChild(parent = parentNode, child = node, atIndex = sentinelIndex + toIndex + 1)) {
+        if (ParentNode.insertChild(parent = parentNode, child = renderableNode.asNode(node), atIndex = sentinelIndex + toIndex + 1)) {
           nodeCountDiff = 1
         }
 
       case CollectionCommand.Replace(node, withNode) =>
-        ParentNode.replaceChild(parent = parentNode, oldChild = node, newChild = withNode)
+        ParentNode.replaceChild(
+          parent = parentNode,
+          oldChild = renderableNode.asNode(node),
+          newChild = renderableNode.asNode(withNode)
+        )
 
       case CollectionCommand.ReplaceAll(newNodes) =>
         Transaction.onStart.shared {
@@ -87,7 +112,12 @@ object ChildrenCommandInserter {
           if (extraNodeCount == 0) {
             var numInsertedNodes = 0
             newNodes.foreach { newChild =>
-              if (ParentNode.insertChild(parent = parentNode, child = newChild, atIndex = sentinelIndex + 1 + numInsertedNodes)) {
+              val inserted = ParentNode.insertChild(
+                parent = parentNode,
+                child = renderableNode.asNode(newChild),
+                atIndex = sentinelIndex + 1 + numInsertedNodes
+              )
+              if (inserted) {
                 numInsertedNodes += 1
               }
             }
@@ -98,7 +128,7 @@ object ChildrenCommandInserter {
               parent = parentNode,
               fromIndex = sentinelIndex + 1,
               toIndex = sentinelIndex + extraNodeCount,
-              newNodes
+              renderableNode.asNodeIterable(newNodes)
             )
             if (replaced) {
               nodeCountDiff = newNodes.size - oldNodeCount

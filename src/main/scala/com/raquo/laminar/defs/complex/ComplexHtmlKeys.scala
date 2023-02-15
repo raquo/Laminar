@@ -8,8 +8,6 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 trait ComplexHtmlKeys {
 
-  // #nc doc this change from prop to attr?
-  // #nc test performance change due to this
   // #Note: we use attrs instead of props here because of https://github.com/raquo/Laminar/issues/136
 
   /**

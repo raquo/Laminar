@@ -15,10 +15,11 @@ object ChildrenInserter {
 
   type Children = immutable.Seq[Child]
 
-  def apply[El <: ReactiveElement.Base](
-    childrenSource: Observable[Children]
-  ): Inserter[El] = {
-    new Inserter[El](
+  def apply[Component](
+    childrenSource: Observable[immutable.Seq[Component]],
+    renderableNode: RenderableNode[Component]
+  ): Inserter.Base = {
+    new Inserter[ReactiveElement.Base](
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
         if (!ctx.strictMode) {
@@ -27,7 +28,12 @@ object ChildrenInserter {
 
         var maybeLastSeenChildren: js.UndefOr[Children] = ctx.extraNodes
 
-        childrenSource.foreach { newChildren =>
+        childrenSource.foreach { components =>
+          // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
+          //  will need to map over the seq, creating a new seq of child nodes.
+          //  Unfortunately, avoiding this is quite complicated.
+          val newChildren = renderableNode.asNodeSeq(components)
+
           // #TODO[Performance] Consider bringing back this eq check. Benchmark performance cost.
           //  - Without it, we might get worse performance, as when the same list is emitted,
           //    Laminar needs to iterate over the list of elements and check their position in the DOM.

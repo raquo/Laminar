@@ -160,6 +160,8 @@ private[laminar] object Laminar
 
   type Inserter[-El <: Element] = modifiers.Inserter[El]
 
+  val Inserter: modifiers.Inserter.type = modifiers.Inserter
+
 
   // Events
 

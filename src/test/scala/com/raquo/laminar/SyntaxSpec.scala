@@ -3,15 +3,15 @@ package com.raquo.laminar
 import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
-import com.raquo.laminar.keys.{DerivedStyleProp, SvgAttr}
+import com.raquo.laminar.keys.DerivedStyleProp
 import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
 import scala.collection.{immutable, mutable}
-import scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 
 class SyntaxSpec extends UnitSpec {
@@ -136,8 +136,15 @@ class SyntaxSpec extends UnitSpec {
     //  - inserters require mounting to be processed.
 
     val actualNode = div(
-      strings, stringsBuffer, stringsArray, stringsJsArray,
-      nodes, nodesBuffer, nodesArray, nodesJsArray, mixed
+      strings,
+      stringsBuffer,
+      stringsArray,
+      stringsJsArray,
+      nodes,
+      nodesBuffer,
+      nodesArray,
+      nodesJsArray,
+      mixed
     )
 
     expectNode(actualNode.ref, div.of(
@@ -250,7 +257,6 @@ class SyntaxSpec extends UnitSpec {
     val stream = signal.changes
     val observable: Observable[Int] = stream
 
-    // @TODO[API] Can we have type inference for this [Int]?
     el.amend(
       onMountBind(_ => observable --> Observer[Int](num => num * 5)),
       onMountBind(_ => signal --> Observer[Int](num => num * 5)),

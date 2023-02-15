@@ -54,3 +54,8 @@ class Inserter[-El <: ReactiveElement.Base] (
     new Inserter[El](Some(context), preferStrictMode = false, insertFn)
   }
 }
+
+object Inserter {
+
+  type Base = Inserter[ReactiveElement.Base]
+}

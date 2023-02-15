@@ -1,13 +1,16 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source.EventSource
-import com.raquo.laminar.modifiers.ChildrenCommandInserter.ChildrenCommand
-import com.raquo.laminar.modifiers.{ChildrenCommandInserter, Inserter}
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.CollectionCommand
+import com.raquo.laminar.modifiers.{ChildrenCommandInserter, Inserter, RenderableNode}
 
 object ChildrenCommandReceiver {
 
-  def <--(commands: EventSource[ChildrenCommand]): Inserter[ReactiveElement.Base] = {
-    ChildrenCommandInserter[ReactiveElement.Base](commands.toObservable)
+  def <--[Component](
+    commands: EventSource[CollectionCommand[Component]]
+  )(
+    implicit renderableNode: RenderableNode[Component]
+  ): Inserter.Base = {
+    ChildrenCommandInserter(commands.toObservable, renderableNode)
   }
 }

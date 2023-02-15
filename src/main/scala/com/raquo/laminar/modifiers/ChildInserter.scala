@@ -7,10 +7,11 @@ import scala.scalajs.js
 
 object ChildInserter {
 
-  def apply[El <: ReactiveElement.Base] (
-    childSource: Observable[ChildNode.Base]
-  ): Inserter[El] = {
-    new Inserter[El](
+  def apply[Component] (
+    childSource: Observable[Component],
+    renderable: RenderableNode[Component]
+  ): Inserter.Base = {
+    new Inserter[ReactiveElement.Base](
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
         if (!ctx.strictMode) {
@@ -19,7 +20,8 @@ object ChildInserter {
 
         var maybeLastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
 
-        childSource.foreach { newChildNode =>
+        childSource.foreach { newComponent =>
+          val newChildNode = renderable.asNode(newComponent)
           var remainingOldExtraNodeCount = ctx.extraNodeCount
 
           maybeLastSeenChild
