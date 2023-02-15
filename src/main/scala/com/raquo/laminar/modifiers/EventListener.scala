@@ -58,7 +58,7 @@ class EventListener[Ev <: dom.Event, Out](
         ReactiveElement.bindSubscriptionUnsafe(element)(subscribe)
       }
 
-      element.addEventListener(new EventListenerSubscription(this, sub), unsafePrepend)
+      element.addEventListener(this, unsafePrepend)
 
       sub
     } else {

@@ -6,7 +6,7 @@ import com.raquo.airstream.ownership.{DynamicSubscription, Subscription, Transfe
 import com.raquo.ew.JsArray
 import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
 import com.raquo.laminar.lifecycle.MountContext
-import com.raquo.laminar.modifiers.{EventListener, EventListenerSubscription, Modifier}
+import com.raquo.laminar.modifiers.{EventListener, Modifier}
 import com.raquo.laminar.tags.Tag
 import org.scalajs.dom
 
@@ -26,19 +26,20 @@ trait ReactiveElement[+Ref <: dom.Element]
     deactivate = dynamicOwner.deactivate
   )
 
-  private[this] var maybeEventListeners: js.UndefOr[JsArray[EventListenerSubscription]] = js.undefined
+  // #TODO[API] Do we actually need this? What for?
+  private[this] var maybeEventListeners: js.UndefOr[JsArray[EventListener.Base]] = js.undefined
 
-  private[laminar] def foreachEventListener(f: EventListenerSubscription => Unit): Unit = {
+  private[laminar] def foreachEventListener(f: EventListener.Base => Unit): Unit = {
     maybeEventListeners.foreach(_.forEach(f))
   }
 
   /** Note: Only call this after checking that this element doesn't already have this listener */
   private[laminar] def addEventListener(
-    listener: EventListenerSubscription,
+    listener: EventListener.Base,
     unsafePrepend: Boolean
   ): Unit = {
     if (maybeEventListeners.isEmpty) {
-      maybeEventListeners = JsArray(listener)
+      maybeEventListeners = JsArray[EventListener.Base](listener)
     } else if (unsafePrepend) {
       maybeEventListeners.get.unshift(listener)
     } else {
@@ -59,7 +60,7 @@ trait ReactiveElement[+Ref <: dom.Element]
       var found: Boolean = false
       var ix = 0
       while (!found && ix < eventListeners.length) {
-        if (eventListeners(ix).listener == listener) {
+        if (eventListeners(ix) == listener) {
           found = true
         } else {
           ix += 1
@@ -144,7 +145,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   val tag: Tag[ReactiveElement[Ref]]
 
   def eventListeners: List[EventListener.Base] = {
-    maybeEventListeners.map(_.map(_.listener).asScalaJs.toList).getOrElse(Nil)
+    maybeEventListeners.map(_.asScalaJs.toList).getOrElse(Nil)
   }
 
   /** Create and get a stream of events on this node */
