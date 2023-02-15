@@ -1,5 +1,6 @@
 package com.raquo.laminar.modifiers
 
+import com.raquo.airstream.core.Transaction
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** This type represents an operation that has a side effect on a node of type [[El]].
@@ -9,6 +10,9 @@ import com.raquo.laminar.nodes.ReactiveElement
   * is added after the fact using the `amend` method, or by manually calling its `apply` method).
   *
   * We're defining a specific trait for this because we expect to have implicit conversions into this type.
+  *
+  * If you choose to extend this trait, make sure to understand how to use [[Transaction.onStart.shared]].
+  * In simple cases, wrapping your callback in it similarly to [[Modifier.apply]] below will probably work.
   */
 trait Modifier[-El <: ReactiveElement.Base] {
 
@@ -36,7 +40,12 @@ object Modifier {
 
   def apply[El <: ReactiveElement.Base](f: El => Unit): Modifier[El] = {
     new Modifier[El] {
-      override def apply(element: El): Unit = f(element)
+      override def apply(element: El): Unit = {
+        /** This is a safe default. See scaladoc for [[Transaction.onStart.shared]] */
+        Transaction.onStart.shared {
+          f(element)
+        }
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 package com.raquo.laminar
 
-import com.raquo.airstream.core.{Sink, Source, Transaction}
+import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.airstream.state.Val
 import com.raquo.ew
 import com.raquo.ew.ewArray
@@ -90,9 +90,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   )(
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    Modifier { element =>
-      maybeModifier.foreach(asModifier(_).apply(element))
-    }
+    Modifier(element => maybeModifier.foreach(asModifier(_).apply(element)))
   }
 
   /** Create a modifier that applies each of the modifiers in a seq */
@@ -101,11 +99,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   )(
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    Modifier { element =>
-      Transaction.onStart.shared {
-        modifiers.foreach(asModifier(_).apply(element))
-      }
-    }
+    Modifier(element => modifiers.foreach(asModifier(_).apply(element)))
   }
 
   /** Create a modifier that applies each of the modifiers in an array */
@@ -114,11 +108,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   )(
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    Modifier { element =>
-      Transaction.onStart.shared {
-        modifiers.foreach(asModifier(_).apply(element))
-      }
-    }
+    Modifier(element => modifiers.foreach(asModifier(_).apply(element)))
   }
 
   /** Create a modifier that applies each of the modifiers in an array */
@@ -127,11 +117,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   )(
     implicit asModifier: A => Modifier[El]
   ): Modifier[El] = {
-    Modifier[El] { element =>
-      Transaction.onStart.shared {
-        modifiers.forEach(asModifier(_).apply(element))
-      }
-    }
+    Modifier(element => modifiers.forEach(asModifier(_).apply(element)))
   }
 
   /** Create a modifier that applies each of the modifiers in an array */
