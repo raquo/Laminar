@@ -70,7 +70,7 @@ trait Airstream {
 
   lazy val AjaxStream: airstream.web.AjaxStream.type = airstream.web.AjaxStream
 
-  lazy val FetchStream: airstream.web.FetchStream.type = airstream.web.FetchStream
+  lazy val Fetch: airstream.web.Fetch.type = airstream.web.Fetch
 
   // -- Flatten
 
