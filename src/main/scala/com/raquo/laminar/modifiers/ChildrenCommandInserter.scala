@@ -2,7 +2,6 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.{EventStream, Transaction}
 import com.raquo.laminar.CollectionCommand
-import com.raquo.laminar.modifiers.ChildrenInserter.Child
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
 /**
@@ -16,7 +15,8 @@ import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
  */
 object ChildrenCommandInserter {
 
-  type ChildrenCommand = CollectionCommand[Child]
+  @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand[ChildNode.Base]", "15.0.0-M5")
+  type ChildrenCommand = CollectionCommand[ChildNode.Base]
 
   def apply[Component, El <: ReactiveElement.Base] (
     commands: EventStream[CollectionCommand[Component]],

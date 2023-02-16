@@ -11,9 +11,11 @@ import scala.scalajs.js
 
 object ChildrenInserter {
 
+  @deprecated("`Child` type alias is deprecated. Use ChildNode.Base", "15.0.0-M6")
   type Child = ChildNode.Base
 
-  type Children = immutable.Seq[Child]
+  @deprecated("`Children`type alias is deprecated. Use immutable.Seq[ChildNode.Base]", "15.0.0-M6")
+  type Children = immutable.Seq[ChildNode.Base]
 
   def apply[Component](
     childrenSource: Observable[immutable.Seq[Component]],
@@ -26,7 +28,7 @@ object ChildrenInserter {
           ctx.forceSetStrictMode()
         }
 
-        var maybeLastSeenChildren: js.UndefOr[Children] = ctx.extraNodes
+        var maybeLastSeenChildren: js.UndefOr[immutable.Seq[ChildNode.Base]] = ctx.extraNodes
 
         childrenSource.foreach { components =>
           // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
@@ -66,10 +68,10 @@ object ChildrenInserter {
   /** @return New child node count */
   private def updateChildren(
     prevChildren: JsMap[dom.Node, ChildNode.Base],
-    nextChildren: Children,
+    nextChildren: immutable.Seq[ChildNode.Base],
     nextChildrenMap: JsMap[dom.Node, ChildNode.Base],
     parentNode: ReactiveElement.Base,
-    sentinelNode: Child,
+    sentinelNode: ChildNode.Base,
     prevChildrenCount: Int
   ): Int = {
     val liveNodeList = parentNode.ref.childNodes
@@ -207,7 +209,7 @@ object ChildrenInserter {
     nextChildrenMap.has(ref)
   }
 
-  private def prevChildFromRef(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Child = {
+  private def prevChildFromRef(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): ChildNode.Base = {
     prevChildren.get(ref).getOrElse(throw new Exception(s"prevChildFromRef[children]: not found for ${ref}"))
   }
 

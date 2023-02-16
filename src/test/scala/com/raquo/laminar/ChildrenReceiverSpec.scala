@@ -1,10 +1,10 @@
 package com.raquo.laminar
 
-import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
+import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
+import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
-import org.scalajs.dom
 import org.scalatest.BeforeAndAfter
 
 import scala.collection.mutable
@@ -35,7 +35,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
   it("updates a list of children") {
 
-    val childrenBus = new EventBus[Vector[Child]]
+    val childrenBus = new EventBus[Vector[ChildNode.Base]]
     val childrenStream = childrenBus.events
 
     val span0 = span(text0)

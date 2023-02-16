@@ -1,11 +1,15 @@
 package com.raquo.laminar
 
+import com.raquo.laminar.nodes.ChildNode
+
 sealed trait CollectionCommand[+Item] {
 
   @inline def map[A](project: Item => A): CollectionCommand[A]
 }
 
 object CollectionCommand {
+
+  type Base = CollectionCommand[ChildNode.Base]
 
   case class Append[+Item](item: Item) extends CollectionCommand[Item] {
 

@@ -1,6 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
+import com.raquo.laminar
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
@@ -16,6 +17,8 @@ import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
 import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
 import org.scalajs.dom
+
+import scala.collection.immutable
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
@@ -125,12 +128,18 @@ private[laminar] object Laminar
 
   type RootNode = nodes.RootNode
 
-  type Child = modifiers.ChildrenInserter.Child
+  @deprecated("`Child` type alias is deprecated. Use ChildNode.Base", "15.0.0-M6")
+  type Child = nodes.ChildNode.Base
 
-  type Children = modifiers.ChildrenInserter.Children
+  @deprecated("`Children`type alias is deprecated. Use immutable.Seq[ChildNode.Base]", "15.0.0-M6")
+  type Children = immutable.Seq[nodes.ChildNode.Base]
 
-  type ChildrenCommand = modifiers.ChildrenCommandInserter.ChildrenCommand
+  @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand.Base", "15.0.0-M5")
+  type ChildrenCommand = CollectionCommand[nodes.ChildNode.Base]
 
+  type CollectionCommand[+Item] = laminar.CollectionCommand[Item]
+
+  lazy val CollectionCommand: laminar.CollectionCommand.type = laminar.CollectionCommand
 
   // Modifiers
 
@@ -249,7 +258,7 @@ private[laminar] object Laminar
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
     * This is a bit annoying, I know, but we kinda have to follow the native JS DOM API on this.
-    * Both [[CommentNode]] and [[nodes.ReactiveElement]] are [[Node]] aka [[Child]].
+    * Both [[CommentNode]] and [[nodes.ReactiveElement]] are [[Node]].
     */
   @inline def emptyNode: CommentNode = commentNode("")
 

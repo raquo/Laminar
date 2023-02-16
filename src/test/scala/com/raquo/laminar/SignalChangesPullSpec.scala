@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.mutable
@@ -143,7 +143,7 @@ class SignalChangesPullSpec extends UnitSpec {
       combined --> _logCombined(log, s"combined-ch$ix-2")
     )
 
-    val maybeChildVar = Var[Option[Child]](initial = Some(makeChild(ix = 1)))
+    val maybeChildVar = Var[Option[ChildNode.Base]](initial = Some(makeChild(ix = 1)))
 
     val el = div(
       "hello",
@@ -238,7 +238,7 @@ class SignalChangesPullSpec extends UnitSpec {
       combined --> _logCombined(log, s"combined-ch$ix-2")
     )
 
-    val childrenVar = Var[List[Child]](initial = List(makeChild(ix = 1), makeChild(ix = 2)))
+    val childrenVar = Var[List[ChildNode.Base]](initial = List(makeChild(ix = 1), makeChild(ix = 2)))
 
     val el = div(
       "hello",
@@ -322,7 +322,7 @@ class SignalChangesPullSpec extends UnitSpec {
       combined --> _logCombined(log, s"combined-ch$ix-2")
     )
 
-    val maybeChildVar = Var[Option[Child]](initial = None)
+    val maybeChildVar = Var[Option[ChildNode.Base]](initial = None)
 
     val el = div(
       "hello",
@@ -386,7 +386,7 @@ class SignalChangesPullSpec extends UnitSpec {
       combined --> _logCombined(log, s"combined-ch$ix-2")
     )
 
-    val maybeChildVar = Var[Option[Child]](initial = None)
+    val maybeChildVar = Var[Option[ChildNode.Base]](initial = None)
 
     val el = div(
       "hello",

@@ -1,6 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.modifiers.ChildrenInserter.{Child, Children}
+import com.raquo.laminar.nodes.ChildNode
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable
@@ -18,40 +18,41 @@ import scala.collection.immutable
   *
   * See also – [[RenderableText]]
   */
-@implicitNotFound("Implicit instance of RenderableNode[${Component}] not found. If you want to render `${Component}` as a node / element, define an implicit RenderableNode[${Component}] instance for it.")
+@implicitNotFound("Implicit instance of RenderableNode[${Component}] not found. If `${Component}` is a custom component that you want to render as a node / element, define an implicit RenderableNode[${Component}] instance for it. For rendering as a string or primitive value, define RenderableText[${Component}] instead, and perhaps use `child.text <--` instead of `child <-- ...`.")
 trait RenderableNode[-Component] {
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
-  def asNode(value: Component): Child
+  def asNode(value: Component): ChildNode.Base
 
   /** For every component in the sequence, this MUST ALWAYS return the exact same node reference. */
-  def asNodeSeq(values: immutable.Seq[Component]): Children
+  def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base]
 
   /** For every component in the sequence, this MUST ALWAYS return the exact same node reference. */
-  def asNodeIterable(values: Iterable[Component]): Iterable[Child]
+  def asNodeIterable(values: Iterable[Component]): Iterable[ChildNode.Base]
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
-  def asNodeOption(value: Option[Component]): Option[Child]
+  def asNodeOption(value: Option[Component]): Option[ChildNode.Base]
 }
 
 object RenderableNode {
 
   def apply[Component](
-    renderNode: Component => Child,
-    renderNodeSeq: immutable.Seq[Component] => Children,
-    renderNodeIterable: Iterable[Component] => Iterable[Child],
-    renderNodeOption: Option[Component] => Option[Child]
+    renderNode: Component => ChildNode.Base,
+    renderNodeSeq: immutable.Seq[Component] => immutable.Seq[ChildNode.Base],
+    renderNodeIterable: Iterable[Component] => Iterable[ChildNode.Base],
+    renderNodeOption: Option[Component] => Option[ChildNode.Base]
   ): RenderableNode[Component] = new RenderableNode[Component] {
 
-    override def asNode(value: Component): Child = renderNode(value)
+    override def asNode(value: Component): ChildNode.Base = renderNode(value)
 
-    override def asNodeSeq(values: immutable.Seq[Component]): Children = renderNodeSeq(values)
+    override def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base] = renderNodeSeq(values)
 
-    override def asNodeIterable(values: Iterable[Component]): Iterable[Child] = renderNodeIterable(values)
+    override def asNodeIterable(values: Iterable[Component]): Iterable[ChildNode.Base] = renderNodeIterable(values)
 
-    override def asNodeOption(value: Option[Component]): Option[Child] = renderNodeOption(value)
+    override def asNodeOption(value: Option[Component]): Option[ChildNode.Base] = renderNodeOption(value)
   }
 
-  implicit val nodeRenderable: RenderableNode[Child] = RenderableNode[Child](identity, identity, identity, identity)
+  implicit val nodeRenderable: RenderableNode[ChildNode.Base] =
+    RenderableNode[ChildNode.Base](identity, identity, identity, identity)
 
 }

@@ -2,7 +2,6 @@ package com.raquo.laminar.lifecycle
 
 import com.raquo.ew.JsMap
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.modifiers.ChildrenInserter.Children
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
@@ -67,7 +66,7 @@ final class InsertContext[+El <: ReactiveElement.Base](
   var sentinelNode: ChildNode.Base,
   var strictMode: Boolean,
   var extraNodeCount: Int, // This is separate from `extraNodesMap` for performance #TODO[Performance]: Check if this is still relevant with JsMap
-  var extraNodes: Children,
+  var extraNodes: immutable.Seq[ChildNode.Base],
   var extraNodesMap: JsMap[dom.Node, ChildNode.Base]
 ) {
 
