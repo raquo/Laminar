@@ -1,5 +1,7 @@
 package com.raquo.laminar.modifiers
 
+import com.raquo.laminar.nodes.TextNode
+
 import scala.annotation.implicitNotFound
 
 /** `RenderableText[A]` is evidence that you can convert a value of type A to
@@ -34,6 +36,13 @@ object RenderableText {
   implicit val doubleRenderable: RenderableText[Double] = RenderableText[Double](_.toString)
 
   implicit val boolRenderable: RenderableText[Boolean] = RenderableText[Boolean](_.toString)
+
+  // --
+
+  /** #Warning: Using this naively in ChildTextInserter is not efficient.
+    *  When we encounter this renderable instance, we use ChildInserter instead.
+    */
+  implicit val textNodeRenderable: RenderableText[TextNode] = RenderableText[TextNode](_.text)
 
   // --
 

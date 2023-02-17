@@ -2,6 +2,7 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.modifiers.{ChildInserter, Inserter, RenderableNode}
+import com.raquo.laminar.nodes.ChildNode
 
 object ChildReceiver {
 
@@ -9,18 +10,15 @@ object ChildReceiver {
 
   val text: ChildTextReceiver.type = ChildTextReceiver
 
-  def <--[Component](childSource: Source[Component])(implicit renderable: RenderableNode[Component]): Inserter.Base = {
-    ChildInserter(childSource.toObservable, renderable)
+  def <--(childSource: Source[ChildNode.Base]): Inserter.Base = {
+    ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable)
   }
 
-  // #TODO[API] I disabled this method because the more general <-- method below
-  //  covers this use case as well. Retaining both methods eliminates the need for
-  //  implicit resolution (user code compilation should be a bit faster), however
-  //  it also degrades user experience with hard-to-parse "overloaded method with
-  //  alternatives..." compiler errors when the user provides the wrong type of
-  //  `childSource`.
+  implicit class RichChildReceiver(val self: ChildReceiver.type) extends AnyVal {
 
-  // def <--(childSource: Source[Child]): Inserter.Base = {
-  //   ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable)
-  // }
+    def <--[Component](childSource: Source[Component])(implicit renderable: RenderableNode[Component]): Inserter.Base = {
+      ChildInserter(childSource.toObservable, renderable)
+    }
+  }
+
 }

@@ -11,6 +11,8 @@ import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}
 import com.raquo.laminar.modifiers.{Binder, Inserter, Modifier, RenderableNode, RenderableText, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
+import com.raquo.laminar.receivers.ChildOptionReceiver.RichChildOptionReceiver
+import com.raquo.laminar.receivers.ChildReceiver.RichChildReceiver
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -195,7 +197,9 @@ object Implicits {
     }
 
     implicit def componentToInserter[Component](component: Component)(implicit renderable: RenderableNode[Component]): Inserter.Base = {
-      child <-- Val(component)
+      // #TODO[Scala3] this could be simply `child <-- Val(component)`, but inside this
+      //  particular method, Scala 3 fails to compile that pattern for some reason. WHY
+      new RichChildReceiver(child) <-- Val(component)
     }
 
     // -- Methods to convert collections of nodes to inserters --
@@ -223,7 +227,9 @@ object Implicits {
     // -- Methods to convert collections of components to inserters --
     
     implicit def componentOptionToInserter[Component: RenderableNode](maybeComponent: Option[Component]): Inserter.Base = {
-      child.maybe <-- Val(maybeComponent)
+      // #TODO[Scala3] this could be simply `child.maybe <-- Val(maybeComponent)`, but inside this
+      //  particular method, Scala 3 fails to compile that pattern for some reason. WHY
+      new RichChildOptionReceiver(child.maybe) <-- Val(maybeComponent)
     }
 
     implicit def componentSeqToInserter[Component: RenderableNode](components: collection.Seq[Component]): Inserter.Base = {

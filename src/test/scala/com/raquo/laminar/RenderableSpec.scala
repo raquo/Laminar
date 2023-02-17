@@ -340,4 +340,174 @@ class RenderableSpec extends UnitSpec {
     // - 1 pilot subscription for child element
     assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 15)
   }
+
+  it("RenderableText with child and child.text") {
+
+    val bus = new EventBus[Int]
+
+    val el = div(
+      child <-- bus.events.map {
+        case 0 => "empty-0"
+        case _ => div("div-0")
+      },
+      child <-- bus.events.map {
+        case 0 => 1
+        case _ => div("div-1")
+      },
+      child <-- bus.events.map {
+        case 0 => 2
+        case _ => "text-2"
+      },
+      child <-- bus.events.map {
+        case 0 => new TextInputComponent()
+        case _ => "text-3"
+      },
+      child <-- bus.events.mapTo(new TextNode("4")),
+      child.text <-- bus.events.mapTo(new TextNode("5")),
+      child <-- bus.events.map {
+        case 0 => 6
+        case _ => "text-6"
+      },
+      // #TODO[Scala] I should not need `TextNode` type param here,
+      //  but I can't figure out how to make implicits work.
+      child.text <-- bus.events.map[TextNode] {
+        case 0 => 7
+        case _ => "text-7"
+      }
+    )
+
+    mount(el)
+
+    bus.emit(0)
+
+    expectNode(
+      div of (
+        ExpectedNode.comment,
+        "empty-0",
+        ExpectedNode.comment,
+        "1",
+        ExpectedNode.comment,
+        "2",
+        ExpectedNode.comment,
+        input,
+        ExpectedNode.comment,
+        "4",
+        ExpectedNode.comment,
+        "5",
+        ExpectedNode.comment,
+        "6",
+        ExpectedNode.comment,
+        "7"
+      )
+    )
+
+    bus.emit(1)
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        div of ("div-0"),
+        ExpectedNode.comment,
+        div of ("div-1"),
+        ExpectedNode.comment,
+        "text-2",
+        ExpectedNode.comment,
+        "text-3",
+        ExpectedNode.comment,
+        "4",
+        ExpectedNode.comment,
+        "5",
+        ExpectedNode.comment,
+        "text-6",
+        ExpectedNode.comment,
+        "text-7"
+      )
+    )
+  }
+
+  it("RenderableText with child.maybe") {
+
+    val bus = new EventBus[Int]
+
+    val el = div(
+      child.maybe <-- bus.events.map {
+        case 0 => None
+        case _ => Some(div("div-0"))
+      },
+      child.maybe <-- bus.events.map {
+        case 0 => None
+        case _ => Some(1)
+      },
+      child.maybe <-- bus.events.map {
+        case 0 => Some(2)
+        case _ => Some("text-2")
+      },
+      child.maybe <-- bus.events.map {
+        case 0 => Some(new TextInputComponent())
+        case _ => Some("text-3")
+      },
+      child.maybe <-- bus.events.mapTo(Some(new TextNode("4")))
+    )
+
+    mount(el)
+
+    bus.emit(0)
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        ExpectedNode.comment,
+        ExpectedNode.comment,
+        ExpectedNode.comment,
+        ExpectedNode.comment,
+        "2",
+        ExpectedNode.comment,
+        input,
+        ExpectedNode.comment,
+        "4"
+      )
+    )
+
+    bus.emit(1)
+
+    expectNode(
+      div of(
+        ExpectedNode.comment,
+        div of ("div-0"),
+        ExpectedNode.comment,
+        "1",
+        ExpectedNode.comment,
+        "text-2",
+        ExpectedNode.comment,
+        "text-3",
+        ExpectedNode.comment,
+        "4"
+      )
+    )
+  }
+
+  it("RenderableText with static children") {
+
+    val el = div(
+      false,
+      "string-0",
+      1,
+      2.0,
+      if (true) "string-3" else 3,
+      if (true) 4 else "string-4",
+    )
+
+    mount(el)
+
+    expectNode(
+      div of (
+        "false",
+        "string-0",
+        "1",
+        "2",
+        "string-3",
+        "4"
+      )
+    )
+  }
 }

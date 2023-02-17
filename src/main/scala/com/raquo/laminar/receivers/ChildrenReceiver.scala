@@ -2,6 +2,7 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.modifiers.{ChildrenInserter, Inserter, RenderableNode}
+import com.raquo.laminar.nodes.ChildNode
 
 import scala.collection.immutable
 
@@ -14,6 +15,10 @@ object ChildrenReceiver {
   // a version that works with arrays and mutable Seq-s too.
   // Let me know if you have a compelling use case for this.
 
+  def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): Inserter.Base = {
+    ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable)
+  }
+
   def <--[Component](
     childrenSource: Source[immutable.Seq[Component]]
   )(
@@ -21,14 +26,4 @@ object ChildrenReceiver {
   ): Inserter.Base = {
     ChildrenInserter(childrenSource.toObservable, renderableNode)
   }
-
-  // #TODO[API] I disabled this method because the more general <-- method below
-  //  covers this use case as well. Retaining both methods eliminates the need for
-  //  implicit resolution (user code compilation should be a bit faster), however
-  //  it also degrades user experience with hard-to-parse "overloaded method with
-  //  alternatives..." compiler errors when the user provides the wrong type of
-  //  `childrenSource`.
-  // def <--(childrenSource: Source[Children]): Inserter.Base = {
-  //   ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable)
-  // }
 }
