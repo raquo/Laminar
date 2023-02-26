@@ -2,13 +2,22 @@ package com.raquo.laminar
 
 package object codecs {
 
+  @deprecated("This used to be a subtrait of Codec, but now it's just a type alias. It will be removed later.")
+  type AsIsCodec[V] = Codec[V, V]
+
+  def AsIsCodec[V](): Codec[V, V] = new Codec[V, V] {
+    override def encode(scalaValue: V): V = scalaValue
+
+    override def decode(domValue: V): V = domValue
+  }
+
   // String Codecs
 
-  val StringAsIsCodec: AsIsCodec[String] = AsIsCodec()
+  val StringAsIsCodec: Codec[String, String] = AsIsCodec()
 
   // Int Codecs
 
-  val IntAsIsCodec: AsIsCodec[Int] = AsIsCodec()
+  val IntAsIsCodec: Codec[Int, Int] = AsIsCodec()
 
   lazy val IntAsStringCodec: Codec[Int, String] = new Codec[Int, String] {
 
@@ -19,7 +28,7 @@ package object codecs {
 
   // Double Codecs
 
-  lazy val DoubleAsIsCodec: AsIsCodec[Double] = AsIsCodec()
+  lazy val DoubleAsIsCodec: Codec[Double, Double] = AsIsCodec()
 
   lazy val DoubleAsStringCodec: Codec[Double, String] = new Codec[Double, String] {
 
@@ -30,7 +39,7 @@ package object codecs {
 
   // Boolean Codecs
 
-  val BooleanAsIsCodec: AsIsCodec[Boolean] = AsIsCodec[Boolean]()
+  val BooleanAsIsCodec: Codec[Boolean, Boolean] = AsIsCodec()
 
   val BooleanAsAttrPresenceCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
 

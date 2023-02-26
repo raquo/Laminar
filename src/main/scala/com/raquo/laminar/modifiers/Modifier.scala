@@ -5,11 +5,9 @@ import com.raquo.laminar.nodes.ReactiveElement
 
 /** This type represents an operation that has a side effect on a node of type [[El]].
   *
-  * For example: `attrs.href := "http://example.com"` is a Modifier that sets the href attribute to an
-  * example URL when invoked on an element (typically when the element is mounted, or if the modifier
+  * For example: `href := "http://example.com"` is a Modifier that sets the href attribute to an
+  * example URL when invoked on an element (typically when the element is created, or if the modifier
   * is added after the fact using the `amend` method, or by manually calling its `apply` method).
-  *
-  * We're defining a specific trait for this because we expect to have implicit conversions into this type.
   *
   * If you choose to extend this trait, make sure to understand how to use [[Transaction.onStart.shared]].
   * In simple cases, wrapping your callback in it similarly to [[Modifier.apply]] below will probably work.
