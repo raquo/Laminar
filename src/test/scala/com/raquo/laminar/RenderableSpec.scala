@@ -154,13 +154,13 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Solo.child"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Option.child.maybe"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "List.children"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Vector.children")
       )
     )
@@ -184,15 +184,15 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Solo.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Solo.child.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Option.child.maybe.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "List.children.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Vector.children.onMountInsert")
       )
     )
@@ -291,13 +291,13 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of (
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Solo.child"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Option.child.maybe"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "List.children"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Vector.children")
       )
     )
@@ -321,15 +321,15 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of (
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Solo.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Solo.child.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Option.child.maybe.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "List.children.onMountInsert"),
-        ExpectedNode.comment,
+        sentinel,
         input of (idAttr is "Vector.children.onMountInsert")
       )
     )
@@ -382,21 +382,21 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of (
-        ExpectedNode.comment,
+        sentinel,
         "empty-0",
-        ExpectedNode.comment,
+        sentinel,
         "1",
-        ExpectedNode.comment,
+        sentinel,
         "2",
-        ExpectedNode.comment,
+        sentinel,
         input,
-        ExpectedNode.comment,
+        sentinel,
         "4",
-        ExpectedNode.comment,
+        sentinel,
         "5",
-        ExpectedNode.comment,
+        sentinel,
         "6",
-        ExpectedNode.comment,
+        sentinel,
         "7"
       )
     )
@@ -405,21 +405,21 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         div of ("div-0"),
-        ExpectedNode.comment,
+        sentinel,
         div of ("div-1"),
-        ExpectedNode.comment,
+        sentinel,
         "text-2",
-        ExpectedNode.comment,
+        sentinel,
         "text-3",
-        ExpectedNode.comment,
+        sentinel,
         "4",
-        ExpectedNode.comment,
+        sentinel,
         "5",
-        ExpectedNode.comment,
+        sentinel,
         "text-6",
-        ExpectedNode.comment,
+        sentinel,
         "text-7"
       )
     )
@@ -455,15 +455,15 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
-        ExpectedNode.comment,
-        ExpectedNode.comment,
-        ExpectedNode.comment,
-        ExpectedNode.comment,
+        sentinel,
+        sentinel,
+        sentinel,
+        sentinel,
+        sentinel,
         "2",
-        ExpectedNode.comment,
+        sentinel,
         input,
-        ExpectedNode.comment,
+        sentinel,
         "4"
       )
     )
@@ -472,15 +472,15 @@ class RenderableSpec extends UnitSpec {
 
     expectNode(
       div of(
-        ExpectedNode.comment,
+        sentinel,
         div of ("div-0"),
-        ExpectedNode.comment,
+        sentinel,
         "1",
-        ExpectedNode.comment,
+        sentinel,
         "text-2",
-        ExpectedNode.comment,
+        sentinel,
         "text-3",
-        ExpectedNode.comment,
+        sentinel,
         "4"
       )
     )
