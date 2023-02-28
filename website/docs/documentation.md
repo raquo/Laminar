@@ -14,14 +14,17 @@ title: Documentation
   * [Missing Keys](#missing-keys)
   * [Modifiers FAQ](#modifiers-faq)
 * [Rendering](#rendering)
-  * [Application Initialization](#application-initialization)
+  * [Waiting for the DOM to load](#waiting-for-the-dom-to-load)
 * [Reactive Data](#reactive-data)
   * [Attributes and Properties](#attributes-and-properties)
   * [Event Streams and Signals](#event-streams-and-signals)
   * [Individual Children](#individual-children)
+  * [Text and Text-like values](#text-and-text-like-values)
+  * [Rendering Custom Components](#rendering-custom-components)
   * [Lists of Children](#lists-of-children)
     * [children <-- observableOfElements](#children----observableofelements)
-    * [Performant Children Rendering – split](#performant-children-rendering--split) 
+    * [Performant Children Rendering – split](#performant-children-rendering--split)
+    * [Splitting Without a Key](#splitting-without-a-key)
     * [Performant Children Rendering – children.command](#performant-children-rendering--childrencommand)
   * [Binding Observables](#binding-observables)
   * [Other Binders](#other-binders)
@@ -32,13 +35,16 @@ title: Documentation
 * [Event System: Emitters, Processors, Buses](#event-system-emitters-processors-buses)
   * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
   * [EventBus](#eventbus)
-  * [composeEvents](#composeevents)
-  * [element.events](#elementevents)
-  * [Multiple Event Listeners](#multiple-event-listeners)
+  * [Arrow Methods Syntax Sugar](#arrow-methods-syntax-sugar)
+  * [`:=> Unit` Sinks](#-unit-sinks)
+  * [Transforming Observers](#transforming-observers)
   * [Event Processors](#event-processors)
     * [preventDefault & stopPropagation](#preventdefault--stoppropagation)
     * [useCapture](#usecapture)
     * [Obtaining Typed Event Target](#obtaining-typed-event-target)
+  * [element.events](#elementevents)
+  * [Compose and flatMap Events](#compose-and-flatmap-events)
+  * [Multiple Event Listeners](#multiple-event-listeners)
   * [Window & Document Events](#window--document-events)
 * [Controlled Inputs](#controlled-inputs)
 * [Ownership](#ownership)
@@ -48,12 +54,12 @@ title: Documentation
   * [What Is Mounting?](#what-is-mounting)
   * [onMountCallback](#onmountcallback)
   * [onUnmountCallback & onMountUnmountCallback](#onunmountcallback--onmountunmountcallback)
-  * [onMountSet](#onmountset)
   * [onMountBind](#onmountbind)
   * [onMountInsert](#onmountinsert)
   * [Why Use Lifecycle Hooks?](#why-use-lifecycle-hooks)
   * [Lifecycle Event Timing](#lifecycle-event-timing)
   * [How Are Mount Events Propagated?](#how-are-mount-events-propagated)
+* [Integrations With Other Libraries](#integrations-with-other-libraries)
 * [URL Routing](#url-routing)
 * [Special Cases](#special-cases)
 
@@ -63,34 +69,36 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v0.14.2**. For other versions, see below.
+This documentation is for Laminar version **v15.0.0**. For other versions, see below.
 
 | Laminar | Airstream |
 | :--- | :--- |
 | **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v0.14.2](https://laminar.dev/documentation)** | **[v0.14.2](https://github.com/raquo/Airstream/blob/v0.14.2/README.md)** |
+| **[v15.0.0](https://laminar.dev/documentation)** | **[v15.0.0](https://github.com/raquo/Airstream/blob/v15.0.0/README.md)** |
+| **[v0.14.2](https://github.com/raquo/Laminar/blob/v0.14.2/docs/Documentation.md)** | **[v0.14.2](https://github.com/raquo/Airstream/blob/v0.14.2/README.md)** |
 | **[v0.13.1](https://github.com/raquo/Laminar/blob/v0.13.1/docs/Documentation.md)** | **[v0.13.0](https://github.com/raquo/Airstream/blob/v0.13.0/README.md)** |
 | **[v0.12.2](https://github.com/raquo/Laminar/blob/v0.12.2/docs/Documentation.md)** | **[v0.12.2](https://github.com/raquo/Airstream/blob/v0.12.2/README.md)** |
 
 
 For documentation of older versions, see git tags.
 
-[Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/com/raquo/airstream/index.html)
+[Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_3/latest/com/raquo/airstream/index.html)
 
 Laminar is very simple under the hood. Don't be afraid to use "Go to definition" functionality of your IDE to see how a certain method works. That said, the documentation provided here explains the mechanics of Laminar in great detail. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.
 
-If you're new here, watching [the Laminar video](https://www.youtube.com/watch?v=L_AHCkl6L-Q) will be time well spent – it's a good introduction to Laminar, covering both the inner workings and the big ideas.
+If you're new here, watching [the Laminar video](https://www.youtube.com/watch?v=L_AHCkl6L-Q) will be time well spent – it's a good introduction to Laminar, covering both the big ideas and some inner workings.
 
 See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https://laminar.dev/examples/hello-world).
 
-If you want to follow along with an IDE, download one of the starter kit projects from the [Resources](https://laminar.dev/resources) page, or learn how to render your app in the [Rendering](#rendering) section.
+If you want to follow along with an IDE, download one of the starter kit projects from the [Resources](https://laminar.dev/resources) page, or learn how to render your app in the [Rendering](#rendering) section below.
+
 
 
 ## Dependencies
 
 Add Laminar to `libraryDependencies` of your Scala.js project in `build.sbt`:
 
-    "com.raquo" %%% "laminar" % "0.13.1"  // Requires Scala.js >= 1.5.0
+    "com.raquo" %%% "laminar" % "15.0.0"  // Requires Scala.js 1.13.0
 
 Laminar depends on Airstream. Every Laminar version includes the latest version of Airstream that was available at the time it was published. If you ever have a reason to use a slightly newer version of Airstream without upgrading Laminar, add this to your `build.sbt` as well:
 
@@ -103,29 +111,32 @@ The html/svg tags, attributes, props, styles, and event names in Laminar come fr
 Laminar also uses [scala-js-dom](http://scala-js.github.io/scala-js-dom/). As it is a very thin interface to native JS types, you can generally use a higher version of scala-js-dom than what Laminar uses without any issue.
 
 
+
 ## Imports
 
-You have two import choices: `import com.raquo.laminar.api.L._` (or `L.{*, given}` in Scala 3) is the easiest, it brings everything you need from Laminar in scope. Unless indicated otherwise, this import is assumed for all code snippets in this documentation.
+You have two import choices: `import com.raquo.laminar.api.L.{*, given}` (or `L._` in Scala 2) is the easiest, it brings everything you need from Laminar in scope. Unless indicated otherwise, this import is assumed for all code snippets in this documentation.
 
-Usually you will not need any other imports. In this documentation you will see references to Laminar types and values that are not available with just this one import because we spell out the types for the sake of explanation. Most of those are available as aliases in the `L` object. For example, `ReactiveHtmlElement[dom.html.Element]` is aliased as simply `HtmlElement`, and `Modifier[El]` as `Mod[El]`.
+Usually you will not need any other Laminar imports. In this documentation you will occasionally see references to some Laminar types and values that are not available with just this one import because we spell out the types for the sake of explanation. Most of those are available as aliases in the `L` object. For example, `ReactiveHtmlElement[dom.html.Element]` is aliased as simply `HtmlElement`, and `Modifier[El]` as `Mod[El]`.
 
-However, you might want to avoid bringing so many values into scope, so instead you can `import com.raquo.laminar.api._` (or `api.{*, given}` in Scala 3), and access Laminar and Airstream values and types with `L` and `A` prefixes respectively, e.g. `A.EventStream`, `L.div`, etc.`
+Alternatively, you might want to avoid bringing so many values into scope, so instead you can `import com.raquo.laminar.api.{*, given}` (or `api._` in Scala 2), and access Laminar and Airstream values and types with `L` and `A` prefixes respectively, e.g. `A.EventStream`, `L.div`, etc.`
 
 There are special import considerations for working with [SVG elements](#svg).
 
 Do check out the available aliases in the `L` object. It's much more pleasant to write and read `Mod[Input]` than `Modifier[ReactiveHtmlElement[dom.html.Input]]`.
 
-Another import you will want in some cases is `import org.scalajs.dom` – whenever you see `dom.X` in documentation, this import is assumed. This object contains [scala-js-dom](https://github.com/scala-js/scala-js-dom) native JS DOM types. I highly recommend that you import this `dom` object and not `dom._` as the `dom.` prefix will help you distinguish native JS platform types from Laminar types.
+Another import you will want in some cases is `import org.scalajs.dom` – whenever you see `dom.X` in documentation, this import is assumed. This object contains [scala-js-dom](https://github.com/scala-js/scala-js-dom) native JS DOM types. I highly recommend that you import this `dom` object and not `dom.*` or `dom._` because the `dom.` prefix will help you distinguish native JS platform types from Laminar types.
 
 
 
 ## Tags & Elements
 
-Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) listings of typed HTML & SVG tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`.
+Laminar uses [Scala DOM Types](https://github.com/raquo/scala-dom-types) to generate listings of typed HTML & SVG tags, attributes, props, event props, etc. For example, this is how we know that `onClick` events produce `dom.MouseEvent` events and not `dom.KeyboardEvent`.
 
-`div` is an `HtmlTag[dom.html.Div]`. It's a factory of div elements. `HtmlTag` extends `Tag` from _Scala DOM Types_ and contains basic information needed to create such an element, such as its tag name ("div").
+`div` is an `HtmlTag[dom.html.Div]`. It's a factory of `<div>` HTML elements. `HtmlTag` extends `Tag` from _Scala DOM Types_ and contains basic information needed to create such an element, such as its tag name ("div").
 
 `div()` is a `ReactiveHtmlElement[dom.html.Div]` (aliased as `Div`). The `apply` method created a Laminar Div element that is linked to the real JS DOM element that it represents. If you need to, you can access the underlying JS DOM element via the `.ref` property. This is useful mostly for event handlers and third party integrations.
+
+This particular `Div` type has no special features, it simply indicates that the tag name is `div`. If you don't care about the type of your HTML element, you can use the more general `HtmlElement` type (alias for `ReactiveHtmlElement[dom.html.Element]`) in your method signatures.
 
 `div()` is **not** a virtual DOM element. When you create a Laminar element, Laminar immediately creates the underlying `dom.Element` as well. That reference is immutable, so these two instances will go together for the duration of their lifetimes. In contrast, in a virtual DOM library (which Laminar is not) you typically create new instances of virtual elements when they change, and these get loosely matched to a `dom.Element` which could actually be a different element over time depending on how the updates that you're requesting and the implementation of virtual DOM's diffing algorithm.  
 
@@ -141,19 +152,22 @@ The `div()` call described above creates an empty div element – no children, n
 input(typ := "checkbox", defaultChecked := true)
 ```
 
-This creates an `input` Laminar element and sets two attributes on it. It's mostly obvious what it does, but how?
+This creates an `<input>` Laminar element and sets two attributes on it. It's mostly obvious what it does, but how?
 
 As we've established before, `input()` call is actually `HtmlTag[El].apply(modifiers: Modifier[El]*)`. So, we can pass Modifiers to it. A `Modifier[El]` (aliased as `Mod[El]`) is a simple trait with an `apply(element: El): Unit` method. Conceptually, it's a function that you can apply to an element `El` to modify it in some way. In our case, `typ := "checkbox"` is a `Modifier` that sets the `type` attribute on an element to `"checkbox"`.
 
-`typ` is a `ReactiveHtmlAttr`, and `:=` is simply a method on it that creates a `Setter` – a `Modifier` that sets a specific key to a specific value. You can set DOM props and CSS style props the same way (e.g. `backgroundColor := "red"`)
+`typ` is an `HtmlAttr`, and `:=` is simply a method on it that creates a `Setter` – a `Modifier` that sets a specific key to a specific value. You can set DOM props and CSS style props the same way (e.g. `backgroundColor := "red"`)
 
-`typ` is coming from _Scala DOM Types_ and represents the "type" attribute. You should consult _Scala DOM Types_ documentation for a list of [naming differences](https://github.com/raquo/scala-dom-types#naming-differences-compared-to-native-html--dom) relative to the native JS DOM API. It will also explain why the `checked` attribute is called `defaultChecked`, and why it accepts a boolean even though all HTML attributes only ever deal in strings in JS DOM ([Codecs](https://github.com/raquo/scala-dom-types#codecs)).
+`typ` is originally coming from _Scala DOM Types_ and represents the "type" attribute. You should consult _Scala DOM Types_ documentation for a list of [naming differences](https://github.com/raquo/scala-dom-types#naming-differences-compared-to-native-html--dom) relative to the native JS DOM API. It will also explain why the `checked` attribute is called `defaultChecked`, and why it accepts a boolean even though all HTML attributes only ever deal in strings in JS DOM ([Codecs](https://github.com/raquo/scala-dom-types#codecs)).
 
-Note: the `apply` method on attributes and other keys is aliased to `:=` in case you prefer a slightly shorter syntax:
+Note: the `apply` method on attributes and other keys is an alias for `:=` in case you prefer a slightly shorter syntax and less pain in your fingers:
 
 ```scala
 input(typ("checkbox"), defaultChecked(true)) // 100% equivalent to the previous snippet
-```  
+```
+
+The documentation will mostly use the `:=` name because I think it's more obvious to beginners.
+
 
 
 ### Nesting and Children
@@ -176,15 +190,31 @@ div(
 )
 ```
 
-Well, a tiny bit of magic – strings are not modifiers themselves, but are implicitly converted to `TextNode` (Laminar text nodes) which _are_ modifiers that append plain JS text nodes with a given text to the element in question. They are not implicitly wrapped into `span` elements.
+Well, a tiny bit of magic – strings are not modifiers themselves, but are implicitly converted to `TextNode` (Laminar text nodes) which _are_ modifiers that append plain JS text nodes with a given text to the element in question. They are **not** implicitly wrapped into `span` elements.
 
-For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq: see `Implicits.seqToModifier`. This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs.
+In fact, this conversion works not only for strings, but also for other primitive types like numbers and booleans. If you want Laminar to render your custom type `A` in a similar manner, define an implicit instance of `RenderableText[A]` for it.
 
-`Implicits.optionToModifier` performs a similar conversion for `Option[Modifier[A]]`. We also have `emptyMod`, a universal Modifier that does nothing, for when you don't want to wrap your stuff in Option-s.
+For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[A]` that applies all the modifiers in the Seq: see `Implicits.seqToModifier`, `arrayToModifier`, etc. This is especially useful when making a component that accepts modifiers as VarArgs. Such design is one way to let users configure the component's elements without the component needing to whitelist all possible configurations in its list of inputs:
+
+```scala
+// Simple component
+def TextInput(inputMods: Modifier[Input]*): HtmlElement =
+  div(
+    cls := "TextInput",
+    input(type := "text", inputMods)
+  )
+
+// Usage (data binding with arrows will be explained later)
+div(
+  TextInput(defaultValue := "Enter your age", value <-- ageVar, onInput --> ageVar)
+)
+```
+
+`Implicits.optionToModifier` and `nodeOptionToModifier` perform similar conversions for `Option[Modifier[A]]`. We also have `emptyMod`, a universal Modifier that does nothing, for when you don't want to wrap your stuff in Option-s.
 
 Modifiers are applied in the order in which they're passed to the element, so in terms of children ordering what you see in your code is what you get in the resulting DOM.
 
-Notice that the code snippet above does not require you to HTML-escape `"&"` or `"<"`. You're just writing Scala code, you're not writing HTML (or anything that will be parsed as HTML), so don't worry about HTML escaping when using Laminar API. **However**, this warranty is void when you manually invoke native Javascript APIs (e.g. anything under `.ref`, or any interfaces provided by [scala-js-dom](https://github.com/scala-js/scala-js-dom)). Then you need to know Javascript and the DOM API to know what's safe and what [isn't](https://security.stackexchange.com/questions/32347/dom-based-xss-attacks-what-is-the-most-dangerous-example).
+Notice that the code snippet in the beginning of this section does not require you to HTML-escape `"&"` or `"<"`. You're just writing Scala code, you're not writing HTML (or anything that will be parsed as HTML), so don't worry about HTML escaping when using Laminar API. **However**, this warranty is void when you manually invoke native Javascript APIs (e.g. anything under `.ref`, or any interfaces provided by [scala-js-dom](https://github.com/scala-js/scala-js-dom)). Then you need to know Javascript and the DOM API to know what's safe and what [isn't](https://security.stackexchange.com/questions/32347/dom-based-xss-attacks-what-is-the-most-dangerous-example).
 
 ---
 
@@ -195,7 +225,7 @@ Note: this section of documentation only explained how to render **static** data
 
 Laminar does not attempt to parse your strings as HTML, so there is no need to use [HTML entities](https://developer.mozilla.org/en-US/docs/Glossary/Entity) like `"&nbsp;"` or `"&amp;"`. Instead, you just insert the actual character into your Scala strings.
 
-Laminar actually provides a shorthand for non-breaking space – `nbsp`, and for any other special characters you can just use them verbatim, e.g. `"»"` instead of  or `"&raquo;"`.
+Laminar actually provides a shorthand for non-breaking space – `nbsp` – because it would otherwise be visually indistinguishable from regular space in your code. For any other special characters you can just use them verbatim, e.g. `"»"` instead of  or `"&raquo;"`.
 
 ```scala
 div(s"${date}${nbsp}${time}")
@@ -206,7 +236,7 @@ div("Features — not bugs") // `—` instead of `&emdash;`
 
 ### Empty Nodes
 
-Thanks to the `optionToModifier` implicit mentioned above, you can use `Option[ReactiveElement]` where a `Modifier` is expected, but in other cases you might not want to deal with Option's boxing.  
+Thanks to the `nodeOptionToModifier` implicit mentioned above, you can use `Option[ReactiveElement]` where a `Modifier` is expected, but in other cases you might not want to deal with Option's boxing.  
 
 And so, an empty DOM node can be created with... `emptyNode`.
 
@@ -214,7 +244,7 @@ And so, an empty DOM node can be created with... `emptyNode`.
 val node: Node = if (foo) element else emptyNode
 ```
 
-`emptyNode` outputs an empty HTML comment node, which is a `CommentNode`, not a `ReactiveElement`. Their common type is `ChildNode[dom.Node]`, aliased as simply `Node`. This distinction comes from JS world where `dom.Comment` nodes and `dom.Text` nodes can't have children, and are not `dom.Element`-s.
+`emptyNode` outputs an empty HTML comment node, which is a `CommentNode`, not a `ReactiveElement`. Their common type is `ChildNode[dom.Node]`, aliased as simply `Node`. This type hierarchy mirrors the JS world where `dom.Comment` nodes and `dom.Text` nodes are not `dom.Element`-s, but all of them are `dom.Node`-s.
 
 
 ### Manual Application
@@ -277,12 +307,12 @@ div(
 
 And of course, every Modifier has a public `apply(element: El)` method that you can use to manually apply it to any element, for example: `(color := "red")(element)`.
 
-Using manual application is only encouraged when it's not enabling imperative coding patterns. You should learn to use [Reactive Data](#reactive-data) effectively before you sprinkle your code with manual applications.
+Using `amend` judiciously is the backbone of good Laminar component patterns, but make sure that you don't over-rely on manual applications of modifiers as this can result in a messy imperative codebase. Learn to use [Reactive Data](#reactive-data) effectively.
 
 
 ### inContext
 
-Sometimes you may need to have a reference to the element before you can decide which modifier to apply to it. For example, one use case is getting dimensions or coordinates in response to some event.
+Sometimes you need to have a reference to the element before you can decide which modifier to apply to it. For example, one use case is getting dimensions or coordinates in response to some event.
 
 ```scala
 div(inContext(thisNode => onClick.mapTo(getCoordinates(thisNode)) --> bus))
@@ -308,7 +338,7 @@ thisNode.amend(
 
 But these are of course rather cumbersome. `inContext` provides an easy, inline solution that always works.
 
-Note: all the unfamiliar syntax used here will be explained in other sections of this documentation. 
+Note: all the unfamiliar syntax used here will be explained in subsequent sections of this documentation. 
 
 
 #### When not to use `inContext`
@@ -327,13 +357,19 @@ You also don't need `inContext` to apply stream operators to events. In older ve
 div(inContext { _.events(onClick).delay(10) --> observer })
 ```
 
-Whereas today you can use the `composeEvents` method:
+or use a weirdly curried `composeEvents` method:
 
 ```scala
 div(composeEvents(onClick)(_.delay(10)) --> observer)
 ```
 
-Or even `delay` on the observer side:
+Nowadays we have a more straightforward `compose` method that lets you use stream operators with DOM events:
+
+```scala
+div(onClick.compose(_.delay(10)) --> observer)
+```
+
+You can also use `delay` on the observer side:
 
 ```scala
 div(onClick --> observer.delay(10))
@@ -342,22 +378,29 @@ div(onClick --> observer.delay(10))
 
 ### Reusing Elements
 
-**Do not.** An element can only have one parent element at a time, so you can't put the same element twice into the real JS DOM – instead, it will be removed from its old location and **moved** into its new location. That's just how the browser DOM works. Laminar does not protect you from doing this for performance reasons, so you need to avoid this on your own, or you will run into unexpected behaviour.
+**Do not.** An element can only have one parent element at a time, so you can't put the same element into two different locations in the DOM at the same time – instead of being "copied" to the new location, the element will be **removed** from its old location and **moved** into its new location. If you feel the need to "copy" an element like this, you probably just want to make the element a `def` instead of a `val`, so that accessing it the second time would create a new element with the same props / attrs / etc. instead of resuing the original instance which is already used elsewhere. 
 
-On a related note, it *is* safe to unmount a Laminar element and then re-mount it in any location, assuming that you use Laminar methods to achieve that, and that you don't compete with any other `child <--` or `children <--` bindings you've set up for the same set of elements.
+For example, this contrieved code will not render "hello" twice. It will put the `span` inside the outer div, then immediately move it to the inner div, so "hello" will only be rendered once, inside the inner div.
+
+```scala
+val el = span("hello")
+div(el, div(el))
+```
+
+If that is what you wanted, that's fine, Laminar will not break, it's just weird. However, you probably intended to render "hello" twice, in both the outer and inner div, and for that you want to make `el` a `def` instead of a `val`, so that when it's used the second time, a new element is created instead of reusing the first instance of `el`.
 
 
 ### Missing Keys
 
-Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from [Scala DOM Types](https://github.com/raquo/scala-dom-types). These definitions provide hundreds of keys, but are not exhaustive. For example, we don't have touch events like `touchmove` defined, so those are not available to be put on the left hand side of `:=` methods.
+Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from [Scala DOM Types](https://github.com/raquo/scala-dom-types). These definitions provide hundreds of keys, but they are not exhaustive. For example, we don't have touch events like `touchmove` defined, so those are not available to be put on the left hand side of `:=` methods.
 
-To work around this, you can contribute definitions of missing keys to Scala DOM Types. It's easy – you don't even need to code any logic, just specify the names and types of the things you want to add. See the [Contribution Guide](https://github.com/raquo/scala-dom-types/blob/master/CONTRIBUTING.md) and an [example PR](https://github.com/raquo/scala-dom-types/pull/16/files).
+To work around this, you can contribute definitions of missing attrs / props / etc. to Scala DOM Types. It's easy – you don't even need to code any logic, just need to specify the names and types of the things you want to add. For example, the `value` property is defined at the bottom of [PropDefs.scala](https://github.com/raquo/scala-dom-types/blob/master/shared/src/main/scala/com/raquo/domtypes/defs/props/PropDefs.scala). Read [this](https://github.com/raquo/scala-dom-types/#reflected-attributes) to understand the difference between props and attributes and reflected attributes.
 
 Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:
 
 ```scala
-val superValue: HtmlProp[String] = customProp("superValue", StringAsIsCodec) // imaginary prop
-val onTouchMove: ReactiveEventProp[dom.TouchEvent] = customEventProp("touchmove")
+val superValue: HtmlProp[String] = htmlProp("superValue", StringAsIsCodec) // imaginary prop
+val onTouchMove: EventProp[dom.TouchEvent] = eventProp("touchmove")
 
 div(
   superValue := "imaginary prop example",
@@ -365,16 +408,16 @@ div(
 )
 ```
 
-And similarly with `customStyleProp`, `customHtmlAttr`, `customHtmlTag`, `customSvgAttr`, `customSvgTag`. 
+And similarly with `styleProp`, `htmlAttr`, `htmlTag`, `svgAttr`, `svgTag`.
 
 To clarify, you don't have to do this for touch events specifically, because [@Busti](https://github.com/busti) already added the superior [pointer-events](https://github.com/raquo/scala-dom-types/pull/49) to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
 
 
 ### Modifiers FAQ
 
-1. Yes, you can create custom Modifiers by simply extending the Modifier trait. You could for example define attributes or CSS props that are missing from _Scala DOM Types_ by extending `ReactiveHtmlAttr` or `ReactiveStyle`, or for completely custom logic you could create a class extending the base `Modifier` trait. That way you could for example make a modifier that applies multiple other modifiers that you often use together.
+1. Yes, you can create custom Modifiers by simply extending the Modifier trait. However, if your modifier creates **multiple** subscriptions / binds **multiple** observables, you should look at the implementation of `Modifier.apply`, and if applicable, wrap the part of your code that creates several subscriptions at once in `Transaction.onStart.shared`.
 
-2. No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results from applying it only once. `Setter`s like `key := value` _are_ idempotent, but for example a `Binder` like `onClick --> observer` isn't. We will talk more about those modifier types later.
+2. No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results compared to applying it only once. `Setter`s like `key := value` _are_ idempotent, but for example a `Binder` like `onClick --> observer` isn't – applying it twice will create two independent subscriptions. We will talk more about those modifier types later.
 
 4. Yes, Modifiers are generally reusable. The same modifier can usually be applied to multiple nodes without any conflict. But again, you have to understand what the modifier does. Setting an attribute to a particular value – sure, reusable. Adding a particular element as a child – no, not reusable – see [Reusing Elements](#reusing-elements). If you're writing your own Modifier and want to make it reusable, don't store element-specific state outside of its `apply` method.
 
@@ -384,7 +427,7 @@ To clarify, you don't have to do this for touch events specifically, because [@B
 
 When you create a Laminar element, the underlying real JS DOM element (`.ref`) is created at the same time. However, it is initially detached from the DOM. That is, it does not appear in the document that the user sees. Such an element is _unmounted_.
 
-For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by Laminar. 
+For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that already is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by Laminar. 
 
 ```scala
 val appContainer: dom.Element = dom.document.querySelector("#appContainer")
@@ -399,30 +442,35 @@ val root: RootNode = render(appContainer, appElement)
 
 That's it. Laminar will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
 
-Note: if `appContainer` was not present in the DOM when you called `render()`, you will need to manually call `root.mount()` to mount `appElement`. More on this in [Element Lifecycle Hooks](#element-lifecycle-hooks).
-
-To remove `appElement` from the DOM, simply call `root.unmount()`.
+To remove `appElement` from the DOM, simply call `root.unmount()`. You can later call `root.mount()` to bring it back.
 
 
 ### Waiting for the DOM to load
 
-Laminar's `render()` method expects the container element to be present in the DOM already. However, this might not be the case if your script is executed before the browser has finished building the DOM. To work around this, you need to call the `render` method after the browser has fired the `DOMContentLoaded` event. You can do this manually with native JS `addEventListener`, or less manually using Laminar's `documentEvents.onDOMContentLoaded` stream, or – preferably – just call Laminar's `renderOnDomContentLoaded` method instead of `render`.
-
-When calling `renderOnDomContentLoaded`, make sure the `container` parameter you pass to it is evaluated on demand only (e.g. it's provided inline, or if not, is stored in a `def` or `lazy val`, not in a `val`), otherwise you'll face the same problem.
-
-
-### Application Initialization
-
 When and where should you call Laminar's render method? Assuming you want your entire application to be powered by Laminar, you want to render your application as soon as the web page containing it loads.
 
-However, what does "loads" mean, exactly? If you just put your code in your Scala.js app's `main` method, it will execute right after the `<script>` tag containing your Scala.js bundle was downloaded. At this point, accessing `dom.document.querySelector("#appContainer")`, will probably not work, because the browser hasn't parsed that HTML element yet (script downloads and execution block DOM parsing).
+However, what does "loads" mean, exactly? If you just put your code in your Scala.js app's `main` method, it will execute right after the `<script>` tag containing your Scala.js bundle was downloaded. At this point, accessing `dom.document.querySelector("#appContainer")` will probably not work, because the browser probably hasn't parsed that HTML element yet (`<script>` blocks DOM parsing until it's downloaded and executed).
 
-So, you probably want to render your application in response to the browser firing the [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event) event:
+So, you probably want to render your application in response to the browser firing the [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event) event. You can do this manually with native JS `addEventListener`, or less manually using Laminar's `documentEvents(_.onDOMContentLoaded)` stream, or – preferably – simply call Laminar's `renderOnDomContentLoaded` method instead of `render`:
  
 ```scala
 object App {
   def main(args: Array[String]): Unit = {
-    documentEvents.onDomContentLoaded.foreach { _ =>
+    lazy val appContainer = dom.document.querySelector("#appContainer")
+    val appElement = div(h1("Hello world"))
+    renderOnDomContentLoaded(appContainer, appElement)
+  }
+}
+```
+
+Important: make sure that `appContainer` is a `lazy val` or a `def`, because if that querySelector is executed before the browser parses the DOM, it will return `null`, and Laminar will complain about the null container. Of course, another reason you could be getting a `null` is if the querySelector you provided is not correct. You can test it in the browser dev console.
+
+If you want to delay app rendering until not only the DOM, but all images and stylesheets have also loaded, you can wait for the [window.load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event) event. There is no built-in helper method for that, so you will need to do it more manually:
+
+```scala
+object App {
+  def main(args: Array[String]): Unit = {
+    windowEvents(_.onLoad).foreach { _ =>
       val appContainer = dom.document.querySelector("#appContainer")
       val appElement = div(h1("Hello world"))
       render(appContainer, appElement)
@@ -431,21 +479,19 @@ object App {
 }
 ```
 
-If you want to also wait for images and stylesheets to load, you can use the [window.load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event) event, so just replace `documentEvents.onDomContentLoaded` with `windowEvents.onLoad`. 
-
 
 
 ## Reactive Data
 
-In the code snippet above we're mounting a completely static element – it will not change over time. This section is about creating elements that will one way or another change over time. All of the above were just the basic mechanics, here we're digging into the meat of Laminar, the fun parts.
+In the code snippets above we're mounting a completely static element – it will not change over time. This section is about creating elements that will one way or another change over time. All of the above were just the basic mechanics, here we're digging into the meat of Laminar, the fun parts.
 
-In a virtual DOM library like React or Snabbdom, changing an element over time is achieved by creating a new virtual element that contains the information on what the element should look like, then running a diffing algorithm on this new virtual element and the previous virtual element representing the same real JS DOM element. Said diffing algorithm will come up with a list of operations that need to be performed on the underlying JS DOM element in order to bring it to the state prescribed by the new virtual element you've created.  
+In a virtual DOM library like React or Snabbdom, changing an element over time is achieved by creating a new **virtual** element that contains the information on what the element should look like, then running a **diffing algorithm** on this new virtual element and the previous virtual element representing the same real JS DOM element. Said diffing algorithm will come up with a **list of operations** that need to be performed on the underlying JS DOM element in order to bring it to the state prescribed by the new virtual element you've created.
 
-Laminar does **not** work like that. We use reactive streams to represent things changing over time. Let's see how this is much simpler than any virtual DOM.
+Laminar does **not** work like that. We use reactive observables to represent things changing over time. Let's see how this is much simpler than any virtual DOM.
 
 Laminar uses [Airstream](https://github.com/raquo/Airstream) observables (event streams and signals). Airstream is an integral part of Laminar, and a huge part of what makes it unique.
 
-**To use Laminar effectively, you need to understand the principles of conventional lazy streams, and have basic knowledge of Airstream. Please do read [Airstream documentation](https://github.com/raquo/Airstream), it's not scary.**
+**To use Laminar effectively, you need to understand the principles of conventional lazy streams, and have basic knowledge of Airstream. Please do read [Airstream documentation](https://github.com/raquo/Airstream), it will save you a lot of guesswork.**
 
 
 ### Attributes and Properties
@@ -457,22 +503,26 @@ val prettyColorStream: EventStream[String] = ???
 val myDiv: Div = div(color <-- prettyColorStream, "Hello")
 ```
 
-This creates a div element with the word "Hello" in it, and a dynamic `color` CSS property. Any time the `prettyColorStream` emits an event, this element's `color` property will be updated to the emitted value. 
+This creates a div element with the word "Hello" in it, and a dynamically updated `color` CSS property. Any time the `prettyColorStream` emits an event, this element's `color` property will be updated to the emitted value. 
 
-The method `<--` comes from `ReactiveStyle` (which is what `color` is). It creates a `Binder` modifier that subscribes to the given stream. This subscription is automatically enabled when the div element is added into the DOM, and automatically disabled when the div is removed from the DOM. More on that in the sections [Ownership](#ownership) and [Element Lifecycle Hooks](#element-lifecycle-hooks) way below. Don't worry about that for now.
+The method `<--` is defined on `class StyleProp`, which is the type of `color`. It creates a `Binder` modifier that subscribes to the given stream. This subscription is automatically enabled when the div element is added into the DOM, and automatically disabled when the div is removed from the DOM. More on that in the sections [Ownership](#ownership) and [Element Lifecycle Hooks](#element-lifecycle-hooks) way below. Don't worry about that for now.
+
+The important takeaway here is that `color <-- prettyColorStream` is a Modifier, and so simply writing out that expression does not activate any logic or create any subscription. For the modifier to do its job, you need to pass `color <-- prettyColorStream` to the element on which you want to update the `color` property, like we pass it to `div` in the code snippet above.
+
+To make sure you don't accidentally leave modifiers unused, you might want to enable the Scala compiler's options to warn you about unused and discarded values.
 
 
 ### Event Streams and Signals
 
-What happens before `prettyColorStream` emitted its first event? To understand that, we need a primer on Airstream reactive variables:
+What happens before `prettyColorStream` emits its first event? To understand that, we need a primer on Airstream reactive variables:
 
-- **EventStream** is a lazy Observable without current value. It represents events that happen at discrete points in time. Philosophically, there is no such thing as a "current event" or "initial event", so streams have no initial or "current" value.
+- **EventStream** is a lazy Observable without a concept of "current value". It represents events that happen at discrete points in time. Philosophically, there is no such thing as a "current event" or "initial event", so streams have no initial or "current" value.
 
 - **Signal** are also lazy Observables, but unlike streams they do have a current value. Signal represents state – a value persisted over time. It always has a current value, and therefore it must have an initial value.
 
-The `<--` method subscribes to the given observable and updates the DOM whenever the observable emits. `prettyColorStream` is an EventStream, so it will only emit if and when the next event comes in. So, until that time, laminar will not set the color property to any initial or default value.
+The `<--` method subscribes to the given observable and updates the DOM whenever the observable emits. `prettyColorStream` is an EventStream, so it will only emit if and when the next event comes in. So, until that time, Laminar will not set the color property to any initial or default value.
 
-On the other hand, if `prettyColorStream` was a Signal, the subscription inside the `<--` method would have set the color property to the observable's current value as soon as the element was added to the DOM, and would behave similar to stream subscription afterwards.
+On the other hand, if `prettyColorStream` was a Signal, the subscription inside the `<--` method would have set the color property to the observable's current value as soon as the element was added to the DOM, and would behave similarly to a stream subscription afterwards.
 
 We said that EventStreams and Signals are lazy – that means they wouldn't run without an Observer. By creating a subscription, the `<--` method creates an Observer of the observable that it is given, so we know for sure that it will run (while the element is mounted into the DOM).
 
@@ -485,13 +535,13 @@ So, **Laminar elements manage themselves**. A `ReactiveElement` encapsulates all
 
 ```scala
 // Define your "Component"
-def Caption(caption: String, colorStream: EventStream[String]): Span = {
+def Caption(caption: String, colorStream: EventStream[String]): HtmlElement = {
   span(color <-- colorStream, caption)
 }
  
 // Now use it
 val prettyColorStream: EventStream[String] = ???
-val myDiv: Div = div(
+val myDiv: HtmlElement = div(
   "Hello ",
   Caption("World", prettyColorStream)
 )
@@ -512,7 +562,7 @@ def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = 
 }
 
 val maybeBlogUrlSignal: Signal[Option[String]] = ???
-val app: Div = div(
+val app: HtmlElement = div(
   "Hello, I have ",
   child <-- MaybeBlogUrl(maybeBlogUrlSignal),
   ", isn't it great?"
@@ -523,7 +573,7 @@ It should be pretty obvious what this does: `MaybeBlogUrl` maps input Signal to 
 
 The elements are put in the obvious order – what you see is what you get – so, between _"Hello, I have "_ and _", isn't it great?"_ text nodes. Each next emitted element replaces the previously emitted one in the DOM.
 
-This example uses Signals, but EventStreams work similarly, and there are also `child.maybe` and `child.text` receivers that have more specialized `<--` methods accepting `Observable[Option[Node]]` and `Observable[V]` given `implicit ev: V => TextNode`, respectively.
+This example uses Signals, but EventStreams work similarly.
 
 
 #### Efficiency
@@ -536,22 +586,88 @@ def renderBlogLink(urlSignal: Signal[String]): HtmlElement = {
 }
  
 def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = {
-  val noBlog = i("no blog")
+  lazy val noBlog = i("no blog")
+  
   val maybeLinkSignal: Signal[Option[HtmlElement]] =
-    maybeUrlSignal.split(_ => ())((_, _, urlSignal) => renderBlogLink(urlSignal))
+    maybeUrlSignal.splitOption((_, urlSignal) => renderBlogLink(urlSignal))
+  
   maybeLinkSignal.map(_.getOrElse(noBlog))
 }
 ```
 
-The main hero of this pattern is Airstream's `split` operator. It's designed specifically to avoid re-rendering of elements in this kind of situation. We will explain its operation in detail when talking about performant `children` rendering below, but in short, `renderBlogLink` is called only when maybeUrlSignal switches from `None` to `Some(url)`. When it goes from `Some(url1)` to `Some(url2)`, it's `href <-- urlSignal` that takes responsibility for updating the blog link.
+The main hero of this pattern is Airstream's `split` operator, actually its `splitOption` variation to be more precise. It's designed specifically to avoid re-rendering of elements in this kind of situation. We will explain its operation in detail when talking about performant `children` rendering below, but in short, thanks to `splitOption`, `renderBlogLink` is called only when maybeUrlSignal switches from `None` to `Some(url)`. When it goes from `Some(url1)` to `Some(url2)`, `renderBlogLink` is **not** called, instead, `urlSignal` is updated, and `href <-- urlSignal` updates the blog url inside the already-created `a` element.
 
-Note that we only create one `noBlog` element, and reuse it every time maybeUrlSignal emits `None`.
+Also note that we only create one `noBlog` element, and reuse it every time maybeUrlSignal emits `None`, instead of creating a new such element every time.
 
 ---
 
-You don't actually need to unmount elements in order to hide them. You can achieve a similar effect by rendering both the link and no-link elements at the same time inside a container, and hiding one of them with CSS (`display <-- ...`). That way both elements will remain mounted all the time, but one of them will be hidden.
+You don't actually need to unmount elements in order to hide them from view. You can achieve a similar effect by rendering both the link and no-link elements at the same time inside a container, and hiding one of them with CSS (`display <-- ...`). That way both elements will remain mounted all the time, but one of them will be hidden.
 
-When engaging in such optimizations, you have to ask yourself – is it worth it? Re-creating a JS DOM element – what we were trying to avoid in this example – is only a problem when you need to do it often (performance), or when that element needs to maintain some JS DOM state (e.g. `input` elements will lose focus if re-created). To put this in the context of our example – if `maybeUrlSignal` is expected to emit only a few times during a user session, just use the dumbest shortest version of `MaybeBlogUrl` instead of optimizing it for no reason. But if you're building some kind of BlogRoulette app that updates the blog URL a hundred times per second, or if the element being re-created is very complex (e.g. your entire app or a big section thereof) then yeah, better optimize it.
+When engaging in such optimizations, you have to ask yourself – is it worth it? Re-creating a JS DOM element – what we were trying to avoid in this example – is only a problem when you need to do it often (performance), or when that element needs to maintain some JS DOM state (e.g. `input` elements will lose focus if re-created). To put this in the context of our example – if `maybeUrlSignal` is expected to emit only a few times during a user session, just use the dumbest shortest version of `MaybeBlogUrl` instead of optimizing it for no reason. Less code – less bugs. But if you're building some kind of BlogRoulette app that updates the blog URL a hundred times per second, or if the element being re-created is very complex (e.g. it's your entire app or a big section thereof) then yeah, better optimize it.
+
+
+#### Optional children
+
+If you have an `Observable[Option[Node]]` instead of `Observable[Node]`, and you don't want to render anything when the observable emits `None`, you can use `child.maybe` in a similar manner:
+
+```scala
+val maybeBlogLink: Signal[Option[HtmlElement]] = ???
+div(
+  child.maybe <-- maybeBlogLink
+)
+```
+
+
+### Text and text-like values
+
+If you want to render dynamic text, do **not** do this:
+
+```scala
+val textStream: EventStream[String] = ???
+div(child <-- textStream.map(str => span(str)) // No! Bad!
+```
+
+Technically that would work, but you are needlessly creating a new `span` element every time you want to update the text. Instead, use `child.text`:
+
+```scala
+val textStream: EventStream[String] = ???
+div(child.text <-- textStream)
+```
+
+This is the most efficient way to render dynamic text in Laminar, and you should prefer it every time to using `child <--` whenever possible.
+
+`child.text` works not only with strings, but also other primitive types like numbers and booleans. Laminar can render any `A` as a string as long as there is an implicit instance of `RenderableText[A]` for it. You can define such instances for your custom types, or you can define such instances for built-in types like `Int` to render them differenly from the default, e.g. by adding formatting.
+
+```scala
+implicit val intRenderable0000: RenderableText[Int] = RenderableText("%04d".format(_))
+
+class Foo { ... }
+implicit val fooRenderable: RenderableText[Foo] = RenderableText(fooToString)
+
+div(
+  // will render as "true" or "false" using built-in bool renderable implicit
+  true,
+  child.text <-- streamOfBooleans,
+  
+  // will render numbers with leading zeroes (e.g. "0001") because of `intRenderable0000`
+  1,
+  child.text <-- streamOfInts
+  
+  // will render Foo-s to string using `fooRenderable`
+  new Foo {},
+  child.text <-- streamOfFoos
+)
+```
+
+
+### Rendering Custom Components
+
+Laminar has no built-in notion of a component, but for the purposes of this section let's say it's some custom type `C` that exposes a Laminar element, e.g. `trait Component { val node: HtmlElement = ??? }`.
+
+You could render such components in Laminar simply by calling `.node` on them, however if you are making heavy use of this pattern, it might get repetitive. Instead of defining an implicit conversion from `Component` to `HtmlElement`, you should define an implicit instance of `RenderableNode[Component]`, then you'll be able to use `Component` in any Laminar context that expects an element, i.e. you would be able to say `child <-- streamOfComponents` etc.
+
+To create a `RenderableNode[Component]`, you need to provide a `Component => Node` function, in our case that would be `_.node`. As explained in RenderableNode's scaladoc, this function must return a constant. Basically your `node` should be either a `val` or a `lazy val`, it must not be a `var` or a `def`, otherwise you might run into unexpected behaviour or performance issues.
+
 
 
 ### Lists of Children
@@ -568,23 +684,26 @@ div("Hello, ", children <-- childrenSignal)
 
 If you have an Observable of desired children elements, this is the most straightforward way to subscribe to it.
 
-Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them. The general idea here is only cosmetically similar to virtual DOM. Laminar diffing is much lighter than typical virtual DOM machinery. We only compare elements for reference equality, we do not look at any attributes / props / state / children and we do not re-render anything like React.
+Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them, but it's a different kind of diffing than what virtual DOM libraries do – Laminar diffing is much lighter. We only compare elements by reference equality, we do not diff any attributes / props / state / children, and we do not "re-render" anything like React does.
 
-We make a single pass through nextChildren, and detect any inconsistencies by checking that `nextChildren(i).ref == childrenInDom(i)` (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (<50LoC total) but efficient.
+We make a single pass through nextChildren, and detect any inconsistencies by checking that `nextChildren(i).ref == childrenInDom(i)` (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (<50LoC total) but efficient, scaling up to thousands of elements – more than you can feasibly show to a user anyway.
 
 Laminar will perform absolutely minimal operations that make sense – for example if a new element needs to be inserted, that is the only thing that will happen, _and_ this new element is the only element for which Laminar will spend time figuring out what to do, because all others will match. Reorderings are probably the worst case performance-wise, but still no worse than virtual DOM. You can read the full algorithm in `ChildrenInserter.updateChildren`.
+
+This algorithm has a catch – the naive implementation of `childrenSignal` is not efficient, but there is an easy solution – read on.
 
 Note: a given DOM node can not exist in multiple locations in the DOM at the same time. Therefore, the Seq-s you provide to `children <--` must not contain several references to the same element. This is on you, as Laminar does not spend CPU cycles to verify this. Generally this isn't a problem unless you're deliberately caching elements for reuse in this manner. If you _are_ doing that, consider using the `split` operator explained below.
 
 
+
 #### Performant Children Rendering – split
 
-We've now established how `children <-- childrenObservable` works, but generating this `childrenObservable` easily and efficiently can be quite complicated depending on your dataflow. For maximum efficiency, you should use Airstream's `split` method. Before we dive into that, let's see what the problem is without it. 
+We've now established how `children <-- childrenObservable` algorithm works, now let's see how to compile `childrenObservable` to get efficient updates. Basically, we just need to use Airstream's `split` method. But before we dive into that, let's see what the problem is without it.
 
-Suppose you want to render a dynamic list of users. The set of users, their order, and the attributes of individual users can all change, except for user id, which uniquely identifies a user. You also know how to render an individual user element:
+Suppose you want to render a dynamic list of users. The set of users, their order, and the attributes of individual users can all change, except for user id, which uniquely identifies a given user. You also know how to render an individual user element:
 
 ```scala
-case class User(id: String, name: String, lastModified: String)
+case class User(id: String, name: String)
  
 val usersStream: EventStream[List[User]] = ???
    
@@ -607,7 +726,7 @@ div(
 )
 ```
 
-This will work, but it is inefficient. Every time `usersStream` emits a new list of users, Laminar re-creates DOM elements for every single user in the list, and then replaces the old list of elements with this new one.
+This will work, but it is inefficient. Every time `usersStream` emits a new list of users, Laminar re-creates DOM elements for every single user in the list, and then replaces all of the old elements with those new ones.
 
 This is the kind of situation that virtual DOM was designed to avoid. While this pattern is perfectly fine for small lists that don't update often (and assuming you don't care about losing DOM element state such as text in an input box), with larger lists and frequent updates there is a lot of needless work being done.
 
@@ -618,14 +737,10 @@ So let's write smarter code. It's actually very easy.
 All we need to do is adjust our `renderUser` function to take a different set of parameters:
 
 ```scala
-def newRenderUser(userId: String, initialUser: User, userStream: EventStream[User]): Div = {
+def newRenderUser(userId: String, initialUser: User, userSignal: Signal[User]): HtmlElement = {
   div(
     p("user id: " + userId),
-    p("name: ", child.text <-- userStream.map(_.name)), 
-    p(
-      "user was updated: ",
-      child.text <-- userStream.map(_.lastModified != initialUser.lastModified)
-    ) 
+    p("name: ", child.text <-- userSignal.map(_.name))
   )
 }
 ```
@@ -633,11 +748,11 @@ def newRenderUser(userId: String, initialUser: User, userStream: EventStream[Use
 And with this, efficient rendering is as simple as:
 
 ```scala
-val userElementsStream: EventStream[List[Div]] =
+val userElementsSignal: EventStream[List[HtmlElement]] =
   usersStream.split(_.id)(newRenderUser)
  
 div(
-  children <-- userElementsStream
+  children <-- userElementsSignal
 )
 ```
 
@@ -645,23 +760,97 @@ Airstream's `split` operator was designed specifically for this use case. On a h
 
 * `usersStream` – a stream (or signal) of `immutable.Seq[User]`
 * `_.id` – a way to uniquely identify users
-* `newRenderUser` – a way to render a user into a single element given its unique key (`id`), the initial instance of that user (`initialUser`), and a stream of updates to that same user (`userStream`).
+* `newRenderUser` – a way to render a user into a single element given its unique key (`id`), the initial instance of that user (`initialUser`), and a signal of updates to that same user (`userSignal`).
 
-To clarify, Airstream-provided `userStream` is a safe and performant equivalent to `usersStream.map(_.find(_.id == userId).get)`. It provides you with updates of one specific user.
+To clarify, Airstream-provided `userSignal` is a safe and performant equivalent to `usersStream.map(_.find(_.id == userId).get)`. It provides you with updates of one specific user.
 
 ---
 
 Here is how `split` works in more detail:
 
-* As soon as a `User` with id="123" first appears in `usersStream`, we call `newRenderUser` to render it. This gives us a `Div` element **that we will reuse** for all future versions of this user.
-* We remember this `Div` element. Whenever `usersStream` emits a list that includes a new version of the id="123" User, the `userStream` in `newRenderUser` emits this new version.
+* As soon as a `User` with id="123" first appears in `usersStream`, we call `newRenderUser` to render it. This gives us a `div` element **that we will reuse** for all future versions of this user.
+* We remember this `div` element. Whenever `usersStream` emits a list that includes a new version of the id="123" User, the `userSignal` in `newRenderUser` emits this new version.
 * Similarly, when other users are updated in `usersStream` their updates are scoped to their own invocations of `newRenderUser`. The grouping happens by `key`, which in our case is the `id` of `User`.
-* When the list emitted by `usersStream` no longer contains a User with id="123", we remove its Div from the output and forget that we ever made it.
-* Thus `userElementsStream` contains a list of Div elements matching one-to-one to the users in the `usersStream`.
+* When the list emitted by `usersStream` no longer contains a User with id="123", we remove its `div` element from the output and forget that we ever made it.
+* Thus `userElementsSignal` contains a list of `div` elements matching one-to-one to the users in the `usersStream`.
+
+So, the `split` operator lets us build an `Observable[immutable.Seq[HtmlElement]]` without needlessly re-creating html elements. For any given `userId`, we will only create and render a single element, and any subsequent updates to this user will be channeled into its individual `userSignal`, so that the div element that we already created for this user can be efficiently *updated* (using `child.text` in this case), instead of being re-created every time.
+
+This is exactly what Laminar's `children <-- observableOfElements` needs to work efficiently.
 
 ---
 
-Lastly, aside from `split` there is also `splitIntoSignals`. Which one you want depends on whether you want `newRenderUser` to accept a stream or a signal. Remember that unlike streams, signals keep track of their current state, and only emit values that don't `==`-equal their current state. This might be desirable or not (or irrelevant) depending on your use case. 
+The list of models you're providing to the split operator must not have items with duplicate keys in it – each key in the list must be unique. By default, if Airstream detects duplicate IDs, it will print an error in the browser console listing the offending IDs, however with or without the warning, you code will fail – at the moment `split` does not tolerate such input. For performance-critical applications, you can disable these checks for a small gain, either wholesale or (preferably) on a case-by-case basis – see `DuplicateKeysCondig` in Airstream.
+
+
+#### Splitting Without a Key
+
+The `split` operator requires a unique key for each item, such as `_.id`. But what if you don't have such a key?
+
+One option is to change your model to create an ephemeral key, that is generated on the frontend and never sent to the backend. Airstream does not need the key to be meaningful or consistent across user sessions – the key simply needs to identify a certain item in the dynamic list for as long as Laminar is rendering that list.
+
+Another, simpler solution, is often quite workable – with `splitByIndex` you can use the index of the item in the list as its key. That way, when you append an item to the list, existing items will not be re-rendered, or if you update the data in some item(s), their elements won't be re-created. However, I don't recommend using this if you will be inserting new items in the beggining or middle of the list, or if you will be reordering the list of items – such cases really call for a proper key.
+
+
+#### Splitting Options
+
+If you are rendering an `Observable[Option[HtmlElement]]`, you might want to use `splitOption` as shown in the [Rendering Individual Children](#efficiency) section above. Now that we have a better understanding of how `split` works, it's easy to see how `splitOption` is simply using the Option's `.isDefined` as a key, creating a new element when switching from `None` to `Some(model)`, and retaining the same element when switching from `Some(model1)` to `Some(model2)`.
+
+
+#### Splitting Individual Items
+
+Now that you know how the `split` operator works, it's only a small leap to understand its special-cased cousin `splitOne`. Where `split` works on observables of collections like `List[Foo]`, `splitOne` works on observables of `Foo` itself, that is, on any observable:
+
+```scala
+case class Editor(text: Boolean, isMultiLine: Boolean)
+   
+def renderEditor(
+  isMultiLine: Boolean,
+  initialEditor: Editor,
+  editorSignal: Signal[Editor]
+): HtmlElement = {
+  val tag = if (isMultiLine) textArea else input
+  tag(value <-- editorSignal.map(_.text))
+}
+ 
+val inputSignal: Signal[Editor] = ???
+ 
+val outputSignal: Signal[HtmlElement] = 
+  inputSignal.split(key = _.isMultiLine)(project = renderEditor)
+```
+
+The high-level purpose of this code is to avoid creating a new element when inpuSignal emits a new value. The interesting part is **when** we do need to create the new element: when the Editor's `isMultiline` property changes, we need to switch to using either a single-line `<input>` element, or a multi-line `textArea`. Changing the type of the element is one kind of update that is impossible to do without re-creating the element.
+
+Another use case for this is when you want to reset a complex component's state, for example:
+
+```scala
+case class Document(id: String, content: DocumentContent, ...)
+   
+def editor(
+  documentId: Boolean,
+  initialDocument: Document,
+  documentSignal: Signal[Document]
+): HtmlElement = {
+  val documentState = Var(initialDocument)
+  ... // More complex setup here, with some internal state specific to a particular document
+  div(
+    someInput --> documentState,
+    documentSignal.map(...) --> documentState,
+    documentState --> ...
+  )
+}
+ 
+val inputSignal: Signal[Document] = ???
+ 
+val outputSignal: Signal[HtmlElement] = 
+  inputSignal.split(key = _.id)(project = editor)
+```
+
+In this case we don't have a strict technical constraint like changing the element type that we need to work around. In principle, we don't absolutely need `splitOne`. However, imagine that this component is rendering an editor for a complex document, similar to e.g. Google Docs. This kind of component has a lot of internal state which is all tied to a specific document, to a specific document ID. When `inputSignal` emits an update to the current document (documentId is the same), we want `documentSignal` to update as usual, but when `inputSignal` emits a new document ID... we don't want to manually clear / reset all that complex `documentId`-specific state inside `editor` – with all the redundant state / caches / etc. in it, this could easily become prone to bugs. It would be much easier to simply discard the old editor component and create a new one for the new document. And this is exactly what the code above does. Less code – less bugs.
+
+In other words, our `splitOne` code above guarantees that every instance of `documentSignal` will always have unchanging `document.id` matching `documentId`, and that the `editor` method will be called whenever we switch to rendering a new `documentId`.
+
+This all might seem similar to what a `distinct` operator would do, and indeed there is some conceptual overlap, because `distinct` is a fundamental part of `split` semantics, but you will be hard pressed to implement this pattern with `distinct` instead of `splitOne`, at least if you have a single observable like `Signal[Document]` as your input.
 
 
 #### Performant Children Rendering – children.command
@@ -683,10 +872,13 @@ var counter = 0
 div(
   "Hello, ",
   children.command <-- commandStream,
-  button("Add a child", onClick.map { _ =>
-    counter += 1
-    CollectionCommand.Append(span(s"Child # $counter"))
-  } --> commandBus)
+  button(
+    "Add a child",
+    onClick.map { _ =>
+      counter += 1
+      CollectionCommand.Append(span(s"Child # $counter"))
+    } --> commandBus
+  )
 )
 ```
 
@@ -699,16 +891,16 @@ That said, don't go crazy trying to adapt your logic to it. Airstream's `split` 
 One downside of ChildrenCommand is that you don't have an observable of the list of children naturally available to you, so if you want to display e.g. the number of children somewhere, you will need to create an observable for that yourself. For example:
 
 ```scala
-val commandBus = new EventBus[ChildrenCommand]
+val commandBus = new EventBus[ChildrenCommand.Append[HtmlElement]]
 val commandStream = commandBus.events
 val countSignal = commandStream.scanLeft(initial = 0)(_ + 1)
 
 div(
   "Hello, ",
   children.command <-- commandStream,
-  button("Add a child", onClick.map( _ =>
-    CollectionCommand.Append(span(s"Just another child"))
-  ) --> commandBus),
+  button(
+    "Add a child",
+    onClick.map( _ => CollectionCommand.Append(span(s"Just another child"))) --> commandBus),
   div(
     "Number of children: ",
     child.text <-- countSignal.map(_.toString)    
@@ -720,7 +912,11 @@ This would need more work if we wanted to support other actions such as removals
 
 ---
 
-You can mix both `children <-- *` and `children.command <-- *` and any other children or modifiers in any order inside one element, and they will happily coexist with no interference. Correct order of elements will be maintained even in edge cases such as showing zero elements. Laminar adds a sentinel HTML comment node into the DOM for each `child* <-- *` receiver to make this possible. These nodes effectively "reserve the spot" for children provided by a particular receiver.
+You can mix both `child <-- ...` and `children <-- ...` and `children.command <-- ...` and any other children or modifiers in any order inside one element, and they will happily coexist with no interference. Correct order of elements will be maintained even in edge cases such as showing zero elements. Laminar adds a sentinel HTML comment node into the DOM for each `child* <-- ...` receiver to make this possible. These nodes effectively "reserve the spot" for children provided by a particular receiver.
+
+---
+
+As of Laminar 15, you can generally safely move elements from one `child* <-- ...` block into another – to do that you would need to remove the child from the source observable and add it to the new observable. Although, you don't _really_ need to proactively remove the child from the old observable if the old observable will not emit this child again, Laminar is resilient to this kind of thing.
 
 
 ### Binding Observables
@@ -729,11 +925,11 @@ By now you must have realized that `-->` and `<--` methods are the main syntax t
 
 To be more precise, such methods always return a `Modifier` that needs to be applied to an element. And when it is applied, a dynamic subscription is created such that it activates when the element is mounted, and deactivates when the element gets unmounted. The types of such modifiers are `Binder` for those that deal with props / attributes / events / etc., and `Inserter` for those that add children to the element.
 
-Inserters are special because they reserve a spot in the element's children where the children provided by the Inserter will be inserted. How does that work? When an Inserter is applied to an element, it appends a sentinel node to the element – just an empty, invisible `CommentNode`. When it's time to insert some children, the inserter either replaces the sentinel node with the next child (in case of `child <-- childStream`), or inserts new children right after the sentinel node (in case of children <-- `childrenStream`). That way your dynamic children will always appear where you expect them to, and you can mix and match any number of child inserters in a single parent element.
+Inserters are special because they reserve a spot in the element's children where the children provided by the Inserter will be inserted. How does that work? When an Inserter is applied to an element, it appends a sentinel node to the element – just an empty, invisible `CommentNode`. When it's time to insert some children, the inserter either replaces the sentinel node with the next child noode (in case of `child.text <-- ...`), or inserts the new child(ren) right after the sentinel node (in case of `child <-- ...`, `child.maybe <-- ...`, and `children <-- ...`). That way your dynamic children will always appear where you expect them to, and you can mix and match any number of child inserters in a single parent element, and you can move children from one inserter to another without re-creating the element.
 
-So far we've talked about Binders and Inserters provided by Laminar. But what if you want to subscribe an arbitrary Observable to an arbitrary Observer? First of all, why would you even need Laminar's help in this? The answer is [Ownership](#ownership) – in order to create an Airstream Subscription, you need an `Owner`, and in 99.9% cases you don't want to create those manually. You want to use owners provided by Laminar. In fact, what you really want is to avoid the ownership boilerplate altogether. When you sent click events to an observer using `onClick --> observer`, you didn't need to think about owners. That was nice.
+So far we've talked about Binders and Inserters provided by Laminar. But what if you want to subscribe an arbitrary Observable to an arbitrary Observer? First of all – why would you even need Laminar's help in this? The answer is [Ownership](#ownership) – in order to create an Airstream Subscription, you need an `Owner`, and in 99.9% cases you don't want to create those manually. You want to use owners provided by Laminar. In fact, what you really want is to avoid the ownership boilerplate altogether. When you sent click events to an observer using `onClick --> observer`, you didn't need to think about owners. That was nice.
 
-It should come naturally then that Laminar offers a similar way to bind any observable to any observer:
+It should come naturally that Laminar offers a similar way to bind any observable to any observer:
 
 ```scala
 val eventStream: EventStream[A] = ???
@@ -748,7 +944,7 @@ div(eventStream --> eventBus.writer)
 div(eventStream --> eventBus) // same as above
 ```
 
-Now, what's your intuition for how long any of these subscriptions will live? Subscriptions can't just live forever, they are leaky resources and need to be shut down. Airstream offers a way to manage this automatically using `Owners`. But you don't see any `Owner`s here (there's nothing `implicit` either).
+Now, what's your intuition for how long any of these subscriptions will live? Subscriptions can't just live forever, they are leaky resources and need to be shut down when they are no longer needed. Airstream offers a way to manage this automatically using `Owners`. But you don't see any `Owner`s here (there's nothing `implicit` either).
 
 The answer was a few paragraphs ago. Subscriptions created by modifiers (and `observable --> observer` is a `Modifier`, a `Binder` to be exact) are activated when the element to which that modifier is applied is mounted, and deactivated when the element is unmounted. This was entirely seamless for `onClick --> observer` because users wouldn't be able to click on your element when it was unmounted anyway, but for arbitrary observables you need to be aware that their subscription is deactivated when the element is unmounted. That would mean that if `observable` doesn't have any other observers, it would stop (See Lazyness section in Airstream docs if you're not sure why).
 
@@ -865,27 +1061,33 @@ Once again, we don't want the CSS class names coming in from `classesStream` to 
 
 So for example, when `classesStream` emits `List("class1", "class2")`, we will _add_ those classes to the element. When it subsequently emits `List("class1", "class3")`, we will remove `class2` and add `class3` to the element's class list.
 
-The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls.toggle("foo") <-- shouldUseFooStream` or similar dynamic modifiers. (Note: prior to v0.12.0, `cls` behaved differently. See release notes).
+The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls.toggle("foo") <-- shouldUseFooStream` or similar dynamic modifiers.
 
 If you (or a third party library you're using) are adding or removing class names without Laminar, using native JS APIs like `ref.className = ???` and `ref.classList.add(???)`, and you are **also** using `cls` modifiers on this **same** element, you must take care to avoid manually adding or removing the same classes as you're setting using the `cls` modifiers. Doing so may cause unexpected behaviour. Basically, **a given class name on a given element should be managed either via Laminar `cls` modifiers or externally via JS APIs, but not both**. See the `cls - third party interference` test in `CompositeKeySpec` for a simple example.
 
 
 ### Other Composite Keys
 
-**`rel`** is another space-separated attribute. Its API in Laminar is exactly identical to that of `cls` (see right above). For example `rel := ("noopener", "noreferrer")` is a Modifier that makes the `a` element it applies to [safer](https://mathiasbynens.github.io/rel-noopener/) without removing existing `rel` attribute value.
-
-**`role`** attribute works similarly.
+**`rel`** and **`role`** are two other space-separated attributes. Their API in Laminar is exactly identical to that of `cls` (see right above).
 
 
 ### SVG
 
 Laminar lets you work with SVG elements (almost) just as well as HTML. Everything works pretty much the same, just need to understand the required imports:
 
+
+#### SVG Syntax and Imports
+
 * SVG elements and attributes are available in the `com.raquo.laminar.api.L.svg` object
+
 * Some of the attributes of SVG and HTML have the same names, for example there are two instances of the `className` attribute, one is `L.className` and is an HTML attribute, the other is `L.svg.className` and is an SVG attribute. You can only apply SVG attributes to SVG elements (and not HTML elements), and similarly for HTML attributes.
-* Therefore, you generally should **not** import both `com.raquo.laminar.api.L.svg._` and `com.raquo.laminar.api.L._` as that would cause name collisions.
+
+* Therefore, you generally should **not** import both `com.raquo.laminar.api.L.svg.*` and `com.raquo.laminar.api.L.{*, given}` as that would cause name collisions.
+
 * On the other hand, event prop keys such as `com.raquo.laminar.api.L.onClick` apply universally to all elements, both HTML and SVG.
-* If you are working mostly with HTML elements in a given file, you can just import `com.raquo.laminar.api.L._` and refer to SVG elements and attributes with an `svg` prefix, like this:
+
+* If you are working mostly with HTML elements in a given file, you can just import `com.raquo.laminar.api.L.{*, given}` and refer to SVG elements and attributes with an `svg` prefix, like this:
+
   ```scala
   div(
     className := "someHtmlClassName",
@@ -901,12 +1103,14 @@ Laminar lets you work with SVG elements (almost) just as well as HTML. Everythin
       )
     )
   )
-  ```  
-* On the other hand, if you are working mostly with SVG elements in a given file, you can use a different set of imports :
+  ```
+
+* On the other hand, if you are working mostly with SVG elements in a given file, you can use a different set of imports:
+
   ```scala
-  import com.raquo.laminar.api.L.svg._ // get svg keys without the svg prefix
-  import com.raquo.laminar.api._ // get `L` and standard implicits like `textToNode`
-  // DO NOT IMPORT: com.raquo.laminar.api.L._
+  import com.raquo.laminar.api.L.svg.* // get svg keys without the svg prefix
+  import com.raquo.laminar.api.{*, given} // get `L` and standard implicits like `textToTextNode`
+  // DO NOT IMPORT: com.raquo.laminar.api.L.{*, given}
   
   L.div(
     L.className := "someHtmlClassName",
@@ -924,6 +1128,21 @@ Laminar lets you work with SVG elements (almost) just as well as HTML. Everythin
   )
   ```
 
+#### Rendering External SVGs
+
+The browsers are able to render SVGs from a URL with a simple `img` tag just like any other image:
+
+```scala
+img(src := "https://example.com/image.svg", role := "img")
+```
+
+The `role := "img"` is apparently needed for accessibility due to a [VoiceOver bug](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#identifying_svg_as_an_image), nothing to do with Laminar.
+
+Rendering SVGs this way makes the browser download them separately, and only when they're needed. In contrast, if you create SVGs with Laminar, they will be included in the JS bundle, and will be available immediately without an extra network request, but will need to be downloaded upfront, and will increase the size of the bundle.
+
+You can also render native SVG elements provided by other libraries, or even create SVG elements from `<svg>...</svg>` strings in Laminar: see [Rendering Third Party HTML or SVG Elements](#rendering-third-party-html-or-svg-elements) and [Parsing HTML or SVG Strings into Elements](#parsing-html-or-svg-strings-into-elements).
+
+
 
 
 ## Event System: Emitters, Processors, Buses 
@@ -931,7 +1150,7 @@ Laminar lets you work with SVG elements (almost) just as well as HTML. Everythin
 
 ### Registering a DOM Event Listener
 
-Laminar uses native JS DOM events. We do not have a synthetic event system like React.js. There is no event pooling, no magic going on. This means there is nothing Laminar-specific to learn about events themselves. There's one exception for certain `onClick` events on checkboxes, see [Special Cases](#special-cases).
+Laminar uses native JS DOM events. We do not have a synthetic event system like React.js. There is no event pooling, no magic going on. This means there is nothing Laminar-specific to learn about events themselves.
 
 To start listening for DOM events, you need to register a listener for a specific event type on a specific element. In Laminar, `EventListener` is a `Modifier` that performs this action.
 
@@ -950,6 +1169,7 @@ val element: Div = div(
 This `-->` method simply registers an event listener on `element` which calls `clickObserver.onNext(ev)` for every click event that comes in, and then the observer prints this event's X coordinate to the console.
 
 
+
 ### EventBus
 
 The contrived example above does not feel like reactive programming at all. As shown, it's just a cumbersome way to define a simple callback. Instead, we usually want to get a stream of events from an element. To do that, we need an Observer that will expose a stream of events that it receives. In FRP terms this is usually called a "Subject" or a "PublishSubject".
@@ -966,22 +1186,81 @@ val coordinateStream: EventStream[Int] = clickBus.events.map(ev => ev.screenX)
 val coordinateObserver = Observer[Int](onNext = x => dom.console.log(x))
  
 val element: Div = div(
-  onClick --> clickBus.writer, // .writer is actually optional here, for convenience
+  onClick --> clickBus.writer,
   "Click me",
   coordinateStream --> coordinateObserver
 )
 ```
 
-`onClick --> clickBus.writer` works exactly the same as the previous example, except that `clickBus.writer` is now the Observer that we send the events to. For convenience, the `-->` method will also accept the event bus itself: `div(onClick --> clickBus, ...)` would have exactly the same effect.
+`onClick --> clickBus.writer` works exactly the same as the previous example, except that `clickBus.writer` is now the Observer that we send the events to.
 
 What's new here is how we subscribe `coordinateObserver` to `onClick` events. As we established, we first send onClick events to `clickBus`. Then we have a `coordinateStream` that maps every click event from `clickBus` to its `screenX` coordinate.
 
 Finally, we subscribe `coordinateObserver` to `coordinateStream` to print out those coordinates on every click. This completes our contrived pipeline. In real life this component might only be exposing the stream of coordinates, and consuming components would provide their own observers. Or this same component could be deriving some of its own state from the click stream, such as tracking and displaying the number of clicks.
 
-It's not a coincidence that `coordinateStream --> coordinateObserver` syntax looks very similar to `onClick --> clickBus.writer`. Both of these `-->` methods create Modifiers that send events from the left hand side to the right hand side for as long as the element is mounted, conceptually speaking. Both methods are also provided implicitly as defined in `Implicits.scala`.
+It's not a coincidence that `coordinateStream --> coordinateObserver` syntax looks very similar to `onClick --> clickBus.writer`. Both of these `-->` methods create Modifiers that send events from the left hand side to the right hand side for as long as the element is mounted, conceptually speaking.
 
 
-#### Transforming Observers
+#### Feeding Multiple Sources into EventBus
+
+Note that Airstream Observers, including `eventBus.writer`, can subscribe to multiple observables. So you can, for example, render a dynamic list of children, each of which sends its own events to the same Observer, possibly with information included in the event needed to identify which child the event came from. You can see an example of this pattern used in `TaskListView.taskViewsStream` in [laminar-examples](https://github.com/raquo/laminar-examples).
+
+This can be achieved either with `addSource` or `addObserver`. Basically, in terms of laziness, with `addSource` the EventBus behaves like a stream that merges other streams – much like `stream1.mergeWith(stream2)`, but with the ability to add and remove source streams at any time. So, if you do `eventBus.writer.addSource(sourceStream)(childOwner)`, `sourceStream` will not be started until and unless `eventBus.stream` is started. Conversely, `sourceStream.addObserver(eventBus.writer)(childOwner)` will immediately start `sourceStream` even if `eventBus` does not have any observers.
+
+The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `subscription.kill` when removing a child from the list of children. `childOwner` will take care of that. Typically, that would be provided by the child Laminar element, via `onMountCallback`. Such an owner kills its subscriptions when the corresponding element gets removed from the DOM.
+
+
+### Arrow Methods Syntax Sugar
+
+All `-->` methods accept `Sink` on the right hand side. `Sink[A]` is anything that can be converted to an `Observer[A]`. `EventBus[A]` and `Var[A]` are both `Sink[A]`, and Laminar also treats `A => Unit` and `js.Function1[A, Unit]` as if they were `Sink[A]`.
+
+Similarly, all the `<--` methods accept `Source[A]`, which is anything that can be converted to an `Observable[A]`. `EventBus[A]` and `Var[A]` are both `Source[A]`, and of course streams and signals are also `Source[A]`, being observables themselves.
+
+So, you don't need to spell out an explicit observer every time you write the arrow methods, everything below is valid syntax:
+
+```scala
+val intBus = new EventBus[Int]
+val textVar = Var("")
+input(
+  onClick.mapTo(1) --> intBus,
+  value <-- textVar,
+  onInput.mapToValue --> textVar,
+  onMouseOver --> { ev => println(ev) },
+  onChange --> { _ => println("committed") },
+  onBlur.mapTo("blur") --> println
+)
+```
+
+Airstream `Var`-s also offer several `updater` helpers that simplify updating their value where an Observer is expected, such as on the right hand side of `-->` methods. See [Airstream docs on this](https://github.com/raquo/Airstream/#observers-feeding-into-var).
+
+
+### `:=> Unit` Sinks
+
+Sometimes the syntax sugar shown above is just not good enough – not consise enough for advanced users, and not intuitive enough for beginners. For example:
+* `myVar.updater` is a weird variation of its `update` method that returns an Observer,
+* `onClick --> { _ => println("hello") }` is annoyingly verbose, and
+* `onClick.mapTo("hello") --> println` splits the responsibility in a rather weird way.
+
+To simplify some of these usage patterns, Laminar is now treating side effects that are typed simply as `:=> Unit` as valid sinks, for example:
+
+```scala
+import com.raquo.laminar.api.features.unitArrows // enable this feature
+input(
+  onClick --> println("hello"),
+  onClick --> myVar.update(_.append(""))
+)
+```
+
+There is no magic to it, these `--> methods` simply accept a `Unit` expression, which is then re-evaluated on every event (that's what `:=>` does in the function signature).
+
+Unfortunately, while this kind of API is perfectly safe in Scala 2, that is not the case in Scala 3. Specifically, in Scala 2, the expression `if (true) observer` is typed as `Any` and returns `observer`, whereas in Scala 3, it is typed as `Unit` and returns `()`. 
+
+So, in Scala 3, code like `div(onClick --> if (bool) observer)` would compile without warnings, but will not actually call the observer, because Scala 3 does not return the `observer` from the `else`-less `if` branch. This is unfortunate for our use case, because beginners might legitimately try to write such code when what they really want is e.g. `div(onClick.filter(_ => bool) --> observer)`.
+
+To prevent such accidents, this new unit-based API requires a special import. If you forget the import, the compiler will give you an error pointing to this section of the documentation. It's up to you to choose between extra brevity and extra safety. With IntelliJ, importing the required implicit is only one command away, so it's not much of an annoyance.
+
+
+### Transforming Observers
 
 You can `contramap` and `filter` Observers, for example:
 
@@ -1006,37 +1285,110 @@ In this pattern AppleComponent has no knowledge of pies. All it knows is how to 
 If your observer is a `WriteBus` (e.g. `myEventBus.writer`), you have even more methods available to you: `filterWriter`, `contramapWriter` and (gasp) `contracomposeWriter`. 
 
 
-#### Feeding Multiple Sources into EventBus
 
-Note that Airstream Observers, including `eventBus.writer`, can subscribe to multiple observables. So you can for example render a dynamic list of children, each of which sends its own events to the same Observer, possibly with information included in the event needed to identify which child the event came from. You can see an example of this pattern used in `TaskListView.taskViewsStream` in [laminar-examples](https://github.com/raquo/laminar-examples).
+### Event Processors
 
-This can be achieved either with `addSource` or `addObserver`. Basically, in terms of laziness, with `addSource` EventBus behaves like a stream that merges other streams – much like `EventStream.merge(stream1, stream2)`, but with the ability to add and remove source streams at any time. So, if you do `eventBus.writer.addSource(sourceStream)(childOwner)`, `sourceStream` will not be started until and unless `eventBus.stream` is started. Conversely, `sourceStream.addObserver(eventBus.writer)(childOwner)` will immediately start `sourceStream` even if `eventBus` does not have any observers.
-
-The best part of this pattern is that you don't need to write custom logic to call `removeSource` or `subscription.kill` when removing a child from the list of children. `childOwner` will take care of that. Typically, that would be provided by the child Laminar element, via `onMountCallback`. Such an owner kills its subscriptions when the corresponding element gets removed from the DOM.
-
-
-
-### composeEvents
-
-The `div(onClick --> observer)` syntax for listening to events is simple but limited. On the left hand side you can apply EventProcessor operations to `onClick` such as map, filter, preventDefault, etc. And on the right hand side you can apply Observer operations like `contramap`, `filter`, and `delay`.
-
-However, observables have a richer set of operators than either of these. For example, you might want to throttle the events, or propagate an event only if a certain other signal contains `true`. This is easy to achieve with the `composeEvents` method:
+Event processors let you spice up the standard `onClick --> eventBus` syntax with simple transformations. This API is different from observables API – it does not have complex / async operators, but it does offer DOM event specific handlers like `preventDefault`, `mapToValue`, etc.
 
 ```scala
-val allowClick: Signal[Boolean] = ???
- 
-div(composeEvents(onScroll)(_.throttle(100)) --> scrollObserver)
- 
-a(
-  composeEvents(
-    onClick.preventDefault
-  )(
-    _.withCurrentValueOf(allowClick).collect { case (ev, true) => ev } 
-  ) --> eventObserver
-)
+val diffBus = new EventBus[Int]
+val incrementButton = button("more", onClick.mapTo(1) --> diffBus)
+val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
+val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-As you see `composeEvents` accepts two argument lists: an EventProcessor which lets you conveniently perform DOM event related tasks such as preventDefault, and a composer function that translates the stream of values emitted by the EventProcessor into any other observable, even a signal.
+This `mapTo` method is defined on `EventProcessor`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order. See the API docs for these methods [here](https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/keys/EventProcessor.html).
+
+More examples:
+
+```scala
+input(onInput.mapToValue --> textObserver)
+ 
+input(typ := "checkbox", onClick.mapToChecked --> textObserver)
+ 
+div("Click me", onClick.map(getClickCoordinates) --> clickCoordinatesBus)
+ 
+form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
+ 
+div(onClick.useCapture --> captureModeClickObserver)
+ 
+input(onKeyUp.filter(_.keyCode == dom.KeyCode.Enter).preventDefault --> enterPressBus)
+ 
+div(onClick.collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
+ 
+// @TODO[Docs] Come up with more relatable examples
+```
+
+Just like `ReactiveEventProp`-s, `EventProcessor`-s are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:
+
+```scala
+val onEnterKeyUp = onKeyUp.filter(_.keyCode == dom.KeyCode.Enter)
+// and then
+input(onEnterKeyUp.preventDefault --> enterPressBus)
+textArea(onEnterKeyUp.preventDefault --> enterPressBus)
+```
+
+This kind of casual flexibility is what Laminar is all about.
+
+
+#### preventDefault & stopPropagation
+
+```scala
+form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
+div(onScroll.stopPropagation.filter(throttle) --> filteredScrollEventBus)
+div(
+  onClick.stopImmediatePropagation --> theOnlyClickObserver,
+  onClick --> ignoredObserver
+)
+
+```
+
+These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation), [stopImmediatePropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation)
+
+Importantly, these are just ordinary processors, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == dom.KeyCode.Enter)`. Internally all processors have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` processor even after you've used `.map(_.keyCode)`.
+
+
+#### useCapture
+
+```scala
+div(onClick.useCapture --> captureModeClickObserver)
+```
+
+JS DOM has two event modes: capture, and bubbling. Typically and by default everyone uses the latter, but capture mode is sometimes useful for event listener priority/ordering/efficiency (not specific to Laminar, standard JS DOM rules/limitations apply).
+
+`.useBubbleMode` is the opposite of `.useCapture`. The former is the default, so you don't need to call it unless you're calling it on an EventProcessor that you've previously enabled capture mode for.
+
+See MDN [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) page for details (see "useCapture" section).
+
+
+#### Obtaining Typed Event Target
+
+Due to dynamic nature of Javascript, `dom.Event.target` is typed only as `dom.EventTarget` for most events, which is not useful when you want to get `ev.target.value` from a target that is a `dom.html.Input` (but doesn't know it). So, you can't do this:
+
+```scala
+// Does not work because .value is defined on dom.html.Input, but not on dom.EventTarget, which is what `ev` is :(
+input(typ := "text", onChange.map(ev => ev.target.value) --> inputStringBus)
+```
+
+Instead, use `mapToValue`, which essentially gives you `ev.target.value`:
+
+```scala
+input(typ := "text", onChange.mapToValue --> inputStringBus)
+```
+
+There's `mapToChecked` for checkboxes too by the way.
+
+For a more general solution, you can use `inContext`:
+
+```scala
+input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBus))
+```
+
+This feature is not specific to events at all. The general syntax is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. Its type is properly inferred to be `Input`, which is an alias for `ReactiveHtmlElement[dom.html.Input]`, thus its `.ref` property is precisely typed as `dom.html.Input`, which is a native JS type that has a `.value` property that holds the current text in the input.
+
+Because `thisNode.ref` refers to the element on which the event listener is **registered**, in JS DOM terms, it is actually equivalent to `dom.Event.currentTarget`, not `dom.Event.target` – the latter refers to the node at which the event **originates**. When dealing with inputs these two targets are usually the same since inputs don't have any child elements, but you need to be aware of this conceptual difference for other events. MDN docs: [target](https://developer.mozilla.org/en-US/docs/Web/API/Event/target), [currentTarget](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget).
+
+You might have noticed that some event props like `onClick` promise somewhat peculiar event types like `TypedTargetMouseEvent` instead of the expected `MouseEvent` – these refined types come from _Scala DOM Types_, and merely provide more specific types for `.target` (as much as is reasonably possible). These types are optional – if you don't care about `.target`, you can just treat such events as simple `MouseEvent`s because `TypedTargetMouseEvent` does in fact extend `MouseEvent`. `// @TODO [API] I don't think we need this, really`.
 
 
 
@@ -1074,12 +1426,12 @@ div("Hello", changeEventStream --> changeObserver)
 
 Under the hood, `element.events(eventProp)` creates an EventBus, applies an `eventProp --> eventBus` modifier to `element`, and returns `eventBus.events`. That's all there is to it, no magic – just alternative syntax that makes it easier to compose your components without tight coupling.
 
-The `events` method also accepts `EventProcessor`, not just `ReactiveEventProp`. This allows for very flexible composition:
+The `events` method accepts `EventProcessor`, not just an `EventProp`. This allows for very flexible composition:
  
- ```scala
+```scala
 // You can define this once for reusability
 val onEnterPress: EventProcessor[dom.KeyboardEvent, dom.KeyboardEvent] =
-  onKeyPress.filter(_.keyCode == KeyCodes.Enter)
+  onKeyPress.filter(_.keyCode == dom.KeyCode.Enter)
  
 input(onEnterPress --> observer)
  
@@ -1090,172 +1442,81 @@ val changeEventStream = myInputNode.events(onEnterPress)
 
 
 
+### composeEvents
+
+Deprecated in favor of `compose`. use `ev.compose(f)` instead of `composeEvents(ev)(f)` – see below.
+
+
+
+### Compose and flatMap Events
+
+Typically, you subscribe to DOM events without explicitly creating any streams. This is simple and convenient, but it lacks the full palette of observables operators. For example, you might want to throttle the events, or propagate an event only if a certain other signal contains `true`. We can use `inContext` to access those fancy operators in Laminar:
+
+```scala
+div(
+  onClick.throttle(100) --> observer, // does not compile
+  inContext(_.events(onClick).throttle(100) --> observer) // works
+)
+```
+
+however, the boilerplate can get annoying. Use the `compose` method instead. It works just like the `compose` method on streams, except it also creates the required stream of DOM events under the hood.
+
+```scala
+val allowClick: Signal[Boolean] = ???
+
+button(
+  onClick
+    .preventDefault
+    .compose(_.withCurrentValueOf(allowClick).collect { case (ev, true) => ev } 
+    --> eventObserver
+)
+```
+
+If you want to create a new stream for every event, you can use the `flatMap` method, for example:
+
+```scala
+def makeAjaxRequest(): EventStream[Response] = AjaxStream.get(...).map(...)
+
+input(
+  onInput
+    .mapToValue
+    .flatMap(txt => makeAjaxRequest(txt)) --> observer
+)
+```
+
+If you use this `flatMap` method in IntelliJ IDEA, you'll be annoyed to find that it causes the IDE to incorrectly report a false type error, at least with Scala 2. Hopefully they'll fix that some day, but for now I added more specialized `flatMapStream` and `flatMapSignal` methods which use simpler types, and don't trigger the false error in the IDE. As another workaround, you can also use `onInput.compose(_.flatMap(...))` instead of `onInput.flatMap(...)`.
+
+
+
 ### Multiple Event Listeners
  
 Just like in native JS DOM, nothing is stopping you from registering two or more event listeners for the same event type on the same element:
  
- ```scala
+```scala
 div(onClick --> clickBus1, onClick --> clickBus2, "Click me")
 ``` 
 
 In this case, two event listeners will be registered on the DOM node, one of them sending events to `clickBus1`, the other sending the exact same events to `clickBus2`. Of course, this works the same regardless of what syntax you use to register event listeners (see previous section).
 
-In most cases you could simply add another listener to `clickBus.events` to achieve whatever you needed multiple event listeners bound to the same element for – it's easier and more performant in extreme cases (thousands of nodes, I'd guess).
+This feature is rarely needed, but it can simplify composition in certain cases. For example, consider the `TextInput` component mentioned above. That component itself might have an internal need to listen to its own `onChange` events (e.g. for some built-in validation), and it will not interfere with any other `onChange` event listeners the end user might want to add to it.
 
-However, sometimes simpler composition is more important. For example, consider the `TextInput` component mentioned above. That component itself might have an internal need to listen to its own `onChange` events (e.g. for some built-in validation), and it will not interfere with any other `onChange` event listeners the end user might want to add to it.
-
-
-### Event Processors
-
-Often times you don't really need a stream of e.g. click events – you only care about parts of the event data, or only a subset of emitted events. With the `events` and `composeEvents` methods described above you would just use Airstream operators to transform the stream of events, like this:
-
-```scala
-val incrementButton = button("more")
-val decrementButton = button("less")
- 
-val diffStream: EventStream[Int] = EventStream.merge(
-  incrementButton.events(onClick).mapTo(1), 
-  decrementButton.events(onClick).mapTo(-1) 
-) // this stream emits 1 or -1 depending on which button was clicked
-```
-
-Or even:
-
-```scala
-val clickObserver: Observer[dom.Event] = ???
-input(composeEvents(onClick)(_.delay(100)) --> clickObserver)
-```
-
-However, when using the standard `onClick --> eventBus` syntax, there is no stream that you could operate on before the events hit `eventBus`. Instead, we provide a different way to transform events:
-
-```scala
-val diffBus = new EventBus[Int]
-val incrementButton = button("more", onClick.mapTo(1) --> diffBus)
-val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
-val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
-```
-
-This `mapTo` method is defined on `EventProcessor`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order. See the API docs for these methods [here](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/kets/EventProcessor.html).
-
-More examples:
-
-```scala
-import org.scalajs.dom.ext.KeyCode
- 
-input(onInput.mapToValue --> textObserver)
- 
-input(typ := "checkbox", onClick.mapToChecked --> textObserver)
- 
-div("Click me", onClick.map(getClickCoordinates) --> clickCoordinatesBus)
- 
-form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
- 
-div(onClick.useCapture --> captureModeClickObserver)
- 
-input(onKeyUp.filter(_.keyCode == KeyCode.Enter).preventDefault --> enterPressBus)
- 
-div(onClick.collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
- 
-// @TODO[Docs] Come up with more relatable examples
-```
-
-Just like `ReactiveEventProp`-s, `EventProcessor`-s are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:
-
-```scala
-import org.scalajs.dom.ext.KeyCode
- 
-val onEnterKeyUp = onKeyUp.filter(_.keyCode == KeyCode.Enter)
-// and then
-input(onEnterKeyUp.preventDefault --> enterPressBus)
-textArea(onEnterKeyUp.preventDefault --> enterPressBus)
-```
-
-This kind of casual flexibility is what Laminar is all about.
-
-
-#### preventDefault & stopPropagation
-
-```scala
-form(onSubmit.preventDefault.map(getFormData) --> formSubmitObserver)
-div(onScroll.stopPropagation.filter(throttle) --> filteredScrollEventBus)
-div(
-  onClick.stopImmediatePropagation --> theOnlyClickObserver,
-  onClick --> ignoredObserver
-)
-
-```
-
-These methods correspond to invocations of the corresponding native JS `dom.Event` methods. MDN docs: [preventDefault](https://developer.mozilla.org/en-US/docs/Web/API/Event/preventDefault), [stopPropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation), [stopImmediatePropagation](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopImmediatePropagation)
-
-Importantly, these are just ordinary processors, and happen in the order in which you have chained them. For example, in the code snippet above `ev.preventDefault` will only be called on events that pass `filter(_.keyCode == KeyCode.Enter)`. Internally all processors have access to both the latest processed value, and the original event, so it's fine to call the `.preventDefault` processor even after you've used `.map(_.keyCode)`.
-
-
-#### useCapture
-
-```scala
-div(onClick.useCapture --> captureModeClickObserver)
-```
-
-JS DOM has two event modes: capture, and bubbling. Typically and by default everyone uses the latter, but capture mode is sometimes useful for event listener priority/ordering/efficiency (not specific to Laminar, standard JS DOM rules/limitations apply).
-
-`.useBubbleMode` is the opposite of `.useCapture`. The former is the default, so you don't need to call it unless you're calling it on an EventProcessor that you've previously enabled capture mode for.
-
-See MDN [addEventListener](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) page for details (see "useCapture" section).
-
-
-#### Obtaining Typed Event Target
-
-Due to dynamic nature of Javascript, `dom.Event.target` is typed only as `dom.EventTarget` for most events, which is not useful when you want to get `ev.target.value` from a target that is a `dom.html.Input` (but doesn't know it). So, you can't do this:
-
-```scala
-// Does not work because .value is defined on dom.html.Input, but not on dom.EventTarget, which is what `ev` is :(
-input(typ := "text", onChange().map(ev => ev.target.value) --> inputStringBus)
-```
-
-Instead, use `mapToValue`, which essentially gives you `ev.target.value`:
-
-```scala
-input(typ := "text", onChange.mapToValue --> inputStringBus)
-```
-
-There's `mapToChecked` for checkboxes too by the way.
-
-For a more general solution, you can use `inContext`:
-
-```scala
-input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBus))
-```
-
-This feature is not specific to events at all. The general syntax is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. Its type is properly inferred to be `Input`, which is an alias for `ReactiveHtmlElement[dom.html.Input]`, thus its `.ref` property is precisely typed as `dom.html.Input`, which is a native JS type that has a `.value` property that holds the current text in the input.
-
-Because `thisNode.ref` refers to the element on which the event listener is **registered**, in JS DOM terms, it is actually equivalent to `dom.Event.currentTarget`, not `dom.Event.target` – the latter refers to the node at which the event **originates**. When dealing with inputs these two targets are usually the same since inputs don't have any child elements, but you need to be aware of this conceptual difference for other events. MDN docs: [target](https://developer.mozilla.org/en-US/docs/Web/API/Event/target), [currentTarget](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget).
-
-You might have noticed that some event props like `onClick` promise somewhat peculiar event types like `TypedTargetMouseEvent` instead of the expected `MouseEvent` – these refined types come from _Scala DOM Types_, and merely provide more specific types for `.target` (as much as is reasonably possible). These types are optional – if you don't care about `.target`, you can just treat such events as simple `MouseEvent`s because `TypedTargetMouseEvent` does in fact extend `MouseEvent`. `// @TODO [API] I don't think we need this, really`.
 
 
 ### Window & Document Events
 
-In Javascript, `window` and `document` support their own custom sets of events. You can obtain streams of those events like this: `documentEvents.onDomContentLoaded.map(ev => renderApp())`.
+In Javascript, `window` and `document` support their own custom sets of events. You can obtain streams of those events like this: `documentEvents(_.onDomContentLoaded).map(ev => renderApp())`.
 
 `windowEvents` provides similar access to `window` events.
 
-These event streams specify [`useCapture = false`](#usecapture), which is probably what you want. If you need capture mode for window or document events, you can instantiate a `DomEventStream` manually:
+All the standard event processors work for these events as well, so if you wanted to get document events in capture mode, you could say `documentEvents(_.onDomContentLoaded.useCapture)`.
 
-```scala
-new DomEventStream[TypedTargetEvent[dom.Node]](
-  dom.document,
-  onClick.name,
-  useCapture = true
-)
-```
-
-Depending on your desired logic, you might not have a Laminar element to act as an Owner for subscriptions of these event streams. For example, if you implement an Ajax service based on observables, you would probably want it making requests regardless of observers. For such app-wide subscriptions you can use `unsafeWindowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar, so you will need to clean them up manually if needed.
+Depending on your desired logic, you might not have a Laminar element to act as an Owner for subscriptions of these event streams. For example, if you implement an Ajax service based on observables, you would probably want it to make your requests regardless of observers. For such app-wide subscriptions you can use `unsafeWindowOwner`. It will never kill its possessions, so needless to say – use with caution. Any subscriptions created with this owner will never be cleaned up by Laminar, so you will need to clean them up manually if needed.
 
 
 
 ## Controlled Inputs
 
-Controlled input is an HTML element whose `value` property (or `checked` property in case of checkboxes) is **locked** to a certain observable. You might be familiar with this concept from [React.js](https://reactjs.org/docs/forms.html#controlled-components). Here is how you do this in Laminar:
+A controlled input is an HTML element whose `value` property (or `checked` property in case of checkboxes) is **locked** to a certain observable. You might be familiar with this concept from [React.js](https://reactjs.org/docs/forms.html#controlled-components). Here is how you do this in Laminar:
 
 ```scala
 val zipVar = Var("")
@@ -1295,7 +1556,7 @@ Note that Laminar can't do anything if you manually set the element's value, eit
 
 ### Life Without Controlled Inputs
 
-You can however use `setAsValue` when you don't need the input to be controlled. The point of having controlled inputs is being able to update their `value` from two sources: user input, and by updating the observable you're locking the value into. We solve the conflicts between these two sources by requiring that user input updates the observable to which value is locked if you want such user input to be allowed. 
+You can use `setAsValue` and `setAsValue` event processors when you don't need the input to be controlled. The point of having controlled inputs is being able to update their `value` from two sources: user input, and by updating the observable you're locking the value into. With controlled inputs, we solve the conflicts between these two sources by requiring that user input updates the observable to which value is locked if you want such user input to be allowed. 
 
 But if you only care about user input, and don't need to lock the value to an observable, you can achieve the same without controlled inputs, for example:
 
@@ -1309,24 +1570,24 @@ input(
 )
 ```
 
-And we only need `setAsValue` in this case because we want to transform the user's input. If we didn't need to filter for digits, we wouldn't need setAsValue as the browser would do the job for us.
+And we only need `setAsValue` in this case because we want to transform the user's input. If we didn't need to filter for digits, we wouldn't need `setAsValue` as the browser would do the job for us.
 
-One limitation of this approach is that we can't "undo" invalid user input because the `onInput` event is not `cancelable`. Well, you could do ugly-hack it, but you'd be reinventing controlled inputs to some extent. So, `setAsValue` is limited to **transforming** inputs. 
+One limitation of this approach is that we can't "undo" invalid user input because the `onInput` event is not `cancelable`. Well, you could ugly-hack it, but you'd be reinventing controlled inputs to some extent. So, `setAsValue` can't really **filter** user input events, it is limited to **transforming** them.
 
 
-### Why controlled inputs, again?
+### Why Controlled Inputs, Again?
 
 So, how is **not** using the `controlled` block different from controlled inputs?
 
 ```scala
 input(
   placeholder := "Enter zip code: ",
-  value <-- zipValueSignal,
+  value <-- zipValueSignal.distinct,
   onInput.mapToValue.map(_.filter(Character.isDigit)) --> zipValueObserver
 )
 ```
 
-This might look and often work a lot like controlled inputs, but it doesn't give you the guarantees that you want, and because of this you can run into issues. For example, without the `controlled` block, `value` is not actually locked to `zipValueSignal`. All that happens is that when `zipValueSignal` emits, we update the element's value to the emitted value. Ok, so what if the user types "123", and then later types another "a"? You'd expect "a" to be filtered out and the input to contain "123" after all this, but it will actually contain "123a", despite the Var containing "123". This is because `zipVar` never contained "123a", this value was transformed into "123" before it reached the Var, and so the Var has nothing new to emit (in this particular case it's because signals don't emit values that `==` the previous value, but there can be other similar situations using `filter` etc.). But at the same time, the user did type "123a" and so that's what you see in the input box. And before you can think of using `preventDefault` to solve this, `onInput` events are not cancelable. There's a more elaborate explanation in [#79](https://github.com/raquo/Laminar/issues/79).
+This might look and often work a lot like controlled inputs, but it doesn't give you the guarantees that you want, and because of this you can run into issues. For example, without the `controlled` block, `value` is not actually locked to `zipValueSignal.distinct`. All that happens is that when `zipValueSignal.distinct` emits, we update the element's value to the emitted value. Ok, so what if the user types "123", and then later types another "a"? You'd expect "a" to be filtered out and the input to contain "123" after all this, but it will actually contain "123a", despite the Var containing "123". This is because `zipValueSignal` never emitted "123a", this value was transformed into "123" before it reached it, and so the `distinct` operator has filtered out the duplicate "123" value. But at the same time, the user did type "123a", and so that's what the browser put in the input box. And before you can think of using `preventDefault` to solve this, you can't, because `onInput` events are not cancelable. There's a more elaborate explanation in [#79](https://github.com/raquo/Laminar/issues/79), although it's outdated because as of Laminar 15 signals don't have built-in `==` checks (but we replaced that with `.distinct` operator for the sake of this example).
 
 So, bottom line is, if you need to transform or filter user input, use either controlled inputs or `setAsValue`.
 
@@ -1344,11 +1605,12 @@ So here are the events that work in all browsers of interest:
 | textarea | onInput | value |  |
 | select | onChange | value | Does not work with multi-select |
 
+
 ### Controlled Inputs Caveats
 
-* You can't have conflicting `controlled` blocks on the same element. You also can't have a `value <-- ???` binder outside of a controlled block on an element that already has `value` controlled. Trying to do that will throw and exception. The `controlled` block defines the sole source of truth for the `value` prop.
+* You can't have conflicting `controlled` blocks on the same element. You also can't have a `value <-- ???` binder outside of a controlled block on an element that already has `value` controlled. Trying to do that will throw and exception. If the `controlled` block is added to the element, it defines the sole source of truth for the `value` prop.
 
-* The `onInput` (or `onClick` etc.) event listener defined inside of the controlled block will be run before any other event listeners on this element, even if you registered those other listeners before adding the controlled block. If the controlled block is added to an element after it has already been mounted, under the hood this is achieved by removing all the Laminar listeners from the element and re-adding them in the same relative order, but **after** the . This is done to ensure that other event listeners do not interfere with the controlled input functionality (e.g. by stopping propagation of the event).
+* The `onInput` (or `onClick` etc.) event listener defined inside of the `controlled` block will be run before any other event listeners on this element, even if you registered those other listeners before adding the controlled block. If the controlled block is added to an element after it has already been mounted, under the hood this is achieved by removing all the Laminar listeners from the element and re-adding them in the same relative order, but **after** the controlled event listener. This is done to ensure that other event listeners do not interfere with the controlled input functionality (e.g. by stopping propagation of the event).
 
 * Remember that Laminar's `controlled` block sets the input's `value` (or `checked`, whichever you use) property to the controlling observable's last emitted value after each input event. This means that all other input event listeners will not see the user's real input, they will see whatever input value was set by the controlled block. This is because the event itself doesn't carry the information about the user's input, it's only stored in the input element's `value` property. So as Laminar updates that property to match the controlled observable, there is no chance for other event listeners to see the user's raw input.
 
@@ -1359,20 +1621,20 @@ So here are the events that work in all browsers of interest:
 
 Ownership is a core Airstream concept. You **really** need to read about it in [Airstream docs](https://github.com/raquo/Airstream#ownership) before proceeding with this section.
 
-Basically, Airstream does not let you create a leaky resource without specifying an Owner which will eventually kill said resource. For example, adding an Observer to an EventStream is a potential memory leak. Once a subscription is established like that, the stream in question obtains a reference to that observer, and the stream's parent stream obtains a reference to this stream, etc. Depending on how long that chain is and how it's used, there is a good chance it will either never be garbage collected or will be garbage collected much later than optimal.
+Basically, Airstream does not let you create a leaky resource without specifying an `Owner` that is responsible for eventually killing said resource. For example, adding an Observer to an EventStream is a potential memory leak. Once a subscription is established like that, the stream in question obtains a reference to that observer, and the stream's parent stream obtains a reference to this stream, etc. Depending on how long that chain is and how it's used, there is a good chance it will either never be garbage collected or will be garbage collected much later than optimal.
 
-With other libraries you would need to eventually manually call `subscription.kill()` for every `addObserver` call you make to avoid memory leaks like that. In Airstream however, you do not need to do that. Instead, when adding an observer you need to specify not just the observer, but also the Owner of this new subscription.
+With other libraries you would need to manually call `subscription.kill()` for every `addObserver` call you make to avoid memory leaks like that. In Airstream however, you do not need to do that. Instead, when adding an observer you need to specify not just the observer, but also the Owner of this new subscription, and that Owner assumes the responsibility for killing the subscription when it's time.
 
 
 ### Laminar's Use of Airstream Ownership
 
 In Laminar versions **prior to v0.8.0** every Laminar element was an `Owner`. In fact, when you used `<--` methods on elements or in their modifiers, the element in question was the owner of the subscription that the `<--` method created. Laminar elements killed their subscriptions when they were unmounted. Sounds simple and effective enough, yet this old design had two known flaws:
 
-1. The subscriptions of an element that was created but never added to the DOM  would be created when the element was instantiated, but would never be killed since it was never unmounted from the DOM, so you needed to be careful to not create any elements that you weren't going to immediately put into the DOM.
+1. The subscriptions belonging to an element would be created when the element was instantiated, and killed when it was unmounted. That means that elements that were created but never mounted into the DOM would never kill their subscriptions, since the elements were technically never unmounted. Because of that, you needed to be careful not to create any elements that you weren't going to immediately put into the DOM.
 
 2. Once you unmounted an element, its subscriptions would be killed with no way to resurrect them. So essentially you weren't able to reuse previously unmounted elements as their subscriptions wouldn't be re-activated when the element was put back into the DOM.
 
-Laminar v0.8.0 introduced dynamic subscriptions with a new contract: an element is no longer an Owner, instead an element creates a new Owner every time it's mounted, and kills that owner and all of its subscriptions when it's unmounted. This means that the element's subscriptions are not activated until it's mounted, solving problem 1. We now also track your subscriptions in a way that allows Laminar to re-activate them after the element is re-mounted, solving problem 2.
+Laminar v0.8.0 introduced dynamic subscriptions with a new contract: an element is no longer an Owner, instead an element creates a new Owner every time it's mounted, and kills that owner and all of its subscriptions when it's unmounted. This means that the element's subscriptions are not activated until it's mounted, solving problem 1. And we now also track your subscriptions in a way that allows Laminar to re-activate them after the element is re-mounted, solving problem 2.
 
 Let's see how ownership in the new Laminar works under the hood by analyzing a simple snippet. You might want to follow along by reading the source code of the methods involved.
 
@@ -1383,11 +1645,11 @@ val element = a(href <-- urlStream) // create the element
 render(element) // mount the element
 ```
 
-1. `href <-- urlStream` creates a `Binder` (see `ReactiveProp.<--`) 
+1. `href <-- urlStream` creates a `Binder` (see `HtmlProp.<--`) 
 
 2. That `Binder` being a `Modifier` is applied to the `a` element immediately after it's created by the `a(...)` call.
 
-3. That Binder's apply method does this (see `ReactiveProp.<--` again):
+3. That Binder's apply method does this (actual source is split between `KeyUpdater.bind` and `HtmlProp.<--`):
   
     ```scala
     ReactiveElement.bindFn(element, valueSource) { value =>
@@ -1399,12 +1661,11 @@ render(element) // mount the element
   
     ```scala
     new DynamicSubscription(element.dynamicOwner, activate = owner => Some(
-        val subscription: Subscription = urlStream.foreach { url =>
-          DomApi.setHtmlProperty(element, href, url)
-        } (owner)
-        subscription
-      )
-    )
+      val subscription: Subscription = urlStream.foreach { url =>
+        DomApi.setHtmlProperty(element, href, url)
+      } (owner)
+      subscription
+    ))
     ```
    
 4. So when the `href <-- urlStream` Binder is applied to the `a()` element, it creates a `DynamicSubscription` which in turn has an activation function that creates a regular non-Dynamic `Subscription`.
@@ -1451,11 +1712,13 @@ With proper use of ownership, Laminar's memory management is pleasantly automati
 
 * Corollary: if you have a parent element which has dynamic children, for example by means of `children <-- childrenStream`, each child must NOT use the parent's `Owner` to create subscriptions, because those subscriptions would only terminate when the parent is unmounted, not the individual child. So if you cycle through a lot of children you will accumulate worse-than-useless subscriptions that should have been killed when previous children were unmounted.
 
-  Of course, Laminar's API does not let you do this _easily_. Also of course, Laminar's API does let you do this if you directly ask for this by getting the parent's `Owner` from an `onMount` hook and passing that owner to children. With Laminar you can always shoot yourself in the foot, but you have to explicitly ask for it. So you should prefer less manual methods: a simple `foo <-- bar` instead of messing with owners manually.
+  Of course, Laminar's API does not let you do this _easily_. Also of course, Laminar's API does let you do this if you directly ask for this by getting the parent's `Owner` from an `onMount*` hook and passing that owner to children. With Laminar you can always shoot yourself in the foot, but you have to explicitly ask for it. So you should prefer less manual methods: a simple `foo <-- bar` instead of messing with owners manually.
 
 Lastly, a warning about `textContent` and `innerHTML`:
 
 * You must not set [textContent](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent) or [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) properties on Laminar elements that have any other children given to them by Laminar. We deliberately do not provide an API to set these properties because of their messy side effects. If you need this functionality, it is up to you to use native JS functionality available on `element.ref` to set those properties, **and** ensure that you either manage the contents of a particular element with Laminar, or you do it manually with `innerHtml` / `textContent`, not both. The two approaches don't mix on the same element. Needless to say, when using native JS methods including `innerHtml` you need to understand [XSS](https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)) and other risks as well.
+
+  Note: if you think you want innerHTML, you might want to settle for Laminar's [unsafeParseHtmlString](#parsing-html-or-svg-strings-into-elements) method, which is allows for a smoother integration of random HTML code snippets into Laminar.
 
 
 
@@ -1557,47 +1820,6 @@ div(
 ```
 
 
-### onMountSet
-
-As you might remember, `Setter` modifiers are idempotent, which is to say applying the same modifier N times in a row to the same element has the same effect regardless of what N is, if N >= 1. We have a special helper to apply one or more Setters on mount:
-
-```scala
-val link = a(
-  "website",
-  onMountSet(ctx => {
-    println("mount")
-    if (ctx.thisNode.maybeParent.exists(_.ref.classList.contains("-legit"))) {
-      href := "http://example.com"
-    } else {
-      href := "http://evil.com"
-    }
-  })
-)
-``` 
-
-In this contrived example, every time this `link` element is mounted, the callback will execute, and the resulting setter will be applied to the element. So every time `link` is mounted, it will print "mount", check whether its new parent has a "-legit" CSS class name, and set the `href` attribute based on that.
-
-Note that when the element is unmounted, any setters applied to it this way are not un-applied. So for example if you were to apply red color to evil links like this:
-
-```scala
-val link = a(
-  "website",
-  onMountSet(ctx => {
-    println("mount")
-    if (ctx.thisNode.maybeParent.exists(_.ref.classList.contains("-legit"))) {
-      href := "http://example.com"
-    } else {
-      List(
-        href := "http://evil.com",
-        color := "red"
-      )
-    }
-  })
-)
-```
-
-Once `link` was mounted and deemed evil, it would become red and never cease being red even if it was re-mounted as a non-evil link, because there is no code to unset this red color or replace it with any other color. As you might have guessed, `Seq[Setter[El]]` implicitly converts to `Setter[El]`, so all you need to do is to change `href := "http://example.com"` to `List(href := "http://example.com", color := "black")` to make the color change with the url.
-
 
 ### onMountBind
 
@@ -1663,7 +1885,7 @@ div(
 )
 ```
 
-Essentially `onMountInsert` is to `Inserter` what `onMountBind` is to `Binder`, and what `onMountSet` is to `Setter`, and what `onMountCallback` is to `() => Unit`.
+Essentially `onMountInsert` is to `Inserter` what `onMountBind` is to `Binder`, and what `onMountCallback` is to `() => Unit`.
 
 Thus the callback can return any `Inserter`, including those created by modifiers `children <-- ???`, `children.command <-- ???`, `child <-- ???`, `child.maybe <-- ???`, and `child.text <-- ???`.
 
@@ -1675,7 +1897,7 @@ So why does `onMountInsert` need to exist, and why doesn't Laminar allow us to p
 
 But as you might recall Inserters like `child <-- ...` and `children <-- ...` reserve a stable spot in the parent element where they will insert new children. That spot is after the last child of the parent element _at the time of reservation_.
 
-This would obviously not work inside `onMountInsert` – the callback is executed only on mount, so the `child <-- childStream` modifier is added only on mount, and at that point the element already has two child nodes in it: `div(TextNode("Hello, "), TextNode("!"))`. Therefore `child <-- childStream` would have reserved a spot **after** "!", which is not what we want, we obviously want it to reserve the spot where the `onMountInsert` modifier itself is visually located, i.e. between "Hello, " and "!".
+This would obviously not work inside `onMountBind` – the callback is executed only on mount, so the `child <-- childStream` modifier is added only on mount, and at that point the element already has two child nodes in it: `div(TextNode("Hello, "), TextNode("!"))`. Therefore `child <-- childStream` would have reserved a spot **after** "!", which is not what we want, we obviously want it to reserve the spot where the `onMountInsert` modifier itself is visually located, i.e. between "Hello, " and "!".
 
 The `onMountInsert` modifier exists to solve this – it reserves a spot when it's applied to the parent element – before any mount events are fired – and provides information about that reserved spot to the `Inserter` returned by the callback. And that reserved spot persists after mounting and unmounting, of course.
 
@@ -1741,6 +1963,76 @@ Assuming container is present in the DOM, `render(container, contentEl)` will im
 8. Now that this subscription is active, if we emit "Nikita" into `nameStream` a `span("Hello ", b("Nikita"))` element will be created and inserted into `contentEl`. This will mount / activate this new `span` element, and then its child `b("Nikita")` by the same cascading logic we described above.
 
 9. If we then emit "Ivan" into `nameStream`, the parent of `span("Hello ", b("Nikita"))` will be set to `None`, and that will trigger an unmount / deactivation cascade for these `span` and `b` elements. A new element will then be created and mounted / activated: `span("Hello ", b("Ivan"))`.  
+
+
+
+## Integrations With Other Libraries
+
+Laminar is very flexible and magic-free. Its declarative-feeling API is easy to decompose into low-level JS primitives like elements and callbacks, and it offers integration helpers for such third party primitives, so it's generally very easy to make use of other libraries with Laminar.
+
+Note: This section is not very complete. We need more examples.
+
+
+### React.js
+
+See the [video chapters](https://www.youtube.com/watch?v=L_AHCkl6L-Q&t=3865s) on rendering Laminar elements inside React and the other way.
+
+This is definitely possible, but might get a bit annoying due to the difference in approaches between Laminar and React. Do this only if you have a pre-existing React application. For greenfield development, if you want to use pre-made components from the JS ecosystem, my advice is don't use React components, find good Web Components instead (see below).
+
+
+### Web Components
+
+[Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components) is a technology that lets one implement a custom component using any JS library they want, and expose an API which is similar to native HTML DOM API, so that end users can interact with said component using attributes / properties / methods much like they would interact with any other HTML element. Well, except that all those attributes and properties are defined by the Web Component's author, and instead of the browser processing the user's declarations, they are passed over to the web component's JS implementation.
+
+With such an API, any UI library that can manage attributes and properties of HTML elements can make use of Web Components. Laminar is great at managing attributes and properties of HTML elements, so using Web Components from Laminar is very easy. All you need to do is create a typed interface to the JS Web Component – this is conceptually similar to making Scala.js interfaces to JS libraries, except you need to define the interface in a Laminar-specific format, because you want to use Laminar's typed API to talk to the web component, not the low-level untyped JS DOM API.
+
+You can see some examples of such interfaces and their usage in [live examples](https://laminar.dev/examples/web-components), and there is a [whole library](https://github.com/sherpal/LaminarSAPUI5Bindings) of such Laminar bindings for SAP UI5 web components.
+
+If you review the source code of all these bindings, you'll see that there's no special API for Web Components in Laminar, all we do is define custom attributes / properties / slots / methods that the given Web Component exposes, and use one simple pattern for accessing them in a scoped manner.
+
+
+### Rendering Third Party HTML or SVG Elements
+
+If you want to render a native HTML element (`dom.html.Element`) created a third party library, you can convert it into a Laminar element using `foreignHtmlElement` or `foreignSvgElement`. Once you have that, you can perform all the usual Laminar operations on it:
+
+```scala
+// Render in Laminar
+div(foreignSvgElement(myJsSvgElement))
+
+// Modify the element before rendering:
+div(
+  foreignHtmlElement(myJsHtmlElement).amend(
+    onClick --> ???,
+    aria.labelledBy := ???,
+    span("Add new child")
+  )
+)
+```
+
+Of course, it's on you to ensure that any such operations on the element will not upset the third party library or whoever provided the element to you.
+
+
+### Parsing HTML or SVG Strings into Elements
+
+Laminar also has `unsafeParseSvgString(dangerousSvgString: String): dom.svg.Element` to help render SVG strings (and a similar method for HTML). Rendering such an element requires two steps, but that inconvenience is by design, appropriate for such an unsafe API:
+
+```scala
+div(
+  // SVG elements:
+  foreignSvgElement(DomApi.unsafeParseSvgString("<svg>....</svg>")),
+  // HTML elements:
+  foreignHtmlElement(DomApi.unsafeParseHtmlString("<div onclick="alert('pwned')"></div>"))
+)
+```
+
+**Warning:** These `unsafeParse*` methods expose you to [XSS attacks](https://owasp.org/www-community/attacks/xss/), so you absolutely must not run them on untrusted strings. Use them only for including trusted content such as hardcoded SVG icon strings. If you really need to include attacker-provided content into those strings, you must escape those values to prevent them from being interpreted as code, or breaking your HTML in other ways.
+
+
+### Observables Interop
+
+You can easily convert any `js.Promise` or `scala.Future` to Airsream observables using `{EventStream,Signal}.{fromJsPromise,fromFuture}` methods, but you can also create a deeper integration with a different observable system – see [Custom Event Sources](https://github.com/raquo/Airstream/#custom-event-sources) in Airstream docs. If you make something useful I encourage you to publish it as a library or at least as a gist. Personally, on the frontend I only use Airstream, so I wouldn't be a good maintainer of such an integration myself.
+
+Integration of observables with callback-driven APIs is usually achieved by providing `observer.onNext` as the callback (e.g. you can pass something like `onclick = clickEventBus.writer.onNext` to React). You might want to check out various Airstream helpers like [EventStream.withJsCallback](https://github.com/raquo/Airstream/#eventstreamwithcallback-and-withobserver) for this.
 
 
 
