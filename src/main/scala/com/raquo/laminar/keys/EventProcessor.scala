@@ -182,7 +182,7 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Unsafe – Get the value of `event.target`, cast to a certain element type
    *
    * You should generally avoid this in favor of other helpers like
-   * `mapToValue` or `inContext { thisNode =>`.
+   * `mapToValue` or `inContext { thisNode => ... }`.
    */
   def mapToTargetAs[Ref <: dom.EventTarget]: EventProcessor[Ev, Ref] = {
     withNewProcessor { ev =>
@@ -214,7 +214,7 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * button(onClick.preventDefault.flatMap(_ => makeAjaxRequest()) --> observer)
     *
-    * #TODO[IDE] IntelliJ (2022.2.2) shows false errors when using this flatMap implementation,
+    * #TODO[IDE] IntelliJ (2022.3.2) shows false errors when using this flatMap implementation,
     *  at least with Scala 2, making it annoying. Use flatMapStream or flatMapSignal to get around that.
     *
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,

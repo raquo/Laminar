@@ -181,7 +181,7 @@ val inputMods = Seq(typ := "text", defaultValue := "Me")
 div(
   h1("Hello world", color := "red"),
   inputCaption,
-  input(inputMods, name := "fullName"),
+  input(inputMods, nameAttr := "fullName"),
   div(
     ">>",
     button("Submit"),
@@ -789,7 +789,7 @@ The `split` operator requires a unique key for each item, such as `_.id`. But wh
 
 One option is to change your model to create an ephemeral key, that is generated on the frontend and never sent to the backend. Airstream does not need the key to be meaningful or consistent across user sessions – the key simply needs to identify a certain item in the dynamic list for as long as Laminar is rendering that list.
 
-Another, simpler solution, is often quite workable – with `splitByIndex` you can use the index of the item in the list as its key. That way, when you append an item to the list, existing items will not be re-rendered, or if you update the data in some item(s), their elements won't be re-created. However, I don't recommend using this if you will be inserting new items in the beggining or middle of the list, or if you will be reordering the list of items – such cases really call for a proper key.
+Another, simpler solution, is often quite workable – with `splitByIndex` you can use the index of the item in the list as its key. That way, when you append an item to the list, existing items will not be re-rendered, or if you update the data in some item(s), their elements won't be re-created. However, I don't recommend using this if you will be inserting new items in the beginning or middle of the list, or if you will be reordering the list of items – such cases really call for a proper key.
 
 
 #### Splitting Options
@@ -1297,7 +1297,7 @@ val decrementButton = button("less", onClick.mapTo(-1) --> diffBus)
 val diffStream: EventStream[Int] = diffBus.events // emits 1 or -1
 ```
 
-This `mapTo` method is defined on `EventProcessor`, which `onClick` (`ReactiveEventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order. See the API docs for these methods [here](https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/keys/EventProcessor.html).
+This `mapTo` method is defined on `EventProcessor`, which `onClick` (`EventProp`) is implicitly converted to. Also available are `mapToStrict`, `map`, `filter`, `collect`, `orElse`,`preventDefault`, `stopPropagation`, `mapToEvent`, `mapToValue`, `mapToChecked`,  etc. and you can chain them in any order. See the API docs for these methods [here](https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/keys/EventProcessor.html).
 
 More examples:
 
@@ -1319,7 +1319,7 @@ div(onClick.collect { case ev if ev.clientX > 100 => "yes" } --> yesStringBus)
 // @TODO[Docs] Come up with more relatable examples
 ```
 
-Just like `ReactiveEventProp`-s, `EventProcessor`-s are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:
+Just like `EventProp`-s, `EventProcessor`-s are immutable and contain no element-specific state, so you can reuse them freely across multiple elements. For example:
 
 ```scala
 val onEnterKeyUp = onKeyUp.filter(_.keyCode == dom.KeyCode.Enter)
@@ -1387,8 +1387,6 @@ input(inContext(thisNode => onChange.mapTo(thisNode.ref.value) --> inputStringBu
 This feature is not specific to events at all. The general syntax is `inContext(El => Modifier[El]): Modifier[El]`. `thisNode` refers to the element to which this modifier will be applied. Its type is properly inferred to be `Input`, which is an alias for `ReactiveHtmlElement[dom.html.Input]`, thus its `.ref` property is precisely typed as `dom.html.Input`, which is a native JS type that has a `.value` property that holds the current text in the input.
 
 Because `thisNode.ref` refers to the element on which the event listener is **registered**, in JS DOM terms, it is actually equivalent to `dom.Event.currentTarget`, not `dom.Event.target` – the latter refers to the node at which the event **originates**. When dealing with inputs these two targets are usually the same since inputs don't have any child elements, but you need to be aware of this conceptual difference for other events. MDN docs: [target](https://developer.mozilla.org/en-US/docs/Web/API/Event/target), [currentTarget](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget).
-
-You might have noticed that some event props like `onClick` promise somewhat peculiar event types like `TypedTargetMouseEvent` instead of the expected `MouseEvent` – these refined types come from _Scala DOM Types_, and merely provide more specific types for `.target` (as much as is reasonably possible). These types are optional – if you don't care about `.target`, you can just treat such events as simple `MouseEvent`s because `TypedTargetMouseEvent` does in fact extend `MouseEvent`. `// @TODO [API] I don't think we need this, really`.
 
 
 

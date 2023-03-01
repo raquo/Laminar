@@ -36,6 +36,11 @@ trait RenderableNode[-Component] {
 
 object RenderableNode {
 
+  /**
+   * A `Component` must have a 1-to-1 relationship to a Laminar ChildNode.
+   * Your Component class/trait should have something like `val node: ChildNode.Base`
+   * or `lazy val node: ChildNode.Base` in it, it must not be a `var` or a `def`.
+   */
   def apply[Component](
     renderNode: Component => ChildNode.Base,
     renderNodeSeq: immutable.Seq[Component] => immutable.Seq[ChildNode.Base],

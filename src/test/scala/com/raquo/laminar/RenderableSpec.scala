@@ -1,6 +1,5 @@
 package com.raquo.laminar
 
-import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.ew
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.modifiers.{RenderableNode, RenderableText}

@@ -21,11 +21,11 @@ class RootNode(
 ) extends ParentNode[dom.Element] {
 
   if (container == null) {
-    throw new Exception("Unable to mount Laminar RootNode into a null container.")
+    throw new Exception("Unable to mount Laminar RootNode into a null container. See https://laminar.dev/documentation#waiting-for-the-dom-to-load")
   }
 
   if (!ChildNode.isNodeMounted(container)) {
-    throw new Exception("Unable to mount Laminar RootNode into an unmounted container.")
+    throw new Exception("Unable to mount Laminar RootNode into an unmounted container. See https://laminar.dev/documentation#rendering")
   }
 
   /** When we create a Root, we don't want to create a new HTML Element, we want to

@@ -34,7 +34,7 @@ As mentioned above, I did previously use virtual DOM in Laminar, and this experi
 
 Outwatch and Laminar are quite similar cosmetically – their arrows notation was just too good not to steal – but they're vastly different under the hood. If you're curious, you can dive into sources to compare how a simple expression such as `div(widthAttr <-- widthStream)` is handled. See what exactly happens when a new event is sent to `widthStream`. Ignore the internals of the streaming libraries (RxJS and Airstream) which call `Observer.onNext` (as they'll be quite similar), but do look at the rest of the code path otherwise. Here it is for Laminar v0.8:
 
-1) Go to definition of this `<--` method, it's in `ReactiveHtmlAttr` because that's what `widthAttr` is:
+1) Go to definition of this `<--` method, it's in `HtmlAttr` because that's what `widthAttr` is:
 
 ```scala
   def <--(values: Observable[V]): Binder[HtmlElement] = {
