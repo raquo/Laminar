@@ -1,4 +1,4 @@
-import com.raquo.domtypes.codegen.DefType.LazyVal
+import com.raquo.domtypes.codegen.DefType.{LazyVal, Val}
 import com.raquo.domtypes.codegen.{CanonicalCache, CanonicalDefGroups, CanonicalGenerator, CodeFormatting, SourceRepr}
 import com.raquo.domtypes.common.{HtmlTagType, SvgTagType}
 import com.raquo.domtypes.defs.styles.StyleTraitDefs
@@ -59,7 +59,7 @@ object DomDefsGenerator {
           "@tparam Ref - type of elements with this tag, e.g. dom.html.Input for \"input\" tag"
         ),
         keyImplName = "htmlTag",
-        defType = LazyVal
+        defType = Val
       )
 
       generator.writeToFile(
@@ -93,7 +93,7 @@ object DomDefsGenerator {
           "@tparam Ref    - type of elements with this tag, e.g. dom.svg.Circle for \"circle\" tag"
         ),
         keyImplName = "svgTag",
-        defType = LazyVal
+        defType = Val
       )
 
       generator.writeToFile(
@@ -119,7 +119,7 @@ object DomDefsGenerator {
         baseImplDefComments = List(
           "Create HTML attribute (Note: for SVG attrs, use L.svg.svgAttr)",
           "",
-          "@param key   - name of the attribute, e.g. \"value\"",
+          "@param name  - name of the attribute, e.g. \"value\"",
           "@param codec - used to encode V into String, e.g. StringAsIsCodec",
           "",
           "@tparam V    - value type for this attr in Scala",
@@ -128,7 +128,7 @@ object DomDefsGenerator {
         namespaceImports = Nil,
         namespaceImpl = _ => ???,
         transformAttrDomName = identity,
-        defType = LazyVal
+        defType = Val
       )
 
       generator.writeToFile(
@@ -153,7 +153,7 @@ object DomDefsGenerator {
         baseImplDefComments = List(
           "Create SVG attribute (Note: for HTML attrs, use L.htmlAttr)",
           "",
-          "@param key   - name of the attribute, e.g. \"value\"",
+          "@param name  - name of the attribute, e.g. \"value\"",
           "@param codec - used to encode V into String, e.g. StringAsIsCodec",
           "",
           "@tparam V    - value type for this attr in Scala",
@@ -197,7 +197,7 @@ object DomDefsGenerator {
         baseImplDefComments = List(
           "Create ARIA attribute (Note: for HTML attrs, use L.htmlAttr)",
           "",
-          "@param key   - suffix of the attribute, without \"aria-\" prefix, e.g. \"labelledby\"",
+          "@param name  - suffix of the attribute, without \"aria-\" prefix, e.g. \"labelledby\"",
           "@param codec - used to encode V into String, e.g. StringAsIsCodec",
           "",
           "@tparam V    - value type for this attr in Scala",
@@ -206,7 +206,7 @@ object DomDefsGenerator {
         namespaceImports = Nil,
         namespaceImpl = _ => ???,
         transformAttrDomName = transformAttrDomName,
-        defType = LazyVal
+        defType = Val
       )
 
       generator.writeToFile(
@@ -232,14 +232,14 @@ object DomDefsGenerator {
         baseImplDefComments = List(
           "Create custom HTML element property",
           "",
-          "@param key   - name of the prop in JS, e.g. \"value\"",
+          "@param name  - name of the prop in JS, e.g. \"value\"",
           "@param codec - used to encode V into DomV, e.g. StringAsIsCodec,",
           "",
           "@tparam V    - value type for this prop in Scala",
           "@tparam DomV - value type for this prop in the underlying JS DOM.",
         ),
         baseImplName = "htmlProp",
-        defType = LazyVal
+        defType = Val
       )
 
       generator.writeToFile(
@@ -271,14 +271,14 @@ object DomDefsGenerator {
           baseImplDefComments = List(
             "Create custom event property",
             "",
-            "@param key - event type in JS, e.g. \"click\"",
+            "@param name - event type in JS, e.g. \"click\"",
             "",
             "@tparam Ev - event type in JS, e.g. dom.MouseEvent",
           ),
           outputBaseImpl = true,
           keyKind = "EventProp",
           keyImplName = "eventProp",
-          defType = LazyVal
+          defType = Val
         )
 
         generator.writeToFile(
@@ -301,7 +301,7 @@ object DomDefsGenerator {
           outputBaseImpl = false,
           keyKind = "EventProp",
           keyImplName = "eventProp",
-          defType = LazyVal
+          defType = Val
         )
 
         generator.writeToFile(
@@ -332,11 +332,11 @@ object DomDefsGenerator {
         baseImplDefComments = List(
           "Create custom CSS property",
           "",
-          "@param key - name of CSS property, e.g. \"font-weight\"",
+          "@param name - name of CSS property, e.g. \"font-weight\"",
           "",
-          "@tparam V  - type of values recognized by JS for this property, e.g. Int",
-          "             Note: String is always allowed regardless of the type you put here.",
-          "             If unsure, use String type as V.",
+          "@tparam V   - type of values recognized by JS for this property, e.g. Int",
+          "              Note: String is always allowed regardless of the type you put here.",
+          "              If unsure, use String type as V.",
         ),
         baseImplName = "styleProp",
         defType = LazyVal,

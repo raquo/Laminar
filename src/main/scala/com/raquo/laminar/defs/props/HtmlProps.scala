@@ -14,22 +14,22 @@ trait HtmlProps {
   /**
     * Create custom HTML element property
     * 
-    * @param key   - name of the prop in JS, e.g. "value"
+    * @param name  - name of the prop in JS, e.g. "value"
     * @param codec - used to encode V into DomV, e.g. StringAsIsCodec,
     * 
     * @tparam V    - value type for this prop in Scala
     * @tparam DomV - value type for this prop in the underlying JS DOM.
     */
-  def htmlProp[V, DomV](key: String, codec: Codec[V, DomV]): HtmlProp[V, DomV] = new HtmlProp(key, codec)
+  def htmlProp[V, DomV](name: String, codec: Codec[V, DomV]): HtmlProp[V, DomV] = new HtmlProp(name, codec)
 
 
-  @inline protected def boolProp(key: String): HtmlProp[Boolean, Boolean] = htmlProp(key, BooleanAsIsCodec)
+  @inline protected def boolProp(name: String): HtmlProp[Boolean, Boolean] = htmlProp(name, BooleanAsIsCodec)
 
-  @inline protected def doubleProp(key: String): HtmlProp[Double, Double] = htmlProp(key, DoubleAsIsCodec)
+  @inline protected def doubleProp(name: String): HtmlProp[Double, Double] = htmlProp(name, DoubleAsIsCodec)
 
-  @inline protected def intProp(key: String): HtmlProp[Int, Int] = htmlProp(key, IntAsIsCodec)
+  @inline protected def intProp(name: String): HtmlProp[Int, Int] = htmlProp(name, IntAsIsCodec)
 
-  @inline protected def stringProp(key: String): HtmlProp[String, String] = htmlProp(key, StringAsIsCodec)
+  @inline protected def stringProp(name: String): HtmlProp[String, String] = htmlProp(name, StringAsIsCodec)
 
 
 
@@ -43,7 +43,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox#Indeterminate_state_checkboxes
     */
-  lazy val indeterminate: HtmlProp[Boolean, Boolean] = boolProp("indeterminate")
+  val indeterminate: HtmlProp[Boolean, Boolean] = boolProp("indeterminate")
 
 
   /**
@@ -55,7 +55,7 @@ trait HtmlProps {
     * 
     * See also: defaultChecked prop / attribute
     */
-  lazy val checked: HtmlProp[Boolean, Boolean] = boolProp("checked")
+  val checked: HtmlProp[Boolean, Boolean] = boolProp("checked")
 
 
   /**
@@ -66,7 +66,7 @@ trait HtmlProps {
     * 
     * See also: defaultSelected prop / attribute
     */
-  lazy val selected: HtmlProp[Boolean, Boolean] = boolProp("selected")
+  val selected: HtmlProp[Boolean, Boolean] = boolProp("selected")
 
 
   /**
@@ -76,7 +76,7 @@ trait HtmlProps {
     * 
     * See also: defaultValue prop / attribute
     */
-  lazy val value: HtmlProp[String, String] = stringProp("value")
+  val value: HtmlProp[String, String] = stringProp("value")
 
 
   // -- Reflected Attributes --
@@ -88,7 +88,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept
     */
-  lazy val accept: HtmlProp[String, String] = stringProp("accept")
+  val accept: HtmlProp[String, String] = stringProp("accept")
 
 
   /**
@@ -101,7 +101,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/action
     */
-  lazy val action: HtmlProp[String, String] = stringProp("action")
+  val action: HtmlProp[String, String] = stringProp("action")
 
 
   /**
@@ -109,7 +109,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/accesskey
     */
-  lazy val accessKey: HtmlProp[String, String] = stringProp("accessKey")
+  val accessKey: HtmlProp[String, String] = stringProp("accessKey")
 
 
   /**
@@ -119,7 +119,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/alt
     */
-  lazy val alt: HtmlProp[String, String] = stringProp("alt")
+  val alt: HtmlProp[String, String] = stringProp("alt")
 
 
   /**
@@ -131,7 +131,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autocapitalize
     */
-  lazy val autoCapitalize: HtmlProp[String, String] = stringProp("autocapitalize")
+  val autoCapitalize: HtmlProp[String, String] = stringProp("autocapitalize")
 
 
   /**
@@ -142,7 +142,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete
     */
-  lazy val autoComplete: HtmlProp[String, String] = stringProp("autocomplete")
+  val autoComplete: HtmlProp[String, String] = stringProp("autocomplete")
 
 
   /**
@@ -155,7 +155,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autofocus
     */
-  lazy val autoFocus: HtmlProp[Boolean, Boolean] = boolProp("autofocus")
+  val autoFocus: HtmlProp[Boolean, Boolean] = boolProp("autofocus")
 
 
   /**
@@ -165,7 +165,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-cols
     */
-  lazy val cols: HtmlProp[Int, Int] = intProp("cols")
+  val cols: HtmlProp[Int, Int] = intProp("cols")
 
 
   /**
@@ -177,7 +177,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td#attr-colspan
     */
-  lazy val colSpan: HtmlProp[Int, Int] = intProp("colSpan")
+  val colSpan: HtmlProp[Int, Int] = intProp("colSpan")
 
 
   /**
@@ -186,7 +186,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta#attr-content
     */
-  lazy val contentAttr: HtmlProp[String, String] = stringProp("content")
+  val contentAttr: HtmlProp[String, String] = stringProp("content")
 
 
   /**
@@ -198,7 +198,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox#attr-checked
     */
-  lazy val defaultChecked: HtmlProp[Boolean, Boolean] = boolProp("defaultChecked")
+  val defaultChecked: HtmlProp[Boolean, Boolean] = boolProp("defaultChecked")
 
 
   /**
@@ -209,7 +209,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option#attr-selected
     */
-  lazy val defaultSelected: HtmlProp[Boolean, Boolean] = boolProp("defaultSelected")
+  val defaultSelected: HtmlProp[Boolean, Boolean] = boolProp("defaultSelected")
 
 
   /**
@@ -220,7 +220,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#value
     */
-  lazy val defaultValue: HtmlProp[String, String] = stringProp("defaultValue")
+  val defaultValue: HtmlProp[String, String] = stringProp("defaultValue")
 
 
   /**
@@ -235,7 +235,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir
     */
-  lazy val dir: HtmlProp[String, String] = stringProp("dir")
+  val dir: HtmlProp[String, String] = stringProp("dir")
 
 
   /**
@@ -248,7 +248,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/disabled
     */
-  lazy val disabled: HtmlProp[Boolean, Boolean] = boolProp("disabled")
+  val disabled: HtmlProp[Boolean, Boolean] = boolProp("disabled")
 
 
   /**
@@ -262,7 +262,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download
     */
-  lazy val download: HtmlProp[String, String] = stringProp("download")
+  val download: HtmlProp[String, String] = stringProp("download")
 
 
   /**
@@ -270,7 +270,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/draggable
     */
-  lazy val draggable: HtmlProp[Boolean, Boolean] = boolProp("draggable")
+  val draggable: HtmlProp[Boolean, Boolean] = boolProp("draggable")
 
 
   /**
@@ -281,7 +281,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form#attr-enctype
     */
-  lazy val encType: HtmlProp[String, String] = stringProp("enctype")
+  val encType: HtmlProp[String, String] = stringProp("enctype")
 
 
   /**
@@ -289,7 +289,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/for
     */
-  lazy val forId: HtmlProp[String, String] = stringProp("htmlFor")
+  val forId: HtmlProp[String, String] = stringProp("htmlFor")
 
 
   /**
@@ -302,7 +302,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formenctype
     */
-  lazy val formEncType: HtmlProp[String, String] = stringProp("formEnctype")
+  val formEncType: HtmlProp[String, String] = stringProp("formEnctype")
 
 
   /**
@@ -315,7 +315,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formmethod
     */
-  lazy val formMethod: HtmlProp[String, String] = stringProp("formMethod")
+  val formMethod: HtmlProp[String, String] = stringProp("formMethod")
 
 
   /**
@@ -326,7 +326,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formnovalidate
     */
-  lazy val formNoValidate: HtmlProp[Boolean, Boolean] = boolProp("formNoValidate")
+  val formNoValidate: HtmlProp[Boolean, Boolean] = boolProp("formNoValidate")
 
 
   /**
@@ -339,7 +339,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formtarget
     */
-  lazy val formTarget: HtmlProp[String, String] = stringProp("formTarget")
+  val formTarget: HtmlProp[String, String] = stringProp("formTarget")
 
 
   /**
@@ -348,7 +348,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden
     */
-  lazy val hidden: HtmlProp[Boolean, Boolean] = boolProp("hidden")
+  val hidden: HtmlProp[Boolean, Boolean] = boolProp("hidden")
 
 
   /**
@@ -358,7 +358,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter#attr-high
     */
-  lazy val high: HtmlProp[Double, Double] = doubleProp("high")
+  val high: HtmlProp[Double, Double] = doubleProp("high")
 
 
   /**
@@ -374,7 +374,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta#attr-http-equiv
     */
-  lazy val httpEquiv: HtmlProp[String, String] = stringProp("httpEquiv")
+  val httpEquiv: HtmlProp[String, String] = stringProp("httpEquiv")
 
 
   /**
@@ -384,7 +384,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id
     */
-  lazy val idAttr: HtmlProp[String, String] = stringProp("id")
+  val idAttr: HtmlProp[String, String] = stringProp("id")
 
 
   /**
@@ -397,14 +397,14 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
     */
-  lazy val inputMode: HtmlProp[String, String] = stringProp("inputMode")
+  val inputMode: HtmlProp[String, String] = stringProp("inputMode")
 
 
   /**
     * For `optgroup` elements, specifies the name of the group of options, which the browser can
     * use when labeling the options in the user interface.
     */
-  lazy val labelAttr: HtmlProp[String, String] = stringProp("label")
+  val labelAttr: HtmlProp[String, String] = stringProp("label")
 
 
   /**
@@ -418,7 +418,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/lang
     */
-  lazy val lang: HtmlProp[String, String] = stringProp("lang")
+  val lang: HtmlProp[String, String] = stringProp("lang")
 
 
   /**
@@ -435,7 +435,7 @@ trait HtmlProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-loading
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-loading
     */
-  lazy val loadingAttr: HtmlProp[String, String] = stringProp("loading")
+  val loadingAttr: HtmlProp[String, String] = stringProp("loading")
 
 
   /**
@@ -445,7 +445,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter#attr-low
     */
-  lazy val low: HtmlProp[Double, Double] = doubleProp("low")
+  val low: HtmlProp[Double, Double] = doubleProp("low")
 
 
   /**
@@ -455,7 +455,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/minlength
     */
-  lazy val minLength: HtmlProp[Int, Int] = intProp("minLength")
+  val minLength: HtmlProp[Int, Int] = intProp("minLength")
 
 
   /**
@@ -465,7 +465,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/maxlength
     */
-  lazy val maxLength: HtmlProp[Int, Int] = intProp("maxLength")
+  val maxLength: HtmlProp[Int, Int] = intProp("maxLength")
 
 
   /**
@@ -476,7 +476,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link#attr-media
     */
-  lazy val media: HtmlProp[String, String] = stringProp("media")
+  val media: HtmlProp[String, String] = stringProp("media")
 
 
   /**
@@ -495,7 +495,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form#attr-method
     */
-  lazy val method: HtmlProp[String, String] = stringProp("method")
+  val method: HtmlProp[String, String] = stringProp("method")
 
 
   /**
@@ -506,7 +506,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#multiple
     */
-  lazy val multiple: HtmlProp[Boolean, Boolean] = boolProp("multiple")
+  val multiple: HtmlProp[Boolean, Boolean] = boolProp("multiple")
 
 
   /**
@@ -521,7 +521,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#name
     */
-  lazy val nameAttr: HtmlProp[String, String] = stringProp("name")
+  val nameAttr: HtmlProp[String, String] = stringProp("name")
 
 
   /**
@@ -532,7 +532,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form#attr-novalidate
     */
-  lazy val noValidate: HtmlProp[Boolean, Boolean] = boolProp("noValidate")
+  val noValidate: HtmlProp[Boolean, Boolean] = boolProp("noValidate")
 
 
   /**
@@ -542,7 +542,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meter#attr-optimum
     */
-  lazy val optimum: HtmlProp[Double, Double] = doubleProp("optimum")
+  val optimum: HtmlProp[Double, Double] = doubleProp("optimum")
 
 
   /**
@@ -552,7 +552,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/pattern
     */
-  lazy val pattern: HtmlProp[String, String] = stringProp("pattern")
+  val pattern: HtmlProp[String, String] = stringProp("pattern")
 
 
   /**
@@ -563,7 +563,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#placeholder
     */
-  lazy val placeholder: HtmlProp[String, String] = stringProp("placeholder")
+  val placeholder: HtmlProp[String, String] = stringProp("placeholder")
 
 
   /**
@@ -573,7 +573,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/readonly
     */
-  lazy val readOnly: HtmlProp[Boolean, Boolean] = boolProp("readOnly")
+  val readOnly: HtmlProp[Boolean, Boolean] = boolProp("readOnly")
 
 
   /**
@@ -584,7 +584,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/required
     */
-  lazy val required: HtmlProp[Boolean, Boolean] = boolProp("required")
+  val required: HtmlProp[Boolean, Boolean] = boolProp("required")
 
 
   /**
@@ -592,7 +592,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/textarea#attr-rows
     */
-  lazy val rows: HtmlProp[Int, Int] = intProp("rows")
+  val rows: HtmlProp[Int, Int] = intProp("rows")
 
 
   /**
@@ -603,7 +603,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/td#attr-rowspan
     */
-  lazy val rowSpan: HtmlProp[Int, Int] = intProp("rowSpan")
+  val rowSpan: HtmlProp[Int, Int] = intProp("rowSpan")
 
 
   /**
@@ -614,7 +614,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLStyleElement/scoped
     */
-  lazy val scoped: HtmlProp[Boolean, Boolean] = boolProp("scoped")
+  val scoped: HtmlProp[Boolean, Boolean] = boolProp("scoped")
 
 
   /**
@@ -627,7 +627,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/size
     */
-  lazy val size: HtmlProp[Int, Int] = intProp("size")
+  val size: HtmlProp[Int, Int] = intProp("size")
 
 
   /**
@@ -637,7 +637,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/slot
     */
-  lazy val slot: HtmlProp[String, String] = stringProp("slot")
+  val slot: HtmlProp[String, String] = stringProp("slot")
 
 
   /**
@@ -647,7 +647,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/spellcheck
     */
-  lazy val spellCheck: HtmlProp[Boolean, Boolean] = boolProp("spellcheck")
+  val spellCheck: HtmlProp[Boolean, Boolean] = boolProp("spellcheck")
 
 
   /**
@@ -670,7 +670,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex
     */
-  lazy val tabIndex: HtmlProp[Int, Int] = intProp("tabIndex")
+  val tabIndex: HtmlProp[Int, Int] = intProp("tabIndex")
 
 
   /**
@@ -697,7 +697,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-target
     */
-  lazy val target: HtmlProp[String, String] = stringProp("target")
+  val target: HtmlProp[String, String] = stringProp("target")
 
 
   /**
@@ -707,7 +707,7 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/title
     */
-  lazy val title: HtmlProp[String, String] = stringProp("title")
+  val title: HtmlProp[String, String] = stringProp("title")
 
 
   /**
@@ -715,11 +715,11 @@ trait HtmlProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/translate
     */
-  lazy val translate: HtmlProp[Boolean, Boolean] = boolProp("translate")
+  val translate: HtmlProp[Boolean, Boolean] = boolProp("translate")
 
 
   /** Specifies XML namespace for the document */
-  lazy val xmlns: HtmlProp[String, String] = stringProp("xmlns")
+  val xmlns: HtmlProp[String, String] = stringProp("xmlns")
 
 
 }

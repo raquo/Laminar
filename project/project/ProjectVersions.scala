@@ -1,5 +1,5 @@
 /** Versions of compile-time dependencies */
 object ProjectVersions {
 
-  val ScalaDomTypes = "17.0.0-M6"
+  val ScalaDomTypes = "17.0.0-M7"
 }

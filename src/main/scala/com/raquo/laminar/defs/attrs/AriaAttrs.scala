@@ -14,21 +14,21 @@ trait AriaAttrs {
   /**
     * Create ARIA attribute (Note: for HTML attrs, use L.htmlAttr)
     * 
-    * @param key   - suffix of the attribute, without "aria-" prefix, e.g. "labelledby"
+    * @param name  - suffix of the attribute, without "aria-" prefix, e.g. "labelledby"
     * @param codec - used to encode V into String, e.g. StringAsIsCodec
     * 
     * @tparam V    - value type for this attr in Scala
     */
-  def ariaAttr[V](key: String, codec: Codec[V, String]): AriaAttr[V] = new AriaAttr(key, codec)
+  def ariaAttr[V](name: String, codec: Codec[V, String]): AriaAttr[V] = new AriaAttr(name, codec)
 
 
-  @inline protected def boolAsTrueFalseAriaAttr(key: String): AriaAttr[Boolean] = ariaAttr(key, BooleanAsTrueFalseStringCodec)
+  @inline protected def boolAsTrueFalseAriaAttr(name: String): AriaAttr[Boolean] = ariaAttr(name, BooleanAsTrueFalseStringCodec)
 
-  @inline protected def doubleAriaAttr(key: String): AriaAttr[Double] = ariaAttr(key, DoubleAsStringCodec)
+  @inline protected def doubleAriaAttr(name: String): AriaAttr[Double] = ariaAttr(name, DoubleAsStringCodec)
 
-  @inline protected def intAriaAttr(key: String): AriaAttr[Int] = ariaAttr(key, IntAsStringCodec)
+  @inline protected def intAriaAttr(name: String): AriaAttr[Int] = ariaAttr(name, IntAsStringCodec)
 
-  @inline protected def stringAriaAttr(key: String): AriaAttr[String] = ariaAttr(key, StringAsIsCodec)
+  @inline protected def stringAriaAttr(name: String): AriaAttr[String] = ariaAttr(name, StringAsIsCodec)
 
 
 
@@ -37,7 +37,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-activedescendant
     */
-  lazy val activeDescendant: AriaAttr[String] = stringAriaAttr("activedescendant")
+  val activeDescendant: AriaAttr[String] = stringAriaAttr("activedescendant")
 
 
   /**
@@ -47,7 +47,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-atomic
     */
-  lazy val atomic: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("atomic")
+  val atomic: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("atomic")
 
 
   /**
@@ -57,7 +57,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-autocomplete
     */
-  lazy val autoComplete: AriaAttr[String] = stringAriaAttr("autocomplete")
+  val autoComplete: AriaAttr[String] = stringAriaAttr("autocomplete")
 
 
   /**
@@ -65,7 +65,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-busy
     */
-  lazy val busy: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("busy")
+  val busy: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("busy")
 
 
   /**
@@ -77,7 +77,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-checked
     */
-  lazy val checked: AriaAttr[String] = stringAriaAttr("checked")
+  val checked: AriaAttr[String] = stringAriaAttr("checked")
 
 
   /**
@@ -86,7 +86,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-controls
     */
-  lazy val controls: AriaAttr[String] = stringAriaAttr("controls")
+  val controls: AriaAttr[String] = stringAriaAttr("controls")
 
 
   /**
@@ -98,7 +98,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current
     */
-  lazy val current: AriaAttr[String] = stringAriaAttr("current")
+  val current: AriaAttr[String] = stringAriaAttr("current")
 
 
   /**
@@ -107,7 +107,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-describedby
     */
-  lazy val describedBy: AriaAttr[String] = stringAriaAttr("describedby")
+  val describedBy: AriaAttr[String] = stringAriaAttr("describedby")
 
 
   /**
@@ -116,7 +116,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-disabled
     */
-  lazy val disabled: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("disabled")
+  val disabled: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("disabled")
 
 
   /**
@@ -131,7 +131,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-dropeffect
     */
-  lazy val dropEffect: AriaAttr[String] = stringAriaAttr("dropeffect")
+  val dropEffect: AriaAttr[String] = stringAriaAttr("dropeffect")
 
 
   /**
@@ -140,7 +140,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-expanded
     */
-  lazy val expanded: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("expanded")
+  val expanded: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("expanded")
 
 
   /**
@@ -150,7 +150,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-flowto
     */
-  lazy val flowTo: AriaAttr[String] = stringAriaAttr("flowto")
+  val flowTo: AriaAttr[String] = stringAriaAttr("flowto")
 
 
   /**
@@ -158,7 +158,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-grabbed
     */
-  lazy val grabbed: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("grabbed")
+  val grabbed: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("grabbed")
 
 
   /**
@@ -166,7 +166,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-haspopup
     */
-  lazy val hasPopup: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("haspopup")
+  val hasPopup: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("haspopup")
 
 
   /**
@@ -176,7 +176,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden
     */
-  lazy val hidden: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("hidden")
+  val hidden: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("hidden")
 
 
   /**
@@ -187,7 +187,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-invalid
     */
-  lazy val invalid: AriaAttr[String] = stringAriaAttr("invalid")
+  val invalid: AriaAttr[String] = stringAriaAttr("invalid")
 
 
   /**
@@ -196,7 +196,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label
     */
-  lazy val label: AriaAttr[String] = stringAriaAttr("label")
+  val label: AriaAttr[String] = stringAriaAttr("label")
 
 
   /**
@@ -205,7 +205,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-labelledby
     */
-  lazy val labelledBy: AriaAttr[String] = stringAriaAttr("labelledby")
+  val labelledBy: AriaAttr[String] = stringAriaAttr("labelledby")
 
 
   /**
@@ -213,7 +213,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-level
     */
-  lazy val level: AriaAttr[Int] = intAriaAttr("level")
+  val level: AriaAttr[Int] = intAriaAttr("level")
 
 
   /**
@@ -224,7 +224,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-live
     */
-  lazy val live: AriaAttr[String] = stringAriaAttr("live")
+  val live: AriaAttr[String] = stringAriaAttr("live")
 
 
   /**
@@ -232,7 +232,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-multiline
     */
-  lazy val multiLine: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("multiline")
+  val multiLine: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("multiline")
 
 
   /**
@@ -240,7 +240,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-multiselectable
     */
-  lazy val multiSelectable: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("multiselectable")
+  val multiSelectable: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("multiselectable")
 
 
   /**
@@ -250,7 +250,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-orientation
     */
-  lazy val orientation: AriaAttr[String] = stringAriaAttr("orientation")
+  val orientation: AriaAttr[String] = stringAriaAttr("orientation")
 
 
   /**
@@ -260,7 +260,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-owns
     */
-  lazy val owns: AriaAttr[String] = stringAriaAttr("owns")
+  val owns: AriaAttr[String] = stringAriaAttr("owns")
 
 
   /**
@@ -269,7 +269,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-posinset
     */
-  lazy val posInSet: AriaAttr[Int] = intAriaAttr("posinset")
+  val posInSet: AriaAttr[Int] = intAriaAttr("posinset")
 
 
   /**
@@ -280,7 +280,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-pressed
     */
-  lazy val pressed: AriaAttr[String] = stringAriaAttr("pressed")
+  val pressed: AriaAttr[String] = stringAriaAttr("pressed")
 
 
   /**
@@ -288,7 +288,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-readonly
     */
-  lazy val readOnly: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("readonly")
+  val readOnly: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("readonly")
 
 
   /**
@@ -299,7 +299,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-relevant
     */
-  lazy val relevant: AriaAttr[String] = stringAriaAttr("relevant")
+  val relevant: AriaAttr[String] = stringAriaAttr("relevant")
 
 
   /**
@@ -307,7 +307,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-required
     */
-  lazy val required: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("required")
+  val required: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("required")
 
 
   /**
@@ -316,7 +316,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-selected
     */
-  lazy val selected: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("selected")
+  val selected: AriaAttr[Boolean] = boolAsTrueFalseAriaAttr("selected")
 
 
   /**
@@ -326,7 +326,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-setsize
     */
-  lazy val setSize: AriaAttr[Int] = intAriaAttr("setsize")
+  val setSize: AriaAttr[Int] = intAriaAttr("setsize")
 
 
   /**
@@ -336,7 +336,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-sort
     */
-  lazy val sort: AriaAttr[String] = stringAriaAttr("sort")
+  val sort: AriaAttr[String] = stringAriaAttr("sort")
 
 
   /**
@@ -344,7 +344,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuemax
     */
-  lazy val valueMax: AriaAttr[Double] = doubleAriaAttr("valuemax")
+  val valueMax: AriaAttr[Double] = doubleAriaAttr("valuemax")
 
 
   /**
@@ -352,7 +352,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuemin
     */
-  lazy val valueMin: AriaAttr[Double] = doubleAriaAttr("valuemin")
+  val valueMin: AriaAttr[Double] = doubleAriaAttr("valuemin")
 
 
   /**
@@ -360,7 +360,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuenow
     */
-  lazy val valueNow: AriaAttr[Double] = doubleAriaAttr("valuenow")
+  val valueNow: AriaAttr[Double] = doubleAriaAttr("valuenow")
 
 
   /**
@@ -368,7 +368,7 @@ trait AriaAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-valuetext
     */
-  lazy val valueText: AriaAttr[String] = stringAriaAttr("valuetext")
+  val valueText: AriaAttr[String] = stringAriaAttr("valuetext")
 
 
 }

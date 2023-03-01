@@ -22,13 +22,13 @@ trait StyleProps {
   /**
     * Create custom CSS property
     * 
-    * @param key - name of CSS property, e.g. "font-weight"
+    * @param name - name of CSS property, e.g. "font-weight"
     * 
-    * @tparam V  - type of values recognized by JS for this property, e.g. Int
-    *              Note: String is always allowed regardless of the type you put here.
-    *              If unsure, use String type as V.
+    * @tparam V   - type of values recognized by JS for this property, e.g. Int
+    *               Note: String is always allowed regardless of the type you put here.
+    *               If unsure, use String type as V.
     */
-  def styleProp[V](key: String): StyleProp[V] = new StyleProp(key)
+  def styleProp[V](name: String): StyleProp[V] = new StyleProp(name)
 
 
   // -- Basic types --
