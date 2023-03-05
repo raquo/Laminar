@@ -38,7 +38,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-charset
     */
-  val charset: HtmlAttr[String] = stringHtmlAttr("charset")
+  lazy val charset: HtmlAttr[String] = stringHtmlAttr("charset")
 
 
   /**
@@ -47,7 +47,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/contentEditable
     */
-  val contentEditable: HtmlAttr[Boolean] = boolAsTrueFalseHtmlAttr("contenteditable")
+  lazy val contentEditable: HtmlAttr[Boolean] = boolAsTrueFalseHtmlAttr("contenteditable")
 
 
   /**
@@ -56,14 +56,14 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contextmenu
     */
-  val contextMenuId: HtmlAttr[String] = stringHtmlAttr("contextmenu")
+  lazy val contextMenuId: HtmlAttr[String] = stringHtmlAttr("contextmenu")
 
 
   /**
     * Specifies whether the dragged data is copied, moved, or linked, when dropped
     * Acceptable values: `copy` | `move` | `link`
     */
-  val dropZone: HtmlAttr[String] = stringHtmlAttr("dropzone")
+  lazy val dropZone: HtmlAttr[String] = stringHtmlAttr("dropzone")
 
 
   /**
@@ -74,11 +74,11 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formaction
     */
-  val formAction: HtmlAttr[String] = stringHtmlAttr("formaction")
+  lazy val formAction: HtmlAttr[String] = stringHtmlAttr("formaction")
 
 
   /** The form attribute specifies an ID of the form an `<input>` element belongs to. */
-  val formId: HtmlAttr[String] = stringHtmlAttr("form")
+  lazy val formId: HtmlAttr[String] = stringHtmlAttr("form")
 
 
   /**
@@ -87,7 +87,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-height
     */
-  val heightAttr: HtmlAttr[Int] = intHtmlAttr("height")
+  lazy val heightAttr: HtmlAttr[Int] = intHtmlAttr("height")
 
 
   /**
@@ -101,7 +101,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href
     */
-  val href: HtmlAttr[String] = stringHtmlAttr("href")
+  lazy val href: HtmlAttr[String] = stringHtmlAttr("href")
 
 
   /**
@@ -111,7 +111,7 @@ trait HtmlAttrs {
     * input element. This attribute is ignored when the type attribute's value is hidden,
     * checkbox, radio, file, or a button type.
     */
-  val listId: HtmlAttr[String] = stringHtmlAttr("list")
+  lazy val listId: HtmlAttr[String] = stringHtmlAttr("list")
 
 
   /**
@@ -120,7 +120,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max
     */
-  val maxAttr: HtmlAttr[String] = stringHtmlAttr("max")
+  lazy val maxAttr: HtmlAttr[String] = stringHtmlAttr("max")
 
 
   /**
@@ -129,7 +129,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min
     */
-  val minAttr: HtmlAttr[String] = stringHtmlAttr("min")
+  lazy val minAttr: HtmlAttr[String] = stringHtmlAttr("min")
 
 
   /**
@@ -140,7 +140,7 @@ trait HtmlAttrs {
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#src
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src
     */
-  val src: HtmlAttr[String] = stringHtmlAttr("src")
+  lazy val src: HtmlAttr[String] = stringHtmlAttr("src")
 
 
   /**
@@ -154,7 +154,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/step
     */
-  val stepAttr: HtmlAttr[String] = stringHtmlAttr("step")
+  lazy val stepAttr: HtmlAttr[String] = stringHtmlAttr("step")
 
 
   /**
@@ -167,17 +167,17 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-type
     */
-  val `type`: HtmlAttr[String] = stringHtmlAttr("type")
+  lazy val `type`: HtmlAttr[String] = stringHtmlAttr("type")
 
 
-  val typ: HtmlAttr[String] = `type`
+  lazy val typ: HtmlAttr[String] = `type`
 
 
-  val tpe: HtmlAttr[String] = `type`
+  lazy val tpe: HtmlAttr[String] = `type`
 
 
   /** IE-specific property to prevent user selection */
-  val unselectable: HtmlAttr[Boolean] = boolAsOnOffHtmlAttr("unselectable")
+  lazy val unselectable: HtmlAttr[Boolean] = boolAsOnOffHtmlAttr("unselectable")
 
 
   /**
@@ -186,7 +186,7 @@ trait HtmlAttrs {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-width
     */
-  val widthAttr: HtmlAttr[Int] = intHtmlAttr("width")
+  lazy val widthAttr: HtmlAttr[Int] = intHtmlAttr("width")
 
 
 }

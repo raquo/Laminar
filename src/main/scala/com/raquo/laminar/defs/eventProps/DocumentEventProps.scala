@@ -27,7 +27,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event
     */
-  val onDomContentLoaded: EventProp[dom.Event] = eventProp("DOMContentLoaded")
+  lazy val onDomContentLoaded: EventProp[dom.Event] = eventProp("DOMContentLoaded")
 
 
   /**
@@ -35,7 +35,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event
     */
-  val onFullScreenChange: EventProp[dom.Event] = eventProp("fullscreenchange")
+  lazy val onFullScreenChange: EventProp[dom.Event] = eventProp("fullscreenchange")
 
 
   /**
@@ -43,7 +43,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenerror_event
     */
-  val onFullScreenError: EventProp[dom.Event] = eventProp("fullscreenerror")
+  lazy val onFullScreenError: EventProp[dom.Event] = eventProp("fullscreenerror")
 
 
   /**
@@ -51,7 +51,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event
     */
-  val onVisibilityChange: EventProp[dom.Event] = eventProp("visibilitychange")
+  lazy val onVisibilityChange: EventProp[dom.Event] = eventProp("visibilitychange")
 
 
 }

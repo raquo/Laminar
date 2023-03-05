@@ -31,7 +31,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onClick: EventProp[dom.MouseEvent] = eventProp("click")
+  lazy val onClick: EventProp[dom.MouseEvent] = eventProp("click")
 
 
   /**
@@ -41,7 +41,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/dblclick_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onDblClick: EventProp[dom.MouseEvent] = eventProp("dblclick")
+  lazy val onDblClick: EventProp[dom.MouseEvent] = eventProp("dblclick")
 
 
   /**
@@ -50,7 +50,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mousedown_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseDown: EventProp[dom.MouseEvent] = eventProp("mousedown")
+  lazy val onMouseDown: EventProp[dom.MouseEvent] = eventProp("mousedown")
 
 
   /**
@@ -59,7 +59,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mousemove_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseMove: EventProp[dom.MouseEvent] = eventProp("mousemove")
+  lazy val onMouseMove: EventProp[dom.MouseEvent] = eventProp("mousemove")
 
 
   /**
@@ -70,7 +70,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseout_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseOut: EventProp[dom.MouseEvent] = eventProp("mouseout")
+  lazy val onMouseOut: EventProp[dom.MouseEvent] = eventProp("mouseout")
 
 
   /**
@@ -80,7 +80,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseover_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseOver: EventProp[dom.MouseEvent] = eventProp("mouseover")
+  lazy val onMouseOver: EventProp[dom.MouseEvent] = eventProp("mouseover")
 
 
   /**
@@ -96,7 +96,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseleave_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseLeave: EventProp[dom.MouseEvent] = eventProp("mouseleave")
+  lazy val onMouseLeave: EventProp[dom.MouseEvent] = eventProp("mouseleave")
 
 
   /**
@@ -112,7 +112,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseenter_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseEnter: EventProp[dom.MouseEvent] = eventProp("mouseenter")
+  lazy val onMouseEnter: EventProp[dom.MouseEvent] = eventProp("mouseenter")
 
 
   /**
@@ -121,7 +121,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/mouseup_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onMouseUp: EventProp[dom.MouseEvent] = eventProp("mouseup")
+  lazy val onMouseUp: EventProp[dom.MouseEvent] = eventProp("mouseup")
 
 
   /**
@@ -130,7 +130,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/wheel_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
     */
-  val onWheel: EventProp[dom.WheelEvent] = eventProp("wheel")
+  lazy val onWheel: EventProp[dom.WheelEvent] = eventProp("wheel")
 
 
   /**
@@ -139,7 +139,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/contextmenu_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
     */
-  val onContextMenu: EventProp[dom.MouseEvent] = eventProp("contextmenu")
+  lazy val onContextMenu: EventProp[dom.MouseEvent] = eventProp("contextmenu")
 
 
   /**
@@ -148,7 +148,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drag_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDrag: EventProp[dom.DragEvent] = eventProp("drag")
+  lazy val onDrag: EventProp[dom.DragEvent] = eventProp("drag")
 
 
   /**
@@ -157,7 +157,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragend_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDragEnd: EventProp[dom.DragEvent] = eventProp("dragend")
+  lazy val onDragEnd: EventProp[dom.DragEvent] = eventProp("dragend")
 
 
   /**
@@ -166,7 +166,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragenter_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDragEnter: EventProp[dom.DragEvent] = eventProp("dragenter")
+  lazy val onDragEnter: EventProp[dom.DragEvent] = eventProp("dragenter")
 
 
   /**
@@ -175,7 +175,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragleave_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDragLeave: EventProp[dom.DragEvent] = eventProp("dragleave")
+  lazy val onDragLeave: EventProp[dom.DragEvent] = eventProp("dragleave")
 
 
   /**
@@ -184,7 +184,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragover_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDragOver: EventProp[dom.DragEvent] = eventProp("dragover")
+  lazy val onDragOver: EventProp[dom.DragEvent] = eventProp("dragover")
 
 
   /**
@@ -193,7 +193,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dragstart_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDragStart: EventProp[dom.DragEvent] = eventProp("dragstart")
+  lazy val onDragStart: EventProp[dom.DragEvent] = eventProp("dragstart")
 
 
   /**
@@ -202,7 +202,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/drop_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/DragEvent
     */
-  val onDrop: EventProp[dom.DragEvent] = eventProp("drop")
+  lazy val onDrop: EventProp[dom.DragEvent] = eventProp("drop")
 
 
   // -- Pointer Events --
@@ -214,7 +214,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerover_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerOver: EventProp[dom.PointerEvent] = eventProp("pointerover")
+  lazy val onPointerOver: EventProp[dom.PointerEvent] = eventProp("pointerover")
 
 
   /**
@@ -225,7 +225,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerenter_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerEnter: EventProp[dom.PointerEvent] = eventProp("pointerenter")
+  lazy val onPointerEnter: EventProp[dom.PointerEvent] = eventProp("pointerenter")
 
 
   /**
@@ -234,7 +234,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerdown_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerDown: EventProp[dom.PointerEvent] = eventProp("pointerdown")
+  lazy val onPointerDown: EventProp[dom.PointerEvent] = eventProp("pointerdown")
 
 
   /**
@@ -243,7 +243,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointermove_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerMove: EventProp[dom.PointerEvent] = eventProp("pointermove")
+  lazy val onPointerMove: EventProp[dom.PointerEvent] = eventProp("pointermove")
 
 
   /**
@@ -252,7 +252,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerup_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerUp: EventProp[dom.PointerEvent] = eventProp("pointerup")
+  lazy val onPointerUp: EventProp[dom.PointerEvent] = eventProp("pointerup")
 
 
   /**
@@ -262,7 +262,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointercancel_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerCancel: EventProp[dom.PointerEvent] = eventProp("pointercancel")
+  lazy val onPointerCancel: EventProp[dom.PointerEvent] = eventProp("pointercancel")
 
 
   /**
@@ -275,7 +275,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerout_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerOut: EventProp[dom.PointerEvent] = eventProp("pointerout")
+  lazy val onPointerOut: EventProp[dom.PointerEvent] = eventProp("pointerout")
 
 
   /**
@@ -285,7 +285,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/pointerleave_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val onPointerLeave: EventProp[dom.PointerEvent] = eventProp("pointerleave")
+  lazy val onPointerLeave: EventProp[dom.PointerEvent] = eventProp("pointerleave")
 
 
   /**
@@ -294,7 +294,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/gotpointercapture_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val gotPointerCapture: EventProp[dom.PointerEvent] = eventProp("gotpointercapture")
+  lazy val gotPointerCapture: EventProp[dom.PointerEvent] = eventProp("gotpointercapture")
 
 
   /**
@@ -303,7 +303,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/lostpointercapture_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent
     */
-  val lostPointerCapture: EventProp[dom.PointerEvent] = eventProp("lostpointercapture")
+  lazy val lostPointerCapture: EventProp[dom.PointerEvent] = eventProp("lostpointercapture")
 
 
   // -- Form Events --
@@ -315,7 +315,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/change_event
     */
-  val onChange: EventProp[dom.Event] = eventProp("change")
+  lazy val onChange: EventProp[dom.Event] = eventProp("change")
 
 
   /**
@@ -324,7 +324,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/select_event
     */
-  val onSelect: EventProp[dom.Event] = eventProp("select")
+  lazy val onSelect: EventProp[dom.Event] = eventProp("select")
 
 
   /**
@@ -338,7 +338,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/beforeinput_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/InputEvent
     */
-  val onBeforeInput: EventProp[dom.InputEvent] = eventProp("beforeinput")
+  lazy val onBeforeInput: EventProp[dom.InputEvent] = eventProp("beforeinput")
 
 
   /**
@@ -347,7 +347,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/input_event
     */
-  val onInput: EventProp[dom.Event] = eventProp("input")
+  lazy val onInput: EventProp[dom.Event] = eventProp("input")
 
 
   /**
@@ -356,7 +356,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/blur_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent
     */
-  val onBlur: EventProp[dom.FocusEvent] = eventProp("blur")
+  lazy val onBlur: EventProp[dom.FocusEvent] = eventProp("blur")
 
 
   /**
@@ -365,7 +365,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/focus_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent
     */
-  val onFocus: EventProp[dom.FocusEvent] = eventProp("focus")
+  lazy val onFocus: EventProp[dom.FocusEvent] = eventProp("focus")
 
 
   /**
@@ -374,7 +374,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit_event
     */
-  val onSubmit: EventProp[dom.Event] = eventProp("submit")
+  lazy val onSubmit: EventProp[dom.Event] = eventProp("submit")
 
 
   /**
@@ -382,7 +382,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reset_event
     */
-  val onReset: EventProp[dom.Event] = eventProp("reset")
+  lazy val onReset: EventProp[dom.Event] = eventProp("reset")
 
 
   /**
@@ -390,7 +390,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/invalid_event
     */
-  val onInvalid: EventProp[dom.Event] = eventProp("invalid")
+  lazy val onInvalid: EventProp[dom.Event] = eventProp("invalid")
 
 
   /**
@@ -398,7 +398,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement/search_event
     */
-  val onSearch: EventProp[dom.Event] = eventProp("search")
+  lazy val onSearch: EventProp[dom.Event] = eventProp("search")
 
 
   // -- Keyboard Events --
@@ -410,7 +410,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/keydown_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
     */
-  val onKeyDown: EventProp[dom.KeyboardEvent] = eventProp("keydown")
+  lazy val onKeyDown: EventProp[dom.KeyboardEvent] = eventProp("keydown")
 
 
   /**
@@ -419,7 +419,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/keyup_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
     */
-  val onKeyUp: EventProp[dom.KeyboardEvent] = eventProp("keyup")
+  lazy val onKeyUp: EventProp[dom.KeyboardEvent] = eventProp("keyup")
 
 
   /**
@@ -432,7 +432,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/keypress_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
     */
-  val onKeyPress: EventProp[dom.KeyboardEvent] = eventProp("keypress")
+  lazy val onKeyPress: EventProp[dom.KeyboardEvent] = eventProp("keypress")
 
 
   // -- Clipboard Events --
@@ -444,7 +444,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/copy_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent
     */
-  val onCopy: EventProp[dom.ClipboardEvent] = eventProp("copy")
+  lazy val onCopy: EventProp[dom.ClipboardEvent] = eventProp("copy")
 
 
   /**
@@ -453,7 +453,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/cut_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent
     */
-  val onCut: EventProp[dom.ClipboardEvent] = eventProp("cut")
+  lazy val onCut: EventProp[dom.ClipboardEvent] = eventProp("cut")
 
 
   /**
@@ -462,7 +462,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/paste_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/ClipboardEvent
     */
-  val onPaste: EventProp[dom.ClipboardEvent] = eventProp("paste")
+  lazy val onPaste: EventProp[dom.ClipboardEvent] = eventProp("paste")
 
 
   // -- Media Events --
@@ -473,7 +473,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/abort_event
     */
-  val onAbort: EventProp[dom.Event] = eventProp("abort")
+  lazy val onAbort: EventProp[dom.Event] = eventProp("abort")
 
 
   /**
@@ -481,7 +481,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/canplay_event
     */
-  val onCanPlay: EventProp[dom.Event] = eventProp("canplay")
+  lazy val onCanPlay: EventProp[dom.Event] = eventProp("canplay")
 
 
   /**
@@ -489,7 +489,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/canplaythrough_event
     */
-  val onCanPlayThrough: EventProp[dom.Event] = eventProp("canplaythrough")
+  lazy val onCanPlayThrough: EventProp[dom.Event] = eventProp("canplaythrough")
 
 
   /**
@@ -497,7 +497,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/TextTrack/cuechange_event
     */
-  val onCueChange: EventProp[dom.Event] = eventProp("cuechange")
+  lazy val onCueChange: EventProp[dom.Event] = eventProp("cuechange")
 
 
   /**
@@ -505,7 +505,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/durationchange_event
     */
-  val onDurationChange: EventProp[dom.Event] = eventProp("durationchange")
+  lazy val onDurationChange: EventProp[dom.Event] = eventProp("durationchange")
 
 
   /**
@@ -513,7 +513,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/emptied_event
     */
-  val onEmptied: EventProp[dom.Event] = eventProp("emptied")
+  lazy val onEmptied: EventProp[dom.Event] = eventProp("emptied")
 
 
   /**
@@ -521,7 +521,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/ended_event
     */
-  val onEnded: EventProp[dom.Event] = eventProp("ended")
+  lazy val onEnded: EventProp[dom.Event] = eventProp("ended")
 
 
   /**
@@ -529,7 +529,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/loadeddata_event
     */
-  val onLoadedData: EventProp[dom.Event] = eventProp("loadeddata")
+  lazy val onLoadedData: EventProp[dom.Event] = eventProp("loadeddata")
 
 
   /**
@@ -537,7 +537,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/loadedmetadata_event
     */
-  val onLoadedMetadata: EventProp[dom.Event] = eventProp("loadedmetadata")
+  lazy val onLoadedMetadata: EventProp[dom.Event] = eventProp("loadedmetadata")
 
 
   /**
@@ -545,7 +545,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/loadstart_event
     */
-  val onLoadStart: EventProp[dom.Event] = eventProp("loadstart")
+  lazy val onLoadStart: EventProp[dom.Event] = eventProp("loadstart")
 
 
   /**
@@ -553,7 +553,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause_event
     */
-  val onPause: EventProp[dom.Event] = eventProp("pause")
+  lazy val onPause: EventProp[dom.Event] = eventProp("pause")
 
 
   /**
@@ -561,7 +561,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play_event
     */
-  val onPlay: EventProp[dom.Event] = eventProp("play")
+  lazy val onPlay: EventProp[dom.Event] = eventProp("play")
 
 
   /**
@@ -569,7 +569,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/playing_event
     */
-  val onPlaying: EventProp[dom.Event] = eventProp("playing")
+  lazy val onPlaying: EventProp[dom.Event] = eventProp("playing")
 
 
   /**
@@ -577,7 +577,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/progress_event
     */
-  val onProgress: EventProp[dom.Event] = eventProp("progress")
+  lazy val onProgress: EventProp[dom.Event] = eventProp("progress")
 
 
   /**
@@ -585,7 +585,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/ratechange_event
     */
-  val onRateChange: EventProp[dom.Event] = eventProp("ratechange")
+  lazy val onRateChange: EventProp[dom.Event] = eventProp("ratechange")
 
 
   /**
@@ -593,7 +593,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/seeked_event
     */
-  val onSeeked: EventProp[dom.Event] = eventProp("seeked")
+  lazy val onSeeked: EventProp[dom.Event] = eventProp("seeked")
 
 
   /**
@@ -601,7 +601,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/seeking_event
     */
-  val onSeeking: EventProp[dom.Event] = eventProp("seeking")
+  lazy val onSeeking: EventProp[dom.Event] = eventProp("seeking")
 
 
   /**
@@ -609,7 +609,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/stalled_event
     */
-  val onStalled: EventProp[dom.Event] = eventProp("stalled")
+  lazy val onStalled: EventProp[dom.Event] = eventProp("stalled")
 
 
   /**
@@ -617,7 +617,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/suspend_event
     */
-  val onSuspend: EventProp[dom.Event] = eventProp("suspend")
+  lazy val onSuspend: EventProp[dom.Event] = eventProp("suspend")
 
 
   /**
@@ -625,7 +625,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/timeupdate_event
     */
-  val onTimeUpdate: EventProp[dom.Event] = eventProp("timeupdate")
+  lazy val onTimeUpdate: EventProp[dom.Event] = eventProp("timeupdate")
 
 
   /**
@@ -633,7 +633,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/volumechange_event
     */
-  val onVolumeChange: EventProp[dom.Event] = eventProp("volumechange")
+  lazy val onVolumeChange: EventProp[dom.Event] = eventProp("volumechange")
 
 
   /**
@@ -641,7 +641,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/waiting_event
     */
-  val onWaiting: EventProp[dom.Event] = eventProp("waiting")
+  lazy val onWaiting: EventProp[dom.Event] = eventProp("waiting")
 
 
   // -- Animation Events --
@@ -653,7 +653,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/animationend_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/AnimationEvent
     */
-  val onAnimationEnd: EventProp[dom.AnimationEvent] = eventProp("animationend")
+  lazy val onAnimationEnd: EventProp[dom.AnimationEvent] = eventProp("animationend")
 
 
   /**
@@ -664,7 +664,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/animationiteration_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/AnimationEvent
     */
-  val onAnimationIteration: EventProp[dom.AnimationEvent] = eventProp("animationiteration")
+  lazy val onAnimationIteration: EventProp[dom.AnimationEvent] = eventProp("animationiteration")
 
 
   /**
@@ -673,7 +673,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/animationstart_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/AnimationEvent
     */
-  val onAnimationStart: EventProp[dom.AnimationEvent] = eventProp("animationstart")
+  lazy val onAnimationStart: EventProp[dom.AnimationEvent] = eventProp("animationstart")
 
 
   /**
@@ -688,7 +688,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/transitionend_event
     */
-  val onTransitionEnd: EventProp[dom.Event] = eventProp("transitionend")
+  lazy val onTransitionEnd: EventProp[dom.Event] = eventProp("transitionend")
 
 
   // -- Misc Events --
@@ -702,7 +702,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/UIEvent
     */
-  val onLoad: EventProp[dom.UIEvent] = eventProp("load")
+  lazy val onLoad: EventProp[dom.UIEvent] = eventProp("load")
 
 
   /**
@@ -712,7 +712,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/UIEvent
     */
-  val onResize: EventProp[dom.UIEvent] = eventProp("resize")
+  lazy val onResize: EventProp[dom.UIEvent] = eventProp("resize")
 
 
   /**
@@ -721,7 +721,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Window/scroll_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/UIEvent
     */
-  val onScroll: EventProp[dom.UIEvent] = eventProp("scroll")
+  lazy val onScroll: EventProp[dom.UIEvent] = eventProp("scroll")
 
 
   /**
@@ -729,7 +729,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/show_event
     */
-  val onShow: EventProp[dom.Event] = eventProp("show")
+  lazy val onShow: EventProp[dom.Event] = eventProp("show")
 
 
   /**
@@ -737,7 +737,7 @@ trait GlobalEventProps {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/toggle_event
     */
-  val onToggle: EventProp[dom.Event] = eventProp("toggle")
+  lazy val onToggle: EventProp[dom.Event] = eventProp("toggle")
 
 
   // -- Error Events --
@@ -749,7 +749,7 @@ trait GlobalEventProps {
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/error_event
     * @see https://developer.mozilla.org/en-US/docs/Web/API/ErrorEvent
     */
-  val onError: EventProp[dom.ErrorEvent] = eventProp("error")
+  lazy val onError: EventProp[dom.ErrorEvent] = eventProp("error")
 
 
 }

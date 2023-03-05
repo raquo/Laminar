@@ -1,4 +1,4 @@
-import com.raquo.domtypes.codegen.DefType.{LazyVal, Val}
+import com.raquo.domtypes.codegen.DefType.LazyVal
 import com.raquo.domtypes.codegen.{CanonicalCache, CanonicalDefGroups, CanonicalGenerator, CodeFormatting, SourceRepr}
 import com.raquo.domtypes.common.{HtmlTagType, SvgTagType}
 import com.raquo.domtypes.defs.styles.StyleTraitDefs
@@ -59,7 +59,7 @@ object DomDefsGenerator {
           "@tparam Ref - type of elements with this tag, e.g. dom.html.Input for \"input\" tag"
         ),
         keyImplName = "htmlTag",
-        defType = Val
+        defType = LazyVal
       )
 
       generator.writeToFile(
@@ -93,7 +93,7 @@ object DomDefsGenerator {
           "@tparam Ref    - type of elements with this tag, e.g. dom.svg.Circle for \"circle\" tag"
         ),
         keyImplName = "svgTag",
-        defType = Val
+        defType = LazyVal
       )
 
       generator.writeToFile(
@@ -128,7 +128,7 @@ object DomDefsGenerator {
         namespaceImports = Nil,
         namespaceImpl = _ => ???,
         transformAttrDomName = identity,
-        defType = Val
+        defType = LazyVal
       )
 
       generator.writeToFile(
@@ -206,7 +206,7 @@ object DomDefsGenerator {
         namespaceImports = Nil,
         namespaceImpl = _ => ???,
         transformAttrDomName = transformAttrDomName,
-        defType = Val
+        defType = LazyVal
       )
 
       generator.writeToFile(
@@ -239,7 +239,7 @@ object DomDefsGenerator {
           "@tparam DomV - value type for this prop in the underlying JS DOM.",
         ),
         baseImplName = "htmlProp",
-        defType = Val
+        defType = LazyVal
       )
 
       generator.writeToFile(
@@ -278,7 +278,7 @@ object DomDefsGenerator {
           outputBaseImpl = true,
           keyKind = "EventProp",
           keyImplName = "eventProp",
-          defType = Val
+          defType = LazyVal
         )
 
         generator.writeToFile(
@@ -301,7 +301,7 @@ object DomDefsGenerator {
           outputBaseImpl = false,
           keyKind = "EventProp",
           keyImplName = "eventProp",
-          defType = Val
+          defType = LazyVal
         )
 
         generator.writeToFile(

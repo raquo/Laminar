@@ -30,7 +30,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/a
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGAElement
     */
-  val a: SvgTag[dom.SVGAElement] = svgTag("a")
+  lazy val a: SvgTag[dom.SVGAElement] = svgTag("a")
 
 
   /**
@@ -39,7 +39,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyph
     */
-  val altGlyph: SvgTag[dom.SVGElement] = svgTag("altGlyph")
+  lazy val altGlyph: SvgTag[dom.SVGElement] = svgTag("altGlyph")
 
 
   /**
@@ -47,7 +47,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyphDef
     */
-  val altGlyphDef: SvgTag[dom.SVGElement] = svgTag("altGlyphDef")
+  lazy val altGlyphDef: SvgTag[dom.SVGElement] = svgTag("altGlyphDef")
 
 
   /**
@@ -56,7 +56,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyphItem
     */
-  val altGlyphItem: SvgTag[dom.SVGElement] = svgTag("altGlyphItem")
+  lazy val altGlyphItem: SvgTag[dom.SVGElement] = svgTag("altGlyphItem")
 
 
   /**
@@ -65,7 +65,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animate
     */
-  val animate: SvgTag[dom.SVGElement] = svgTag("animate")
+  lazy val animate: SvgTag[dom.SVGElement] = svgTag("animate")
 
 
   /**
@@ -74,7 +74,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateMotion
     */
-  val animateMotion: SvgTag[dom.SVGElement] = svgTag("animateMotion")
+  lazy val animateMotion: SvgTag[dom.SVGElement] = svgTag("animateMotion")
 
 
   /**
@@ -84,7 +84,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateTransform
     */
-  val animateTransform: SvgTag[dom.SVGElement] = svgTag("animateTransform")
+  lazy val animateTransform: SvgTag[dom.SVGElement] = svgTag("animateTransform")
 
 
   /**
@@ -94,7 +94,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGCircleElement
     */
-  val circle: SvgTag[dom.SVGCircleElement] = svgTag("circle")
+  lazy val circle: SvgTag[dom.SVGCircleElement] = svgTag("circle")
 
 
   /**
@@ -105,7 +105,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGClipPathElement
     */
-  val clipPathTag: SvgTag[dom.SVGClipPathElement] = svgTag("clipPath")
+  lazy val clipPathTag: SvgTag[dom.SVGClipPathElement] = svgTag("clipPath")
 
 
   /**
@@ -113,7 +113,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/color-profile
     */
-  val colorProfileTag: SvgTag[dom.SVGElement] = svgTag("color-profile")
+  lazy val colorProfileTag: SvgTag[dom.SVGElement] = svgTag("color-profile")
 
 
   /**
@@ -125,7 +125,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/cursor
     */
-  val cursor: SvgTag[dom.SVGElement] = svgTag("cursor")
+  lazy val cursor: SvgTag[dom.SVGElement] = svgTag("cursor")
 
 
   /**
@@ -140,7 +140,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGDefsElement
     */
-  val defs: SvgTag[dom.SVGDefsElement] = svgTag("defs")
+  lazy val defs: SvgTag[dom.SVGDefsElement] = svgTag("defs")
 
 
   /**
@@ -155,7 +155,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/desc
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGDescElement
     */
-  val desc: SvgTag[dom.SVGDescElement] = svgTag("desc")
+  lazy val desc: SvgTag[dom.SVGDescElement] = svgTag("desc")
 
 
   /**
@@ -169,7 +169,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGEllipseElement
     */
-  val ellipse: SvgTag[dom.SVGEllipseElement] = svgTag("ellipse")
+  lazy val ellipse: SvgTag[dom.SVGEllipseElement] = svgTag("ellipse")
 
 
   /**
@@ -180,7 +180,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feBlend
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEBlendElement
     */
-  val feBlend: SvgTag[dom.SVGFEBlendElement] = svgTag("feBlend")
+  lazy val feBlend: SvgTag[dom.SVGFEBlendElement] = svgTag("feBlend")
 
 
   /**
@@ -191,7 +191,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEColorMatrixElement
     */
-  val feColorMatrix: SvgTag[dom.SVGFEColorMatrixElement] = svgTag("feColorMatrix")
+  lazy val feColorMatrix: SvgTag[dom.SVGFEColorMatrixElement] = svgTag("feColorMatrix")
 
 
   /**
@@ -202,7 +202,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComponentTransfer
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGComponentTransferFunctionElement
     */
-  val feComponentTransfer: SvgTag[dom.SVGComponentTransferFunctionElement] = svgTag("feComponentTransfer")
+  lazy val feComponentTransfer: SvgTag[dom.SVGComponentTransferFunctionElement] = svgTag("feComponentTransfer")
 
 
   /**
@@ -214,7 +214,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComposite
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFECompositeElement
     */
-  val feComposite: SvgTag[dom.SVGFECompositeElement] = svgTag("feComposite")
+  lazy val feComposite: SvgTag[dom.SVGFECompositeElement] = svgTag("feComposite")
 
 
   /**
@@ -227,7 +227,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feConvolveMatrix
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEConvolveMatrixElement
     */
-  val feConvolveMatrix: SvgTag[dom.SVGFEConvolveMatrixElement] = svgTag("feConvolveMatrix")
+  lazy val feConvolveMatrix: SvgTag[dom.SVGFEConvolveMatrixElement] = svgTag("feConvolveMatrix")
 
 
   /**
@@ -238,7 +238,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDiffuseLighting
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDiffuseLightingElement
     */
-  val feDiffuseLighting: SvgTag[dom.SVGFEDiffuseLightingElement] = svgTag("feDiffuseLighting")
+  lazy val feDiffuseLighting: SvgTag[dom.SVGFEDiffuseLightingElement] = svgTag("feDiffuseLighting")
 
 
   /**
@@ -248,7 +248,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDisplacementMap
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDisplacementMapElement
     */
-  val feDisplacementMap: SvgTag[dom.SVGFEDisplacementMapElement] = svgTag("feDisplacementMap")
+  lazy val feDisplacementMap: SvgTag[dom.SVGFEDisplacementMapElement] = svgTag("feDisplacementMap")
 
 
   /**
@@ -259,7 +259,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDistantLighting
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDistantLightElement
     */
-  val feDistantLighting: SvgTag[dom.SVGFEDistantLightElement] = svgTag("feDistantLighting")
+  lazy val feDistantLighting: SvgTag[dom.SVGFEDistantLightElement] = svgTag("feDistantLighting")
 
 
   /**
@@ -269,7 +269,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFlood
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFloodElement
     */
-  val feFlood: SvgTag[dom.SVGFEFloodElement] = svgTag("feFlood")
+  lazy val feFlood: SvgTag[dom.SVGFEFloodElement] = svgTag("feFlood")
 
 
   /**
@@ -279,7 +279,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncA
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncAElement
     */
-  val feFuncA: SvgTag[dom.SVGFEFuncAElement] = svgTag("feFuncA")
+  lazy val feFuncA: SvgTag[dom.SVGFEFuncAElement] = svgTag("feFuncA")
 
 
   /**
@@ -289,7 +289,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncB
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncBElement
     */
-  val feFuncB: SvgTag[dom.SVGFEFuncBElement] = svgTag("feFuncB")
+  lazy val feFuncB: SvgTag[dom.SVGFEFuncBElement] = svgTag("feFuncB")
 
 
   /**
@@ -299,7 +299,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncG
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncGElement
     */
-  val feFuncG: SvgTag[dom.SVGFEFuncGElement] = svgTag("feFuncG")
+  lazy val feFuncG: SvgTag[dom.SVGFEFuncGElement] = svgTag("feFuncG")
 
 
   /**
@@ -309,7 +309,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncR
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncRElement
     */
-  val feFuncR: SvgTag[dom.SVGFEFuncRElement] = svgTag("feFuncR")
+  lazy val feFuncR: SvgTag[dom.SVGFEFuncRElement] = svgTag("feFuncR")
 
 
   /**
@@ -319,7 +319,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feGaussianBlur
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEGaussianBlurElement
     */
-  val feGaussianBlur: SvgTag[dom.SVGFEGaussianBlurElement] = svgTag("feGaussianBlur")
+  lazy val feGaussianBlur: SvgTag[dom.SVGFEGaussianBlurElement] = svgTag("feGaussianBlur")
 
 
   /**
@@ -330,7 +330,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feImage
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEImageElement
     */
-  val feImage: SvgTag[dom.SVGFEImageElement] = svgTag("feImage")
+  lazy val feImage: SvgTag[dom.SVGFEImageElement] = svgTag("feImage")
 
 
   /**
@@ -342,7 +342,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMerge
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMergeElement
     */
-  val feMerge: SvgTag[dom.SVGFEMergeElement] = svgTag("feMerge")
+  lazy val feMerge: SvgTag[dom.SVGFEMergeElement] = svgTag("feMerge")
 
 
   /**
@@ -352,7 +352,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMergeNode
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMergeNodeElement
     */
-  val feMergeNode: SvgTag[dom.SVGFEMergeNodeElement] = svgTag("feMergeNode")
+  lazy val feMergeNode: SvgTag[dom.SVGFEMergeNodeElement] = svgTag("feMergeNode")
 
 
   /**
@@ -362,7 +362,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMorphology
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMorphologyElement
     */
-  val feMorphology: SvgTag[dom.SVGFEMorphologyElement] = svgTag("feMorphology")
+  lazy val feMorphology: SvgTag[dom.SVGFEMorphologyElement] = svgTag("feMorphology")
 
 
   /**
@@ -372,14 +372,14 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feOffset
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEOffsetElement
     */
-  val feOffset: SvgTag[dom.SVGFEOffsetElement] = svgTag("feOffset")
+  lazy val feOffset: SvgTag[dom.SVGFEOffsetElement] = svgTag("feOffset")
 
 
   /**
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/fePointLight
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEPointLightElement
     */
-  val fePointLight: SvgTag[dom.SVGFEPointLightElement] = svgTag("fePointLight")
+  lazy val fePointLight: SvgTag[dom.SVGFEPointLightElement] = svgTag("fePointLight")
 
 
   /**
@@ -394,14 +394,14 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpecularLighting
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFESpecularLightingElement
     */
-  val feSpecularLighting: SvgTag[dom.SVGFESpecularLightingElement] = svgTag("feSpecularLighting")
+  lazy val feSpecularLighting: SvgTag[dom.SVGFESpecularLightingElement] = svgTag("feSpecularLighting")
 
 
   /**
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpotlight
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFESpotLightElement
     */
-  val feSpotlight: SvgTag[dom.SVGFESpotLightElement] = svgTag("feSpotlight")
+  lazy val feSpotlight: SvgTag[dom.SVGFESpotLightElement] = svgTag("feSpotlight")
 
 
   /**
@@ -411,7 +411,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTile
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFETileElement
     */
-  val feTile: SvgTag[dom.SVGFETileElement] = svgTag("feTile")
+  lazy val feTile: SvgTag[dom.SVGFETileElement] = svgTag("feTile")
 
 
   /**
@@ -422,7 +422,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFETurbulenceElement
     */
-  val feTurbulence: SvgTag[dom.SVGFETurbulenceElement] = svgTag("feTurbulence")
+  lazy val feTurbulence: SvgTag[dom.SVGFETurbulenceElement] = svgTag("feTurbulence")
 
 
   /**
@@ -433,7 +433,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/filter
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFilterElement
     */
-  val filter: SvgTag[dom.SVGFilterElement] = svgTag("filter")
+  lazy val filter: SvgTag[dom.SVGFilterElement] = svgTag("filter")
 
 
   /**
@@ -441,7 +441,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font
     */
-  val font: SvgTag[dom.SVGElement] = svgTag("font")
+  lazy val font: SvgTag[dom.SVGElement] = svgTag("font")
 
 
   /**
@@ -450,7 +450,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face
     */
-  val fontFace: SvgTag[dom.SVGElement] = svgTag("font-face")
+  lazy val fontFace: SvgTag[dom.SVGElement] = svgTag("font-face")
 
 
   /**
@@ -459,7 +459,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-format
     */
-  val fontFaceFormat: SvgTag[dom.SVGElement] = svgTag("font-face-format")
+  lazy val fontFaceFormat: SvgTag[dom.SVGElement] = svgTag("font-face-format")
 
 
   /**
@@ -468,7 +468,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-name
     */
-  val fontFaceName: SvgTag[dom.SVGElement] = svgTag("font-face-name")
+  lazy val fontFaceName: SvgTag[dom.SVGElement] = svgTag("font-face-name")
 
 
   /**
@@ -479,7 +479,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-src
     */
-  val fontFaceSrc: SvgTag[dom.SVGElement] = svgTag("font-face-src")
+  lazy val fontFaceSrc: SvgTag[dom.SVGElement] = svgTag("font-face-src")
 
 
   /**
@@ -487,7 +487,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-uri
     */
-  val fontFaceUri: SvgTag[dom.SVGElement] = svgTag("font-face-uri")
+  lazy val fontFaceUri: SvgTag[dom.SVGElement] = svgTag("font-face-uri")
 
 
   /**
@@ -498,7 +498,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject
     */
-  val foreignObject: SvgTag[dom.SVGElement] = svgTag("foreignObject")
+  lazy val foreignObject: SvgTag[dom.SVGElement] = svgTag("foreignObject")
 
 
   /**
@@ -510,7 +510,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGGElement
     */
-  val g: SvgTag[dom.SVGGElement] = svgTag("g")
+  lazy val g: SvgTag[dom.SVGGElement] = svgTag("g")
 
 
   /**
@@ -518,7 +518,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/glyph
     */
-  val glyph: SvgTag[dom.SVGElement] = svgTag("glyph")
+  lazy val glyph: SvgTag[dom.SVGElement] = svgTag("glyph")
 
 
   /**
@@ -527,7 +527,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/glyphRef
     */
-  val glyphRef: SvgTag[dom.SVGElement] = svgTag("glyphRef")
+  lazy val glyphRef: SvgTag[dom.SVGElement] = svgTag("glyphRef")
 
 
   /**
@@ -536,7 +536,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/hkern
     */
-  val hkern: SvgTag[dom.SVGElement] = svgTag("hkern")
+  lazy val hkern: SvgTag[dom.SVGElement] = svgTag("hkern")
 
 
   /**
@@ -546,7 +546,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGImageElement
     */
-  val image: SvgTag[dom.SVGImageElement] = svgTag("image")
+  lazy val image: SvgTag[dom.SVGImageElement] = svgTag("image")
 
 
   /**
@@ -556,7 +556,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGLineElement
     */
-  val line: SvgTag[dom.SVGLineElement] = svgTag("line")
+  lazy val line: SvgTag[dom.SVGLineElement] = svgTag("line")
 
 
   /**
@@ -566,7 +566,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGLinearGradientElement
     */
-  val linearGradient: SvgTag[dom.SVGLinearGradientElement] = svgTag("linearGradient")
+  lazy val linearGradient: SvgTag[dom.SVGLinearGradientElement] = svgTag("linearGradient")
 
 
   /**
@@ -577,7 +577,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGMarkerElement
     */
-  val marker: SvgTag[dom.SVGMarkerElement] = svgTag("marker")
+  lazy val marker: SvgTag[dom.SVGMarkerElement] = svgTag("marker")
 
 
   /**
@@ -589,7 +589,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mask
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGMaskElement
     */
-  val mask: SvgTag[dom.SVGMaskElement] = svgTag("mask")
+  lazy val mask: SvgTag[dom.SVGMaskElement] = svgTag("mask")
 
 
   /**
@@ -601,7 +601,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/metadata
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGMetadataElement
     */
-  val metadata: SvgTag[dom.SVGMetadataElement] = svgTag("metadata")
+  lazy val metadata: SvgTag[dom.SVGMetadataElement] = svgTag("metadata")
 
 
   /**
@@ -610,7 +610,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/missing-glyph
     */
-  val missingGlyph: SvgTag[dom.SVGElement] = svgTag("missing-glyph")
+  lazy val missingGlyph: SvgTag[dom.SVGElement] = svgTag("missing-glyph")
 
 
   /**
@@ -619,7 +619,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mpath
     */
-  val mpath: SvgTag[dom.SVGElement] = svgTag("mpath")
+  lazy val mpath: SvgTag[dom.SVGElement] = svgTag("mpath")
 
 
   /**
@@ -629,7 +629,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPathElement
     */
-  val path: SvgTag[dom.SVGPathElement] = svgTag("path")
+  lazy val path: SvgTag[dom.SVGPathElement] = svgTag("path")
 
 
   /**
@@ -643,7 +643,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPatternElement
     */
-  val pattern: SvgTag[dom.SVGPatternElement] = svgTag("pattern")
+  lazy val pattern: SvgTag[dom.SVGPatternElement] = svgTag("pattern")
 
 
   /**
@@ -653,7 +653,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPolygonElement
     */
-  val polygon: SvgTag[dom.SVGPolygonElement] = svgTag("polygon")
+  lazy val polygon: SvgTag[dom.SVGPolygonElement] = svgTag("polygon")
 
 
   /**
@@ -664,7 +664,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polyline
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPolylineElement
     */
-  val polyline: SvgTag[dom.SVGPolylineElement] = svgTag("polyline")
+  lazy val polyline: SvgTag[dom.SVGPolylineElement] = svgTag("polyline")
 
 
   /**
@@ -674,7 +674,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGRadialGradientElement
     */
-  val radialGradient: SvgTag[dom.SVGRadialGradientElement] = svgTag("radialGradient")
+  lazy val radialGradient: SvgTag[dom.SVGRadialGradientElement] = svgTag("radialGradient")
 
 
   /**
@@ -685,7 +685,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGRectElement
     */
-  val rect: SvgTag[dom.SVGRectElement] = svgTag("rect")
+  lazy val rect: SvgTag[dom.SVGRectElement] = svgTag("rect")
 
 
   /**
@@ -697,7 +697,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/set
     */
-  val set: SvgTag[dom.SVGElement] = svgTag("set")
+  lazy val set: SvgTag[dom.SVGElement] = svgTag("set")
 
 
   /**
@@ -708,7 +708,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGStopElement
     */
-  val stop: SvgTag[dom.SVGStopElement] = svgTag("stop")
+  lazy val stop: SvgTag[dom.SVGStopElement] = svgTag("stop")
 
 
   /**
@@ -720,7 +720,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement
     */
-  val svg: SvgTag[dom.SVGSVGElement] = svgTag("svg")
+  lazy val svg: SvgTag[dom.SVGSVGElement] = svgTag("svg")
 
 
   /**
@@ -734,7 +734,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/switch
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGSwitchElement
     */
-  val switch: SvgTag[dom.SVGSwitchElement] = svgTag("switch")
+  lazy val switch: SvgTag[dom.SVGSwitchElement] = svgTag("switch")
 
 
   /**
@@ -750,7 +750,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement
     */
-  val symbol: SvgTag[dom.SVGSymbolElement] = svgTag("symbol")
+  lazy val symbol: SvgTag[dom.SVGSymbolElement] = svgTag("symbol")
 
 
   /**
@@ -761,7 +761,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTextElement
     */
-  val text: SvgTag[dom.SVGTextElement] = svgTag("text")
+  lazy val text: SvgTag[dom.SVGTextElement] = svgTag("text")
 
 
   /**
@@ -774,7 +774,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/textPath
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTextPathElement
     */
-  val textPath: SvgTag[dom.SVGTextPathElement] = svgTag("textPath")
+  lazy val textPath: SvgTag[dom.SVGTextPathElement] = svgTag("textPath")
 
 
   /**
@@ -789,7 +789,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTextPathElement
     */
-  val titleTag: SvgTag[dom.SVGTextPathElement] = svgTag("title")
+  lazy val titleTag: SvgTag[dom.SVGTextPathElement] = svgTag("title")
 
 
   /**
@@ -799,7 +799,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tref
     */
-  val tref: SvgTag[dom.SVGElement] = svgTag("tref")
+  lazy val tref: SvgTag[dom.SVGElement] = svgTag("tref")
 
 
   /**
@@ -810,7 +810,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTSpanElement
     */
-  val tspan: SvgTag[dom.SVGTSpanElement] = svgTag("tspan")
+  lazy val tspan: SvgTag[dom.SVGTSpanElement] = svgTag("tspan")
 
 
   /**
@@ -825,7 +825,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGUseElement
     */
-  val use: SvgTag[dom.SVGUseElement] = svgTag("use")
+  lazy val use: SvgTag[dom.SVGUseElement] = svgTag("use")
 
 
   /**
@@ -835,7 +835,7 @@ trait SvgTags {
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/view
     * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGViewElement
     */
-  val view: SvgTag[dom.SVGViewElement] = svgTag("view")
+  lazy val view: SvgTag[dom.SVGViewElement] = svgTag("view")
 
 
   /**
@@ -844,7 +844,7 @@ trait SvgTags {
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/vkern
     */
-  val vkern: SvgTag[dom.SVGElement] = svgTag("vkern")
+  lazy val vkern: SvgTag[dom.SVGElement] = svgTag("vkern")
 
 
 }
