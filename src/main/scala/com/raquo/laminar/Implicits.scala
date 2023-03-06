@@ -5,7 +5,7 @@ import com.raquo.airstream.state.Val
 import com.raquo.ew
 import com.raquo.ew.ewArray
 import com.raquo.laminar.Implicits.RichSource
-import com.raquo.laminar.api.Laminar.{StyleEncoder, child, children}
+import com.raquo.laminar.api.L.{StyleEncoder, child, children}
 import com.raquo.laminar.api.UnitArrowsFeature
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}

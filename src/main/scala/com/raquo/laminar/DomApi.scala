@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.ew._
-import com.raquo.laminar.api.Laminar.{div, svg}
+import com.raquo.laminar.api.L.{div, svg}
 import com.raquo.laminar.keys.{AriaAttr, EventProcessor, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
@@ -499,12 +499,12 @@ object DomApi {
 
   /** DOM Parser */
 
-  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings. */
+  /** #WARNING: Only use on trusted HTML strings. HTML strings can contain embedded Javascript code, which this function will execute blindly! */
   def unsafeParseHtmlString(dangerousHtmlString: String): dom.html.Element = {
     unsafeParseElementString(htmlParserContainer, tag = js.undefined, dangerousHtmlString, "Error parsing HTML string")
   }
 
-  /** #WARNING: HTML can contain Javascript code, which this function will execute blindly! Only use on trusted HTML strings.
+  /** #WARNING: Only use on trusted HTML strings. HTML strings can contain embedded Javascript code, which this function will execute blindly!
     *
     * @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
     */
@@ -512,12 +512,12 @@ object DomApi {
     unsafeParseElementString(htmlParserContainer, tag, dangerousHtmlString, "Error parsing HTML string")
   }
 
-  /** #WARNING: SVG can contain Javascript code, which this function will execute blindly! Only use on trusted SVG strings. */
+  /** #WARNING: Only use on trusted SVG strings. SVG strings can contain embedded Javascript code, which this function will execute blindly! */
   def unsafeParseSvgString(dangerousSvgString: String): dom.svg.Element = {
     unsafeParseElementString(svgParserContainer, tag = js.undefined, dangerousSvgString, "Error parsing SVG string")
   }
 
-  /** #WARNING: SVG can contain Javascript code, which this function will be execute blindly! Only use on trusted SVG strings.
+  /** #WARNING: Only use on trusted SVG strings. SVG strings can contain embedded Javascript code, which this function will execute blindly!
     *
     * @param tag   the SVG tag you expect from parsing. Will throw exception if does not match the result.
     */

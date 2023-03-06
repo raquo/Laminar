@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.ew.ewArray
-import com.raquo.laminar.api.Laminar.{MapValueMapper, StringValueMapper}
+import com.raquo.laminar.api.L.{MapValueMapper, StringValueMapper}
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.keys.CompositeKey.{CompositeCodec, CompositeValueMapper}
 import com.raquo.laminar.modifiers.{CompositeKeySetter, KeyUpdater}

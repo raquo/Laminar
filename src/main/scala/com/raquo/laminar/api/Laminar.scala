@@ -22,7 +22,7 @@ import scala.collection.immutable
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
-private[laminar] object Laminar
+trait Laminar
   extends Airstream
     with HtmlTags
     with HtmlAttrs

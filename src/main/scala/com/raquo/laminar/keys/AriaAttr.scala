@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar.{Element, optionToSetter}
+import com.raquo.laminar.api.L.{Element, optionToSetter}
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.modifiers.KeySetter.AriaAttrSetter
 import com.raquo.laminar.modifiers.KeyUpdater.AriaAttrUpdater

@@ -1,7 +1,7 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.api.Laminar.child
+import com.raquo.laminar.api.L.child
 import com.raquo.laminar.modifiers.{Inserter, RenderableNode}
 import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 

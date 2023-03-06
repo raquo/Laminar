@@ -3,7 +3,7 @@ package com.raquo.laminar.inputs
 import com.raquo.airstream.core.Observer
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.Laminar
+import com.raquo.laminar.api.L
 import com.raquo.laminar.keys.{EventProcessor, EventProp, HtmlProp}
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
@@ -105,15 +105,15 @@ class ValueController[A, B](
 object ValueController {
 
   private def nodeDescription(element: ReactiveHtmlElement.Base): String = {
-    val maybeTyp = DomApi.getHtmlAttributeRaw(element, Laminar.typ)
+    val maybeTyp = DomApi.getHtmlAttributeRaw(element, L.typ)
     val typSuffix = maybeTyp.map(t => s" [type=$t]").getOrElse("")
     s"${DomApi.debugNodeDescription(element.ref)}$typSuffix"
   }
 
   private def hasBinder(element: ReactiveHtmlElement.Base, prop: HtmlProp[_, _]): Boolean = {
-    if (prop == Laminar.value) {
+    if (prop == L.value) {
       element.hasValueBinder
-    } else if (prop == Laminar.checked) {
+    } else if (prop == L.checked) {
       element.hasCheckedBinder
     } else {
       false
@@ -125,9 +125,9 @@ object ValueController {
     element: ReactiveHtmlElement.Base,
     prop: HtmlProp[_, _]
   ): Boolean = {
-    if (prop == Laminar.value) {
+    if (prop == L.value) {
       element.hasOtherValueController(thisController)
-    } else if (prop == Laminar.checked) {
+    } else if (prop == L.checked) {
       element.hasOtherCheckedController(thisController)
     } else {
       false
@@ -176,25 +176,25 @@ object ValueController {
 
       case input: dom.html.Input =>
         input.`type` match {
-          case "text" => Some((Laminar.value, Laminar.onInput)) // Tiny perf shortcut for the most common case
-          case "checkbox" | "radio" => Some((Laminar.checked, Laminar.onClick))
+          case "text" => Some((L.value, L.onInput)) // Tiny perf shortcut for the most common case
+          case "checkbox" | "radio" => Some((L.checked, L.onClick))
           case "file" => None
-          case _ => Some((Laminar.value, Laminar.onInput)) // All the other input types: email, color, date, etc.
+          case _ => Some((L.value, L.onInput)) // All the other input types: email, color, date, etc.
         }
 
       case _: dom.html.TextArea =>
-        Some((Laminar.value, Laminar.onInput))
+        Some((L.value, L.onInput))
 
       case _: dom.html.Select =>
         // @TODO Allow onInput? it's the same but not all browsers support it.
         // Note: onChange browser event emits only when the selected value actually changes
         //       (clicking the same option doesn't trigger the event)
-        Some((Laminar.value, Laminar.onChange))
+        Some((L.value, L.onChange))
 
       case el if DomApi.isCustomElement(el) =>
         // @TODO Not sure if custom elements can actually work that way.
         //  I think yes, if they fire onInput events and have a value prop. But is that how they usually work?
-        Some((Laminar.value, Laminar.onInput))
+        Some((L.value, L.onInput))
 
       case _ =>
         None
