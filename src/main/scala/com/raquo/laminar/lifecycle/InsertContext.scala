@@ -153,10 +153,30 @@ object InsertContext {
     parentNode: El,
     strictMode: Boolean
   ): InsertContext[El] = {
+
     val sentinelNode = new CommentNode("")
 
     ParentNode.appendChild(parent = parentNode, child = sentinelNode)
 
+    unsafeMakeReservedSpotContext(
+      parentNode = parentNode,
+      sentinelNode = sentinelNode,
+      strictMode = strictMode
+    )
+  }
+
+  /** Reserve the spot for when we actually insert real nodes later.
+    *
+    * Unsafe: you must make sure yourself that sentinelNode is already
+    * a child of parentNode in the real DOM.
+    *
+    * This method is exposed to help third parties make hydration helpers.
+    */
+  def unsafeMakeReservedSpotContext[El <: ReactiveElement.Base](
+    parentNode: El,
+    sentinelNode: ChildNode.Base,
+    strictMode: Boolean
+  ): InsertContext[El] = {
     // #Warning[Fragile] - We avoid instantiating a JsMap in loose mode, for performance.
     //  The JsMap is initialized if/when needed, in forceSetStrictMode.
     new InsertContext[El](
