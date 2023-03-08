@@ -178,26 +178,13 @@ trait ReactiveElement[+Ref <: dom.Element]
     this
   }
 
-  override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    //println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
-
-    // @Note this should cover ALL cases not covered by setParent
-    if (isUnmounting(maybePrevParent = maybeParent, maybeNextParent = maybeNextParent)) {
-      setPilotSubscriptionOwner(maybeNextParent)
-    }
-  }
-
-  /** Don't call setParent directly – willSetParent will not be called. Use methods like `appendChild` defined on `ParentNode` instead. */
+  /** Don't call setParent directly. Use methods like `ParentNode.appendChild` instead. */
   override private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     //println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
-    val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
 
-    // @Note this should cover ALL cases not covered by willSetParent
-    if (!isUnmounting(maybePrevParent = maybePrevParent, maybeNextParent = maybeNextParent)) {
-      setPilotSubscriptionOwner(maybeNextParent)
-    }
+    setPilotSubscriptionOwner(maybeNextParent)
   }
 
   private[this] def isUnmounting(

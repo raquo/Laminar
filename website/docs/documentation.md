@@ -1927,7 +1927,7 @@ Mounting and unmounting are discrete events that happen at a certain time.
 
 All mounting callbacks / effects are executed when the element has just mounted. At this point the element has its new parent already, if that changed. So pretty much equivalent to React's `componentDidMount` hook.
 
-All unmounting callbacks / effects are executed when the element is about to become unmounted. At this point the element still has its old parent, if it's being moved or detached. So like React's `componentWillUnmount` hook.
+All unmounting callbacks / effects are executed when the element has just become unmounted. At this point the element is no longer attached to its old parent (if it's being moved or detached), and all its subscriptions are deactivated.
 
 
 ### How Are Mount Events Propagated?

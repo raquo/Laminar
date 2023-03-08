@@ -33,14 +33,9 @@ object ParentNode {
     parent: ParentNode.Base,
     child: ChildNode.Base
   ): Boolean = {
-    val nextParent = Some(parent)
-    child.willSetParent(nextParent)
-
-    // 1. Update DOM
     val appended = DomApi.appendChild(parent = parent.ref, child = child.ref)
     if (appended) {
-      // 3. Update child
-      child.setParent(nextParent)
+      child.setParent(Some(parent))
     }
     appended
   }
@@ -50,10 +45,8 @@ object ParentNode {
     parent: ParentNode.Base,
     child: ChildNode.Base
   ): Boolean = {
-    var removed = false
-    if (child.ref.parentNode == parent.ref) {
-      child.willSetParent(None)
-      removed = DomApi.removeChild(parent = parent.ref, child = child.ref)
+    val removed = DomApi.removeChild(parent = parent.ref, child = child.ref)
+    if (removed) {
       child.setParent(None)
     }
     removed
@@ -64,14 +57,14 @@ object ParentNode {
     newChild: ChildNode.Base,
     referenceChild: ChildNode.Base
   ): Boolean = {
-    val nextParent = Some(parent)
-    newChild.willSetParent(nextParent)
     val inserted = DomApi.insertBefore(
       parent = parent.ref,
       newChild = newChild.ref,
       referenceChild = referenceChild.ref
     )
-    newChild.setParent(nextParent)
+    if (inserted) {
+      newChild.setParent(Some(parent))
+    }
     inserted
   }
 
@@ -80,14 +73,14 @@ object ParentNode {
     newChild: ChildNode.Base,
     referenceChild: ChildNode.Base
   ): Boolean = {
-    val nextParent = Some(parent)
-    newChild.willSetParent(nextParent)
     val inserted = DomApi.insertAfter(
       parent = parent.ref,
       newChild = newChild.ref,
       referenceChild = referenceChild.ref
     )
-    newChild.setParent(nextParent)
+    if (inserted) {
+      newChild.setParent(Some(parent))
+    }
     inserted
   }
 
@@ -101,13 +94,8 @@ object ParentNode {
     child: ChildNode.Base,
     index: Int
   ): Boolean = {
-    var inserted = false
-    val nextParent = Some(parent)
-
-    child.willSetParent(nextParent)
-
     val children = parent.ref.childNodes
-    inserted = if (index < children.length) {
+    val inserted = if (index < children.length) {
       val referenceChild = children(index)
       DomApi.insertBefore(
         parent = parent.ref,
@@ -117,11 +105,9 @@ object ParentNode {
     } else {
       DomApi.appendChild(parent = parent.ref, child = child.ref)
     }
-
     if (inserted) {
-      child.setParent(nextParent)
+      child.setParent(Some(parent))
     }
-
     inserted
   }
 
@@ -137,20 +123,14 @@ object ParentNode {
     var replaced = false
     if (oldChild ne newChild) {
       if (oldChild.maybeParent.contains(parent)) {
-        val newChildNextParent = Some(parent)
-
-        oldChild.willSetParent(None)
-        newChild.willSetParent(newChildNextParent)
-
         replaced = DomApi.replaceChild(
           parent = parent.ref,
           newChild = newChild.ref,
           oldChild = oldChild.ref
         )
-
         if (replaced) {
           oldChild.setParent(None)
-          newChild.setParent(newChildNextParent)
+          newChild.setParent(Some(parent))
         }
       }
     }
