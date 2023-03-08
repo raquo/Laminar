@@ -1,5 +1,6 @@
 package com.raquo.laminar.nodes
 
+import com.raquo.laminar.DomApi
 import org.scalajs.dom
 
 /** RootNode will mount itself (and the child) if the container node
@@ -24,7 +25,7 @@ class RootNode(
     throw new Exception("Unable to mount Laminar RootNode into a null container. See https://laminar.dev/documentation#waiting-for-the-dom-to-load")
   }
 
-  if (!ChildNode.isNodeMounted(container)) {
+  if (!DomApi.isDescendantOf(container, dom.document)) {
     throw new Exception("Unable to mount Laminar RootNode into an unmounted container. See https://laminar.dev/documentation#rendering")
   }
 
