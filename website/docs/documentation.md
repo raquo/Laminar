@@ -211,7 +211,7 @@ For convenience, `Seq[Modifier[A]]` is also implicitly converted to a `Modifier[
 def TextInput(inputMods: Modifier[Input]*): HtmlElement =
   div(
     cls := "TextInput",
-    input(type := "text", inputMods)
+    input(typ := "text", inputMods)
   )
 
 // Usage (data binding with arrows will be explained later)
@@ -1958,9 +1958,9 @@ Lifecycle hooks let you do stuff when the element is being mounted or unmounted,
 
 **In JS DOM** an element is said to be mounted when one of its ancestors is the document being displayed: `dom.document`. In other words, a mounted element is present in the DOM, or "attached" to the DOM. On the contrary, elements that are not mounted are called "unmounted" or "detached". Those elements are not present in the DOM. They might have none, one or more ancestors, but none of them are `dom.document`, so the highest level ancestor of this element must have no parent.
 
-**Laminar** does not get notified by the browser when elements change parents and become mounted / unmounted. Therefore, technically we use a slightly different definition of mounted / unmounted elements. A Laminar element is considered mounted when one of its ancestors is a **mounted** Laminar `RootNode`. A `RootNode` is created with `val rootNode = render(containerEl, contentEl)`. A `RootNode` is mounted immediately if `containerEl` was present in the DOM when `render` is called. Other than that, you need to manually call `mount()` / `unmount()` methods on `rootNode` to toggle its mounted / unmounted state.
+**Laminar** does not get notified by the browser when elements change parents and become mounted / unmounted. Therefore, technically we use a slightly different definition of mounted / unmounted elements. A Laminar element is considered mounted when one of its ancestors is a **mounted** Laminar `RootNode`. A `RootNode` is created with `val rootNode = render(containerEl, contentEl)`. A `RootNode` is mounted immediately when it's initialized if `containerEl` was present in the DOM when `render` is called. If you manually remove one of RootNode's ancestor elements from the DOM, you should call `unmount()` on the `RootNode`, otherwise Laminar will still consider the RootNode mounted, which is probably not be what you want.
 
-In practice this distinction is only useful for integrating with third party libraries, e.g. rendering a Laminar element inside a React.js component. If you're rendering your whole app in Laminar, you're likely rendering it into some `<div id="appContainer"></div>` element that's always present in the DOM so there is no practical difference between Laminar's definition of mounting and JS DOM definition of mounting.
+In practice the distinction between JS DOM mounting and Laminar mounting meaning is only important when Laminar is not managing the entire DOM in your app. For example, when you are rendering Laminar elements inside a React.js components. If you're rendering your whole app in Laminar, you're likely rendering it into some `<div id="appContainer"></div>` element that's always present in the DOM so there is no practical difference between Laminar's definition of mounting and JS DOM definition of mounting.
 
 Laminar elements that are mounted are also called "active", because the subscriptions associated with them are also active while they're mounted. Every Laminar element starts out unmounted because it has no parent at initialization time. An element can become mounted if its parent becomes mounted – either if its parent is changed to a different one, or if the same parent becomes mounted. The latter is a recursion that terminates at the `RootNode`.
 
@@ -2019,11 +2019,13 @@ printBus.writer.onNext("hi") // this will print "Mod: hi" and "Mount: hi"
 ```
 
 The bottom line is, avoid using `onMountCallback` if all you need is a reference to `thisNode` or `Owner`. Better use `inContext` or `amend` if you need `thisNode`, and binders like `foo <-- bar` instead of messing with owners manually. Use `onMountCallback` when its purpose aligns with your big picture: running some code on mount. The same goes for all other helpers below.
+
+To reiterate for – you don't necessarily need `onMountCallback` if you want to do something on mount only. For example, you could say `onMountBind(_ => observable --> onNext)` to get similar behaviour without messing with the owners manually. More on other such `onMount*` helpers below.
  
 
 ### onUnmountCallback & onMountUnmountCallback
 
-Works just like `onMountCallback`, same caveats.
+Works just like `onMountCallback`, with the same caveats.
 
 ```scala
 div(
@@ -2092,7 +2094,7 @@ In other words, while `Setter` modifiers are idempotent, `Binder` modifiers are 
 
 `onMountBind` solves this problem by remembering the dynamic subscription returned by the binder and permanently killing it on unmount, instead of merely deactivating it. So when the element mounts again, onMountBind callback will run again, but there will be no pre-existing dynamic subscription from the previous mount left. 
 
-So we know why `onMountCallback` fails us technically, but why is it failing us philosophically? Well, Laminar is just doing what we're telling it to do: "Every time this element mounts, create a new click listener and add it to this element". And the reason you're even able to tell this to Laminar is: _what if this was what you actually wanted to do_? What would be a simpler way to express that? I can't think of any without introducing completely arbitrary helpers that are dependent on fleeting fashions on frontend dev.
+So, now we know why `onMountCallback` fails us on a technical level, but why does it have to be that way? Well, Laminar is just doing what we're telling it to do: "Every time this element mounts, create a new click listener and add it to this element". And the reason you're even able to tell this to Laminar is: _what if this was what you actually wanted to do_? What would be a simpler way to express that? I can't think of any, without introducing completely arbitrary helpers that are dependent on fleeting fashions on frontend dev.
 
 And so, `onMountBind` exists as the simplest way to do what it does, and `onMountCallback` as the simplest way to do the other thing.
 
@@ -2122,7 +2124,7 @@ So why does `onMountInsert` need to exist, and why doesn't Laminar allow us to p
 
 `onMountInsert` offers the same deal as `onMountBind` in terms of cancelling the subscription on unmount to prevent a conflict between N `child <-- childStream` modifiers after mounting the element N times. Note that cancelling this subscription does **not** mean that the previously inserted child is removed. If you want that, emit `emptyNode` into childStream while it's still mounted.
 
-But as you might recall Inserters like `child <-- ...` and `children <-- ...` reserve a stable spot in the parent element where they will insert new children. That spot is after the last child of the parent element _at the time of reservation_.
+But as you might recall, Inserters like `child <-- ...` and `children <-- ...` reserve a stable spot in the parent element where they will insert new children. That spot is located after the last child of the parent element _at the time of reservation_.
 
 This would obviously not work inside `onMountBind` – the callback is executed only on mount, so the `child <-- childStream` modifier is added only on mount, and at that point the element already has two child nodes in it: `div(TextNode("Hello, "), TextNode("!"))`. Therefore `child <-- childStream` would have reserved a spot **after** "!", which is not what we want, we obviously want it to reserve the spot where the `onMountInsert` modifier itself is visually located, i.e. between "Hello, " and "!".
 
@@ -2133,13 +2135,19 @@ The `onMountInsert` modifier exists to solve this – it reserves a spot when it
 
 * If you legitimately need to run arbitrary code on mount and/or on unmount, for example to integrate with a third party library.
 
-* If you need your callback to run on mount **but also** to run immediately in case the element is already mounted, use `ReactiveElement.bindFn` / `bindObserver` / etc. methods. Generally you shouldn't need these but they might be useful for integration or extensions. 
+  * Note: If you need your callback to run on mount **but also** to run immediately in case the element is already mounted, use `ReactiveElement.bindFn` / `bindObserver` / etc. methods. Generally you shouldn't need these, but they might be useful for integration or extensions. 
 
 * If you want an `Owner` to _simplify_ some code. For example, if you have a complex component where you don't want to fiddle with ownership everywhere, you can pass a parent's owner to it using `onMountInsert(ctx => makeComponent(ctx.owner)`, but you have to know what you're doing to avoid memory leaks. Read more about Ownership in Laminar and Airstream docs.
 
   * Note: if you want an `Owner` because you're upgrading from Laminar v0.7 where each element was an Owner, this might not be the best way to achieve what you want. We've redesigned the API to reduce the need mess around with owners manually. For example, you can have modifiers like `stream --> observer` now.
 
-* If you just need a reference to `thisNode`, don't use lifecycle hooks, use `inContext`.
+* If you need to decide which binders / inserters to use at mount time. For example, with `onMountInsert` you could switch between `child <-- stream` and `children <-- otherStream` every time the element is mounted.
+
+* If you just need a reference to `thisNode`, **don't** use lifecycle hooks, use `inContext` – it is simpler and more performant.
+
+* If you can get away with `stream --> observer` binding syntax, use that, **don't** bother with lifecycle hooks.
+
+  * Note: Remember you can often use streams like `EventStream.unit()` and `EventStream.delay(100)` if you want the observer to be called "on mount" or 100ms after it's mounted.
 
 
 ### Lifecycle Event Timing
