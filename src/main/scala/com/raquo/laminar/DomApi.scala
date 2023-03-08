@@ -14,7 +14,7 @@ import scala.scalajs.js.{JavaScriptException, |}
 
 object DomApi {
 
-  /* Tree functions */
+  /* Tree update functions */
 
   def appendChild(
     parent: dom.Node,
@@ -81,12 +81,35 @@ object DomApi {
     }
   }
 
+
+  /** Tree query functions */
+
   def indexOfChild(
     parent: dom.Node,
     child: dom.Node
   ): Int = {
     parent.childNodes.indexOf(child)
   }
+
+  /** Note: This walks up the real DOM element tree, not the Laminar DOM tree.
+    * See ChildNode.isDescendantOf if you want to walk up Laminar's tree instead.
+    */
+  @tailrec final def isDescendantOf(node: dom.Node, ancestor: dom.Node): Boolean = {
+    // @TODO[Performance] Maybe use https://developer.mozilla.org/en-US/docs/Web/API/Node/contains instead (but IE only supports it for Elements)
+    // For children of shadow roots, parentNode is null, but the host property contains a reference to the shadow root
+    val effectiveParentNode = if (node.parentNode != null) {
+      node.parentNode
+    } else {
+      val maybeShadowHost = node.asInstanceOf[js.Dynamic].selectDynamic("host").asInstanceOf[js.UndefOr[dom.Node]]
+      maybeShadowHost.orNull
+    }
+    effectiveParentNode match {
+      case null => false
+      case `ancestor` => true
+      case intermediateParent => isDescendantOf(intermediateParent, ancestor)
+    }
+  }
+
 
 
   /** Events */
