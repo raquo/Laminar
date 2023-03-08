@@ -61,6 +61,7 @@ title: Documentation
   * [How Are Mount Events Propagated?](#how-are-mount-events-propagated)
 * [Integrations With Other Libraries](#integrations-with-other-libraries)
 * [URL Routing](#url-routing)
+* [Browser Compatibility](#browser-compatibility)
 * [Special Cases](#special-cases)
 
 
@@ -2042,6 +2043,22 @@ Integration of observables with callback-driven APIs is usually achieved by prov
 
 These routers are designed for Laminar, but don't actually depend on it, only on Airstream, so you could potentially use them without Laminar.
 
+
+
+## Browser Compatibility
+
+Laminar supports all modern browsers as well as Internet Explorer 11, with minor caveats (listed below).
+
+However, I do not guarantee continued support for Internet Explorer. If your company needs reliable IE support, please subscribe as a [GOLD sponsor](https://github.com/sponsors/raquo) and let me know that you need this.
+
+Note that Laminar, Airstream, and scala-js-dom provide access to browser APIs that Internet Explorer might not support – for example, just because we defined a typed interface to use a certain CSS property, it does not mean that IE supports said property.
+
+For IE, you will need to shim / polyfill some browser APIs to make use of certain Laminar features:
+
+* [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), if you want to use Airstream's `scala.Future` integrations (e.g. `EventStream.fromFuture`)
+* [Fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), if you want to use FetchStream (alternatively, you can use AjaxStream without any polyfill)
+
+Also, the current implementation of `DomApi.unsafeParseHtmlString` method does not support IE. See its scaladoc for an alternative.
 
 
 ## Special Cases
