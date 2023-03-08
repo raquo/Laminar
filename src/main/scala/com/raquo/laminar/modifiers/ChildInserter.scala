@@ -28,8 +28,11 @@ object ChildInserter {
             .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
             .fold {
               // Inserting the child for the first time, OR after the previous child was externally moved / removed.
-              val sentinelNodeIndex = ParentNode.indexOfChild(ctx.parentNode, ctx.sentinelNode)
-              ParentNode.insertChild(parent = ctx.parentNode, newChildNode, atIndex = sentinelNodeIndex + 1)
+              ParentNode.insertChildAfter(
+                parent = ctx.parentNode,
+                newChild = newChildNode,
+                referenceChild = ctx.sentinelNode
+              )
               ()
             } { lastSeenChild =>
               // We found the existing child in the right place in the DOM

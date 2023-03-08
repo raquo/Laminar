@@ -69,7 +69,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    ParentNode.insertChild(parent = elx, child = el3, atIndex = 0)
+    ParentNode.insertChildAtIndex(parent = elx, child = el3, index = 0)
 
     ChildNode.isDescendantOf(node = el3.ref, ancestor = elx.ref) shouldBe true
     ChildNode.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe false
@@ -79,7 +79,7 @@ class TreeSpec extends UnitSpec {
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     ChildNode.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    ParentNode.insertChild(parent = el10, child = el3, atIndex = 0)
+    ParentNode.insertChildAtIndex(parent = el10, child = el3, index = 0)
 
     ChildNode.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     ChildNode.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true

@@ -75,7 +75,7 @@ class ValueController[A, B](
       //  - This does not touch `element.maybeEventSubscriptions` or `dynamicOwner.subscriptions`
       //  - We want to maintain the same DynamicSubscription references because users might be holding them too
       //    (e.g. as a result of calling .bind() on a listener), so we shouldn't kill them
-      element.foreachEventListener(listener => DomApi.removeEventListener(element, listener))
+      element.foreachEventListener(listener => DomApi.removeEventListener(element.ref, listener))
 
       // Add the controller listener as the first one
       //  - `unsafePrepend` is safe here because we've just removed event listeners from the DOM
@@ -87,7 +87,7 @@ class ValueController[A, B](
       //  - After this, the order of subscriptions and listeners is the same everywhere
       //  - Note that listener caches the js.Function so we're adding the same exact listener back to the DOM.
       //    So, other than the desired side effect, this whole patch is very transparent to the users.
-      element.foreachEventListener(listener => DomApi.addEventListener(element, listener))
+      element.foreachEventListener(listener => DomApi.addEventListener(element.ref, listener))
 
       // @TODO[Performance] This rearrangement of listeners can be micro-optimized later, e.g.
       //  - Reduce scope of events that we're moving (we move all of them to maintain relative order between them)

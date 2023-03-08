@@ -14,14 +14,14 @@ import scala.scalajs.js.{JavaScriptException, |}
 
 object DomApi {
 
-  /** Tree functions */
+  /* Tree functions */
 
   def appendChild(
-    parent: ParentNode.Base,
-    child: ChildNode.Base
+    parent: dom.Node,
+    child: dom.Node
   ): Boolean = {
     try {
-      parent.ref.appendChild(child.ref)
+      parent.appendChild(child)
       true
     } catch {
       // @TODO[Integrity] Does this only catch DOM exceptions? (here and in other methods)
@@ -30,11 +30,11 @@ object DomApi {
   }
 
   def removeChild(
-    parent: ParentNode.Base,
-    child: ChildNode.Base
+    parent: dom.Node,
+    child: dom.Node
   ): Boolean = {
     try {
-      parent.ref.removeChild(child.ref)
+      parent.removeChild(child)
       true
     } catch {
       case JavaScriptException(_: dom.DOMException) => false
@@ -42,12 +42,26 @@ object DomApi {
   }
 
   def insertBefore(
-    parent: ParentNode.Base,
-    newChild: ChildNode.Base,
-    referenceChild: ChildNode.Base
+    parent: dom.Node,
+    newChild: dom.Node,
+    referenceChild: dom.Node
   ): Boolean = {
     try {
-      parent.ref.insertBefore(newChild = newChild.ref, refChild = referenceChild.ref)
+      parent.insertBefore(newChild = newChild, refChild = referenceChild)
+      true
+    } catch {
+      case JavaScriptException(_: DOMException) => false
+    }
+  }
+
+  def insertAfter(
+    parent: dom.Node,
+    newChild: dom.Node,
+    referenceChild: dom.Node
+  ): Boolean = {
+    try {
+      // Note: parent.insertBefore correctly handles the case of `refChild == null`
+      parent.insertBefore(newChild = newChild, refChild = referenceChild.nextSibling)
       true
     } catch {
       case JavaScriptException(_: dom.DOMException) => false
@@ -55,27 +69,34 @@ object DomApi {
   }
 
   def replaceChild(
-    parent: ParentNode.Base,
-    newChild: ChildNode.Base,
-    oldChild: ChildNode.Base
+    parent: dom.Node,
+    newChild: dom.Node,
+    oldChild: dom.Node
   ): Boolean = {
     try {
-      parent.ref.replaceChild(newChild = newChild.ref, oldChild = oldChild.ref)
+      parent.replaceChild(newChild = newChild, oldChild = oldChild)
       true
     } catch {
       case JavaScriptException(_: dom.DOMException) => false
     }
   }
 
+  def indexOfChild(
+    parent: dom.Node,
+    child: dom.Node
+  ): Int = {
+    parent.childNodes.indexOf(child)
+  }
+
 
   /** Events */
 
   def addEventListener[Ev <: dom.Event](
-    element: ReactiveElement.Base,
+    element: dom.Element,
     listener: EventListener[Ev, _]
   ): Unit = {
     //println(s"> Adding listener on ${DomApi.debugNodeDescription(element.ref)} for `${eventPropSetter.key.name}` with useCapture=${eventPropSetter.useCapture}")
-    element.ref.addEventListener(
+    element.addEventListener(
       `type` = EventProcessor.eventProp(listener.eventProcessor).name,
       listener = listener.domCallback,
       options = listener.options
@@ -83,10 +104,10 @@ object DomApi {
   }
 
   def removeEventListener[Ev <: dom.Event](
-    element: ReactiveElement.Base,
+    element: dom.Element,
     listener: EventListener[Ev, _]
   ): Unit = {
-    element.ref.removeEventListener(
+    element.removeEventListener(
       `type` = EventProcessor.eventProp(listener.eventProcessor).name,
       listener = listener.domCallback,
       options = listener.options

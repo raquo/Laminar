@@ -97,13 +97,10 @@ final class InsertContext[+El <: ReactiveElement.Base](
       // it as such for the strict mode, and insert a new sentinel node into the DOM.
       val contentNode = sentinelNode
       val newSentinelNode = new CommentNode("")
-      ParentNode.insertChild(
-        parent = parentNode,
-        child = newSentinelNode,
-        atIndex = ParentNode.indexOfChild(
-          parent = parentNode,
-          child = contentNode
-        )
+      DomApi.insertBefore(
+        parent = parentNode.ref,
+        newChild = newSentinelNode.ref,
+        referenceChild = contentNode.ref
       )
 
       // Convert loose mode context values to strict mode context values

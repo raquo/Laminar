@@ -126,7 +126,7 @@ class LifecycleEventSpec extends UnitSpec {
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
-        child => ParentNode.insertChild(parent = parent2, child, atIndex = 1),
+        child => ParentNode.insertChildAtIndex(parent = parent2, child, index = 1),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(

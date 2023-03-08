@@ -74,29 +74,24 @@ object ChildrenInserter {
     sentinelNode: ChildNode.Base,
     prevChildrenCount: Int
   ): Int = {
-    val liveNodeList = parentNode.ref.childNodes
-    val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
 
     // Loop variables
     var index = 0
     var currentChildrenCount = prevChildrenCount
-    var prevChildRef = liveNodeList(sentinelIndex + 1)
+    var prevChildRef = sentinelNode.ref.nextSibling
 
     // Sorry for all the debug comments, but they really help me figure things out.
 
     // println(">>>>>>>>>>>>>>>>>")
     // println(s"updateChildren(nextChildren = ${nextChildren.map(_.ref.textContent)})")
 
-    nextChildren.foreach { nextChild => // #TODO Not sure if this is faster than iterating over a js.Map
+    var lastIndexChild = sentinelNode
 
-      // Desired index of `nextChild` in `liveNodeList`
-      val nextChildNodeIndex = sentinelIndex + index + 1
+    nextChildren.foreach { nextChild => // #TODO Not sure if this is faster than iterating over a js.Map
 
       // println("evaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if ((prevChildRef: js.UndefOr[dom.Node]) == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))
 
       // @TODO[Integrity] prevChildRef can be null or even undefined here if we reach the end, under certain circumstances. See what can be done...
-
-      // @TODO[Performance] prevChildren are not needed here, it's fixable right now by just looking at parentNode's maybeChildren
 
       // @TODO[Performance] this diffing algo is decent, but can still be optimized in a few ways (but we need benchmarking & data for that)
       // @TODO[Performance] We could optimize this for specific `Seq` implementations. For example, foreach is faster than while() on a `List`
@@ -108,7 +103,12 @@ object ChildrenInserter {
         // Note: `prevChildRef` is not valid in this branch
         // println("> overflow: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
         // @Note: DOM update
-        ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
+        // ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
+        ParentNode.insertChildAfter(
+          parent = parentNode,
+          newChild = nextChild,
+          referenceChild = lastIndexChild
+        )
         // println(s"setting prevChildRef=${nextChild.ref.textContent}")
         prevChildRef = nextChild.ref
         currentChildrenCount += 1
@@ -124,29 +124,41 @@ object ChildrenInserter {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
             // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
             // @Note: DOM update
-            ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
+            ParentNode.insertChildAfter(
+              parent = parentNode,
+              newChild = nextChild,
+              referenceChild = lastIndexChild
+            )
             // println(s"setting prevChildRef=${nextChild.ref.textContent}")
             prevChildRef = nextChild.ref
             currentChildrenCount += 1
           } else {
             // nextChild is found, but at a different index
-            // First, let's check if prevChild should be deleted. This will reduce the amount of moving needed to be done in most cases.
+
+            // First, let's check if prevChild should be deleted.
+            // This will reduce the amount of moving needed to be done in most cases.
             // Note:
             // - This loop should never go out of bounds on `liveNodeList` because we know that `nextChild.ref` is still in that list somewhere
-            // - `nextChild.ref != prevChildNode` is a performance shortcut
             // - In `containsNode` call we only start looking at `index` because we know that all nodes before `index` are already in place.
             while (
               nextChild.ref != prevChildRef && !containsRef(nextChildrenMap, prevChildRef)
             ) {
-              // prevChild should be deleted, so we remove it from the DOM, and try again with the next prevChild
-              // but first we save its next sibling, which will become our next `prevChildRef`
+              // Loop logic:
+              // - prevChild should be deleted, so we remove it from the DOM,
+              //   and try again with the next prevChild in the DOM.
+              // - We repeat this until we find an element in the DOM that is
+              //   present in nextChildren.
+
               // println(s"> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
               val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)
               // @Note: DOM update
-              ParentNode.removeChild(parent = parentNode, child = prevChild)
+              ParentNode.removeChild(
+                parent = parentNode,
+                child = prevChild
+              )
               // println(s"setting prevChildRef=${nextPrevChildRef.textContent}")
               prevChildRef = nextPrevChildRef
               currentChildrenCount -= 1
@@ -155,7 +167,11 @@ object ChildrenInserter {
               // nextChild is still not in the right place, so let's move it to the correct index
               // println("> order: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
               // @Note: DOM update
-              ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
+              ParentNode.insertChildAfter(
+                parent = parentNode,
+                newChild = nextChild,
+                referenceChild = lastIndexChild
+              )
               prevChildRef = nextChild.ref
               // This is a MOVE, so we DO NOT update currentDomChildrenCount here.
             }
@@ -171,7 +187,7 @@ object ChildrenInserter {
         //
         // At this point in the code, what we know that:
         // - There are no more elements in the DOM – the `nextSibling` of the last element we looked at / inserted is `null`.
-        // - There are no more `nextChildren` – we've just exhausted for foreach loop above
+        // - There are no more `nextChildren` – we've just exhausted our foreach loop above
         // Conclusion:
         // - We thought there would be more elements in the DOM, but they were removed (presumably externally),
         //   and they are not found in `nextChildren`. So everything is right, but "for the wrong reasons", sort of.
@@ -182,7 +198,8 @@ object ChildrenInserter {
       } else {
         prevChildRef = prevChildRef.nextSibling
       }
-      index += 1 // Faster than zipWithIndex
+      lastIndexChild = nextChild
+      index += 1
     }
 
     // println("reached end of nextChildren")
