@@ -266,22 +266,26 @@ trait Laminar
 
   /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
   def foreignHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref], element: Ref): ReactiveHtmlElement[Ref] = {
-    DomApi.assertTagMatches(tag, element, "Unable to init foreign element")
+    DomApi.assertTagMatches(tag, element, "Unable to init foreign html element")
     new ReactiveHtmlElement[Ref](tag, element)
+  }
+
+  /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
+  def foreignHtmlElement(element: dom.html.Element): ReactiveHtmlElement.Base = {
+    val tag = new HtmlTag(ReactiveElement.normalizeTagName(element)) // #Note: this tag instance is fake
+    new ReactiveHtmlElement(tag, element)
   }
 
   /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element. */
   def foreignSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref], element: Ref): ReactiveSvgElement[Ref] = {
-    DomApi.assertTagMatches(tag, element, "Unable to init foreign element")
+    DomApi.assertTagMatches(tag, element, "Unable to init foreign svg element")
     new ReactiveSvgElement[Ref](tag, element)
   }
 
-  /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element.
-    *
-    * Note: this method is a shorthand for the <svg> tag only, see the other version for other SVG tags.
-    */
+  /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element. */
   def foreignSvgElement(element: dom.svg.Element): ReactiveSvgElement[dom.svg.Element] = {
-    foreignSvgElement(svg.svg, element)
+    val tag = new SvgTag(ReactiveElement.normalizeTagName(element)) // #Note: this tag instance is fake
+    foreignSvgElement(tag, element)
   }
 
   /** Non-breaking space character

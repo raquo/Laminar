@@ -5,6 +5,7 @@ import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.utils.UnitSpec
+import org.scalajs.dom
 
 class ElementSpec extends UnitSpec {
 
@@ -92,6 +93,7 @@ class ElementSpec extends UnitSpec {
       div(
         b("Hello"),
         foreignHtmlElement(span, DomApi.unsafeParseHtmlString(span, "<span class='foo'>world</span>")),
+        foreignHtmlElement(DomApi.unsafeParseHtmlString("<span class='bar'>sun</span>")),
         " Eh"
       )
     )
@@ -103,12 +105,16 @@ class ElementSpec extends UnitSpec {
           cls is "foo",
           "world"
         ),
+        span of(
+          cls is "bar",
+          "sun"
+        ),
         " Eh"
       )
     )
   }
 
-  it("renders foreign SVG elements") {
+  it("renders foreign SVG root elements") {
     mount(
       div(
         b("Hello"),
@@ -142,7 +148,8 @@ class ElementSpec extends UnitSpec {
         s.svg(
           s.height("200"),
           s.width("400"),
-          foreignSvgElement(svg.circle, DomApi.unsafeParseSvgString("<circle cx='200' cy='15' r='30' fill='red'></circle>")),
+          foreignSvgElement(svg.circle, DomApi.unsafeParseSvgString(svg.circle, "<circle cx='200' cy='15' r='30' fill='red'></circle>")),
+          foreignSvgElement(DomApi.unsafeParseSvgString("<circle cx='2000' cy='150' r='300' fill='blue'></circle>"))
         ),
         " Eh"
       )
@@ -159,6 +166,12 @@ class ElementSpec extends UnitSpec {
             s.cy is "15",
             s.r is "30",
             s.fill is "red"
+          ),
+          s.circle of(
+            s.cx is "2000",
+            s.cy is "150",
+            s.r is "300",
+            s.fill is "blue"
           )
         ),
         " Eh"

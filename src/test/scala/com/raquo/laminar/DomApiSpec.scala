@@ -32,7 +32,7 @@ class DomApiSpec extends UnitSpec {
     val caught = intercept[Exception] {
       DomApi.unsafeParseHtmlString(div, "<div class='foo bar'>Hello <b>world</b></div><span></span")
     }
-    assert(caught.getMessage == "Error parsing HTML string: expected exactly 1 child in parserContainer, got 2")
+    assert(caught.getMessage == "Error parsing HTML string: expected exactly 1 element, got 2")
   }
 
   it("HTML: fails on incorrect tag name when expected tag is provided") {
@@ -87,7 +87,7 @@ class DomApiSpec extends UnitSpec {
     val caught = intercept[Exception] {
       DomApi.unsafeParseSvgString(s.svg, "<svg height=\"200\" width='400'></svg><circle cx='200' cy='15' r='30' fill='red'></circle>")
     }
-    assert(caught.getMessage == "Error parsing SVG string: expected exactly 1 child in parserContainer, got 2")
+    assert(caught.getMessage == "Error parsing SVG string: expected exactly 1 element, got 2")
   }
 
   it("SVG: fails on incorrect tag name when expected tag is provided") {

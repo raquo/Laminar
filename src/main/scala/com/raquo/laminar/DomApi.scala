@@ -1,7 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.ew._
-import com.raquo.laminar.api.L.{div, svg}
+import com.raquo.laminar.api.L.svg
 import com.raquo.laminar.keys.{AriaAttr, EventProcessor, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
@@ -499,60 +499,157 @@ object DomApi {
 
   /** DOM Parser */
 
-  /** #WARNING: Only use on trusted HTML strings. HTML strings can contain embedded Javascript code, which this function will execute blindly! */
-  def unsafeParseHtmlString(dangerousHtmlString: String): dom.html.Element = {
-    unsafeParseElementString(htmlParserContainer, tag = js.undefined, dangerousHtmlString, "Error parsing HTML string")
+  private val htmlParserContainer: dom.HTMLTemplateElement = {
+    dom.document.createElement("template").asInstanceOf[dom.HTMLTemplateElement]
   }
 
-  /** #WARNING: Only use on trusted HTML strings. HTML strings can contain embedded Javascript code, which this function will execute blindly!
+  private val svgParserContainer: dom.svg.Element = {
+    createSvgElement(svg.svg)
+  }
+
+  /** #WARNING: Only use on trusted HTML strings.
+    *  HTML strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
     *
-    * @param tag   the HTML tag you expect from parsing. Will throw exception if does not match the result.
+    * Note: this expects the html string to contain one HTML element,
+    * and will throw otherwise (e.g. if given a text node, an SVG, or multiple elements)
     */
-  def unsafeParseHtmlString[Ref <: dom.html.Element](tag: HtmlTag[Ref], dangerousHtmlString: String): Ref = {
-    unsafeParseElementString(htmlParserContainer, tag, dangerousHtmlString, "Error parsing HTML string")
+  def unsafeParseHtmlString(
+    dangerousHtmlString: String
+  ): dom.html.Element = {
+    val nodes = unsafeParseHtmlStringIntoNodeArray(dangerousHtmlString)
+    val clue = "Error parsing HTML string"
+    val node = assertSingleNode(nodes, clue)
+    assertHtmlElement(node, clue)
   }
 
-  /** #WARNING: Only use on trusted SVG strings. SVG strings can contain embedded Javascript code, which this function will execute blindly! */
-  def unsafeParseSvgString(dangerousSvgString: String): dom.svg.Element = {
-    unsafeParseElementString(svgParserContainer, tag = js.undefined, dangerousSvgString, "Error parsing SVG string")
-  }
-
-  /** #WARNING: Only use on trusted SVG strings. SVG strings can contain embedded Javascript code, which this function will execute blindly!
+  /** #WARNING: Only use on trusted HTML strings.
+    *  HTML strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
     *
-    * @param tag   the SVG tag you expect from parsing. Will throw exception if does not match the result.
+    * Note: this expects the html string to contain one element matching the
+    * tag name, and will throw otherwise (e.g. if given a text node, an
+    * element with a different tag name, or multiple elements)
     */
-  def unsafeParseSvgString[Ref <: dom.svg.Element](tag: SvgTag[Ref], dangerousSvgString: String): Ref = {
-    unsafeParseElementString(svgParserContainer, tag, dangerousSvgString, "Error parsing SVG string")
-  }
-
-  private val htmlParserContainer: dom.html.Element = createHtmlElement(div)
-
-  private val svgParserContainer: dom.svg.Element = createSvgElement(svg.svg)
-
-  private def unsafeParseElementString[Ref <: dom.Element](
-    parserContainer: dom.Element,
-    tag: js.UndefOr[Tag[ReactiveElement[Ref]]],
-    dangerousHtmlOrSvgString: String,
-    clue: String
+  def unsafeParseHtmlString[Ref <: dom.html.Element](
+    tag: HtmlTag[Ref],
+    dangerousHtmlString: String
   ): Ref = {
-    parserContainer.innerHTML = dangerousHtmlOrSvgString
-    val numChildren = parserContainer.children.length
-    if (numChildren != 1) {
-      throw new Exception(s"$clue: expected exactly 1 child in parserContainer, got $numChildren")
-    }
-    val element = parserContainer.children(0)
-    tag.foreach(DomApi.assertTagMatches(_, element, clue))
-    parserContainer.innerHTML = ""
-    element.asInstanceOf[Ref]
+    val nodes = unsafeParseHtmlStringIntoNodeArray(dangerousHtmlString)
+    val clue = "Error parsing HTML string"
+    val node = assertSingleNode(nodes, clue)
+    assertTagMatches(tag, node, clue)
   }
 
-  private[laminar] def assertTagMatches[Ref <: dom.Element](
-    tag: Tag[ReactiveElement[Ref]],
-    element: dom.Element,
+  /** #WARNING: Only use on trusted SVG strings.
+    *  SVG strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    *
+    * Note: this expects the svg string to contain one HTML element,
+    * and will throw otherwise (e.g. if given a text node, HTML, or
+    * multiple elements)
+    */
+  def unsafeParseSvgString(
+    dangerousSvgString: String
+  ): dom.svg.Element = {
+    val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString)
+    val clue = "Error parsing SVG string"
+    val node = assertSingleNode(nodes, clue)
+    assertSvgElement(node, clue)
+  }
+
+  /** #WARNING: Only use on trusted SVG strings.
+    *  SVG strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    *
+    * Note: this expects the svg string to contain one element matching the
+    * tag name, and will throw otherwise (e.g. if given a text node, an
+    * element with a different tag name, or multiple elements)
+    */
+  def unsafeParseSvgString[Ref <: dom.svg.Element](
+    tag: SvgTag[Ref],
+    dangerousSvgString: String
+  ): Ref = {
+    val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString)
+    val clue = "Error parsing SVG string"
+    val node = assertSingleNode(nodes, clue)
+    assertTagMatches(tag, node, clue)
+  }
+
+  /** #WARNING: Only use on trusted HTML strings.
+    *  HTML strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    *
+    * Note: This method does not work in Internet Explorer.
+    * See https://stackoverflow.com/q/10585029 for the issues with various approaches.
+    * Use this if you need IE support: https://gist.github.com/Munawwar/6e6362dbdf77c7865a99
+    */
+  def unsafeParseHtmlStringIntoNodeArray(
+    dangerousHtmlString: String
+  ): js.Array[dom.Node] = {
+    htmlParserContainer.innerHTML = dangerousHtmlString
+    // #TODO add to `ew`: js.Array.from(nodeList)
+    val arr = js.Array.from(htmlParserContainer.content.childNodes.asInstanceOf[js.Iterable[dom.Node]])
+    htmlParserContainer.innerHTML = ""
+    arr
+  }
+
+  /** #WARNING: Only use on trusted SVG strings.
+    *  SVG strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    */
+  def unsafeParseSvgStringIntoNodeArray(
+    dangerousSvgString: String
+  ): js.Array[dom.Node] = {
+    svgParserContainer.innerHTML = dangerousSvgString
+    // #TODO add to `ew`: js.Array.from(nodeList)
+    val arr = js.Array.from(svgParserContainer.childNodes.asInstanceOf[js.Iterable[dom.Node]])
+    svgParserContainer.innerHTML = ""
+    arr
+  }
+
+  def assertSingleNode(
+    nodes: js.Array[dom.Node],
     clue: String
-  ): Unit = {
-    if (tag.name.ew.toLowerCase() != element.tagName.ew.toLowerCase()) {
-      throw new Exception(s"$clue: expected tag name `${tag.name}`, got `${element.tagName}`")
+  ): dom.Node = {
+    if (nodes.length != 1) {
+      throw new Exception(s"$clue: expected exactly 1 element, got ${nodes.length}")
+    }
+    nodes(0)
+  }
+
+  def assertHtmlElement(node: dom.Node, clue: String = "Error"): dom.html.Element = {
+    node match {
+      case element: dom.html.Element =>
+        element
+      case _ =>
+        throw new Exception(s"$clue: expected HTML element, got non-element node: ${node.nodeName}")
+    }
+  }
+
+  def assertSvgElement(node: dom.Node, clue: String = "Error"): dom.svg.Element = {
+    node match {
+      case element: dom.svg.Element =>
+        element
+      case _ =>
+        throw new Exception(s"$clue: expected SVG element, got non-element node: ${node.nodeName}")
+    }
+  }
+
+  def assertTagMatches[Ref <: dom.Element](
+    tag: Tag[ReactiveElement[Ref]],
+    node: dom.Node,
+    clue: String = "Error"
+  ): Ref = {
+    node match {
+      case element: dom.Element =>
+        if (tag.name.ew.toLowerCase() != element.tagName.ew.toLowerCase()) {
+          throw new Exception(s"$clue: expected tag name `${tag.name}`, got `${element.tagName}`")
+        } else {
+          node.asInstanceOf[Ref]
+        }
+      case _ =>
+        throw new Exception(s"$clue: expected element, got non-element node: ${node.nodeName}")
     }
   }
 

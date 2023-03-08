@@ -316,4 +316,21 @@ object ReactiveElement {
   def numDynamicSubscriptions(element: ReactiveElement.Base): Int = {
     element.dynamicOwner.numSubscriptions
   }
+
+  /** Transform tag name obtained from the DOM to match the tag name
+    * that we would have defined for it in HtmlTags / SvgTags.
+    *
+    * Basically this just means lower-casing HTML tag names, e.g.
+    * transforming "DIV" returned from the DOM to "div", taking care
+    * to avoid mangling custom element tag names.
+    */
+  def normalizeTagName(element: dom.Element): String = {
+    val rawTagName = element.tagName
+    val isCustomElement = rawTagName.contains("-")
+    if (isCustomElement) {
+      rawTagName // Don't touch tag names of custom elements
+    } else {
+      rawTagName.toLowerCase
+    }
+  }
 }

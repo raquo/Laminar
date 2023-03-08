@@ -19,7 +19,8 @@ trait HtmlTags {
     *  - This does not register this tag name as a custom element
     *    - See https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements
     * 
-    * @param tagName - e.g. "div" or "mwc-input"
+    * @param name - e.g. "div" or "mwc-input"
+    * 
     * @tparam Ref - type of elements with this tag, e.g. dom.html.Input for "input" tag
     */
   def htmlTag[Ref <: dom.html.Element](name: String, void: Boolean = false): HtmlTag[Ref] = new HtmlTag(name, void)
