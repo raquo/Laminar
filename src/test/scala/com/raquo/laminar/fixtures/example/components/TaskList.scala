@@ -5,7 +5,7 @@ import com.raquo.laminar.CollectionCommand.Append
 
 class TaskList {
 
-  private val taskDiffBus = new EventBus[ChildrenCommand]
+  private val taskDiffBus = new EventBus[CollectionCommand[Node]]
 
   private val showAddTaskInputBus = new EventBus[Boolean]
 

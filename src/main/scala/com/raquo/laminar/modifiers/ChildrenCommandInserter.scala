@@ -1,21 +1,21 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.airstream.core.{EventStream, Transaction}
-import com.raquo.laminar.CollectionCommand
+import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
+import com.raquo.laminar.{CollectionCommand, DomApi}
 
-/**
- * Note: this is a low level inserter. It is the fastest one, but due to
- * its rather imperative API, its usefulness is very limited. It's good for
- * simple but voluminous stuff, like appending new log items to a big list,
- * but not much else.
- *
- * Consider using `children <-- observable.split(...)` instead, it has
- * great performance and is much more convenient.
- */
+/** Note: this is a low level inserter. It is the fastest one in certain cases,
+  * but due to its rather imperative API, its usefulness is very limited.
+  *
+  * It's good for simple operations on voluminous data, like prepending new
+  * log items to a big list, but not much else.
+  *
+  * Consider using `children <-- observable.split(...)` instead, it has
+  * great performance and is much more convenient.
+  */
 object ChildrenCommandInserter {
 
-  @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand[ChildNode.Base]", "15.0.0-M5")
+  @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand[Node]", "15.0.0-M5")
   type ChildrenCommand = CollectionCommand[ChildNode.Base]
 
   def apply[Component, El <: ReactiveElement.Base] (
@@ -47,36 +47,38 @@ object ChildrenCommandInserter {
     renderableNode: RenderableNode[Component]
   ): Int = {
     var nodeCountDiff = 0
+    def findSentinelIndex(): Int = DomApi.indexOfChild(
+      parent = parentNode.ref,
+      child = sentinelNode.ref
+    )
+
     command match {
 
       case CollectionCommand.Append(node) =>
-        val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        val inserted = ParentNode.insertChild(
+        val inserted = ParentNode.insertChildAtIndex(
           parent = parentNode,
           child = renderableNode.asNode(node),
-          atIndex = sentinelIndex + extraNodeCount + 1)
+          index = findSentinelIndex() + extraNodeCount + 1)
         if (inserted) {
           nodeCountDiff = 1
         }
         nodeCountDiff = 1
 
       case CollectionCommand.Prepend(node) =>
-        val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        val inserted = ParentNode.insertChild(
+        val inserted = ParentNode.insertChildAfter(
           parent = parentNode,
-          child = renderableNode.asNode(node),
-          atIndex = sentinelIndex + 1
+          newChild = renderableNode.asNode(node),
+          referenceChild = sentinelNode
         )
         if (inserted) {
           nodeCountDiff = 1
         }
 
       case CollectionCommand.Insert(node, atIndex) =>
-        val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        val inserted = ParentNode.insertChild(
+        val inserted = ParentNode.insertChildAtIndex(
           parent = parentNode,
           child = renderableNode.asNode(node),
-          atIndex = sentinelIndex + atIndex + 1
+          index = findSentinelIndex() + atIndex + 1
         )
         if (inserted) {
           nodeCountDiff = 1
@@ -91,51 +93,14 @@ object ChildrenCommandInserter {
           nodeCountDiff = -1
         }
 
-      case CollectionCommand.Move(node, toIndex) =>
-        // @TODO same as Insert.
-        // @TODO Should we also add a MoveToEnd method?
-        val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-        if (ParentNode.insertChild(parent = parentNode, child = renderableNode.asNode(node), atIndex = sentinelIndex + toIndex + 1)) {
-          nodeCountDiff = 1
-        }
-
       case CollectionCommand.Replace(node, withNode) =>
         ParentNode.replaceChild(
           parent = parentNode,
           oldChild = renderableNode.asNode(node),
           newChild = renderableNode.asNode(withNode)
         )
-
-      case CollectionCommand.ReplaceAll(newNodes) =>
-        Transaction.onStart.shared {
-          val sentinelIndex = ParentNode.indexOfChild(parent = parentNode, sentinelNode)
-          if (extraNodeCount == 0) {
-            var numInsertedNodes = 0
-            newNodes.foreach { newChild =>
-              val inserted = ParentNode.insertChild(
-                parent = parentNode,
-                child = renderableNode.asNode(newChild),
-                atIndex = sentinelIndex + 1 + numInsertedNodes
-              )
-              if (inserted) {
-                numInsertedNodes += 1
-              }
-            }
-            nodeCountDiff = numInsertedNodes
-          } else {
-            val oldNodeCount = extraNodeCount
-            val replaced = ParentNode.replaceChildren(
-              parent = parentNode,
-              fromIndex = sentinelIndex + 1,
-              toIndex = sentinelIndex + extraNodeCount,
-              renderableNode.asNodeIterable(newNodes)
-            )
-            if (replaced) {
-              nodeCountDiff = newNodes.size - oldNodeCount
-            }
-          }
-        }
     }
+
     nodeCountDiff
   }
 }

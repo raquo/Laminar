@@ -39,27 +39,10 @@ object CollectionCommand {
     }
   }
 
-  /** @param toIndex
-    *    the index at which the item would end up IF it hadn't been removed from its current position.
-    *    basically, this is the CURRENT index of an item in front of which the item will be moved to. */
-  case class Move[+Item](item: Item, toIndex: Int) extends CollectionCommand[Item] {
-
-    @inline override def map[A](project: Item => A): Move[A] = {
-      Move(project(item), toIndex)
-    }
-  }
-
   case class Replace[+Item](oldItem: Item, newItem: Item) extends CollectionCommand[Item] {
 
     @inline override def map[A](project: Item => A): Replace[A] = {
       Replace(project(oldItem), project(newItem))
-    }
-  }
-
-  case class ReplaceAll[+Item](newItems: Iterable[Item]) extends CollectionCommand[Item] {
-
-    @inline override def map[A](project: Item => A): ReplaceAll[A] = {
-      ReplaceAll(newItems.map(project))
     }
   }
 
@@ -71,12 +54,17 @@ object CollectionCommand {
 
   def vectorProcessor[Item](prevItems: Vector[Item], command: CollectionCommand[Item]): Vector[Item] = {
     command match {
-      case Append(item) => prevItems :+ item
-      case Prepend(item) => item +: prevItems
+      case Append(item) =>
+        prevItems :+ item
+
+      case Prepend(item) =>
+        item +: prevItems
+
       case Insert(item, atIndex) =>
         // @TODO[Integrity] handle out of bound index
         val chunks = prevItems.splitAt(atIndex)
         (chunks._1 :+ item) ++ chunks._2
+
       case Remove(item) =>
         val index = prevItems.indexOf(item)
         if (index == -1) {
@@ -86,20 +74,7 @@ object CollectionCommand {
         } else {
           prevItems.take(index) ++ prevItems.drop(index + 1)
         }
-      case Move(item, toIndex) =>
-        val oldIndex = prevItems.indexOf(item)
-        if (oldIndex == -1) {
-          vectorProcessor(prevItems, Insert(item, toIndex))
-        } else if (oldIndex == toIndex) {
-          prevItems
-        } else {
-          val newIndex = if (oldIndex > toIndex) {
-            toIndex
-          } else {
-            toIndex - 1
-          }
-          vectorProcessor(vectorProcessor(prevItems, Remove(item)), Insert(item, newIndex))
-        }
+
       case Replace(oldItem, newItem) =>
         val index = prevItems.indexOf(oldItem)
         if (index == -1) {
@@ -107,8 +82,6 @@ object CollectionCommand {
         } else {
           prevItems.updated(index, newItem)
         }
-      case ReplaceAll(newItems) =>
-        newItems.toVector
     }
   }
 }

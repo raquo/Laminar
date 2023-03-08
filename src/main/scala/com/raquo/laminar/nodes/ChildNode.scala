@@ -49,6 +49,7 @@ object ChildNode {
     isDescendantOf(node = node, ancestor = dom.document)
   }
 
+  /** Note: This walks up the real DOM element tree, not the Laminar DOM tree */
   @tailrec final def isDescendantOf(node: dom.Node, ancestor: dom.Node): Boolean = {
     // @TODO[Performance] Maybe use https://developer.mozilla.org/en-US/docs/Web/API/Node/contains instead (but IE only supports it for Elements)
     // For children of shadow roots, parentNode is null, but the host property contains a reference to the shadow root
@@ -65,7 +66,8 @@ object ChildNode {
     }
   }
 
-  @tailrec final def isDescendantOf[N, BaseRef](
+  /** Note: This walks up Laminar's element tree, not the real DOM tree */
+  @tailrec final def isDescendantOf(
     child: ChildNode.Base,
     parent: ParentNode.Base
   ): Boolean = {
