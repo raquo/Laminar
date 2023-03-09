@@ -2348,9 +2348,9 @@ div(
 )
 ```
 
-This is complicated an inefficient. You are creating a new `span` element (a real one, we don't do virtual elements in Laminar) every time `userStream` emits, and replacing the previous element you created with it.
+This is inefficient. You are creating a new `span` element (a real one, we don't do virtual elements in Laminar) every time `userStream` emits, and replacing the previous element you created with it.
 
-As you see from the code, the div tag always stays the same, so just keep it static, and update its innards instead:
+As you see from the code, the `span` tag always stays the same, so just keep it static, and update its innards instead:
 
 ```scala
 div(
@@ -2363,7 +2363,7 @@ div(
 
 Now, you only have one `span` element, and you are updating its `color` CSS property and text contents whenever `userSignal` emits.
 
-This is good practice not just for performance, but for improved user experience: in the original `child <-- ...` code snippet above, your span element would lose all its DOM state whenever `userSignal` updated. If user has selected its text in the browser, the selection would disappear. If the span element had `<input>` or `<button>` elements in it, they would be re-created as well, and their DOM state would be lost too – all inputted text would be lost, and the focus, if any, would be lost.
+This is good practice not just for performance, but for user experience: in the original `child <-- ...` code snippet above, your span element would lose all its DOM state whenever `userSignal` updated. If the user has selected its text in the browser, the selection would disappear. If the span element had `<input>` or `<button>` elements in it, they would be re-created as well, and their DOM state would be lost too – all inputted text would be lost, and the focus, if any, would be lost.
 
 Getting rid of `child <-- ...` also simplified the structure of your application: if you want to add any other components to that element, you no longer need to worry about those components getting unmounted and losing their internal state whenever `userSignal` emits.
 
@@ -2384,11 +2384,11 @@ While EventBus-es are typically the sources of actions / events, Airstream Var-s
 
 If you are a backend developer, think of all the state in your Var-s as data in the database. RDBMS performance issues aside, you want to have a [normalized database](https://stackoverflow.com/questions/246701/what-is-normalisation-or-normalization) to reduce duplication of data, because if you have any duplication in your database, you need some way to keep the duplicated data in sync, and that is extra complexity, extra code, extra bugs.
 
-Similarly, when it comes to Airstream Var-s, you don't want to store redundant data in them, because then you will need to manually sync it together. If you have two Var-s updating each other, chances are that they should be one var, or at least the mutually-dependent part of their data should be in one var.
+Similarly, when it comes to Airstream Var-s, you don't want to store redundant data in them, because then you will need to manually sync it together. If you have two Var-s updating each other, chances are that they should be combined into just one Var, or at least the mutually-dependent part of their data should be in one Var.
 
 You can create [derived vars](https://github.com/raquo/Airstream/#derived-vars) using the `zoom` method, but remember that you can also map over the Var's `signal`, and transform the Var's `writer` separately, you don't need to have these transformations linked.
 
-For example, this unnecessarily complicated component is supposed to show the user's name from `userVar`, and update it when the user types a new name:
+For example, this unnecessarily complicated component is supposed to show the user's name from `userVar`, and update `userVar` when the user types a new name:
 
 ```scala
 def nameInput(userVar: Var[User]): HtmlElement = {
@@ -2403,7 +2403,7 @@ def nameInput(userVar: Var[User]): HtmlElement = {
 }
 ```
 
-It doesn't even work well, because if `userVar` updates, the displayed name will not update. And if you try to fix that, you will run into an infinite loop of two vars updating each other. You could break that loop with a strategically placed `.distinct` filter to eliminate redundant updates, but instead of fighting with redundant state with manual syncing, consider a much simpler solution:
+It doesn't even work well, because if `userVar` updates after initializing this component, the displayed name will not update. And if you try to fix that, you will run into an infinite loop of two Vars updating each other. You could break that loop with a strategically placed `.distinct` filter, but instead of fighting with redundant state using such manual syncing, consider a much simpler solution:
 
 ```scala
 def nameInput(userVar: Var[User]): HtmlElement = {
@@ -2417,6 +2417,8 @@ def nameInput(userVar: Var[User]): HtmlElement = {
 ```
 
 We eliminated the redundant local state, and replaced it with a simple map over `userVar.signal`.
+
+Bottom line: Eliminate redundancy from Var-s, express state dependencies via signals / observers / derived vars instead.
 
 
 ### Observables of Modifiers
@@ -2473,7 +2475,7 @@ div(
 )
 ```
 
-Bottom line: `Observable[Modifier]` is heresy. Pipe updates to individual props instead.
+Bottom line: `Observable[Modifier]` is heresy. Pipe observable updates to individual props instead.
 
 
 
