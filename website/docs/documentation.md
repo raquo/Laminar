@@ -69,6 +69,7 @@ title: Documentation
   * [How Are Mount Events Propagated?](#how-are-mount-events-propagated)
 * [Integrations With Other Libraries](#integrations-with-other-libraries)
 * [URL Routing](#url-routing)
+* [Anti-patterns](#anti-patterns)
 * [Browser Compatibility](#browser-compatibility)
 * [Special Cases](#special-cases)
 
@@ -2269,6 +2270,210 @@ Integration of observables with callback-driven APIs is usually achieved by prov
 [frountroute](https://github.com/tulz-app/frontroute) – Alternative router for Laminar with API inspired by Akka HTTP
 
 These routers are designed for Laminar, but don't actually depend on it, only on Airstream, so you could potentially use them without Laminar.
+
+
+
+## Anti-patterns
+
+Some day I'll have enough time to write a more detailed cookbook with Laminar component patterns and examples (you can [expedite this](https://github.com/sponsors/raquo)), but until then, I will at least list some things that you really shouldn't do.
+
+
+### flatMap All The Things!
+
+When programming with Scala collections or certain functional libraries, you might be used to using the flatMap operator liberally, often using Scala's [for-comprehensions](https://docs.scala-lang.org/tour/for-comprehensions.html) for syntactic convenience.
+
+`flatMap` is the obvious tool to reach for when you want to combine `Option[A]` with `Option[B]` to get `Option[(A, B)]`, however that is only the case due to the simplicity of static collections. The algorithm to combine two optional values is obvious, and flatMap being a suitable implementation is also obvious.
+
+**However, `flatMap`-ing Airstream observables merely to combine their values is a very bad idea**. Take this snippet, for example:
+
+```scala
+val intSignal: Signal[Int] = ???
+val boolSignal: Signal[Boolean] = ???
+val resultSignal: Signal[(Int, Boolean)] = (
+  for {
+    int <- intSignal
+    bool <- boolSignal
+  } yield (int, bool)
+)
+```
+
+You might think that `resultSignal` will combine the two observables as desired, after all, it has the correct type. However, the type of observables only indicates their content, **it says nothing of the timing of their events**.
+
+To understand the timing of resultSignal, let's desugar its definition first:
+
+```scala
+val resultSignal: Signal[(Int, Boolean)] = (
+  intSignal.flatMap { int =>
+    boolSignal.map(bool => (int, bool))
+  }
+)
+```
+
+Now, we have a better idea of what's really going on: instead of combining two observables **as equals**, we wait for `intSignal` to update before creating a new observable that actually combines its last emitted value (`int`) with the current value of `bool`. There is an asymmetry here: every time `intSignal` emits, this inner observable is torn down and replaced with a new copy, but every time `boolSignal` emits, nothing like that happens.
+
+In some streaming libraries, this asymmetry might be an implementation detail, invisible to the user. Sounds nice, but such libraries must inevitably suffer from [FRP glitches](https://github.com/raquo/Airstream/#frp-glitches). `flatMap` is an operator that allows you to create a loop of observables (i.e. an observable that depends on itself), so to prevent unpredictable FRP glitches, in Airstream it emits every event in a new [Transaction](https://github.com/raquo/Airstream/#transactions).
+
+Technically, transaction boundaries like this can cause glitch-like behaviour. For example, our `flatMap` code above would have a glitch if it was plugged into the canonical [double-diamond example](https://github.com/raquo/Airstream/#other-libraries). However, in practice, **this glitch-like behaviour only happens if you abuse transaction-creating methods, using them where they are not required.**
+
+As Airstream documentation explains, avoiding the glitch in this situation is trivial – just use the correct operator, `combineWith` in this case. It is even easier to do than messing with `flatMap`-s.
+
+```scala
+val resultSignal: Signal[(Int, Boolean)] = intSignal.combineWith(boolSignal)
+```
+
+How do you know whether you **need** `flatMap` or not? Follow the principle of least power. flatMaps lets you create a new observable on every incoming event. Do you **need** this, semantically? No? Then there must be an operator that you can use instead: `combineWith`, `withCurrentValueOf`, `sample`, `filterWith`, `map`, `collect`, `split`, `distinct` etc. 
+
+Here's one example when you legitimately can't avoid firing events in a new transaction:
+
+```scala
+val responseStream = stream.flatMap(request => AjaxStream.get(request.url))
+```
+
+Do you need `request` to get a `response`? Yes. Can you get `response` from `request` synchronously, without creating a new Observable / future / etc.? No. Therefore, you need `flatMap` (or another transaction-creating equivalent like `EventBus.emit`). Will this cause FRP glitches? Absolutely not.
+
+Bottom line:
+1) Make sure you understand which operators and methods create a new transaction, and why it is needed.
+2) Do not abuse transaction-creating methods like `flatMap`, `Var.set`, and `EventBus.emit` to achieve outcomes that do not require transaction boundary.
+3) Feel free to use these methods when they are actually needed, as this will not cause glitches.
+
+
+### Creating Elements Instead of Updating Them
+
+Don't automatically reach for `child <-- stream`, look for more efficient solutions. Consider this code:
+
+```scala
+val userSignal: Signal[User] = ???
+div(
+  child <-- userSignal.map(user => span(color := user.prefColor, user.name))
+)
+```
+
+This is complicated an inefficient. You are creating a new `span` element (a real one, we don't do virtual elements in Laminar) every time `userStream` emits, and replacing the previous element you created with it.
+
+As you see from the code, the div tag always stays the same, so just keep it static, and update its innards instead:
+
+```scala
+div(
+  span(
+    color <-- userSignal.map(_.prefColor),
+    child.text <-- userSignal.map(_.name)
+  )
+)
+```
+
+Now, you only have one `span` element, and you are updating its `color` CSS property and text contents whenever `userSignal` emits.
+
+This is good practice not just for performance, but for improved user experience: in the original `child <-- ...` code snippet above, your span element would lose all its DOM state whenever `userSignal` updated. If user has selected its text in the browser, the selection would disappear. If the span element had `<input>` or `<button>` elements in it, they would be re-created as well, and their DOM state would be lost too – all inputted text would be lost, and the focus, if any, would be lost.
+
+Getting rid of `child <-- ...` also simplified the structure of your application: if you want to add any other components to that element, you no longer need to worry about those components getting unmounted and losing their internal state whenever `userSignal` emits.
+
+That said, if these concerns are not relevant to your use case, feel free to use `child <-- ...`. For example, if `userSignal` emits very rarely, e.g. only when the logged-in user changes their preferences, it is probably perfectly fine to use `child <-- userSignal.map(...)` to re-render the whole component displaying their avatar and name.
+
+Note that we only showed a very simple case here. Laminar and Airstream have lots of features to help with efficiently rendering all kinds of observables and data structures – see the docs of both libraries.
+
+Bottom line:
+1. If you're used to virtual DOM, lose the habit of creating virtual elements whenever, because all elements in Laminar are real.
+2. Prefer `attr <-- source` and `child.text <-- source` to `child <-- source.map(s => div(/*...*/))`
+
+
+### Redundant Vars
+
+The graph of observables is the core of your Laminar application. If you design that graph poorly, your code will suffer from excessive complexity, state-syncing boilerplate, and even FRP glitches.
+
+While EventBus-es are typically the sources of actions / events, Airstream Var-s are typically the sources of state in your application. It is very important to put state in the right places (think child vs parent component), and it is very important to avoid creating redundant state.
+
+If you are a backend developer, think of all the state in your Var-s as data in the database. RDBMS performance issues aside, you want to have a [normalized database](https://stackoverflow.com/questions/246701/what-is-normalisation-or-normalization) to reduce duplication of data, because if you have any duplication in your database, you need some way to keep the duplicated data in sync, and that is extra complexity, extra code, extra bugs.
+
+Similarly, when it comes to Airstream Var-s, you don't want to store redundant data in them, because then you will need to manually sync it together. If you have two Var-s updating each other, chances are that they should be one var, or at least the mutually-dependent part of their data should be in one var.
+
+You can create [derived vars](https://github.com/raquo/Airstream/#derived-vars) using the `zoom` method, but remember that you can also map over the Var's `signal`, and transform the Var's `writer` separately, you don't need to have these transformations linked.
+
+For example, this unnecessarily complicated component is supposed to show the user's name from `userVar`, and update it when the user types a new name:
+
+```scala
+def nameInput(userVar: Var[User]): HtmlElement = {
+  val nameVar = Var(userVar.now())
+  input(
+    value <-- nameVar,
+    onInput.mapToValue --> nameVar,
+    nameVar.signal --> { newName => 
+      userVar.update(user => user.copy(name = newName)) 
+    }
+  )
+}
+```
+
+It doesn't even work well, because if `userVar` updates, the displayed name will not update. And if you try to fix that, you will run into an infinite loop of two vars updating each other. You could break that loop with a strategically placed `.distinct` filter to eliminate redundant updates, but instead of fighting with redundant state with manual syncing, consider a much simpler solution:
+
+```scala
+def nameInput(userVar: Var[User]): HtmlElement = {
+  input(
+    value <-- userVar.signal.map(_.name),
+    onInput.mapToValue --> { newName =>
+      userVar.update(user => user.copy(name = newName)) 
+    }
+  )
+}
+```
+
+We eliminated the redundant local state, and replaced it with a simple map over `userVar.signal`.
+
+
+### Observables of Modifiers
+
+I get asked relatively often whether it's possible to use an `Observable[Modifier]`. The intent is to get something like this to work:
+
+```scala
+div(
+  userSignal.map { user => 
+    if (user.isActive) {
+      cls := "active" 
+    } else {
+      opacity := 0.5 
+    }
+  }
+)
+```
+
+This kind of pattern does not work, because Laminar's DOM updates are granular down to the property, so you need to pipe observables into individual properties, like this:
+
+```scala
+div(
+  cls.toggle("active") <-- userSignal.map(_.isActive),
+  opacity <-- userSignal.map(if (_.isActive) 1 else 0.5)
+)
+```
+
+Now, for educational purposes only (do not try this at home!), this will compile:
+
+```scala
+// NO!!!
+div(
+  inContext { thisNode =>
+    userSignal --> { user =>
+      if (user.isActive) {
+        thisNode.amend(cls := "active", opacity := 1)
+      } else {
+        thisNode.amend(opacity := 0.5)
+      }
+    }
+  }
+)
+```
+
+However, that will not work the way you want. For example, the absence of `cls := "active"` in the `else` branch will not remove the "active" class name, nor is there any other way to remove that class name with Laminar APIs after you set it this way, because [cls](#cls) is a composite attribute with special semantics optimized for different usage patterns. Basically, this weird pattern only happens to work for modifiers that are both idempotent and undoable. Anything other than trivial `KeySetter`-s like `attr := value` will break.
+
+But what if `user.isActive` call is expensive, or you just want to keep related values in one place? You can do something like this:
+
+```scala
+val clsWithOpacitySignal = userSignal.map(if (_.isActive) ("active", 1) else ("", 0.5))
+div(
+  cls <-- clsWithOpacitySignal.map(_._1),
+  opacity <-- clsWithOpacitySignal.map(_._2)
+)
+```
+
+Bottom line: `Observable[Modifier]` is heresy. Pipe updates to individual props instead.
 
 
 
