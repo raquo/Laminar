@@ -2478,6 +2478,56 @@ div(
 Bottom line: `Observable[Modifier]` is heresy. Pipe observable updates to individual props instead.
 
 
+### Creating Redundant Observables
+
+In Airstream, observables have shared execution, that is, the code in every observable is executed only once per incoming event, no matter how many listeners the observable has. Therefore, it is more efficient to share an observable than to create multiple copies of it.
+
+For example, consider this snippet, rendering a document as a list of interactive input elements:
+
+```scala
+val renderConfigSignal: Signal[RenderConfig] = ???
+val blocks = Signal[List[DocumentBlock]]
+div(
+  display.flex,
+  flexDirection.column,
+  children <-- blocks.split(_.blockId)((blockId, _, blockSignal) => {
+    input(
+      value <-- (
+        blockSignal
+          .combineWith(renderConfigSignal.map(_.computeStyle))
+          .mapN((block, style) => block.formatWith(style))
+      ),
+      onInput --> ???
+    )
+  })
+)
+```
+
+If we have 1000 of those input elements, we are creating 1000 copies of `renderConfigSignal.map(_.computeStyle)`, so when renderConfigSignal updates, we would call `computeStyle` on the same config instance 1000 times. That computation does not require any block-specific information, so we can instead create a shared instance of this observable. You can think of observables as function calls – you wouldn't call the same function 1000 times with the same parameters, you would just do it once, and save the value in a `val`. Same principle here.
+
+Additionally, there is another small optimization available in this code snippet: `mapN` creates a new observable just to map over the combined result, but Airstream actually has a `combineWithFn` operator that does both `combineWith` and `map` in one observable. It's more compact and saves the overhead of an extra observable.
+
+Improved version:
+
+```scala
+val renderConfigSignal: Signal[RenderConfig] = ???
+val blocks = Signal[List[DocumentBlock]]
+val renderStyleSignal = renderConfigSignal.map(_.computeStyle) 
+div(
+  display.flex,
+  flexDirection.column,
+  children <-- blocks.split(_.blockId)((blockId, _, blockSignal) => {
+    input(
+      value <-- blockSignal.combineWithFn(renderStyleSignal)(_ formatWith _),
+      onInput --> ???
+    )
+  })
+)
+```
+
+Bottom line: observables can be shared just like the results of a function call, to eliminate redundant computation, and to reduce the number of observable instances.
+
+
 
 ## Browser Compatibility
 
