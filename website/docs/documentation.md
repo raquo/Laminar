@@ -686,19 +686,21 @@ div("Hello, ", children <-- childrenSignal)
 
 If you have an Observable of desired children elements, this is the most straightforward way to subscribe to it.
 
-Internally, this `<--` method keeps track of prevChildren and nextChildren. It then "diffs" them, but it's a different kind of diffing than what virtual DOM libraries do – Laminar diffing is much lighter. We only compare elements by reference equality, we do not diff any attributes / props / state / children, and we do not "re-render" anything like React does.
+Internally, this `<--` method keeps track of prevChildren and nextChildren. It then reconciles the two lists, but it does not do heavy, recursive diffing that virtual DOM libraries do. Laminar only compares elements by reference equality, we do not diff any attributes / props / state / children, and we do not "re-render" anything like React does.
 
 We make a single pass through nextChildren, and detect any inconsistencies by checking that `nextChildren(i).ref == childrenInDom(i)` (simplified). If this is false, we look at prevChildren to see what happened – whether the child was created, moved, or deleted. The algorithm is short (<50LoC total) but efficient, scaling up to thousands of elements – more than you can feasibly show to a user anyway.
 
 Laminar will perform absolutely minimal operations that make sense – for example if a new element needs to be inserted, that is the only thing that will happen, _and_ this new element is the only element for which Laminar will spend time figuring out what to do, because all others will match. Reorderings are probably the worst case performance-wise, but still no worse than virtual DOM. You can read the full algorithm in `ChildrenInserter.updateChildren`.
 
-This algorithm has a catch – the naive implementation of `childrenSignal` is not efficient, but there is an easy solution – read on.
+**However, this algorithm has a catch** – since it's only doing reference equality checks on the elements, and since Laminar has no concept of **virtual** elements, it would be very inefficient with naive code like `children <-- modelsSignal.map(models => models.map(model => div(model.name))`, because such an implementation would create N new `div` elements (one for each model in the list) every time `modelsSignal` emits, regardless of how the list has changed. Of course, we have an easy solution to that – read on.
 
-Note: a given DOM node can not exist in multiple locations in the DOM at the same time. Therefore, the Seq-s you provide to `children <--` must not contain several references to the same element. This is on you, as Laminar does not spend CPU cycles to verify this. Generally this isn't a problem unless you're deliberately caching elements for reuse in this manner. If you _are_ doing that, consider using the `split` operator explained below.
+Note: a given DOM node / element can not exist in multiple locations in the DOM at the same time. Therefore, the Seq-s you provide to `children <--` must not contain several references to the same element. This is on you, as Laminar does not spend CPU cycles to verify this. Generally this isn't a problem unless you're deliberately caching elements for reuse in this manner. If you _are_ doing that, consider using the `split` operator explained below to automate that.
 
 
 
 #### Performant Children Rendering – split
+
+**Note: This mechanism is important to understand. If the explanation below is not clear, try the explanation in [the video](https://www.youtube.com/watch?v=L_AHCkl6L-Q&t=767s).**
 
 We've now established how `children <-- childrenObservable` algorithm works, now let's see how to compile `childrenObservable` to get efficient updates. Basically, we just need to use Airstream's `split` method. But before we dive into that, let's see what the problem is without it.
 
@@ -732,7 +734,7 @@ This will work, but it is inefficient. Every time `usersStream` emits a new list
 
 This is the kind of situation that virtual DOM was designed to avoid. While this pattern is perfectly fine for small lists that don't update often (and assuming you don't care about losing DOM element state such as text in an input box), with larger lists and frequent updates there is a lot of needless work being done.
 
-So does this mean that virtual DOM is more efficient than Laminar when rendering large lists of dynamic children? Yes, if you render children **as described above**. This might be a surprising admission, but this default is necessary to uphold Laminar's core value: simplicity. There is no magic in Laminar. Laminar does what we tell it to do, and in this case we very explicitly tell it to create a list of elements every time the stream emits a new list of users, and then replace the old elements with brand new ones.
+So does this mean that virtual DOM is more efficient than Laminar when rendering large lists of dynamic children? Yes, if you render children **as described above**. This might be a surprising admission, but this default is necessary to uphold Laminar's core value: simplicity. There is no magic in Laminar. Laminar does what we tell it to do, and in this case we very explicitly tell it to create a list of elements every time the stream emits a new list of users, and then replace the old elements with brand-new ones.
 
 So let's write smarter code. It's actually very easy.
 
