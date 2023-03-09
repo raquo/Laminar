@@ -4,7 +4,14 @@ import com.raquo.laminar.keys.{AriaAttr, HtmlAttr, HtmlProp, Key, StyleProp, Svg
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 
 /** This class represents a modifier that sets a [[Key]] (e.g. an attribute or a style)
-  * to a specific value on a [[El]]. [[action]] is what performs this change. */
+  * to a specific value on a [[El]]. [[action]] is what performs this change.
+  *
+  * These modifiers are not only idempotent, but are also expected to be undoable,
+  * that is, calling `key := value2` will override `key := value1`. In contrast,
+  * that is not the case for `cls := "class"` for example, which *adds* a class
+  * instead of *setting* it. Such `cls` modifiers are [[CompositeKeySetter]], which
+  * does not extend [[KeySetter]]. // #TODO the naming of these traits is confusing...
+  */
 class KeySetter[K <: Key, V, -El <: ReactiveElement.Base] (
   val key: K,
   val value: V,

@@ -9,7 +9,8 @@ import com.raquo.laminar.nodes.ReactiveElement
   * several times in a row would produce the same effect as applying it once.
   *
   * That way we can provide it to onMountSet { c => setter } and expect
-  * things to work if the element is mounted several times.
+  * things to work if the element is mounted several times. However, note that
+  * [[CompositeKeySetter]] has special behaviour.
   */
 trait Setter[-El <: ReactiveElement.Base] extends Modifier[El]
 
