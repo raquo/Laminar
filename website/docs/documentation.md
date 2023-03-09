@@ -32,7 +32,6 @@ title: Documentation
 * [ClassName and Other Special Keys](#classname-and-other-special-keys)
   * [cls](#cls)
   * [Other Composite Keys](#other-composite-keys)
-  * [SVG](#svg)
 * [Event System: Emitters, Processors, Buses](#event-system-emitters-processors-buses)
   * [Registering a DOM Event Listener](#registering-a-dom-event-listener)
   * [EventBus](#eventbus)
@@ -48,6 +47,14 @@ title: Documentation
   * [Multiple Event Listeners](#multiple-event-listeners)
   * [Window & Document Events](#window--document-events)
 * [Controlled Inputs](#controlled-inputs)
+* [SVG](#svg)
+  * [SVG Syntax and Imports](#svg-syntax-and-imports)
+  * [Rendering External SVGs](#rendering-external-svgs)
+* [CSS](#css)
+  * [CSS Keyword Helpers](#css-keyword-helpers)
+  * [Unit and Function Helpers](#unit-and-function-helpers)
+  * [Vendor Prefixes](#vendor-prefixes)
+  * [Approaches To CSS](#approaches-to-css)
 * [Ownership](#ownership)
   * [Laminar's Use of Airstream Ownership](#laminars-use-of-airstream-ownership)
 * [Memory Management](#memory-management)
@@ -1192,79 +1199,6 @@ If you (or a third party library you're using) are adding or removing class name
 **`rel`** and **`role`** are two other space-separated attributes. Their API in Laminar is exactly identical to that of `cls` (see right above).
 
 
-### SVG
-
-Laminar lets you work with SVG elements (almost) just as well as HTML. Everything works pretty much the same, just need to understand the required imports:
-
-
-#### SVG Syntax and Imports
-
-* SVG elements and attributes are available in the `com.raquo.laminar.api.L.svg` object
-
-* Some of the attributes of SVG and HTML have the same names, for example there are two instances of the `className` attribute, one is `L.className` and is an HTML attribute, the other is `L.svg.className` and is an SVG attribute. You can only apply SVG attributes to SVG elements (and not HTML elements), and similarly for HTML attributes.
-
-* Therefore, you generally should **not** import both `com.raquo.laminar.api.L.svg.*` and `com.raquo.laminar.api.L.{*, given}` as that would cause name collisions.
-
-* On the other hand, event prop keys such as `com.raquo.laminar.api.L.onClick` apply universally to all elements, both HTML and SVG.
-
-* If you are working mostly with HTML elements in a given file, you can just import `com.raquo.laminar.api.L.{*, given}` and refer to SVG elements and attributes with an `svg` prefix, like this:
-
-  ```scala
-  div(
-    className := "someHtmlClassName",
-    onClick --> ???,
-    svg.svg(
-      svg.height := "800",
-      svg.width := "500",
-      svg.polyline(
-        svg.points := "20,20 40,25 60,40",
-        svg.className := "someSvgClassName",
-        onClick --> ???,
-        children <-- ???
-      )
-    )
-  )
-  ```
-
-* On the other hand, if you are working mostly with SVG elements in a given file, you can use a different set of imports:
-
-  ```scala
-  import com.raquo.laminar.api.L.svg.* // get svg keys without the svg prefix
-  import com.raquo.laminar.api.{*, given} // get `L` and standard implicits like `textToTextNode`
-  // DO NOT IMPORT: com.raquo.laminar.api.L.{*, given}
-  
-  L.div(
-    L.className := "someHtmlClassName",
-    L.onClick --> ???,
-    svg(
-      height := "800",
-      width := "500",
-      polyline(
-        points := "20,20 40,25 60,40",
-        className := "someSvgClassName",
-        L.onClick --> ???,
-        L.children <-- ???
-      )
-    )
-  )
-  ```
-
-#### Rendering External SVGs
-
-The browsers are able to render SVGs from a URL with a simple `img` tag just like any other image:
-
-```scala
-img(src := "https://example.com/image.svg", role := "img")
-```
-
-The `role := "img"` is apparently needed for accessibility due to a [VoiceOver bug](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#identifying_svg_as_an_image), nothing to do with Laminar.
-
-Rendering SVGs this way makes the browser download them separately, and only when they're needed. In contrast, if you create SVGs with Laminar, they will be included in the JS bundle, and will be available immediately without an extra network request, but will need to be downloaded upfront, and will increase the size of the bundle.
-
-You can also render native SVG elements provided by other libraries, or even create SVG elements from `<svg>...</svg>` strings in Laminar: see [Rendering Third Party HTML or SVG Elements](#rendering-third-party-html-or-svg-elements) and [Parsing HTML or SVG Strings into Elements](#parsing-html-or-svg-strings-into-elements).
-
-
-
 
 ## Event System: Emitters, Processors, Buses 
 
@@ -1733,6 +1667,179 @@ So here are the events that work in all browsers of interest:
 
 * Remember that Laminar's `controlled` block sets the input's `value` (or `checked`, whichever you use) property to the controlling observable's last emitted value after each input event. This means that all other input event listeners will not see the user's real input, they will see whatever input value was set by the controlled block. This is because the event itself doesn't carry the information about the user's input, it's only stored in the input element's `value` property. So as Laminar updates that property to match the controlled observable, there is no chance for other event listeners to see the user's raw input.
 
+
+
+## SVG
+
+Laminar lets you work with SVG elements (almost) just as well as HTML. Everything works pretty much the same, just need to understand the required imports:
+
+
+### SVG Syntax and Imports
+
+* SVG elements and attributes are available in the `com.raquo.laminar.api.L.svg` object
+
+* Some of the attributes of SVG and HTML have the same names, for example there are two instances of the `className` attribute, one is `L.className` and is an HTML attribute, the other is `L.svg.className` and is an SVG attribute. You can only apply SVG attributes to SVG elements (and not HTML elements), and similarly for HTML attributes.
+
+* Therefore, you generally should **not** import both `com.raquo.laminar.api.L.svg.*` and `com.raquo.laminar.api.L.{*, given}` as that would cause name collisions.
+
+* On the other hand, event prop keys such as `com.raquo.laminar.api.L.onClick` apply universally to all elements, both HTML and SVG.
+
+* If you are working mostly with HTML elements in a given file, you can just import `com.raquo.laminar.api.L.{*, given}` and refer to SVG elements and attributes with an `svg` prefix, like this:
+
+  ```scala
+  div(
+    className := "someHtmlClassName",
+    onClick --> ???,
+    svg.svg(
+      svg.height := "800",
+      svg.width := "500",
+      svg.polyline(
+        svg.points := "20,20 40,25 60,40",
+        svg.className := "someSvgClassName",
+        onClick --> ???,
+        children <-- ???
+      )
+    )
+  )
+  ```
+
+* On the other hand, if you are working mostly with SVG elements in a given file, you can use a different set of imports:
+
+  ```scala
+  import com.raquo.laminar.api.L.svg.* // get svg keys without the svg prefix
+  import com.raquo.laminar.api.{*, given} // get `L` and standard implicits like `textToTextNode`
+  // DO NOT IMPORT: com.raquo.laminar.api.L.{*, given}
+  
+  L.div(
+    L.className := "someHtmlClassName",
+    L.onClick --> ???,
+    svg(
+      height := "800",
+      width := "500",
+      polyline(
+        points := "20,20 40,25 60,40",
+        className := "someSvgClassName",
+        L.onClick --> ???,
+        L.children <-- ???
+      )
+    )
+  )
+  ```
+
+### Rendering External SVGs
+
+The browsers are able to render SVGs from a URL with a simple `img` tag just like any other image:
+
+```scala
+img(src := "https://example.com/image.svg", role := "img")
+```
+
+For SVGs, the `role := "img"` is apparently needed for accessibility due to a [VoiceOver bug](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#identifying_svg_as_an_image), nothing to do with Laminar.
+
+Rendering SVGs this way makes the browser download them separately, and only when they're included in the document. In contrast, if you create SVGs with Laminar, they will be included in the JS bundle, and will be available immediately without an extra network request, but will need to be downloaded upfront, and will increase the size of the bundle.
+
+You can also render native SVG elements provided by other libraries, or even create SVG elements from `<svg>...</svg>` strings in Laminar: see [Rendering Third Party HTML or SVG Elements](#rendering-third-party-html-or-svg-elements) and [Parsing HTML or SVG Strings into Elements](#parsing-html-or-svg-strings-into-elements).
+
+
+
+## CSS
+
+Laminar lets you set CSS style properties in all the same ways as HTML attributes, but since CSS values are more complex, we offer additional conveniences.
+
+
+### CSS Keyword Helpers
+
+```scala
+div(
+  fontSize.inherit, // same as `fontSize := "inherit"`
+  display.none, // same as `display := "none"`
+  flexDirection.column // same as `flexDirection := "column"`
+)
+```
+
+The available keywords are different for every CSS property according to the values that are valid for that property. IDE auto-complete should reduce the need to look up the correct values online.
+
+Of course, you can still set any value manually, e.g. `display := "block flow"`.
+
+You can get the string value of a CSS setter like `display.none` with `.value`, so `display.none.value` returns "none". You can use this when you want assurance that you're using the right values in observables, e.g.:
+
+```scala
+div(
+  // You can spell out the values manually...
+  textAlign <-- streamOfBooleans.map(
+    if (_) "left" else "right"
+  ),
+  // Or refer to defined constants:
+  textAlign <-- streamOfBooleans.map(
+    if (_) textAlign.left.value else textAlign.right.value
+  )
+)
+```
+
+If you want less boilerplate for this use case, define a trivial implicit conversion from `StyleSetter[String]` to `String`, and you won't need to call `.value` manually. This is a bit too magicky to be included in Laminar core though.
+
+
+### Unit and Function Helpers
+
+CSS properties that accept lengths, like `marginTop`, require you to provide strings that include the units of measure (most commonly, pixels). Doing this manually can get annoying, and might require the overhead of creating a new observables, e.g. `intStream.map(s"${_}px")`) when working with dynamic data.
+
+To help with that, Laminar offers several ways to set units like `px`, `vh`, `percent`, `ms`, etc.:
+
+```scala
+div(
+  margin.px := 12,
+  marginTop.px := 12,
+  marginTop.px(12), // remember that all `:=` methods in Laminar are aliased to `apply` for convenience!
+  marginTop.calc("12px + 50%"),
+  marginTop.px <-- streamOfInts,
+  marginTop.px <-- streamOfDoubles
+)
+```
+
+The new API is type-safe, so for example `backgroundImage.px` does not exist, but `.url` does:
+
+```scala
+div
+  // Equivalent to CSS:  background-image: url("https://example.com/image.png")
+  backgroundImage := """url("https://example.com/image.png")""",
+  backgroundImage.url := "https://example.com/image.png",
+  backgroundImage.url("https://example.com/image.png"), // same
+  backgroundImage.url <-- streamOfUrls
+)
+```
+
+Currently, complex CSS properties don't have all applicable helpers defined, which means that you can do e.g. `borderWidth.px := 12`, but you can't do `border.px := 12` yet.
+
+For such cases, you can use `style` string helpers: `style.px(12)` returns a plain "12px" string which you can use like `border := style.px(12)`.
+
+
+### Vendor Prefixes
+
+Not a super relevant feature these days, but you can now do this to set a style property along with several prefixes:
+
+```scala
+div(
+  transition.withPrefixes(_.moz, _.ms, _.webkit) := "all 4s ease"
+  // and similarly for `<--`.
+)
+```
+
+
+### Approaches To CSS
+
+Laminar's CSS API lets you set styles that apply to a given element. You can also reuse groups of styles by passing around style setter modifiers or even lists of them. In Javascript world this general approach is known as "inline styles" or "CSS in JS".
+
+Various CSS Frameworks like Tailwind and Bootstrap can also be used with Laminar – such frameworks define a bunch of CSS classes in external stylesheets, and if you load those stylesheets, you can add their classes to elements with Laminar to style them (see the [cls](#cls) attribute).
+
+Of course, instead of, or in addition to, using a CSS file provided by a CSS framework, you can provide your own CSS file (or several). You can write CSS manually, or use a CSS preprocessor like SASS or LESS. All of this is done using standard methods, not specific to Laminar.
+
+[ScalaCSS](https://japgolly.github.io/scalacss/book/) needs a special mention. Laminar does not provide an integration with it out of the box, however the two can certainly be used together. See [this discussion](https://github.com/raquo/Laminar/issues/20). Note that ScalaCSS is pretty heavy machinery. It offers a lot of features and safeties, however all that comes at a cost in regard to JS bundle size and compile time.
+
+One common approach in Laminar apps is to use external stylesheets to provide the bulk of the styling in your application, and using Laminar's API only to set styles dynamically (in response to user actions or changing data, e.g. showing / hiding elements onclick). This way, you can set up your build config to do very quick CSS hot reloads, which is very useful for pixel pushing / quick iteration on styling. In contrast, if you use inline styles for all styling, then you need to reload the whole Scala.js bundle to see even a small change in your CSS.
+
+Keep in mind that CSS, being a visual design language, is fundamentally different from a programming language like Scala. To a significant extent, the correctness of a typical Scala program can be checked with types alone, however the correctness of CSS has very little to do with types. Yes, with Laminar or ScalaCSS you can easily make sure that you're not passing invalid values to CSS properties, however having technically-valid values is far from having **correct** values when it comes to CSS.
+
+Your compiler has no idea if `50px` is a good `top-margin` for `h1` elements, and even **you** the designer don't know that upfront. You need to actually see the visual result of this top-margin first, then you'll probably want to adjust it by a few pixels, look at the result again, and so on, until you're happy with the result. I highly recommend that you optimize your CSS build setup for such fast-paced iterative development over anything else. In CSS, it's the visual correctness that matters, and long term, that's what takes the most time to get right. Typechecking is a trivial concern, in comparison. Always remember that type safety is but a tool, not the end-goal.  
 
 
 
