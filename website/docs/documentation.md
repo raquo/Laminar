@@ -28,6 +28,7 @@ title: Documentation
     * [Performant Children Rendering – children.command](#performant-children-rendering--childrencommand)
   * [Binding Observables](#binding-observables)
   * [Other Binders](#other-binders)
+* [Conditional Rendering](#conditional-rendering)
 * [ClassName and Other Special Keys](#classname-and-other-special-keys)
   * [cls](#cls)
   * [Other Composite Keys](#other-composite-keys)
@@ -965,6 +966,123 @@ input(focus <-- focusStream)
 You can dynamically focus or blur an element by emitting `true` or `false` respectively. Keep in mind that this is just compositional sugar over calling `myInput.ref.focus()` or `myInput.ref.blur()` with all the same limitations – emitting `true` once will not make Laminar enforce focused state on the input until you emit `false`. If the user clicks away from the focused element, the focus will still be lost, and if you need it otherwise, you'll have to code that yourself.
 
 Speaking of focus, Laminar provides a simple `onMountFocus` modifier that focuses the element when it's mounted into the DOM. It's like the HTML `autoFocus` attribute that actually works for dynamic content.
+
+
+
+## Conditional Rendering
+
+This section offers examples of rendering elements based on some condition, whether static or dynamic.
+
+A few patterns of static conditionals:
+
+```scala
+val bool: Boolean = ???
+val option: Option[String] = ???
+div(
+  "Hello",
+  if (bool) b(" world") else emptyNode
+)
+
+div(
+  "Hello ",
+  if (bool) 
+    b("world") :: Nil
+  else
+    div("foo") :: div("bar") :: Nil 
+)
+
+a(
+  option.map(str => href := str), // conditionally apply a modifier 
+  option.map(str => span(str))
+)
+
+div(
+  option.map(str => span(str)).getOrElse("– nothing –")
+)
+
+val element = div(/*...*/)
+
+if (bool) {
+  // apply modifiers to existing element
+  element.amend(
+    rel := "foo",
+    span("Append another child")
+  )
+}
+```
+
+For reactive data, you often need to compose observables to get conditional logic, e.g.:
+
+```scala
+val boolSignal: Signal[Boolean] = ???
+val userStream: EventStream[User] = ???
+val maybeElementSignal: Signal[Option[HtmlElement]] = ???
+
+div(
+  child <-- maybeElementSignal.map(_.getOrElse(span("no data")))
+)
+
+div(
+  child.maybe <-- maybeElementSignal
+)
+
+{
+  // Cache these to avoid re-creating them on repeated events
+  lazy val trueDiv = div("true")
+  lazy val falseDiv = div("false")
+
+  div(
+    child <-- boolSignal.map(if (_) trueDiv else falseDiv)
+  )
+}
+
+{
+  val maybeActiveUserSignal: Signal[Option[User]] =
+    userStream
+      .startWithNone
+      .map(maybeUser => maybeUser.filter(_.isActive))
+  
+  val emptyElement = span("no active user")
+  
+  // using .splitOption instead of .map for efficiency
+  div(
+    child <-- maybeActiveUserSignal.splitOption(
+      (initialActiveUser, activeUserSignal) => {
+        div(
+          idAttr := s"user-${initialActiveUser.id}",
+          child.text <-- activeUserSignal.map(_.name)
+        )
+      },
+      ifEmpty = emptyElement
+    )
+  )
+}
+
+{
+  val maybeUserSignal: Signal[Option[User]] =
+    userStream
+      .startWithNone
+      .combineWithFn(boolSignal, {
+        case (Some(user), true) => Some(user)
+        case _ => None
+      })
+  
+  val emptyCommentNode = emptyNode 
+  
+  // using .splitOption instead of .map for efficiency
+  div(
+    child <-- maybeUserSignal.splitOption(
+      (initialUser, userSignal) => {
+        div(
+          idAttr := s"user-${initialUser.id}",
+          child.text <-- userSignal.map(_.name)
+        )
+      },
+      ifEmpty = emptyCommentNode
+    )
+  )
+}
+```
 
 
 
