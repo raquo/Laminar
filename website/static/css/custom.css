@@ -299,10 +299,15 @@ textarea::placeholder {
   flex-direction: row;
   column-gap: 40px;
   margin-bottom: 40px;
+  flex-wrap: wrap;
 }
 
 .post .-sponsorsList {
   max-width: 700px;
+}
+
+.-sponsorsList .-sponsor {
+  min-width: 280px;
 }
 
 @media(max-width: 699px) {
@@ -431,6 +436,29 @@ textarea::placeholder {
   top: 5px;
 }
 
+.-sponsorsList .-sponsor.x-heartai {
+  text-align: center;
+}
+
+.-homeSection .-sponsorsList .-sponsor.x-heartai {
+  position: relative;
+  top: 10px;
+}
+
+.-sponsorsList .-sponsor.x-heartai {
+  position: relative;
+  top: 5px;
+  max-width: max(300px, calc(50% - 20px));
+}
+
+.-sponsorsList .-sponsor.x-heartai .-logo {
+  width: 320px;
+}
+
+.post .-newSponsorLogoLink .-logo.x-heartai {
+  margin-top: 5px;
+  width: 320px;
+}
 
 
 /* Header */

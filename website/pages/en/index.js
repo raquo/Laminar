@@ -244,6 +244,12 @@ class Index extends React.Component {
                     <div className="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
                   </a>
                 </div>
+                <div className="-sponsor x-company x-heartai">
+                  <a className="x-noHover" href="https://www.heartai.net/">
+                    <img className="-logo" src="/img/sponsors/heartai-dark.svg" alt="" />
+                    <div className="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+                  </a>
+                </div>
               </div>
               <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
             </div>

@@ -11,6 +11,7 @@ import com.raquo.laminar.nodes.ReactiveElement
   *
   * If you choose to extend this trait, make sure to understand how to use [[Transaction.onStart.shared]].
   * In simple cases, wrapping your callback in it similarly to [[Modifier.apply]] below will probably work.
+  * See https://github.com/raquo/Airstream/#restarting-streams-that-depend-on-signals--signalchanges-
   */
 trait Modifier[-El <: ReactiveElement.Base] {
 

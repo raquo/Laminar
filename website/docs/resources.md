@@ -20,7 +20,7 @@ title: Resources
 
 * [Documentation](https://laminar.dev/documentation)
 
-* [Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/index.html)
+* [Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_3/latest/index.html)
 
 * [Changelog](https://github.com/raquo/Laminar/blob/master/CHANGELOG.md)
 

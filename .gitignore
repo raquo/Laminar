@@ -16,3 +16,5 @@ yarn.lock
 website/node_modules
 website/build
 website/i18n/*
+
+websiteJS/package-lock.json

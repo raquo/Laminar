@@ -31,7 +31,7 @@ val app: HtmlElement = div(
       input(
         idAttr(option.name),
         typ("radio"),
-        name("ajaxOption"),
+        nameAttr("ajaxOption"),
         checked <-- selectedOptionVar.signal.map(_ == option),
         onChange.mapTo(option) --> selectedOptionVar,
       ),
