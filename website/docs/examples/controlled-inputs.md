@@ -11,7 +11,7 @@ In this example, we prevent user input that isn't all digits (try pasting "12ab"
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 val zipVar = Var("")

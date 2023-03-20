@@ -7,7 +7,7 @@ title: Time
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 val tickStream = EventStream.periodic(1000)
@@ -37,7 +37,7 @@ Asynchrony works naturally with observables. In this example, on every click, we
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 val clickBus = new EventBus[Unit]
@@ -66,7 +66,7 @@ render(containerNode, app)
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 def emailError(email: String): Option[String] =

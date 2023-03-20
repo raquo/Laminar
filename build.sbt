@@ -17,7 +17,7 @@ ThisBuild / dynver := {
     .mkVersion(out => versionFmt(out, dynverSonatypeSnapshots.value), fallbackVersion(d))
 }
 
-ThisBuild / scalaVersion := Versions.Scala_2_13
+ThisBuild / scalaVersion := Versions.Scala_3
 
 ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
 
@@ -33,6 +33,9 @@ lazy val websiteJS = project
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % Versions.ScalaJsDom,
     (publish / skip) := true,
     webpackBundlingMode := BundlingMode.LibraryOnly(),
+    (installJsdom / version) := Versions.JsDom,
+    (webpack / version) := Versions.Webpack,
+    (startWebpackDevServer / version) := Versions.WebpackDevServer,
     //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)

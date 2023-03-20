@@ -7,7 +7,7 @@ In addition to the code presented below, this example uses a fairly standard Tod
 <div class = "mdoc-example mdoc-example-todomvc">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 object TodoMvcApp {

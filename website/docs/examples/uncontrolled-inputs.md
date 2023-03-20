@@ -7,7 +7,7 @@ title: Uncontrolled Inputs
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 val inputTextVar = Var("")
@@ -56,7 +56,7 @@ If you want to **filter** user input, for example if you want to **prevent** any
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 val zipVar = Var("")
@@ -98,7 +98,7 @@ You don't need to keep track of state in Vars. It is often useful, and more comp
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 val inputEl = input(

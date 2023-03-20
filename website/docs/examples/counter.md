@@ -5,7 +5,7 @@ title: Counter
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 def Counter(label: String, initialStep: Int): HtmlElement = {

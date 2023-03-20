@@ -9,7 +9,7 @@ In addition to the code presented, for these examples we use Scala.js / Laminar 
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import website.webcomponents.material.Button
 import org.scalajs.dom
 
@@ -62,7 +62,7 @@ This web component is available as part of the **[Laminar Web Components](https:
 <h2>Material UI Slider & ProgressBar</h2>
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import website.webcomponents.material.{LinearProgressBar, Slider}
 import org.scalajs.dom
 import scala.scalajs.js

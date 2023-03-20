@@ -8,7 +8,7 @@ Simplest example from the [video](https://www.youtube.com/watch?v=L_AHCkl6L-Q).
 
 ```scala mdoc:js
 import org.scalajs.dom
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 
 val nameVar = Var(initial = "world")
 

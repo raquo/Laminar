@@ -7,7 +7,7 @@ title: Ajax
 ```scala mdoc:js
 import com.raquo.airstream.web.AjaxStream
 import com.raquo.airstream.web.AjaxStream.AjaxStreamError
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 // Example based on plain JS version: http://plnkr.co/edit/ycQbBr0vr7ceUP2p6PHy?preview

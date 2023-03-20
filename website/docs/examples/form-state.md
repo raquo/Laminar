@@ -7,7 +7,7 @@ Here is one of many ways you could model form state and validation in Laminar.
 <div class = "mdoc-example">
 
 ```scala mdoc:js
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
 
 case class FormState(
