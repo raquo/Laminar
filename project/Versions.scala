@@ -8,7 +8,7 @@ object Versions {
 
   // -- Dependencies --
 
-  val Airstream = "15.0.0-M5"
+  val Airstream = "15.0.0"
 
   val Ew = "0.1.2"
 
@@ -19,13 +19,13 @@ object Versions {
 
   // -- Test --
 
-  val ScalaDomTestUtils = "0.16.0-RC5"
+  val ScalaDomTestUtils = "17.0.0"
 
   val ScalaTest = "3.2.14"
 
-  val JsDom = "20.0.3"
+  val JsDom = "21.1.1"
 
-  val Webpack = "5.75.0"
+  val Webpack = "5.76.2"
 
-  val WebpackDevServer = "4.11.1"
+  val WebpackDevServer = "4.13.1"
 }
