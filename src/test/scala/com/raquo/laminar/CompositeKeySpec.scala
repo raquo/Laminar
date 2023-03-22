@@ -155,6 +155,7 @@ class CompositeKeySpec extends UnitSpec {
     val el = div(
       cls := "foo faa",
       cls.toggle("bar bax") := true,
+      cls.toggle("bar nope") := false,
       cls.toggle("bar baz") <-- bus.events,
       cls.toggle("qux") <-- bus.events
     )
@@ -177,6 +178,7 @@ class CompositeKeySpec extends UnitSpec {
     val el = div(
       cls := "foo faa",
       cls.toggle("bar bax") := true,
+      cls.toggle("bar nope") := false,
       cls.toggle("foo baz") <-- bus
     )
     mount(el)
