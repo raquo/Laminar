@@ -18,7 +18,11 @@ class LockedCompositeKey[K <: Key, -El <: ReactiveElement.Base](
 
   /** If `include` is true, the value(s) will be added, if false, they will not be added */
   def :=(include: Boolean): CompositeKeySetter[K, El] = {
-    key.:=(items: _*)
+    if (include) {
+      key.:=(items: _*)
+    } else {
+      key.:=()
+    }
   }
 
   /** If the `include` observable emits true, value(s) will be added, if false, they will be removed. */
