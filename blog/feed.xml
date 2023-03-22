@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Mon, 24 Oct 2022 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 22 Mar 2023 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -12,7 +12,15 @@
             <url>https://laminar.dev/undefined</url>
             <link>https://laminar.dev/blog</link>
         </image>
-        <copyright>Copyright © 2022 Nikita Gazarov</copyright>
+        <copyright>Copyright © 2023 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v15.0.0 Mega Release]]></title>
+            <link>https://laminar.dev/blog/2023/03/22/laminar-v15.0.0.html</link>
+            <guid>https://laminar.dev/blog/2023/03/22/laminar-v15.0.0.html</guid>
+            <pubDate>Wed, 22 Mar 2023 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>Huge release with better Airstream semantics and many new features.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v0.14.5, Discord and More News]]></title>
             <link>https://laminar.dev/blog/2022/10/24/laminar-v0.14.5.html</link>

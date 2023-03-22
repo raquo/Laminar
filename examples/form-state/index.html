@@ -56,7 +56,7 @@
             });
         </script></nav></div><div class="container mainContainer docsContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 id="__docusaurus" class="postHeaderTitle">Form State &amp; Validation</h1></header><article><div><span><p>Here is one of many ways you could model form state and validation in Laminar.</p>
 <div class = "mdoc-example">
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>._
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.api.<span class="hljs-type">L</span>.{*, given}
 <span class="hljs-keyword">import</span> org.scalajs.dom
 
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FormState</span>(<span class="hljs-params">
@@ -103,12 +103,12 @@
 }
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">renderInputRow</span></span>(error: <span class="hljs-type">FormState</span> =&gt; <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>])(mods: <span class="hljs-type">Modifier</span>[<span class="hljs-type">HtmlElement</span>]*): <span class="hljs-type">HtmlElement</span> = {
-  <span class="hljs-keyword">val</span> $error = stateVar.signal.map(_.displayError(error))
+  <span class="hljs-keyword">val</span> errorSignal = stateVar.signal.map(_.displayError(error))
   div(
     cls(<span class="hljs-string">"-inputRow"</span>),
-    cls.toggle(<span class="hljs-string">"x-hasError"</span>) &lt;-- $error.map(_.nonEmpty),
+    cls.toggle(<span class="hljs-string">"x-hasError"</span>) &lt;-- errorSignal.map(_.nonEmpty),
     p(mods),
-    child.maybe &lt;-- $error.map(_.map(err =&gt; div(cls(<span class="hljs-string">"-error"</span>), err)))
+    child.maybe &lt;-- errorSignal.map(_.map(err =&gt; div(cls(<span class="hljs-string">"-error"</span>), err)))
   )
 }
 
@@ -163,4 +163,4 @@ render(containerNode, app)
 <script type="text/javascript" src="../assets/examples/websitejs-opt-loader.js" defer></script>
 <script type="text/javascript" src="../assets/examples/form-state.md.js" defer></script>
 <script type="text/javascript" src="../assets/examples/mdoc.js" defer></script>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/examples/controlled-inputs"><span class="arrow-prev">← </span><span>Controlled Inputs</span></a><a class="docs-next button" href="/examples/ajax"><span>Ajax</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2022 Nikita Gazarov</section></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/examples/controlled-inputs"><span class="arrow-prev">← </span><span>Controlled Inputs</span></a><a class="docs-next button" href="/examples/ajax"><span>Ajax</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2023 Nikita Gazarov</section></footer></div></body></html>
