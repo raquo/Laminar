@@ -40,7 +40,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
       ),
       button(
         "+",
-        inContext(_.events(onClick).sample(stepVar.signal) --> diffBus)
+        onClick.compose(_.sample(stepVar.signal)) --> diffBus
       )
     )
   )

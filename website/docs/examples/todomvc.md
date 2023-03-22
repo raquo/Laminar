@@ -104,14 +104,11 @@ object TodoMvcApp {
       cls("new-todo"),
       placeholder("What needs to be done?"),
       autoFocus(true),
-      inContext { thisNode =>
-        // Note: mapTo below accepts parameter by-name, evaluating it on every enter key press
-        onEnterPress.mapTo(thisNode.ref.value).filter(_.nonEmpty) -->
-          commandObserver.contramap[String] { text =>
-            thisNode.ref.value = "" // clear input
-            Create(itemText = text)
-          }
-      }
+      onEnterPress
+        .mapToValue
+        .filter(_.nonEmpty)
+        .map(Create(_))
+        .setValue("") --> commandObserver
     )
 
   // Render a single item. Note that the result is a single element: not a stream, not some virtual DOM representation.
@@ -150,14 +147,8 @@ object TodoMvcApp {
       cls("edit"),
       defaultValue <-- itemSignal.map(_.text),
       onMountFocus,
-      inContext { thisNode =>
-        @inline def updateText = UpdateText(itemId, thisNode.ref.value)
-
-        List(
-          onEnterPress.mapTo(updateText) --> updateTextObserver,
-          onBlur.mapTo(updateText) --> updateTextObserver
-        )
-      }
+      onEnterPress.mapToValue.map(UpdateText(itemId, _)) --> updateTextObserver,
+      onBlur.mapToValue.map(UpdateText(itemId, _)) --> updateTextObserver
     )
 
   private def renderCheckboxInput(itemId: Int, itemSignal: Signal[TodoItem]) =

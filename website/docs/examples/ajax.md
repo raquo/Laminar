@@ -29,11 +29,11 @@ val app: HtmlElement = div(
   options.map { option =>
     div(
       input(
-        idAttr(option.name),
         typ("radio"),
+        idAttr(option.name),
         nameAttr("ajaxOption"),
         checked <-- selectedOptionVar.signal.map(_ == option),
-        onChange.mapTo(option) --> selectedOptionVar,
+        onChange.mapTo(option) --> selectedOptionVar
       ),
       label(forId(option.name), " " + option.name)
     )
