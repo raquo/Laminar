@@ -36,6 +36,9 @@ Huge thanks to our sponsors who support Laminar development with their generous 
 
 [Aurinko](https://aurinko.io/) is an API platform for workplace addons and integrations.
 
+[![HeartAI.net](https://laminar.dev/img/sponsors/heartai-300px.png)](https://www.heartai.net/)
+
+[HeartAI](https://www.heartai.net/) is a data and analytics platform for digital health and clinical care.
 
 Laminar is sponsored by [people like you](https://github.com/sponsors/raquo). If you enjoy using Laminar, please consider supporting the project. 🙏
 
