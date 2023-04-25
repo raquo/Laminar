@@ -831,7 +831,7 @@ val outputSignal: Signal[HtmlElement] =
   inputSignal.split(key = _.isMultiLine)(project = renderEditor)
 ```
 
-The high-level purpose of this code is to avoid creating a new element when inpuSignal emits a new value. The interesting part is **when** we do need to create the new element: when the Editor's `isMultiline` property changes, we need to switch to using either a single-line `<input>` element, or a multi-line `textArea`. Changing the type of the element is one kind of update that is impossible to do without re-creating the element.
+The high-level purpose of this code is to avoid creating a new element when `inputSignal` emits a new value. The interesting part is **when** we do need to create the new element: when the Editor's `isMultiline` property changes, we need to switch to using either a single-line `<input>` element, or a multi-line `textArea`. Changing the type of the element is one kind of update that is impossible to do without re-creating the element.
 
 Another use case for this is when you want to reset a complex component's state, for example:
 
