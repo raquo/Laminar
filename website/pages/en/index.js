@@ -238,6 +238,12 @@ class Index extends React.Component {
                     <div className="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
                   </div>
                 </div>
+                <div className="-sponsor x-company x-aurinko">
+                  <a className="x-noHover" href="https://www.aurinko.io/">
+                    <img className="-logo" src="/img/sponsors/aurinko-dark-300px.png" alt="" />
+                    <div className="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+                  </a>
+                </div>
                 <div className="-sponsor x-company x-heartai">
                   <a className="x-noHover" href="https://www.heartai.net/">
                     <img className="-logo" src="/img/sponsors/heartai-dark.svg" alt="" />
