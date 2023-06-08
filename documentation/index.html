@@ -564,7 +564,7 @@ div(
 <span class="hljs-keyword">val</span> outputSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">HtmlElement</span>] = 
   inputSignal.split(key = _.isMultiLine)(project = renderEditor)
 </code></pre>
-<p>The high-level purpose of this code is to avoid creating a new element when inpuSignal emits a new value. The interesting part is <strong>when</strong> we do need to create the new element: when the Editor's <code>isMultiline</code> property changes, we need to switch to using either a single-line <code>&lt;input&gt;</code> element, or a multi-line <code>textArea</code>. Changing the type of the element is one kind of update that is impossible to do without re-creating the element.</p>
+<p>The high-level purpose of this code is to avoid creating a new element when <code>inputSignal</code> emits a new value. The interesting part is <strong>when</strong> we do need to create the new element: when the Editor's <code>isMultiline</code> property changes, we need to switch to using either a single-line <code>&lt;input&gt;</code> element, or a multi-line <code>textArea</code>. Changing the type of the element is one kind of update that is impossible to do without re-creating the element.</p>
 <p>Another use case for this is when you want to reset a complex component's state, for example:</p>
 <pre><code class="hljs css language-scala"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Document</span>(<span class="hljs-params">id: <span class="hljs-type">String</span>, content: <span class="hljs-type">DocumentContent</span>, ...</span>)</span>
    
