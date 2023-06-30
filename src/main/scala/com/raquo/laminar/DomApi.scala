@@ -79,7 +79,7 @@ object DomApi {
     element.ref.addEventListener(
       `type` = EventProcessor.eventProp(listener.eventProcessor).name,
       listener = listener.domCallback,
-      useCapture = EventProcessor.shouldUseCapture(listener.eventProcessor)
+      options = listener.options
     )
   }
 
@@ -90,7 +90,7 @@ object DomApi {
     element.ref.removeEventListener(
       `type` = EventProcessor.eventProp(listener.eventProcessor).name,
       listener = listener.domCallback,
-      useCapture = EventProcessor.shouldUseCapture(listener.eventProcessor)
+      options = listener.options
     )
   }
 

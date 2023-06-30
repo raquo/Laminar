@@ -24,6 +24,7 @@ import org.scalajs.dom
 class EventProcessor[Ev <: dom.Event, V](
   protected val eventProp: EventProp[Ev],
   protected val shouldUseCapture: Boolean = false,
+  protected val shouldBePassive: Boolean = false,
   protected val processor: Ev => Option[V]
 ) {
 
@@ -47,7 +48,7 @@ class EventProcessor[Ev <: dom.Event, V](
     * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
     */
   def useCapture: EventProcessor[Ev, V] = {
-    new EventProcessor(eventProp, shouldUseCapture = true, processor = processor)
+    new EventProcessor(eventProp, shouldUseCapture = true, shouldBePassive = shouldBePassive, processor = processor)
   }
 
   /** Use standard bubble propagation mode.
@@ -56,7 +57,27 @@ class EventProcessor[Ev <: dom.Event, V](
     * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
     */
   def useBubbleMode: EventProcessor[Ev, V] = {
-    new EventProcessor(eventProp, shouldUseCapture = false, processor = processor)
+    new EventProcessor(eventProp, shouldUseCapture = false, shouldBePassive = shouldBePassive, processor = processor)
+  }
+
+  /** Use a passive event listener
+   *
+   * Note that unlike `preventDefault` config which applies to individual events,
+   * `passive` is used to install the listener onto the DOM node in the first place.
+   *
+   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   */
+  def passive: EventProcessor[Ev, V] = {
+    new EventProcessor(eventProp, shouldUseCapture = shouldUseCapture, shouldBePassive = true, processor = processor)
+  }
+
+  /** Use a standard non-passive listener.
+   * You don't need to call this unless you set `passive` previously, and want to revert to non-passive.
+   *
+   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   */
+  def nonPassive: EventProcessor[Ev, V] = {
+    new EventProcessor(eventProp, shouldUseCapture = shouldUseCapture, shouldBePassive = false, processor = processor)
   }
 
   /** Prevent default browser action for the given event (e.g. following the link when it is clicked)
@@ -337,14 +358,14 @@ class EventProcessor[Ev <: dom.Event, V](
   }
 
   private def withNewProcessor[V2](newProcessor: Ev => Option[V2]): EventProcessor[Ev, V2] = {
-    new EventProcessor[Ev, V2](eventProp, shouldUseCapture, newProcessor)
+    new EventProcessor[Ev, V2](eventProp, shouldUseCapture, shouldBePassive, newProcessor)
   }
 }
 
 object EventProcessor {
 
-  def empty[Ev <: dom.Event](eventProp: EventProp[Ev], shouldUseCapture: Boolean = false): EventProcessor[Ev, Ev] = {
-    new EventProcessor(eventProp, shouldUseCapture, Some(_))
+  def empty[Ev <: dom.Event](eventProp: EventProp[Ev], shouldUseCapture: Boolean = false, shouldBePassive: Boolean = false): EventProcessor[Ev, Ev] = {
+    new EventProcessor(eventProp, shouldUseCapture, shouldBePassive, Some(_))
   }
 
   // These methods are only exposed publicly via companion object
@@ -353,6 +374,8 @@ object EventProcessor {
   @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): EventProp[Ev] = prop.eventProp
 
   @inline def shouldUseCapture(prop: EventProcessor[_, _]): Boolean = prop.shouldUseCapture
+
+  @inline def shouldBePassive(prop: EventProcessor[_, _]): Boolean = prop.shouldBePassive
 
   @inline def processor[Ev <: dom.Event, Out](prop: EventProcessor[Ev, Out]): Ev => Option[Out] = prop.processor
 }
