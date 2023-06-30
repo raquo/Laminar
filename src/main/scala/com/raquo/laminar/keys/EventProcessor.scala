@@ -45,7 +45,7 @@ class EventProcessor[Ev <: dom.Event, V](
     * Note that unlike `preventDefault` config which applies to individual events,
     * useCapture is used to install the listener onto the DOM node in the first place.
     *
-    * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+    * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#usecapture
     */
   def useCapture: EventProcessor[Ev, V] = {
     new EventProcessor(eventProp, shouldUseCapture = true, shouldBePassive = shouldBePassive, processor = processor)
@@ -54,7 +54,7 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Use standard bubble propagation mode.
     * You don't need to call this unless you set `useCapture` previously, and want to revert to bubbling.
     *
-    * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+    * See `useCapture` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#usecapture
     */
   def useBubbleMode: EventProcessor[Ev, V] = {
     new EventProcessor(eventProp, shouldUseCapture = false, shouldBePassive = shouldBePassive, processor = processor)
@@ -65,7 +65,7 @@ class EventProcessor[Ev <: dom.Event, V](
    * Note that unlike `preventDefault` config which applies to individual events,
    * `passive` is used to install the listener onto the DOM node in the first place.
    *
-   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive
    */
   def passive: EventProcessor[Ev, V] = {
     new EventProcessor(eventProp, shouldUseCapture = shouldUseCapture, shouldBePassive = true, processor = processor)
@@ -74,7 +74,7 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Use a standard non-passive listener.
    * You don't need to call this unless you set `passive` previously, and want to revert to non-passive.
    *
-   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive
    */
   def nonPassive: EventProcessor[Ev, V] = {
     new EventProcessor(eventProp, shouldUseCapture = shouldUseCapture, shouldBePassive = false, processor = processor)

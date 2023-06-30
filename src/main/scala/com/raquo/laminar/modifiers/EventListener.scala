@@ -3,7 +3,6 @@ package com.raquo.laminar.modifiers
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription}
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.keys.EventProcessor
-import com.raquo.laminar.keys.EventProcessor.{shouldUseCapture, shouldBePassive}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
@@ -31,8 +30,8 @@ class EventListener[Ev <: dom.Event, Out](
   val domValue: js.Function1[Ev, Unit] = domCallback
 
   val options: dom.EventListenerOptions = new dom.EventListenerOptions {
-    capture = shouldUseCapture(eventProcessor)
-    passive = shouldBePassive(eventProcessor)
+    capture = EventProcessor.shouldUseCapture(eventProcessor)
+    passive = EventProcessor.shouldBePassive(eventProcessor)
   }
 
   override def bind(element: ReactiveElement.Base): DynamicSubscription = {

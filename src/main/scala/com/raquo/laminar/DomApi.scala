@@ -7,7 +7,6 @@ import com.raquo.laminar.modifiers.EventListener
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, TextNode}
 import com.raquo.laminar.tags.{HtmlTag, SvgTag, Tag}
 import org.scalajs.dom
-import org.scalajs.dom.DOMException
 
 import scala.annotation.tailrec
 import scala.scalajs.js
@@ -26,7 +25,7 @@ object DomApi {
       true
     } catch {
       // @TODO[Integrity] Does this only catch DOM exceptions? (here and in other methods)
-      case JavaScriptException(_: DOMException) => false
+      case JavaScriptException(_: dom.DOMException) => false
     }
   }
 
@@ -38,7 +37,7 @@ object DomApi {
       parent.ref.removeChild(child.ref)
       true
     } catch {
-      case JavaScriptException(_: DOMException) => false
+      case JavaScriptException(_: dom.DOMException) => false
     }
   }
 
@@ -51,7 +50,7 @@ object DomApi {
       parent.ref.insertBefore(newChild = newChild.ref, refChild = referenceChild.ref)
       true
     } catch {
-      case JavaScriptException(_: DOMException) => false
+      case JavaScriptException(_: dom.DOMException) => false
     }
   }
 
@@ -64,7 +63,7 @@ object DomApi {
       parent.ref.replaceChild(newChild = newChild.ref, oldChild = oldChild.ref)
       true
     } catch {
-      case JavaScriptException(_: DOMException) => false
+      case JavaScriptException(_: dom.DOMException) => false
     }
   }
 
@@ -289,7 +288,10 @@ object DomApi {
     element: ReactiveSvgElement.Base,
     attr: SvgAttr[_]
   ): js.UndefOr[String] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
+    val domValue = element.ref.getAttributeNS(
+      namespaceURI = attr.namespaceUri.orNull,
+      localName = attr.localName
+    )
     if (domValue != null) {
       domValue
     } else {
@@ -311,10 +313,15 @@ object DomApi {
     attr: SvgAttr[_],
     domValue: String
   ): Unit = {
-    if (domValue == null) { // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
+    if (domValue == null) {
+      // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
       removeSvgAttribute(element, attr)
     } else {
-      element.ref.setAttributeNS(namespaceURI = attr.namespaceUri.orNull, qualifiedName = attr.name, value = domValue)
+      element.ref.setAttributeNS(
+        namespaceURI = attr.namespaceUri.orNull,
+        qualifiedName = attr.name,
+        value = domValue
+      )
     }
   }
 
@@ -322,7 +329,10 @@ object DomApi {
     element: ReactiveSvgElement.Base,
     attr: SvgAttr[_]
   ): Unit = {
-    element.ref.removeAttributeNS(namespaceURI = attr.namespaceUri.orNull, localName = attr.localName)
+    element.ref.removeAttributeNS(
+      namespaceURI = attr.namespaceUri.orNull,
+      localName = attr.localName
+    )
   }
 
   /** Aria attributes */
@@ -360,7 +370,8 @@ object DomApi {
     attr: AriaAttr[_],
     domValue: String
   ): Unit = {
-    if (domValue == null) { // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
+    if (domValue == null) {
+      // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
       removeAriaAttribute(element, attr)
     } else {
       element.ref.setAttribute(attr.name, domValue)
