@@ -40,7 +40,7 @@ class EventProcessor[Ev <: dom.Event, V](
     new EventListener[Ev, V](this, _ => onNext)
   }
 
-  /** Use capture mode (v=true) or bubble mode (v=false)
+  /** Use capture mode
     *
     * Note that unlike `preventDefault` config which applies to individual events,
     * useCapture is used to install the listener onto the DOM node in the first place.

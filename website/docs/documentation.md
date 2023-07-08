@@ -68,6 +68,7 @@ title: Documentation
   * [Lifecycle Event Timing](#lifecycle-event-timing)
   * [How Are Mount Events Propagated?](#how-are-mount-events-propagated)
 * [Integrations With Other Libraries](#integrations-with-other-libraries)
+* [Network Requests](#network-requests)
 * [URL Routing](#url-routing)
 * [Anti-patterns](#anti-patterns)
 * [Browser Compatibility](#browser-compatibility)
@@ -2324,6 +2325,70 @@ div(
 You can easily convert any `js.Promise` or `scala.Future` to Airsream observables using `{EventStream,Signal}.{fromJsPromise,fromFuture}` methods, but you can also create a deeper integration with a different observable system – see [Custom Event Sources](https://github.com/raquo/Airstream/#custom-event-sources) in Airstream docs. If you make something useful I encourage you to publish it as a library or at least as a gist. Personally, on the frontend I only use Airstream, so I wouldn't be a good maintainer of such an integration myself.
 
 Integration of observables with callback-driven APIs is usually achieved by providing `observer.onNext` as the callback (e.g. you can pass something like `onclick = clickEventBus.writer.onNext` to React). You might want to check out various Airstream helpers like [EventStream.withJsCallback](https://github.com/raquo/Airstream/#eventstreamwithcallback-and-withobserver) for this.
+
+
+
+## Network Requests
+
+On the frontend, the primary method to make network requests is the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API). In Laminar, you can use Airstream's [FetchStream](https://github.com/raquo/Airstream/#fetchstream):
+
+```scala
+div(
+  // Make fetch request when this div element is mounted:
+  FetchStream.get(url) --> { responseText => doSomething },
+  // Make fetch request on every click:
+  onClick.flatMap(_ => FetchStream.get(url)) --> { responseText => doSomething },
+  // Same, but also get the click event:
+  onClick.flatMap(ev => FetchStream.get(url).map((ev, _))) --> {
+    case (ev, responseText) => doSomething
+  }
+)
+```
+
+`FetchStream` also supports raw (non-text) responses and codecs – see Airstream docs for their usage.
+
+[AJAX](https://developer.mozilla.org/en-US/docs/Web/Guide/AJAX) (XmlHttpResponse) is an older API for making network requests from the browser. One good reason to use AJAX over Fetch is when you need to track the progress of file uploads – the browsers' Fetch API does not yet provide this functionality. In Laminar you can use AJAX via Airstream's [AjaxStream](https://github.com/raquo/Airstream/#ajax):
+
+```scala
+div(
+  AjaxStream.get("/api/kittens") --> { xhr =>
+    dom.console.log(xhr.responseText)
+  }
+)
+```
+
+[Websockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) is a browser API that lets you set up a bidirectional communication session between frontend and backend. For example, you would almost certainly use WebSockets to implement a realtime chat app. Airstream itself [does not yet have](https://github.com/raquo/Airstream/issues/49) a canonical websockets implementation, but [Laminext](https://laminext.dev/v/0.15.x/websocket) does offer a Laminar API for websockets.
+
+
+### Network Requests Security
+
+Please note that browsers have several security mechanisms that dictate whether you're allowed to make certain network requests, and whether you're allowed to see the response content. For security reasons, when your request is blocked, your code often gets only a generic error message with no details (e.g. just "Network Error"). This is most typical for cross-origin (cross-domain) requests that violate [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). To solve the problem, you first need to understand CORS, and you will likely need your backend server code to specify a safe CORS policy. The browser dev tools (the network tab and the console) will help too, of course.
+
+Your requests can also be blocked by [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), although for that to be an issue, you need to configure the CSP restrictions on your own backend server, it's usually permissive by default.
+
+Adblockers can also block network requests, image / CSS downloads, and hide DOM elements. You may want to add a popular adblocker extension like uBlock Origin to your dev browser, to avoid surprises in production.
+
+
+### Scala HTTP Libraries
+
+All Scala HTTP libraries that are published for Scala.js use one of the above browser APIs to make network requests when compiled for Scala.js. You don't _need_ to use them to make network requests. If you do want to use those libraries for any reason, you will probably want to convert the `scala.Future`-s that they produce to observables (see Airstream docs for this) to integrate them smoothly into Laminar. Keep in mind that libraries that were designed for the JVM first can significantly increase JS bundle size if they use either heavy Java types or functional effect libraries. You can check the contribution of various classes and packages to your JS bundle size using npm package [source-map-explorer](https://www.npmjs.com/package/source-map-explorer).
+
+
+### Codecs and Type-Safe Requests
+
+Network requests are data-heavy touch points between your code and the outside world. Request data is typically encoded in URL params (for GET requests) and / or as JSON in the request body (for POST requests), and response data is typically encoded as a JSON string. (Of course, you can use MessagePack or any other encoding instead of JSON). Typically, you would use a JSON library like [jsoniter-scala](https://github.com/plokhotnyuk/jsoniter-scala) or [uPickle](https://github.com/com-lihaoyi/upickle) to derive codecs for Scala case classes or GADTs representing requests and responses, and with that, your requests and responses are already pretty type-safe.
+
+However, two important components of safety are missing still:
+
+1. Matching request params / request type to the response type, for a given endpoint
+2. Matching of endpoint URLs and requests / response types in the frontend codebase to those in the backend codebase
+
+You can solve both or those in a DIY manner (often my preference), for example by having a single RPC-style endpoint URL, and defining GADTs for request and response types, however you can also use one of the libraries designed for this purpose, such as [tapir](https://tapir.softwaremill.com/en/latest/) or [endpoints4s](https://endpoints4s.github.io/).
+
+
+### GraphQL
+
+You can use [Caliban](https://ghostdogpr.github.io/caliban/docs/client.html) as a type-safe [GraphQL](https://graphql.org/) client – they have a [Laminar integration](https://ghostdogpr.github.io/caliban/docs/laminext.html) that uses Laminext's WebSockets implementation mentioned above.
 
 
 
