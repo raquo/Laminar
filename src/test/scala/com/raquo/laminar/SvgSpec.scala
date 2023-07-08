@@ -26,6 +26,7 @@ class SvgSpec extends UnitSpec {
     )
 
     val el = svg(
+      xmlns := SvgAttr.svgNamespaceUri, // kinda tests https://github.com/raquo/Laminar/issues/143
       height := "800",
       width := "500",
       polylineEl

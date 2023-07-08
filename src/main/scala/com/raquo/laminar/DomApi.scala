@@ -361,11 +361,19 @@ object DomApi {
       // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
       removeSvgAttribute(element, attr)
     } else {
-      element.ref.setAttributeNS(
-        namespaceURI = attr.namespaceUri.orNull,
-        qualifiedName = attr.name,
-        value = domValue
-      )
+      attr.namespaceUri.fold {
+        // See https://github.com/raquo/Laminar/issues/143
+        element.ref.setAttribute(
+          name = attr.name,
+          value = domValue
+        )
+      } { namespaceUri =>
+        element.ref.setAttributeNS(
+          namespaceURI = namespaceUri,
+          qualifiedName = attr.name,
+          value = domValue
+        )
+      }
     }
   }
 

@@ -47,6 +47,15 @@ trait DocumentEventProps { this: GlobalEventProps =>
 
 
   /**
+    * The selectionchange event is fired when the current Selection of a Document is changed.
+    * This event is not cancelable and does not bubble.
+    * 
+    * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/selectionchange_event
+    */
+  lazy val onSelectionChange: EventProp[dom.Event] = eventProp("selectionchange")
+
+
+  /**
     * The visibilitychange event is fired when the content of a tab has become visible or has been hidden.
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event

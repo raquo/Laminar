@@ -725,6 +725,15 @@ trait GlobalEventProps {
 
 
   /**
+    * Fires when a user starts a new selection.
+    * If the event is canceled, the selection is not changed.
+    * 
+    * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/selectstart_event
+    */
+  lazy val onSelectStart: EventProp[dom.Event] = eventProp("selectstart")
+
+
+  /**
     * Fires when a `<menu>` element is shown as a context menu
     * 
     * @see https://developer.mozilla.org/en-US/docs/Web/API/Element/show_event

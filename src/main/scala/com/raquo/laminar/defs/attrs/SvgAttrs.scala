@@ -889,6 +889,10 @@ trait SvgAttrs {
   lazy val surfaceScale: SvgAttr[String] = stringSvgAttr("surfaceScale")
 
 
+  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/tabindex */
+  lazy val tabIndex: SvgAttr[String] = stringSvgAttr("tabindex")
+
+
   /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/target */
   lazy val target: SvgAttr[String] = stringSvgAttr("target")
 
@@ -987,8 +991,8 @@ trait SvgAttrs {
   lazy val xmlSpace: SvgAttr[String] = stringSvgAttr("space", namespace = "xml")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xmlns */
-  lazy val xmlns: SvgAttr[String] = stringSvgAttr("xmlns", namespace = "xmlns")
+  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg */
+  lazy val xmlns: SvgAttr[String] = stringSvgAttr("xmlns")
 
 
   /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xmlns:xlink */
