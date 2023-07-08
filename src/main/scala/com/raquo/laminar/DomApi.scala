@@ -50,7 +50,7 @@ object DomApi {
       parent.insertBefore(newChild = newChild, refChild = referenceChild)
       true
     } catch {
-      case JavaScriptException(_: DOMException) => false
+      case JavaScriptException(_: dom.DOMException) => false
     }
   }
 
