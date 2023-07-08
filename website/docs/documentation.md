@@ -73,6 +73,7 @@ title: Documentation
 * [Anti-patterns](#anti-patterns)
 * [Browser Compatibility](#browser-compatibility)
 * [Special Cases](#special-cases)
+* [Troubleshooting](#troubleshooting)
 
 
 
@@ -2674,6 +2675,7 @@ For IE, you will need to shim / polyfill some browser APIs to make use of certai
 Also, the current implementation of `DomApi.unsafeParseHtmlString` method does not support IE. See its scaladoc for an alternative.
 
 
+
 ## Special Cases
 
 Laminar is conceptually a simple layer that brings a lightweight reactive API to native Javascript DOM. In general there is no magic to it, what goes in goes out, transformed in some obvious way. However, in a few cases we do some ugly things under the hood so that you don't need to pull your hair and still do said ugly things in your own code.
@@ -2703,6 +2705,34 @@ However, this is not actually valid HTML. There needs to be a [`tbody`](https://
 Nevertheless, web browsers render this invalid HTML just fine, by silently inserting a `tbody` element to wrap all `tr` elements. This is a problem because the web browser will not notify Laminar about this, so Laminar's DOM tree will become incorrect.
 
 Therefore, if you're rendering a table you must make sure to wrap your `tr` elements in `tbody` (or `thead` or `tfoot`) elements.
+
+
+
+## Troubleshooting
+
+Hiccups are inevitable in development, especially when you're trying a new paradigm (observables and lack of virtual DOM for a React.js developer, or the whole concept of frontend development for a backend developer). Here is some assorted advice for dealing with Laminar issues, in no particular order.
+
+* Understand the separation of concerns between the browser runtime, Scala.js, Laminar, Airstream, Scala DOM Types. For many issues, you just need to understand how to do something on the frontend in plain HTML / JS / CSS, and then it will become obvious how to do it in Scala.js / Laminar. This is actually great news, because there are a ton of resources about plain HTML / JS / CSS online. They are very helpful to us, because Scala.js exposes all the JS APIs almost verbatim, and Laminar itself is a relatively thin layer for manipulating the [DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction).
+
+* Especially if you're completely new to frontend development, make sure to manage the scope of uncertainty. Start small, and don't let the sheer scope of things-to-learn demotivate you (reduce that scope / pace your ambitions as necessary). That said, aim to understand all the foundational concepts _eventually_. Once you do, frontend development is pretty easy.
+
+* Review Laminar documentation, including [Airstream docs](https://github.com/raquo/airstream/) and [Scala DOM Types](https://github.com/raquo/scala-dom-types). See the table of contents, and Ctrl+F. Documentation contains both
+
+* Review the content and examples linked on the [resources](https://laminar.dev/resources).
+
+* Search [discord chat](https://discord.gg/JTrUxhq7sj) and [Github issues](https://github.com/search?q=owner%3Araquo+signal+current+value&type=issues) for Laminar, Airstream, and Scala DOM Types, as applicable.
+
+* Don't be afraid to look at Laminar code if needed. It has some complicated areas (e.g. the `children <--` algorithm), but mostly it's very reasonable, with few implicits, no macros, no functional effects, no category theory.
+
+* Use [scribble.ninja](https://scribble.ninja/) to test things out in a clean(ish) context. If stuff works here, but not in your own codebase, now you have a lead, try to reconcile the difference.
+
+* Use the browser dev tools. Always have the dev console open during development, because both Airstream, other libraries, and the browser itself dumps certain types of errors in there.
+
+* Observable/Task/IO-style systems tend to produce complicated stack traces in case of exceptions. Use Airstream's [debugging functionality](https://github.com/raquo/Airstream/#debugging) to diagnose errors that happen within the observable graph.
+
+* Speaking of exceptions, understand Airstream's [error handling](https://github.com/raquo/Airstream/#error-handling), as it is different from other streaming/task/IO libraries.
+
+* Ask for advice on [Discord](https://discord.gg/JTrUxhq7sj). Be specific, show your code, or your desired pseudocode. Try to minimize. Check and report any errors in the console. The act of writing a good question, properly describing the problem, can actually lead you to the solution.
 
 
 
