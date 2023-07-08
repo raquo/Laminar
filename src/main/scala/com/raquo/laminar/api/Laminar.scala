@@ -12,7 +12,7 @@ import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
+import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
 import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
@@ -237,6 +237,10 @@ trait Laminar
   type TextArea = nodes.ReactiveHtmlElement[dom.html.TextArea]
 
 
+  /** Render a Laminar element into a container DOM node, right now.
+    * You must make sure that the container node already exists
+    * in the DOM, otherwise this method will throw.
+    */
   @inline def render(
     container: dom.Element,
     rootNode: nodes.ReactiveElement.Base
@@ -244,6 +248,12 @@ trait Laminar
     new RootNode(container, rootNode)
   }
 
+  /** Wait for `DOMContentLoaded` event to fire, then render a Laminar
+    * element into a container DOM node. This is probably what you want
+    * to initialize your Laminar application on page load.
+    *
+    * See https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event
+    */
   @inline def renderOnDomContentLoaded(
     container: => dom.Element,
     rootNode: => nodes.ReactiveElement.Base
@@ -251,6 +261,23 @@ trait Laminar
     documentEvents(_.onDomContentLoaded).foreach { _ =>
       new RootNode(container, rootNode)
     }(unsafeWindowOwner)
+  }
+
+  /** Wrap a Laminar element in [[DetachedRoot]], which allows you to
+    * manually activate and deactivate Laminar subscriptions on this
+    * element. Pass `activateNow = true` to activate the subscriptions
+    * upon calling this method, or call `.activate()` manually.
+    *
+    * Unlike other `render*` methods, this one does NOT attach the element
+    * to any container / parent DOM node. Instead, you can obtain the JS DOM
+    * node as `.ref`, and pass it to a third party JS library that requires
+    * you to provide a DOM node (which it will attach to the DOM on its own).
+    */
+  def renderDetached[El <: ReactiveElement.Base](
+    rootNode: => El,
+    activateNow: Boolean
+  ): DetachedRoot[El] = {
+    new DetachedRoot(rootNode, activateNow)
   }
 
   /** A universal Modifier that does nothing */

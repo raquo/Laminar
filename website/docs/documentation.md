@@ -2226,6 +2226,62 @@ You can see some examples of such interfaces and their usage in [live examples](
 If you review the source code of all these bindings, you'll see that there's no special API for Web Components in Laminar, all we do is define custom attributes / properties / slots / methods that the given Web Component exposes, and use one simple pattern for accessing them in a scoped manner.
 
 
+### Passing Laminar Elements to Third Party Libraries
+
+Some libraries expect you to pass them a DOM element, that they will "render" (attach to their DOM) themselves. For example, a Javascript modal library might expect you to specify the content to render in this way.
+
+```scala
+object JsModalLibrary {
+  def renderModal(element: dom.Element) = ???
+}
+```
+
+All Laminar elements have a `.ref` property that returns the JS DOM node, so it _seems_ as if you can just pass that node to the JS library:
+
+```scala
+val content = div(b("Important"), " message")
+JsModalLibrary.renderModal(content.ref)
+```
+
+However, this only works so long as your `content` Laminar element is static, that is, does not contain any bindings / subscriptions like `<--` and `-->`. A Laminar element's subscriptions only get activated when it is mounted into the DOM (by Laminar), but here we're delegating this mounting responsibility to `JsModalLibrary`, who on its own knows nothing about Laminar's needs.
+
+For such cases, Laminar offers a special `renderDetached` method that lets you manually control the activation and deactivation of subscriptions on a Laminar element:
+
+```scala
+val content = div(
+  b("Important"), " message",
+  button(onClick --> { _ => dom.console.log("click") }, "Log")
+)
+
+val contentRoot: DetachedRoot[Div] = renderDetached(
+  content,
+  activateNow = true
+)
+
+JsModalLibrary.renderModal(contentRoot.ref)
+```
+
+Now, this `contentRoot` detached root is managing the lifecycle of `content` element's subscriptions. We said `activateNow = true`, so the `onClick` subscription will be activated immediately upon creation of the `contentRoot`, and so it will log "click" when the user clicks the button.
+
+There is one last issue to take care of: since we activated the element's subscriptions manually, we also need to deactivate them manually when we don't need the element anymore, otherwise they will never be deactivated and garbage collected. Typically, the Javascript modal library will provide some kind of `onClose` hook, which is exactly what we need. So, our final code could look something like this:
+
+```scala
+val contentRoot: DetachedRoot[Div] = renderDetached(
+  content, // Laminar element
+  activateNow = false // !!! see activation code below
+)
+
+def openModal() {
+  JsModalLibrary.renderModal(
+    contentRoot.ref,
+    onClose = contentRoot.deactivate // !!!
+  )
+  // re-activate subscriptions every time the modal is opened
+  contentRoot.activate()
+}
+```
+
+
 ### Rendering Third Party HTML or SVG Elements
 
 If you want to render a native HTML element (`dom.html.Element`) created a third party library, you can convert it into a Laminar element using `foreignHtmlElement` or `foreignSvgElement`. Once you have that, you can perform all the usual Laminar operations on it:
