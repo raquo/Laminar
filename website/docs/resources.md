@@ -34,6 +34,8 @@ title: Resources
 
 * [Kit Langton – Deriving the Frontend](https://www.youtube.com/watch?v=JHriftPO62I)
 
+* [Sébastien Doeraene – Getting started with Scala.js, Laminar and ScalablyTyped](https://www.youtube.com/watch?v=UePrOa_1Am8)
+
 
 ## Community & Support
 
@@ -68,6 +70,8 @@ title: Resources
 * [NPC Generator](https://gitlab.com/scala-js-games/npc-generator/)
 
 * [Hippo](https://github.com/indoorvivants/hippo) – web-based heap dump viewer.
+
+* [Full stack ZIO blog app with Laminar](https://github.com/kyledinh/zio-blogapp)
 
 * [Network Threat Monitor](https://github.com/alexeybi/threat-monitor)
 
@@ -158,6 +162,8 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
   * See [updated repo](https://github.com/kitlangton/formula) for safe management of Owner-s
 
+* **[Official Scala.js tutorial](https://www.scala-js.org/doc/tutorial/)** explains how to make a Scala.js app with Vite, Laminar, and a JS charting library (using ScalablyTyped). [Final code repo](https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example). Video version: [part 1 (Vite)](https://www.youtube.com/watch?v=dv7fPmgFTNA), [part 2 (Laminar & ScalablyTyped)](https://www.youtube.com/watch?v=UePrOa_1Am8).
+
 * **[Twotm8 – Building the Frontend](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend)** walks you through creating a twitter clone in full stack Scala. The chapter on frontend explains how to use Laminar, implement routing with [Waypoint](https://github.com/raquo/waypoint), and styling with [ScalaCSS](https://github.com/japgolly/scalacss). See also the [source code](https://github.com/keynmol/twotm8) and [demo](https://twotm8-web.fly.dev/login).
 
 * [Cross-Platform Mobile dev with Scala and Capacitor](https://medium.com/geekculture/cross-platform-mobile-dev-with-scala-and-capacitor-54e69b62b50c)
@@ -165,6 +171,8 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 * SoftwareMill's [Hands-on Laminar](https://blog.softwaremill.com/hands-on-laminar-354ddcc536a9?gi=167c9cdb6442) article includes form validation, and integration with ScalaCSS and Monocle
 
 * Alvin Alexander's [Laminar 101](https://alvinalexander.com/scala/laminar-101-hello-world-example-static/), [102](https://alvinalexander.com/scala/laminar-102-reactive-hello-world-example/), and [103](https://alvinalexander.com/scala/laminar-103-reactive-routing-example/) tutorials take you from setting up a static Laminar page to implementing a basic router.
+
+* [Laminar TicTacToe tutorial in Japanese](https://zenn.dev/110416/articles/21ff164361b49b) by [110416](https://twitter.com/by110416)
 
 
 
