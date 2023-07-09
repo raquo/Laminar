@@ -69,6 +69,10 @@ title: Resources
 
 * [Hippo](https://github.com/indoorvivants/hippo) – web-based heap dump viewer.
 
+* [Network Threat Monitor](https://github.com/alexeybi/threat-monitor)
+
+* [Semagrams.jl](https://github.com/algebraicjulia/Semagrams.jl) + [Demo](https://semagrams.algebraicjulia.org/apps/dwd/index.html)
+
 
 
 ## Starter Kits & More Examples
@@ -123,6 +127,12 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 * [Formula](https://github.com/kitlangton/formula) – Derive functional, reactive, Laminar forms at compile-time with this type-safe, composable form combinator library
 
 * [Laminar.cycle](https://github.com/vic/laminar_cycle) – Cycle.js dialogue abstraction in Laminar
+
+* [Laminar dragging](https://github.com/blue-pitaya/laminar-dragging)
+
+* [Laminar color](https://github.com/blue-pitaya/laminar-color)
+
+* [Laminar contenteditable](https://github.com/blue-pitaya/laminar-contenteditable)
 
 
 

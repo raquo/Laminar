@@ -1,7 +1,7 @@
 ---
 title: Airstream v0.11.1 
 author: Nikita
-authorURL: http://twitter.com/raquo
+authorURL: https://twitter.com/raquo
 ---
 
 I have just released a bugfix for Airstream which fixes [#45](https://github.com/raquo/Airstream/issues/42).

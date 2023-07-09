@@ -1,7 +1,7 @@
 ---
 title: 2022 Laminar Ecosystem Updates
 author: Nikita
-authorURL: http://twitter.com/raquo
+authorURL: https://twitter.com/raquo
 ---
 
 Here is a deluge of new libraries, web components, tutorials, sponsors – all the news that couldn't wait until the next Laminar release. Hope I didn't miss anything!
