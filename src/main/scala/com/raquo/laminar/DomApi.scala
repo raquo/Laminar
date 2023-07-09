@@ -382,7 +382,7 @@ object DomApi {
     attr: SvgAttr[_]
   ): Unit = {
     element.ref.removeAttributeNS(
-      namespaceURI = attr.namespaceUri.orNull,
+      namespaceURI = attr.namespaceUri.orNull, // Tested that this works in Chrome & FF
       localName = attr.localName
     )
   }

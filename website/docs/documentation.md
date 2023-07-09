@@ -81,12 +81,12 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v15.0.0**. For other versions, see below.
+This documentation is for Laminar version **v16.0.0**. For other versions, see below.
 
-| Laminar | Airstream |
-| :--- | :--- |
-| **[master](https://github.com/raquo/Laminar/blob/master/docs/Documentation.md)** | **[master](https://github.com/raquo/Airstream/blob/master/README.md)** |
-| **[v15.0.0](https://laminar.dev/documentation)** | **[v15.0.0](https://github.com/raquo/Airstream/blob/v15.0.0/README.md)** |
+| Laminar                                                                            | Airstream                                                                |
+|:-----------------------------------------------------------------------------------|:-------------------------------------------------------------------------|
+| **[v16.0.0](https://github.com/raquo/Laminar/blob/v16.0.0/docs/Documentation.md)** | **[v16.0.0](https://github.com/raquo/Airstream/blob/v16.0.0/README.md)** |
+| **[v15.0.0](https://github.com/raquo/Laminar/blob/v15.0.0/docs/Documentation.md)** | **[v15.0.0](https://github.com/raquo/Airstream/blob/v15.0.0/README.md)** |
 | **[v0.14.2](https://github.com/raquo/Laminar/blob/v0.14.2/docs/Documentation.md)** | **[v0.14.2](https://github.com/raquo/Airstream/blob/v0.14.2/README.md)** |
 | **[v0.13.1](https://github.com/raquo/Laminar/blob/v0.13.1/docs/Documentation.md)** | **[v0.13.0](https://github.com/raquo/Airstream/blob/v0.13.0/README.md)** |
 | **[v0.12.2](https://github.com/raquo/Laminar/blob/v0.12.2/docs/Documentation.md)** | **[v0.12.2](https://github.com/raquo/Airstream/blob/v0.12.2/README.md)** |
@@ -110,13 +110,13 @@ If you want to follow along with an IDE, download one of the starter kit project
 
 Add Laminar to `libraryDependencies` of your Scala.js project in `build.sbt`:
 
-    "com.raquo" %%% "laminar" % "15.0.0"  // Requires Scala.js 1.13.0
+    "com.raquo" %%% "laminar" % "16.0.0"  // Requires Scala.js 1.13.2+
 
 Laminar depends on Airstream. Every Laminar version includes the latest version of Airstream that was available at the time it was published. If you ever have a reason to use a slightly newer version of Airstream without upgrading Laminar, add this to your `build.sbt` as well:
 
     "com.raquo" %%% "airstream" % "<version>"
 
-As you can see, Laminar and Airstream versions can diverge slightly, so don't use a single `LaminarVersion` variable to for both.
+As you can see, Laminar and Airstream versions can diverge slightly, so don't use a single `LaminarVersion` variable for both.
 
 The html/svg tags, attributes, props, styles, and event names in Laminar come from [Scala DOM Types](https://github.com/raquo/scala-dom-types). If there's a missing prop, consider contributing it there.
 
@@ -2358,12 +2358,12 @@ div(
 )
 ```
 
-[Websockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) is a browser API that lets you set up a bidirectional communication session between frontend and backend. For example, you would almost certainly use WebSockets to implement a realtime chat app. Airstream itself [does not yet have](https://github.com/raquo/Airstream/issues/49) a canonical websockets implementation, but [Laminext](https://laminext.dev/v/0.15.x/websocket) does offer a Laminar API for websockets.
+[Websockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) is a browser API that lets you set up a bidirectional communication session between frontend and backend. For example, you would almost certainly use WebSockets to implement a realtime chat app. Airstream itself [does not yet have](https://github.com/raquo/Airstream/issues/49) a canonical websockets implementation, but [Laminext](https://laminext.dev/websocket) does offer a Laminar API for websockets.
 
 
 ### Network Requests Security
 
-Please note that browsers have several security mechanisms that dictate whether you're allowed to make certain network requests, and whether you're allowed to see the response content. For security reasons, when your request is blocked, your code often gets only a generic error message with no details (e.g. just "Network Error"). This is most typical for cross-origin (cross-domain) requests that violate [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). To solve the problem, you first need to understand CORS, and you will likely need your backend server code to specify a safe CORS policy. The browser dev tools (the network tab and the console) will help too, of course.
+Please note that browsers have several security mechanisms that dictate whether you're allowed to make certain network requests, and whether you're allowed to see the response content. For security reasons, when your request is blocked, your code often gets only a generic error message with no details (e.g. just "NetworkError when attempting to fetch resource"). This is most typical for cross-origin (cross-domain) requests that violate [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS). To solve the problem, you first need to understand CORS, and you will likely need your backend server code to specify a safe CORS policy. The browser dev tools (the network tab and the console) will help too, of course.
 
 Your requests can also be blocked by [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP), although for that to be an issue, you need to configure the CSP restrictions on your own backend server, it's usually permissive by default.
 
