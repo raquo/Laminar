@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v16.0.0 · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="This release fixes a few bugs, and adds a few small features."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v16.0.0 · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2023/07/13/laminar-v16.0.0"/><meta property="og:description" content="This release fixes a few bugs, and adds a few small features."/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="/examples/hello-world" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2023/07/13/laminar-v16.0.0">Laminar v16.0.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/03/22/laminar-v15.0.0">Laminar v15.0.0 Mega Release</a></li><li class="navListItem"><a class="navItem" href="/blog/2022/10/24/laminar-v0.14.5">Laminar v0.14.5, Discord and More News</a></li><li class="navListItem"><a class="navItem" href="/blog/2022/06/23/ecosystem">2022 Laminar Ecosystem Updates</a></li><li class="navListItem"><a class="navItem" href="/blog/2021/07/10/laminar-v-0.13.1">Laminar v0.13.1 &amp; Waypoint 0.4.2</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2023/07/13/laminar-v16.0.0">Laminar v16.0.0</a></h1><p class="post-meta">July 13, 2023</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>This release fixes a few bugs, and adds a few small features.</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a Scala.js library for building web application interfaces and managing UI state. Learn more in <a href="https://laminar.dev/examples/hello-world">a few short examples</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one long video</a>.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="news"></a><a href="#news" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>News</h2>
+<p>Releases: Laminar 16.0.0, Airstream 16.0.0, Waypoint 7.0.0, Scala DOM Types 17.1.0, Laminext 0.16.0, Frontroute 0.18.0</p>
+<p><a href="https://www.scala-js.org/doc/tutorial/">Official Scala.js tutorial</a> explains how to make a Scala.js app with Vite, Laminar, and a JS charting library (using ScalablyTyped). <a href="https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example">Final code repo</a>. Video version: <a href="https://www.youtube.com/watch?v=dv7fPmgFTNA">part 1 (Vite)</a>, <a href="https://www.youtube.com/watch?v=UePrOa_1Am8">part 2 (Laminar &amp; ScalablyTyped)</a>.</p>
+<p><a href="https://github.com/kyledinh/zio-blogapp">Full stack ZIO blog app with Laminar</a> by Kyle Dinh</p>
+<p><a href="https://github.com/alexeybi/threat-monitor">Network Threat Monitor</a> Laminar app by Alexey Bityukov</p>
+<p><a href="https://github.com/AlgebraicJulia/Semagrams.jl">Semagrams Laminar App</a> by Owen Lynch + <a href="https://semagrams.algebraicjulia.org/apps/dwd/index.html">demo</a></p>
+<p>New Laminar libraries by Blue Pitaya: <a href="https://github.com/blue-pitaya/laminar-dragging">Laminar dragging</a>, <a href="https://github.com/blue-pitaya/laminar-color">Laminar color</a>, <a href="https://github.com/blue-pitaya/laminar-contenteditable">Laminar contenteditable</a></p>
+<p><a href="https://zenn.dev/110416/articles/21ff164361b49b">Laminar TicTacToe tutorial in Japanese</a> by <a href="https://twitter.com/by110416">110416</a></p>
+<p>Our sponsor <a href="https://heartai.net/">HeartAI</a> has <a href="https://twitter.com/raquo/status/1666712834938646529/photo/1">shared a glimpse</a> of their Laminar app. Great to see enterprise adoption of Scala.js!</p>
+<p>Fun fact – Laminar is now <a href="https://twitter.com/raquo/status/1625965955032690688">featured</a> on the Scala language home page.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-features"></a><a href="#new-features" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Features</h2>
+<ul>
+<li><p><code>renderDetached(laminarElement, activateNow = true)</code> method lets you pass manually managed DOM nodes to third party JS libraries that want to render them. You need to manually <code>.deactivate()</code> the node after it's no longer needed to stop its subscriptions. Basically it's similar to the <code>render</code> method, but does not require a container node upfront. See the <a href="https://laminar.dev/documentation#passing-laminar-elements-to-third-party-libraries">new doc section</a> for details.</p></li>
+<li><p>Support for <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive">passive</a> event listeners (thanks, <a href="https://github.com/fgoepel">@fgoepel</a>!)</p></li>
+<li><p>AjaxStream <code>uploadProgressObserver</code> (thanks, <a href="https://github.com/Dennis4b">@Dennis4b</a>!)</p></li>
+<li><p>A few more low level DOM manipulation methods: <code>ParentNode.insertChildBefore</code>, <code>insertChildAfter</code>, <code>DomApi.insertAfter</code></p></li>
+<li><p><code>tabIndex</code> attribute for SVG, <code>startselect</code> and <code>selectionchange</code> events</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="new-documentation-sections"></a><a href="#new-documentation-sections" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Documentation Sections</h2>
+<ul>
+<li><p><a href="https://laminar.dev/documentation#network-requests">Network Requests</a></p></li>
+<li><p><a href="https://laminar.dev/documentation#passing-laminar-elements-to-third-party-libraries">Passing Laminar Elements to Third Party Libraries</a></p></li>
+<li><p><a href="https://laminar.dev/documentation#troubleshooting">Troubleshooting</a></p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="bug-fixes"></a><a href="#bug-fixes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Bug Fixes</h2>
+<ul>
+<li><p>The optional SVG <code>xmlns</code> attribute did not work in Firefox because its namespace was incorrectly specified (<a href="https://github.com/raquo/Laminar/issues/143">#143</a>)</p></li>
+<li><p><code>FetchStream</code> did not emit events if initialized outside a transaction (<a href="https://github.com/raquo/Airstream/issues/106">Airstream#106</a>).</p></li>
+<li><p><code>stream1.mergeWith(stream2, stream3)</code> helper method was ignoring the <code>stream1</code> itself. Note: <code>EventStream.merge(stream1, stream2, stream3)</code> was unaffected.</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="breaking-changes"></a><a href="#breaking-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Breaking Changes</h2>
+<ul>
+<li><p><code>DomApi</code> children-related methods like <code>appendChild</code> now accept raw <code>dom.Node</code>-s now instead of Laminar nodes.</p>
+<ul>
+<li>Migration: if you use those methods directly, pass <code>node.ref</code> instead of <code>node</code>.</li>
+</ul></li>
+<li><p>Remove <code>ParentNode.replaceChildren</code>, <code>replaceAllChildren</code>, <code>CollectionCommand.ReplaceAll</code></p></li>
+<li><p>Remove <code>CollectionCommand.Move</code> alias – use <code>Insert</code></p></li>
+<li><p>Remove <code>ChildNode.isNodeMounted</code> method – use <code>DomApi.isDescendantOf(node.ref, dom.document)</code></p></li>
+<li><p>Rename <code>ParentNode.insertChild</code> -&gt; <code>insertChildAtIndex</code></p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="other-changes"></a><a href="#other-changes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Other Changes</h2>
+<ul>
+<li><p>Laminar no longer maintains its own list of children for every Laminar element (<code>ParentNode._maybeChildren</code>). This makes integrations easier, increases resilience to external DOM changes, and improves performance a bit in most cases.</p></li>
+<li><p>Laminar is now published for <a href="https://www.scala-lang.org/blog/2023/05/30/scala-3.3.0-released.html">Scala 3.3.0 LTS</a> and Scala.js 1.13.2, and scalajs-dom 2.6.0. By the way, we <a href="https://github.com/raquo/Laminar/issues/132">plan</a> to drop support for Scala 2.12 in 2024.</p></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank You</h2>
+<p>The development of Laminar is kindly sponsored by <a href="https://github.com/sponsors/raquo">people</a> who use it in their businesses and personal projects.</p>
+<p><strong>GOLD</strong> sponsors supporting Laminar:</p>
+<div class="-sponsorsList x-alignItemsEnd">
+  <div class="-sponsor x-person x-yurique">
+    <img class="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-300px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+  <div class="-sponsor x-company x-heartai">
+    <a class="x-noHover" href="https://www.heartai.net/">
+      <img class="-logo" src="/img/sponsors/heartai.svg" alt="" />
+      <div class="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+    </a>
+  </div>
+</div>
+<p>Thank you for supporting me! ❤️</p>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#news">News</a></li><li><a href="#new-features">New Features</a></li><li><a href="#new-documentation-sections">New Documentation Sections</a></li><li><a href="#bug-fixes">Bug Fixes</a></li><li><a href="#breaking-changes">Breaking Changes</a></li><li><a href="#other-changes">Other Changes</a></li><li><a href="#thank-you">Thank You</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chatroom</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2023 Nikita Gazarov</section></footer></div></body></html>

@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Wed, 22 Mar 2023 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 13 Jul 2023 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,6 +13,14 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2023 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v16.0.0]]></title>
+            <link>https://laminar.dev/blog/2023/07/13/laminar-v16.0.0.html</link>
+            <guid>https://laminar.dev/blog/2023/07/13/laminar-v16.0.0.html</guid>
+            <pubDate>Thu, 13 Jul 2023 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>This release fixes a few bugs, and adds a few small features.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v15.0.0 Mega Release]]></title>
             <link>https://laminar.dev/blog/2023/03/22/laminar-v15.0.0.html</link>
