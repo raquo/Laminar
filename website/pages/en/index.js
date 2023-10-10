@@ -230,6 +230,15 @@ class Index extends React.Component {
               <p>Our main chatroom is in <a href="https://discord.gg/JTrUxhq7sj">Discord</a>, join us there for news, tips & support!</p>
               <hr />
               <p>Laminar is developed by Nikita Gazarov with generous support from my <a href="https://github.com/sponsors/raquo">sponsors</a>.</p>
+              <h2>DIAMOND sponsor:</h2>
+              <div className="-sponsorsList x-alignItemsStart x-justifyContentCenter">
+                <div className="-sponsor x-diamond x-company x-heartai">
+                  <a className="x-noHover" href="https://www.heartai.net/">
+                    <img className="-logo" src="/img/sponsors/heartai-dark.svg" alt="" />
+                    <div className="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+                  </a>
+                </div>
+              </div>
               <h2>GOLD Sponsors:</h2>
               <div className="-sponsorsList x-alignItemsEnd">
                 <div className="-sponsor x-person x-yurique">
@@ -244,14 +253,8 @@ class Index extends React.Component {
                     <div className="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
                   </a>
                 </div>
-                <div className="-sponsor x-company x-heartai">
-                  <a className="x-noHover" href="https://www.heartai.net/">
-                    <img className="-logo" src="/img/sponsors/heartai-dark.svg" alt="" />
-                    <div className="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
-                  </a>
-                </div>
               </div>
-              <p className="-narrower">Laminar is sponsored by people like you. If you enjoy using Laminar, please consider supporting the project on github. <span className="-emoji">🙏</span></p>
+              <p className="-narrower">Sponsorships enable me to spend more time on Laminar, Airstream, various add-ons, as well as documentation, learning materials, and community support. Thank you for making open source more sustainable. <span className="-emoji">🙏</span></p>
             </div>
           </div>
         </div>

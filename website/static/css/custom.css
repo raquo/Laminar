@@ -325,6 +325,10 @@ textarea::placeholder {
     align-items: start !important;
   }
 
+  .-sponsorsList.x-justifyContentCenter {
+    justify-content: normal !important;
+  }
+
   .-sponsorsList .-sponsor.x-aurinko {
     max-width: 300px;
     top: 0 !important;
@@ -367,6 +371,10 @@ textarea::placeholder {
 
 .-sponsorsList.x-alignItemsEnd {
   align-items: end;
+}
+
+.-sponsorsList.x-justifyContentCenter {
+  justify-content: center;
 }
 
 @media(min-width: 700px) {
@@ -438,11 +446,6 @@ textarea::placeholder {
 
 .-sponsorsList .-sponsor.x-heartai {
   text-align: center;
-}
-
-.-homeSection .-sponsorsList .-sponsor.x-heartai {
-  position: relative;
-  top: 10px;
 }
 
 .-sponsorsList .-sponsor.x-heartai {
