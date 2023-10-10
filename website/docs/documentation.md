@@ -5,6 +5,8 @@ title: Documentation
 * [Introduction](#introduction)
 * [Dependencies](#dependencies)
 * [Imports](#imports)
+* [Rendering](#rendering)
+  * [Waiting for the DOM to load](#waiting-for-the-dom-to-load)
 * [Tags & Elements](#tags--elements)
 * [Modifiers](#modifiers)
   * [Nesting and Children](#nesting-and-children)
@@ -13,8 +15,6 @@ title: Documentation
   * [Reusing Elements](#reusing-elements)
   * [Missing Keys](#missing-keys)
   * [Modifiers FAQ](#modifiers-faq)
-* [Rendering](#rendering)
-  * [Waiting for the DOM to load](#waiting-for-the-dom-to-load)
 * [Reactive Data](#reactive-data)
   * [Attributes and Properties](#attributes-and-properties)
   * [Event Streams and Signals](#event-streams-and-signals)
@@ -137,6 +137,64 @@ There are special import considerations for working with [SVG elements](#svg).
 Do check out the available aliases in the `L` object. It's much more pleasant to write and read `Mod[Input]` than `Modifier[ReactiveHtmlElement[dom.html.Input]]`.
 
 Another import you will want in some cases is `import org.scalajs.dom` – whenever you see `dom.X` in documentation, this import is assumed. This object contains [scala-js-dom](https://github.com/scala-js/scala-js-dom) native JS DOM types. I highly recommend that you import this `dom` object and not `dom.*` or `dom._` because the `dom.` prefix will help you distinguish native JS platform types from Laminar types.
+
+
+
+## Rendering
+
+When you create a Laminar element, the underlying real JS DOM element (`.ref`) is created at the same time. However, it is initially detached from the DOM. That is, it does not appear in the document that the user sees. Such an element is _unmounted_.
+
+For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that already is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by Laminar.
+
+```scala
+val appContainer: dom.Element = dom.document.querySelector("#appContainer")
+val appElement: Div = div(
+  h1("Hello"),
+  "Current time is:",
+  b("12:00") 
+)
+ 
+val root: RootNode = render(appContainer, appElement)
+```
+
+That's it. Laminar will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
+
+To remove `appElement` from the DOM, simply call `root.unmount()`. You can later call `root.mount()` to bring it back.
+
+
+### Waiting for the DOM to load
+
+When and where should you call Laminar's `render` method? Assuming you want your entire application to be powered by Laminar, you want to render your application as soon as the web page containing it loads.
+
+However, what does "loads" mean, exactly? If you just put your code in your Scala.js app's `main` method, it will execute right after the `<script>` tag containing your Scala.js bundle was downloaded. At this point, whether accessing `dom.document.querySelector("#appContainer")` will work or not depends on the position of the `<script>` tag relative to `<div id="appContainer">` in your HTML file. If the container div comes first in your HTML document, then your script will be able to access it. Usually this is all that is needed to render your application, so my recommendation is to place your Scala.js script tag at just before the closing `</body>` tag in your HTML, and place any other elements / scripts / stylesheets / resources that you need at app launch above it. Do not place the `<script>` element inside of `<div id="appContainer">`.
+
+Alternatively, you may want to delay rendering until the browser's [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event) event fires. You can do that with a special `renderOnDomContentLoaded` helper:
+
+```scala
+object App {
+  def main(args: Array[String]): Unit = {
+    lazy val appContainer = dom.document.querySelector("#appContainer")
+    val appElement = div(h1("Hello world"))
+    renderOnDomContentLoaded(appContainer, appElement)
+  }
+}
+```
+
+Important: if you're relying on `renderOnDomContentLoaded` to delay the rendering, make sure that `appContainer` is a `lazy val` or a `def`, because if that querySelector is executed before the browser parses the div in your DOM, it will return `null`, and Laminar will complain about the null container. Of course, another reason you could be getting a `null` is if the querySelector you provided is not correct. You can manually test it in the browser dev console.
+
+Lastly, if you want to delay app rendering until not only the DOM, but all images and iframes from the HTML have also loaded, you can wait for the [window.load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event) event. There is no built-in helper method for that, so you will need to do it more manually:
+
+```scala
+object App {
+  def main(args: Array[String]): Unit = {
+    windowEvents(_.onLoad).foreach { _ =>
+      val appContainer = dom.document.querySelector("#appContainer")
+      val appElement = div(h1("Hello world"))
+      render(appContainer, appElement)
+    }(unsafeWindowOwner)
+  }
+}
+```
 
 
 
@@ -432,64 +490,6 @@ To clarify, you don't have to do this for touch events specifically, because [@B
 2. No, Modifiers are not guaranteed to be idempotent. Applying the same Modifier to the same element multiple times might have different results compared to applying it only once. `Setter`s like `key := value` _are_ idempotent, but for example a `Binder` like `onClick --> observer` isn't – applying it twice will create two independent subscriptions. We will talk more about those modifier types later.
 
 4. Yes, Modifiers are generally reusable. The same modifier can usually be applied to multiple nodes without any conflict. But again, you have to understand what the modifier does. Setting an attribute to a particular value – sure, reusable. Adding a particular element as a child – no, not reusable – see [Reusing Elements](#reusing-elements). If you're writing your own Modifier and want to make it reusable, don't store element-specific state outside of its `apply` method.
-
-
-
-## Rendering
-
-When you create a Laminar element, the underlying real JS DOM element (`.ref`) is created at the same time. However, it is initially detached from the DOM. That is, it does not appear in the document that the user sees. Such an element is _unmounted_.
-
-For the user to see this element we need to _mount_ it into the DOM by either adding it as a Modifier to another element that already is (or at some point will become) _mounted_, or if we're dealing with the top element in our application's hierarchy, we ask Laminar to _render_ it into some container `dom.Element` that already exists on the page. Said container must not be managed by Laminar. 
-
-```scala
-val appContainer: dom.Element = dom.document.querySelector("#appContainer")
-val appElement: Div = div(
-  h1("Hello"),
-  "Current time is:",
-  b("12:00") 
-)
- 
-val root: RootNode = render(appContainer, appElement)
-```
-
-That's it. Laminar will find an element with id "appContainer" in the document, and append `appElement.ref` as its child. For sanity sake, the container should not have any other children, but that's not really a requirement.
-
-To remove `appElement` from the DOM, simply call `root.unmount()`. You can later call `root.mount()` to bring it back.
-
-
-### Waiting for the DOM to load
-
-When and where should you call Laminar's render method? Assuming you want your entire application to be powered by Laminar, you want to render your application as soon as the web page containing it loads.
-
-However, what does "loads" mean, exactly? If you just put your code in your Scala.js app's `main` method, it will execute right after the `<script>` tag containing your Scala.js bundle was downloaded. At this point, accessing `dom.document.querySelector("#appContainer")` will probably not work, because the browser probably hasn't parsed that HTML element yet (`<script>` blocks DOM parsing until it's downloaded and executed).
-
-So, you probably want to render your application in response to the browser firing the [DOMContentLoaded](https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event) event. You can do this manually with native JS `addEventListener`, or less manually using Laminar's `documentEvents(_.onDOMContentLoaded)` stream, or – preferably – simply call Laminar's `renderOnDomContentLoaded` method instead of `render`:
- 
-```scala
-object App {
-  def main(args: Array[String]): Unit = {
-    lazy val appContainer = dom.document.querySelector("#appContainer")
-    val appElement = div(h1("Hello world"))
-    renderOnDomContentLoaded(appContainer, appElement)
-  }
-}
-```
-
-Important: make sure that `appContainer` is a `lazy val` or a `def`, because if that querySelector is executed before the browser parses the DOM, it will return `null`, and Laminar will complain about the null container. Of course, another reason you could be getting a `null` is if the querySelector you provided is not correct. You can test it in the browser dev console.
-
-If you want to delay app rendering until not only the DOM, but all images and stylesheets have also loaded, you can wait for the [window.load](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event) event. There is no built-in helper method for that, so you will need to do it more manually:
-
-```scala
-object App {
-  def main(args: Array[String]): Unit = {
-    windowEvents(_.onLoad).foreach { _ =>
-      val appContainer = dom.document.querySelector("#appContainer")
-      val appElement = div(h1("Hello world"))
-      render(appContainer, appElement)
-    }(unsafeWindowOwner)
-  }
-}
-```
 
 
 
