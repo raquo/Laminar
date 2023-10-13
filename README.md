@@ -25,7 +25,7 @@ Sales pitch, quick start, documentation, live examples, and other resources, all
 
 ## Sponsorships
 
-Huge thanks to our sponsors who support Laminar development with their generous donations.
+Huge thanks to [all of our sponsors](https://github.com/sponsors/raquo) – your backing enables me to spend more time on Laminar, Airstream, various add-ons, as well as documentation, learning materials, and community support.
 
 
 ### DIAMOND sponsor:
@@ -43,7 +43,7 @@ Huge thanks to our sponsors who support Laminar development with their generous 
 
 [Aurinko](https://aurinko.io/) is an API platform for workplace addons and integrations.
 
-Sponsorships enable me to spend more time on Laminar, Airstream, various add-ons, as well as documentation, learning materials, and community support. Thank you for making open source more sustainable. 🙏
+
 
 
 
