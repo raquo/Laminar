@@ -28,6 +28,13 @@ Sales pitch, quick start, documentation, live examples, and other resources, all
 Huge thanks to our sponsors who support Laminar development with their generous donations.
 
 
+### DIAMOND sponsor:
+
+[![HeartAI.net](https://laminar.dev/img/sponsors/heartai-300px.png)](https://www.heartai.net/)
+
+[HeartAI](https://www.heartai.net/) is a data and analytics platform for digital health and clinical care.
+
+
 ### GOLD Sponsors:
 
 [![Yurique](https://laminar.dev/img/sponsors/yurique-50px.jpg?)](https://github.com/yurique) **[Iurii Malchenko](https://github.com/yurique)**
@@ -36,11 +43,7 @@ Huge thanks to our sponsors who support Laminar development with their generous 
 
 [Aurinko](https://aurinko.io/) is an API platform for workplace addons and integrations.
 
-[![HeartAI.net](https://laminar.dev/img/sponsors/heartai-300px.png)](https://www.heartai.net/)
-
-[HeartAI](https://www.heartai.net/) is a data and analytics platform for digital health and clinical care.
-
-Laminar is sponsored by [people like you](https://github.com/sponsors/raquo). If you enjoy using Laminar, please consider supporting the project. 🙏
+Sponsorships enable me to spend more time on Laminar, Airstream, various add-ons, as well as documentation, learning materials, and community support. Thank you for making open source more sustainable. 🙏
 
 
 
