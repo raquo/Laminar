@@ -145,7 +145,7 @@ trait Laminar
 
   type Mod[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
 
-  @inline def Mod: modifiers.Modifier.type = modifiers.Modifier
+  val Mod: modifiers.Modifier.type = modifiers.Modifier
 
   type HtmlMod = Mod[HtmlElement]
 
@@ -281,7 +281,7 @@ trait Laminar
   }
 
   /** A universal Modifier that does nothing */
-  val emptyMod: Modifier[ReactiveElement.Base] = Modifier.empty
+  val emptyMod: Modifier.Base = Modifier.empty
 
   /** Note: this is not a [[nodes.ReactiveElement]] because [[dom.Comment]] is not a [[dom.Element]].
     * This is a bit annoying, I know, but we kinda have to follow the native JS DOM API on this.

@@ -486,6 +486,10 @@ class SyntaxSpec extends UnitSpec {
     }
   }
 
+  it("Mod alias lets you get the base type") {
+    val mod: Mod.Base = emptyMod
+  }
+
   it("unit-based binding syntax") {
     var i = 0
     val intVar = Var(0)

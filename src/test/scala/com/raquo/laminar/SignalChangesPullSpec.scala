@@ -412,7 +412,7 @@ class SignalChangesPullSpec extends UnitSpec {
     v.set(3)
 
     // Using the seqToModifier implicit conversion
-    val combinedMod: Modifier[ReactiveElement.Base] = List(
+    val combinedMod: Modifier.Base = List(
       combined --> _logCombined(log, "combined-amend-1"),
       combined --> _logCombined(log, "combined-amend-2"),
     )
