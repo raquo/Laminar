@@ -5,7 +5,7 @@ title: Quick Start
 Laminar's most obvious building block are elements:
 
 ```scala
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
  
 val streamOfNames: EventStream[String] = ???
 val helloDiv: Div = div("Hello, ", child.text <-- streamOfNames)
@@ -34,7 +34,7 @@ def Hello(
 Almost the same as what we had before, but now with dynamic color and a bit of styling, and more importantly – abstracted away inside a function. Here's how you use it in your app:
 
 ```scala
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
  
 val nameStream: EventStream[String] = ???
@@ -55,7 +55,7 @@ render(dom.document.querySelector("#appContainer"), appDiv)
 Easy, eh? But wait a minute, the streams are coming out of thin air! Fair enough, let's add an input text box for users to type their name into, and get the name from there:
 
 ```scala
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
  
 val nameBus = new EventBus[String]
@@ -127,7 +127,7 @@ object InputBox {
 And this is how we would use it:
 
 ```scala
-import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{*, given}
 import org.scalajs.dom
  
 val inputBox = InputBox("Please enter your name:")
@@ -161,4 +161,4 @@ As you learn more about Laminar you will see that there are even more ways to st
 
 Laminar has more exciting features to make building your programs a breeze. There's a lot of documentation explaining all of the concepts and features in much greater detail.
 
-Read the [docs](https://laminar.dev/documentation), check out some [examples](https://laminar.dev/examples/hello-world), and join us in [Discord](https://discord.gg/JTrUxhq7sj)!
+Read the [docs](https://laminar.dev/documentation), check out some [examples](https://demo.laminar.dev), and join us in [Discord](https://discord.gg/JTrUxhq7sj)!

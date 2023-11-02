@@ -26,7 +26,7 @@ class Footer extends React.Component {
           </a>
           <div className="community-column">
             <h5>Community</h5>
-            <a href="https://discord.gg/JTrUxhq7sj">Discord chatroom</a>
+            <a href="https://discord.gg/JTrUxhq7sj">Discord chat</a>
             <a href="https://github.com/sponsors/raquo">Sponsor the project</a>
           </div>
           <div className="github-column">
@@ -47,6 +47,33 @@ class Footer extends React.Component {
                 href={this.props.config.airstreamRepoUrl}
               >
                 Airstream
+              </a>
+            </p>
+            <p>
+              <a
+                className="github-button"
+                data-icon="octicon"
+                href={this.props.config.waypointRepoUrl}
+              >
+                Waypoint
+              </a>
+            </p>
+            <p>
+              <a
+                className="github-button"
+                data-icon="octicon"
+                href={this.props.config.sdtRepoUrl}
+              >
+                Scala DOM Types
+              </a>
+            </p>
+            <p>
+              <a
+                className="github-button"
+                data-icon="octicon"
+                href={this.props.config.laminarDemoRepoUrl}
+              >
+                Laminar Demo
               </a>
             </p>
             <p>

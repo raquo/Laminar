@@ -1,3 +1,5 @@
+![](https://laminar.dev/img/brand/laminar-logo-100px-rounded.png)
+
 # Laminar
 
 [![Build status](https://github.com/raquo/Laminar/actions/workflows/test.yml/badge.svg)](https://github.com/raquo/Laminar/actions/workflows/test.yml)
@@ -39,7 +41,7 @@ Huge thanks to [all of our sponsors](https://github.com/sponsors/raquo) – your
 
 [![Yurique](https://laminar.dev/img/sponsors/yurique-50px.jpg?)](https://github.com/yurique) **[Iurii Malchenko](https://github.com/yurique)**
 
-[![Aurinko.io](https://laminar.dev/img/sponsors/aurinko-light-300px.png)](https://www.aurinko.io/)
+[![Aurinko.io](https://laminar.dev/img/sponsors/aurinko-light-250px.png)](https://www.aurinko.io/)
 
 [Aurinko](https://aurinko.io/) is an API platform for workplace addons and integrations.
 
@@ -59,6 +61,6 @@ Nikita Gazarov – [@raquo](https://twitter.com/raquo)
 
 Laminar is provided under the [MIT license](https://github.com/raquo/laminar/blob/master/LICENSE.md).
 
-The logos and avatars in the `sponsors` directory are not covered by the MIT license. No license is granted to you for these assets.
+The artwork in the `brand` and `sponsors` directories is not covered by the MIT license. No license is granted to you for these assets. However, you may still have "fair use" rights, as stipulated by law.
 
 Comments in the `defs` directory pertaining to individual DOM element tags, attributes, properties and event properties, as well as CSS properties and their special values / keywords, are taken or derived from content created by Mozilla Contributors and are licensed under Creative Commons Attribution-ShareAlike license (CC-BY-SA), v2.5.

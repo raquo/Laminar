@@ -10,7 +10,7 @@ title: Resources
 
 * [Video Introduction to Laminar](https://www.youtube.com/watch?v=L_AHCkl6L-Q)
 
-* [Live Examples](https://laminar.dev/examples/hello-world)
+* [Live Demo App & Examples](https://demo.laminar.dev)
 
 * See also the "Tutorials, Videos & Blog Posts" section below.
 
@@ -41,25 +41,29 @@ title: Resources
 
 * [Discord](https://discord.gg/JTrUxhq7sj) for support, advice, feature requests, showing off your Laminar projects, posting Laminar jobs, etc.
 
-  * Until late 2022, our chat was in [Gitter](https://gitter.im/Laminar_/Lobby) – you might be able to find answers there, but please post new questions to Discord.
+  * Note: Until late 2022, our chat was in [Gitter](https://gitter.im/Laminar_/Lobby). Please post new questions to Discord.
 
 * [Github discussions](https://github.com/raquo/laminar/discussions) for how-tos, whys, and any questions or discussions that other people would benefit from easily finding online.
 
 * [Github issues](https://github.com/raquo/laminar/issues) for bugs and buglike issues.
 
-* Please consider [sponsoring Laminar](https://github.com/sponsors/raquo) on Github to make Laminar development more sustainable.
+* Please consider [sponsoring Laminar](https://github.com/sponsors/raquo) on Github to make my OSS work more sustainable and increase the pace of Laminar development.
 
 
 
 ## Useful Tools
 
-* **[Laminext Scribble](https://scribble.ninja/)** to try things on the fly.
+* **[Scribble.ninja](https://scribble.ninja/)** to try things on the fly.
 
 * [Html to Scala Converter](https://simerplaha.github.io/html-to-scala-converter/) can convert HTML strings to Laminar code.
 
 
 
 ## Open Source Laminar Apps
+
+* **[TodoMVC](https://demo.laminar.dev/app/apps/todomvc)** – Standard todo app demonstrating basic state management etc.
+
+* **[Wind Gradient](https://demo.laminar.dev/app/weather/gradient/squamish)** – Simple full stack weather app.
 
 * **[Twotm8](https://github.com/keynmol/twotm8)** – Twitter clone. See [demo](https://twotm8-web.fly.dev/login) and also the [detailed tutorial](https://blog.indoorvivants.com/2022-03-07-twotm8-part-5-building-the-frontend).
 
@@ -81,7 +85,7 @@ title: Resources
 
 ## Starter Kits & More Examples
 
-* [Live examples](https://laminar.dev/examples/hello-world) on this website
+* **[Laminar demo & examples](https://demo.laminar.dev) + [docs](https://github.com/raquo/laminar-full-stack-demo/) – Official Laminar full stack setup, example applications, etc.**
 
 * [keynmol/http4s-laminar-stack](https://github.com/keynmol/http4s-laminar-stack) – Laminar setup with http4s, sttp, docker, and other niceties
 
@@ -97,13 +101,13 @@ title: Resources
 
 * [vic/laminar_cycle/examples](https://github.com/vic/laminar_cycle/tree/master/examples) – Examples of Cycle.js style apps in Laminar
 
-* [raquo/laminar-examples](https://github.com/raquo/laminar-examples) – an old repo with some Laminar examples, most of which you can see on this website already.
-
 
 
 ## Examples without Scalajs-bundler
 
-* **[sjrd/scalajs-sbt-vite-laminar-chartjs-example](https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example)** – Setup with [Vite](https://vitejs.dev/), Laminar and Chart.js (via [ScalablyTyped](https://scalablytyped.org/docs/readme.html))
+* **[Laminar demo & examples](https://demo.laminar.dev) – Full stack Laminar setup with [Vite](https://vitejs.dev/) and other niceties.**
+
+* [sjrd/scalajs-sbt-vite-laminar-chartjs-example](https://github.com/sjrd/scalajs-sbt-vite-laminar-chartjs-example) – Setup with [Vite](https://vitejs.dev/), Laminar and Chart.js (via [ScalablyTyped](https://scalablytyped.org/docs/readme.html))
 
 * [lolgab/scala-fullstack](https://github.com/lolgab/scala-fullstack) – Laminar setup with Akka HTTP, [Mill](https://github.com/lihaoyi/mill), [Sloth](https://github.com/cornerman/sloth)
 
@@ -144,9 +148,11 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 * **[SAP UI5 Laminar Web Components](https://github.com/sherpal/LaminarSAPUI5Bindings) – [live demo](https://sherpal.github.io/laminar-ui5-demo/)**
 
+* [Shoelace Web Components for Laminar](https://demo.laminar.dev/app/integrations/web-components/shoelace) – WIP? Maybe? Some day.
+
 * [Material UI Laminar Web Components](https://github.com/uosis/laminar-web-components) (Note: appears to be abandoned)
 
-* Or, easily make your own interfaces: [runnable example](https://github.com/raquo/laminar-examples/tree/master/src/main/scala/webcomponents)
+* Or, easily make your own interfaces. See the Shoelace and UI5 examples above for good patterns.
 
 
 
@@ -154,7 +160,7 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 * [My Four Year Quest For Perfect Scala.js UI Development](https://dev.to/raquo/my-four-year-quest-for-perfect-scala-js-ui-development-b9a) – the history and ideological foundations of Laminar
 
-* **[[VIDEO] Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q)** – the why and the how of building with Laminar
+* **[[VIDEO] Laminar – Smooth UI Development with Scala.js](https://www.youtube.com/watch?v=L_AHCkl6L-Q)** – Laminar foundations and mechanics that everyone should know
 
 * **[[VIDEO] Stockholm Syndrome Escape Velocity](https://www.youtube.com/watch?v=kLZr87CGY-U)** – Kit Langton sets an impossible standard in conference talk delivery
 
@@ -176,9 +182,11 @@ Warning: Using `ModuleKind.ESModule` (e.g when using Vite or Snowpack) results i
 
 
 
-## Other Related Projects
+## My Other Related Projects
 
 * [Airstream](https://github.com/raquo/Airstream/) – The reactive layer of Laminar. Its docs explain everything about streams, signals, event buses, state vars, etc.
+
+* [Waypoint](https://github.com/raquo/Waypoint) – URL router for Laminar
 
 * [Scala DOM Types](https://github.com/raquo/scala-dom-types) – Type definitions that we use for all the HTML tags, attributes, properties, and styles.
 

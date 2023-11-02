@@ -61,7 +61,7 @@ class HomeSplash extends React.Component {
           <PromoSection>
             <Button href="https://github.com/raquo/Laminar">Github</Button>
             <Button href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">Big Video</Button>
-            <Button href={docUrl('examples/hello-world')}>Interactive examples</Button>
+            <Button href="https://demo.laminar.dev">Live Demo & Examples</Button>
             <Button href={docUrl('documentation')}>Documentation</Button>
           </PromoSection>
           <div className="-problem">
@@ -249,7 +249,7 @@ class Index extends React.Component {
                 </div>
                 <div className="-sponsor x-company x-aurinko">
                   <a className="x-noHover" href="https://www.aurinko.io/">
-                    <img className="-logo" src="/img/sponsors/aurinko-dark-300px.png" alt="" />
+                    <img className="-logo" src="/img/sponsors/aurinko-dark-250px.png" alt="" />
                     <div className="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
                   </a>
                 </div>
@@ -258,6 +258,7 @@ class Index extends React.Component {
             </div>
           </div>
         </div>
+        <img alt="" width="0" height="0" src="https://demo.laminar.dev/ping" />
       </div>
     );
   }

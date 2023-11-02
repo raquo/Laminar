@@ -12,7 +12,7 @@ const siteConfig = {
   organizationName: 'raquo',
   headerLinks: [
     { doc: 'documentation', label: 'Docs' },
-    { doc: 'examples/hello-world', label: 'Examples' },
+    { href: 'https://demo.laminar.dev', label: 'Examples' },
     { doc: 'resources', label: 'Resources' },
     { blog: true, label: 'News' }
   ],
@@ -85,6 +85,9 @@ const siteConfig = {
   // template. For example, if you need your repo's URL...
   laminarRepoUrl: 'https://github.com/raquo/Laminar',
   airstreamRepoUrl: 'https://github.com/raquo/Airstream',
+  waypointRepoUrl: 'https://github.com/raquo/Waypoint',
+  sdtRepoUrl: 'https://github.com/raquo/scala-dom-types',
+  laminarDemoRepoUrl: 'https://github.com/raquo/laminar-full-stack-demo',
 };
 
 module.exports = siteConfig;

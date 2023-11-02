@@ -8,7 +8,7 @@ Here is a deluge of new libraries, web components, tutorials, sponsors – all t
 
 <!--truncate-->
 
-> Laminar is a native Scala.js library for building web application interfaces. Learn more in [a few short examples](https://laminar.dev/examples/hello-world) or [one long video](https://www.youtube.com/watch?v=L_AHCkl6L-Q).
+> Laminar is a native Scala.js library for building web application interfaces. Learn more in [a few short examples](https://demo.laminar.dev) or [one long video](https://www.youtube.com/watch?v=L_AHCkl6L-Q).
 
 
 
