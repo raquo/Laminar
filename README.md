@@ -23,6 +23,9 @@ Look up the latest version of Laminar [here](https://laminar.dev/blog/), or in g
 
 Sales pitch, quick start, documentation, live examples, and other resources, all there. 
 
+### 👉 [demo.laminar.dev](https://laminar.dev)
+
+Live demo, with examples, code snippets, and a fully working client + server, dev + prod build setup that you can experiment with, and then deploy to the could for free.
 
 
 ## Sponsorships
