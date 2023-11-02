@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Thu, 13 Jul 2023 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Thu, 02 Nov 2023 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,6 +13,14 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2023 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar & Scala.js Full Stack Demo & More]]></title>
+            <link>https://laminar.dev/blog/2023/11/02/laminar-full-stack-demo.html</link>
+            <guid>https://laminar.dev/blog/2023/11/02/laminar-full-stack-demo.html</guid>
+            <pubDate>Thu, 02 Nov 2023 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>I built a full stack Laminar &amp; Scala.js showcase, made some useful Vite plugins on the way, and more.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v16.0.0]]></title>
             <link>https://laminar.dev/blog/2023/07/13/laminar-v16.0.0.html</link>

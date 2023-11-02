@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar &amp; Scala.js Full Stack Demo &amp; More · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="I built a full stack Laminar &amp; Scala.js showcase, made some useful Vite plugins on the way, and more."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar &amp; Scala.js Full Stack Demo &amp; More · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2023/11/02/laminar-full-stack-demo"/><meta property="og:description" content="I built a full stack Laminar &amp; Scala.js showcase, made some useful Vite plugins on the way, and more."/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="https://demo.laminar.dev" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2023/11/02/laminar-full-stack-demo">Laminar &amp; Scala.js Full Stack Demo &amp; More</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/07/13/laminar-v16.0.0">Laminar v16.0.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/03/22/laminar-v15.0.0">Laminar v15.0.0 Mega Release</a></li><li class="navListItem"><a class="navItem" href="/blog/2022/10/24/laminar-v0.14.5">Laminar v0.14.5, Discord and More News</a></li><li class="navListItem"><a class="navItem" href="/blog/2022/06/23/ecosystem">2022 Laminar Ecosystem Updates</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2023/11/02/laminar-full-stack-demo">Laminar &amp; Scala.js Full Stack Demo &amp; More</a></h1><p class="post-meta">November 2, 2023</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>I built a full stack Laminar &amp; Scala.js showcase, made some useful Vite plugins on the way, and more.</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a Scala.js library for building web application interfaces and managing UI state. Learn more in <a href="https://demo.laminar.dev">a few short examples</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one long video</a>.</p>
+</blockquote>
+<p>As I'm trying to get more Laminar examples and learning materials out there, I wanted a better platform for hosting the examples. Both this website, which used mdoc, and my old laminar-examples repo, are not great for authoring examples, and are certainly not great for people who are trying to run the examples, or transfer them into a more realistic, full stack app environment.</p>
+<p>I also wanted to make starting with Scala.js even easier, to reduce the amount of rediscovery every new developer needs to do when it comes to sbt and vite build config, Scala.js facades, shared code &amp; datastructures, JSON data sharing, URL routing, packaging for production, etc.</p>
+<p>And so, say hello to <span style="font-size:120%">✨ <strong><a href="https://demo.laminar.dev/">demo.laminar.dev</a></strong> ✨</span>. Here's what it is:</p>
+<ul>
+<li>A set of Laminar examples, from basic <a href="https://demo.laminar.dev/app/basic/hello">hello world</a> including to <a href="https://demo.laminar.dev/app/weather/gradient/squamish">a full stack weather app</a>.</li>
+<li>A fully working client + server, dev + prod setup, that you can immediately run, start experimenting with, and deploy to the cloud for free, without worrying about build or server setup.</li>
+<li>A new <a href="https://demo.laminar.dev/app/integrations/code-snippets">documentation system</a> letting me write <a href="https://demo.laminar.dev/app/integrations/waypoint-url-routing">long narratives like this</a> while showing relevant snippets of source code of the very application that the user is looking at, with links to full sources on Github.</li>
+<li>Some <a href="https://github.com/raquo/laminar-full-stack-demo/#suggested-css-styling-strategy">opinionated ramblings</a> that badly need further editing, that I nevertheless hope will be useful to backend developers venturing into the frontend.</li>
+</ul>
+<p>For more details, see the project's <a href="https://github.com/raquo/laminar-full-stack-demo/#features">Features</a> listing.</p>
+<h2><a class="anchor" aria-hidden="true" id="new-vite-plugins-for-scalajs"></a><a href="#new-vite-plugins-for-scalajs" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Vite Plugins for Scala.js</h2>
+<p>I wanted to replicate a <a href="https://github.com/raquo/laminar-full-stack-demo/#suggested-css-styling-strategy">good CSS organization strategy</a> from the Javascript world, where you have one CSS file per component, and you just <code>import &quot;./ComponentName.css&quot;</code> from <code>ComponentName.js</code>. Turns out, we can't readily do this particular pattern from Scala.js, because:</p>
+<ol>
+<li><p>Scala.js can't import resources for their side effects only, it needs to assign the imported object to a variable, which  Vite, the module bundler, <a href="https://discord.com/channels/632150470000902164/635668814956068864/1161984220814643241">disagrees with</a> when it comes to CSS.</p></li>
+<li><p>Scala.js can't import resources from relative paths, or <a href="https://discord.com/channels/632150470000902164/635668814956068864/1161932392009826314">to be more precise</a>, the relative paths will resolve relative to <code>scalaJSOutputDirectory</code>, instead of resolving relative to the source file in which the imports appear, as is the case in JS.</p></li>
+</ol>
+<p>So, I wrote two Vite plugins to work around these limitations.</p>
+<p>First, <a href="https://github.com/raquo/laminar-full-stack-demo/blob/a44a8d829d9d23160f9932277cbbf0d1a5ea19ab/client/vite-plugins/import-side-effect.js">import-side-effect</a> plugin lets you import resources for their side effects only like this: <code>JSImportSideEffect(&quot;somepackage/path/file.css&quot;)</code>.</p>
+<p>Then, <a href="https://github.com/raquo/laminar-full-stack-demo/blob/a44a8d829d9d23160f9932277cbbf0d1a5ea19ab/client/vite-plugins/glob-resolver.js">glob-resolver</a> plugin lets you import relative paths, or to be more precise, it lets you import a file in your project matching a glob pattern. It throws a graceful error if it finds more than one matching file, so you can just say <code>JSImport(&quot;@find/**/ComponentName.css&quot;)</code>, and it will find <code>ComponentName.css</code> wherever it is in your project, and if there happens to be more than one such file, you can just make the glob pattern more specific to disambiguate, e.g. <code>JSImport(&quot;@find/**/foo/ComponentName.css&quot;)</code>.</p>
+<p>For what I want to do, I need both of these plugins working together, so I say <code>JSImportSideEffect(&quot;@find/**/ComponentName.css&quot;)</code> to get a nice clean <code>import &quot;/absolute/path/to/ComponentName.css&quot;</code> in the JS output, which Vite is happy to oblige. The source maps are preserved, everything works both in dev and prod builds.</p>
+<p>Currently, these plugins live in this Laminar demo project as source files that you can copy-paste into your own project, but if there's enough interest, I could publish them to npm, or if the Scala.js team sees fit, they could be included into the official <a href="https://github.com/scala-js/vite-plugin-scalajs">scalajs-vite-plugin</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="forward-looking-statements"></a><a href="#forward-looking-statements" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Forward-Looking Statements</h2>
+<p>This new demo project is a solid MVP, but it could be so much more.</p>
+<p>I want to make a comprehensive collection of Laminar mini-tutorials, showcasing various features, techniques, patterns, etc. Some of this is technically covered by our extensive documentation, but not the more complex stuff (such as nested state management). And people have been asking me to create more bite-sized/example/tutorial-style learning materials over and over, since forever. I do what I can with the time that I have, but I'm hoping that with this new platform, adding more examples over time will be easier.</p>
+<p>I also want to create more Scala.js &lt;&gt; JS and Scala.js &lt;&gt; JVM integration examples. Everything from making facades for more JS libraries manually to show how it's done, to showing patterns for sanely dealing with complex types that are incompatible between JS and JVM, such as DateTime.</p>
+<p>Last but not least, I recently played around with <a href="https://demo.laminar.dev/app/integrations/web-components/shoelace">Shoelace web components</a>, and I must say that I like them quite a bit more than <a href="https://github.com/sherpal/LaminarSAPUI5Bindings">SAP UI5</a>. Both libraries are solid, respectable, and well documented, but Shoelace has a nicer (IMO) modern-web look to it, and crucially, is much more flexible when it comes to theming and customization. I made Laminar bindings for a few Shoelace components that you can see at the link above, and I think it would be great to cover their entire collection of components, and publish it for people to use. Personally I like to create my own bespoke components because I'm very particular about the UIs that I build, but I understand that most people and most business applications will be better off with high-quality premade components, like what Shoelace offers.</p>
+<h2><a class="anchor" aria-hidden="true" id="sustainability-report"></a><a href="#sustainability-report" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Sustainability Report</h2>
+<p>My continued work on Laminar and Laminar things is made possible by <a href="https://github.com/sponsors/raquo/">21 sponsors</a>. Their support lets me spend more time doing what I love – designing and building useful tools for people to enjoy – and for that, I am eternally grateful.</p>
+<p>Laminar sponsorships have been gradually growing for a long time, thanks both to the new people and companies coming in, and the same diehards who've been with us since day one (Woo! <a href="https://github.com/yurique">Iurii</a>! <a href="https://github.com/doofin">Eason</a>! <a href="https://github.com/keynmol">Anton</a>!, <a href="https://github.com/ngbinh">Binh</a>!, <a href="https://github.com/phfroidmont">Paul-Henri</a>!), and everyone in between.</p>
+<p>Recently, HeartAI have upgraded their Laminar sponsorship to an extent that I had to create a new tier for such a level of support. Frankly, this one event is what prompted me to create this new Laminar demo project. I have wanted to do it for a long time, but up until now it has always been an unattainable nice-to-have, buried in the ever-growing todo list. But as my support base has grown to a new level, so has my ability to work on things that will help grow our community even further.</p>
+<h3><a class="anchor" aria-hidden="true" id="diamond-sponsor"></a><a href="#diamond-sponsor" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>DIAMOND sponsor:</h3>
+<div class="-sponsorsList x-alignItemsStart x-justifyContentCenter">
+<div class="-sponsor x-diamond x-company x-heartai">
+  <a class="x-noHover" href="https://www.heartai.net/">
+    <img class="-logo" src="/img/sponsors/heartai.svg" alt="" />
+    <div class="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+  </a>
+</div>
+</div>
+<p><strong>GOLD sponsors</strong>:</p>
+<div class="-sponsorsList x-alignItemsEnd">
+  <div class="-sponsor x-person x-yurique">
+    <img class="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-250px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+</div>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#new-vite-plugins-for-scalajs">New Vite Plugins for Scala.js</a></li><li><a href="#forward-looking-statements">Forward-Looking Statements</a></li><li><a href="#sustainability-report">Sustainability Report</a><ul class="toc-headings"><li><a href="#diamond-sponsor">DIAMOND sponsor:</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chat</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Waypoint">Waypoint</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/laminar-full-stack-demo">Laminar Demo</a></p></div></section><section class="copyright">Copyright © 2023 Nikita Gazarov</section></footer></div></body></html>
