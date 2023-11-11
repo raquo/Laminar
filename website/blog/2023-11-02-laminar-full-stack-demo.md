@@ -34,13 +34,15 @@ I wanted to replicate a [good CSS organization strategy](https://github.com/raqu
 
 So, I wrote two Vite plugins to work around these limitations.
 
-First, [import-side-effect](https://github.com/raquo/laminar-full-stack-demo/blob/a44a8d829d9d23160f9932277cbbf0d1a5ea19ab/client/vite-plugins/import-side-effect.js) plugin lets you import resources for their side effects only like this: `JSImportSideEffect("somepackage/path/file.css")`.
+First, the [import-side-effect](https://github.com/raquo/vite-plugin-import-side-effect) plugin lets you import CSS resources in Vite without double-loading in production builds, and without warnings. It also provides an optional more concise syntax for such imports.
 
-Then, [glob-resolver](https://github.com/raquo/laminar-full-stack-demo/blob/a44a8d829d9d23160f9932277cbbf0d1a5ea19ab/client/vite-plugins/glob-resolver.js) plugin lets you import relative paths, or to be more precise, it lets you import a file in your project matching a glob pattern. It throws a graceful error if it finds more than one matching file, so you can just say `JSImport("@find/**/ComponentName.css")`, and it will find `ComponentName.css` wherever it is in your project, and if there happens to be more than one such file, you can just make the glob pattern more specific to disambiguate, e.g. `JSImport("@find/**/foo/ComponentName.css")`.
+Then, the [glob-resolver](https://github.com/raquo/vite-plugin-glob-resolver) plugin lets you import relative paths, or to be more precise, it lets you import a file in your project matching a glob pattern. It throws a graceful error if it finds more than one matching file, so you can just say `JSImport("@find/**/ComponentName.css")`, and it will find `ComponentName.css` wherever it is in your project, and if there happens to be more than one such file, you can just make the glob pattern more specific to disambiguate, e.g. `JSImport("@find/**/foo/ComponentName.css")`.
 
 For what I want to do, I need both of these plugins working together, so I say `JSImportSideEffect("@find/**/ComponentName.css")` to get a nice clean `import "/absolute/path/to/ComponentName.css"` in the JS output, which Vite is happy to oblige. The source maps are preserved, everything works both in dev and prod builds.
 
-Currently, these plugins live in this Laminar demo project as source files that you can copy-paste into your own project, but if there's enough interest, I could publish them to npm, or if the Scala.js team sees fit, they could be included into the official [scalajs-vite-plugin](https://github.com/scala-js/vite-plugin-scalajs).
+~~Currently, these plugins live in this Laminar demo project as source files that you can copy-paste into your own project, but if there's enough interest, I could publish them to npm, or if the Scala.js team sees fit, they could be included into the official [scalajs-vite-plugin](https://github.com/scala-js/vite-plugin-scalajs).~~
+
+**Update:** I've published my vite plugins to npm, and updated the import-side-effect plugin with a new (better) approach.
 
 
 ## Forward-Looking Statements
