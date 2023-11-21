@@ -96,11 +96,11 @@ class SignalChangesPullSpec extends UnitSpec {
     mount(el)
 
     log.toList shouldBe List(
-      "xxx: x",
       "-2 isPositive = false",
       "-2 isEven = true",
       "combined-init-1: -2 isPositive = false, isEven = true",
-      "combined-init-2: -2 isPositive = false, isEven = true"
+      "combined-init-2: -2 isPositive = false, isEven = true",
+      "xxx: x",
     )
     log.clear()
 
