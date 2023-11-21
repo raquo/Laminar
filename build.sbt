@@ -85,6 +85,11 @@ lazy val laminar = project.in(file("."))
       "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
     ),
 
+    scalacOptions ++= Seq(
+      "-feature",
+      "-language:implicitConversions"
+    ),
+
     scalacOptions ~= { options: Seq[String] =>
       options.filterNot(Set(
         "-Ywarn-value-discard",
