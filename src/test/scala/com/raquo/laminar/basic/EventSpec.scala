@@ -136,7 +136,7 @@ class EventSpec extends UnitSpec {
 
     val childEl = span(
       onClick.preventDefault.compose { events =>
-        events.flatMap { _ =>
+        events.flatMapSwitch { _ =>
           eventCount += 1
           effects += Effect("processor", eventCount)
           EventStream.fromValue(eventCount).map(_ * 100)

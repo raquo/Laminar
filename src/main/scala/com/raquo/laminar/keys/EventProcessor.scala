@@ -1,7 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.{EventStream, Observable, Signal, Sink}
-import com.raquo.airstream.flatten.FlattenStrategy
+import com.raquo.airstream.flatten.SwitchingStrategy
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.UnitArrowsFeature
 import com.raquo.laminar.modifiers.EventListener
@@ -244,27 +244,39 @@ class EventProcessor[Ev <: dom.Event, V](
   def flatMap[Out, Obs[_] <: Observable[_]](
     operator: V => Obs[Out]
   )(
-    implicit flattenStrategy: FlattenStrategy[EventStream, Obs, Observable]
+    implicit strategy: SwitchingStrategy[EventStream, Obs, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    new LockedEventKey[Ev, V, Out](this, eventStream => eventStream.flatMap(operator)(flattenStrategy))
+    new LockedEventKey[Ev, V, Out](this, eventStream => eventStream.flatMapSwitch(operator)(strategy))
+  }
+
+  /** Equivalent to `flatMap(_ => observable)`
+    *
+    * Note: `observable` will be re-evaluated every time the event is fired.
+    */
+  @inline def flatMapTo[Out, Obs[_] <: Observable[_]](
+    observable: => Obs[Out]
+  )(
+    implicit strategy: SwitchingStrategy[EventStream, Obs, Observable]
+  ): LockedEventKey[Ev, V, Out] = {
+    flatMap(_ => observable)(strategy)
   }
 
   /** Similar to `flatMap`, but restricted to streams only. */
-  def flatMapStream[Out](
+  @inline def flatMapStream[Out](
     operator: V => EventStream[Out]
   )(
-    implicit flattenStrategy: FlattenStrategy[EventStream, EventStream, Observable]
+    implicit strategy: SwitchingStrategy[EventStream, EventStream, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    flatMap(operator)(flattenStrategy)
+    flatMap(operator)(strategy)
   }
 
   /** Similar to `flatMap`, but restricted to signals only. */
-  def flatMapSignal[Out](
+  @inline def flatMapSignal[Out](
     operator: V => Signal[Out]
   )(
-    implicit flattenStrategy: FlattenStrategy[EventStream, Signal, Observable]
+    implicit strategy: SwitchingStrategy[EventStream, Signal, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    flatMap(operator)(flattenStrategy)
+    flatMap(operator)(strategy)
   }
 
   /** Evaluate `f` if the value was filtered out up the chain. For example:
