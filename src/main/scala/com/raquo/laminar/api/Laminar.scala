@@ -325,6 +325,8 @@ trait Laminar
 
   val child: ChildReceiver.type = ChildReceiver
 
+  val text: ChildTextReceiver.type = ChildTextReceiver
+
   val children: ChildrenReceiver.type = ChildrenReceiver
 
 
