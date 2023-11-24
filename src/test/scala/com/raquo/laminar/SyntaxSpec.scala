@@ -609,4 +609,14 @@ class SyntaxSpec extends UnitSpec {
     assert(intVar.now() == 15)
   }
 
+  it("compose syntax") {
+    val eventObs = Observer.empty[dom.Event]
+    div(
+      onClick.compose(_.delay(100)) --> eventObs,
+      onClick(_.delay(100)) --> eventObs,
+      //
+      onClick.preventDefault.compose(_.delay(100)) --> eventObs,
+      onClick.preventDefault(_.delay(100)) --> eventObs,
+    )
+  }
 }

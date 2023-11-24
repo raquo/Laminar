@@ -221,12 +221,26 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     *     a(onClick.preventDefault.compose(_.delay(100)) --> observer)
     *
+    * Note: can also use with more compact `apply` alias:
+    *
+    *     div(onScroll(_.throttle(100)) --> observer)
+    *
+    *     a(onClick.preventDefault(_.delay(100)) --> observer)
+    *
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback.
+    *
     */
   def compose[Out](
     operator: EventStream[V] => Observable[Out]
   ): LockedEventKey[Ev, V, Out] = {
     new LockedEventKey(this, operator)
+  }
+
+  /** Alias for [[compose]] */
+  @inline def apply[Out](
+    composer: EventStream[V] => Observable[Out]
+  ): LockedEventKey[Ev, V, Out] = {
+    compose(composer)
   }
 
   /** Similar to the Airstream `flatMap` operator.
