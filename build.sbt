@@ -87,7 +87,8 @@ lazy val laminar = project.in(file("."))
 
     scalacOptions ++= Seq(
       "-feature",
-      "-language:implicitConversions"
+      "-language:implicitConversions",
+      "-language:higherKinds"
     ),
 
     scalacOptions ~= { options: Seq[String] =>
