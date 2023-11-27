@@ -3,6 +3,7 @@ package com.raquo.laminar
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
@@ -430,6 +431,84 @@ class ChildReceiverSpec extends UnitSpec {
         sentinel,
         span of "d"
       )
+    )
+  }
+
+  it("locked to one child") {
+
+    val v = Var(true)
+
+    val el = div(
+      child(span("nope")) := false,
+      child(span("yep")) := true,
+      child(span("hello")) <-- v
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div.of(emptyCommentNode, span.of("yep"), sentinel, span.of("hello"))
+    )
+
+    // --
+
+    v.set(false)
+
+    expectNode(
+      div.of(emptyCommentNode, span.of("yep"), sentinel, sentinel)
+    )
+
+    // --
+
+    v.set(true)
+
+    expectNode(
+      div.of(emptyCommentNode, span.of("yep"), sentinel, span.of("hello"))
+    )
+  }
+
+  it("locked to one component") {
+
+    class Component(text: String) {
+      val node: Span = span(text)
+    }
+
+    implicit val componentRenderable: RenderableNode[Component] =
+      RenderableNode(_.node, _.map(_.node), _.map(_.node), _.map(_.node))
+
+
+    val v = Var(true)
+
+    val el = div(
+      child(new Component("nope")) := false,
+      child(new Component("yep")) := true,
+      child(new Component("hello")) <-- v
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div.of(emptyCommentNode, span.of("yep"), sentinel, span.of("hello"))
+    )
+
+    // --
+
+    v.set(false)
+
+    expectNode(
+      div.of(emptyCommentNode, span.of("yep"), sentinel, sentinel)
+    )
+
+    // --
+
+    v.set(true)
+
+    expectNode(
+      div.of(emptyCommentNode, span.of("yep"), sentinel, span.of("hello"))
     )
   }
 

@@ -3,6 +3,7 @@ package com.raquo.laminar
 import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
 import org.scalatest.BeforeAndAfter
@@ -901,6 +902,129 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
         sentinel,
         span of "a",
         span of "b"
+      )
+    )
+  }
+
+  it("locked to one list of children") {
+
+    val v = Var(true)
+
+    val list = List(span("nope"), span("nada"))
+
+    val el = div(
+      children(list) := false,
+      children(span("yep"), span("yas")) := true,
+      children(span("yippers")) := true,
+      children(span("hello"), span("world")) := true,
+      children(span("dyn")) <-- v
+    )
+
+    // --
+
+    mount(el)
+
+    println(el)
+
+    expectNode(
+      div.of(
+        span.of("yep"), span.of("yas"),
+        span.of("yippers"),
+        span.of("hello"), span.of("world"),
+        sentinel,
+        span.of("dyn")
+      )
+    )
+
+    // --
+
+    v.set(false)
+
+    expectNode(
+      div.of(
+        span.of("yep"), span.of("yas"),
+        span.of("yippers"),
+        span.of("hello"), span.of("world"),
+        sentinel
+      )
+    )
+
+    // --
+
+    v.set(true)
+
+    expectNode(
+      div.of(
+        span.of("yep"), span.of("yas"),
+        span.of("yippers"),
+        span.of("hello"), span.of("world"),
+        sentinel,
+        span.of("dyn")
+      )
+    )
+  }
+
+  it("locked to one list of components") {
+
+    class Component(text: String) {
+      val node: Span = span(text)
+    }
+
+    implicit val componentRenderable: RenderableNode[Component] =
+      RenderableNode(_.node, _.map(_.node), _.map(_.node), _.map(_.node))
+
+    val v = Var(true)
+
+    val list = List(new Component("nope"), new Component("nada"))
+
+    val el = div(
+      children(list) := false,
+      children(new Component("yep"), new Component("yas")) := true,
+      children(new Component("yippers")) := true,
+      children(new Component("hello"), new Component("world")) := true,
+      children(new Component("dyn")) <-- v
+    )
+
+    // --
+
+    mount(el)
+
+    println(el)
+
+    expectNode(
+      div.of(
+        span.of("yep"), span.of("yas"),
+        span.of("yippers"),
+        span.of("hello"), span.of("world"),
+        sentinel,
+        span.of("dyn")
+      )
+    )
+
+    // --
+
+    v.set(false)
+
+    expectNode(
+      div.of(
+        span.of("yep"), span.of("yas"),
+        span.of("yippers"),
+        span.of("hello"), span.of("world"),
+        sentinel
+      )
+    )
+
+    // --
+
+    v.set(true)
+
+    expectNode(
+      div.of(
+        span.of("yep"), span.of("yas"),
+        span.of("yippers"),
+        span.of("hello"), span.of("world"),
+        sentinel,
+        span.of("dyn")
       )
     )
   }

@@ -1,6 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.modifiers.RenderableText
 import com.raquo.laminar.utils.UnitSpec
 
 class ChildTextReceiverSpec extends UnitSpec {
@@ -128,6 +129,80 @@ class ChildTextReceiverSpec extends UnitSpec {
         "c",
         "3"
       )
+    )
+  }
+
+  it("locked to one string") {
+
+    val v = Var(true)
+
+    val el = div(
+      text("nope") := false,
+      text("yep") := true,
+      text("hello") <-- v
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div.of(emptyCommentNode, "yep", "hello")
+    )
+
+    // --
+
+    v.set(false)
+
+    expectNode(
+      div.of(emptyCommentNode, "yep", "")
+    )
+
+    // --
+
+    v.set(true)
+
+    expectNode(
+      div.of(emptyCommentNode, "yep", "hello")
+    )
+  }
+
+  it("locked to one textLike") {
+
+    val v = Var(true)
+
+    class TextLike(val str: String)
+
+    implicit val renderable: RenderableText[TextLike] = RenderableText(_.str)
+
+    val el = div(
+      text(new TextLike("nope")) := false,
+      text(new TextLike("yep")) := true,
+      text(new TextLike("hello")) <-- v
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div.of(emptyCommentNode, "yep", "hello")
+    )
+
+    // --
+
+    v.set(false)
+
+    expectNode(
+      div.of(emptyCommentNode, "yep", "")
+    )
+
+    // --
+
+    v.set(true)
+
+    expectNode(
+      div.of(emptyCommentNode, "yep", "hello")
     )
   }
 }

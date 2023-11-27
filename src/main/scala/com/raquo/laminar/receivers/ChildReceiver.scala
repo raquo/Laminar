@@ -10,13 +10,31 @@ object ChildReceiver {
 
   val text: ChildTextReceiver.type = ChildTextReceiver
 
+  /** Usage example: child(element) <-- signalOfBoolean */
+  def apply(node: ChildNode.Base): LockedChildReceiver = {
+    new LockedChildReceiver(node)
+  }
+
   def <--(childSource: Source[ChildNode.Base]): Inserter.Base = {
     ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable)
   }
 
   implicit class RichChildReceiver(val self: ChildReceiver.type) extends AnyVal {
 
-    def <--[Component](childSource: Source[Component])(implicit renderable: RenderableNode[Component]): Inserter.Base = {
+    /** Usage example: child(component) <-- signalOfBoolean */
+    def apply[Component](
+      component: Component
+    )(
+      implicit renderable: RenderableNode[Component]
+    ): LockedChildReceiver = {
+      new LockedChildReceiver(renderable.asNode(component))
+    }
+
+    def <--[Component](
+      childSource: Source[Component]
+    )(
+      implicit renderable: RenderableNode[Component]
+    ): Inserter.Base = {
       ChildInserter(childSource.toObservable, renderable)
     }
   }

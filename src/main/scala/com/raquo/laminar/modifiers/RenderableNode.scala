@@ -1,6 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.nodes.ChildNode
+import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable
@@ -18,7 +18,7 @@ import scala.collection.immutable
   *
   * See also – [[RenderableText]]
   */
-@implicitNotFound("Implicit instance of RenderableNode[${Component}] not found. If `${Component}` is a custom component that you want to render as a node / element, define an implicit RenderableNode[${Component}] instance for it. For rendering as a string or primitive value, define RenderableText[${Component}] instead, and perhaps use `child.text <--` instead of `child <-- ...`.")
+@implicitNotFound("Implicit instance of RenderableNode[${Component}] not found. If `${Component}` is a custom component that you want to render as a node / element, define an implicit RenderableNode[${Component}] instance for it. For rendering as a string or primitive value, define RenderableText[${Component}] instead, and use `text <--` instead of `child <-- ...`.")
 trait RenderableNode[-Component] {
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */

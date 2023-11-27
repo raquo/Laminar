@@ -18,7 +18,15 @@ class ModSpec extends UnitSpec {
         height.px(100),
         width.px(200)
       ),
+      when(true) {
+        List(minAttr("10"), maxAttr("20"))
+      },
       when(true)(div("hello")),
+      when(true) {
+        onMountInsert(_ =>
+          "world"
+        )
+      },
       when(true) {
         text <-- Val("text")
       }
@@ -30,8 +38,12 @@ class ModSpec extends UnitSpec {
       title is "foo",
       height is "100px",
       width is "200px",
+      minAttr is "10",
+      maxAttr is "20",
       div.of("hello"),
+      "world",
       "text"
     ))
   }
+
 }

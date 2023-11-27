@@ -6,6 +6,18 @@ import com.raquo.laminar.nodes.TextNode
 
 object ChildTextReceiver {
 
+  /** Usage example: text("hello") <-- signalOfBoolean */
+  def apply(text: String): LockedChildTextReceiver = {
+    new LockedChildTextReceiver(text)
+  }
+
+  /** Usage example: text(textLikeThing) <-- signalOfBoolean */
+  def apply[TextLike](text: TextLike)(implicit renderable: RenderableText[TextLike]): LockedChildTextReceiver = {
+    // #TODO[Perf] is there a better way to handle RenderableText.textNodeRenderable?
+    //  (see comment about it in the `<--` method)
+    new LockedChildTextReceiver(renderable.asString(text))
+  }
+
   def <--(textSource: Source[String]): Inserter.Base = {
     ChildTextInserter(textSource.toObservable, RenderableText.stringRenderable)
   }

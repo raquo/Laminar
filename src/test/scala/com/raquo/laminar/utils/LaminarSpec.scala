@@ -25,6 +25,9 @@ trait LaminarSpec
 
   def sentinel: ExpectedNode = ExpectedNode.comment
 
+  /** You can use this when `sentinel` does not make sense semantically */
+  def emptyCommentNode: ExpectedNode = ExpectedNode.comment
+
   def mount(
     node: ReactiveElement.Base,
     clue: String = defaultMountedElementClue
