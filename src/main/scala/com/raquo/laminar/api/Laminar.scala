@@ -481,6 +481,15 @@ trait Laminar
     Modifier[El] { element => makeModifier(element).apply(element) }
   }
 
+  /** Modifier that applies one or more modifiers if `condition` is true */
+  def when[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = {
+    if (condition) {
+      mods // implicitly converted to a single modifier
+    } else {
+      emptyMod
+    }
+  }
+
   /** Use this when you need to apply stream operators on this element's events, e.g.:
     *
     *     div(composeEvents(onScroll)(_.throttle(100)) --> observer)
