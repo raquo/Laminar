@@ -188,7 +188,7 @@ object TodoMvcApp {
 
   private def renderFilterButton(filter: Filter) =
     a(
-      cls.toggle("selected") <-- filterVar.signal.map(_ == filter),
+      cls("selected") <-- filterVar.signal.map(_ == filter),
       onClick.preventDefault.mapTo(filter) --> filterVar.writer,
       filter.name
     )

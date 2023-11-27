@@ -391,9 +391,9 @@ class SyntaxSpec extends UnitSpec {
     //implicit def xxxx[A](obs: Observable[_]#Self[A]): Source[A] = obs: Observable[A]
 
     div(
-      cls.toggle("cls1") <-- boolSignal,
-      cls.toggle("cls1") <-- boolStream,
-      cls.toggle("cls1") <-- boolBus,
+      cls("cls1") <-- boolSignal,
+      cls("cls1") <-- boolStream,
+      cls("cls1") <-- boolBus,
       focus <-- boolStream,
       focus <-- boolBus,
       child <-- divObservable,

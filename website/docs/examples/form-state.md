@@ -57,7 +57,7 @@ def renderInputRow(error: FormState => Option[String])(mods: Modifier[HtmlElemen
   val errorSignal = stateVar.signal.map(_.displayError(error))
   div(
     cls("-inputRow"),
-    cls.toggle("x-hasError") <-- errorSignal.map(_.nonEmpty),
+    cls("x-hasError") <-- errorSignal.map(_.nonEmpty),
     p(mods),
     child.maybe <-- errorSignal.map(_.map(err => div(cls("-error"), err)))
   )

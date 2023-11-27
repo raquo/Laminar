@@ -13,7 +13,8 @@ class LockedEventKey[Ev <: dom.Event, -In, +Out](
 
   def -->(sink: Sink[Out]): Binder.Base = {
     Binder { el =>
-      ReactiveElement.bindSink[Out](el, composer(el.events(eventProcessor)))(sink)
+      val observable = composer(el.events(eventProcessor))
+      ReactiveElement.bindSink[Out](el, observable)(sink)
     }
   }
 

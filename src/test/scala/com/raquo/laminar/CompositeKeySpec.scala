@@ -154,10 +154,10 @@ class CompositeKeySpec extends UnitSpec {
     val bus = new EventBus[Boolean]
     val el = div(
       cls := "foo faa",
-      cls.toggle("bar bax") := true,
-      cls.toggle("bar nope") := false,
-      cls.toggle("bar baz") <-- bus.events,
-      cls.toggle("qux") <-- bus.events
+      cls("bar bax") := true,
+      cls("bar nope") := false,
+      cls("bar baz") <-- bus,
+      cls("qux") <-- bus.events
     )
     mount(el)
     expectNode(div.of(cls is "foo faa bar bax"))
@@ -169,7 +169,7 @@ class CompositeKeySpec extends UnitSpec {
     expectNode(div.of(cls is "foo faa bar bax baz qux"))
 
     // This does not actually do anything since Laminar v0.12.0
-    el.amend(cls.toggle("foo faa") := false)
+    el.amend(cls("foo faa") := false)
     expectNode(div.of(cls is "foo faa bar bax baz qux"))
   }
 
@@ -177,9 +177,9 @@ class CompositeKeySpec extends UnitSpec {
     val bus = Var(false)
     val el = div(
       cls := "foo faa",
-      cls.toggle("bar bax") := true,
-      cls.toggle("bar nope") := false,
-      cls.toggle("foo baz") <-- bus
+      cls("bar bax") := true,
+      cls("bar nope") := false,
+      cls("foo baz") <-- bus
     )
     mount(el)
     expectNode(div.of(cls is "foo faa bar bax")) // Var starts with false

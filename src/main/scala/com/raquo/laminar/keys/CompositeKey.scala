@@ -3,6 +3,7 @@ package com.raquo.laminar.keys
 import com.raquo.airstream.core.Source
 import com.raquo.ew.ewArray
 import com.raquo.laminar.api.L.{MapValueMapper, StringValueMapper}
+import com.raquo.laminar.api.StringSeqValueMapper
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.keys.CompositeKey.{CompositeCodec, CompositeValueMapper}
 import com.raquo.laminar.modifiers.{CompositeKeySetter, KeyUpdater}
@@ -46,6 +47,7 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
     this.:=(items: _*)
   }
 
+  @deprecated("""toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""", since = "17.0.0-M1")
   def toggle(items: String*): LockedCompositeKey[K, El] = {
     new LockedCompositeKey(this, items.toList)
   }
@@ -74,8 +76,7 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
   private def addStaticItems(normalizedItems: List[String]): CompositeKeySetter[K, El] = {
     new CompositeKeySetter(
       key = this,
-      itemsToAdd = normalizedItems,
-      itemsToRemove = Nil
+      itemsToAdd = normalizedItems
     )
   }
 }

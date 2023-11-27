@@ -1161,9 +1161,9 @@ cls := (Seq("class1" -> true, "class2" -> someBoolean), Seq("class3" -> someBool
 cls := Map("class1" -> true, "class2" -> false)
  
 // Add class names conditionally (true = add, false = do nothing)
-cls.toggle("class1") := true
-cls.toggle("class1 class2") := someBoolean
-cls.toggle("class1", "class2") := true
+cls("class1") := true
+cls("class1 class2") := someBoolean
+cls("class1", "class2") := true
 ```
 
 Of course, the reactive layer is similarly considerate in regard to `cls`. Consider this use case:
@@ -1175,7 +1175,7 @@ val isSelectedSignal: Signal[Boolean] = ???
 div(
   cls := "MyComponent",
   cls <-- classesStream,
-  cls.toggle("class1", "class2") <-- isSelectedSignal,
+  cls("class1", "class2") <-- isSelectedSignal,
   cls <-- boolSignal.map { isSelected =>
     if (isSelected) "always x-selected" else "always"
   },
@@ -1192,7 +1192,7 @@ Once again, we don't want the CSS class names coming in from `classesStream` to 
 
 So for example, when `classesStream` emits `List("class1", "class2")`, we will _add_ those classes to the element. When it subsequently emits `List("class1", "class3")`, we will remove `class2` and add `class3` to the element's class list.
 
-The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls.toggle("foo") <-- shouldUseFooStream` or similar dynamic modifiers.
+The **`<--`** method can be called with Observables of `String`, `Seq[String]`, `Seq[(String, Boolean)]`, `Map[String, Boolean]`, `Seq[Seq[String]]`, `Seq[Seq[(String, Boolean)]]`. The ones involving booleans let you issue events that instruct Laminar to remove certain classes **that were previously added by this same modifier** (by setting their value to `false`). **Importantly, cls modifiers never remove classes added by other modifiers.** So if you said `cls := "foo"` somewhere, no other modifier can later remove this `foo` class. If you need to add and remove `foo` over time, use `cls("foo") <-- shouldUseFooStream` or similar dynamic modifiers.
 
 If you (or a third party library you're using) are adding or removing class names without Laminar, using native JS APIs like `ref.className = ???` and `ref.classList.add(???)`, and you are **also** using `cls` modifiers on this **same** element, you must take care to avoid manually adding or removing the same classes as you're setting using the `cls` modifiers. Doing so may cause unexpected behaviour. Basically, **a given class name on a given element should be managed either via Laminar `cls` modifiers or externally via JS APIs, but not both**. See the `cls - third party interference` test in `CompositeKeySpec` for a simple example.
 
@@ -2571,7 +2571,7 @@ This kind of pattern does not work, because Laminar's DOM updates are granular d
 
 ```scala
 div(
-  cls.toggle("active") <-- userSignal.map(_.isActive),
+  cls("active") <-- userSignal.map(_.isActive),
   opacity <-- userSignal.map(if (_.isActive) 1 else 0.5)
 )
 ```
