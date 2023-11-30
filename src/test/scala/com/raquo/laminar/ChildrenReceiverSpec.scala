@@ -924,8 +924,6 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
     mount(el)
 
-    println(el)
-
     expectNode(
       div.of(
         span.of("yep"), span.of("yas"),
@@ -988,8 +986,6 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     // --
 
     mount(el)
-
-    println(el)
 
     expectNode(
       div.of(

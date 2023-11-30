@@ -4,7 +4,7 @@ object Versions {
 
   val Scala_2_13 = "2.13.10"
 
-  val Scala_3 = "3.3.0"
+  val Scala_3 = "3.3.1"
 
   // -- Dependencies --
 
@@ -19,7 +19,7 @@ object Versions {
 
   // -- Test --
 
-  val ScalaDomTestUtils = "17.0.0"
+  val ScalaDomTestUtils = "17.1.0-SNAPSHOT"
 
   val ScalaTest = "3.2.14"
 

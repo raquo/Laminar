@@ -32,7 +32,8 @@ trait LaminarSpec
     node: ReactiveElement.Base,
     clue: String = defaultMountedElementClue
   )(
-    implicit pos: scalactic.source.Position
+    implicit prettifier: scalactic.Prettifier,
+    pos: scalactic.source.Position
   ): Unit = {
     mountedElementClue = clue
     assertEmptyContainer("laminar.mount")
@@ -43,12 +44,18 @@ trait LaminarSpec
     clue: String,
     node: ReactiveElement.Base
   )(
-    implicit pos: scalactic.source.Position
+    implicit prettifier: scalactic.Prettifier,
+    pos: scalactic.source.Position
   ): Unit = {
-    mount(node, clue)(pos)
+    mount(node, clue)(prettifier, pos)
   }
 
-  override def unmount(clue: String = "unmount")(implicit pos: scalactic.source.Position): Unit = {
+  override def unmount(
+    clue: String = "unmount"
+  )(
+    implicit prettifier: scalactic.Prettifier,
+    pos: scalactic.source.Position
+  ): Unit = {
     assertRootNodeMounted("unmount:" + clue)
     doAssert(
       root != null,
