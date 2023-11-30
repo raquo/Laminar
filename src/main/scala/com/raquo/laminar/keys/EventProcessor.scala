@@ -2,6 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.{EventStream, Observable, Signal, Sink}
 import com.raquo.airstream.flatten.SwitchingStrategy
+import com.raquo.airstream.status.Status
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.UnitArrowsFeature
 import com.raquo.laminar.modifiers.EventListener
@@ -247,10 +248,13 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * Use this when you want to create a new stream or signal on every event, e.g.:
     *
+    * {{{
     * button(onClick.preventDefault.flatMap(_ => makeAjaxRequest()) --> observer)
+    * }}}
     *
     * #TODO[IDE] IntelliJ (2022.3.2) shows false errors when using this flatMap implementation,
     *  at least with Scala 2, making it annoying. Use flatMapStream or flatMapSignal to get around that.
+    *  https://youtrack.jetbrains.com/issue/SCL-21836/Kind-context-bound-callback-argument-causes-false-positive-type-mismatch-error
     *
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,
     *       or use the `compose` method instead for more flexibility
@@ -260,7 +264,10 @@ class EventProcessor[Ev <: dom.Event, V](
   )(
     implicit strategy: SwitchingStrategy[EventStream, Obs, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    new LockedEventKey[Ev, V, Out](this, eventStream => eventStream.flatMapSwitch(operator)(strategy))
+    new LockedEventKey[Ev, V, Out](
+      this,
+      eventStream => eventStream.flatMapSwitch(operator)(strategy)
+    )
   }
 
   /** Equivalent to `flatMap(_ => observable)`
@@ -291,6 +298,42 @@ class EventProcessor[Ev <: dom.Event, V](
     implicit strategy: SwitchingStrategy[EventStream, Signal, Observable]
   ): LockedEventKey[Ev, V, Out] = {
     flatMap(operator)(strategy)
+  }
+
+  /** Similar to Airstream `flatMapWithStatus` operator.
+    *
+    * Use this when you want to flatMapSwitch and get a status indicating
+    * whether the input has been processed by the inner stream, e.g.:
+    *
+    * {{{
+    * button(onClick.flatMapWithStatus(ev => AjaxStream.get(ev, ...)) --> observer
+    * }}}
+    */
+  def flatMapWithStatus[Out](
+    operator: V => EventStream[Out]
+  ): LockedEventKey[Ev, V, Status[V, Out]] = {
+    new LockedEventKey[Ev, V, Status[V, Out]](
+      this,
+      eventStream => eventStream.flatMapWithStatus(operator)
+    )
+  }
+
+  /** Similar to Airstream `flatMapWithStatus` operator.
+    *
+    * Use this when you want to flatMapSwitch and get a status indicating
+    * whether the input has been processed by the inner stream, e.g.:
+    *
+    * {{{
+    * button(onClick.flatMapWithStatus(AjaxStream.get(...)) --> observer
+    * }}}
+    */
+  def flatMapWithStatus[Out](
+    innerStream: => EventStream[Out]
+  ): LockedEventKey[Ev, V, Status[V, Out]] = {
+    new LockedEventKey[Ev, V, Status[V, Out]](
+      this,
+      eventStream => eventStream.flatMapWithStatus(innerStream)
+    )
   }
 
   /** Evaluate `f` if the value was filtered out up the chain. For example:
