@@ -490,6 +490,9 @@ trait Laminar
     }
   }
 
+  /** Modifier that applies one or more modifiers if `condition` is true */
+  @inline def whenNot[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = when(!condition)(mods)
+
   /** Use this when you need to apply stream operators on this element's events, e.g.:
     *
     *     div(composeEvents(onScroll)(_.throttle(100)) --> observer)
