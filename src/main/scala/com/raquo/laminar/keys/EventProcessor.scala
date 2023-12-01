@@ -136,10 +136,13 @@ class EventProcessor[Ev <: dom.Event, V](
     }
   }
 
-  /** Values that do not pass will not propagate down the chain and into the emitter. */
+  /** Values that do not pass the test will not propagate down the chain and into the emitter. */
   def filter(passes: V => Boolean): EventProcessor[Ev, V] = {
     withNewProcessor(ev => processor(ev).filter(passes))
   }
+
+  /** Values that pass the test will not propagate down the chain and into the emitter. */
+  def filterNot(skip: V => Boolean): EventProcessor[Ev, V] = filter(!skip(_))
 
   def collect[V2](pf: PartialFunction[V, V2]): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).collect(pf))
