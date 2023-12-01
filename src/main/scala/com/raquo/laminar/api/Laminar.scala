@@ -9,6 +9,7 @@ import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, 
 import com.raquo.laminar.defs.props.HtmlProps
 import com.raquo.laminar.defs.styles.{StyleProps, units}
 import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
+import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
@@ -512,17 +513,7 @@ trait Laminar
     updater: KeyUpdater[El, HtmlProp[V, _], V],
     listener: EventListener[Ev, _]
   ): Binder[El] = {
-    Binder[El] { element =>
-      // @TODO[Elegance] Clean up the whole ValueController structure later
-      // @TODO[Integrity] Not sure if there's a good way to avoid asInstanceOf here
-      if (updater.key == value) {
-        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[String, _], String]], listener)
-      } else if (updater.key == checked) {
-        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[Boolean, _], Boolean]], listener)
-      } else {
-        throw new Exception(s"Can not add a controller for property `${updater.key}` – only `value` and `checked` can be controlled this way. See docs on controlled inputs for details.")
-      }
-    }
+    InputController.controlled(updater, listener)
   }
 
   /** Just like the other `controlled` method, but with the two arguments swapped places. Works the same. */

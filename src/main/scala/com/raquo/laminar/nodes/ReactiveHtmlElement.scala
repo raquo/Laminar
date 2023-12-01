@@ -1,12 +1,13 @@
 package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicSubscription
+import com.raquo.ew.JsArray
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L
-import com.raquo.laminar.inputs.ValueController
+import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys.{HtmlProp, Key}
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
-import com.raquo.laminar.tags.HtmlTag
+import com.raquo.laminar.tags.{CustomHtmlTag, HtmlTag}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -18,83 +19,117 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
 
   // -- `value` prop controller
 
-  private[this] var valueController: js.UndefOr[ValueController[_, _]] = js.undefined
+  // #nc do we actually need multiple controllers per element? Don't need it for HTML elements, if only for weird web components, maybe
+  //  - actually as long as our custom elements API allows only one pair, this is moot, so make a choice here.
 
-  private[laminar] def hasValueController: Boolean = valueController.nonEmpty
+  /** List of value controllers installed on this element */
+  private[this] var controllers: js.UndefOr[JsArray[InputController[_, _]]] = js.undefined
 
-  private[laminar] def hasOtherValueController(thisController: ValueController[_, _]): Boolean = {
-    valueController.exists(_ != thisController)
+  /** List of binders for props that are controllable */
+  private[this] var controllablePropBinders: js.UndefOr[JsArray[String]] = js.undefined
+
+  private[this] def appendValueController(controller: InputController[_, _]): Unit = {
+    controllers.fold {
+      controllers = js.defined(JsArray(controller))
+    }(_.push(controller))
   }
 
-  private[laminar] var hasValueBinder: Boolean = false
+  private[this] def appendControllablePropBinder(propDomName: String): Unit = {
+    controllablePropBinders.fold {
+      controllablePropBinders = js.defined(JsArray(propDomName))
+    }(_.push(propDomName))
+  }
 
-  private[laminar] def setValueController[A](
-    updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String],
-    listener: EventListener[_ <: dom.Event, A]
-  ): DynamicSubscription = {
-    val controller = new ValueController[String, A](
-      initialValue = "",
-      getDomValue = DomApi.getValue(_).getOrElse(""),
-      setDomValue = DomApi.setValue,
-      element = this,
-      updater,
-      listener
-    )
+  private[laminar] def hasBinderForControllableProp(domPropName: String): Boolean = {
+    controllablePropBinders.exists(_.includes(domPropName))
+  }
+
+  private[laminar] def hasOtherControllerForSameProp(thisController: InputController[_, _]): Boolean = {
+    controllers.exists(_.asScalaJs.exists { otherController =>
+      otherController.propDomName == thisController.propDomName && otherController != thisController
+    })
+  }
+
+  private[laminar] def bindController(controller: InputController[_, _]): DynamicSubscription = {
     val dynSub = controller.bind()
-    valueController = controller
+    appendValueController(controller)
     dynSub
   }
+
+  // private[laminar] def setValueController[A](
+  //   updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String],
+  //   listener: EventListener[_ <: dom.Event, A]
+  // ): DynamicSubscription = {
+  //   val controller = new InputController[String, A](
+  //     initialValue = "",
+  //     getDomValue = DomApi.getValue(_).getOrElse(""),
+  //     setDomValue = DomApi.setValue,
+  //     element = this,
+  //     updater,
+  //     listener
+  //   )
+  //   val dynSub = controller.bind()
+  //   appendValueController(controller)
+  //   dynSub
+  // }
 
   // -- `checked` prop controller
 
-  private[this] var checkedController: js.UndefOr[ValueController[_, _]] = js.undefined
-
-  private[laminar] def hasCheckedController: Boolean = checkedController.nonEmpty
-
-  private[laminar] def hasOtherCheckedController(thisController: ValueController[_, _]): Boolean = {
-    checkedController.exists(_ != thisController)
-  }
-
-  private[laminar] var hasCheckedBinder: Boolean = false
-
-  private[laminar] def setCheckedController[A](
-    updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean],
-    listener: EventListener[_ <: dom.Event, A]
-  ): DynamicSubscription = {
-    val controller = new ValueController[Boolean, A](
-      initialValue = false,
-      getDomValue = DomApi.getChecked(_).getOrElse(false),
-      setDomValue = DomApi.setChecked,
-      element = this,
-      updater,
-      listener
-    )
-    val dynSub = controller.bind()
-    checkedController = controller
-    dynSub
-  }
+  // private[laminar] def setCheckedController[A](
+  //   updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean],
+  //   listener: EventListener[_ <: dom.Event, A]
+  // ): DynamicSubscription = {
+  //   val controller = new InputController[Boolean, A](
+  //     initialValue = false,
+  //     getDomValue = DomApi.getChecked(_).getOrElse(false),
+  //     setDomValue = DomApi.setChecked,
+  //     element = this,
+  //     updater,
+  //     listener
+  //   )
+  //   val dynSub = controller.bind()
+  //   appendValueController(controller)
+  //   dynSub
+  // }
 
   // --
 
+  private[laminar] def controllableProps: js.UndefOr[JsArray[String]] = {
+    if (DomApi.isCustomElement(ref)) {
+      tag match {
+        case t: CustomHtmlTag[Ref@unchecked] => t.allowableControlProps
+        case _ => js.undefined
+      }
+    } else {
+      InputController.htmlControllableProps
+    }
+  }
+
+  private[laminar] def isControllableProp(propDomName: String): Boolean = {
+    controllableProps.exists(_.includes(propDomName))
+  }
+
+  private def hasController(propDomName: String): Boolean = {
+    controllers.exists(_.asScalaJs.exists(_.propDomName == propDomName))
+  }
+
   override private[laminar] def onAddKeyUpdater(key: Key): Unit = {
-    if (key == L.value) {
-      if (hasValueController) {
-        throw new Exception(s"Can not add a `value <-- ???` binder to an element that already has a `value` controller: ${DomApi.debugNodeDescription(ref)}")
-      } else {
-        hasValueBinder = true
-      }
-    } else if (key == L.checked) {
-      if (hasCheckedController) {
-        throw new Exception(s"Can not add a `checked <-- ???` binder to an element that already has a `checked` controller: ${DomApi.debugNodeDescription(ref)}")
-      } else {
-        hasCheckedBinder = true
-      }
+    key match {
+      case p: HtmlProp[_, _] =>
+        if (isControllableProp(p.name)) {
+          if (hasController(p.name)) {
+            throw new Exception(s"Can not add a `${p.name} <-- ???` binder to an element that already has a `${p.name}` controller: ${DomApi.debugNodeDescription(ref)}")
+          } else {
+            appendControllablePropBinder(p.name)
+          }
+        }
+      case _ => ()
     }
   }
 
   override def toString: String = {
     // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.
-    s"ReactiveHtmlElement(${ if (ref != null) ref.outerHTML else s"tag=${tag.name}"})"
+    s"ReactiveHtmlElement(${if (ref != null) ref.outerHTML else s"tag=${tag.name}"})"
   }
 }
 
