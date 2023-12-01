@@ -193,7 +193,7 @@ trait Laminar
   @deprecated("Use `HtmlProp` instead of `Prop`", "0.15.0-RC1")
   type Prop[V] = keys.HtmlProp[V, _]
 
-  type HtmlProp[V] = keys.HtmlProp[V, _]
+  type HtmlProp[V, DomV] = keys.HtmlProp[V, DomV]
 
   @deprecated("Use `StyleProp` instead of `Style`", "0.15.0-RC1")
   type Style[V] = keys.StyleProp[V]
@@ -509,16 +509,16 @@ trait Laminar
   }
 
   def controlled[El <: HtmlElement, Ev <: dom.Event, V](
-    updater: KeyUpdater[El, HtmlProp[V], V],
+    updater: KeyUpdater[El, HtmlProp[V, _], V],
     listener: EventListener[Ev, _]
   ): Binder[El] = {
     Binder[El] { element =>
       // @TODO[Elegance] Clean up the whole ValueController structure later
       // @TODO[Integrity] Not sure if there's a good way to avoid asInstanceOf here
       if (updater.key == value) {
-        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[String], String]], listener)
+        element.setValueController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[String, _], String]], listener)
       } else if (updater.key == checked) {
-        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[Boolean], Boolean]], listener)
+        element.setCheckedController(updater.asInstanceOf[KeyUpdater[HtmlElement, HtmlProp[Boolean, _], Boolean]], listener)
       } else {
         throw new Exception(s"Can not add a controller for property `${updater.key}` – only `value` and `checked` can be controlled this way. See docs on controlled inputs for details.")
       }
@@ -528,7 +528,7 @@ trait Laminar
   /** Just like the other `controlled` method, but with the two arguments swapped places. Works the same. */
   @inline def controlled[El <: HtmlElement, Ev <: dom.Event, V](
     listener: EventListener[Ev, _],
-    updater: KeyUpdater[El, HtmlProp[V], V]
+    updater: KeyUpdater[El, HtmlProp[V, _], V]
   ): Binder[El] = {
     controlled(updater, listener)
   }

@@ -47,7 +47,7 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
     this.:=(items: _*)
   }
 
-  @deprecated("""toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""", since = "17.0.0-M1")
+  @deprecated("""cls.toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""", since = "17.0.0-M1")
   def toggle(items: String*): LockedCompositeKey[K, El] = {
     new LockedCompositeKey(this, items.toList)
   }
