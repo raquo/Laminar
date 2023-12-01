@@ -30,7 +30,7 @@ class HtmlProp[V, DomV](
   }
 
   def maybe(value: Option[V]): Setter[HtmlElement] = {
-    optionToSetter(value.map(v => this := v))
+    optionToSetter(value.map(this := _))
   }
 
   def <--(values: Source[V]): PropUpdater[V, DomV] = {

@@ -20,7 +20,7 @@ class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
 ) extends Binder[El] { self =>
 
   override def bind(element: El): DynamicSubscription = {
-    element.onAddKeyUpdater(key)
+    element.onBoundKeyUpdater(key)
     ReactiveElement.bindFn(element, values) { value =>
       update(element, value, self)
     }

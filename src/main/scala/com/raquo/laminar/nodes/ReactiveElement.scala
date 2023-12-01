@@ -178,7 +178,7 @@ trait ReactiveElement[+Ref <: dom.Element]
     this
   }
 
-  private[laminar] def onAddKeyUpdater(key: Key): Unit
+  private[laminar] def onBoundKeyUpdater(key: Key): Unit
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     //println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")

@@ -5,7 +5,8 @@ import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.ew.JsArray
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L
-import com.raquo.laminar.keys.{EventProcessor, HtmlProp}
+import com.raquo.laminar.inputs.InputController.InputControllerConfig
+import com.raquo.laminar.keys.{EventProcessor, EventProp, HtmlProp}
 import com.raquo.laminar.modifiers.{Binder, EventListener, KeyUpdater}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 import com.raquo.laminar.tags.CustomHtmlTag
@@ -13,18 +14,14 @@ import org.scalajs.dom
 
 import scala.scalajs.js
 
-// @TODO[Elegance,Cleanup] There's some redundancy between prop / getDomValue / setDomValue / updater. Clean up later.
-//  - Also maybe this shouldn't be a class... or should be a Binder, or something
-class InputController[A, B](
-  initialValue: A,
-  getDomValue: dom.html.Element => A,
-  setDomValue: (dom.html.Element, A) => Unit,
-  element: ReactiveHtmlElement.Base,
-  updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[A, _], A],
+class InputController[Ref <: dom.html.Element, A, B](
+  config: InputControllerConfig[Ref, A],
+  element: ReactiveHtmlElement[Ref],
+  updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A],
   listener: EventListener[_ <: dom.Event, B]
 ) {
 
-  private var prevValue: A = initialValue // Note: this might not match `defaultValue` / `defaultChecked` prop (see below)
+  private var prevValue: A = config.initialValue // Note: this might not match `defaultValue` / `defaultChecked` prop (see below)
 
   private val resetProcessor = listener.eventProcessor.orElseEval { _ =>
     // If value is not filtered out, resetObserver will handle it.
@@ -35,14 +32,14 @@ class InputController[A, B](
   // Force-override the `defaultValue` prop.
   // If updater.values is Signal, its initial value will in turn override this,
   // but if it's a stream, this will remain the effective initial value.
-  setValue(initialValue, force = true) // this also sets prevValue
+  setValue(config.initialValue, force = true) // this also sets prevValue
 
-  def propDomName: String = updater.key.name
+  def propDomName: String = config.prop.name // updater.key.name // #nc
 
   private def setValue(nextValue: A, force: Boolean = false): Unit = {
     // Checking against current DOM value prevents cursor position reset in Safari
-    if (force || nextValue != getDomValue(element.ref)) {
-      setDomValue(element.ref, nextValue)
+    if (force || nextValue != config.getDomValue(element.ref)) {
+      config.setDomValue(element.ref, nextValue)
     }
     // We need to update prevValue regardless of the above condition (duh, it was only introduced to deal with a Safari DOM bug).
     // Otherwise, inputting *filtered out* values will clear the input value: https://github.com/raquo/Laminar/issues/100
@@ -140,6 +137,38 @@ class InputController[A, B](
 
 object InputController {
 
+  class InputControllerConfig[-Ref <: dom.html.Element, A](
+    val initialValue: A,
+    val prop: HtmlProp[A, _],
+    val eventProps: JsArray[EventProp[_]],
+    val getDomValue: Ref => A,
+    val setDomValue: (Ref, A) => Unit,
+  )
+
+  private val textValueConfig: InputControllerConfig[dom.html.Element, String] = new InputControllerConfig(
+    initialValue = "",
+    prop = L.value,
+    eventProps = JsArray(L.onInput),
+    getDomValue = DomApi.getValue(_).getOrElse(""),
+    setDomValue = DomApi.setValue
+  )
+
+  private val selectValueConfig: InputControllerConfig[dom.html.Element, String] = new InputControllerConfig(
+    initialValue = "",
+    prop = L.value,
+    eventProps = JsArray(L.onInput, L.onChange),
+    getDomValue = DomApi.getValue(_).getOrElse(""),
+    setDomValue = DomApi.setValue
+  )
+
+  private val checkedConfig: InputControllerConfig[dom.html.Element, Boolean] = new InputControllerConfig(
+    initialValue = false,
+    prop = L.checked,
+    eventProps = JsArray(L.onInput, L.onClick), // #nc does checkbox actually work with onInput?
+    getDomValue = DomApi.getChecked(_).getOrElse(false),
+    setDomValue = DomApi.setChecked
+  )
+
   def controlled[El <: ReactiveHtmlElement.Base, Ev <: dom.Event, V](
     updater: KeyUpdater[El, HtmlProp[V, _], V],
     listener: EventListener[Ev, _]
@@ -156,20 +185,14 @@ object InputController {
         } else {
           val controller = {
             if (propDomName == "value") {
-              valueController(
-                element,
-                updater.asInstanceOf[KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String]], // #TODO[Integrity]
-                listener
-              )
+              val knownUpdater = updater.asInstanceOf[KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String]] // #TODO[Integrity]
+              new InputController(textValueConfig, element, knownUpdater, listener)
             } else {
               if (propDomName != "checked") {
                 throw new Exception(s"Unexpected HTML controlled prop: ${propDomName}")
               }
-              checkedController(
-                element,
-                updater.asInstanceOf[KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean]], // #TODO[Integrity]
-                listener
-              )
+              val knownUpdater = updater.asInstanceOf[KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean]] // #TODO[Integrity]
+              new InputController(checkedConfig, element, knownUpdater, listener)
             }
           }
           element.bindController(controller)
@@ -182,36 +205,6 @@ object InputController {
         )
       }
     }
-  }
-
-  private[this] def valueController[A, El <: ReactiveHtmlElement.Base, Ev <: dom.Event](
-    element: El,
-    updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String],
-    listener: EventListener[Ev, A]
-  ): InputController[String, A] = {
-    new InputController[String, A](
-      initialValue = "",
-      getDomValue = DomApi.getValue(_).getOrElse(""),
-      setDomValue = DomApi.setValue,
-      element = element,
-      updater,
-      listener
-    )
-  }
-
-  private[this] def checkedController[A, El <: ReactiveHtmlElement.Base, Ev <: dom.Event](
-    element: El,
-    updater: KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean],
-    listener: EventListener[Ev, A]
-  ): InputController[Boolean, A] = {
-    new InputController[Boolean, A](
-      initialValue = false,
-      getDomValue = DomApi.getChecked(_).getOrElse(false),
-      setDomValue = DomApi.setChecked,
-      element = element,
-      updater,
-      listener
-    )
   }
 
   /** Standard HTML properties than can be `controlled` in Laminar. */
@@ -246,8 +239,58 @@ object InputController {
 
       case el if DomApi.isCustomElement(el) =>
         element.tag match {
-          case tag: CustomHtmlTag[Ref@unchecked] => tag.allowedControlKeys(element.ref)
-          case _ => js.undefined // If nothing is specified, and user tries to use `controlled`, they will get one of the errors above.
+          case tag: CustomHtmlTag[Ref @unchecked] =>
+            tag.allowedInputControllerConfigs(element.ref).map(config => (config.prop.name, config.eventProps(0).name))
+          case _ =>
+            // If nothing is specified, and user tries to use `controlled`,
+            // they will get one of the errors above.
+            js.undefined
+        }
+
+      case _ =>
+        js.undefined
+    }
+  }
+
+  /** Returns the input controller config(s) that we can use `controlled` for with this element.
+    *
+    * For all regular HTML elements and most web components, it will always be at most one config.
+    *
+    * I'm allowing returning multiple configs for weird cases like a web component with two input
+    * fields that can both be controlled independently. Not sure if such components actually exist.
+    *
+    * For custom elements / Web Components, see [[CustomHtmlTag]]
+    *
+    * @return Option((prop, eventProp))
+    */
+  def allowedControllerConfigs[Ref <: dom.html.Element](element: ReactiveHtmlElement[Ref]): js.UndefOr[InputControllerConfig[Ref, _]] = {
+    element.ref match {
+
+      case input: dom.html.Input =>
+        input.`type` match {
+          case "text" => textValueConfig // Tiny perf shortcut for the most common case
+          case "checkbox" | "radio" => checkedConfig
+          case "file" => js.undefined
+          case _ => textValueConfig// All the other input types: email, color, date, etc.
+        }
+
+      case _: dom.html.TextArea =>
+        textValueConfig
+
+      case _: dom.html.Select =>
+        // @TODO Allow onInput? it's the same but not all browsers support it.
+        // Note: onChange browser event emits only when the selected value actually changes
+        //       (clicking the same option doesn't trigger the event)
+        selectValueConfig
+
+      case el if DomApi.isCustomElement(el) =>
+        element.tag match {
+          case tag: CustomHtmlTag[Ref @unchecked] =>
+            tag.allowedInputControllerConfigs(element.ref)
+          case _ =>
+            // If nothing is specified, and user tries to use `controlled`,
+            // they will get one of the errors above.
+            js.undefined
         }
 
       case _ =>
