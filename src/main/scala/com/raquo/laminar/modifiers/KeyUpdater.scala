@@ -2,10 +2,9 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
-import com.raquo.laminar.keys.{AriaAttr, HtmlAttr, Key, HtmlProp, StyleProp, SvgAttr}
+import com.raquo.laminar.keys.{AriaAttr, HtmlAttr, HtmlProp, Key, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 
-import scala.scalajs.js
 import scala.scalajs.js.|
 
 /**
@@ -21,6 +20,7 @@ class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
 ) extends Binder[El] { self =>
 
   override def bind(element: El): DynamicSubscription = {
+    element.onAddKeyUpdater(key)
     ReactiveElement.bindFn(element, values) { value =>
       update(element, value, self)
     }

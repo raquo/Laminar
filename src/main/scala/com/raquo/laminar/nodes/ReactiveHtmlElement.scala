@@ -2,8 +2,9 @@ package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.api.L
 import com.raquo.laminar.inputs.ValueController
-import com.raquo.laminar.keys.HtmlProp
+import com.raquo.laminar.keys.{HtmlProp, Key}
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
@@ -74,6 +75,22 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
   }
 
   // --
+
+  override private[laminar] def onAddKeyUpdater(key: Key): Unit = {
+    if (key == L.value) {
+      if (hasValueController) {
+        throw new Exception(s"Can not add a `value <-- ???` binder to an element that already has a `value` controller: ${DomApi.debugNodeDescription(ref)}")
+      } else {
+        hasValueBinder = true
+      }
+    } else if (key == L.checked) {
+      if (hasCheckedController) {
+        throw new Exception(s"Can not add a `checked <-- ???` binder to an element that already has a `checked` controller: ${DomApi.debugNodeDescription(ref)}")
+      } else {
+        hasCheckedBinder = true
+      }
+    }
+  }
 
   override def toString: String = {
     // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.

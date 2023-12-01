@@ -4,7 +4,7 @@ import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink, Transa
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicOwner, DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.ew.JsArray
-import com.raquo.laminar.keys.{CompositeKey, EventProcessor}
+import com.raquo.laminar.keys.{CompositeKey, EventProcessor, Key}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{EventListener, Modifier}
 import com.raquo.laminar.tags.Tag
@@ -177,6 +177,8 @@ trait ReactiveElement[+Ref <: dom.Element]
     mod(this)
     this
   }
+
+  private[laminar] def onAddKeyUpdater(key: Key): Unit
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     //println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
