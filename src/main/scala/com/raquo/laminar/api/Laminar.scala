@@ -500,7 +500,7 @@ trait Laminar
     *
     *     a(composeEvents(onClick.preventDefault)(_.delay(100)) --> observer)
     */
-  @deprecated("Instead of composeEvents(a)(b), use a.compose(b)", "0.15.0-RC1")
+  @deprecated("Instead of composeEvents(a)(b), use a.compose(b) or just a(b)", "0.15.0-RC1")
   def composeEvents[Ev <: dom.Event, In, Out](
     event: EventProcessor[Ev, In]
   )(
@@ -509,18 +509,19 @@ trait Laminar
     new LockedEventKey(event, composer)
   }
 
-  def controlled[El <: HtmlElement, Ev <: dom.Event, V](
-    updater: KeyUpdater[El, HtmlProp[V, _], V],
-    listener: EventListener[Ev, _]
-  ): Binder[El] = {
-    InputController.controlled(updater, listener)
+  /** Creates controlled input block. See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]] */
+  def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
+    listener: EventListener[Ev, _],
+    updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V]
+  ): Binder[ReactiveHtmlElement[Ref]] = {
+    InputController.controlled(listener, updater)
   }
 
-  /** Just like the other `controlled` method, but with the two arguments swapped places. Works the same. */
-  @inline def controlled[El <: HtmlElement, Ev <: dom.Event, V](
-    listener: EventListener[Ev, _],
-    updater: KeyUpdater[El, HtmlProp[V, _], V]
-  ): Binder[El] = {
-    controlled(updater, listener)
+  /** Creates controlled input block. See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]] */
+  @inline def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
+    updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V],
+    listener: EventListener[Ev, _]
+  ): Binder[ReactiveHtmlElement[Ref]] = {
+    controlled(listener, updater)
   }
 }

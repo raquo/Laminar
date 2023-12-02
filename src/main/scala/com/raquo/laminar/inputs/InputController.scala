@@ -13,6 +13,7 @@ import com.raquo.laminar.tags.CustomHtmlTag
 import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.scalajs.js.JSConverters.JSRichOption
 
 class InputController[Ref <: dom.html.Element, A, B](
   config: InputControllerConfig[Ref, A],
@@ -34,12 +35,14 @@ class InputController[Ref <: dom.html.Element, A, B](
   // but if it's a stream, this will remain the effective initial value.
   setValue(config.initialValue, force = true) // this also sets prevValue
 
-  def propDomName: String = config.prop.name // updater.key.name // #nc
+  def propDomName: String = updater.key.name
+
+  def eventPropName: String = EventProcessor.eventProp(listener.eventProcessor).name
 
   private def setValue(nextValue: A, force: Boolean = false): Unit = {
     // Checking against current DOM value prevents cursor position reset in Safari
-    if (force || nextValue != config.getDomValue(element.ref)) {
-      config.setDomValue(element.ref, nextValue)
+    if (force || nextValue != config.getDomValue(element)) {
+      config.setDomValue(element, nextValue)
     }
     // We need to update prevValue regardless of the above condition (duh, it was only introduced to deal with a Safari DOM bug).
     // Otherwise, inputting *filtered out* values will clear the input value: https://github.com/raquo/Laminar/issues/100
@@ -70,7 +73,7 @@ class InputController[Ref <: dom.html.Element, A, B](
   private[laminar] def bind(): DynamicSubscription = {
     ReactiveElement.bindSubscriptionUnsafe(element) { ctx =>
 
-      // This should be run when the element's type property is properly set,
+      // This should be run when the element's type property has already been set,
       // and doing this on bind gives the highest chance of that.
       checkControllerCompatibility()
 
@@ -108,29 +111,68 @@ class InputController[Ref <: dom.html.Element, A, B](
   private[this] def checkControllerCompatibility(): Unit = {
 
     if (element.hasOtherControllerForSameProp(this)) {
-      throw new Exception(s"Can not add another `${propDomName}` controller to an element that already has one: ${InputController.nodeDescription(element)}")
+      throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
+        reason = s"Element already has a `${propDomName}` controller."
+      ))
     }
 
     if (element.hasBinderForControllableProp(propDomName)) {
-      throw new Exception(s"Can not add `${propDomName}` controller to an element that already has a `${propDomName} <-- ???` binder: ${InputController.nodeDescription(element)}")
+      throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
+        reason = s"Element already has an uncontrolled `${propDomName} <-- ???` binder."
+      ))
     }
 
-    // @TODO[Warn] Consider warning if `type` is not set at this point. Might be annoying though.
+    if (DomApi.isCustomElement(element.ref)) {
+      element.tag match {
+        case tag: CustomHtmlTag[Ref @unchecked] =>
+          val maybeAllowedConfigs = tag.allowedControllerConfigs(element.ref)
+          if (maybeAllowedConfigs.isEmpty || maybeAllowedConfigs.get.length == 0) {
+            throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
+              reason = s"This element does not support any controlled props."
+            ))
+          } else {
+            val maybeMatchingPropConfig = maybeAllowedConfigs.flatMap(_.asScalaJs.find(_.prop == updater.key).orUndefined)
+            maybeMatchingPropConfig.fold(
+              ifEmpty = {
+                val expectedPropNames = s"`${maybeAllowedConfigs.get.map(_.prop.name).join("` or `")}`"
+                throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
+                  reason = s"This element does not support `${propDomName}` controlled property",
+                  suggestion = s"Use ${expectedPropNames} controlled property instead"
+                ))
+              }
+            ) { config =>
+              checkEventPropCompatibility(expectedEventProps = config.allowedEventProps)
+            }
+          }
 
-    // Wait until mounting to check these conditions. By this time, the element's `type`
-    // will certainly be set (assuming the user intended to set it).
-    InputController.allowedControlKeys(element).fold(
-      ifEmpty = throw new Exception(s"Can not add `${propDomName}` controller to unsupported kind of element: ${InputController.nodeDescription(element)}")
-
-    ) { case (expectedProp, expectedEventProp) =>
-      if (propDomName != expectedProp) {
-        val suggestion = s"Use `${expectedProp}` prop instead of `${propDomName}` prop"
-        throw new Exception(s"Can not add `${propDomName}` controller to this element: ${InputController.nodeDescription(element)}: $suggestion.")
-
-      } else if (EventProcessor.eventProp(listener.eventProcessor).name != expectedEventProp) {
-        val suggestion = s"Use `${expectedEventProp}` event instead of `${EventProcessor.eventProp(listener.eventProcessor).name}` event"
-        throw new Exception(s"Can not add `${propDomName}` controller to this element: ${InputController.nodeDescription(element)}: $suggestion.")
+        case _ =>
+          // If nothing is specified, and user tries to use `controlled`,
+          // they will get one of the errors above.
+          ()
       }
+    } else {
+      val expectedPropName = config.prop.name
+      if (propDomName != expectedPropName) {
+        throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
+          reason = s"This element does not support `${propDomName}` controlled property",
+          suggestion = s"Use `${expectedPropName}` controlled property instead"
+        ))
+      } else {
+        checkEventPropCompatibility(expectedEventProps = config.allowedEventProps)
+      }
+    }
+  }
+
+  private[this] def checkEventPropCompatibility(
+    expectedEventProps: JsArray[EventProp[_]]
+  ): Unit = {
+    val expectedEventProps = config.allowedEventProps
+    if (!expectedEventProps.asScalaJs.exists(_.name == eventPropName)) {
+      val expectedEventPropNames = s"`${expectedEventProps.map(_.name).join("` or `")}`"
+      throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
+        reason = s"This element does not support `${eventPropName}` event for controlled inputs",
+        suggestion = s"Use ${expectedEventPropNames} event instead"
+      ))
     }
   }
 }
@@ -140,68 +182,97 @@ object InputController {
   class InputControllerConfig[-Ref <: dom.html.Element, A](
     val initialValue: A,
     val prop: HtmlProp[A, _],
-    val eventProps: JsArray[EventProp[_]],
-    val getDomValue: Ref => A,
-    val setDomValue: (Ref, A) => Unit,
+    val allowedEventProps: JsArray[EventProp[_]],
+    val getDomValue: ReactiveHtmlElement[Ref] => A,
+    val setDomValue: (ReactiveHtmlElement[Ref], A) => Unit,
   )
 
   private val textValueConfig: InputControllerConfig[dom.html.Element, String] = new InputControllerConfig(
     initialValue = "",
     prop = L.value,
-    eventProps = JsArray(L.onInput),
-    getDomValue = DomApi.getValue(_).getOrElse(""),
-    setDomValue = DomApi.setValue
+    allowedEventProps = JsArray(L.onInput),
+    getDomValue = el => DomApi.getValue(el.ref).getOrElse(""),
+    setDomValue = (el, v) => DomApi.setValue(el.ref, v)
   )
 
   private val selectValueConfig: InputControllerConfig[dom.html.Element, String] = new InputControllerConfig(
     initialValue = "",
     prop = L.value,
-    eventProps = JsArray(L.onInput, L.onChange),
-    getDomValue = DomApi.getValue(_).getOrElse(""),
-    setDomValue = DomApi.setValue
+    allowedEventProps = JsArray(L.onInput, L.onChange), // Note: IE does not support onInput for select tags.
+    getDomValue = el => DomApi.getValue(el.ref).getOrElse(""),
+    setDomValue = (el, v) => DomApi.setValue(el.ref, v)
   )
 
   private val checkedConfig: InputControllerConfig[dom.html.Element, Boolean] = new InputControllerConfig(
     initialValue = false,
     prop = L.checked,
-    eventProps = JsArray(L.onInput, L.onClick), // #nc does checkbox actually work with onInput?
-    getDomValue = DomApi.getChecked(_).getOrElse(false),
-    setDomValue = DomApi.setChecked
+    allowedEventProps = JsArray(L.onInput, L.onClick), // #TODO does checkbox actually work with onInput?
+    getDomValue = el => DomApi.getChecked(el.ref).getOrElse(false),
+    setDomValue = (el, v) => DomApi.setChecked(el.ref, v)
   )
 
-  def controlled[El <: ReactiveHtmlElement.Base, Ev <: dom.Event, V](
-    updater: KeyUpdater[El, HtmlProp[V, _], V],
-    listener: EventListener[Ev, _]
-  ): Binder[El] = {
-    Binder[El] { element =>
+  def controlled[Ref <: dom.html.Element, Ev <: dom.Event, A, B](
+    listener: EventListener[Ev, B],
+    updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A]
+  ): Binder[ReactiveHtmlElement[Ref]] = {
+    Binder[ReactiveHtmlElement[Ref]] { element =>
       val propDomName = updater.key.name
-      val controllableProps = element.controllableProps
-      val isControllableProp = controllableProps.exists(_.includes(propDomName))
+      val maybeControllableProps = element.controllableProps
+      val isControllableProp = maybeControllableProps.exists(_.includes(propDomName))
+
+      // We wait until mounting to check allowed props. By this time, the element's `type`
+      // will certainly be set (assuming the user intended to set it), so we will get the
+      // correct values (e.g. we'll know whether an element is <input type="checkbox">)
 
       if (isControllableProp) {
-        if (DomApi.isCustomElement(element.ref)) {
-          // #TODO implement this
-          ???
-        } else {
-          val controller = {
-            if (propDomName == "value") {
-              val knownUpdater = updater.asInstanceOf[KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[String, _], String]] // #TODO[Integrity]
-              new InputController(textValueConfig, element, knownUpdater, listener)
-            } else {
-              if (propDomName != "checked") {
-                throw new Exception(s"Unexpected HTML controlled prop: ${propDomName}")
+        val controller = {
+          if (DomApi.isCustomElement(element.ref)) {
+            element.tag match {
+              case tag: CustomHtmlTag[Ref @unchecked] =>
+                tag.allowableControllerConfigForProp(updater.key).fold(
+                  ifEmpty = {
+                    val eventPropName = EventProcessor.eventProp(listener.eventProcessor).name
+                    throw new Exception(errorMessage(updater.key.name, eventPropName, element)(
+                      reason = s"This element does not support `${propDomName}` controlled property in its current configuration",
+                      suggestion = "Make sure you passed the right props / attributes, such as `type` for HTML inputs."
+                    ))
+                  }
+                ) { config =>
+                  new InputController(config, element, updater, listener)
+                }
+              case _ =>
+                throw new Exception(s"Custom element `${nodeDescription(element)}` must use CustomHtmlTag in order to support `controlled` inputs.")
+            }
+          } else {
+            allowedHtmlControllerConfig(element.ref).fold(
+              ifEmpty = {
+                val eventPropName = EventProcessor.eventProp(listener.eventProcessor).name
+                throw new Exception(errorMessage(propDomName, eventPropName, element)(
+                  reason = "This element does not support any controlled input props."
+                ))
               }
-              val knownUpdater = updater.asInstanceOf[KeyUpdater[ReactiveHtmlElement.Base, HtmlProp[Boolean, _], Boolean]] // #TODO[Integrity]
-              new InputController(checkedConfig, element, knownUpdater, listener)
+            ) { config =>
+              // Here we assume that the config is the correct one.
+              // If not, InputController's checkControllerCompatibility method will
+              // throw an exception when we call bindController below.
+              val assumedConfig = config.asInstanceOf[InputControllerConfig[Ref, A]]
+              new InputController(assumedConfig, element, updater, listener)
             }
           }
-          element.bindController(controller)
         }
+        element.bindController(controller)
+
       } else {
-        controllableProps.fold(
-          ifEmpty = throw new Exception(s"Can not add a controller for property `${propDomName}` to ${nodeDescription(element)} – this element type is not configured to allow controlled inputs. See docs on controlled inputs for details.")
+        val eventPropName = EventProcessor.eventProp(listener.eventProcessor).name
+        maybeControllableProps.fold(
+          ifEmpty = throw new Exception(errorMessage(propDomName, eventPropName, element)(
+            reason = "This element does not support any controlled input props."
+          ))
         )(
-          props => throw new Exception(s"Can not add a controller for property `${propDomName}` to ${nodeDescription(element)} – on this element type, only the following props can be controlled this way: `${props.join("`, `")}`. See docs on controlled inputs for details.")
+          controllableProps => throw new Exception(errorMessage(propDomName, eventPropName, element)(
+            reason = s"This element does not support `${propDomName}` controlled property",
+            suggestion = s"Use `${controllableProps.join("` or `")}` controlled property instead"
+          ))
         )
       }
     }
@@ -210,61 +281,13 @@ object InputController {
   /** Standard HTML properties than can be `controlled` in Laminar. */
   private[laminar] val htmlControllableProps: JsArray[String] = JsArray("value", "checked")
 
-  /** Returns the prop and eventProp that we can use `controlled` for with this element.
+  /** Returns the input controller config that we can use `controlled` for with this HTML element.
     *
-    * For custom elements / Web Components, you need to specify this in their
-    * [[CustomHtmlTag]]'s `allowedControlKeys` property.
-    *
-    * @return Option((prop, eventProp))
+    * Note: This method does not support web components.
     */
-  def allowedControlKeys[Ref <: dom.html.Element](element: ReactiveHtmlElement[Ref]): js.UndefOr[(String, String)] = {
-    element.ref match {
-
-      case input: dom.html.Input =>
-        input.`type` match {
-          case "text" => "value" -> "input" // Tiny perf shortcut for the most common case
-          case "checkbox" | "radio" => "checked" -> "click"
-          case "file" => js.undefined
-          case _ => "value" -> "input" // All the other input types: email, color, date, etc.
-        }
-
-      case _: dom.html.TextArea =>
-        "value" -> "input"
-
-      case _: dom.html.Select =>
-        // @TODO Allow onInput? it's the same but not all browsers support it.
-        // Note: onChange browser event emits only when the selected value actually changes
-        //       (clicking the same option doesn't trigger the event)
-        "value" -> "change"
-
-      case el if DomApi.isCustomElement(el) =>
-        element.tag match {
-          case tag: CustomHtmlTag[Ref @unchecked] =>
-            tag.allowedInputControllerConfigs(element.ref).map(config => (config.prop.name, config.eventProps(0).name))
-          case _ =>
-            // If nothing is specified, and user tries to use `controlled`,
-            // they will get one of the errors above.
-            js.undefined
-        }
-
-      case _ =>
-        js.undefined
-    }
-  }
-
-  /** Returns the input controller config(s) that we can use `controlled` for with this element.
-    *
-    * For all regular HTML elements and most web components, it will always be at most one config.
-    *
-    * I'm allowing returning multiple configs for weird cases like a web component with two input
-    * fields that can both be controlled independently. Not sure if such components actually exist.
-    *
-    * For custom elements / Web Components, see [[CustomHtmlTag]]
-    *
-    * @return Option((prop, eventProp))
-    */
-  def allowedControllerConfigs[Ref <: dom.html.Element](element: ReactiveHtmlElement[Ref]): js.UndefOr[InputControllerConfig[Ref, _]] = {
-    element.ref match {
+  def allowedHtmlControllerConfig[Ref <: dom.html.Element](element: Ref): js.UndefOr[InputControllerConfig[Ref, _]] = {
+    println("allowedHtmlControllerConfig? " + element.tagName)
+    element match {
 
       case input: dom.html.Input =>
         input.`type` match {
@@ -283,16 +306,6 @@ object InputController {
         //       (clicking the same option doesn't trigger the event)
         selectValueConfig
 
-      case el if DomApi.isCustomElement(el) =>
-        element.tag match {
-          case tag: CustomHtmlTag[Ref @unchecked] =>
-            tag.allowedInputControllerConfigs(element.ref)
-          case _ =>
-            // If nothing is specified, and user tries to use `controlled`,
-            // they will get one of the errors above.
-            js.undefined
-        }
-
       case _ =>
         js.undefined
     }
@@ -302,6 +315,21 @@ object InputController {
     val maybeTyp = DomApi.getHtmlAttributeRaw(element, L.typ)
     val typSuffix = maybeTyp.map(t => s" [type=$t]").getOrElse("")
     s"${DomApi.debugNodeDescription(element.ref)}$typSuffix"
+  }
+
+  private def errorMessage(
+    propDomName: String,
+    eventPropName: String,
+    element: ReactiveHtmlElement.Base
+  )(
+    reason: String,
+    suggestion: String = ""
+  ): String = {
+    JsArray(
+      s"Can not add input controller (prop: `${propDomName}` + event: `${eventPropName}`) to element `${InputController.nodeDescription(element)}`",
+      if (reason.nonEmpty) s"- Cause: $reason" else "",
+      if (suggestion.nonEmpty) s"- Suggestion: $suggestion" else ""
+    ).filter(_.nonEmpty).join("\n")
   }
 
 }

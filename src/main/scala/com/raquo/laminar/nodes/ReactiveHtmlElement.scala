@@ -15,15 +15,13 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
   final override val ref: Ref
 ) extends ReactiveElement[Ref] {
 
-  // -- `value` prop controller
-
-  // #nc do we actually need multiple controllers per element? Don't need it for HTML elements, if only for weird web components, maybe
-  //  - actually as long as our custom elements API allows only one pair, this is moot, so make a choice here.
-
   /** List of value controllers installed on this element */
   private[this] var controllers: js.UndefOr[JsArray[InputController[_, _, _]]] = js.undefined
 
-  /** List of binders for props that are controllable */
+  /**
+    * List of binders for props that are controllable.
+    * Note: this includes both controlled and uncontrolled binders
+    */
   private[this] var controllablePropBinders: js.UndefOr[JsArray[String]] = js.undefined
 
   private[this] def appendValueController(controller: InputController[_, _, _]): Unit = {
@@ -80,7 +78,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
       case p: HtmlProp[_, _] =>
         if (isControllableProp(p.name)) {
           if (hasController(p.name)) {
-            throw new Exception(s"Can not add a `${p.name} <-- ???` binder to an element that already has a `${p.name}` controller: ${DomApi.debugNodeDescription(ref)}")
+            throw new Exception(s"Can not add uncontrolled `${p.name} <-- ???` to element `${DomApi.debugNodeDescription(ref)}` that already has an input controller for `${p.name}` property.")
           } else {
             appendControllablePropBinder(p.name)
           }
