@@ -1,13 +1,12 @@
-package com.raquo.laminar.modifiers
+package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
-import com.raquo.laminar.lifecycle.InsertContext
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.collection.immutable
-import scala.scalajs.js
 
 object ChildrenInserter {
 

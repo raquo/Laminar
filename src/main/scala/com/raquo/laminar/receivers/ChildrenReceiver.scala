@@ -1,7 +1,8 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.modifiers.{ChildrenInserter, DynamicInserter, RenderableNode}
+import com.raquo.laminar.inserters.{ChildrenInserter, DynamicInserter}
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.ChildNode
 
 import scala.collection.immutable

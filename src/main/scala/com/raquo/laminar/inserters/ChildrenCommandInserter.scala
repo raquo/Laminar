@@ -1,8 +1,9 @@
-package com.raquo.laminar.modifiers
+package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.EventStream
+import com.raquo.laminar.DomApi
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
-import com.raquo.laminar.{CollectionCommand, DomApi}
 
 /** Note: this is a low level inserter. It is the fastest one in certain cases,
   * but due to its rather imperative API, its usefulness is very limited.

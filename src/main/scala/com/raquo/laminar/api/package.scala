@@ -4,7 +4,7 @@ import scala.annotation.implicitNotFound
 
 package object api extends Implicits {
 
-  lazy val A: Airstream = new Airstream {}
+  lazy val A: AirstreamAliases = new AirstreamAliases {}
 
   val L: Laminar = new Laminar {}
 

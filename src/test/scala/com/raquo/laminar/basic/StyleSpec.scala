@@ -1,6 +1,7 @@
 package com.raquo.laminar.basic
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
 import com.raquo.laminar.keys.DerivedStyleBuilder
 import com.raquo.laminar.utils.UnitSpec
 

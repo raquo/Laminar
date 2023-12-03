@@ -1,8 +1,8 @@
-package com.raquo.laminar.modifiers
+package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Observable
-import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
+import com.raquo.laminar.modifiers.RenderableNode
+import com.raquo.laminar.nodes.{ChildNode, ParentNode}
 
 import scala.scalajs.js
 

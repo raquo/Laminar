@@ -1,8 +1,6 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
-import com.raquo.laminar
-import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
@@ -11,63 +9,43 @@ import com.raquo.laminar.defs.styles.{StyleProps, units}
 import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
-import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.modifiers.{DynamicInserter, EventListener, KeyUpdater, StaticInserter}
+import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
+import com.raquo.laminar.{DomApi, nodes}
 import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
-import com.raquo.laminar.{DomApi, Implicits, keys, lifecycle, modifiers, nodes}
 import org.scalajs.dom
-
-import scala.collection.immutable
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
 trait Laminar
-  extends Airstream
-    with HtmlTags
+  extends HtmlTags
     with HtmlAttrs
     with HtmlProps
     with GlobalEventProps
     with StyleProps
     with ComplexHtmlKeys
+    with MountHooks // onMountFocus, onMountSet, onMountBind, OnMountCallback, OnUnmountCallback, etc.
+    with AirstreamAliases
+    with LaminarAliases
     with Implicits {
 
-  /** This marker trait is used for implicit conversions. For all intents and purposes it's just a function. */
-  trait StyleEncoder[A] extends Function1[A, String]
-
+  /** Contains Helpers like `style.px(12)` // returns "12px" */
   object style
-    extends DerivedStyleBuilder[String, StyleEncoder]
-      with units.Color[String, StyleEncoder]
-      with units.Length[StyleEncoder, Int]
-      with units.Time[StyleEncoder]
-      with units.Url[StyleEncoder] {
+    extends StyleUnitsApi
 
-    override protected def styleSetter(value: String): String = value
-
-    override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = new StyleEncoder[A] {
-      override def apply(v: A): String = encode(v)
-    }
-  }
-
+  /** Contains ARIA attrs for accessibility */
   object aria
     extends AriaAttrs
 
-  // @TODO[API] Add GlobalEventProps to SVG as well? Regular event props work fine, but they might be hard to import if you also import svg._
+  // @TODO[API] Add GlobalEventProps to SVG as well?
+  //  Regular event props work fine, but they might be hard to import if you also import svg._
+  /** Contains SVG tags and attrs */
   object svg
     extends SvgTags
       with SvgAttrs
-      with ComplexSvgKeys {
+      with ComplexSvgKeys
 
-    @deprecated("customEventProp was removed from the svg scope, use eventProp in the parent scope", "0.15.0-RC1")
-    @inline def customEventProp[Ev <: dom.Event](key: String): EventProp[Ev] = eventProp(key)
-
-    @deprecated("customSvgAttr was renamed to svgAttr", "0.15.0-RC1")
-    @inline def customSvgAttr[V](key: String, codec: Codec[V, String], namespace: Option[String] = None): SvgAttr[V] = svgAttr(key, codec, namespace)
-
-    @deprecated("customSvgTag was renamed to svgTag", "0.15.0-RC1")
-    @inline def customSvgTag[Ref <: dom.svg.Element](tagName: String): SvgTag[Ref] = svgTag(tagName)
-  }
 
   // -- Document & window events --
 
@@ -78,7 +56,7 @@ trait Laminar
   /** Typical usage: documentEvents(_.onDomContentLoaded) */
   def documentEvents[Ev <: dom.Event, V](events: documentEventProps.type => EventProcessor[Ev, V]): EventStream[V] = {
     val p = events(documentEventProps)
-    DomEventStream[Ev](dom.document, EventProcessor.eventProp(p).name,  EventProcessor.shouldUseCapture(p))
+    DomEventStream[Ev](dom.document, EventProcessor.eventProp(p).name, EventProcessor.shouldUseCapture(p))
       .collectOpt(EventProcessor.processor(p))
   }
 
@@ -89,20 +67,6 @@ trait Laminar
       .collectOpt(EventProcessor.processor(p))
   }
 
-  @deprecated("customHtmlAttr was renamed to htmlAttr", "0.15.0-RC1")
-  @inline def customHtmlAttr[V](key: String, codec: Codec[V, String]): keys.HtmlAttr[V] = htmlAttr(key, codec)
-
-  @deprecated("customProp was renamed to htmlProp", "0.15.0-RC1")
-  @inline def customProp[V, DomV](key: String, codec: Codec[V, DomV]): keys.HtmlProp[V, DomV] = htmlProp(key, codec)
-
-  @deprecated("customEventProp was renamed to eventProp", "0.15.0-RC1")
-  @inline def customEventProp[Ev <: dom.Event](key: String): keys.EventProp[Ev] = eventProp(key)
-
-  @deprecated("customStyle was renamed to styleProp", "0.15.0-RC1")
-  @inline def customStyle[V](key: String): keys.StyleProp[V] = styleProp(key)
-
-  @deprecated("customHtmlTag was renamed to htmlTag", "0.15.0-RC1")
-  @inline def customHtmlTag[Ref <: dom.html.Element](tagName: String): HtmlTag[Ref] = htmlTag(tagName)
 
   /** An owner that never kills its possessions.
     *
@@ -113,132 +77,8 @@ trait Laminar
     */
   object unsafeWindowOwner extends Owner {}
 
-  // Base elements and nodes
 
-  type HtmlElement = nodes.ReactiveHtmlElement.Base
-
-  type SvgElement = nodes.ReactiveSvgElement.Base
-
-  type Element = nodes.ReactiveElement.Base
-
-  type Node = nodes.ChildNode.Base
-
-  type TextNode = nodes.TextNode
-
-  type CommentNode = nodes.CommentNode
-
-  type RootNode = nodes.RootNode
-
-  @deprecated("`Child` type alias is deprecated. Use ChildNode.Base", "15.0.0-M6")
-  type Child = nodes.ChildNode.Base
-
-  @deprecated("`Children`type alias is deprecated. Use immutable.Seq[ChildNode.Base]", "15.0.0-M6")
-  type Children = immutable.Seq[nodes.ChildNode.Base]
-
-  @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand.Base", "15.0.0-M5")
-  type ChildrenCommand = CollectionCommand[nodes.ChildNode.Base]
-
-  type CollectionCommand[+Item] = laminar.CollectionCommand[Item]
-
-  lazy val CollectionCommand: laminar.CollectionCommand.type = laminar.CollectionCommand
-
-  // Modifiers
-
-  type Mod[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
-
-  val Mod: modifiers.Modifier.type = modifiers.Modifier
-
-  type HtmlMod = Mod[HtmlElement]
-
-  type SvgMod = Mod[SvgElement]
-
-
-  type Modifier[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
-
-  val Modifier: modifiers.Modifier.type = modifiers.Modifier
-
-
-  type Setter[-El <: Element] = modifiers.Setter[El]
-
-  val Setter: modifiers.Setter.type = modifiers.Setter
-
-
-  type Binder[-El <: Element] = modifiers.Binder[El]
-
-  val Binder: modifiers.Binder.type = modifiers.Binder
-
-
-  type Inserter = modifiers.Inserter
-
-  type StaticInserter = modifiers.StaticInserter
-
-  type DynamicInserter = modifiers.DynamicInserter
-
-
-  // Events
-
-  type EventProcessor[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
-
-
-  // Lifecycle
-
-  type MountContext[+El <: Element] = lifecycle.MountContext[El]
-
-  type InsertContext = lifecycle.InsertContext
-
-
-  // Keys
-
-  type EventProp[Ev <: dom.Event] = keys.EventProp[Ev]
-
-  type HtmlAttr[V] = keys.HtmlAttr[V]
-
-  @deprecated("Use `HtmlProp` instead of `Prop`", "0.15.0-RC1")
-  type Prop[V] = keys.HtmlProp[V, _]
-
-  type HtmlProp[V, DomV] = keys.HtmlProp[V, DomV]
-
-  @deprecated("Use `StyleProp` instead of `Style`", "0.15.0-RC1")
-  type Style[V] = keys.StyleProp[V]
-
-  type StyleProp[V] = keys.StyleProp[V]
-
-  type SvgAttr[V] = keys.SvgAttr[V]
-
-  type CompositeHtmlAttr = ComplexHtmlKeys.CompositeHtmlAttr
-
-  type CompositeSvgAttr = ComplexSvgKeys.CompositeSvgAttr
-
-
-  // Specific HTML elements
-
-  type Anchor = nodes.ReactiveHtmlElement[dom.html.Anchor]
-
-  type Button = nodes.ReactiveHtmlElement[dom.html.Button]
-
-  type Div = nodes.ReactiveHtmlElement[dom.html.Div]
-
-  type IFrame = nodes.ReactiveHtmlElement[dom.html.IFrame]
-
-  type Image = nodes.ReactiveHtmlElement[dom.html.Image]
-
-  type Input = nodes.ReactiveHtmlElement[dom.html.Input]
-
-  type FormElement = nodes.ReactiveHtmlElement[dom.html.Form]
-
-  type Label = nodes.ReactiveHtmlElement[dom.html.Label]
-
-  @deprecated("Use LI instead of Li type", "0.15.0-RC1")
-  type Li = nodes.ReactiveHtmlElement[dom.html.LI]
-
-  type LI = nodes.ReactiveHtmlElement[dom.html.LI]
-
-  type Select = nodes.ReactiveHtmlElement[dom.html.Select]
-
-  type Span = nodes.ReactiveHtmlElement[dom.html.Span]
-
-  type TextArea = nodes.ReactiveHtmlElement[dom.html.TextArea]
-
+  // -- Rendering --
 
   /** Render a Laminar element into a container DOM node, right now.
     * You must make sure that the container node already exists
@@ -294,6 +134,13 @@ trait Laminar
 
   def commentNode(text: String = ""): CommentNode = new CommentNode(text)
 
+  /** Non-breaking space character
+    *
+    * Note: In Laminar you don't need to use html entities, you can just
+    * insert the actual character you want, e.g. "»" instead of "&raquo;"
+    */
+  val nbsp: String = "\u00a0"
+
   /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
   def foreignHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref], element: Ref): ReactiveHtmlElement[Ref] = {
     DomApi.assertTagMatches(tag, element, "Unable to init foreign html element")
@@ -318,13 +165,6 @@ trait Laminar
     foreignSvgElement(tag, element)
   }
 
-  /** Non-breaking space character
-    *
-    * Note: In Laminar you don't need to use html entities, you can just
-    * insert the actual character you want, e.g. "»" instead of "&raquo;"
-    */
-  val nbsp: String = "\u00a0"
-
 
   val child: ChildReceiver.type = ChildReceiver
 
@@ -332,166 +172,15 @@ trait Laminar
 
   val children: ChildrenReceiver.type = ChildrenReceiver
 
-
   /** Focus or blur an element: `focus <-- EventStream[Boolean]` (true = focus, false = blur) */
   val focus: FocusReceiver.type = FocusReceiver
 
-  /** Focus this element on mount */
-  val onMountFocus: Modifier[HtmlElement] = onMountCallback(_.thisNode.ref.focus())
 
-  /** Set a property / attribute / style on mount.
-    * Similarly to other onMount methods, you only need this when:
-    * a) you need to access MountContext
-    * b) you truly need this to only happen on mount
-    *
-    * Example usage: `onMountSet(ctx => someAttr := someValue(ctx))`. See docs for details.
-    */
-  def onMountSet[El <: Element](fn: MountContext[El] => Setter[El]): Modifier[El] = {
-    onMountCallback(c => fn(c)(c.thisNode))
-  }
-
-  /** Bind a subscription on mount
-    *
-    * Example usage: `onMountBind(ctx => someAttr <-- someObservable(ctx))`. See docs for details.
-    */
-  @inline def onMountBind[El <: Element](fn: MountContext[El] => Binder[El]): Modifier[El] = {
-    var maybeSubscription: Option[DynamicSubscription] = None
-    onMountUnmountCallback(
-      mount = { c =>
-        val binder = fn(c)
-        maybeSubscription = Some(binder.bind(c.thisNode))
-      },
-      unmount = { _ =>
-        maybeSubscription.foreach(_.kill())
-        maybeSubscription = None
-      }
-    )
-  }
-
-  /** Insert child node(s) on mount.
-    *
-    * Note: insert position is reserved as soon as this modifier is applied to the element.
-    * Basically it will insert elements in the same position, where you'd expect, on every mount.
-    *
-    * Example usage: `onMountInsert(ctx => child <-- someObservable(ctx))`. See docs for details.
-    */
-  def onMountInsert[El <: Element](fn: MountContext[El] => Inserter): Modifier[El] = {
-    Modifier[El] { element =>
-      var maybeSubscription: Option[DynamicSubscription] = None
-      // We start the context in loose mode for performance, because it's cheaper to go from there
-      // to strict mode, than the other way. The inserters are able to handle any initial mode.
-      val lockedInsertContext = InsertContext.reserveSpotContext(element, strictMode = false)
-      element.amend(
-        onMountUnmountCallback[El](
-          mount = { mountContext =>
-            val inserter = fn(mountContext)
-            inserter match {
-              case dynamicInserter: DynamicInserter =>
-                maybeSubscription = Some(
-                  dynamicInserter
-                    .withContext(lockedInsertContext)
-                    .bind(mountContext.thisNode)
-                )
-              case staticInserter: StaticInserter =>
-                staticInserter.renderInContext(lockedInsertContext)
-            }
-          },
-          unmount = { _ =>
-            maybeSubscription.foreach(_.kill())
-            maybeSubscription = None
-          }
-        )
-      )
-    }
-  }
-
-  /** Execute a callback on mount. Good for integrating third party libraries.
-    *
-    * The callback runs on every mount, not just the first one.
-    * - Therefore, don't bind any subscriptions inside that you won't manually unbind on unmount.
-    *   - If you fail to unbind manually, you will have N copies of them after mounting this element N times.
-    *   - Use onMountBind or onMountInsert for that.
-    *
-    * When the callback is called, the element is already mounted.
-    *
-    * If you apply this modifier to an element that is already mounted, the callback
-    * will not fire until and unless it is unmounted and mounted again.
-    */
-  def onMountCallback[El <: Element](fn: MountContext[El] => Unit): Modifier[El] = {
-    Modifier[El] { element =>
-      var ignoreNextActivation = ReactiveElement.isActive(element)
-      ReactiveElement.bindCallback[El](element) { c =>
-        if (ignoreNextActivation) {
-          ignoreNextActivation = false
-        } else {
-          fn(c)
-        }
-      }
-    }
-  }
-
-  /** Execute a callback on unmount. Good for integrating third party libraries.
-    *
-    * When the callback is called, the element is still mounted.
-    *
-    * If you apply this modifier to an element that is already unmounted, the callback
-    * will not fire until and unless it is mounted and then unmounted again.
-    */
-  def onUnmountCallback[El <: Element](fn: El => Unit): Modifier[El] = {
-    Modifier[El] { element =>
-      ReactiveElement.bindSubscriptionUnsafe(element) { c =>
-        new Subscription(c.owner, cleanup = () => fn(element))
-      }
-    }
-  }
-
-  /** Combines onMountCallback and onUnmountCallback for easier integration.
-    * - Note that the same caveats apply as for those individual methods.
-    * - See also: [[onMountUnmountCallbackWithState]]
-    */
-  def onMountUnmountCallback[El <: Element](
-    mount: MountContext[El] => Unit,
-    unmount: El => Unit
-  ): Modifier[El] = {
-    onMountUnmountCallbackWithState[El, Unit](mount, (el, _) => unmount(el))
-  }
-
-  /** Combines onMountCallback and onUnmountCallback for easier integration.
-    * - Note that the same caveats apply as for those individual methods.
-    * - The mount callback returns state which will be provided to the unmount callback.
-    * - The unmount callback receives an Option of the state because it's possible that
-    * onMountUnmountCallbackWithState was called *after* the element was already mounted,
-    * in which case the mount callback defined here wouldn't have run.
-    */
-  def onMountUnmountCallbackWithState[El <: Element, A](
-    mount: MountContext[El] => A,
-    unmount: (El, Option[A]) => Unit
-  ): Modifier[El] = {
-    Modifier[El] { element =>
-      var ignoreNextActivation = ReactiveElement.isActive(element)
-      var state: Option[A] = None
-      ReactiveElement.bindSubscriptionUnsafe[El](element) { c =>
-        if (ignoreNextActivation) {
-          ignoreNextActivation = false
-        } else {
-          state = Some(mount(c))
-        }
-        new Subscription(
-          c.owner,
-          cleanup = () => {
-            unmount(element, state)
-            state = None
-          }
-        )
-      }
-    }
-  }
-
-  // @TODO[Naming] Find a better name for this. We now have actual MountContext classes that this has nothing to do with.
   /** Use this when you need a reference to current element. See docs. */
   def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
     Modifier[El] { element => makeModifier(element).apply(element) }
   }
+
 
   /** Modifier that applies one or more modifiers if `condition` is true */
   def when[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = {
@@ -505,22 +194,10 @@ trait Laminar
   /** Modifier that applies one or more modifiers if `condition` is true */
   @inline def whenNot[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = when(!condition)(mods)
 
-  /** Use this when you need to apply stream operators on this element's events, e.g.:
-    *
-    *     div(composeEvents(onScroll)(_.throttle(100)) --> observer)
-    *
-    *     a(composeEvents(onClick.preventDefault)(_.delay(100)) --> observer)
-    */
-  @deprecated("Instead of composeEvents(a)(b), use a.compose(b) or just a(b)", "0.15.0-RC1")
-  def composeEvents[Ev <: dom.Event, In, Out](
-    event: EventProcessor[Ev, In]
-  )(
-    composer: EventStream[In] => Observable[Out]
-  ): LockedEventKey[Ev, In, Out] = {
-    new LockedEventKey(event, composer)
-  }
 
-  /** Creates controlled input block. See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]] */
+  /** Creates controlled input block.
+    * See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]]
+    */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
     listener: EventListener[Ev, _],
     updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V]
@@ -528,11 +205,13 @@ trait Laminar
     InputController.controlled(listener, updater)
   }
 
-  /** Creates controlled input block. See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]] */
-  @inline def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
+  /** Creates controlled input block.
+    * See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]]
+    */
+  def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
     updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V],
     listener: EventListener[Ev, _]
   ): Binder[ReactiveHtmlElement[Ref]] = {
-    controlled(listener, updater)
+    InputController.controlled(listener, updater)
   }
 }

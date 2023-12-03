@@ -1,7 +1,8 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.modifiers.{ChildInserter, DynamicInserter, RenderableNode}
+import com.raquo.laminar.inserters.{ChildInserter, DynamicInserter}
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.ChildNode
 
 object ChildReceiver {

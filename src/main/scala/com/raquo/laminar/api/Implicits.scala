@@ -1,14 +1,14 @@
-package com.raquo.laminar
+package com.raquo.laminar.api
 
 import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.ew
 import com.raquo.ew.ewArray
-import com.raquo.laminar.Implicits.RichSource
-import com.raquo.laminar.api.L.StyleEncoder
-import com.raquo.laminar.api.UnitArrowsFeature
+import com.raquo.laminar.api.Implicits.RichSource
+import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
+import com.raquo.laminar.inserters.{Inserter, StaticChildInserter, StaticChildrenInserter, StaticTextInserter}
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}
-import com.raquo.laminar.modifiers.{Binder, Inserter, Modifier, StaticChildrenInserter, RenderableNode, RenderableText, Setter, StaticChildInserter, StaticTextInserter}
+import com.raquo.laminar.modifiers.{Binder, Modifier, RenderableNode, RenderableText, Setter}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 import org.scalajs.dom
 
@@ -21,17 +21,23 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     new RichSource(source)
   }
 
+
+  // -- CSS Styles --
+
   /** Allow both Int-s and Double-s in numeric style props */
-  @inline implicit def derivedStyleIntToDouble[V](style: DerivedStyleProp[Int]): DerivedStyleProp[Double] = {
+  @inline implicit def derivedStyleIntToDouble(style: DerivedStyleProp[Int]): DerivedStyleProp[Double] = {
     // Safe because Int-s and Double-s have identical runtime representation in Scala.js
     style.asInstanceOf[DerivedStyleProp[Double]]
   }
 
   /** Allow both Int-s and Double-s in numeric style props */
-  @inline implicit def styleEncoderIntToDouble[V](encoder: StyleEncoder[Int]): StyleEncoder[Double] = {
+  @inline implicit def styleEncoderIntToDouble(encoder: StyleEncoder[Int]): StyleEncoder[Double] = {
     // Safe because Int-s and Double-s have identical runtime representation in Scala.js
     encoder.asInstanceOf[StyleEncoder[Double]]
   }
+
+
+  // -- Basic laminar syntax --
 
   /** Add [[EventProcessor]] methods (mapToValue / filter / preventDefault / etc.) to event props (e.g. onClick) */
   @inline implicit def eventPropToProcessor[Ev <: dom.Event](eventProp: EventProp[Ev]): EventProcessor[Ev, Ev] = {
@@ -47,6 +53,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   implicit def componentToNode[A](component: A)(implicit r: RenderableNode[A]): ChildNode.Base = {
     r.asNode(component)
   }
+
 
   // -- Methods to convert collections of Setter[El] to a single Setter[El] --
 
@@ -85,6 +92,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   //implicit def seqToBinder[El <: ReactiveElement.Base](binders: collection.Seq[Binder[El]]): Binder[El] = {
   //  Binder[El] { ??? }
   //}
+
 
   // -- Methods to convert collections of Modifier[El]-like things to Modifier[El] --
 
@@ -192,6 +200,7 @@ object Implicits {
     }
 
   }
+
 
   /** Implicit conversions from X to Inserter are primarily needed for
     * `onMountInsert`, but they are relatively expensive compared to simpler

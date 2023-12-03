@@ -1,8 +1,8 @@
-package com.raquo.laminar.modifiers
+package com.raquo.laminar.inserters
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.laminar.api.L.seqToModifier
-import com.raquo.laminar.lifecycle.InsertContext
+import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
 
 import scala.scalajs.js

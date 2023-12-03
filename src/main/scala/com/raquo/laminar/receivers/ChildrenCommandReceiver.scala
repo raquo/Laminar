@@ -1,8 +1,8 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source.EventSource
-import com.raquo.laminar.CollectionCommand
-import com.raquo.laminar.modifiers.{ChildrenCommandInserter, DynamicInserter, RenderableNode}
+import com.raquo.laminar.inserters.{ChildrenCommandInserter, CollectionCommand, DynamicInserter}
+import com.raquo.laminar.modifiers.RenderableNode
 
 object ChildrenCommandReceiver {
 

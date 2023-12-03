@@ -1,4 +1,4 @@
-package com.raquo.laminar
+package com.raquo.laminar.inserters
 
 import com.raquo.laminar.nodes.ChildNode
 

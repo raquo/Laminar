@@ -12,6 +12,13 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.{JavaScriptException, |}
 
+/** Low level DOM APIs used by Laminar.
+  *
+  * End users: Do not call any mutator methods here on Laminar-managed elements,
+  * these methods do not make the necessary updates to Laminar internal state.
+  * Instead, use regular Laminar API, or, if you must, the methods from
+  * [[com.raquo.laminar.nodes.ParentNode]]
+  */
 object DomApi {
 
   /* Tree update functions */

@@ -2,7 +2,7 @@ package com.raquo.laminar.api
 
 import com.raquo.airstream
 
-trait Airstream {
+trait AirstreamAliases {
 
   // -- Core
 

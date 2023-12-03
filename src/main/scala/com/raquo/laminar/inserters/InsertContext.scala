@@ -1,4 +1,4 @@
-package com.raquo.laminar.lifecycle
+package com.raquo.laminar.inserters
 
 import com.raquo.ew.JsMap
 import com.raquo.laminar.DomApi

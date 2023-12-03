@@ -2,7 +2,8 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.L.child
-import com.raquo.laminar.modifiers.{DynamicInserter, RenderableNode}
+import com.raquo.laminar.inserters.DynamicInserter
+import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 
 object ChildOptionReceiver {
