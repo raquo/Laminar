@@ -20,7 +20,7 @@ class LockedChildTextReceiver(
   }
 
   /** If `includeSource` emits true, text will be added. Otherwise, it will be removed. */
-  def <--(includeSource: Source[Boolean]): DynamicInserter.Base = {
+  def <--(includeSource: Source[Boolean]): DynamicInserter = {
     child.text <-- includeSource.toObservable.map(if (_) text else "")
   }
 }

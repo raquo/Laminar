@@ -22,7 +22,7 @@ class LockedChildrenReceiver(
   }
 
   /** If `includeSource` emits true, node will be added. Otherwise, it will be removed. */
-  def <--(includeSource: Source[Boolean]): DynamicInserter.Base = {
+  def <--(includeSource: Source[Boolean]): DynamicInserter = {
     children <-- includeSource.toObservable.map(if (_) nodes else Nil)
   }
 

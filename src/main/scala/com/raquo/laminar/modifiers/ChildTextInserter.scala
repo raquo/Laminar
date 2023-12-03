@@ -11,8 +11,8 @@ object ChildTextInserter {
   def apply[Component] (
     textSource: Observable[Component],
     renderable: RenderableText[Component]
-  ): DynamicInserter.Base = {
-    new DynamicInserter[ReactiveElement.Base](
+  ): DynamicInserter = {
+    new DynamicInserter(
       preferStrictMode = false,
       insertFn = (ctx, owner) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
@@ -33,7 +33,7 @@ object ChildTextInserter {
     )
   }
 
-  def switchToText(newTextNode: TextNode, ctx: InsertContext[ReactiveElement.Base]): Unit = {
+  def switchToText(newTextNode: TextNode, ctx: InsertContext): Unit = {
     // First event: inserting the child for the first time: replace sentinel comment node with new TextNode
     ParentNode.replaceChild(parent = ctx.parentNode, oldChild = ctx.sentinelNode, newChild = newTextNode)
 

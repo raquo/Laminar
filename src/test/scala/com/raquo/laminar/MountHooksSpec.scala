@@ -441,7 +441,7 @@ class MountHooksSpec extends UnitSpec {
 
     val yChildrenInserter = children <-- yChildrenSignal
 
-    var dynamicInserter: Inserter.Base = xChildInserter
+    var dynamicInserter: Inserter = xChildInserter
 
     // --
 
@@ -651,7 +651,7 @@ class MountHooksSpec extends UnitSpec {
 
     val yChildrenInserter = children <-- yChildrenStream
 
-    var dynamicInserter: Inserter.Base = xChildInserter
+    var dynamicInserter: Inserter = xChildInserter
 
     // --
 
@@ -911,7 +911,7 @@ class MountHooksSpec extends UnitSpec {
 
     val yChildrenInserter = children <-- yChildrenStream
 
-    var dynamicInserter: Inserter.Base = xChildInserter
+    var dynamicInserter: Inserter = xChildInserter
 
     // --
 

@@ -168,9 +168,11 @@ trait Laminar
   val Binder: modifiers.Binder.type = modifiers.Binder
 
 
-  type Inserter[-El <: Element] = modifiers.Inserter[El]
+  type Inserter = modifiers.Inserter
 
-  val Inserter: modifiers.Inserter.type = modifiers.Inserter
+  type StaticInserter = modifiers.StaticInserter
+
+  type DynamicInserter = modifiers.DynamicInserter
 
 
   // Events
@@ -182,7 +184,7 @@ trait Laminar
 
   type MountContext[+El <: Element] = lifecycle.MountContext[El]
 
-  type InsertContext[+El <: Element] = lifecycle.InsertContext[El]
+  type InsertContext = lifecycle.InsertContext
 
 
   // Keys
@@ -373,24 +375,24 @@ trait Laminar
     *
     * Example usage: `onMountInsert(ctx => child <-- someObservable(ctx))`. See docs for details.
     */
-  def onMountInsert[El <: Element](fn: MountContext[El] => Inserter[El]): Modifier[El] = {
+  def onMountInsert[El <: Element](fn: MountContext[El] => Inserter): Modifier[El] = {
     Modifier[El] { element =>
       var maybeSubscription: Option[DynamicSubscription] = None
       // We start the context in loose mode for performance, because it's cheaper to go from there
       // to strict mode, than the other way. The inserters are able to handle any initial mode.
-      val lockedInsertContext = InsertContext.reserveSpotContext[El](element, strictMode = false)
+      val lockedInsertContext = InsertContext.reserveSpotContext(element, strictMode = false)
       element.amend(
         onMountUnmountCallback[El](
           mount = { mountContext =>
             val inserter = fn(mountContext)
             inserter match {
-              case dynamicInserter: DynamicInserter[El @unchecked] =>
+              case dynamicInserter: DynamicInserter =>
                 maybeSubscription = Some(
                   dynamicInserter
                     .withContext(lockedInsertContext)
                     .bind(mountContext.thisNode)
                 )
-              case staticInserter: StaticInserter[El @unchecked] =>
+              case staticInserter: StaticInserter =>
                 staticInserter.renderInContext(lockedInsertContext)
             }
           },

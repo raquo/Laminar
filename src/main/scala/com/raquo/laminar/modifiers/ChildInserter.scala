@@ -11,8 +11,8 @@ object ChildInserter {
   def apply[Component] (
     childSource: Observable[Component],
     renderable: RenderableNode[Component]
-  ): DynamicInserter.Base = {
-    new DynamicInserter[ReactiveElement.Base](
+  ): DynamicInserter = {
+    new DynamicInserter(
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
         // Reset sentinel node on binding too, don't wait for events
@@ -32,7 +32,7 @@ object ChildInserter {
   def switchToChild(
     maybeLastSeenChild: js.UndefOr[ChildNode.Base],
     newChildNode: ChildNode.Base,
-    ctx: InsertContext[ReactiveElement.Base]
+    ctx: InsertContext
   ): Unit = {
     if (!ctx.strictMode) {
       // #Note: previously in ChildInserter we only did this once in insertFn.

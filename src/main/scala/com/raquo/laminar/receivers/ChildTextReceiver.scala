@@ -18,11 +18,11 @@ object ChildTextReceiver {
     new LockedChildTextReceiver(renderable.asString(text))
   }
 
-  def <--(textSource: Source[String]): DynamicInserter.Base = {
+  def <--(textSource: Source[String]): DynamicInserter = {
     ChildTextInserter(textSource.toObservable, RenderableText.stringRenderable)
   }
 
-  def <--[TextLike](textSource: Source[TextLike])(implicit renderable: RenderableText[TextLike]): DynamicInserter.Base = {
+  def <--[TextLike](textSource: Source[TextLike])(implicit renderable: RenderableText[TextLike]): DynamicInserter = {
     if (renderable == RenderableText.textNodeRenderable) {
       // #Note: Special case: since we already have TextNode-s, using them in ChildTextInserter would be
       //  inefficient, so we redirect this case to ChildInserter (child <-- textSource) instead.
@@ -41,11 +41,11 @@ object ChildTextReceiver {
 
   // implicit class RichTextReceiver(val self: ChildTextReceiver.type) extends AnyVal {
   //
-  //   def <--(textSource: Source[TextNode]): Inserter.Base = {
+  //   def <--(textSource: Source[TextNode]): Inserter = {
   //     ChildTextInserter(textSource.toObservable, RenderableText.textNodeRenderable)
   //   }
   //
-  //   def <--[TextLike](textSource: Source[TextLike])(implicit renderable: RenderableText[TextLike]): Inserter.Base = {
+  //   def <--[TextLike](textSource: Source[TextLike])(implicit renderable: RenderableText[TextLike]): Inserter = {
   //     if (renderable == RenderableText.textNodeRenderable) {
   //       // Special case: since we already have TextNode-s, using them in ChildTextInserter would be
   //       // inefficient, so we redirect this case to ChildInserter (child <-- textSource) instead.

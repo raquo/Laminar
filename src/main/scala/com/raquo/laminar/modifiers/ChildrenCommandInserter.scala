@@ -18,11 +18,11 @@ object ChildrenCommandInserter {
   @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand[Node]", "15.0.0-M5")
   type ChildrenCommand = CollectionCommand[ChildNode.Base]
 
-  def apply[Component, El <: ReactiveElement.Base] (
+  def apply[Component] (
     commands: EventStream[CollectionCommand[Component]],
     renderableNode: RenderableNode[Component]
-  ): DynamicInserter[El] = {
-    new DynamicInserter[El](
+  ): DynamicInserter = {
+    new DynamicInserter(
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
         commands.foreach { command =>

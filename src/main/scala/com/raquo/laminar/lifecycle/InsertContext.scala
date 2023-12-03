@@ -61,8 +61,8 @@ import scala.collection.immutable
  * @param extraNodesMap       - Map of child nodes, for more efficient search
  *                              Warning: can get out of sync with the real DOM!
  */
-final class InsertContext[+El <: ReactiveElement.Base](
-  val parentNode: El,
+final class InsertContext(
+  val parentNode: ReactiveElement.Base,
   var sentinelNode: ChildNode.Base,
   var strictMode: Boolean,
   var extraNodeCount: Int, // This is separate from `extraNodesMap` for performance #TODO[Performance]: Check if this is still relevant with JsMap
@@ -146,11 +146,10 @@ final class InsertContext[+El <: ReactiveElement.Base](
 object InsertContext {
 
   /** Reserve the spot for when we actually insert real nodes later */
-  def reserveSpotContext[El <: ReactiveElement.Base](
-    parentNode: El,
+  def reserveSpotContext(
+    parentNode: ReactiveElement.Base,
     strictMode: Boolean
-  ): InsertContext[El] = {
-
+  ): InsertContext = {
     val sentinelNode = new CommentNode("")
 
     ParentNode.appendChild(parent = parentNode, child = sentinelNode)
@@ -169,14 +168,14 @@ object InsertContext {
     *
     * This method is exposed to help third parties make hydration helpers.
     */
-  def unsafeMakeReservedSpotContext[El <: ReactiveElement.Base](
-    parentNode: El,
+  def unsafeMakeReservedSpotContext(
+    parentNode: ReactiveElement.Base,
     sentinelNode: ChildNode.Base,
     strictMode: Boolean
-  ): InsertContext[El] = {
+  ): InsertContext = {
     // #Warning[Fragile] - We avoid instantiating a JsMap in loose mode, for performance.
     //  The JsMap is initialized if/when needed, in forceSetStrictMode.
-    new InsertContext[El](
+    new InsertContext(
       parentNode = parentNode,
       sentinelNode = sentinelNode,
       strictMode = strictMode,

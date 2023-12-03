@@ -29,7 +29,7 @@ object ChildrenReceiver {
   // a version that works with arrays and mutable Seq-s too.
   // Let me know if you have a compelling use case for this.
 
-  def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): DynamicInserter.Base = {
+  def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): DynamicInserter = {
     ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable)
   }
 
@@ -37,7 +37,7 @@ object ChildrenReceiver {
     childrenSource: Source[immutable.Seq[Component]]
   )(
     implicit renderableNode: RenderableNode[Component]
-  ): DynamicInserter.Base = {
+  ): DynamicInserter = {
     ChildrenInserter(childrenSource.toObservable, renderableNode)
   }
 

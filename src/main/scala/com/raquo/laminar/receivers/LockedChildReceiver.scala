@@ -20,7 +20,7 @@ class LockedChildReceiver(
   }
 
   /** If `includeSource` emits true, node will be added. Otherwise, it will be removed. */
-  def <--(includeSource: Source[Boolean]): DynamicInserter.Base = {
+  def <--(includeSource: Source[Boolean]): DynamicInserter = {
     val emptyNode = new CommentNode("")
     child <-- includeSource.toObservable.map(if (_) node else emptyNode)
   }

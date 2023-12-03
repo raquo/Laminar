@@ -10,7 +10,7 @@ object ChildrenCommandReceiver {
     commands: EventSource[CollectionCommand[Component]]
   )(
     implicit renderableNode: RenderableNode[Component]
-  ): DynamicInserter.Base = {
+  ): DynamicInserter = {
     ChildrenCommandInserter(commands.toObservable, renderableNode)
   }
 }

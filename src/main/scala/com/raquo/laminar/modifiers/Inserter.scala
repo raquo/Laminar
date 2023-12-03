@@ -16,46 +16,41 @@ import scala.scalajs.js
   * just by calling its `apply` method. It will work the same way as
   * rendering any other child node, static or dynamic, would.
   *
-  * So, you can use [[Inserter.Base]] essentially as (an implicit-powered)
+  * So, you can use [[Inserter]] essentially as (an implicit-powered)
   * sypertype of regular laminar elements and dynamic inserters like
   * `children <-- ...`. We use it this way in `onMountInsert`, for example.
   */
-sealed trait Inserter[-El <: ReactiveElement.Base] extends Modifier[El]
+sealed trait Inserter extends Modifier[ReactiveElement.Base]
 
-object Inserter {
+sealed trait StaticInserter extends Inserter {
 
-  type Base = Inserter[ReactiveElement.Base]
-}
-
-sealed trait StaticInserter[El <: ReactiveElement.Base] extends Inserter[El] {
-
-  def renderInContext(ctx: InsertContext[El]): Unit
+  def renderInContext(ctx: InsertContext): Unit
 }
 
 /** Inserter for a single static node */
-class StaticTextInserter[El <: ReactiveElement.Base](
+class StaticTextInserter(
   text: String
-) extends StaticInserter[El] {
+) extends StaticInserter {
 
-  override def apply(element: El): Unit = {
+  override def apply(element: ReactiveElement.Base): Unit = {
     element.amend(new TextNode(text))
   }
 
-  def renderInContext(ctx: InsertContext[El]): Unit = {
+  def renderInContext(ctx: InsertContext): Unit = {
     ChildTextInserter.switchToText(new TextNode(text), ctx)
   }
 }
 
 /** Inserter for a single static node */
-class StaticChildInserter[El <: ReactiveElement.Base](
+class StaticChildInserter(
   child: ChildNode.Base
-) extends StaticInserter[El] {
+) extends StaticInserter {
 
-  override def apply(element: El): Unit = {
+  override def apply(element: ReactiveElement.Base): Unit = {
     element.amend(child)
   }
 
-  def renderInContext(ctx: InsertContext[El]): Unit = {
+  def renderInContext(ctx: InsertContext): Unit = {
     ChildInserter.switchToChild(
       maybeLastSeenChild = js.undefined,
       newChildNode = child,
@@ -69,15 +64,15 @@ class StaticChildInserter[El <: ReactiveElement.Base](
   * This can also insert a single nodes, just a bit less efficiently
   * than SingleStaticInserter.
   */
-class StaticChildrenInserter[El <: ReactiveElement.Base](
+class StaticChildrenInserter(
   nodes: collection.Seq[ChildNode.Base]
-) extends StaticInserter[El] {
+) extends StaticInserter {
 
-  override def apply(element: El): Unit = {
+  override def apply(element: ReactiveElement.Base): Unit = {
     element.amend(nodes)
   }
 
-  def renderInContext(ctx: InsertContext[El]): Unit = {
+  def renderInContext(ctx: InsertContext): Unit = {
     ChildrenInserter.switchToChildren(nodes.toList, ctx)
   }
 }
@@ -94,13 +89,13 @@ class StaticChildrenInserter[El <: ReactiveElement.Base](
   * Note: If you DO provide initialContext, its parentNode MUST always
   * be the same `element` that you apply this Modifier to.
   */
-class DynamicInserter[-El <: ReactiveElement.Base](
-  initialContext: Option[InsertContext[El]] = None,
+class DynamicInserter(
+  initialContext: Option[InsertContext] = None,
   preferStrictMode: Boolean,
-  insertFn: (InsertContext[El], Owner) => Subscription,
-) extends Inserter[El] {
+  insertFn: (InsertContext, Owner) => Subscription,
+) extends Inserter {
 
-  def bind(element: El): DynamicSubscription = {
+  def bind(element: ReactiveElement.Base): DynamicSubscription = {
     // @TODO[Performance] The way it's used in `onMountInsert`, we create a DynSub inside DynSub.
     //  - Currently this does not seem avoidable as we don't want to expose a `map` on DynSub
     //  - That would allow you to create leaky resources without having a reference to the owner
@@ -117,7 +112,7 @@ class DynamicInserter[-El <: ReactiveElement.Base](
     }
   }
 
-  override def apply(element: El): Unit = {
+  override def apply(element: ReactiveElement.Base): Unit = {
     bind(element)
   }
 
@@ -127,13 +122,8 @@ class DynamicInserter[-El <: ReactiveElement.Base](
     *
     * The arrangement is admittedly a bit weird, but is required to build a smooth end user API.
     */
-  def withContext(context: InsertContext[El]): DynamicInserter[El] = {
+  def withContext(context: InsertContext): DynamicInserter = {
     // Note: preferStrictMode has no effect here, because initial context is defined.
-    new DynamicInserter[El](Some(context), preferStrictMode = false, insertFn)
+    new DynamicInserter(Some(context), preferStrictMode = false, insertFn)
   }
-}
-
-object DynamicInserter {
-
-  type Base = DynamicInserter[ReactiveElement.Base]
 }

@@ -15,7 +15,7 @@ object ChildReceiver {
     new LockedChildReceiver(node)
   }
 
-  def <--(childSource: Source[ChildNode.Base]): DynamicInserter.Base = {
+  def <--(childSource: Source[ChildNode.Base]): DynamicInserter = {
     ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable)
   }
 
@@ -34,7 +34,7 @@ object ChildReceiver {
       childSource: Source[Component]
     )(
       implicit renderable: RenderableNode[Component]
-    ): DynamicInserter.Base = {
+    ): DynamicInserter = {
       ChildInserter(childSource.toObservable, renderable)
     }
   }

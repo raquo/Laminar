@@ -202,7 +202,7 @@ object Implicits {
 
     // -- Methods to convert individual values / nodes / components to inserters --
 
-    implicit def textToInserter[A](value: A)(implicit r: RenderableText[A]): Inserter.Base = {
+    implicit def textToInserter[A](value: A)(implicit r: RenderableText[A]): Inserter = {
       if (r == RenderableText.textNodeRenderable) {
         new StaticChildInserter(value.asInstanceOf[TextNode])
       } else {
@@ -210,63 +210,63 @@ object Implicits {
       }
     }
 
-    implicit def nodeToInserter(node: ChildNode.Base): Inserter.Base = {
+    implicit def nodeToInserter(node: ChildNode.Base): Inserter = {
       new StaticChildInserter(node)
     }
 
-    implicit def componentToInserter[Component](component: Component)(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentToInserter[Component](component: Component)(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildInserter(r.asNode(component))
     }
 
     // -- Methods to convert collections of nodes to inserters --
 
-    implicit def nodeOptionToInserter(maybeNode: Option[ChildNode.Base]): Inserter.Base = {
+    implicit def nodeOptionToInserter(maybeNode: Option[ChildNode.Base]): Inserter = {
       new StaticChildrenInserter(maybeNode.toSeq)
     }
 
-    implicit def nodeSeqToInserter(nodes: collection.Seq[ChildNode.Base]): Inserter.Base = {
+    implicit def nodeSeqToInserter(nodes: collection.Seq[ChildNode.Base]): Inserter = {
       new StaticChildrenInserter(nodes)
     }
 
-    implicit def nodeArrayToInserter(nodes: scala.Array[ChildNode.Base]): Inserter.Base = {
+    implicit def nodeArrayToInserter(nodes: scala.Array[ChildNode.Base]): Inserter = {
       new StaticChildrenInserter(nodes)
     }
 
-    implicit def nodeJsVectorToInserter[N <: ChildNode.Base](nodes: ew.JsVector[N]): Inserter.Base = {
+    implicit def nodeJsVectorToInserter[N <: ChildNode.Base](nodes: ew.JsVector[N]): Inserter = {
       new StaticChildrenInserter(nodes.toList)
     }
 
-    implicit def nodeJsArrayToInserter[N <: ChildNode.Base](nodes: ew.JsArray[N]): Inserter.Base = {
+    implicit def nodeJsArrayToInserter[N <: ChildNode.Base](nodes: ew.JsArray[N]): Inserter = {
       new StaticChildrenInserter(nodes.asScalaJs.toList)
     }
 
-    implicit def nodeSjsArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter.Base = {
+    implicit def nodeSjsArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): Inserter = {
       new StaticChildrenInserter(nodes.toList)
     }
 
     // -- Methods to convert collections of components to inserters --
 
-    implicit def componentOptionToInserter[Component](maybeComponent: Option[Component])(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentOptionToInserter[Component](maybeComponent: Option[Component])(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildrenInserter(r.asNodeOption(maybeComponent).toList)
     }
 
-    implicit def componentSeqToInserter[Component](components: collection.Seq[Component])(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentSeqToInserter[Component](components: collection.Seq[Component])(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildrenInserter(r.asNodeSeq(components.toList))
     }
 
-    implicit def componentArrayToInserter[Component](components: scala.Array[Component])(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentArrayToInserter[Component](components: scala.Array[Component])(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildrenInserter(r.asNodeSeq(components.toList))
     }
 
-    implicit def componentJsVectorToInserter[Component](components: ew.JsVector[Component])(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentJsVectorToInserter[Component](components: ew.JsVector[Component])(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildrenInserter(r.asNodeSeq(components.toList))
     }
 
-    implicit def componentJsArrayToInserter[Component](components: ew.JsArray[Component])(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentJsArrayToInserter[Component](components: ew.JsArray[Component])(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildrenInserter(r.asNodeSeq(components.asScalaJs.toList))
     }
 
-    implicit def componentSjsArrayToInserter[Component](components: js.Array[Component])(implicit r: RenderableNode[Component]): Inserter.Base = {
+    implicit def componentSjsArrayToInserter[Component](components: js.Array[Component])(implicit r: RenderableNode[Component]): Inserter = {
       new StaticChildrenInserter(r.asNodeSeq(components.toList))
     }
 
