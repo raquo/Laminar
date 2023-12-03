@@ -20,16 +20,15 @@ object ChildrenInserter {
   def apply[Component](
     childrenSource: Observable[immutable.Seq[Component]],
     renderableNode: RenderableNode[Component]
-  ): Inserter.Base = {
-    new Inserter[ReactiveElement.Base](
+  ): DynamicInserter.Base = {
+    new DynamicInserter[ReactiveElement.Base](
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
+        // Reset sentinel node on binding too, don't wait for events
         if (!ctx.strictMode) {
           ctx.forceSetStrictMode()
         }
-
-        var maybeLastSeenChildren: js.UndefOr[immutable.Seq[ChildNode.Base]] = ctx.extraNodes
-
+        // var maybeLastSeenChildren: js.UndefOr[immutable.Seq[ChildNode.Base]] = ctx.extraNodes
         childrenSource.foreach { components =>
           // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
           //  will need to map over the seq, creating a new seq of child nodes.
@@ -46,23 +45,35 @@ object ChildrenInserter {
           //    difference. Check that performance cost is not too bad with benchmarks.
 
           // if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
-            // println(s">> ${$children}.foreach with newChildren = ${newChildren.map(_.ref).map(DomApi.debugNodeOuterHtml)}")
-            maybeLastSeenChildren = newChildren
-            val newChildrenMap = InsertContext.nodesToMap(newChildren)
-            ctx.extraNodeCount = updateChildren(
-              prevChildren = ctx.extraNodesMap,
-              nextChildren = newChildren,
-              nextChildrenMap = newChildrenMap,
-              parentNode = ctx.parentNode,
-              sentinelNode = ctx.sentinelNode,
-              ctx.extraNodeCount
-            )
-            ctx.extraNodes = newChildren
-            ctx.extraNodesMap = newChildrenMap
+          //   maybeLastSeenChildren = newChildren
+          switchToChildren(newChildren, ctx)
           // }
         }(owner)
       }
     )
+  }
+
+  def switchToChildren(
+    newChildren: immutable.Seq[ChildNode.Base],
+    ctx: InsertContext[ReactiveElement.Base]
+  ): Unit = {
+    if (!ctx.strictMode) {
+      // #Note: previously in ChildInserter we only did this once in insertFn.
+      //  I think it's cheap and safe to do this check on every childSource.foreach.
+      ctx.forceSetStrictMode()
+    }
+
+    val newChildrenMap = InsertContext.nodesToMap(newChildren)
+    ctx.extraNodeCount = updateChildren(
+      prevChildren = ctx.extraNodesMap,
+      nextChildren = newChildren,
+      nextChildrenMap = newChildrenMap,
+      parentNode = ctx.parentNode,
+      sentinelNode = ctx.sentinelNode,
+      ctx.extraNodeCount
+    )
+    ctx.extraNodes = newChildren
+    ctx.extraNodesMap = newChildrenMap
   }
 
   /** @return New child node count */

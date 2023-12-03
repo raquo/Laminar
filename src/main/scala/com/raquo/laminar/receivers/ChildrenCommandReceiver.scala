@@ -2,7 +2,7 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source.EventSource
 import com.raquo.laminar.CollectionCommand
-import com.raquo.laminar.modifiers.{ChildrenCommandInserter, Inserter, RenderableNode}
+import com.raquo.laminar.modifiers.{ChildrenCommandInserter, DynamicInserter, RenderableNode}
 
 object ChildrenCommandReceiver {
 
@@ -10,7 +10,7 @@ object ChildrenCommandReceiver {
     commands: EventSource[CollectionCommand[Component]]
   )(
     implicit renderableNode: RenderableNode[Component]
-  ): Inserter.Base = {
+  ): DynamicInserter.Base = {
     ChildrenCommandInserter(commands.toObservable, renderableNode)
   }
 }

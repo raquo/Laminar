@@ -12,7 +12,7 @@ import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
 import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
+import com.raquo.laminar.modifiers.{DynamicInserter, EventListener, KeyUpdater, StaticInserter}
 import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
@@ -382,8 +382,17 @@ trait Laminar
       element.amend(
         onMountUnmountCallback[El](
           mount = { mountContext =>
-            val inserter = fn(mountContext).withContext(lockedInsertContext)
-            maybeSubscription = Some(inserter.bind(mountContext.thisNode))
+            val inserter = fn(mountContext)
+            inserter match {
+              case dynamicInserter: DynamicInserter[El @unchecked] =>
+                maybeSubscription = Some(
+                  dynamicInserter
+                    .withContext(lockedInsertContext)
+                    .bind(mountContext.thisNode)
+                )
+              case staticInserter: StaticInserter[El @unchecked] =>
+                staticInserter.renderInContext(lockedInsertContext)
+            }
           },
           unmount = { _ =>
             maybeSubscription.foreach(_.kill())

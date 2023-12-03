@@ -2,12 +2,12 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.L.child
-import com.raquo.laminar.modifiers.{Inserter, RenderableNode}
+import com.raquo.laminar.modifiers.{DynamicInserter, RenderableNode}
 import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 
 object ChildOptionReceiver {
 
-  def <--(maybeChildSource: Source[Option[ChildNode.Base]]): Inserter.Base = {
+  def <--(maybeChildSource: Source[Option[ChildNode.Base]]): DynamicInserter.Base = {
     val emptyNode = new CommentNode("")
     child <-- maybeChildSource.toObservable.map(_.getOrElse(emptyNode))
   }
@@ -18,7 +18,7 @@ object ChildOptionReceiver {
       maybeChildSource: Source[Option[Component]]
     )(
       implicit renderable: RenderableNode[Component]
-    ): Inserter.Base = {
+    ): DynamicInserter.Base = {
       val emptyNode = new CommentNode("")
       child <-- {
         maybeChildSource

@@ -1,8 +1,86 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
+import com.raquo.laminar.api.L.seqToModifier
 import com.raquo.laminar.lifecycle.InsertContext
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
+
+import scala.scalajs.js
+
+/** Inserter is a class that can insert child nodes into [[InsertContext]].
+  *
+  * This is needed in `onMountInsert`, or when rendering dynamic children
+  * with `child <-- ...`, `children <-- ...`, etc.
+  *
+  * If you don't have a [[InsertContext]], you can render the Inserter
+  * just by calling its `apply` method. It will work the same way as
+  * rendering any other child node, static or dynamic, would.
+  *
+  * So, you can use [[Inserter.Base]] essentially as (an implicit-powered)
+  * sypertype of regular laminar elements and dynamic inserters like
+  * `children <-- ...`. We use it this way in `onMountInsert`, for example.
+  */
+sealed trait Inserter[-El <: ReactiveElement.Base] extends Modifier[El]
+
+object Inserter {
+
+  type Base = Inserter[ReactiveElement.Base]
+}
+
+sealed trait StaticInserter[El <: ReactiveElement.Base] extends Inserter[El] {
+
+  def renderInContext(ctx: InsertContext[El]): Unit
+}
+
+/** Inserter for a single static node */
+class StaticTextInserter[El <: ReactiveElement.Base](
+  text: String
+) extends StaticInserter[El] {
+
+  override def apply(element: El): Unit = {
+    element.amend(new TextNode(text))
+  }
+
+  def renderInContext(ctx: InsertContext[El]): Unit = {
+    ChildTextInserter.switchToText(new TextNode(text), ctx)
+  }
+}
+
+/** Inserter for a single static node */
+class StaticChildInserter[El <: ReactiveElement.Base](
+  child: ChildNode.Base
+) extends StaticInserter[El] {
+
+  override def apply(element: El): Unit = {
+    element.amend(child)
+  }
+
+  def renderInContext(ctx: InsertContext[El]): Unit = {
+    ChildInserter.switchToChild(
+      maybeLastSeenChild = js.undefined,
+      newChildNode = child,
+      ctx
+    )
+  }
+}
+
+/**
+  * Inserter for multiple static nodes.
+  * This can also insert a single nodes, just a bit less efficiently
+  * than SingleStaticInserter.
+  */
+class StaticChildrenInserter[El <: ReactiveElement.Base](
+  nodes: collection.Seq[ChildNode.Base]
+) extends StaticInserter[El] {
+
+  override def apply(element: El): Unit = {
+    element.amend(nodes)
+  }
+
+  def renderInContext(ctx: InsertContext[El]): Unit = {
+    ChildrenInserter.switchToChildren(nodes.toList, ctx)
+  }
+}
 
 // @TODO[API] Inserter really wants to extend Binder. And yet.
 
@@ -16,11 +94,11 @@ import com.raquo.laminar.nodes.ReactiveElement
   * Note: If you DO provide initialContext, its parentNode MUST always
   * be the same `element` that you apply this Modifier to.
   */
-class Inserter[-El <: ReactiveElement.Base] (
+class DynamicInserter[-El <: ReactiveElement.Base](
   initialContext: Option[InsertContext[El]] = None,
   preferStrictMode: Boolean,
   insertFn: (InsertContext[El], Owner) => Subscription,
-) extends Modifier[El] {
+) extends Inserter[El] {
 
   def bind(element: El): DynamicSubscription = {
     // @TODO[Performance] The way it's used in `onMountInsert`, we create a DynSub inside DynSub.
@@ -49,13 +127,13 @@ class Inserter[-El <: ReactiveElement.Base] (
     *
     * The arrangement is admittedly a bit weird, but is required to build a smooth end user API.
     */
-  def withContext(context: InsertContext[El]): Inserter[El] = {
+  def withContext(context: InsertContext[El]): DynamicInserter[El] = {
     // Note: preferStrictMode has no effect here, because initial context is defined.
-    new Inserter[El](Some(context), preferStrictMode = false, insertFn)
+    new DynamicInserter[El](Some(context), preferStrictMode = false, insertFn)
   }
 }
 
-object Inserter {
+object DynamicInserter {
 
-  type Base = Inserter[ReactiveElement.Base]
+  type Base = DynamicInserter[ReactiveElement.Base]
 }

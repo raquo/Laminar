@@ -1,7 +1,7 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.modifiers.{ChildrenInserter, Inserter, RenderableNode}
+import com.raquo.laminar.modifiers.{ChildrenInserter, DynamicInserter, RenderableNode}
 import com.raquo.laminar.nodes.ChildNode
 
 import scala.collection.immutable
@@ -29,7 +29,7 @@ object ChildrenReceiver {
   // a version that works with arrays and mutable Seq-s too.
   // Let me know if you have a compelling use case for this.
 
-  def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): Inserter.Base = {
+  def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): DynamicInserter.Base = {
     ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable)
   }
 
@@ -37,7 +37,7 @@ object ChildrenReceiver {
     childrenSource: Source[immutable.Seq[Component]]
   )(
     implicit renderableNode: RenderableNode[Component]
-  ): Inserter.Base = {
+  ): DynamicInserter.Base = {
     ChildrenInserter(childrenSource.toObservable, renderableNode)
   }
 

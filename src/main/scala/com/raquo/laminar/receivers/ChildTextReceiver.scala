@@ -1,7 +1,7 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.{Observable, Source}
-import com.raquo.laminar.modifiers.{ChildInserter, ChildTextInserter, Inserter, RenderableNode, RenderableText}
+import com.raquo.laminar.modifiers.{ChildInserter, ChildTextInserter, DynamicInserter, RenderableNode, RenderableText}
 import com.raquo.laminar.nodes.TextNode
 
 object ChildTextReceiver {
@@ -18,11 +18,11 @@ object ChildTextReceiver {
     new LockedChildTextReceiver(renderable.asString(text))
   }
 
-  def <--(textSource: Source[String]): Inserter.Base = {
+  def <--(textSource: Source[String]): DynamicInserter.Base = {
     ChildTextInserter(textSource.toObservable, RenderableText.stringRenderable)
   }
 
-  def <--[TextLike](textSource: Source[TextLike])(implicit renderable: RenderableText[TextLike]): Inserter.Base = {
+  def <--[TextLike](textSource: Source[TextLike])(implicit renderable: RenderableText[TextLike]): DynamicInserter.Base = {
     if (renderable == RenderableText.textNodeRenderable) {
       // #Note: Special case: since we already have TextNode-s, using them in ChildTextInserter would be
       //  inefficient, so we redirect this case to ChildInserter (child <-- textSource) instead.

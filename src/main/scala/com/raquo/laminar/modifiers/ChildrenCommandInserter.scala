@@ -21,8 +21,8 @@ object ChildrenCommandInserter {
   def apply[Component, El <: ReactiveElement.Base] (
     commands: EventStream[CollectionCommand[Component]],
     renderableNode: RenderableNode[Component]
-  ): Inserter[El] = {
-    new Inserter[El](
+  ): DynamicInserter[El] = {
+    new DynamicInserter[El](
       preferStrictMode = true,
       insertFn = (ctx, owner) => {
         commands.foreach { command =>

@@ -1,7 +1,7 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.modifiers.{ChildInserter, Inserter, RenderableNode}
+import com.raquo.laminar.modifiers.{ChildInserter, DynamicInserter, RenderableNode}
 import com.raquo.laminar.nodes.ChildNode
 
 object ChildReceiver {
@@ -15,7 +15,7 @@ object ChildReceiver {
     new LockedChildReceiver(node)
   }
 
-  def <--(childSource: Source[ChildNode.Base]): Inserter.Base = {
+  def <--(childSource: Source[ChildNode.Base]): DynamicInserter.Base = {
     ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable)
   }
 
@@ -34,7 +34,7 @@ object ChildReceiver {
       childSource: Source[Component]
     )(
       implicit renderable: RenderableNode[Component]
-    ): Inserter.Base = {
+    ): DynamicInserter.Base = {
       ChildInserter(childSource.toObservable, renderable)
     }
   }

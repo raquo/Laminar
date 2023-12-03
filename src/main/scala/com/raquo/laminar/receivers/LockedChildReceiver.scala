@@ -2,7 +2,7 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.L.child
-import com.raquo.laminar.modifiers.Inserter
+import com.raquo.laminar.modifiers.DynamicInserter
 import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 
 class LockedChildReceiver(
@@ -20,7 +20,7 @@ class LockedChildReceiver(
   }
 
   /** If `includeSource` emits true, node will be added. Otherwise, it will be removed. */
-  def <--(includeSource: Source[Boolean]): Inserter.Base = {
+  def <--(includeSource: Source[Boolean]): DynamicInserter.Base = {
     val emptyNode = new CommentNode("")
     child <-- includeSource.toObservable.map(if (_) node else emptyNode)
   }

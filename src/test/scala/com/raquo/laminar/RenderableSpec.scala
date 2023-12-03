@@ -200,7 +200,7 @@ class RenderableSpec extends UnitSpec {
     // - 1 for onMountInsert
     // - 1 for inserter inside onMountInsert
     // - 1 pilot subscription for child element
-    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 15)
+    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 14)
   }
 
   it("Regular node rendering") {
@@ -337,7 +337,7 @@ class RenderableSpec extends UnitSpec {
     // - 1 for onMountInsert
     // - 1 for inserter inside onMountInsert
     // - 1 pilot subscription for child element
-    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 15)
+    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 14)
   }
 
   it("RenderableText with child and child.text") {

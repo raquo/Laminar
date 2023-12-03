@@ -4,7 +4,6 @@ import com.raquo.laminar.modifiers.Modifier
 import org.scalajs.dom
 
 import scala.annotation.tailrec
-import scala.scalajs.js
 
 trait ChildNode[+Ref <: dom.Node]
   extends ReactiveNode[Ref]
