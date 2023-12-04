@@ -5,6 +5,9 @@ on:
     branches: [publish]
     tags: ["*"]
 
+env:
+  CI: true
+
 jobs:
   publish:
     runs-on: ubuntu-22.04
