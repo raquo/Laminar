@@ -27,8 +27,8 @@ trait SvgTags {
   /**
     * Represents a hyperlink, linking to another resource.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/a
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGAElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/a a @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGAElement SVGAElement @ MDN]]
     */
   lazy val a: SvgTag[dom.SVGAElement] = svgTag("a")
 
@@ -37,7 +37,7 @@ trait SvgTags {
     * The altGlyph element allows sophisticated selection of the glyphs used to
     * render its child character data.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyph
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyph altGlyph @ MDN]]
     */
   lazy val altGlyph: SvgTag[dom.SVGElement] = svgTag("altGlyph")
 
@@ -45,7 +45,7 @@ trait SvgTags {
   /**
     * The altGlyphDef element defines a substitution representation for glyphs.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyphDef
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyphDef altGlyphDef @ MDN]]
     */
   lazy val altGlyphDef: SvgTag[dom.SVGElement] = svgTag("altGlyphDef")
 
@@ -54,7 +54,7 @@ trait SvgTags {
     * The altGlyphItem element provides a set of candidates for glyph substitution
     * by the altGlyph element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyphItem
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/altGlyphItem altGlyphItem @ MDN]]
     */
   lazy val altGlyphItem: SvgTag[dom.SVGElement] = svgTag("altGlyphItem")
 
@@ -63,7 +63,7 @@ trait SvgTags {
     * The animate element is put inside a shape element and defines how an
     * attribute of an element changes over the animation
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animate
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animate animate @ MDN]]
     */
   lazy val animate: SvgTag[dom.SVGElement] = svgTag("animate")
 
@@ -72,7 +72,7 @@ trait SvgTags {
     * The animateMotion element causes a referenced element to move along a
     * motion path.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateMotion
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateMotion animateMotion @ MDN]]
     */
   lazy val animateMotion: SvgTag[dom.SVGElement] = svgTag("animateMotion")
 
@@ -82,7 +82,7 @@ trait SvgTags {
     * element, thereby allowing animations to control translation, scaling,
     * rotation and/or skewing.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateTransform
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/animateTransform animateTransform @ MDN]]
     */
   lazy val animateTransform: SvgTag[dom.SVGElement] = svgTag("animateTransform")
 
@@ -91,8 +91,8 @@ trait SvgTags {
     * The circle element is an SVG basic shape, used to create circles based on a
     * center point and a radius.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGCircleElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle circle @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGCircleElement SVGCircleElement @ MDN]]
     */
   lazy val circle: SvgTag[dom.SVGCircleElement] = svgTag("circle")
 
@@ -102,8 +102,8 @@ trait SvgTags {
     * Conceptually, any parts of the drawing that lie outside of the region
     * bounded by the currently active clipping path are not drawn.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGClipPathElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath clipPath @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGClipPathElement SVGClipPathElement @ MDN]]
     */
   lazy val clipPathTag: SvgTag[dom.SVGClipPathElement] = svgTag("clipPath")
 
@@ -111,7 +111,7 @@ trait SvgTags {
   /**
     * The element allows describing the color profile used for the image.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/color-profile
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/color-profile color-profile @ MDN]]
     */
   lazy val colorProfileTag: SvgTag[dom.SVGElement] = svgTag("color-profile")
 
@@ -123,7 +123,7 @@ trait SvgTags {
     * the PNG image and identifies the exact position within the image which is
     * the pointer position (i.e., the hot spot).
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/cursor
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/cursor cursor @ MDN]]
     */
   lazy val cursor: SvgTag[dom.SVGElement] = svgTag("cursor")
 
@@ -137,8 +137,8 @@ trait SvgTags {
     * rendered. You can use a use element to render those elements wherever you
     * want on the viewport.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGDefsElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs defs @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGDefsElement SVGDefsElement @ MDN]]
     */
   lazy val defs: SvgTag[dom.SVGDefsElement] = svgTag("defs")
 
@@ -152,8 +152,8 @@ trait SvgTags {
     * not display path elements or other graphics elements. The desc element
     * generally improve accessibility of SVG documents
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/desc
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGDescElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/desc desc @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGDescElement SVGDescElement @ MDN]]
     */
   lazy val desc: SvgTag[dom.SVGDescElement] = svgTag("desc")
 
@@ -166,8 +166,8 @@ trait SvgTags {
     * for example, you wanted to draw an ellipse titled at a 45 degree angle),
     * but can be rotated by using the transform attribute.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGEllipseElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/ellipse ellipse @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGEllipseElement SVGEllipseElement @ MDN]]
     */
   lazy val ellipse: SvgTag[dom.SVGEllipseElement] = svgTag("ellipse")
 
@@ -177,8 +177,8 @@ trait SvgTags {
     * mode. This is similar to what is known from image editing software when
     * blending two layers. The mode is defined by the mode attribute.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feBlend
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEBlendElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feBlend feBlend @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEBlendElement SVGFEBlendElement @ MDN]]
     */
   lazy val feBlend: SvgTag[dom.SVGFEBlendElement] = svgTag("feBlend")
 
@@ -188,8 +188,8 @@ trait SvgTags {
     * color value (represented by an [R,G,B,A] vector) is matrix multiplied to
     * create a new color.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEColorMatrixElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix feColorMatrix @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEColorMatrixElement SVGFEColorMatrixElement @ MDN]]
     */
   lazy val feColorMatrix: SvgTag[dom.SVGFEColorMatrixElement] = svgTag("feColorMatrix")
 
@@ -199,8 +199,8 @@ trait SvgTags {
     * A) to the result of what the children feFuncR, feFuncB, feFuncG,
     * and feFuncA return.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComponentTransfer
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGComponentTransferFunctionElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComponentTransfer feComponentTransfer @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGComponentTransferFunctionElement SVGComponentTransferFunctionElement @ MDN]]
     */
   lazy val feComponentTransfer: SvgTag[dom.SVGComponentTransferFunctionElement] = svgTag("feComponentTransfer")
 
@@ -211,8 +211,8 @@ trait SvgTags {
     * in, atop, out, xor. Additionally, a component-wise arithmetic operation
     * (with the result clamped between [0..1]) can be applied.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComposite
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFECompositeElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feComposite feComposite @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFECompositeElement SVGFECompositeElement @ MDN]]
     */
   lazy val feComposite: SvgTag[dom.SVGFECompositeElement] = svgTag("feComposite")
 
@@ -224,8 +224,8 @@ trait SvgTags {
     * achieved through convolutions, including blurring, edge detection,
     * sharpening, embossing and beveling.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feConvolveMatrix
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEConvolveMatrixElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feConvolveMatrix feConvolveMatrix @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEConvolveMatrixElement SVGFEConvolveMatrixElement @ MDN]]
     */
   lazy val feConvolveMatrix: SvgTag[dom.SVGFEConvolveMatrixElement] = svgTag("feConvolveMatrix")
 
@@ -235,8 +235,8 @@ trait SvgTags {
     * The resulting image, which is an RGBA opaque image, depends on the light
     * color, light position and surface geometry of the input bump map.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDiffuseLighting
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDiffuseLightingElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDiffuseLighting feDiffuseLighting @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDiffuseLightingElement SVGFEDiffuseLightingElement @ MDN]]
     */
   lazy val feDiffuseLighting: SvgTag[dom.SVGFEDiffuseLightingElement] = svgTag("feDiffuseLighting")
 
@@ -245,8 +245,8 @@ trait SvgTags {
     * This filter primitive uses the pixels values from the image from in2 to
     * spatially displace the image from in.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDisplacementMap
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDisplacementMapElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDisplacementMap feDisplacementMap @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDisplacementMapElement SVGFEDisplacementMapElement @ MDN]]
     */
   lazy val feDisplacementMap: SvgTag[dom.SVGFEDisplacementMapElement] = svgTag("feDisplacementMap")
 
@@ -256,8 +256,8 @@ trait SvgTags {
     * within a lighting filter primitive: feDiffuseLighting or
     * feSpecularLighting.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDistantLighting
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDistantLightElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feDistantLighting feDistantLighting @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEDistantLightElement SVGFEDistantLightElement @ MDN]]
     */
   lazy val feDistantLighting: SvgTag[dom.SVGFEDistantLightElement] = svgTag("feDistantLighting")
 
@@ -266,8 +266,8 @@ trait SvgTags {
     * The filter fills the filter subregion with the color and opacity defined by
     * flood-color and flood-opacity.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFlood
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFloodElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFlood feFlood @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFloodElement SVGFEFloodElement @ MDN]]
     */
   lazy val feFlood: SvgTag[dom.SVGFEFloodElement] = svgTag("feFlood")
 
@@ -276,8 +276,8 @@ trait SvgTags {
     * This filter primitive defines the transfer function for the alpha component
     * of the input graphic of its parent feComponentTransfer element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncA
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncAElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncA feFuncA @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncAElement SVGFEFuncAElement @ MDN]]
     */
   lazy val feFuncA: SvgTag[dom.SVGFEFuncAElement] = svgTag("feFuncA")
 
@@ -286,8 +286,8 @@ trait SvgTags {
     * This filter primitive defines the transfer function for the blue component
     * of the input graphic of its parent feComponentTransfer element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncB
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncBElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncB feFuncB @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncBElement SVGFEFuncBElement @ MDN]]
     */
   lazy val feFuncB: SvgTag[dom.SVGFEFuncBElement] = svgTag("feFuncB")
 
@@ -296,8 +296,8 @@ trait SvgTags {
     * This filter primitive defines the transfer function for the green component
     * of the input graphic of its parent feComponentTransfer element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncG
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncGElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncG feFuncG @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncGElement SVGFEFuncGElement @ MDN]]
     */
   lazy val feFuncG: SvgTag[dom.SVGFEFuncGElement] = svgTag("feFuncG")
 
@@ -306,8 +306,8 @@ trait SvgTags {
     * This filter primitive defines the transfer function for the red component
     * of the input graphic of its parent feComponentTransfer element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncR
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncRElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feFuncR feFuncR @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEFuncRElement SVGFEFuncRElement @ MDN]]
     */
   lazy val feFuncR: SvgTag[dom.SVGFEFuncRElement] = svgTag("feFuncR")
 
@@ -316,8 +316,8 @@ trait SvgTags {
     * The filter blurs the input image by the amount specified in stdDeviation,
     * which defines the bell-curve.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feGaussianBlur
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEGaussianBlurElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feGaussianBlur feGaussianBlur @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEGaussianBlurElement SVGFEGaussianBlurElement @ MDN]]
     */
   lazy val feGaussianBlur: SvgTag[dom.SVGFEGaussianBlurElement] = svgTag("feGaussianBlur")
 
@@ -327,8 +327,8 @@ trait SvgTags {
     * the pixel data as output (meaning, if the external source is an SVG image,
     * it is rasterize).
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feImage
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEImageElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feImage feImage @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEImageElement SVGFEImageElement @ MDN]]
     */
   lazy val feImage: SvgTag[dom.SVGFEImageElement] = svgTag("feImage")
 
@@ -339,8 +339,8 @@ trait SvgTags {
     * output via the result attribute and then accessing it in a feMergeNode
     * child.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMerge
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMergeElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMerge feMerge @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMergeElement SVGFEMergeElement @ MDN]]
     */
   lazy val feMerge: SvgTag[dom.SVGFEMergeElement] = svgTag("feMerge")
 
@@ -349,8 +349,8 @@ trait SvgTags {
     * The feMergeNode takes the result of another filter to be processed by its
     * parent feMerge.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMergeNode
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMergeNodeElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMergeNode feMergeNode @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMergeNodeElement SVGFEMergeNodeElement @ MDN]]
     */
   lazy val feMergeNode: SvgTag[dom.SVGFEMergeNodeElement] = svgTag("feMergeNode")
 
@@ -359,8 +359,8 @@ trait SvgTags {
     * This filter is used to erode or dilate the input image. It's usefulness
     * lies especially in fattening or thinning effects.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMorphology
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMorphologyElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feMorphology feMorphology @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEMorphologyElement SVGFEMorphologyElement @ MDN]]
     */
   lazy val feMorphology: SvgTag[dom.SVGFEMorphologyElement] = svgTag("feMorphology")
 
@@ -369,15 +369,15 @@ trait SvgTags {
     * The input image as a whole is offset by the values specified in the dx
     * and dy attributes. It's used in creating drop-shadows.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feOffset
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEOffsetElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feOffset feOffset @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEOffsetElement SVGFEOffsetElement @ MDN]]
     */
   lazy val feOffset: SvgTag[dom.SVGFEOffsetElement] = svgTag("feOffset")
 
 
   /**
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/fePointLight
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFEPointLightElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/fePointLight fePointLight @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFEPointLightElement SVGFEPointLightElement @ MDN]]
     */
   lazy val fePointLight: SvgTag[dom.SVGFEPointLightElement] = svgTag("fePointLight")
 
@@ -391,15 +391,15 @@ trait SvgTags {
     * lighting calculation is added. The filter primitive assumes that the viewer
     * is at infinity in the z direction.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpecularLighting
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFESpecularLightingElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpecularLighting feSpecularLighting @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFESpecularLightingElement SVGFESpecularLightingElement @ MDN]]
     */
   lazy val feSpecularLighting: SvgTag[dom.SVGFESpecularLightingElement] = svgTag("feSpecularLighting")
 
 
   /**
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpotlight
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFESpotLightElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feSpotlight feSpotlight @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFESpotLightElement SVGFESpotLightElement @ MDN]]
     */
   lazy val feSpotlight: SvgTag[dom.SVGFESpotLightElement] = svgTag("feSpotlight")
 
@@ -408,8 +408,8 @@ trait SvgTags {
     * An input image is tiled and the result used to fill a target. The effect
     * is similar to the one of a pattern.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTile
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFETileElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTile feTile @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFETileElement SVGFETileElement @ MDN]]
     */
   lazy val feTile: SvgTag[dom.SVGFETileElement] = svgTag("feTile")
 
@@ -419,8 +419,8 @@ trait SvgTags {
     * function. It allows the synthesis of artificial textures like clouds or
     * marble.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFETurbulenceElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence feTurbulence @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFETurbulenceElement SVGFETurbulenceElement @ MDN]]
     */
   lazy val feTurbulence: SvgTag[dom.SVGFETurbulenceElement] = svgTag("feTurbulence")
 
@@ -430,8 +430,8 @@ trait SvgTags {
     * never rendered directly. A filter is referenced by using the filter
     * attribute on the target SVG element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/filter
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGFilterElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/filter filter @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGFilterElement SVGFilterElement @ MDN]]
     */
   lazy val filter: SvgTag[dom.SVGFilterElement] = svgTag("filter")
 
@@ -439,7 +439,7 @@ trait SvgTags {
   /**
     * The font element defines a font to be used for text layout.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font font @ MDN]]
     */
   lazy val font: SvgTag[dom.SVGElement] = svgTag("font")
 
@@ -448,7 +448,7 @@ trait SvgTags {
     * The font-face element corresponds to the CSS @font-face declaration. It
     * defines a font's outer properties.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face font-face @ MDN]]
     */
   lazy val fontFace: SvgTag[dom.SVGElement] = svgTag("font-face")
 
@@ -457,7 +457,7 @@ trait SvgTags {
     * The font-face-format element describes the type of font referenced by its
     * parent font-face-uri.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-format
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-format font-face-format @ MDN]]
     */
   lazy val fontFaceFormat: SvgTag[dom.SVGElement] = svgTag("font-face-format")
 
@@ -466,7 +466,7 @@ trait SvgTags {
     * The font-face-name element points to a locally installed copy of this font,
     * identified by its name.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-name
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-name font-face-name @ MDN]]
     */
   lazy val fontFaceName: SvgTag[dom.SVGElement] = svgTag("font-face-name")
 
@@ -477,7 +477,7 @@ trait SvgTags {
     * locally installed copies of this font, and font-face-uri, utilizing
     * remotely defined fonts.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-src
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-src font-face-src @ MDN]]
     */
   lazy val fontFaceSrc: SvgTag[dom.SVGElement] = svgTag("font-face-src")
 
@@ -485,7 +485,7 @@ trait SvgTags {
   /**
     * The font-face-uri element points to a remote definition of the current font.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-uri
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/font-face-uri font-face-uri @ MDN]]
     */
   lazy val fontFaceUri: SvgTag[dom.SVGElement] = svgTag("font-face-uri")
 
@@ -496,7 +496,7 @@ trait SvgTags {
     * included foreign graphical content is subject to SVG transformations and
     * compositing.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/foreignObject foreignObject @ MDN]]
     */
   lazy val foreignObject: SvgTag[dom.SVGElement] = svgTag("foreignObject")
 
@@ -507,8 +507,8 @@ trait SvgTags {
     * applied are inherited by child elements. In addition, it can be used to
     * define complex objects that can later be referenced with the use element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGGElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g g @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGGElement SVGGElement @ MDN]]
     */
   lazy val g: SvgTag[dom.SVGGElement] = svgTag("g")
 
@@ -516,7 +516,7 @@ trait SvgTags {
   /**
     * A glyph defines a single glyph in an SVG font.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/glyph
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/glyph glyph @ MDN]]
     */
   lazy val glyph: SvgTag[dom.SVGElement] = svgTag("glyph")
 
@@ -525,7 +525,7 @@ trait SvgTags {
     * The glyphRef element provides a single possible glyph to the referencing
     * altGlyph substitution.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/glyphRef
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/glyphRef glyphRef @ MDN]]
     */
   lazy val glyphRef: SvgTag[dom.SVGElement] = svgTag("glyphRef")
 
@@ -534,7 +534,7 @@ trait SvgTags {
     * The horizontal distance between two glyphs can be fine-tweaked with an
     * hkern Element. This process is known as Kerning.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/hkern
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/hkern hkern @ MDN]]
     */
   lazy val hkern: SvgTag[dom.SVGElement] = svgTag("hkern")
 
@@ -543,8 +543,8 @@ trait SvgTags {
     * The SVG Image Element (image) allows a raster image into be included in
     * an SVG document.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGImageElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image image @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGImageElement SVGImageElement @ MDN]]
     */
   lazy val image: SvgTag[dom.SVGImageElement] = svgTag("image")
 
@@ -553,8 +553,8 @@ trait SvgTags {
     * The line element is an SVG basic shape, used to create a line connecting
     * two points.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGLineElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/line line @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGLineElement SVGLineElement @ MDN]]
     */
   lazy val line: SvgTag[dom.SVGLineElement] = svgTag("line")
 
@@ -563,8 +563,8 @@ trait SvgTags {
     * linearGradient lets authors define linear gradients to fill or stroke
     * graphical elements.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGLinearGradientElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/linearGradient linearGradient @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGLinearGradientElement SVGLinearGradientElement @ MDN]]
     */
   lazy val linearGradient: SvgTag[dom.SVGLinearGradientElement] = svgTag("linearGradient")
 
@@ -574,8 +574,8 @@ trait SvgTags {
     * arrowheads or polymarkers on a given path, line, polyline or
     * polygon element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGMarkerElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/marker marker @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGMarkerElement SVGMarkerElement @ MDN]]
     */
   lazy val marker: SvgTag[dom.SVGMarkerElement] = svgTag("marker")
 
@@ -586,8 +586,8 @@ trait SvgTags {
     * background. A mask is defined with the mask element. A mask is
     * used/referenced using the mask property.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mask
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGMaskElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mask mask @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGMaskElement SVGMaskElement @ MDN]]
     */
   lazy val mask: SvgTag[dom.SVGMaskElement] = svgTag("mask")
 
@@ -598,8 +598,8 @@ trait SvgTags {
     * metadata should be elements from other XML namespaces such as RDF, FOAF,
     * etc.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/metadata
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGMetadataElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/metadata metadata @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGMetadataElement SVGMetadataElement @ MDN]]
     */
   lazy val metadata: SvgTag[dom.SVGMetadataElement] = svgTag("metadata")
 
@@ -608,7 +608,7 @@ trait SvgTags {
     * The missing-glyph's content is rendered, if for a given character the font
     * doesn't define an appropriate glyph.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/missing-glyph
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/missing-glyph missing-glyph @ MDN]]
     */
   lazy val missingGlyph: SvgTag[dom.SVGElement] = svgTag("missing-glyph")
 
@@ -617,7 +617,7 @@ trait SvgTags {
     * the mpath sub-element for the animateMotion element provides the ability
     * to reference an external path element as the definition of a motion path.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mpath
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/mpath mpath @ MDN]]
     */
   lazy val mpath: SvgTag[dom.SVGElement] = svgTag("mpath")
 
@@ -626,8 +626,8 @@ trait SvgTags {
     * The path element is the generic element to define a shape. All the basic
     * shapes can be created with a path element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPathElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path path @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGPathElement SVGPathElement @ MDN]]
     */
   lazy val path: SvgTag[dom.SVGPathElement] = svgTag("path")
 
@@ -640,8 +640,8 @@ trait SvgTags {
     * graphics element to indicate that the given element shall be filled or
     * stroked with the referenced pattern.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPatternElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/pattern pattern @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGPatternElement SVGPatternElement @ MDN]]
     */
   lazy val pattern: SvgTag[dom.SVGPatternElement] = svgTag("pattern")
 
@@ -650,8 +650,8 @@ trait SvgTags {
     * The polygon element defines a closed shape consisting of a set of connected
     * straight line segments.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPolygonElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polygon polygon @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGPolygonElement SVGPolygonElement @ MDN]]
     */
   lazy val polygon: SvgTag[dom.SVGPolygonElement] = svgTag("polygon")
 
@@ -661,8 +661,8 @@ trait SvgTags {
     * straight lines connecting several points. Typically a polyline is used to
     * create open shapes
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polyline
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGPolylineElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/polyline polyline @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGPolylineElement SVGPolylineElement @ MDN]]
     */
   lazy val polyline: SvgTag[dom.SVGPolylineElement] = svgTag("polyline")
 
@@ -671,8 +671,8 @@ trait SvgTags {
     * radialGradient lets authors define radial gradients to fill or stroke
     * graphical elements.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGRadialGradientElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/radialGradient radialGradient @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGRadialGradientElement SVGRadialGradientElement @ MDN]]
     */
   lazy val radialGradient: SvgTag[dom.SVGRadialGradientElement] = svgTag("radialGradient")
 
@@ -682,8 +682,8 @@ trait SvgTags {
     * the position of a corner and their width and height. It may also be used to
     * create rectangles with rounded corners.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGRectElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect rect @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGRectElement SVGRectElement @ MDN]]
     */
   lazy val rect: SvgTag[dom.SVGRectElement] = svgTag("rect")
 
@@ -695,7 +695,7 @@ trait SvgTags {
     * boolean values. The set element is non-additive. The additive and
     * accumulate attributes are not allowed, and will be ignored if specified.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/set
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/set set @ MDN]]
     */
   lazy val set: SvgTag[dom.SVGElement] = svgTag("set")
 
@@ -705,8 +705,8 @@ trait SvgTags {
     * that are child elements to either the lineargradient element or the
     * radialGradient element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGStopElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/stop stop @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGStopElement SVGStopElement @ MDN]]
     */
   lazy val stop: SvgTag[dom.SVGStopElement] = svgTag("stop")
 
@@ -717,8 +717,8 @@ trait SvgTags {
     * document). This standalone fragment has its own viewPort and its own
     * coordinate system.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg svg @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGSVGElement SVGSVGElement @ MDN]]
     */
   lazy val svg: SvgTag[dom.SVGSVGElement] = svgTag("svg")
 
@@ -731,8 +731,8 @@ trait SvgTags {
     * child element is a container element such as a g, then the entire
     * subtree is either processed/rendered or bypassed/not rendered.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/switch
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGSwitchElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/switch switch @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGSwitchElement SVGSwitchElement @ MDN]]
     */
   lazy val switch: SvgTag[dom.SVGSwitchElement] = svgTag("switch")
 
@@ -747,8 +747,8 @@ trait SvgTags {
     * symbol element (i.e., a reference to a symbol by a use element) are
     * rendered.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/symbol symbol @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGSymbolElement SVGSymbolElement @ MDN]]
     */
   lazy val symbol: SvgTag[dom.SVGSymbolElement] = svgTag("symbol")
 
@@ -758,8 +758,8 @@ trait SvgTags {
     * it is possible to apply a gradient, pattern, clipping path, mask or filter
     * to text.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTextElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text text @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGTextElement SVGTextElement @ MDN]]
     */
   lazy val text: SvgTag[dom.SVGTextElement] = svgTag("text")
 
@@ -771,8 +771,8 @@ trait SvgTags {
     * the given text within a textPath element which includes an xlink:href
     * attribute with a reference to a path element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/textPath
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTextPathElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/textPath textPath @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGTextPathElement SVGTextPathElement @ MDN]]
     */
   lazy val textPath: SvgTag[dom.SVGTextPathElement] = svgTag("textPath")
 
@@ -786,8 +786,8 @@ trait SvgTags {
     * not display path elements or other graphics elements. The title element
     * generally improve accessibility of SVG documents.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTextPathElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/title title @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGTextPathElement SVGTextPathElement @ MDN]]
     */
   lazy val titleTag: SvgTag[dom.SVGTextPathElement] = svgTag("title")
 
@@ -797,7 +797,7 @@ trait SvgTags {
     * embedded within the text element or the character data content of a
     * referenced element, where the referencing is specified with a tref element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tref
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tref tref @ MDN]]
     */
   lazy val tref: SvgTag[dom.SVGElement] = svgTag("tref")
 
@@ -807,8 +807,8 @@ trait SvgTags {
     * position can be adjusted with absolute or relative coordinate values by
     * including a tspan element.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGTSpanElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/tspan tspan @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGTSpanElement SVGTSpanElement @ MDN]]
     */
   lazy val tspan: SvgTag[dom.SVGTSpanElement] = svgTag("tspan")
 
@@ -822,8 +822,8 @@ trait SvgTags {
     * descendants. CSS attributes are not guaranteed to be inherited by the
     * hidden, cloned DOM unless you explicitly request it using CSS inheritance.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGUseElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/use use @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGUseElement SVGUseElement @ MDN]]
     */
   lazy val use: SvgTag[dom.SVGUseElement] = svgTag("use")
 
@@ -832,8 +832,8 @@ trait SvgTags {
     * A view is a defined way to view the image, like a zoom level or a detail
     * view.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/view
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/SVGViewElement
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/view view @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/SVGViewElement SVGViewElement @ MDN]]
     */
   lazy val view: SvgTag[dom.SVGViewElement] = svgTag("view")
 
@@ -842,7 +842,7 @@ trait SvgTags {
     * The vertical distance between two glyphs in top-to-bottom fonts can be
     * fine-tweaked with an vkern Element. This process is known as Kerning.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/vkern
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/vkern vkern @ MDN]]
     */
   lazy val vkern: SvgTag[dom.SVGElement] = svgTag("vkern")
 

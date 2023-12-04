@@ -10,6 +10,12 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 
 trait Color { this: StyleProp[_] =>
 
+  /**
+    * The `currentcolor` keyword represents the value of an element's color property.
+    * This lets you use the color value on properties that do not receive it by default.
+    */
+  lazy val currentColor: StyleSetter = this := "currentcolor"
+
   lazy val aqua: StyleSetter = this := "aqua"
 
   lazy val black: StyleSetter = this := "black"

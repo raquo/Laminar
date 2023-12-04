@@ -36,7 +36,8 @@ trait HtmlAttrs {
     * Declares the character encoding of the page or script. Used on meta and
     * script elements.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-charset
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta#charset meta#charset @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#charset script#charset @ MDN]]
     */
   lazy val charset: HtmlAttr[String] = stringHtmlAttr("charset")
 
@@ -45,7 +46,7 @@ trait HtmlAttrs {
     * Indicates whether the element should be editable by the user.
     * If so, the browser modifies its widget to allow editing.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/contentEditable
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/contentEditable contentEditable @ MDN]]
     */
   lazy val contentEditable: HtmlAttr[Boolean] = boolAsTrueFalseHtmlAttr("contenteditable")
 
@@ -54,7 +55,7 @@ trait HtmlAttrs {
     * Specifies a context menu for an element by its element id.
     * The context menu appears when a user right-clicks on the element
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contextmenu
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/contextmenu contextmenu @ MDN]]
     */
   lazy val contextMenuId: HtmlAttr[String] = stringHtmlAttr("contextmenu")
 
@@ -72,7 +73,7 @@ trait HtmlAttrs {
     * `form` element. This should be used only with `input` elements of `type` 
     * submit or image.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formaction
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#formaction input#formaction @ MDN]]
     */
   lazy val formAction: HtmlAttr[String] = stringHtmlAttr("formaction")
 
@@ -85,7 +86,7 @@ trait HtmlAttrs {
     * The `height` attribute specifies the pixel height of the following elements:
     * `<canvas>, <embed>, <iframe>, <img>, <input type="image">, <object>, <video>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-height
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#height object#height @ MDN]]
     */
   lazy val heightAttr: HtmlAttr[Int] = intHtmlAttr("height")
 
@@ -99,7 +100,7 @@ trait HtmlAttrs {
     * supported by the browser. For example, file, ftp, and mailto work in most
     * user agents.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-href
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#href a#href @ MDN]]
     */
   lazy val href: HtmlAttr[String] = stringHtmlAttr("href")
 
@@ -118,7 +119,7 @@ trait HtmlAttrs {
     * The max attribute specifies the maximum value for an `<input>` element of type
     * number, range, date, datetime, datetime-local, month, time, or week.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max max @ MDN]]
     */
   lazy val maxAttr: HtmlAttr[String] = stringHtmlAttr("max")
 
@@ -127,7 +128,7 @@ trait HtmlAttrs {
     * The min attribute specifies the minimum value for an `<input>` element of type
     * number, range, date, datetime, datetime-local, month, time, or week.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min min @ MDN]]
     */
   lazy val minAttr: HtmlAttr[String] = stringHtmlAttr("min")
 
@@ -136,9 +137,9 @@ trait HtmlAttrs {
     * Specifies the URL of an image for `<img>` tag, for `type="image"` input buttons, 
     * or the URL of some other network resources like `<iframe>`.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#attr-src
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#src
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-src
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#src img#src @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#src input#src @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#src iframe#src @ MDN]]
     */
   lazy val src: HtmlAttr[String] = stringHtmlAttr("src")
 
@@ -152,20 +153,20 @@ trait HtmlAttrs {
     * The step attribute is applicable to `<input>` elements of the following
     * types: number, range, date, datetime, datetime-local, month, time and week.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/step
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/step step @ MDN]]
     */
   lazy val stepAttr: HtmlAttr[String] = stringHtmlAttr("step")
 
 
   /**
-    * This attribute is used to define the type of the content linked to. The
-    * value of the attribute should be a MIME type such as text/html, text/css,
-    * and so on. The common use of this attribute is to define the type of style
-    * sheet linked and the most common current value is text/css, which indicates
-    * a Cascading Style Sheet format. You can use tpe as an alias for this
-    * attribute so you don't have to backtick-escape this attribute.
+    * This attribute has several meanings depending on what element it's applied to. 
+    * It could indicate the type of a button, an input, a script, a stylesheet, etc.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-type
+    * Aliases: [[typ]], [[tpe]]
+    * 
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types input#input_types @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#type button#type @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#type object#type @ MDN]]
     */
   lazy val `type`: HtmlAttr[String] = stringHtmlAttr("type")
 
@@ -184,7 +185,7 @@ trait HtmlAttrs {
     * The `width` attribute specifies the pixel width of the following elements:
     * `<canvas>, <embed>, <iframe>, <img>, <input type="image">, <object>, <video>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#attr-width
+    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/object#width object#width @ MDN]]
     */
   lazy val widthAttr: HtmlAttr[Int] = intHtmlAttr("width")
 

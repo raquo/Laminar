@@ -14,6 +14,15 @@ trait OverflowWrap extends Normal { this: StyleProp[_] =>
   override lazy val normal: StyleSetter = this := "normal"
 
   /**
+    * Indicates that normally unbreakable words may be broken at any points
+    * if there are no otherwise-acceptable break points in the line.
+    * No hyphenation character is inserted at the break point. Soft wrap
+    * opportunities introduced by the word break are considered when calculating
+    * min-content intrinsic sizes.
+    */
+  lazy val anywhere: StyleSetter = this := "anywhere"
+
+  /**
     * Indicates that normally unbreakable words may be broken at arbitrary
     * points if there are no otherwise acceptable break points in the line.
     */

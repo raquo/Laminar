@@ -25,7 +25,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
     * It is an incredibly common mistake to use load where DOMContentLoaded would be much more appropriate,
     * so be cautious.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event DOMContentLoaded_event @ MDN]]
     */
   lazy val onDomContentLoaded: EventProp[dom.Event] = eventProp("DOMContentLoaded")
 
@@ -33,7 +33,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
   /**
     * The fullscreenchange event is fired immediately after the browser switches into or out of full-screen mode.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event fullscreenchange_event @ MDN]]
     */
   lazy val onFullScreenChange: EventProp[dom.Event] = eventProp("fullscreenchange")
 
@@ -41,7 +41,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
   /**
     * The fullscreenerror event is fired when the browser cannot switch to full-screen mode.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenerror_event
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenerror_event fullscreenerror_event @ MDN]]
     */
   lazy val onFullScreenError: EventProp[dom.Event] = eventProp("fullscreenerror")
 
@@ -50,7 +50,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
     * The selectionchange event is fired when the current Selection of a Document is changed.
     * This event is not cancelable and does not bubble.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/selectionchange_event
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/Document/selectionchange_event selectionchange_event @ MDN]]
     */
   lazy val onSelectionChange: EventProp[dom.Event] = eventProp("selectionchange")
 
@@ -58,7 +58,7 @@ trait DocumentEventProps { this: GlobalEventProps =>
   /**
     * The visibilitychange event is fired when the content of a tab has become visible or has been hidden.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilitychange_event visibilitychange_event @ MDN]]
     */
   lazy val onVisibilityChange: EventProp[dom.Event] = eventProp("visibilitychange")
 

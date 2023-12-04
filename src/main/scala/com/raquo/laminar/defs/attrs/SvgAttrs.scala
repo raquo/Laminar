@@ -40,7 +40,7 @@ trait SvgAttrs {
     * 
     * Value 	`<number>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/accent-height
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/accent-height accent-height @ MDN]]
     */
   lazy val accentHeight: SvgAttr[Double] = doubleSvgAttr("accent-height")
 
@@ -53,7 +53,7 @@ trait SvgAttrs {
     * 
     * Value 	none | sum
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/accumulate
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/accumulate accumulate @ MDN]]
     */
   lazy val accumulate: SvgAttr[String] = stringSvgAttr("accumulate")
 
@@ -67,7 +67,7 @@ trait SvgAttrs {
     * 
     * Value 	replace | sum
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/additive
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/additive additive @ MDN]]
     */
   lazy val additive: SvgAttr[String] = stringSvgAttr("additive")
 
@@ -86,7 +86,7 @@ trait SvgAttrs {
     * Value: 	auto | baseline | before-edge | text-before-edge | middle | central | after-edge |
     * text-after-edge | ideographic | alphabetic | hanging | mathematical | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/alignment-baseline alignment-baseline @ MDN]]
     */
   lazy val alignmentBaseline: SvgAttr[String] = stringSvgAttr("alignment-baseline")
 
@@ -99,7 +99,7 @@ trait SvgAttrs {
     * 
     * Value 	`<number>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ascent
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ascent ascent @ MDN]]
     */
   lazy val ascent: SvgAttr[Double] = doubleSvgAttr("ascent")
 
@@ -110,7 +110,7 @@ trait SvgAttrs {
     * 
     * Value 	`<attributeName>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeName
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeName attributeName @ MDN]]
     */
   lazy val attributeName: SvgAttr[String] = stringSvgAttr("attributeName")
 
@@ -121,7 +121,7 @@ trait SvgAttrs {
     * 
     * Value 	CSS | XML | auto
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeType
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/attributeType attributeType @ MDN]]
     */
   lazy val attributeType: SvgAttr[String] = stringSvgAttr("attributeType")
 
@@ -134,7 +134,7 @@ trait SvgAttrs {
     * 
     * Value 	`<number>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/azimuth
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/azimuth azimuth @ MDN]]
     */
   lazy val azimuth: SvgAttr[Double] = doubleSvgAttr("azimuth")
 
@@ -151,7 +151,7 @@ trait SvgAttrs {
     * 
     * Value 	`<number-optional-number>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseFrequency
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseFrequency baseFrequency @ MDN]]
     */
   lazy val baseFrequency: SvgAttr[String] = stringSvgAttr("baseFrequency")
 
@@ -165,7 +165,7 @@ trait SvgAttrs {
     * 
     * Value 	auto | baseline | sup | sub | <percentage> | <length> | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseline-shift
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/baseline-shift baseline-shift @ MDN]]
     */
   lazy val baselineShift: SvgAttr[String] = stringSvgAttr("baseline-shift")
 
@@ -180,7 +180,7 @@ trait SvgAttrs {
     * 
     * Value 	`<begin-value-list>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/begin
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/begin begin @ MDN]]
     */
   lazy val begin: SvgAttr[String] = stringSvgAttr("begin")
 
@@ -194,7 +194,7 @@ trait SvgAttrs {
     * 
     * Value 	`<number>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/bias
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/bias bias @ MDN]]
     */
   lazy val bias: SvgAttr[Double] = doubleSvgAttr("bias")
 
@@ -206,7 +206,7 @@ trait SvgAttrs {
     * 
     * Value 	discrete | linear | paced | spline
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/calcMode
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/calcMode calcMode @ MDN]]
     */
   lazy val calcMode: SvgAttr[String] = stringSvgAttr("calcMode")
 
@@ -221,7 +221,7 @@ trait SvgAttrs {
     * 
     * Value 	`auto | <shape> | inherit`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip clip @ MDN]]
     */
   lazy val clip: SvgAttr[String] = stringSvgAttr("clip")
 
@@ -232,7 +232,7 @@ trait SvgAttrs {
     * 
     * Value 	`<FuncIRI> | none | inherit`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip-path
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip-path clip-path @ MDN]]
     */
   lazy val clipPathAttr: SvgAttr[String] = stringSvgAttr("clip-path")
 
@@ -248,7 +248,7 @@ trait SvgAttrs {
     * 
     * Value 	userSpaceOnUse | objectBoundingBox
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clipPathUnits
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clipPathUnits clipPathUnits @ MDN]]
     */
   lazy val clipPathUnits: SvgAttr[String] = stringSvgAttr("clipPathUnits")
 
@@ -260,7 +260,7 @@ trait SvgAttrs {
     * 
     * Value 	nonezero | evenodd | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip-rule
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/clip-rule clip-rule @ MDN]]
     */
   lazy val clipRule: SvgAttr[String] = stringSvgAttr("clip-rule")
 
@@ -273,7 +273,7 @@ trait SvgAttrs {
     * 
     * Value 	`<color> | inherit`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color color @ MDN]]
     */
   lazy val color: SvgAttr[String] = stringSvgAttr("color")
 
@@ -293,7 +293,7 @@ trait SvgAttrs {
     * 
     * Value 	auto | sRGB | linearRGB | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-interpolation
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-interpolation color-interpolation @ MDN]]
     */
   lazy val colorInterpolation: SvgAttr[String] = stringSvgAttr("color-interpolation")
 
@@ -310,7 +310,7 @@ trait SvgAttrs {
     * 
     * Value 	auto | sRGB | linearRGB | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-interpolation-filters
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-interpolation-filters color-interpolation-filters @ MDN]]
     */
   lazy val colorInterpolationFilters: SvgAttr[String] = stringSvgAttr("color-interpolation-filters")
 
@@ -323,7 +323,7 @@ trait SvgAttrs {
     * 
     * Value 	`auto | sRGB | <name> | <IRI> | inherit`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-profile
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-profile color-profile @ MDN]]
     */
   lazy val colorProfileAttr: SvgAttr[String] = stringSvgAttr("color-profile")
 
@@ -341,7 +341,7 @@ trait SvgAttrs {
     * 
     * Value 	auto | optimizeSpeed | optimizeQuality | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-rendering
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/color-rendering color-rendering @ MDN]]
     */
   lazy val colorRendering: SvgAttr[String] = stringSvgAttr("color-rendering")
 
@@ -356,7 +356,7 @@ trait SvgAttrs {
     * 
     * Value 	`<content-type>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/contentScriptType
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/contentScriptType contentScriptType @ MDN]]
     */
   lazy val contentScriptType: SvgAttr[String] = stringSvgAttr("contentScriptType")
 
@@ -368,7 +368,7 @@ trait SvgAttrs {
     * 
     * Value 	`<content-type>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/contentStyleType
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/contentStyleType contentStyleType @ MDN]]
     */
   lazy val contentStyleType: SvgAttr[String] = stringSvgAttr("contentStyleType")
 
@@ -384,7 +384,7 @@ trait SvgAttrs {
     * ne-resize | nw-resize | n-resize | se-resize | sw-resize | s-resize | w-resize| text |
     * wait | help | inherit
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cursor
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cursor cursor @ MDN]]
     */
   lazy val cursorAttr: SvgAttr[String] = stringSvgAttr("cursor")
 
@@ -400,7 +400,7 @@ trait SvgAttrs {
     * 
     * Value 	`<coordinate>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cx
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cx cx @ MDN]]
     */
   lazy val cx: SvgAttr[String] = stringSvgAttr("cx")
 
@@ -416,260 +416,260 @@ trait SvgAttrs {
     * 
     * Value 	`<coordinate>`
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cy
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/cy cy @ MDN]]
     */
   lazy val cy: SvgAttr[String] = stringSvgAttr("cy")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d d @ MDN]] */
   lazy val d: SvgAttr[String] = stringSvgAttr("d")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/diffuseConstant */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/diffuseConstant diffuseConstant @ MDN]] */
   lazy val diffuseConstant: SvgAttr[String] = stringSvgAttr("diffuseConstant")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/direction */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/direction direction @ MDN]] */
   lazy val direction: SvgAttr[String] = stringSvgAttr("direction")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/display */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/display display @ MDN]] */
   lazy val display: SvgAttr[String] = stringSvgAttr("display")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/divisor */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/divisor divisor @ MDN]] */
   lazy val divisor: SvgAttr[String] = stringSvgAttr("divisor")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dominant-baseline dominant-baseline @ MDN]] */
   lazy val dominantBaseline: SvgAttr[String] = stringSvgAttr("dominant-baseline")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dur */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dur dur @ MDN]] */
   lazy val dur: SvgAttr[String] = stringSvgAttr("dur")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dx */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dx dx @ MDN]] */
   lazy val dx: SvgAttr[String] = stringSvgAttr("dx")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dy */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/dy dy @ MDN]] */
   lazy val dy: SvgAttr[String] = stringSvgAttr("dy")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/edgeMode */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/edgeMode edgeMode @ MDN]] */
   lazy val edgeMode: SvgAttr[String] = stringSvgAttr("edgeMode")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/elevation */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/elevation elevation @ MDN]] */
   lazy val elevation: SvgAttr[Double] = doubleSvgAttr("elevation")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/end */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/end end @ MDN]] */
   lazy val end: SvgAttr[String] = stringSvgAttr("end")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/externalResourcesRequired */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/externalResourcesRequired externalResourcesRequired @ MDN]] */
   lazy val externalResourcesRequired: SvgAttr[String] = stringSvgAttr("externalResourcesRequired")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill fill @ MDN]] */
   lazy val fill: SvgAttr[String] = stringSvgAttr("fill")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill-opacity */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill-opacity fill-opacity @ MDN]] */
   lazy val fillOpacity: SvgAttr[String] = stringSvgAttr("fill-opacity")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill-rule */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill-rule fill-rule @ MDN]] */
   lazy val fillRule: SvgAttr[String] = stringSvgAttr("fill-rule")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/filter */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/filter filter @ MDN]] */
   lazy val filterAttr: SvgAttr[String] = stringSvgAttr("filter")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/filterRes */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/filterRes filterRes @ MDN]] */
   lazy val filterRes: SvgAttr[String] = stringSvgAttr("filterRes")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/filterUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/filterUnits filterUnits @ MDN]] */
   lazy val filterUnits: SvgAttr[String] = stringSvgAttr("filterUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-color flood-color @ MDN]] */
   lazy val floodColor: SvgAttr[String] = stringSvgAttr("flood-color")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-opacity */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/flood-opacity flood-opacity @ MDN]] */
   lazy val floodOpacity: SvgAttr[String] = stringSvgAttr("flood-opacity")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-family */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-family font-family @ MDN]] */
   lazy val fontFamily: SvgAttr[String] = stringSvgAttr("font-family")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-size */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-size font-size @ MDN]] */
   lazy val fontSize: SvgAttr[String] = stringSvgAttr("font-size")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-size-adjust */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-size-adjust font-size-adjust @ MDN]] */
   lazy val fontSizeAdjust: SvgAttr[String] = stringSvgAttr("font-size-adjust")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-stretch */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-stretch font-stretch @ MDN]] */
   lazy val fontStretch: SvgAttr[String] = stringSvgAttr("font-stretch")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-variant */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-variant font-variant @ MDN]] */
   lazy val fontVariant: SvgAttr[String] = stringSvgAttr("font-variant")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-weight */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/font-weight font-weight @ MDN]] */
   lazy val fontWeight: SvgAttr[String] = stringSvgAttr("font-weight")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/from */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/from from @ MDN]] */
   lazy val from: SvgAttr[String] = stringSvgAttr("from")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/gradientTransform */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/gradientTransform gradientTransform @ MDN]] */
   lazy val gradientTransform: SvgAttr[String] = stringSvgAttr("gradientTransform")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/gradientUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/gradientUnits gradientUnits @ MDN]] */
   lazy val gradientUnits: SvgAttr[String] = stringSvgAttr("gradientUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/height */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/height height @ MDN]] */
   lazy val height: SvgAttr[String] = stringSvgAttr("height")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/href */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/href href @ MDN]] */
   lazy val href: SvgAttr[String] = stringSvgAttr("href")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/imageRendering */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/imageRendering imageRendering @ MDN]] */
   lazy val imageRendering: SvgAttr[String] = stringSvgAttr("imageRendering")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/id */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/id id @ MDN]] */
   lazy val idAttr: SvgAttr[String] = stringSvgAttr("id")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/in */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/in in @ MDN]] */
   lazy val in: SvgAttr[String] = stringSvgAttr("in")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/in2 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/in2 in2 @ MDN]] */
   lazy val in2: SvgAttr[String] = stringSvgAttr("in2")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k1 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k1 k1 @ MDN]] */
   lazy val k1: SvgAttr[Double] = doubleSvgAttr("k1")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k2 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k2 k2 @ MDN]] */
   lazy val k2: SvgAttr[Double] = doubleSvgAttr("k2")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k3 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k3 k3 @ MDN]] */
   lazy val k3: SvgAttr[Double] = doubleSvgAttr("k3")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k4 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/k4 k4 @ MDN]] */
   lazy val k4: SvgAttr[Double] = doubleSvgAttr("k4")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kernelMatrix */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kernelMatrix kernelMatrix @ MDN]] */
   lazy val kernelMatrix: SvgAttr[String] = stringSvgAttr("kernelMatrix")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kernelUnitLength */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kernelUnitLength kernelUnitLength @ MDN]] */
   lazy val kernelUnitLength: SvgAttr[String] = stringSvgAttr("kernelUnitLength")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kerning */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/kerning kerning @ MDN]] */
   lazy val kerning: SvgAttr[String] = stringSvgAttr("kerning")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/keySplines */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/keySplines keySplines @ MDN]] */
   lazy val keySplines: SvgAttr[String] = stringSvgAttr("keySplines")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/keyTimes */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/keyTimes keyTimes @ MDN]] */
   lazy val keyTimes: SvgAttr[String] = stringSvgAttr("keyTimes")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/letter-spacing */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/letter-spacing letter-spacing @ MDN]] */
   lazy val letterSpacing: SvgAttr[String] = stringSvgAttr("letter-spacing")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/lighting-color */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/lighting-color lighting-color @ MDN]] */
   lazy val lightingColor: SvgAttr[String] = stringSvgAttr("lighting-color")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/limitingConeAngle */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/limitingConeAngle limitingConeAngle @ MDN]] */
   lazy val limitingConeAngle: SvgAttr[String] = stringSvgAttr("limitingConeAngle")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/local */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/local local @ MDN]] */
   lazy val local: SvgAttr[String] = stringSvgAttr("local")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/marker-end */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/marker-end marker-end @ MDN]] */
   lazy val markerEnd: SvgAttr[String] = stringSvgAttr("marker-end")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/marker-mid */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/marker-mid marker-mid @ MDN]] */
   lazy val markerMid: SvgAttr[String] = stringSvgAttr("marker-mid")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/marker-start */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/marker-start marker-start @ MDN]] */
   lazy val markerStart: SvgAttr[String] = stringSvgAttr("marker-start")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerHeight */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerHeight markerHeight @ MDN]] */
   lazy val markerHeight: SvgAttr[String] = stringSvgAttr("markerHeight")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerUnits markerUnits @ MDN]] */
   lazy val markerUnits: SvgAttr[String] = stringSvgAttr("markerUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerWidth */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/markerWidth markerWidth @ MDN]] */
   lazy val markerWidth: SvgAttr[String] = stringSvgAttr("markerWidth")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/maskContentUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/maskContentUnits maskContentUnits @ MDN]] */
   lazy val maskContentUnits: SvgAttr[String] = stringSvgAttr("maskContentUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/maskUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/maskUnits maskUnits @ MDN]] */
   lazy val maskUnits: SvgAttr[String] = stringSvgAttr("maskUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mask */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mask mask @ MDN]] */
   lazy val maskAttr: SvgAttr[String] = stringSvgAttr("mask")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/max max @ MDN]] */
   lazy val maxAttr: SvgAttr[String] = stringSvgAttr("max")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/min min @ MDN]] */
   lazy val minAttr: SvgAttr[String] = stringSvgAttr("min")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mode */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/mode mode @ MDN]] */
   lazy val mode: SvgAttr[String] = stringSvgAttr("mode")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/numOctaves */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/numOctaves numOctaves @ MDN]] */
   lazy val numOctaves: SvgAttr[Int] = intSvgAttr("numOctaves")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/offset */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/offset offset @ MDN]] */
   lazy val offsetAttr: SvgAttr[String] = stringSvgAttr("offset")
 
 
@@ -678,84 +678,84 @@ trait SvgAttrs {
     * 
     * Value type: `auto|auto-start-reverse|<angle>` ; Default value: 0; Animatable: yes
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/orient
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/orient orient @ MDN]]
     */
   lazy val orient: SvgAttr[String] = stringSvgAttr("orient")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/opacity */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/opacity opacity @ MDN]] */
   lazy val opacity: SvgAttr[String] = stringSvgAttr("opacity")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/operator */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/operator operator @ MDN]] */
   lazy val operator: SvgAttr[String] = stringSvgAttr("operator")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/order */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/order order @ MDN]] */
   lazy val order: SvgAttr[String] = stringSvgAttr("order")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/overflow */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/overflow overflow @ MDN]] */
   lazy val overflow: SvgAttr[String] = stringSvgAttr("overflow")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/paint-order */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/paint-order paint-order @ MDN]] */
   lazy val paintOrder: SvgAttr[String] = stringSvgAttr("paint-order")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pathLength */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pathLength pathLength @ MDN]] */
   lazy val pathLength: SvgAttr[String] = stringSvgAttr("pathLength")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/patternContentUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/patternContentUnits patternContentUnits @ MDN]] */
   lazy val patternContentUnits: SvgAttr[String] = stringSvgAttr("patternContentUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/patternTransform */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/patternTransform patternTransform @ MDN]] */
   lazy val patternTransform: SvgAttr[String] = stringSvgAttr("patternTransform")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/patternUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/patternUnits patternUnits @ MDN]] */
   lazy val patternUnits: SvgAttr[String] = stringSvgAttr("patternUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointer-events pointer-events @ MDN]] */
   lazy val pointerEvents: SvgAttr[String] = stringSvgAttr("pointer-events")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/points */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/points points @ MDN]] */
   lazy val points: SvgAttr[String] = stringSvgAttr("points")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointsAtX */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointsAtX pointsAtX @ MDN]] */
   lazy val pointsAtX: SvgAttr[String] = stringSvgAttr("pointsAtX")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointsAtY */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointsAtY pointsAtY @ MDN]] */
   lazy val pointsAtY: SvgAttr[String] = stringSvgAttr("pointsAtY")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointsAtZ */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/pointsAtZ pointsAtZ @ MDN]] */
   lazy val pointsAtZ: SvgAttr[String] = stringSvgAttr("pointsAtZ")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAlpha */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAlpha preserveAlpha @ MDN]] */
   lazy val preserveAlpha: SvgAttr[String] = stringSvgAttr("preserveAlpha")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio preserveAspectRatio @ MDN]] */
   lazy val preserveAspectRatio: SvgAttr[String] = stringSvgAttr("preserveAspectRatio")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/primitiveUnits */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/primitiveUnits primitiveUnits @ MDN]] */
   lazy val primitiveUnits: SvgAttr[String] = stringSvgAttr("primitiveUnits")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/r r @ MDN]] */
   lazy val r: SvgAttr[String] = stringSvgAttr("r")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/radius */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/radius radius @ MDN]] */
   lazy val radius: SvgAttr[String] = stringSvgAttr("radius")
 
 
@@ -765,7 +765,7 @@ trait SvgAttrs {
     * coordinate system (after application of the ‘viewBox’ and ‘preserveAspectRatio’ attributes), and not
     * the markable element it is placed on.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/refX
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/refX refX @ MDN]]
     */
   lazy val refX: SvgAttr[String] = stringSvgAttr("refX")
 
@@ -776,156 +776,160 @@ trait SvgAttrs {
     * coordinate system (after application of the ‘viewBox’ and ‘preserveAspectRatio’ attributes), and not
     * the markable element it is placed on.
     * 
-    * @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/refY
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/refY refY @ MDN]]
     */
   lazy val refY: SvgAttr[String] = stringSvgAttr("refY")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/repeatCount */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/repeatCount repeatCount @ MDN]] */
   lazy val repeatCount: SvgAttr[String] = stringSvgAttr("repeatCount")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/repeatDur */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/repeatDur repeatDur @ MDN]] */
   lazy val repeatDur: SvgAttr[String] = stringSvgAttr("repeatDur")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/requiredFeatures */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/requiredFeatures requiredFeatures @ MDN]] */
   lazy val requiredFeatures: SvgAttr[String] = stringSvgAttr("requiredFeatures")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/restart */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/restart restart @ MDN]] */
   lazy val restart: SvgAttr[String] = stringSvgAttr("restart")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/result */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/result result @ MDN]] */
   lazy val resultAttr: SvgAttr[String] = stringSvgAttr("result")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/rx */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/rx rx @ MDN]] */
   lazy val rx: SvgAttr[String] = stringSvgAttr("rx")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ry */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/ry ry @ MDN]] */
   lazy val ry: SvgAttr[String] = stringSvgAttr("ry")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/scale */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/scale scale @ MDN]] */
   lazy val scale: SvgAttr[String] = stringSvgAttr("scale")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/seed */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/seed seed @ MDN]] */
   lazy val seed: SvgAttr[Double] = doubleSvgAttr("seed")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/shape-rendering */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/shape-rendering shape-rendering @ MDN]] */
   lazy val shapeRendering: SvgAttr[String] = stringSvgAttr("shape-rendering")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/specularConstant */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/specularConstant specularConstant @ MDN]] */
   lazy val specularConstant: SvgAttr[Double] = doubleSvgAttr("specularConstant")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/specularExponent */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/specularExponent specularExponent @ MDN]] */
   lazy val specularExponent: SvgAttr[Double] = doubleSvgAttr("specularExponent")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/spreadMethod */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/spreadMethod spreadMethod @ MDN]] */
   lazy val spreadMethod: SvgAttr[String] = stringSvgAttr("spreadMethod")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stdDeviation */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stdDeviation stdDeviation @ MDN]] */
   lazy val stdDeviation: SvgAttr[String] = stringSvgAttr("stdDeviation")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stitchTiles */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stitchTiles stitchTiles @ MDN]] */
   lazy val stitchTiles: SvgAttr[String] = stringSvgAttr("stitchTiles")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stop-color */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stop-color stop-color @ MDN]] */
   lazy val stopColor: SvgAttr[String] = stringSvgAttr("stop-color")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stop-opacity */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stop-opacity stop-opacity @ MDN]] */
   lazy val stopOpacity: SvgAttr[String] = stringSvgAttr("stop-opacity")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke stroke @ MDN]] */
   lazy val stroke: SvgAttr[String] = stringSvgAttr("stroke")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dasharray stroke-dasharray @ MDN]] */
   lazy val strokeDashArray: SvgAttr[String] = stringSvgAttr("stroke-dasharray")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dashoffset */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-dashoffset stroke-dashoffset @ MDN]] */
   lazy val strokeDashOffset: SvgAttr[String] = stringSvgAttr("stroke-dashoffset")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linecap */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linecap stroke-linecap @ MDN]] */
   lazy val strokeLineCap: SvgAttr[String] = stringSvgAttr("stroke-linecap")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin stroke-linejoin @ MDN]] */
   lazy val strokeLineJoin: SvgAttr[String] = stringSvgAttr("stroke-linejoin")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit stroke-miterlimit @ MDN]] */
   lazy val strokeMiterLimit: SvgAttr[String] = stringSvgAttr("stroke-miterlimit")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-opacity */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-opacity stroke-opacity @ MDN]] */
   lazy val strokeOpacity: SvgAttr[String] = stringSvgAttr("stroke-opacity")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-width */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-width stroke-width @ MDN]] */
   lazy val strokeWidth: SvgAttr[String] = stringSvgAttr("stroke-width")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/style */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/style style @ MDN]] */
   lazy val style: SvgAttr[String] = stringSvgAttr("style")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/surfaceScale */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/surfaceScale surfaceScale @ MDN]] */
   lazy val surfaceScale: SvgAttr[String] = stringSvgAttr("surfaceScale")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/tabindex */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/tabindex tabindex @ MDN]] */
   lazy val tabIndex: SvgAttr[String] = stringSvgAttr("tabindex")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/target */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/target target @ MDN]] */
   lazy val target: SvgAttr[String] = stringSvgAttr("target")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/targetX */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/targetX targetX @ MDN]] */
   lazy val targetX: SvgAttr[String] = stringSvgAttr("targetX")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/targetY */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/targetY targetY @ MDN]] */
   lazy val targetY: SvgAttr[String] = stringSvgAttr("targetY")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-anchor text-anchor @ MDN]] */
   lazy val textAnchor: SvgAttr[String] = stringSvgAttr("text-anchor")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-decoration */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-decoration text-decoration @ MDN]] */
   lazy val textDecoration: SvgAttr[String] = stringSvgAttr("text-decoration")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-rendering */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/text-rendering text-rendering @ MDN]] */
   lazy val textRendering: SvgAttr[String] = stringSvgAttr("text-rendering")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/to */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/to to @ MDN]] */
   lazy val to: SvgAttr[String] = stringSvgAttr("to")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform transform @ MDN]] */
   lazy val transform: SvgAttr[String] = stringSvgAttr("transform")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/type */
+  /**
+    * Aliases: [[typ]], [[tpe]]
+    * 
+    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/type type @ MDN]]
+    */
   lazy val `type`: SvgAttr[String] = stringSvgAttr("type")
 
 
@@ -935,87 +939,87 @@ trait SvgAttrs {
   lazy val tpe: SvgAttr[String] = `type`
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/values */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/values values @ MDN]] */
   lazy val values: SvgAttr[String] = stringSvgAttr("values")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox viewBox @ MDN]] */
   lazy val viewBox: SvgAttr[String] = stringSvgAttr("viewBox")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/visibility */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/visibility visibility @ MDN]] */
   lazy val visibility: SvgAttr[String] = stringSvgAttr("visibility")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/width */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/width width @ MDN]] */
   lazy val width: SvgAttr[String] = stringSvgAttr("width")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/word-spacing */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/word-spacing word-spacing @ MDN]] */
   lazy val wordSpacing: SvgAttr[String] = stringSvgAttr("word-spacing")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/writing-mode */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/writing-mode writing-mode @ MDN]] */
   lazy val writingMode: SvgAttr[String] = stringSvgAttr("writing-mode")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x x @ MDN]] */
   lazy val x: SvgAttr[String] = stringSvgAttr("x")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x1 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x1 x1 @ MDN]] */
   lazy val x1: SvgAttr[String] = stringSvgAttr("x1")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x2 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/x2 x2 @ MDN]] */
   lazy val x2: SvgAttr[String] = stringSvgAttr("x2")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xChannelSelector */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xChannelSelector xChannelSelector @ MDN]] */
   lazy val xChannelSelector: SvgAttr[String] = stringSvgAttr("xChannelSelector")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href xlink:href @ MDN]] */
   lazy val xlinkHref: SvgAttr[String] = stringSvgAttr("href", namespace = "xlink")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:role */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:role xlink:role @ MDN]] */
   lazy val xlinkRole: SvgAttr[String] = stringSvgAttr("role", namespace = "xlink")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:title */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:title xlink:title @ MDN]] */
   lazy val xlinkTitle: SvgAttr[String] = stringSvgAttr("title", namespace = "xlink")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:space */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xml:space xml:space @ MDN]] */
   lazy val xmlSpace: SvgAttr[String] = stringSvgAttr("space", namespace = "xml")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Element/svg svg @ MDN]] */
   lazy val xmlns: SvgAttr[String] = stringSvgAttr("xmlns")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xmlns:xlink */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xmlns:xlink xmlns:xlink @ MDN]] */
   lazy val xmlnsXlink: SvgAttr[String] = stringSvgAttr("xlink", namespace = "xmlns")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y y @ MDN]] */
   lazy val y: SvgAttr[String] = stringSvgAttr("y")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y1 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y1 y1 @ MDN]] */
   lazy val y1: SvgAttr[String] = stringSvgAttr("y1")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y2 */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/y2 y2 @ MDN]] */
   lazy val y2: SvgAttr[String] = stringSvgAttr("y2")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/yChannelSelector */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/yChannelSelector yChannelSelector @ MDN]] */
   lazy val yChannelSelector: SvgAttr[String] = stringSvgAttr("yChannelSelector")
 
 
-  /** @see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/z */
+  /** [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/z z @ MDN]] */
   lazy val z: SvgAttr[String] = stringSvgAttr("z")
 
 
