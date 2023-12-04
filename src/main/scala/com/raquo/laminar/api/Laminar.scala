@@ -123,6 +123,18 @@ trait Laminar
     new DetachedRoot(rootNode, activateNow)
   }
 
+  /**
+    * Get a Seq of modifiers. You could just use Seq(...), but this helper
+    * has better type inference in some cases.
+    */
+  def modSeq[El <: Element](mods: Modifier[El]*): Seq[Modifier[El]] = mods
+
+  /**
+    * Get a Seq of nodes. You could just use Seq(...), but this helper
+    * has better type inference in some cases.
+    */
+  def nodeSeq[El <: Node](nodes: Node*): Seq[Node] = nodes
+
   /** A universal Modifier that does nothing */
   val emptyMod: Modifier.Base = Modifier.empty
 

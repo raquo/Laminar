@@ -46,4 +46,37 @@ class ModSpec extends UnitSpec {
     ))
   }
 
+  it("nodeSeq type inference") {
+
+    val nodes = nodeSeq("text", span("element"))
+
+    val el = div(
+      nodes
+    )
+
+    mount(el)
+
+    expectNode(
+      div.of("text", span.of("element"))
+    )
+  }
+
+  it("modSeq type inference") {
+
+    val mods = modSeq(title("world"), "text", span("element"))
+
+    val el = div(
+      "hello",
+      mods
+    )
+
+    mount(el)
+
+    expectNode(
+      div.of("hello", title is "world", "text", span.of("element"))
+    )
+  }
+
+
+
 }
