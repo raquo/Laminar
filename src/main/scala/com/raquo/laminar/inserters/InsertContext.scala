@@ -6,6 +6,7 @@ import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElem
 import org.scalajs.dom
 
 import scala.collection.immutable
+import scala.scalajs.js
 
 // #TODO[Naming] This feels more like InserterState?
 //  "Extra nodes" are more like "content nodes"
@@ -148,11 +149,12 @@ object InsertContext {
   /** Reserve the spot for when we actually insert real nodes later */
   def reserveSpotContext(
     parentNode: ReactiveElement.Base,
-    strictMode: Boolean
+    strictMode: Boolean,
+    hooks: js.UndefOr[InserterHooks]
   ): InsertContext = {
     val sentinelNode = new CommentNode("")
 
-    ParentNode.appendChild(parent = parentNode, child = sentinelNode)
+    ParentNode.appendChild(parent = parentNode, child = sentinelNode, hooks)
 
     unsafeMakeReservedSpotContext(
       parentNode = parentNode,

@@ -26,9 +26,6 @@ class EventListener[Ev <: dom.Event, Out](
     processor(ev).foreach(callback)
   }
 
-  @deprecated("Renamed: Use `domCallback` instead of `domValue`", "0.12.0")
-  val domValue: js.Function1[Ev, Unit] = domCallback
-
   val options: dom.EventListenerOptions = new dom.EventListenerOptions {
     capture = EventProcessor.shouldUseCapture(eventProcessor)
     passive = EventProcessor.shouldBePassive(eventProcessor)

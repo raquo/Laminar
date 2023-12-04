@@ -10,7 +10,8 @@ object ChildInserter {
 
   def apply[Component] (
     childSource: Observable[Component],
-    renderable: RenderableNode[Component]
+    renderable: RenderableNode[Component],
+    hooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = true,
@@ -22,17 +23,19 @@ object ChildInserter {
         var maybeLastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
         childSource.foreach { newComponent =>
           val newChildNode = renderable.asNode(newComponent)
-          switchToChild(maybeLastSeenChild, newChildNode, ctx)
+          switchToChild(maybeLastSeenChild, newChildNode, ctx, hooks)
           maybeLastSeenChild = newChildNode
         }(owner)
-      }
+      },
+      hooks = hooks
     )
   }
 
   def switchToChild(
     maybeLastSeenChild: js.UndefOr[ChildNode.Base],
     newChildNode: ChildNode.Base,
-    ctx: InsertContext
+    ctx: InsertContext,
+    hooks: js.UndefOr[InserterHooks]
   ): Unit = {
     if (!ctx.strictMode) {
       // #Note: previously in ChildInserter we only did this once in insertFn.
@@ -49,7 +52,8 @@ object ChildInserter {
         ParentNode.insertChildAfter(
           parent = ctx.parentNode,
           newChild = newChildNode,
-          referenceChild = ctx.sentinelNode
+          referenceChild = ctx.sentinelNode,
+          hooks = hooks
         )
         ()
       } { lastSeenChild =>
@@ -60,7 +64,8 @@ object ChildInserter {
         val replaced = ParentNode.replaceChild(
           parent = ctx.parentNode,
           oldChild = lastSeenChild,
-          newChild = newChildNode
+          newChild = newChildNode,
+          hooks = hooks
         )
         if (replaced || (lastSeenChild eq newChildNode)) { // #TODO[Performance,Integrity] Not liking this redundant auto-distinction
           // The only time we DON'T decrement this is when replacing fails for unexpected reasons.

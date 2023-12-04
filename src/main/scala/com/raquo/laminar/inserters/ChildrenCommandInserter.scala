@@ -5,6 +5,8 @@ import com.raquo.laminar.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 
+import scala.scalajs.js
+
 /** Note: this is a low level inserter. It is the fastest one in certain cases,
   * but due to its rather imperative API, its usefulness is very limited.
   *
@@ -21,7 +23,8 @@ object ChildrenCommandInserter {
 
   def apply[Component] (
     commands: EventStream[CollectionCommand[Component]],
-    renderableNode: RenderableNode[Component]
+    renderableNode: RenderableNode[Component],
+    hooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = true,
@@ -32,11 +35,13 @@ object ChildrenCommandInserter {
             parentNode = ctx.parentNode,
             sentinelNode = ctx.sentinelNode,
             ctx.extraNodeCount,
-            renderableNode
+            renderableNode,
+            hooks
           )
           ctx.extraNodeCount += nodeCountDiff
         }(owner)
-      }
+      },
+      hooks = hooks
     )
   }
 
@@ -45,7 +50,8 @@ object ChildrenCommandInserter {
     parentNode: ReactiveElement.Base,
     sentinelNode: ChildNode.Base,
     extraNodeCount: Int,
-    renderableNode: RenderableNode[Component]
+    renderableNode: RenderableNode[Component],
+    hooks: js.UndefOr[InserterHooks]
   ): Int = {
     var nodeCountDiff = 0
     def findSentinelIndex(): Int = DomApi.indexOfChild(
@@ -59,7 +65,9 @@ object ChildrenCommandInserter {
         val inserted = ParentNode.insertChildAtIndex(
           parent = parentNode,
           child = renderableNode.asNode(node),
-          index = findSentinelIndex() + extraNodeCount + 1)
+          index = findSentinelIndex() + extraNodeCount + 1,
+          hooks
+        )
         if (inserted) {
           nodeCountDiff = 1
         }
@@ -69,7 +77,8 @@ object ChildrenCommandInserter {
         val inserted = ParentNode.insertChildAfter(
           parent = parentNode,
           newChild = renderableNode.asNode(node),
-          referenceChild = sentinelNode
+          referenceChild = sentinelNode,
+          hooks
         )
         if (inserted) {
           nodeCountDiff = 1
@@ -79,7 +88,8 @@ object ChildrenCommandInserter {
         val inserted = ParentNode.insertChildAtIndex(
           parent = parentNode,
           child = renderableNode.asNode(node),
-          index = findSentinelIndex() + atIndex + 1
+          index = findSentinelIndex() + atIndex + 1,
+          hooks
         )
         if (inserted) {
           nodeCountDiff = 1
@@ -98,7 +108,8 @@ object ChildrenCommandInserter {
         ParentNode.replaceChild(
           parent = parentNode,
           oldChild = renderableNode.asNode(node),
-          newChild = renderableNode.asNode(withNode)
+          newChild = renderableNode.asNode(withNode),
+          hooks
         )
     }
 

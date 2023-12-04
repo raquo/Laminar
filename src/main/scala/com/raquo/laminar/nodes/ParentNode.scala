@@ -2,7 +2,10 @@ package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicOwner
 import com.raquo.laminar.DomApi
+import com.raquo.laminar.inserters.InserterHooks
 import org.scalajs.dom
+
+import scala.scalajs.js
 
 trait ParentNode[+Ref <: dom.Element] extends ReactiveNode[Ref] {
 
@@ -31,12 +34,14 @@ object ParentNode {
     */
   def appendChild(
     parent: ParentNode.Base,
-    child: ChildNode.Base
+    child: ChildNode.Base,
+    hooks: js.UndefOr[InserterHooks]
   ): Boolean = {
     val nextParent = Some(parent)
     child.willSetParent(nextParent)
 
     // 1. Update DOM
+    hooks.foreach(_.onWillInsertNode(parent = parent, child = child))
     val appended = DomApi.appendChild(parent = parent.ref, child = child.ref)
     if (appended) {
       // 3. Update child
@@ -62,10 +67,12 @@ object ParentNode {
   def insertChildBefore(
     parent: ParentNode.Base,
     newChild: ChildNode.Base,
-    referenceChild: ChildNode.Base
+    referenceChild: ChildNode.Base,
+    hooks: js.UndefOr[InserterHooks]
   ): Boolean = {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
+    hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
     val inserted = DomApi.insertBefore(
       parent = parent.ref,
       newChild = newChild.ref,
@@ -78,10 +85,12 @@ object ParentNode {
   def insertChildAfter(
     parent: ParentNode.Base,
     newChild: ChildNode.Base,
-    referenceChild: ChildNode.Base
+    referenceChild: ChildNode.Base,
+    hooks: js.UndefOr[InserterHooks]
   ): Boolean = {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
+    hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
     val inserted = DomApi.insertAfter(
       parent = parent.ref,
       newChild = newChild.ref,
@@ -99,12 +108,14 @@ object ParentNode {
   def insertChildAtIndex(
     parent: ParentNode.Base,
     child: ChildNode.Base,
-    index: Int
+    index: Int,
+    hooks: js.UndefOr[InserterHooks]
   ): Boolean = {
     var inserted = false
     val nextParent = Some(parent)
 
     child.willSetParent(nextParent)
+    hooks.foreach(_.onWillInsertNode(parent = parent, child = child))
 
     val children = parent.ref.childNodes
     inserted = if (index < children.length) {
@@ -132,7 +143,8 @@ object ParentNode {
   def replaceChild(
     parent: ParentNode.Base,
     oldChild: ChildNode.Base,
-    newChild: ChildNode.Base
+    newChild: ChildNode.Base,
+    hooks: js.UndefOr[InserterHooks]
   ): Boolean = {
     var replaced = false
     if (oldChild ne newChild) {
@@ -141,6 +153,7 @@ object ParentNode {
 
         oldChild.willSetParent(None)
         newChild.willSetParent(newChildNextParent)
+        hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
 
         replaced = DomApi.replaceChild(
           parent = parent.ref,

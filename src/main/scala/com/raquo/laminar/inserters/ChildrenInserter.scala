@@ -7,6 +7,7 @@ import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.collection.immutable
+import scala.scalajs.js
 
 object ChildrenInserter {
 
@@ -18,7 +19,8 @@ object ChildrenInserter {
 
   def apply[Component](
     childrenSource: Observable[immutable.Seq[Component]],
-    renderableNode: RenderableNode[Component]
+    renderableNode: RenderableNode[Component],
+    hooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = true,
@@ -45,16 +47,18 @@ object ChildrenInserter {
 
           // if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
           //   maybeLastSeenChildren = newChildren
-          switchToChildren(newChildren, ctx)
+          switchToChildren(newChildren, ctx, hooks)
           // }
         }(owner)
-      }
+      },
+      hooks = hooks
     )
   }
 
   def switchToChildren(
     newChildren: immutable.Seq[ChildNode.Base],
-    ctx: InsertContext
+    ctx: InsertContext,
+    hooks: js.UndefOr[InserterHooks]
   ): Unit = {
     if (!ctx.strictMode) {
       // #Note: previously in ChildInserter we only did this once in insertFn.
@@ -69,7 +73,8 @@ object ChildrenInserter {
       nextChildrenMap = newChildrenMap,
       parentNode = ctx.parentNode,
       sentinelNode = ctx.sentinelNode,
-      ctx.extraNodeCount
+      ctx.extraNodeCount,
+      hooks
     )
     ctx.extraNodes = newChildren
     ctx.extraNodesMap = newChildrenMap
@@ -82,7 +87,8 @@ object ChildrenInserter {
     nextChildrenMap: JsMap[dom.Node, ChildNode.Base],
     parentNode: ReactiveElement.Base,
     sentinelNode: ChildNode.Base,
-    prevChildrenCount: Int
+    prevChildrenCount: Int,
+    hooks: js.UndefOr[InserterHooks]
   ): Int = {
 
     // Loop variables
@@ -117,7 +123,8 @@ object ChildrenInserter {
         ParentNode.insertChildAfter(
           parent = parentNode,
           newChild = nextChild,
-          referenceChild = lastIndexChild
+          referenceChild = lastIndexChild,
+          hooks
         )
         // println(s"setting prevChildRef=${nextChild.ref.textContent}")
         prevChildRef = nextChild.ref
@@ -137,7 +144,8 @@ object ChildrenInserter {
             ParentNode.insertChildAfter(
               parent = parentNode,
               newChild = nextChild,
-              referenceChild = lastIndexChild
+              referenceChild = lastIndexChild,
+              hooks
             )
             // println(s"setting prevChildRef=${nextChild.ref.textContent}")
             prevChildRef = nextChild.ref
@@ -180,7 +188,8 @@ object ChildrenInserter {
               ParentNode.insertChildAfter(
                 parent = parentNode,
                 newChild = nextChild,
-                referenceChild = lastIndexChild
+                referenceChild = lastIndexChild,
+                hooks
               )
               prevChildRef = nextChild.ref
               // This is a MOVE, so we DO NOT update currentDomChildrenCount here.

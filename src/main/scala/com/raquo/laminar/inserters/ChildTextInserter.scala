@@ -29,13 +29,19 @@ object ChildTextInserter {
             textNode.ref.textContent = renderable.asString(newValue)
           }
         }(owner)
-      }
+      },
+      hooks = js.undefined
     )
   }
 
   def switchToText(newTextNode: TextNode, ctx: InsertContext): Unit = {
     // First event: inserting the child for the first time: replace sentinel comment node with new TextNode
-    ParentNode.replaceChild(parent = ctx.parentNode, oldChild = ctx.sentinelNode, newChild = newTextNode)
+    ParentNode.replaceChild(
+      parent = ctx.parentNode,
+      oldChild = ctx.sentinelNode,
+      newChild = newTextNode,
+      hooks = js.undefined
+    )
 
     ctx.sentinelNode = newTextNode
     if (ctx.strictMode) {

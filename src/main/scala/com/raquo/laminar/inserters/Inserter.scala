@@ -1,9 +1,8 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
-import com.raquo.laminar.api.L.seqToModifier
 import com.raquo.laminar.modifiers.Modifier
-import com.raquo.laminar.nodes.{ChildNode, ReactiveElement, TextNode}
+import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
 
@@ -22,60 +21,19 @@ import scala.scalajs.js
   */
 sealed trait Inserter extends Modifier[ReactiveElement.Base]
 
-sealed trait StaticInserter extends Inserter {
+trait Hookable[+Self <: Inserter] { this: Inserter =>
+
+  /** Create a copy of the inserter that will apply these
+    * additional hooks after the original inserter's hooks.
+    */
+  def withHooks(addHooks: InserterHooks): Self
+}
+
+trait StaticInserter extends Inserter {
 
   def renderInContext(ctx: InsertContext): Unit
 }
 
-/** Inserter for a single static node */
-class StaticTextInserter(
-  text: String
-) extends StaticInserter {
-
-  override def apply(element: ReactiveElement.Base): Unit = {
-    element.amend(new TextNode(text))
-  }
-
-  def renderInContext(ctx: InsertContext): Unit = {
-    ChildTextInserter.switchToText(new TextNode(text), ctx)
-  }
-}
-
-/** Inserter for a single static node */
-class StaticChildInserter(
-  child: ChildNode.Base
-) extends StaticInserter {
-
-  override def apply(element: ReactiveElement.Base): Unit = {
-    element.amend(child)
-  }
-
-  def renderInContext(ctx: InsertContext): Unit = {
-    ChildInserter.switchToChild(
-      maybeLastSeenChild = js.undefined,
-      newChildNode = child,
-      ctx
-    )
-  }
-}
-
-/**
-  * Inserter for multiple static nodes.
-  * This can also insert a single nodes, just a bit less efficiently
-  * than SingleStaticInserter.
-  */
-class StaticChildrenInserter(
-  nodes: collection.Seq[ChildNode.Base]
-) extends StaticInserter {
-
-  override def apply(element: ReactiveElement.Base): Unit = {
-    element.amend(nodes)
-  }
-
-  def renderInContext(ctx: InsertContext): Unit = {
-    ChildrenInserter.switchToChildren(nodes.toList, ctx)
-  }
-}
 
 // @TODO[API] Inserter really wants to extend Binder. And yet.
 
@@ -93,7 +51,8 @@ class DynamicInserter(
   initialContext: Option[InsertContext] = None,
   preferStrictMode: Boolean,
   insertFn: (InsertContext, Owner) => Subscription,
-) extends Inserter {
+  hooks: js.UndefOr[InserterHooks] = js.undefined
+) extends Inserter with Hookable[DynamicInserter] {
 
   def bind(element: ReactiveElement.Base): DynamicSubscription = {
     // @TODO[Performance] The way it's used in `onMountInsert`, we create a DynSub inside DynSub.
@@ -105,7 +64,9 @@ class DynamicInserter(
     //  because it would match the state of the DOM upon reactivation
     //  (unless some of the managed child elements were externally removed from the DOM,
     //  which Laminar should be able to recover from).
-    val insertContext = initialContext.getOrElse(InsertContext.reserveSpotContext(element, strictMode = preferStrictMode))
+    val insertContext = initialContext.getOrElse(
+      InsertContext.reserveSpotContext(element, strictMode = preferStrictMode, hooks)
+    )
 
     ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
       insertFn(insertContext, mountContext.owner)
@@ -116,6 +77,10 @@ class DynamicInserter(
     bind(element)
   }
 
+  override def withHooks(addHooks: InserterHooks): DynamicInserter = {
+    new DynamicInserter(initialContext, preferStrictMode, insertFn, addHooks.appendTo(hooks))
+  }
+
   /** Call this to get a copy of Inserter with a context locked to a certain element.
     * We use this to "reserve a spot" for future nodes when a bind(c => inserter) modifier
     * is initialized, as opposed to waiting until subscription is activated.
@@ -124,6 +89,6 @@ class DynamicInserter(
     */
   def withContext(context: InsertContext): DynamicInserter = {
     // Note: preferStrictMode has no effect here, because initial context is defined.
-    new DynamicInserter(Some(context), preferStrictMode = false, insertFn)
+    new DynamicInserter(Some(context), preferStrictMode = false, insertFn, hooks)
   }
 }

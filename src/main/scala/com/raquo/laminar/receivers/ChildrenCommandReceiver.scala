@@ -4,6 +4,8 @@ import com.raquo.airstream.core.Source.EventSource
 import com.raquo.laminar.inserters.{ChildrenCommandInserter, CollectionCommand, DynamicInserter}
 import com.raquo.laminar.modifiers.RenderableNode
 
+import scala.scalajs.js
+
 object ChildrenCommandReceiver {
 
   def <--[Component](
@@ -11,6 +13,6 @@ object ChildrenCommandReceiver {
   )(
     implicit renderableNode: RenderableNode[Component]
   ): DynamicInserter = {
-    ChildrenCommandInserter(commands.toObservable, renderableNode)
+    ChildrenCommandInserter(commands.toObservable, renderableNode, hooks = js.undefined)
   }
 }

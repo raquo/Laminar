@@ -211,6 +211,34 @@ object InputController {
     setDomValue = (el, v) => DomApi.setChecked(el.ref, v)
   )
 
+  /** Pool of memoized controller configs, to reuse between the various element types */
+  private val customControllerConfigs: js.Dictionary[InputControllerConfig[dom.html.Element, _]] = js.Dictionary()
+
+  /** Controller configs for custom properties. Cached by key for efficiency.
+    * This method is used to add input controller support to web components.
+    */
+  def customConfig[A](
+    prop: HtmlProp[A, _],
+    eventProps: JsArray[EventProp[_]],
+    initial: A
+  ): InputControllerConfig[dom.html.Element, A] = {
+    // Note: we need the codec because in principle we might have two different
+    // prop-s with the same DOM name but different codecs, for example valueStr
+    // and valueList for space-separated composite list props.
+    val eventPropsStr = eventProps.reduce((acc: String, p: EventProp[_]) => acc + s"-${p.name}", "")
+    val key = prop.name + "-" + prop.codec.toString + eventPropsStr
+    val knownConfig = customControllerConfigs.getOrElseUpdate(key, {
+      new InputControllerConfig[dom.html.Element, A](
+        initialValue = initial,
+        prop = prop,
+        allowedEventProps = eventProps,
+        getDomValue = el => DomApi.getHtmlProperty(el, prop).get,
+        setDomValue = (el, v) => DomApi.setHtmlProperty(el, prop, v)
+      )
+    })
+    knownConfig.asInstanceOf[InputControllerConfig[dom.html.Element, A]]
+  }
+
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, A, B](
     listener: EventListener[Ev, B],
     updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A]

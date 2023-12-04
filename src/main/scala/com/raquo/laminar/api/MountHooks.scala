@@ -6,6 +6,8 @@ import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{Binder, Modifier, Setter}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
+import scala.scalajs.js
+
 
 trait MountHooks {
 
@@ -55,7 +57,9 @@ trait MountHooks {
       var maybeSubscription: Option[DynamicSubscription] = None
       // We start the context in loose mode for performance, because it's cheaper to go from there
       // to strict mode, than the other way. The inserters are able to handle any initial mode.
-      val lockedInsertContext = InsertContext.reserveSpotContext(element, strictMode = false)
+      val lockedInsertContext = InsertContext.reserveSpotContext(
+        element, strictMode = false, hooks = js.undefined
+      )
       element.amend(
         onMountUnmountCallback[El](
           mount = { mountContext =>

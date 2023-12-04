@@ -4,6 +4,7 @@ import com.raquo.laminar.modifiers.Modifier
 import org.scalajs.dom
 
 import scala.annotation.tailrec
+import scala.scalajs.js
 
 trait ChildNode[+Ref <: dom.Node]
   extends ReactiveNode[Ref]
@@ -35,7 +36,7 @@ trait ChildNode[+Ref <: dom.Node]
   @inline private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
   override def apply(parentNode: ReactiveElement.Base): Unit = {
-    ParentNode.appendChild(parent = parentNode, child = this)
+    ParentNode.appendChild(parent = parentNode, child = this, hooks = js.undefined)
   }
 
 }

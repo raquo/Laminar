@@ -6,6 +6,7 @@ import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.ChildNode
 
 import scala.collection.immutable
+import scala.scalajs.js
 
 object ChildrenReceiver {
 
@@ -31,7 +32,7 @@ object ChildrenReceiver {
   // Let me know if you have a compelling use case for this.
 
   def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): DynamicInserter = {
-    ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable)
+    ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable, hooks = js.undefined)
   }
 
   def <--[Component](
@@ -39,7 +40,7 @@ object ChildrenReceiver {
   )(
     implicit renderableNode: RenderableNode[Component]
   ): DynamicInserter = {
-    ChildrenInserter(childrenSource.toObservable, renderableNode)
+    ChildrenInserter(childrenSource.toObservable, renderableNode, hooks = js.undefined)
   }
 
   implicit class RichChildrenReceiver(val self: ChildrenReceiver.type) extends AnyVal {

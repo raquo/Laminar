@@ -3,11 +3,16 @@ package com.raquo.laminar.basic
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.nodes.{ChildNode, ParentNode}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
+import scala.scalajs.js
+
 class TreeSpec extends UnitSpec {
+
+  val noHooks: js.UndefOr[InserterHooks] = js.undefined
 
   it("DomApi.isDescendantOf") {
 
@@ -38,8 +43,8 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el0.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.isDescendantOf(node = el0.ref, ancestor = otherEl.ref) shouldBe false
 
-    ParentNode.appendChild(parent = el0, child = el10)
-    ParentNode.appendChild(parent = el0, child = el11)
+    ParentNode.appendChild(parent = el0, child = el10, noHooks)
+    ParentNode.appendChild(parent = el0, child = el11, noHooks)
 
     DomApi.isDescendantOf(node = el10.ref, ancestor = rootNode.ref) shouldBe true
     DomApi.isDescendantOf(node = el11.ref, ancestor = rootNode.ref) shouldBe true
@@ -50,7 +55,7 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el11.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.isDescendantOf(node = el11.ref, ancestor = otherEl.ref) shouldBe false
 
-    ParentNode.appendChild(parent = el10, child = el2)
+    ParentNode.appendChild(parent = el10, child = el2, noHooks)
 
     DomApi.isDescendantOf(node = el2.ref, rootNode.ref) shouldBe true
     DomApi.isDescendantOf(node = el2.ref, el0.ref) shouldBe true
@@ -60,7 +65,7 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el2.ref, otherRootNode.ref) shouldBe false
     DomApi.isDescendantOf(node = el2.ref, otherEl.ref) shouldBe false
 
-    ParentNode.appendChild(parent = el2, child = el3)
+    ParentNode.appendChild(parent = el2, child = el3, noHooks)
 
     DomApi.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     DomApi.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true
@@ -70,7 +75,7 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    ParentNode.insertChildAtIndex(parent = elx, child = el3, index = 0)
+    ParentNode.insertChildAtIndex(parent = elx, child = el3, index = 0, noHooks)
 
     DomApi.isDescendantOf(node = el3.ref, ancestor = elx.ref) shouldBe true
     DomApi.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe false
@@ -80,7 +85,7 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    ParentNode.insertChildAtIndex(parent = el10, child = el3, index = 0)
+    ParentNode.insertChildAtIndex(parent = el10, child = el3, index = 0, noHooks)
 
     DomApi.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     DomApi.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true
@@ -102,7 +107,7 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el10.ref, dom.document) shouldBe false
     DomApi.isDescendantOf(node = el2.ref, dom.document) shouldBe false
 
-    ParentNode.appendChild(parent = el0, child = el10)
+    ParentNode.appendChild(parent = el0, child = el10, noHooks)
 
     DomApi.isDescendantOf(node = el10.ref, dom.document) shouldBe false
 
@@ -119,7 +124,7 @@ class TreeSpec extends UnitSpec {
     DomApi.isDescendantOf(node = el10.ref, dom.document) shouldBe false
     DomApi.isDescendantOf(node = el2.ref, dom.document) shouldBe true
 
-    ParentNode.appendChild(parent = el2, child = el0)
+    ParentNode.appendChild(parent = el2, child = el0, noHooks)
 
     DomApi.isDescendantOf(node = el0.ref, dom.document) shouldBe true
     DomApi.isDescendantOf(node = el10.ref, dom.document) shouldBe true
