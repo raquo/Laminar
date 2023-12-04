@@ -1,5 +1,6 @@
 package com.raquo.laminar.nodes
 
+import com.raquo.airstream.core.AirstreamError
 import com.raquo.laminar.inserters.{Hookable, Inserter, InserterHooks}
 import org.scalajs.dom
 
@@ -18,11 +19,11 @@ class Slot(val name: String) {
         case el: dom.Element =>
           el.setAttribute("slot", name)
         case text: dom.Text =>
-          dom.console.error(
-            s"Error: You are trying to insert a raw text node `${text.textContent}` into the `${name}` slot of <${parent.ref.tagName}>.\n" +
-              " - Cause: This is not possible. Only elements can be slotted.\n" +
-              " - Suggestion: Wrap your text node into span()"
-          )
+          AirstreamError.sendUnhandledError(new Exception(
+            s"Error: You tried to insert a raw text node `${text.textContent}` into the `${name}` slot of <${parent.ref.tagName.toLowerCase}>.\n" +
+              " - Cause: This is not possible: named slots only accept elements. Your node was inserted into the default slot instead.\n" +
+              " - Suggestion: Wrap your text node into `span()`"
+          ))
         case _ =>
           () // Do nothing with comment nodes
       }

@@ -24,11 +24,11 @@ object ChildrenCommandInserter {
   def apply[Component] (
     commands: EventStream[CollectionCommand[Component]],
     renderableNode: RenderableNode[Component],
-    hooks: js.UndefOr[InserterHooks]
+    initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = true,
-      insertFn = (ctx, owner) => {
+      insertFn = (ctx, owner, hooks) => {
         commands.foreach { command =>
           val nodeCountDiff = updateList(
             command,
@@ -41,7 +41,7 @@ object ChildrenCommandInserter {
           ctx.extraNodeCount += nodeCountDiff
         }(owner)
       },
-      hooks = hooks
+      hooks = initialHooks
     )
   }
 

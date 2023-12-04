@@ -3,6 +3,7 @@ package com.raquo.laminar.inserters
 import com.raquo.airstream.core.Observable
 import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ParentNode}
+import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -11,11 +12,11 @@ object ChildInserter {
   def apply[Component] (
     childSource: Observable[Component],
     renderable: RenderableNode[Component],
-    hooks: js.UndefOr[InserterHooks]
+    initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = true,
-      insertFn = (ctx, owner) => {
+      insertFn = (ctx, owner, hooks) => {
         // Reset sentinel node on binding too, don't wait for events
         if (!ctx.strictMode) {
           ctx.forceSetStrictMode()
@@ -27,7 +28,7 @@ object ChildInserter {
           maybeLastSeenChild = newChildNode
         }(owner)
       },
-      hooks = hooks
+      hooks = initialHooks
     )
   }
 

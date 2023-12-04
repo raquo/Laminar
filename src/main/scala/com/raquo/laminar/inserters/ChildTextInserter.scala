@@ -14,7 +14,7 @@ object ChildTextInserter {
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = false,
-      insertFn = (ctx, owner) => {
+      insertFn = (ctx, owner, _) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValue =>
           maybeTextNode.fold {

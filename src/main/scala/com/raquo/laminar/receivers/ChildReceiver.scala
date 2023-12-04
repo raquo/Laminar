@@ -19,7 +19,7 @@ object ChildReceiver {
   }
 
   def <--(childSource: Source[ChildNode.Base]): DynamicInserter = {
-    ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable, hooks = js.undefined)
+    ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable, initialHooks = js.undefined)
   }
 
   implicit class RichChildReceiver(val self: ChildReceiver.type) extends AnyVal {
@@ -38,7 +38,7 @@ object ChildReceiver {
     )(
       implicit renderable: RenderableNode[Component]
     ): DynamicInserter = {
-      ChildInserter(childSource.toObservable, renderable, hooks = js.undefined)
+      ChildInserter(childSource.toObservable, renderable, initialHooks = js.undefined)
     }
   }
 

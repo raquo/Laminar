@@ -32,7 +32,7 @@ object ChildTextReceiver {
       // #TODO[Perf] Test performance vs regular child.text, see if we need to improve this.
       // This .asInstanceOf is safe because `textNodeRenderable` only applies if `TextLike` is `TextNode`.
       val nodes = textSource.toObservable.asInstanceOf[Observable[TextNode]]
-      ChildInserter(nodes, RenderableNode.nodeRenderable, hooks = js.undefined)
+      ChildInserter(nodes, RenderableNode.nodeRenderable, initialHooks = js.undefined)
     } else {
       ChildTextInserter(textSource.toObservable, renderable)
     }

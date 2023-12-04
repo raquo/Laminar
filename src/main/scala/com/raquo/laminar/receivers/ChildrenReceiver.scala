@@ -32,7 +32,7 @@ object ChildrenReceiver {
   // Let me know if you have a compelling use case for this.
 
   def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): DynamicInserter = {
-    ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable, hooks = js.undefined)
+    ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable, initialHooks = js.undefined)
   }
 
   def <--[Component](
@@ -40,7 +40,7 @@ object ChildrenReceiver {
   )(
     implicit renderableNode: RenderableNode[Component]
   ): DynamicInserter = {
-    ChildrenInserter(childrenSource.toObservable, renderableNode, hooks = js.undefined)
+    ChildrenInserter(childrenSource.toObservable, renderableNode, initialHooks = js.undefined)
   }
 
   implicit class RichChildrenReceiver(val self: ChildrenReceiver.type) extends AnyVal {

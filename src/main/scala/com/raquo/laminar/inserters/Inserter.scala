@@ -50,7 +50,7 @@ trait StaticInserter extends Inserter {
 class DynamicInserter(
   initialContext: Option[InsertContext] = None,
   preferStrictMode: Boolean,
-  insertFn: (InsertContext, Owner) => Subscription,
+  insertFn: (InsertContext, Owner, js.UndefOr[InserterHooks]) => Subscription,
   hooks: js.UndefOr[InserterHooks] = js.undefined
 ) extends Inserter with Hookable[DynamicInserter] {
 
@@ -69,7 +69,7 @@ class DynamicInserter(
     )
 
     ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
-      insertFn(insertContext, mountContext.owner)
+      insertFn(insertContext, mountContext.owner, hooks)
     }
   }
 
@@ -78,7 +78,8 @@ class DynamicInserter(
   }
 
   override def withHooks(addHooks: InserterHooks): DynamicInserter = {
-    new DynamicInserter(initialContext, preferStrictMode, insertFn, addHooks.appendTo(hooks))
+    val newHooks = addHooks.appendTo(hooks)
+    new DynamicInserter(initialContext, preferStrictMode, insertFn, newHooks)
   }
 
   /** Call this to get a copy of Inserter with a context locked to a certain element.

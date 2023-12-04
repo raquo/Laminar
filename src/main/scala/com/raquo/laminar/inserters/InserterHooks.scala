@@ -10,6 +10,12 @@ import scala.scalajs.js
   * We currently use it only for slotting elements into web components,
   * but will likely use it more broadly later.
   *
+  * NOTE: Currently hooks do not run on _some_ text nodes. They are also
+  * not run on some sentinel comment nodes, because only element nodes are
+  * slottable. So, this is fine for slotting purposes, but that's the
+  * kind of thing that will need a more principled contract if this API
+  * is to be used more widely.
+  *
   * WARNING: Your hooks should not throw!
   * Any thrown errors will be sent to Airstream unhandled errors.
   *

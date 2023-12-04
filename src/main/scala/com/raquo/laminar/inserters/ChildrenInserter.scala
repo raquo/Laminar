@@ -20,11 +20,11 @@ object ChildrenInserter {
   def apply[Component](
     childrenSource: Observable[immutable.Seq[Component]],
     renderableNode: RenderableNode[Component],
-    hooks: js.UndefOr[InserterHooks]
+    initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       preferStrictMode = true,
-      insertFn = (ctx, owner) => {
+      insertFn = (ctx, owner, hooks) => {
         // Reset sentinel node on binding too, don't wait for events
         if (!ctx.strictMode) {
           ctx.forceSetStrictMode()
@@ -51,7 +51,7 @@ object ChildrenInserter {
           // }
         }(owner)
       },
-      hooks = hooks
+      hooks = initialHooks
     )
   }
 
