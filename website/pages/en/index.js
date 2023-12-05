@@ -211,8 +211,8 @@ class Index extends React.Component {
                 ),
                 contents: [
                   {
-                    title: '[Live Examples](/examples/hello-world)',
-                    content: "Live app and its code side-by-side.<br />What sorcery is this?"
+                    title: '[Live Examples](https://demo.laminar.dev)',
+                    content: "Live app showing its own source code.<br />What sorcery is this?"
                   },
                   {
                     title: '[Documentation](/documentation)',
