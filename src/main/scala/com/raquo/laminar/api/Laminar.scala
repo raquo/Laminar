@@ -5,15 +5,15 @@ import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
 import com.raquo.laminar.defs.props.HtmlProps
-import com.raquo.laminar.defs.styles.{StyleProps, units}
+import com.raquo.laminar.defs.styles.StyleProps
 import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
-import com.raquo.laminar.{DomApi, nodes}
 import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
+import com.raquo.laminar.{DomApi, nodes}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
