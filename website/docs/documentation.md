@@ -369,7 +369,7 @@ div(
   // List[Mod[El]] is implicitly converted to Mod[El]
   // so you can specify several modifiers like this:
   TextInput().amendThis { thisNode => List(
-    onInput.mapTo(thisNode.ref.value) --> nameVar,
+    onInput.mapTo(thisNode.ref.value) --> nameVar, // Note: `mapToValue` is easier, does not require thisNode
     thisNode.events(onClick).delay(0) --> clickObserver  
   )}
 )

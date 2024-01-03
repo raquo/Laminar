@@ -69,7 +69,7 @@ val appDiv: Div = div(
     "Please enter your name:",
     input(
       typ := "text",
-      inContext(thisNode => onInput.mapTo(thisNode.ref.value) --> nameBus) // extract text entered into this input node whenever the user types in it
+      onInput.mapToValue --> nameBus // extract text entered into this input node whenever the user types in it
     )
   ),
   div(
@@ -99,7 +99,7 @@ def InputBox(caption: String, textBus: WriteBus[String]): Div = {
     caption,
     input(
       typ := "text",
-      inContext(thisNode => onInput.mapTo(thisNode.ref.value) --> textBus)
+      onInput.mapToValue --> textBus
     )
   )
 }
