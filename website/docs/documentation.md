@@ -1605,7 +1605,7 @@ input(
 
 We could also route the `onInput` event in any other way, we could even update zipVar asynchronously. When Laminar detects that `onInput` event happened and you didn't synchronously update the observable that the `value` is locked to, `zipValueSignal` in this case, we set the value property to the previous value emitted by `zipValueSignal`. This happens synchronously, so the user will feel as if their input was ignored, they will not even see it flash.
 
-Then if your logic updates the `value` prop at some point in the future, the it will work as you'd expect. Your updates to `zipValueSignal` don't actually need to come exclusively from user input, you can emit a value into that observable any time, and the `value` prop will update to match.
+Then if your logic updates the `value` prop at some point in the future, it will work as you'd expect. Your updates to `zipValueSignal` don't actually need to come exclusively from user input, you can emit a value into that observable any time, and the `value` prop will update to match.
 
 Note that Laminar can't do anything if you manually set the element's value, either via `inputEl.ref.value = "newValue"` or using the `setAsValue` EventProcessor. You should not use either of these methods with controlled inputs. Speaking of, you shouldn't call `preventDefault` on controlled events either, even on events that are cancelable (`onInput` is not), because for example for checkboxes the rollback of checked state happens **after** the event listener has finished executing, potentially undoing Laminar's changes to the `checked` property and de-syncing it from the controlling observable.
 

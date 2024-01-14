@@ -69,6 +69,10 @@ title: Resources
 
 * [Skłable](https://github.com/przemekd/sklable) – multiplayer Scrabble-like game. [Demo](https://sk%C5%82able.pl)
 
+* [Java Date Formatter](https://github.com/chadselph/DateTimeFormatter-ui/) – [Demo](https://chadselph.github.io/DateTimeFormatter-ui/) 
+
+* [Catenary](https://github.com/felher/catenary) – interactive Catenary tutorial [Demo](https://catenary.sabix2.sabix.eu/)
+
 * [Laika-Laminar](https://github.com/i10416/laika-laminar) – converts Markdown and ReStructuredText to HTML using [Laika](https://planet42.github.io/Laika/). [Demo](https://i10416.github.io/demo/)
 
 * [NPC Generator](https://gitlab.com/scala-js-games/npc-generator/)
