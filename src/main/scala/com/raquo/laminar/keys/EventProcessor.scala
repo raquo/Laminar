@@ -144,6 +144,23 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Values that pass the test will not propagate down the chain and into the emitter. */
   def filterNot(skip: V => Boolean): EventProcessor[Ev, V] = filter(!skip(_))
 
+  /** Filter events by `event.target`
+    *
+    * For example, discard clicks on child <a> links with something like:
+    *
+    *     div(
+    *       onClick.filterByTarget {
+    *         case dom.html.Anchor => false
+    *         case _ => true
+    *       } --> observer,
+    *       "A bunch of clickable stuff",
+    *       a("Some link", href("..."))
+    *     )
+    * */
+  def filterByTarget(passes: dom.EventTarget => Boolean): EventProcessor[Ev, V] = {
+    withNewProcessor(ev => if (passes(ev.target)) processor(ev) else None)
+  }
+
   def collect[V2](pf: PartialFunction[V, V2]): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).collect(pf))
   }
