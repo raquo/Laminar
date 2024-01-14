@@ -217,6 +217,24 @@ class EventProcessor[Ev <: dom.Event, V](
     }
   }
 
+  /** Execute a side effecting callback every time the event emits.
+    *
+    * Note: Do not provide a callback that returns a LAZY value such as EventStream,
+    * it will not be started. Use `compose` or `flatMap` methods for that kind of thing.
+    *
+    * Note: You still need to bind this event processor to an observer with
+    * the `-->` method. Generally you should put "side effects" in the observer, but
+    * strictly speaking this is not required, and you can use `--> Observer.empty`.
+    *
+    * Note: This method is called `tapEach` for consistency with Scala collections.
+    */
+  def tapEach[U](f: V => U): EventProcessor[Ev, V] = map { v => f(v); v }
+
+  /** Like [[tapEach]] but provides the original event instead of the processed value. */
+  def tapEachEvent[U](f: Ev => U): EventProcessor[Ev, V] = {
+    withNewProcessor { ev => f(ev); processor(ev) }
+  }
+
   /** Similar to the Airstream `compose` operator.
     *
     * Use this when you need to apply stream operators on this element's events, e.g.:
