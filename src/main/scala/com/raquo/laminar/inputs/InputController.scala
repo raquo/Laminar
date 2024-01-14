@@ -314,7 +314,7 @@ object InputController {
     * Note: This method does not support web components.
     */
   def allowedHtmlControllerConfig[Ref <: dom.html.Element](element: Ref): js.UndefOr[InputControllerConfig[Ref, _]] = {
-    println("allowedHtmlControllerConfig? " + element.tagName)
+    // println("allowedHtmlControllerConfig? " + element.tagName)
     element match {
 
       case input: dom.html.Input =>
