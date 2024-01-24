@@ -75,7 +75,7 @@ lazy val website = project
   )
 
 lazy val laminar = project.in(file("."))
-  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % Versions.Airstream,
@@ -135,17 +135,16 @@ lazy val laminar = project.in(file("."))
       "-no-link-warnings" // Suppress scaladoc "Could not find any member to link for" warnings
     ),
 
-    (Test / parallelExecution) := false,
+    (Test / parallelExecution) := true,
 
-    (Test / requireJsDomEnv) := true,
-
-    (installJsdom / version) := Versions.JsDom,
-
-    (webpack / version) := Versions.Webpack,
-
-    (startWebpackDevServer / version) := Versions.WebpackDevServer,
-
-    useYarn := true,
+    jsEnv := new jsenv.playwright.PWEnv(
+      browserName = "chromium",
+      headless = true,
+      showLogs = false
+    ),
+    scalaJSLinkerConfig ~= {
+      _.withModuleKind(ModuleKind.ESModule)
+    },
 
     scalaJSUseMainModuleInitializer := true,
 
@@ -174,6 +173,7 @@ lazy val laminar = project.in(file("."))
       )
     ),
     (Test / publishArtifact) := false,
+    Test / scalaJSStage := FullOptStage,
     pomIncludeRepository := { _ => false },
     sonatypeCredentialHost := "s01.oss.sonatype.org",
     sonatypeRepository := "https://s01.oss.sonatype.org/service/local"

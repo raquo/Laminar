@@ -1,3 +1,4 @@
+libraryDependencies += "io.github.gmkumar2005" %% "scala-js-env-playwright" % "0.1.11"
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.14.0")
 
 addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.1")
