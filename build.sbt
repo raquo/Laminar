@@ -19,7 +19,7 @@ ThisBuild / dynver := {
 
 ThisBuild / scalaVersion := Versions.Scala_3
 
-ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_12, Versions.Scala_2_13, Versions.Scala_3)
+ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_13, Versions.Scala_3)
 
 lazy val precompile = taskKey[Unit]("runs Laminar-specific pre-compile tasks")
 
@@ -105,11 +105,9 @@ lazy val laminar = project.in(file("."))
       s"${sourcesOptionName}:$localSourcesPath->$remoteSourcesPath"
     },
 
-    // @TODO[Build,Scala 2.12] This should only be disabled for tests, but I can't figure out how to make @unused work in 2.12
     //  We do have the stub defined in Airstream, but it throws deprecation errors in Laminar for some reason as if
     //  the unused value is in fact used, but that doesn't seem right.
-    //(Test / scalacOptions) ~= { options: Seq[String] =>
-    scalacOptions ~= { options: Seq[String] =>
+    (Test / scalacOptions) ~= { options: Seq[String] =>
       options.filterNot { o =>
         o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
       }

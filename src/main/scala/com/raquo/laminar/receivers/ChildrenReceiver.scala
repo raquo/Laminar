@@ -47,8 +47,7 @@ object ChildrenReceiver {
 
     /** Example usage: children(node1, node2) <-- signalOfBoolean */
     def apply(nodes: ChildNode.Base*): LockedChildrenReceiver = {
-      // #TODO[Scala 2.12] - toList is only needed because in Scala 2.12 varargs are (non-immutable) Seq
-      new LockedChildrenReceiver(nodes.toList)
+      new LockedChildrenReceiver(nodes)
     }
 
     /** Example usage: children(component1, component2) <-- signalOfBoolean */
@@ -57,8 +56,7 @@ object ChildrenReceiver {
     )(
       implicit renderable: RenderableNode[Component]
     ): LockedChildrenReceiver = {
-      // #TODO[Scala 2.12] - toList is only needed because in Scala 2.12 varargs are (non-immutable) Seq
-      new LockedChildrenReceiver(renderable.asNodeSeq(components.toList))
+      new LockedChildrenReceiver(renderable.asNodeSeq(components))
     }
   }
 }

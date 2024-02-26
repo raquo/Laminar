@@ -216,7 +216,7 @@ class SyntaxSpec extends UnitSpec {
     ))
 
     el.amend(
-      onMountUnmountCallback[Div]( // @Note "Div" type param is required only in scala 2.12
+      onMountUnmountCallback(
         mount = c => {
           val proof: MountContext[Div] = c
           ()
@@ -264,7 +264,7 @@ class SyntaxSpec extends UnitSpec {
     )
 
     el.amend(
-      onMountInsert[Div](_ => div()) // @Note "Div" type param is required only in scala 2.12
+      onMountInsert(_ => div())
     )
 
     el.amend(
@@ -279,17 +279,17 @@ class SyntaxSpec extends UnitSpec {
     )
 
     el.amend(
-      onMountBind(_ => observable --> ((num: Int) => noop(num * 5))),
-      onMountBind(_ => signal --> ((num: Int) => noop(num * 5))),
-      onMountBind(_ => stream --> ((num: Int) => noop(num * 5)))
+      onMountBind(_ => observable --> ((num: Int) => num * 5)),
+      onMountBind(_ => signal --> ((num: Int) => num * 5)),
+      onMountBind(_ => stream --> ((num: Int) => num * 5))
     )
 
     el.amend(
-      onMountBind[Div](_.thisNode.events(onClick).map(_ => 1) --> (num => noop(num * 5))) // @Note "Div" type param is required only in scala 2.12
+      onMountBind(_.thisNode.events(onClick).map(_ => 1) --> (num => num * 5))
     )
 
     el.amend(
-      onMountBind[Div](_ => stream --> bus.writer) // @Note "Div" type param is required only in scala 2.12
+      onMountBind(_ => stream --> bus.writer)
     )
 
     mount(el)
