@@ -211,7 +211,7 @@ class ChildReceiverSpec extends UnitSpec {
     expectNode(
       div.of(
         sentinel,
-        L.a.of(href is "http://blog2.com/", "a blog")
+        L.a.of(href is "http://blog3.com/", "a blog")
       )
     )
 
