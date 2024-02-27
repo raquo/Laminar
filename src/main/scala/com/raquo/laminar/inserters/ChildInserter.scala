@@ -3,7 +3,6 @@ package com.raquo.laminar.inserters
 import com.raquo.airstream.core.Observable
 import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ParentNode}
-import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -83,7 +82,7 @@ object ChildInserter {
 
     ctx.extraNodesMap.clear()
     ctx.extraNodesMap.set(newChildNode.ref, newChildNode)
-    ctx.extraNodes = newChildNode :: Nil
+    // ctx.extraNodes = ChildrenSeq.fromJsVector(JsVector(newChildNode))
     ctx.extraNodeCount = 1
   }
 

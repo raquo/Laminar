@@ -279,9 +279,9 @@ class SyntaxSpec extends UnitSpec {
     )
 
     el.amend(
-      onMountBind(_ => observable --> ((num: Int) => num * 5)),
-      onMountBind(_ => signal --> ((num: Int) => num * 5)),
-      onMountBind(_ => stream --> ((num: Int) => num * 5))
+      onMountBind(_ => observable --> ((num: Int) => noop(num * 5))), // #nc
+      onMountBind(_ => signal --> ((num: Int) => noop(num * 5))),
+      onMountBind(_ => stream --> ((num: Int) => noop(num * 5)))
     )
 
     el.amend(

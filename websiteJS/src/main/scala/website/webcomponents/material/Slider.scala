@@ -30,12 +30,12 @@ object Slider {
 
   private val tag: HtmlTag[Ref] = htmlTag("mwc-slider")
 
-  val pin: HtmlProp[Boolean]     = htmlProp("pin", BooleanAsIsCodec)
-  val markers: HtmlProp[Boolean] = htmlProp("markers", BooleanAsIsCodec)
-  val value: HtmlProp[Double]    = htmlProp("value", DoubleAsIsCodec)
-  val min: HtmlProp[Double]      = htmlProp("min", DoubleAsIsCodec)
-  val max: HtmlProp[Double]      = htmlProp("max", DoubleAsIsCodec)
-  val step: HtmlProp[Double]     = htmlProp("step", DoubleAsIsCodec)
+  val pin: HtmlProp[Boolean, Boolean]     = htmlProp("pin", BooleanAsIsCodec)
+  val markers: HtmlProp[Boolean, Boolean] = htmlProp("markers", BooleanAsIsCodec)
+  val value: HtmlProp[Double, Double]     = htmlProp("value", DoubleAsIsCodec)
+  val min: HtmlProp[Double, Double]       = htmlProp("min", DoubleAsIsCodec)
+  val max: HtmlProp[Double, Double]       = htmlProp("max", DoubleAsIsCodec)
+  val step: HtmlProp[Double, Double]      = htmlProp("step", DoubleAsIsCodec)
 
 
   val onInput: EventProp[dom.Event]  = eventProp("input")

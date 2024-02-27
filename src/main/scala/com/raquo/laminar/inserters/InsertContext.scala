@@ -57,9 +57,8 @@ import scala.scalajs.js
  *                              context left by the previous inserter in onMountBind.
  * @param extraNodeCount      - Number of child nodes in addition to the sentinel node.
  *                              Warning: can get out of sync with the real DOM!
- * @param extraNodes          - Ordered list of child nodes in addition to the sentinel node.
- *                              Warning: can get out of sync with the real DOM!
- * @param extraNodesMap       - Map of child nodes, for more efficient search
+ * @param extraNodesMap       - Map of child nodes in addition to the sentinel node,
+ *                              for more efficient search
  *                              Warning: can get out of sync with the real DOM!
  */
 final class InsertContext(
@@ -67,7 +66,7 @@ final class InsertContext(
   var sentinelNode: ChildNode.Base,
   var strictMode: Boolean,
   var extraNodeCount: Int, // This is separate from `extraNodesMap` for performance #TODO[Performance]: Check if this is still relevant with JsMap
-  var extraNodes: immutable.Seq[ChildNode.Base],
+  // var extraNodes: immutable.Seq[ChildNode.Base],
   var extraNodesMap: JsMap[dom.Node, ChildNode.Base]
 ) {
 
@@ -107,7 +106,7 @@ final class InsertContext(
       // Convert loose mode context values to strict mode context values
       sentinelNode = newSentinelNode
       extraNodeCount = 1
-      extraNodes = contentNode :: Nil
+      // extraNodes = ChildrenSeq.fromJsVector(JsVector(contentNode))
       extraNodesMap.set(contentNode.ref, contentNode) // we initialized the map above
     }
     strictMode = true
@@ -182,7 +181,7 @@ object InsertContext {
       sentinelNode = sentinelNode,
       strictMode = strictMode,
       extraNodeCount = 0,
-      extraNodes = Nil,
+      // extraNodes = ChildrenSeq.empty,
       extraNodesMap = if (strictMode) new JsMap() else null
     )
   }

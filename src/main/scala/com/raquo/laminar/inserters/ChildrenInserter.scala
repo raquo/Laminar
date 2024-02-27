@@ -76,7 +76,7 @@ object ChildrenInserter {
       ctx.extraNodeCount,
       hooks
     )
-    ctx.extraNodes = newChildren
+    // ctx.extraNodes = newChildren
     ctx.extraNodesMap = newChildrenMap
   }
 

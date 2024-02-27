@@ -54,7 +54,7 @@ object ChildTextInserter {
       // of elements in between different inserters (otherwise Laminar would lose track of the reserved
       // spot in such cases).
       ctx.extraNodesMap.clear()
-      ctx.extraNodes = Nil
+      // ctx.extraNodes = ChildrenSeq.empty
       ctx.extraNodeCount = 0
     }
   }

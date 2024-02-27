@@ -62,7 +62,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     Setter(element => maybeSetter.foreach(_.apply(element)))
   }
 
-  /** Combine aa Seq of [[Setter]]-s into a single [[Setter]] that applies them all. */
+  /** Combine a Seq of [[Setter]]-s into a single [[Setter]] that applies them all. */
   implicit def seqToSetter[El <: ReactiveElement.Base](setters: collection.Seq[Setter[El]]): Setter[El] = {
     Setter(element => setters.foreach(_.apply(element)))
   }
