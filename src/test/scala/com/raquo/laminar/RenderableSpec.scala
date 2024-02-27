@@ -62,8 +62,7 @@ class RenderableSpec extends UnitSpec {
     )
   }
 
-  implicit val componentRenderable: RenderableNode[Component] =
-    RenderableNode(_.node, _.map(_.node), _.map(_.node), _.map(_.node))
+  implicit val componentRenderable: RenderableNode[Component] = RenderableNode(_.node)
 
 
   it("Component rendering") {

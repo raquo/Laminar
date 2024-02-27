@@ -475,8 +475,7 @@ class ChildReceiverSpec extends UnitSpec {
       val node: Span = span(text)
     }
 
-    implicit val componentRenderable: RenderableNode[Component] =
-      RenderableNode(_.node, _.map(_.node), _.map(_.node), _.map(_.node))
+    implicit val componentRenderable: RenderableNode[Component] = RenderableNode(_.node)
 
 
     val v = Var(true)

@@ -1,6 +1,7 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.nodes.{ChildNode, CommentNode}
+import com.raquo.ew.JsVector
+import com.raquo.laminar.nodes.ChildNode
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable
@@ -28,7 +29,7 @@ trait RenderableNode[-Component] {
   def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base]
 
   /** For every component in the sequence, this MUST ALWAYS return the exact same node reference. */
-  def asNodeIterable(values: Iterable[Component]): Iterable[ChildNode.Base]
+  def asNodeJsVector(values: JsVector[Component]): JsVector[ChildNode.Base]
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
   def asNodeOption(value: Option[Component]): Option[ChildNode.Base]
@@ -40,24 +41,35 @@ object RenderableNode {
    * A `Component` must have a 1-to-1 relationship to a Laminar ChildNode.
    * Your Component class/trait should have something like `val node: ChildNode.Base`
    * or `lazy val node: ChildNode.Base` in it, it must not be a `var` or a `def`.
+    *
+    * Note: This implementation works for essentially all use cases,
+    *       and while it is USUALLY the most efficient, that is not always the case.
+    *       For example, `nodeRenderable` below is a special implementation that
+    *       avoids mapping over the input collections because that is not needed.
    */
   def apply[Component](
-    renderNode: Component => ChildNode.Base,
-    renderNodeSeq: immutable.Seq[Component] => immutable.Seq[ChildNode.Base],
-    renderNodeIterable: Iterable[Component] => Iterable[ChildNode.Base],
-    renderNodeOption: Option[Component] => Option[ChildNode.Base]
+    renderNode: Component => ChildNode.Base
   ): RenderableNode[Component] = new RenderableNode[Component] {
 
     override def asNode(value: Component): ChildNode.Base = renderNode(value)
 
-    override def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base] = renderNodeSeq(values)
+    override def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base] = values.map(renderNode)
 
-    override def asNodeIterable(values: Iterable[Component]): Iterable[ChildNode.Base] = renderNodeIterable(values)
+    override def asNodeJsVector(values: JsVector[Component]): JsVector[ChildNode.Base] = values.map(renderNode)
 
-    override def asNodeOption(value: Option[Component]): Option[ChildNode.Base] = renderNodeOption(value)
+    override def asNodeOption(value: Option[Component]): Option[ChildNode.Base] = value.map(renderNode)
   }
 
-  implicit val nodeRenderable: RenderableNode[ChildNode.Base] =
-    RenderableNode[ChildNode.Base](identity, identity, identity, identity)
+  /** This low level implementation avoids mapping over collections for maximum efficiency. */
+  implicit val nodeRenderable: RenderableNode[ChildNode.Base] = new RenderableNode[ChildNode.Base] {
+
+    override def asNode(value: ChildNode.Base): ChildNode.Base = value
+
+    override def asNodeSeq(values: Seq[ChildNode.Base]): Seq[ChildNode.Base] = values
+
+    override def asNodeJsVector(values: JsVector[ChildNode.Base]): JsVector[ChildNode.Base] = values
+
+    override def asNodeOption(value: Option[ChildNode.Base]): Option[ChildNode.Base] = value
+  }
 
 }
