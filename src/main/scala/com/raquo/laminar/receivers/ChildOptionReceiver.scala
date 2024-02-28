@@ -24,7 +24,9 @@ object ChildOptionReceiver {
       child <-- {
         maybeChildSource
           .toObservable
-          .map(renderable.asNodeOption(_).getOrElse(emptyNode))
+          .map { maybeComponent =>
+            renderable.asNode(maybeComponent, default = emptyNode)
+          }
       }
     }
   }

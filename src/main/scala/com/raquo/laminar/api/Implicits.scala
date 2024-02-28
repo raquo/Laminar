@@ -5,7 +5,7 @@ import com.raquo.ew
 import com.raquo.ew.ewArray
 import com.raquo.laminar.api.Implicits.RichSource
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
-import com.raquo.laminar.inserters.{StaticChildInserter, StaticChildrenInserter, StaticInserter, StaticTextInserter}
+import com.raquo.laminar.inserters.{ChildrenSeq, StaticChildInserter, StaticChildrenInserter, StaticInserter, StaticTextInserter}
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys.{DerivedStyleProp, EventProcessor, EventProp}
 import com.raquo.laminar.modifiers.{Binder, Modifier, RenderableNode, RenderableText, Setter}
@@ -150,6 +150,16 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     jsArrayToModifier(modifiers.ew)
   }
 
+  // #nc
+  /** Create a modifier that applies each of the modifiers in a seq */
+  implicit def childrenSeqToModifier[A, El <: ReactiveElement.Base](
+    modifiers: ChildrenSeq[A]
+  )(
+    implicit asModifier: A => Modifier[El]
+  ): Modifier[El] = {
+    Modifier(element => modifiers.foreach(asModifier(_).apply(element)))
+  }
+
   // The various collection-to-modifier conversions below are cheaper and better equivalents of
   // collection-to-inserter modifiers found in the `LowPriorityImplicits` trait below.
   // We have a test that will fail should the priority of implicits be wrong.
@@ -178,6 +188,11 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
 
   implicit def nodeSjsArrayToModifier[N <: ChildNode.Base](nodes: js.Array[N]): Modifier.Base = {
     Modifier(element => nodes.ew.forEach(_.apply(element)))
+  }
+
+  // #nc
+  implicit def nodeChildrenSeqToModifier(nodes: ChildrenSeq[ChildNode.Base]): Modifier.Base = {
+    Modifier(element => nodes.foreach(_.apply(element)))
   }
 }
 
@@ -230,53 +245,63 @@ object Implicits {
     // -- Methods to convert collections of nodes to inserters --
 
     implicit def nodeOptionToInserter(maybeNode: Option[ChildNode.Base]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(maybeNode.toSeq)
+      StaticChildrenInserter.noHooks(ChildrenSeq.from(maybeNode.toSeq))
     }
 
     implicit def nodeSeqToInserter(nodes: collection.Seq[ChildNode.Base]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(nodes)
+      StaticChildrenInserter.noHooks(ChildrenSeq.from(nodes))
     }
 
     implicit def nodeArrayToInserter(nodes: scala.Array[ChildNode.Base]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(nodes)
+      StaticChildrenInserter.noHooks(ChildrenSeq.from(nodes))
     }
 
     implicit def nodeJsVectorToInserter[N <: ChildNode.Base](nodes: ew.JsVector[N]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(nodes.toList)
+      StaticChildrenInserter.noHooks(ChildrenSeq.from(nodes))
     }
 
     implicit def nodeJsArrayToInserter[N <: ChildNode.Base](nodes: ew.JsArray[N]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(nodes.asScalaJs.toList)
+      StaticChildrenInserter.noHooks(ChildrenSeq.from(nodes))
     }
 
     implicit def nodeSjsArrayToInserter[N <: ChildNode.Base](nodes: js.Array[N]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(nodes.toList)
+      StaticChildrenInserter.noHooks(ChildrenSeq.from(nodes))
+    }
+
+    // #nc
+    implicit def nodeChildrenSeqToInserter[N <: ChildNode.Base](nodes: ChildrenSeq[N]): StaticChildrenInserter = {
+      StaticChildrenInserter.noHooks(nodes)
     }
 
     // -- Methods to convert collections of components to inserters --
 
     implicit def componentOptionToInserter[Component: RenderableNode](maybeComponent: Option[Component]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooksC(maybeComponent.toList)
+      StaticChildrenInserter.noHooksC(ChildrenSeq.from(maybeComponent.toSeq))
     }
 
     implicit def componentSeqToInserter[Component: RenderableNode](components: collection.Seq[Component]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooksC(components.toList)
+      StaticChildrenInserter.noHooksC(ChildrenSeq.from(components))
     }
 
     implicit def componentArrayToInserter[Component: RenderableNode](components: scala.Array[Component]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooksC(components.toList)
+      StaticChildrenInserter.noHooksC(ChildrenSeq.from(components))
     }
 
     implicit def componentJsVectorToInserter[Component: RenderableNode](components: ew.JsVector[Component]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooksC(components.toList)
+      StaticChildrenInserter.noHooksC(ChildrenSeq.from(components))
     }
 
     implicit def componentJsArrayToInserter[Component: RenderableNode](components: ew.JsArray[Component]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooksC(components.asScalaJs.toList)
+      StaticChildrenInserter.noHooksC(ChildrenSeq.from(components))
     }
 
     implicit def componentSjsArrayToInserter[Component: RenderableNode](components: js.Array[Component]): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooksC(components.toList)
+      StaticChildrenInserter.noHooksC(ChildrenSeq.from(components))
+    }
+
+    // #nc
+    implicit def componentChildrenSeqToInserter[Component: RenderableNode](components: ChildrenSeq[Component]): StaticChildrenInserter = {
+      StaticChildrenInserter.noHooksC(components)
     }
 
   }

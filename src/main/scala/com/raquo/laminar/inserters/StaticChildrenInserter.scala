@@ -13,7 +13,7 @@ import scala.scalajs.js
   * than SingleStaticInserter.
   */
 class StaticChildrenInserter(
-  nodes: collection.Seq[ChildNode.Base],
+  nodes: ChildrenSeq[ChildNode.Base],
   hooks: js.UndefOr[InserterHooks]
 ) extends StaticInserter with Hookable[StaticChildrenInserter] {
 
@@ -27,7 +27,7 @@ class StaticChildrenInserter(
   }
 
   override def renderInContext(ctx: InsertContext): Unit = {
-    ChildrenInserter.switchToChildren(nodes.toList, ctx, hooks)
+    ChildrenInserter.switchToChildren(nodes, ctx, hooks)
   }
 
   override def withHooks(addHooks: InserterHooks): StaticChildrenInserter = {
@@ -39,17 +39,17 @@ class StaticChildrenInserter(
 object StaticChildrenInserter {
 
   def noHooks(
-    nodes: collection.Seq[ChildNode.Base],
+    nodes: ChildrenSeq[ChildNode.Base],
   ): StaticChildrenInserter = {
     new StaticChildrenInserter(nodes, hooks = js.undefined)
   }
 
   def noHooksC[Component](
-    components: immutable.Seq[Component]
+    components: ChildrenSeq[Component]
   )(
     implicit renderable: RenderableNode[Component]
   ): StaticChildrenInserter = {
-    new StaticChildrenInserter(renderable.asNodeSeq(components), hooks = js.undefined)
+    new StaticChildrenInserter(renderable.asNodeChildrenSeq(components), hooks = js.undefined)
   }
 
 }

@@ -13,7 +13,10 @@ object ChildReceiver {
 
   val text: ChildTextReceiver.type = ChildTextReceiver
 
-  /** Usage example: child(element) <-- signalOfBoolean */
+  /** Example usages:
+    *     child(element) <-- signalOfBoolean
+    *     child(component) <-- signalOfBoolean
+    */
   def apply(node: ChildNode.Base): LockedChildReceiver = {
     new LockedChildReceiver(node)
   }
@@ -24,15 +27,6 @@ object ChildReceiver {
 
   implicit class RichChildReceiver(val self: ChildReceiver.type) extends AnyVal {
 
-    /** Usage example: child(component) <-- signalOfBoolean */
-    def apply[Component](
-      component: Component
-    )(
-      implicit renderable: RenderableNode[Component]
-    ): LockedChildReceiver = {
-      new LockedChildReceiver(renderable.asNode(component))
-    }
-
     def <--[Component](
       childSource: Source[Component]
     )(
@@ -40,6 +34,12 @@ object ChildReceiver {
     ): DynamicInserter = {
       ChildInserter(childSource.toObservable, renderable, initialHooks = js.undefined)
     }
+
+    // #TODO[Scala,Ergonomics] If user provides Source[A] for which
+    //  RenderableNode[A] does not exist, we don't get the nice
+    //  @implicitNotFound message, the compiler only says that
+    //  A is not ChildNode.Base. Not sure how to improve the situation.
+
   }
 
 }

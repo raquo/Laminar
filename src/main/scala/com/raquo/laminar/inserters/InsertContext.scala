@@ -186,7 +186,7 @@ object InsertContext {
     )
   }
 
-  private[laminar] def nodesToMap(nodes: immutable.Seq[ChildNode.Base]): JsMap[dom.Node, ChildNode.Base] = {
+  private[laminar] def nodesToMap(nodes: ChildrenSeq[ChildNode.Base]): JsMap[dom.Node, ChildNode.Base] = {
     val acc = new JsMap[dom.Node, ChildNode.Base]()
     nodes.foreach { node =>
       acc.set(node.ref, node)

@@ -1,6 +1,7 @@
 package com.raquo.laminar
 
 import com.raquo.domtestutils.matching.Rule
+import com.raquo.ew.JsVector
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.modifiers.RenderableNode
@@ -9,6 +10,7 @@ import com.raquo.laminar.utils.UnitSpec
 import org.scalatest.BeforeAndAfter
 
 import scala.collection.mutable
+import scala.scalajs.js
 
 class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
 
@@ -34,9 +36,9 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
   //  private val text6 = randomString("text6_")
   //  private val text7 = randomString("text7_")
 
-  it("updates a list of children") {
+  it("updates a list of children - List") {
 
-    val childrenBus = new EventBus[Vector[ChildNode.Base]]
+    val childrenBus = new EventBus[List[ChildNode.Base]]
     val childrenStream = childrenBus.events
 
     val span0 = span(text0)
@@ -49,60 +51,239 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     mount(mainTag(children <-- childrenStream))
     expectChildren("none")
 
-    childrenBus.writer.onNext(Vector())
+    childrenBus.writer.onNext(List())
 
-    childrenBus.writer.onNext(Vector(span0))
+    childrenBus.writer.onNext(List(span0))
     expectChildren("append #1:", span of text0)
 
-    childrenBus.writer.onNext(Vector(span0, span1))
+    childrenBus.writer.onNext(List(span0, span1))
     expectChildren("append #2:", span of text0, span of text1)
 
-    childrenBus.writer.onNext(Vector(div2, span0, span1))
+    childrenBus.writer.onNext(List(div2, span0, span1))
     expectChildren("prepend:", div of text2, span of text0, span of text1)
 
-    childrenBus.writer.onNext(Vector(div2, span1))
+    childrenBus.writer.onNext(List(div2, span1))
     expectChildren("remove:", div of text2, span of text1)
 
-    childrenBus.writer.onNext(Vector(div2, div3))
+    childrenBus.writer.onNext(List(div2, div3))
     expectChildren("replace:", div of text2, div of text3)
 
-    childrenBus.writer.onNext(Vector(span1, span0))
+    childrenBus.writer.onNext(List(span1, span0))
     expectChildren("replaceAll:", span of text1, span of text0)
 
-    childrenBus.writer.onNext(Vector(span0, span1))
+    childrenBus.writer.onNext(List(span0, span1))
     expectChildren("switch places:", span of text0, span of text1)
 
-    childrenBus.writer.onNext(Vector(span1, span0, span4))
+    childrenBus.writer.onNext(List(span1, span0, span4))
     expectChildren("switch places & append:", span of text1, span of text0, span of text4)
 
-    childrenBus.writer.onNext(Vector(span1, span0, span5, span4))
+    childrenBus.writer.onNext(List(span1, span0, span5, span4))
     expectChildren("insert:", span of text1, span of text0, span of text5, span of text4)
 
-    childrenBus.writer.onNext(Vector(span5, span4))
+    childrenBus.writer.onNext(List(span5, span4))
     expectChildren("remove #2:", span of text5, span of text4)
 
-    childrenBus.writer.onNext(Vector(span1, span5, span4))
+    childrenBus.writer.onNext(List(span1, span5, span4))
     expectChildren("prepend #2:", span of text1, span of text5, span of text4)
 
-    childrenBus.writer.onNext(Vector(span1, span5, span4, span0, div2, div3))
-    expectChildren("insert #2:", span of text1, span of text5, span of text4, span of text0, div of text2, div of text3)
+    childrenBus.writer.onNext(List(span1, span5, span4, span0, div2, div3))
+    expectChildren("append #3:", span of text1, span of text5, span of text4, span of text0, div of text2, div of text3)
 
-    childrenBus.writer.onNext(Vector(span1, span5, span4, span0))
+    childrenBus.writer.onNext(List(span1, span5, span4, span0))
     expectChildren("remove #3:", span of text1, span of text5, span of text4, span of text0)
 
-    childrenBus.writer.onNext(Vector(span0, span1, div2, div3, span4))
+    childrenBus.writer.onNext(List(span0, span1, div2, div3, span4))
     expectChildren("mix:", span of text0, span of text1, div of text2, div of text3, span of text4)
 
-    childrenBus.writer.onNext(Vector(div3, div2, span1, span4, span0))
+    childrenBus.writer.onNext(List(div3, div2, span1, span4, span0))
     expectChildren("reorder:", div of text3, div of text2, span of text1, span of text4, span of text0)
 
-    childrenBus.writer.onNext(Vector())
+    childrenBus.writer.onNext(List())
     expectChildren("clear:")
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
-        val first: Rule = "Hello"
-        val last: Rule = articleTag of "World"
+        val rules: Seq[Rule] = (sentinel: Rule) +: childRules
+
+        expectNode(mainTag.of(rules: _*))
+      }
+    }
+  }
+
+  it("updates a list of children - JsVector") {
+
+    val childrenBus = new EventBus[JsVector[ChildNode.Base]]
+    val childrenStream = childrenBus.events
+
+    val span0 = span(text0)
+    val span1 = span(text1)
+    val div2 = div(text2)
+    val div3 = div(text3)
+    val span4 = span(text4)
+    val span5 = span(text5)
+
+    mount(mainTag(children <-- childrenStream))
+    expectChildren("none")
+
+    childrenBus.writer.onNext(JsVector())
+
+    childrenBus.writer.onNext(JsVector(span0))
+    expectChildren("append #1:", span of text0)
+
+    childrenBus.writer.onNext(JsVector(span0, span1))
+    expectChildren("append #2:", span of text0, span of text1)
+
+    childrenBus.writer.onNext(JsVector(div2, span0, span1))
+    expectChildren("prepend:", div of text2, span of text0, span of text1)
+
+    childrenBus.writer.onNext(JsVector(div2, span1))
+    expectChildren("remove:", div of text2, span of text1)
+
+    childrenBus.writer.onNext(JsVector(div2, div3))
+    expectChildren("replace:", div of text2, div of text3)
+
+    childrenBus.writer.onNext(JsVector(span1, span0))
+    expectChildren("replaceAll:", span of text1, span of text0)
+
+    childrenBus.writer.onNext(JsVector(span0, span1))
+    expectChildren("switch places:", span of text0, span of text1)
+
+    childrenBus.writer.onNext(JsVector(span1, span0, span4))
+    expectChildren("switch places & append:", span of text1, span of text0, span of text4)
+
+    childrenBus.writer.onNext(JsVector(span1, span0, span5, span4))
+    expectChildren("insert:", span of text1, span of text0, span of text5, span of text4)
+
+    childrenBus.writer.onNext(JsVector(span5, span4))
+    expectChildren("remove #2:", span of text5, span of text4)
+
+    childrenBus.writer.onNext(JsVector(span1, span5, span4))
+    expectChildren("prepend #2:", span of text1, span of text5, span of text4)
+
+    childrenBus.writer.onNext(JsVector(span1, span5, span4, span0, div2, div3))
+    expectChildren("append #3:", span of text1, span of text5, span of text4, span of text0, div of text2, div of text3)
+
+    childrenBus.writer.onNext(JsVector(span1, span5, span4, span0))
+    expectChildren("remove #3:", span of text1, span of text5, span of text4, span of text0)
+
+    childrenBus.writer.onNext(JsVector(span0, span1, div2, div3, span4))
+    expectChildren("mix:", span of text0, span of text1, div of text2, div of text3, span of text4)
+
+    childrenBus.writer.onNext(JsVector(div3, div2, span1, span4, span0))
+    expectChildren("reorder:", div of text3, div of text2, span of text1, span of text4, span of text0)
+
+    childrenBus.writer.onNext(JsVector())
+    expectChildren("clear:")
+
+    def expectChildren(clue: String, childRules: Rule*): Unit = {
+      withClue(clue) {
+        val rules: Seq[Rule] = (sentinel: Rule) +: childRules
+
+        expectNode(mainTag.of(rules: _*))
+      }
+    }
+  }
+
+  it("updates a list of children - mutable js.Array") {
+
+    val arr = js.Array[ChildNode.Base]()
+
+    val childrenBus = new EventBus[js.Array[ChildNode.Base]]
+    val childrenStream = childrenBus.events
+
+    val span0 = span(text0)
+    val span1 = span(text1)
+    val div2 = div(text2)
+    val div3 = div(text3)
+    val span4 = span(text4)
+    val span5 = span(text5)
+
+    mount(mainTag(children <-- childrenStream))
+    expectChildren("none")
+
+    childrenBus.emit(arr)
+
+    arr.push(span0)
+    childrenBus.emit(arr)
+    expectChildren("append #1:", span of text0)
+
+    arr.push(span1)
+    childrenBus.emit(arr)
+    expectChildren("append #2:", span of text0, span of text1)
+
+    arr.unshift(div2)
+    childrenBus.emit(arr)
+    expectChildren("prepend:", div of text2, span of text0, span of text1)
+
+    arr.remove(1)
+    childrenBus.emit(arr)
+    expectChildren("remove:", div of text2, span of text1)
+
+    arr.update(1, div3)
+    childrenBus.emit(arr)
+    expectChildren("replace:", div of text2, div of text3)
+
+    arr.clear()
+    arr.push(span1)
+    arr.push(span0)
+    childrenBus.emit(arr)
+    expectChildren("replaceAll:", span of text1, span of text0)
+
+    arr.reverseInPlace()
+    childrenBus.emit(arr)
+    expectChildren("switch places:", span of text0, span of text1)
+
+    arr.reverseInPlace()
+    arr.push(span4)
+    childrenBus.emit(arr)
+    expectChildren("switch places & append:", span of text1, span of text0, span of text4)
+
+    arr.insert(2, span5)
+    childrenBus.emit(arr)
+    expectChildren("insert:", span of text1, span of text0, span of text5, span of text4)
+
+    arr.shift()
+    arr.shift()
+    childrenBus.emit(arr)
+    expectChildren("remove #2:", span of text5, span of text4)
+
+    arr.unshift(span1)
+    childrenBus.emit(arr)
+    expectChildren("prepend #2:", span of text1, span of text5, span of text4)
+
+    arr.push(span0)
+    arr.push(div2)
+    arr.push(div3)
+    childrenBus.emit(arr)
+    expectChildren("append #3:", span of text1, span of text5, span of text4, span of text0, div of text2, div of text3)
+
+    arr.pop()
+    arr.pop()
+    childrenBus.emit(arr)
+    expectChildren("remove #3:", span of text1, span of text5, span of text4, span of text0)
+
+    arr.update(0, span0)
+    arr.update(1, span1)
+    arr.update(2, div2)
+    arr.update(3, div3)
+    arr.push(span4)
+    childrenBus.emit(arr)
+    expectChildren("mix:", span of text0, span of text1, div of text2, div of text3, span of text4)
+
+    arr.update(0, div3)
+    arr.update(1, div2)
+    arr.update(2, span1)
+    arr.update(3, span4)
+    arr.update(4, span0)
+    childrenBus.emit(arr)
+    expectChildren("reorder:", div of text3, div of text2, span of text1, span of text4, span of text0)
+
+    arr.clear()
+    childrenBus.emit(arr)
+    expectChildren("clear:")
+
+    def expectChildren(clue: String, childRules: Rule*): Unit = {
+      withClue(clue) {
         val rules: Seq[Rule] = (sentinel: Rule) +: childRules
 
         expectNode(mainTag.of(rules: _*))
@@ -1023,4 +1204,5 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
       )
     )
   }
+
 }

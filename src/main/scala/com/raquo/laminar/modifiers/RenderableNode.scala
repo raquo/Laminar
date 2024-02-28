@@ -1,6 +1,7 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.ew.JsVector
+import com.raquo.laminar.inserters.ChildrenSeq
 import com.raquo.laminar.nodes.ChildNode
 
 import scala.annotation.implicitNotFound
@@ -25,11 +26,13 @@ trait RenderableNode[-Component] {
   /** For every component, this MUST ALWAYS return the exact same node reference. */
   def asNode(value: Component): ChildNode.Base
 
-  /** For every component in the sequence, this MUST ALWAYS return the exact same node reference. */
-  def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base]
+  /** For every component, this MUST ALWAYS return the exact same node reference. */
+  def asNode(value: Option[Component], default: => ChildNode.Base): ChildNode.Base = {
+    value.fold(default)(asNode)
+  }
 
-  /** For every component in the sequence, this MUST ALWAYS return the exact same node reference. */
-  def asNodeJsVector(values: JsVector[Component]): JsVector[ChildNode.Base]
+  /** For every component, this MUST ALWAYS return the exact same node reference. */
+  def asNodeChildrenSeq(values: ChildrenSeq[Component]): ChildrenSeq[ChildNode.Base]
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
   def asNodeOption(value: Option[Component]): Option[ChildNode.Base]
@@ -53,9 +56,7 @@ object RenderableNode {
 
     override def asNode(value: Component): ChildNode.Base = renderNode(value)
 
-    override def asNodeSeq(values: immutable.Seq[Component]): immutable.Seq[ChildNode.Base] = values.map(renderNode)
-
-    override def asNodeJsVector(values: JsVector[Component]): JsVector[ChildNode.Base] = values.map(renderNode)
+    override def asNodeChildrenSeq(values: ChildrenSeq[Component]): ChildrenSeq[ChildNode.Base] = values.map(renderNode)
 
     override def asNodeOption(value: Option[Component]): Option[ChildNode.Base] = value.map(renderNode)
   }
@@ -65,9 +66,7 @@ object RenderableNode {
 
     override def asNode(value: ChildNode.Base): ChildNode.Base = value
 
-    override def asNodeSeq(values: Seq[ChildNode.Base]): Seq[ChildNode.Base] = values
-
-    override def asNodeJsVector(values: JsVector[ChildNode.Base]): JsVector[ChildNode.Base] = values
+    override def asNodeChildrenSeq(values: ChildrenSeq[ChildNode.Base]): ChildrenSeq[ChildNode.Base] = values
 
     override def asNodeOption(value: Option[ChildNode.Base]): Option[ChildNode.Base] = value
   }

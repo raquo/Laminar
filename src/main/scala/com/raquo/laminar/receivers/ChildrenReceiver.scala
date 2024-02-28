@@ -1,62 +1,64 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.inserters.{ChildrenInserter, DynamicInserter}
-import com.raquo.laminar.modifiers.RenderableNode
+import com.raquo.laminar.inserters.{ChildrenInserter, ChildrenSeq, DynamicInserter}
+import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
 import com.raquo.laminar.nodes.ChildNode
 
-import scala.collection.immutable
 import scala.scalajs.js
 
 object ChildrenReceiver {
 
   val command: ChildrenCommandReceiver.type = ChildrenCommandReceiver
 
-  /** Example usage: children(listOfNodes) <-- signalOfBoolean */
-  def apply(nodes: immutable.Seq[ChildNode.Base]): LockedChildrenReceiver = {
-    new LockedChildrenReceiver(nodes)
-  }
-
-  /** Example usage: children(listOfComponents) <-- signalOfBoolean */
-  def apply[Component](
-    components: immutable.Seq[Component]
-  )(
-    implicit renderable: RenderableNode[Component]
-  ): LockedChildrenReceiver = {
-    new LockedChildrenReceiver(renderable.asNodeSeq(components))
-  }
-
-  // Note: currently this <-- method requires an observable of an
-  // **immutable** Seq, but if needed, I might be able to implement
-  // a version that works with arrays and mutable Seq-s too.
-  // Let me know if you have a compelling use case for this.
-
-  def <--(childrenSource: Source[immutable.Seq[ChildNode.Base]]): DynamicInserter = {
-    ChildrenInserter(childrenSource.toObservable, RenderableNode.nodeRenderable, initialHooks = js.undefined)
-  }
-
-  def <--[Component](
-    childrenSource: Source[immutable.Seq[Component]]
-  )(
-    implicit renderableNode: RenderableNode[Component]
-  ): DynamicInserter = {
-    ChildrenInserter(childrenSource.toObservable, renderableNode, initialHooks = js.undefined)
+  /** Example usages:
+    *     children(node1, node2) <-- signalOfBoolean
+    *     children(component1, component2) <-- signalOfBoolean
+    */
+  def apply(nodes: ChildNode.Base*): LockedChildrenReceiver = {
+    new LockedChildrenReceiver(ChildrenSeq.from(nodes))
   }
 
   implicit class RichChildrenReceiver(val self: ChildrenReceiver.type) extends AnyVal {
 
-    /** Example usage: children(node1, node2) <-- signalOfBoolean */
-    def apply(nodes: ChildNode.Base*): LockedChildrenReceiver = {
+    /** Example usages:
+      *     children(listOfNodes) <-- signalOfBoolean
+      *     children(arrayOfComponents) <-- signalOfBoolean
+      */
+    def apply[Collection[_], Component](
+      components: Collection[Component]
+    )(
+      implicit renderableNode: RenderableNode[Component],
+      renderableSeq: RenderableSeq[Collection]
+    ): LockedChildrenReceiver = {
+      val nodes = renderableNode.asNodeChildrenSeq(renderableSeq.toChildrenSeq(components))
       new LockedChildrenReceiver(nodes)
     }
 
-    /** Example usage: children(component1, component2) <-- signalOfBoolean */
-    def apply[Component](
-      components: Component*
+    def <--(
+      childrenSource: Source[Seq[ChildNode.Base]]
+    ): DynamicInserter = {
+      ChildrenInserter(
+        childrenSource.toObservable,
+        RenderableSeq.collectionSeqRenderable,
+        RenderableNode.nodeRenderable,
+        initialHooks = js.undefined
+      )
+    }
+
+    def <--[Collection[_], Component](
+      childrenSource: Source[Collection[Component]]
     )(
-      implicit renderable: RenderableNode[Component]
-    ): LockedChildrenReceiver = {
-      new LockedChildrenReceiver(renderable.asNodeSeq(components))
+      implicit renderableNode: RenderableNode[Component],
+      renderableSeq: RenderableSeq[Collection]
+    ): DynamicInserter = {
+      ChildrenInserter(
+        childrenSource.toObservable,
+        renderableSeq,
+        renderableNode,
+        initialHooks = js.undefined
+      )
     }
   }
+
 }

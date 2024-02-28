@@ -3,6 +3,7 @@ package com.raquo.laminar
 import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
+import com.raquo.laminar.inserters.ChildrenSeq
 import com.raquo.laminar.keys.DerivedStyleProp
 import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.nodes.ReactiveElement
@@ -384,9 +385,7 @@ class SyntaxSpec extends UnitSpec {
 
 
 
-
-    // @TODO[Test] this should be `"..." shouldNot typeCheck` but https://github.com/scalatest/scalatest/issues/1947
-    assertDoesNotCompile("focus <-- boolSignal")
+    assertTypeError("focus <-- boolSignal")
 
     //implicit def xxxx[A](obs: Observable[_]#Self[A]): Source[A] = obs: Observable[A]
 
@@ -424,6 +423,7 @@ class SyntaxSpec extends UnitSpec {
       children <-- childrenStream.map(c => c),
       children <-- childrenSignal,
       children <-- childrenSignal.map(c => c),
+      children <-- childrenSignal.map(ChildrenSeq.from(_)),
       idAttr <-- textObservable,
       idAttr <-- textObservable.map(t => t),
       idAttr <-- textStream,

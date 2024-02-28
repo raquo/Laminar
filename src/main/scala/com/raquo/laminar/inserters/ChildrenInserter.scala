@@ -2,7 +2,7 @@ package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
-import com.raquo.laminar.modifiers.RenderableNode
+import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
@@ -17,8 +17,9 @@ object ChildrenInserter {
   @deprecated("`Children`type alias is deprecated. Use immutable.Seq[ChildNode.Base]", "15.0.0-M6")
   type Children = immutable.Seq[ChildNode.Base]
 
-  def apply[Component](
-    childrenSource: Observable[immutable.Seq[Component]],
+  def apply[Collection[_], Component](
+    childrenSource: Observable[Collection[Component]],
+    renderableSeq: RenderableSeq[Collection],
     renderableNode: RenderableNode[Component],
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
@@ -34,7 +35,9 @@ object ChildrenInserter {
           // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
           //  will need to map over the seq, creating a new seq of child nodes.
           //  Unfortunately, avoiding this is quite complicated.
-          val newChildren = renderableNode.asNodeSeq(components)
+          val newChildren = renderableNode.asNodeChildrenSeq(
+            renderableSeq.toChildrenSeq(components)
+          )
 
           // #TODO[Performance] Consider bringing back this eq check. Benchmark performance cost.
           //  - Without it, we might get worse performance, as when the same list is emitted,
@@ -56,7 +59,7 @@ object ChildrenInserter {
   }
 
   def switchToChildren(
-    newChildren: immutable.Seq[ChildNode.Base],
+    newChildren: ChildrenSeq[ChildNode.Base],
     ctx: InsertContext,
     hooks: js.UndefOr[InserterHooks]
   ): Unit = {
@@ -83,7 +86,7 @@ object ChildrenInserter {
   /** @return New child node count */
   private def updateChildren(
     prevChildren: JsMap[dom.Node, ChildNode.Base],
-    nextChildren: immutable.Seq[ChildNode.Base],
+    nextChildren: ChildrenSeq[ChildNode.Base],
     nextChildrenMap: JsMap[dom.Node, ChildNode.Base],
     parentNode: ReactiveElement.Base,
     sentinelNode: ChildNode.Base,
