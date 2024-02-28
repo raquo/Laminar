@@ -5,7 +5,7 @@ import com.raquo.laminar.inserters.ChildrenSeq
 
 import scala.scalajs.js
 
-// #TODO[Naming] - RenderableSeq + IsRenderableSeq? // #nc
+// #TODO[Naming] - LSeq + RenderableSeq?   RenderableSeq + IsRenderableSeq? // #nc
 trait RenderableSeq[-Collection[_]] {
 
   def toChildrenSeq[A](values: Collection[A]): ChildrenSeq[A]
@@ -48,5 +48,17 @@ object RenderableSeq {
       values
     }
   }
+
+  // object optionRenderable extends RenderableSeq[Option] {
+  //   override def toChildrenSeq[A](maybeValue: Option[A]): ChildrenSeq[A] = {
+  //     ChildrenSeq.from(maybeValue.toList)
+  //   }
+  // }
+  //
+  // object jsUndefOrRenderable extends RenderableSeq[js.UndefOr] {
+  //   override def toChildrenSeq[A](maybeValue: js.UndefOr[A]): ChildrenSeq[A] = {
+  //     ChildrenSeq.from(JsArray.from(maybeValue))
+  //   }
+  // }
 
 }
