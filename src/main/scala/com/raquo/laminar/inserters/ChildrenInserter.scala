@@ -2,6 +2,7 @@ package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
+import com.raquo.laminar
 import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
@@ -35,8 +36,8 @@ object ChildrenInserter {
           // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
           //  will need to map over the seq, creating a new seq of child nodes.
           //  Unfortunately, avoiding this is quite complicated.
-          val newChildren = renderableNode.asNodeChildrenSeq(
-            renderableSeq.toChildrenSeq(components)
+          val newChildren = renderableNode.asNodeSeq(
+            renderableSeq.toSeq(components)
           )
 
           // #TODO[Performance] Consider bringing back this eq check. Benchmark performance cost.
@@ -59,7 +60,7 @@ object ChildrenInserter {
   }
 
   def switchToChildren(
-    newChildren: ChildrenSeq[ChildNode.Base],
+    newChildren: laminar.Seq[ChildNode.Base],
     ctx: InsertContext,
     hooks: js.UndefOr[InserterHooks]
   ): Unit = {
@@ -86,7 +87,7 @@ object ChildrenInserter {
   /** @return New child node count */
   private def updateChildren(
     prevChildren: JsMap[dom.Node, ChildNode.Base],
-    nextChildren: ChildrenSeq[ChildNode.Base],
+    nextChildren: laminar.Seq[ChildNode.Base],
     nextChildrenMap: JsMap[dom.Node, ChildNode.Base],
     parentNode: ReactiveElement.Base,
     sentinelNode: ChildNode.Base,

@@ -1,11 +1,11 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.ew.JsMap
+import com.raquo.laminar
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
-import scala.collection.immutable
 import scala.scalajs.js
 
 // #TODO[Naming] This feels more like InserterState?
@@ -186,7 +186,7 @@ object InsertContext {
     )
   }
 
-  private[laminar] def nodesToMap(nodes: ChildrenSeq[ChildNode.Base]): JsMap[dom.Node, ChildNode.Base] = {
+  private[laminar] def nodesToMap(nodes: laminar.Seq[ChildNode.Base]): JsMap[dom.Node, ChildNode.Base] = {
     val acc = new JsMap[dom.Node, ChildNode.Base]()
     nodes.foreach { node =>
       acc.set(node.ref, node)

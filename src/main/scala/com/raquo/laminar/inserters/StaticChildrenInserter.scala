@@ -1,10 +1,10 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Transaction
+import com.raquo.laminar
 import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 
-import scala.collection.immutable
 import scala.scalajs.js
 
 /**
@@ -13,7 +13,7 @@ import scala.scalajs.js
   * than SingleStaticInserter.
   */
 class StaticChildrenInserter(
-  nodes: ChildrenSeq[ChildNode.Base],
+  nodes: laminar.Seq[ChildNode.Base],
   hooks: js.UndefOr[InserterHooks]
 ) extends StaticInserter with Hookable[StaticChildrenInserter] {
 
@@ -43,7 +43,7 @@ object StaticChildrenInserter {
     renderableSeq: RenderableSeq[Collection],
     renderableNode: RenderableNode[Component]
   ): StaticChildrenInserter = {
-    val children = renderableNode.asNodeChildrenSeq(renderableSeq.toChildrenSeq(components))
+    val children = renderableNode.asNodeSeq(renderableSeq.toSeq(components))
     new StaticChildrenInserter(children, hooks = js.undefined)
   }
 

@@ -1,7 +1,8 @@
 package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.inserters.{ChildrenInserter, ChildrenSeq, DynamicInserter}
+import com.raquo.laminar
+import com.raquo.laminar.inserters.{ChildrenInserter, DynamicInserter}
 import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
 import com.raquo.laminar.nodes.ChildNode
 
@@ -16,7 +17,7 @@ object ChildrenReceiver {
     *     children(component1, component2) <-- signalOfBoolean
     */
   def apply(nodes: ChildNode.Base*): LockedChildrenReceiver = {
-    new LockedChildrenReceiver(ChildrenSeq.from(nodes))
+    new LockedChildrenReceiver(laminar.Seq.from(nodes))
   }
 
   implicit class RichChildrenReceiver(val self: ChildrenReceiver.type) extends AnyVal {
@@ -31,7 +32,7 @@ object ChildrenReceiver {
       implicit renderableNode: RenderableNode[Component],
       renderableSeq: RenderableSeq[Collection]
     ): LockedChildrenReceiver = {
-      val nodes = renderableNode.asNodeChildrenSeq(renderableSeq.toChildrenSeq(components))
+      val nodes = renderableNode.asNodeSeq(renderableSeq.toSeq(components))
       new LockedChildrenReceiver(nodes)
     }
 

@@ -1,11 +1,9 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.ew.JsVector
-import com.raquo.laminar.inserters.ChildrenSeq
+import com.raquo.laminar
 import com.raquo.laminar.nodes.ChildNode
 
 import scala.annotation.implicitNotFound
-import scala.collection.immutable
 
 /** `RenderableNode[Component]` is evidence that you can convert a Component to
   * a Laminar ChildNode.
@@ -32,7 +30,7 @@ trait RenderableNode[-Component] {
   }
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
-  def asNodeChildrenSeq(values: ChildrenSeq[Component]): ChildrenSeq[ChildNode.Base]
+  def asNodeSeq(values: laminar.Seq[Component]): laminar.Seq[ChildNode.Base]
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
   def asNodeOption(value: Option[Component]): Option[ChildNode.Base]
@@ -56,7 +54,7 @@ object RenderableNode {
 
     override def asNode(value: Component): ChildNode.Base = renderNode(value)
 
-    override def asNodeChildrenSeq(values: ChildrenSeq[Component]): ChildrenSeq[ChildNode.Base] = values.map(renderNode)
+    override def asNodeSeq(values: laminar.Seq[Component]): laminar.Seq[ChildNode.Base] = values.map(renderNode)
 
     override def asNodeOption(value: Option[Component]): Option[ChildNode.Base] = value.map(renderNode)
   }
@@ -66,7 +64,7 @@ object RenderableNode {
 
     override def asNode(value: ChildNode.Base): ChildNode.Base = value
 
-    override def asNodeChildrenSeq(values: ChildrenSeq[ChildNode.Base]): ChildrenSeq[ChildNode.Base] = values
+    override def asNodeSeq(values: laminar.Seq[ChildNode.Base]): laminar.Seq[ChildNode.Base] = values
 
     override def asNodeOption(value: Option[ChildNode.Base]): Option[ChildNode.Base] = value
   }

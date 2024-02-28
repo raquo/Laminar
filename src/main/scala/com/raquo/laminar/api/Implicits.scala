@@ -65,7 +65,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     implicit renderableSeq: RenderableSeq[Collection]
   ): Setter[El] = {
     Setter { element =>
-      val settersSeq = renderableSeq.toChildrenSeq(setters)
+      val settersSeq = renderableSeq.toSeq(setters)
       settersSeq.foreach(_.apply(element))
     }
   }
@@ -95,7 +95,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     implicit asModifier: A => Modifier[El],
     renderableSeq: RenderableSeq[Collection]
   ): Modifier[El] = {
-    Modifier(element => renderableSeq.toChildrenSeq(modifiers).foreach(asModifier(_).apply(element)))
+    Modifier(element => renderableSeq.toSeq(modifiers).foreach(asModifier(_).apply(element)))
   }
 
   // The various collection-to-modifier conversions below are cheaper and better equivalents of
@@ -115,7 +115,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     implicit renderableSeq: RenderableSeq[Collection]
   ): Modifier.Base = {
     Modifier { element =>
-      val nodesSeq = renderableSeq.toChildrenSeq(nodes)
+      val nodesSeq = renderableSeq.toSeq(nodes)
       nodesSeq.foreach(_.apply(element))
     }
   }

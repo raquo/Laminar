@@ -9,6 +9,7 @@ import com.raquo.laminar.tags.{HtmlTag, SvgTag, Tag}
 import org.scalajs.dom
 
 import scala.annotation.tailrec
+import scala.collection.immutable
 import scala.scalajs.js
 import scala.scalajs.js.{JavaScriptException, |}
 
@@ -301,7 +302,7 @@ object DomApi {
   @inline private[laminar] def setRefStyle(
     ref: dom.html.Element,
     styleCssName: String,
-    prefixes: Seq[String],
+    prefixes: immutable.Seq[String],
     styleValue: String
   ): Unit = {
     // #Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
