@@ -145,11 +145,7 @@ lazy val laminar = project.in(file("."))
 
     useYarn := true,
 
-    scalaJSUseMainModuleInitializer := true,
-
-    (Compile / fastOptJS / scalaJSLinkerConfig) ~= {
-      _.withSourceMap(false)
-    }
+    scalaJSUseMainModuleInitializer := true
   )
   .settings(
     name := "Laminar",
