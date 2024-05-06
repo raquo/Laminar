@@ -16,6 +16,8 @@ class SvgTag[+Ref <: dom.svg.Element] (
     element
   }
 
+  override def jsTagName: String = name
+
   /** Create a Scala DOM Builder element from this Tag */
   def build(): ReactiveSvgElement[Ref] = new ReactiveSvgElement(this, DomApi.createSvgElement(this))
 }

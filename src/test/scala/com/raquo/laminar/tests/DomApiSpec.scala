@@ -98,4 +98,10 @@ class DomApiSpec extends UnitSpec {
     assert(caught.getMessage == "Error parsing SVG string: expected tag name `svg`, got `circle`")
   }
 
+  it("jsTagName: matches case for both HTML and SVG elements") {
+    a.jsTagName == a().ref.tagName
+    div.jsTagName == div().ref.tagName
+    svg.svg.jsTagName == svg.svg().ref.tagName
+    svg.circle.jsTagName == svg.circle().ref.tagName
+  }
 }

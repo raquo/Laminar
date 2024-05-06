@@ -16,6 +16,8 @@ class HtmlTag[+Ref <: dom.html.Element] (
     element
   }
 
+  override def jsTagName: String = name.toUpperCase
+
   /** Create a Scala DOM Builder element from this Tag */
   protected def build(): ReactiveHtmlElement[Ref] = new ReactiveHtmlElement(this, DomApi.createHtmlElement(this))
 }
