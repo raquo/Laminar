@@ -86,4 +86,16 @@ trait AirstreamAliases {
 
   lazy val SwitchSignalObservableStrategy: airstream.flatten.FlattenStrategy.SwitchSignalObservableStrategy.type = airstream.flatten.FlattenStrategy.SwitchSignalObservableStrategy
 
+  // -- Status
+
+  type Status[+In, +Out] = airstream.status.Status[In, Out]
+
+  type Pending[+In] = airstream.status.Pending[In]
+
+  @inline def Pending: airstream.status.Pending.type = airstream.status.Pending
+
+  type Resolved[+In, +Out] = airstream.status.Resolved[In, Out]
+
+  @inline def Resolved: airstream.status.Resolved.type = airstream.status.Resolved
+
 }
