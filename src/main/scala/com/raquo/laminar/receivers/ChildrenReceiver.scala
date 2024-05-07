@@ -36,6 +36,7 @@ object ChildrenReceiver {
       new LockedChildrenReceiver(nodes)
     }
 
+    // #TODO[UX] Can I remove this method, to improve error messages, get rid of "none of the overloaded alternatives" error?
     def <--(
       childrenSource: Source[Seq[ChildNode.Base]]
     ): DynamicInserter = {

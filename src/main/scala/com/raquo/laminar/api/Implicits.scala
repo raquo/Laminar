@@ -101,6 +101,14 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   // The various collection-to-modifier conversions below are cheaper and better equivalents of
   // collection-to-inserter modifiers found in the `LowPriorityImplicits` trait below.
   // We have a test that will fail should the priority of implicits be wrong.
+  // #Note ^^ That comment is outdated as of v17. We have a test that ensures that the selected
+  //  implicits don't create unnecessary subscriptions, but the implicits in LowPriorityImplicits
+  //  don't do that anymore, so the test does not catch using them. But, that is also not a problem.
+  // #TODO[Elegance] We should simplify the implicits even further
+  //  - I think `nodeOptionToModifier` and `nodeSeqToModifier` are not needed anymore
+  //  - Possibly other non-Component versions of the things in LowPriorityImplicits as well
+  //  - But then we should probably move that Component stuff out of LowPriorityImplicits,
+  //    I hope we don't get any conflicts. I'll leave this for v18.
 
   // -- Methods to convert collections of nodes to modifiers --
 
@@ -145,6 +153,12 @@ object Implicits {
     * `onMountInsert`, but they are relatively expensive compared to simpler
     * alternatives when a mere Modifier would suffice. And so, the conversions
     * below are de-prioritized.
+    *
+    * #Note: Prior to v17, these conversions involved dynamic inserters with
+    *  inefficient implementations like `children <-- Val(nodes.toList)`.
+    *  Now, they use static inserters, and don't have such a significant
+    *  inefficiency.
+    * #TODO Simplify this! See the other #TODO comment above about moving stuff out of LowPriorityImplicits.
     */
   trait LowPriorityImplicits {
 
