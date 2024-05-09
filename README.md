@@ -10,7 +10,7 @@ Laminar is a small library that lets you build web application interfaces, keepi
 
 Laminar is also a friendly community of passionate people from across the world who help each other learn new skills and achieve their goals. Check out all the learning materials we've put out, and chat us up on Discord if you hit a snag!
 
-    "com.raquo" %%% "laminar" % "<version>" // Requires Scala.js 1.13.2+
+    "com.raquo" %%% "laminar" % "<version>" // Requires Scala.js 1.16.0+
 
 Look up the latest version of Laminar [here](https://laminar.dev/blog/), or in git tags above ("v" prefix is _not_ part of the version number).
 
