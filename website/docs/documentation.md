@@ -87,15 +87,15 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v16.0.0**. For other versions, see below.
+This documentation is for Laminar version **v17.0.0**. For other versions, see below.
 
 | Laminar                                                                            | Airstream                                                                |
 |:-----------------------------------------------------------------------------------|:-------------------------------------------------------------------------|
+| **[v17.0.0](https://github.com/raquo/Laminar/blob/v17.0.0/docs/Documentation.md)** | **[v17.0.0](https://github.com/raquo/Airstream/blob/v17.0.0/README.md)** |
 | **[v16.0.0](https://github.com/raquo/Laminar/blob/v16.0.0/docs/Documentation.md)** | **[v16.0.0](https://github.com/raquo/Airstream/blob/v16.0.0/README.md)** |
 | **[v15.0.0](https://github.com/raquo/Laminar/blob/v15.0.0/docs/Documentation.md)** | **[v15.0.0](https://github.com/raquo/Airstream/blob/v15.0.0/README.md)** |
 | **[v0.14.2](https://github.com/raquo/Laminar/blob/v0.14.2/docs/Documentation.md)** | **[v0.14.2](https://github.com/raquo/Airstream/blob/v0.14.2/README.md)** |
 | **[v0.13.1](https://github.com/raquo/Laminar/blob/v0.13.1/docs/Documentation.md)** | **[v0.13.0](https://github.com/raquo/Airstream/blob/v0.13.0/README.md)** |
-| **[v0.12.2](https://github.com/raquo/Laminar/blob/v0.12.2/docs/Documentation.md)** | **[v0.12.2](https://github.com/raquo/Airstream/blob/v0.12.2/README.md)** |
 
 
 For documentation of older versions, see git tags.
