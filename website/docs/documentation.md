@@ -486,7 +486,7 @@ If that is what you wanted, that's fine, Laminar will not break, it's just weird
 
 ### Missing Keys
 
-Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from [Scala DOM Types](https://github.com/raquo/scala-dom-types). These definitions provide hundreds of keys, but they are not exhaustive. For example, we don't have touch events like `touchmove` defined, so those are not available to be put on the left hand side of `:=` methods.
+Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from [Scala DOM Types](https://github.com/raquo/scala-dom-types). These definitions provide hundreds of keys, but they are not exhaustive. For example, we don't have CSS grid properties like `grid-area` defined, so those are not available to be put on the left hand side of `:=` methods.
 
 To work around this, you can contribute definitions of missing attrs / props / etc. to Scala DOM Types. It's easy – you don't even need to code any logic, just need to specify the names and types of the things you want to add. For example, the `value` property is defined at the bottom of [PropDefs.scala](https://github.com/raquo/scala-dom-types/blob/master/shared/src/main/scala/com/raquo/domtypes/defs/props/PropDefs.scala). Read [this](https://github.com/raquo/scala-dom-types/#reflected-attributes) to understand the difference between props and attributes and reflected attributes.
 
@@ -504,7 +504,7 @@ div(
 
 And similarly with `styleProp`, `htmlAttr`, `htmlTag`, `svgAttr`, `svgTag`.
 
-To clarify, you don't have to do this for touch events specifically, because [@Busti](https://github.com/busti) already added the superior [pointer-events](https://github.com/raquo/scala-dom-types/pull/49) to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
+I mentioned `onTouchMove` as an example, but you don't have to do this for touch events specifically, because [@felher](https://github.com/felher) already [added](https://github.com/raquo/scala-dom-types/pull/102) them to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
 
 
 ### Modifiers FAQ
