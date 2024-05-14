@@ -59,10 +59,10 @@ class HomeSplash extends React.Component {
             tagline="Native Scala.js library for building user interfaces"
           />
           <PromoSection>
-            <Button href="https://github.com/raquo/Laminar">Github</Button>
             <Button href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">Big Video</Button>
             <Button href="https://demo.laminar.dev">Live Demo & Examples</Button>
             <Button href={docUrl('documentation')}>Documentation</Button>
+            <Button href="https://github.com/raquo/Laminar">Github</Button>
           </PromoSection>
           <div className="-problem">
             Laminar lets you build web application interfaces, keeping UI state in sync with the underlying application state. Its simple yet expressive patterns build on a rock solid foundation of <a href="https://github.com/raquo/Airstream">Airstream</a> observables and the <a href="https://www.scala-js.org/">Scala.js</a> platform.
@@ -258,7 +258,7 @@ class Index extends React.Component {
             </div>
           </div>
         </div>
-        <img alt="" width="0" height="0" src="https://demo.laminar.dev/ping" />
+        <img style={{display: 'none'}} alt="" width="0" height="0" src="https://demo.laminar.dev/ping" />
       </div>
     );
   }

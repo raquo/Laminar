@@ -205,7 +205,7 @@ object TodoMvcApp {
   private def pluralize(num: Int, singular: String, plural: String): String =
     s"$num ${if (num == 1) singular else plural}"
 
-  private val onEnterPress = onKeyPress.filter(_.keyCode == dom.ext.KeyCode.Enter)
+  private val onEnterPress = onKeyPress.filter(_.keyCode == dom.KeyCode.Enter)
 }
 
 

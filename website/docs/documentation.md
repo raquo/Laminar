@@ -2634,7 +2634,7 @@ Bottom line:
 2) Do not abuse transaction-creating methods like `flatMap`, `Var.set`, and `EventBus.emit` to achieve outcomes that do not require transaction boundary.
 3) Feel free to use these methods when they are actually needed, as this will not cause glitches.
 
-**See also Airstream docs about [avoiding unnecessary flatMap](github.com/raquo/Airstream/#avoid-unnecessary-flatmap).**
+**See also Airstream docs about [avoiding unnecessary flatMap](https://github.com/raquo/Airstream/#avoid-unnecessary-flatmap).**
 
 
 ### Creating Elements Instead of Updating Them

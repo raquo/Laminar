@@ -44,7 +44,7 @@ val app: HtmlElement = div(
       "Send",
       inContext { thisNode =>
         val clickStream = thisNode.events(onClick).sample(selectedOptionVar.signal)
-        val responseStream = clickStream.flatMap { opt =>
+        val responseStream = clickStream.flatMapSwitch { opt =>
           AjaxStream
             .get(
               url = opt.url,
