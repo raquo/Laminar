@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Thu, 02 Nov 2023 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 14 May 2024 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -12,7 +12,15 @@
             <url>https://laminar.dev/undefined</url>
             <link>https://laminar.dev/blog</link>
         </image>
-        <copyright>Copyright © 2023 Nikita Gazarov</copyright>
+        <copyright>Copyright © 2024 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v17.0.0 & Shoelace Web Components v0.1.0]]></title>
+            <link>https://laminar.dev/blog/2024/05/14/laminar-v17.0.0.html</link>
+            <guid>https://laminar.dev/blog/2024/05/14/laminar-v17.0.0.html</guid>
+            <pubDate>Tue, 14 May 2024 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>This release has it all: new features, ergonomic improvements, and bug fixes, in both Laminar and Airstream.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar & Scala.js Full Stack Demo & More]]></title>
             <link>https://laminar.dev/blog/2023/11/02/laminar-full-stack-demo.html</link>
