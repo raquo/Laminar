@@ -233,7 +233,8 @@ textarea::placeholder {
   text-decoration: underline;
 }
 
-.-homeSection a:not(.x-noHover):hover {
+.-homeSection a:not(.x-noHover):hover,
+.-homeSection u.pseudolink:hover {
   padding: 5px;
   margin: -5px;
   background: rgba(213, 49, 48, 0.6);
@@ -397,6 +398,12 @@ textarea::placeholder {
   flex-basis: 0;
 }
 
+.-sponsorsList .-sponsor.x-empty {
+  /* This empty "sponsor" fills the 2x2 grid. */
+  /* Because it's empty, we allow the sibling sponsor to use up some of its space */
+  margin-left: -80px;
+}
+
 .-sponsorsList .-sponsor.x-company a {
   text-decoration: none !important;
 }
@@ -439,9 +446,25 @@ textarea::placeholder {
   top: 10px;
 }
 
+.-homeSection .-sponsorsList {
+  color: white;
+}
+
 .post .-sponsorsList .-sponsor.x-aurinko {
   position: relative;
   top: 5px;
+}
+
+.post .-sponsorsList .-sponsor.x-company .-tagline {
+  color: black;
+}
+
+.post .-sponsorsList .-sponsor.x-company .-tagline u {
+  color: #dc322f;
+}
+
+.post .-sponsorsList a.-sponsor.x-person .-description {
+  color: black;
 }
 
 .-sponsorsList .-sponsor.x-heartai {
@@ -496,6 +519,11 @@ textarea::placeholder {
   position: absolute;
   left: -20px;
   color: #999;
+}
+
+.post h4.x-like-h3 {
+  /* Looks like h3 but, being h4, it does not appear in the table of contents */
+  font-size: 20px;
 }
 
 /* Docs sidebar */

@@ -235,7 +235,7 @@ class Index extends React.Component {
                 <div className="-sponsor x-diamond x-company x-heartai">
                   <a className="x-noHover" href="https://www.heartai.net/">
                     <img className="-logo" src="/img/sponsors/heartai-dark.svg" alt="" />
-                    <div className="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+                    <div className="-tagline"><u className="pseudolink">HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
                   </a>
                 </div>
               </div>
@@ -250,8 +250,18 @@ class Index extends React.Component {
                 <div className="-sponsor x-company x-aurinko">
                   <a className="x-noHover" href="https://www.aurinko.io/">
                     <img className="-logo" src="/img/sponsors/aurinko-dark-250px.png" alt="" />
-                    <div className="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+                    <div className="-tagline"><u className="pseudolink">Aurinko</u> is an API platform for workplace addons and integrations.</div>
                   </a>
+                </div>
+                <div className="-sponsor x-person x-tawasal">
+                  <img className="-avatar" src="/img/sponsors/tawasal.svg" alt="" />
+                  <div className="-text">
+                    <div className="-name"><a href="https://tawasal.ae">Tawasal</a></div>
+                    <div className="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+                  </div>
+                </div>
+                <div className="-sponsor x-empty">
+                  {/* placeholder for layout purposes */}
                 </div>
               </div>
               <p className="-narrower">Sponsorships enable me to spend more time on Laminar, Airstream, various add-ons, as well as documentation, learning materials, and community support. Thank you for making open source more sustainable. <span className="-emoji">🙏</span></p>

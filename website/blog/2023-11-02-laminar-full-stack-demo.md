@@ -65,7 +65,7 @@ Laminar sponsorships have been gradually growing for a long time, thanks both to
 Recently, HeartAI have upgraded their Laminar sponsorship to an extent that I had to create a new tier for such a level of support. Frankly, this one event is what prompted me to create this new Laminar demo project. I have wanted to do it for a long time, but up until now it has always been an unattainable nice-to-have, buried in the ever-growing todo list. But as my support base has grown to a new level, so has my ability to work on things that will help grow our community even further.
 
 
-### DIAMOND sponsor:
+<h4 class="x-like-h3">DIAMOND sponsor:</h4>
 
 <div class="-sponsorsList x-alignItemsStart x-justifyContentCenter">
 <div class="-sponsor x-diamond x-company x-heartai">

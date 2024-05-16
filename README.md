@@ -42,14 +42,16 @@ Huge thanks to [all of our sponsors](https://github.com/sponsors/raquo) – your
 
 ### GOLD Sponsors:
 
-[![Yurique](https://laminar.dev/img/sponsors/yurique-50px.jpg?)](https://github.com/yurique) **[Iurii Malchenko](https://github.com/yurique)**
-
-[![Aurinko.io](https://laminar.dev/img/sponsors/aurinko-light-250px.png)](https://www.aurinko.io/)
-
-[Aurinko](https://aurinko.io/) is an API platform for workplace addons and integrations.
-
-
-
+[![Yurique](https://laminar.dev/img/sponsors/yurique-80px.jpg?)](https://github.com/yurique)<br />
+**[Iurii Malchenko](https://github.com/yurique)**
+<br />
+<br />
+[![Aurinko.io](https://laminar.dev/img/sponsors/aurinko-light-250px.png)](https://www.aurinko.io/)<br />
+**[Aurinko](https://aurinko.io/)** is an API platform for workplace addons and integrations.
+<br />
+<br />
+<a href="https://tawasal.ae"><img src="https://laminar.dev/img/sponsors/tawasal.svg" width="80"></a><br />
+<b><a href="https://tawasal.ae">Tawasal</a></b> is a secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.
 
 
 
