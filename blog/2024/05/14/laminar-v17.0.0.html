@@ -143,8 +143,18 @@
 <p>As Airstream users (should) know, using <code>flatMap</code> <em>unnecessarily</em> – i.e. in cases when other operators like <code>combineWith</code> would suffice – creates observable graphs that can suffer from <a href="https://github.com/raquo/Airstream/#frp-glitches">FRP glitches</a>, and defeats Airstream's painstakingly fine-tuned Transaction mechanism that prevents such glitches. To be super clear, using <code>flatMap</code> does not cause glitches on its own. It can only cause glitches when it's used <em>unnecessarily</em>, and even then, only under certain conditions. When <code>flatMap</code> is used by true necessity, the observable graph is pretty much always structured in such a way that a glitch can't possibly happen (simplifying a bit here, but it really does work like that. Airstream docs about transactions, topological rank, and loopy vs flowy operators explain all that in more detail).</p>
 <p>Unfortunately, with <code>flatMap</code> being such a common operation on many data types, developers tend to reach for it before they learn about why it's a bad idea in Airstream, and many never read the entirety of the documentation – which does explain the undesirable characteristics of <code>flatMap</code> in great detail. And so, they end up using <code>flatMap</code> in a way that is <em>unnecessary</em>, and can thus cause FRP glitches.</p>
 <p>Most of the problem with <code>flatMap</code> is its very inviting / innocuous name, as well as Scala's for-comprehensions using it invisibly under the hood, resulting in developers using it on autopilot. And so, to improve the user experience, especially for non-experts, the method called <code>flatMap</code> on Observables is now renamed into several variants, such as <code>flatMapSwitch</code>, <code>flatMapMerge</code>, and <code>flatMapCustom</code>. It is thus no longer available via for-comprehensions.</p>
+<p>Of the new operators, <code>flatMapSwitch</code> is the <strong>&quot;standard&quot;</strong> one that matches the default behaviour of <code>flatMap</code>.</p>
 <p>Similar changes apply to the <code>flatten</code> operator, of course.</p>
 <p>See the rewritten <a href="https://github.com/raquo/Airstream/#flattening-observables">Flattening Observables</a> section of Airstream docs.</p>
+<blockquote>
+<p><strong>UPDATE:</strong> I would like to emphasize that using <code>flatMap</code> (now <code>flatMapSwitch</code>) to get <em>async</em> events is perfectly fine. To put it simply, the concept of glitches basically does not apply to observables that emit their events asynchronously. So you can safely use <code>flatMapSwitch</code> to get e.g. network responses:</p>
+</blockquote>
+<pre><code class="hljs css language-scala"><span class="hljs-comment">// This is fine.</span>
+<span class="hljs-keyword">val</span> userS: <span class="hljs-type">Signal</span>[<span class="hljs-type">User</span>] = ???
+<span class="hljs-keyword">val</span> responseS: <span class="hljs-type">EventStream</span>[<span class="hljs-type">Response</span>] = userS.flatMapSwitch { user =&gt;
+  <span class="hljs-type">FetchStream</span>.get(<span class="hljs-string">s"/user/<span class="hljs-subst">${user.id}</span>"</span>)
+}
+</code></pre>
 <p><strong>Migration:</strong></p>
 <ul>
 <li>First, see the compiler error caused by <code>flatMap</code> usage, and import <code>FlattenStrategy.flatMapAllowed</code> as necessary, to make your code compile as-is.</li>
