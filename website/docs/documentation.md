@@ -2331,7 +2331,7 @@ All unmounting callbacks / effects are executed when the element is about to bec
 
 ### How Are Mount Events Propagated?
 
-Every Laminar element starts its life unmounted: `div("Hello")`. This element has no parent specified, therefore it has no ancestors, and can't have an ancestor that is a mounted RootNode. This element still exists, but it's not present in the DOM, it's detached from teh DOM.
+Every Laminar element starts its life unmounted: `div("Hello")`. This element has no parent specified, therefore it has no ancestors, and can't have an ancestor that is a mounted RootNode. This element still exists, but it's not present in the DOM, it's detached from the DOM.
 
 We could mount this element directly: `render(appContainer, div("Hello"))` – but almost all the elements in your application are mounted indirectly, by setting their parent to an already mounted element. How do these elements know when they're being mounted, if their direct parent does not change? 
 
