@@ -1832,7 +1832,7 @@ So here are the events that work in all browsers of interest:
 
 ### Controlled Inputs Caveats
 
-* You can't have conflicting `controlled` blocks on the same element. You also can't have a `value <-- ???` binder outside of a controlled block on an element that already has `value` controlled. Trying to do that will throw and exception. If the `controlled` block is added to the element, it defines the sole source of truth for the `value` prop.
+* You can't have conflicting `controlled` blocks on the same element. You also can't have a `value <-- ???` binder outside of a controlled block on an element that already has `value` controlled. Trying to do that will throw an exception. If the `controlled` block is added to the element, it defines the sole source of truth for the `value` prop.
 
 * The `onInput` (or `onClick` etc.) event listener defined inside of the `controlled` block will be run before any other event listeners on this element, even if you registered those other listeners before adding the controlled block. If the controlled block is added to an element after it has already been mounted, under the hood this is achieved by removing all the Laminar listeners from the element and re-adding them in the same relative order, but **after** the controlled event listener. This is done to ensure that other event listeners do not interfere with the controlled input functionality (e.g. by stopping propagation of the event).
 
