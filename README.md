@@ -25,7 +25,7 @@ Sales pitch, quick start, documentation, live examples, and other resources, all
 
 ### 👉 [demo.laminar.dev](https://demo.laminar.dev)
 
-Live demo, with examples, code snippets, and a fully working client + server, dev + prod build setup that you can experiment with, and then deploy to the could for free.
+Live demo, with examples, code snippets, and a fully working client + server, dev + prod build setup that you can experiment with, and then deploy to the cloud for free.
 
 
 ## Sponsorships
