@@ -72,6 +72,6 @@ Nikita Gazarov – [@raquo](https://twitter.com/raquo)
 
 Laminar is provided under the [MIT license](https://github.com/raquo/laminar/blob/master/LICENSE.md).
 
-The artwork in the `brand` and `sponsors` directories is not covered by the MIT license. No license is granted to you for these assets. However, you may still have "fair use" rights, as stipulated by law.
+The artwork in the `img/brand`, `img/sponsors`, and `img/blog` directories is not covered by the MIT license. No license is granted to you for these assets. However, you may still have "fair use" rights, as stipulated by law.
 
 Comments in the `defs` directory pertaining to individual DOM element tags, attributes, properties and event properties, as well as CSS properties and their special values / keywords, are taken or derived from content created by Mozilla Contributors and are licensed under Creative Commons Attribution-ShareAlike license (CC-BY-SA), v2.5.
