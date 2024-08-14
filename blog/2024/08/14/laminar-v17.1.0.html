@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v17.1.0, News &amp; Stickers · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="New Airstream features: splitting Vars, and zooming into Vars without an owner."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v17.1.0, News &amp; Stickers · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2024/08/14/laminar-v17.1.0"/><meta property="og:description" content="New Airstream features: splitting Vars, and zooming into Vars without an owner."/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="https://demo.laminar.dev" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2024/08/14/laminar-v17.1.0">Laminar v17.1.0, News &amp; Stickers</a></li><li class="navListItem"><a class="navItem" href="/blog/2024/05/14/laminar-v17.0.0">Laminar v17.0.0 &amp; Shoelace Web Components v0.1.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/11/02/laminar-full-stack-demo">Laminar &amp; Scala.js Full Stack Demo &amp; More</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/07/13/laminar-v16.0.0">Laminar v16.0.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/03/22/laminar-v15.0.0">Laminar v15.0.0 Mega Release</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2024/08/14/laminar-v17.1.0">Laminar v17.1.0, News &amp; Stickers</a></h1><p class="post-meta">August 14, 2024</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>New Airstream features: splitting Vars, and zooming into Vars without an owner.</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a Scala.js library for building web application interfaces and managing UI state. Learn more in <a href="https://demo.laminar.dev">a few short examples</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one long video</a>.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="releases"></a><a href="#releases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Releases</h2>
+<ul>
+<li><a href="https://github.com/raquo/laminar">Laminar</a> 17.1.0 (no code changes, just bumps Airstream version)</li>
+<li><a href="https://github.com/raquo/airstream">Airstream</a> 17.1.0</li>
+<li><a href="https://github.com/raquo/waypoint">Waypoint</a> 8.0.1</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="news"></a><a href="#news" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>News</h2>
+<h3><a class="anchor" aria-hidden="true" id="scalajs--laminar-in-healthcare"></a><a href="#scalajs--laminar-in-healthcare" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scala.js &amp; Laminar in Healthcare</h3>
+<p>The HeartAI team are using Scala.js and Laminar to develop their Critical Care Informatics System for CALHN, a major health network in South Australia. A key feature of this system, <a href="https://heartai.net/docs/projects/calhn-critical-care-informatics-system/icu-ward-and-bed-boards/">ICU ward and bed dashboards</a>, support critical care workers with high-quality health information about ICU patients. <em>&quot;Scala.js and Laminar have provided a scalable way to build robust applications in the complex health domain.&quot;</em> – says Lukah Dykes, Managing Director at HeartAI.</p>
+<p><a href="/img/blog/2024/heartai_icu_vitals.png"><img src="/img/blog/2024/heartai_icu_vitals.png" /></a></p>
+<h3><a class="anchor" aria-hidden="true" id="laminar-stickers"></a><a href="#laminar-stickers" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Laminar Stickers</h3>
+<p>In case you missed it, I'm mailing out free Laminar stickers as a thank you to people who have, in one way or another, contributed to Laminar or the ecosystem. <a href="https://docs.google.com/forms/d/e/1FAIpQLSdxwtT0-Yy9mxcyYoNPUwinAMzAojGviAY-pp8KARnf_NLxKA/viewform">Sign up here</a>.</p>
+<p><img src="/img/blog/2024/laminar_stickers_1000.jpg" /></p>
+<h2><a class="anchor" aria-hidden="true" id="new-airstream-features"></a><a href="#new-airstream-features" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Airstream Features</h2>
+<h3><a class="anchor" aria-hidden="true" id="splitting-var-s"></a><a href="#splitting-var-s" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Splitting Var-s</h3>
+<p>You could always <code>split</code> a <code>Signal[Collection[A]]</code> into N individual <code>Signal[A]</code>, but now you can also directly split a <code>Var[Collection[A]]</code> into N individual <code>Var[A]</code> that are linked to the original <code>Var[Collection[A]]</code>.</p>
+<p>For example, in the example below, the user's name in both <code>userVar</code> and <code>usersVar</code> is updated when you type the new name into the input text box.</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span>(<span class="hljs-params">id: <span class="hljs-type">String</span>, name: <span class="hljs-type">String</span></span>)</span>
+<span class="hljs-keyword">val</span> usersVar = <span class="hljs-type">Var</span>[<span class="hljs-type">List</span>[<span class="hljs-type">User</span>]](???)
+
+div(
+  usersVar.split(_.id)((userId, initial, userVar) =&gt; {
+    div(
+      <span class="hljs-string">s"User <span class="hljs-subst">${userId}</span>: "</span>,
+      input(
+        value &lt;-- userVar.signal.map(_.name),
+        onInput.mapToValue --&gt; { newName =&gt;
+          userVar.update(_.copy(name = newName))
+        }
+      )
+    )
+  })
+)
+</code></pre>
+<p>Previously in this situation, you would have needed to update <code>usersVar</code> manually by finding the user with <code>id == userId</code> and updating the list with the new user at that index. Now this is done behind the scenes just by updating <code>userVar</code>.</p>
+<p>Also, in addition to <code>split</code>, you can also use <code>splitMutate</code> on Vars that contain <strong>mutable</strong> collections. As the name implies, it works the same as regular <code>Var.split</code>, except that when you update <code>userVar</code>, it would <strong>mutate</strong> the collection in <code>usersVar</code> instead of creating a copy of it as is usually done with immutable collections. This may be more efficient when working with very large mutable collections.</p>
+<h3><a class="anchor" aria-hidden="true" id="zoom-into-a-var-without-needing-an-owner"></a><a href="#zoom-into-a-var-without-needing-an-owner" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Zoom into a Var without needing an Owner</h3>
+<p>Airstream has had the <code>zoom</code> method to create derived vars for a while now: <code>Var.zoom(a =&gt; b)((a, b) =&gt; a)(implicit owner)</code>. Unfortunately, that method required an <code>Owner</code>, which made using it rather annoying.</p>
+<p>Recently, <a href="https://github.com/kitlangton">@KitLangton</a> has <a href="https://github.com/raquo/Airstream/issues/119">figured out</a> that this Owner isn't really needed, and so we now have a new <code>zoomLazy(a =&gt; b)((a, b) =&gt; a)</code> method that does not require an <code>Owner</code>, and otherwise works pretty much the same. One catch is that your <code>zoomIn</code> (<code>a =&gt; b</code>) function is now called lazily, so it shouldn't have side effects. In practice that shouldn't be a problem because this function typically just selects some field from an object.</p>
+<p>This small change should help a lot with ergonomics of local state management.</p>
+<p>We use the <code>zoomLazy</code> name to stay binary-compatible with 17.0.0 in this release, but in the next major release, <code>zoomLazy</code> will be renamed to <code>zoom</code>, and the old <code>zoom</code> will be renamed to <code>zoomStrict</code> and deprecated.</p>
+<h3><a class="anchor" aria-hidden="true" id="small-stuff"></a><a href="#small-stuff" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Small stuff</h3>
+<ul>
+<li>New: <code>.not</code> alias to the <code>.invert</code> operator on observables of booleans</li>
+<li>The <code>Splittable</code> trait has two new methods: <code>foreach</code> and <code>findUpdate</code>. <strong>Migration:</strong> if you have custom instances of <code>Splittable</code> for non-standard collection types, make sure to review the default implementations of those methods for efficiency.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="waypoint-bug-fix"></a><a href="#waypoint-bug-fix" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Waypoint bug fix</h2>
+<ul>
+<li>Waypoint upgraded to URL-DSL 6.0.2:
+<ul>
+<li>Fixed a case with <code>listParam</code> where matching failed if no query parameters were provided in the URL, whereas it should have matched as <code>Nil</code>. Thanks, <a href="https://github.com/arturaz">@arturaz</a>!</li>
+</ul></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank you</h2>
+<p>Laminar development is kindly supported by <a href="https://github.com/sponsors/raquo">my sponsors</a>, and I am very grateful to be able to work on all this.</p>
+<p><h4 class="x-like-h3">DIAMOND sponsor:</h4></p>
+<div class="-sponsorsList x-alignItemsStart x-justifyContentCenter">
+<div class="-sponsor x-diamond x-company x-heartai">
+  <a class="x-noHover" href="https://www.heartai.net/">
+    <img class="-logo" src="/img/sponsors/heartai.svg" alt="" />
+    <div class="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+  </a>
+</div>
+</div>
+<p><strong>GOLD sponsors</strong>:</p>
+<div class="-sponsorsList x-alignItemsEnd">
+  <div class="-sponsor x-person x-yurique">
+    <img class="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-250px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+  <a class="-sponsor x-person x-tawasal" href="https://tawasal.ae">
+    <img class="-avatar" src="/img/sponsors/tawasal.svg" alt="" />
+    <div class="-text">
+      <div class="-name">Tawasal</div>
+      <div class="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+    </div>
+  </a>
+  <div class="-sponsor x-empty">
+    <!-- filler for layout purposes -->
+  </div>
+</div>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#releases">Releases</a></li><li><a href="#news">News</a><ul class="toc-headings"><li><a href="#scalajs--laminar-in-healthcare">Scala.js &amp; Laminar in Healthcare</a></li><li><a href="#laminar-stickers">Laminar Stickers</a></li></ul></li><li><a href="#new-airstream-features">New Airstream Features</a><ul class="toc-headings"><li><a href="#splitting-var-s">Splitting Var-s</a></li><li><a href="#zoom-into-a-var-without-needing-an-owner">Zoom into a Var without needing an Owner</a></li><li><a href="#small-stuff">Small stuff</a></li></ul></li><li><a href="#waypoint-bug-fix">Waypoint bug fix</a></li><li><a href="#thank-you">Thank you</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chat</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Waypoint">Waypoint</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/laminar-full-stack-demo">Laminar Demo</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2024 Nikita Gazarov</section></footer></div></body></html>
