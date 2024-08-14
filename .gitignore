@@ -12,6 +12,7 @@ project/.bloop
 project/project/target
 
 yarn.lock
+!website/yarn.lock
 
 website/node_modules
 website/build
