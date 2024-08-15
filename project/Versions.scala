@@ -21,7 +21,7 @@ object Versions {
 
   val ScalaTest = "3.2.14"
 
-  val JsDom = "21.1.1"
+  val JsDom = "24.1.1"
 
   val Webpack = "5.76.2"
 

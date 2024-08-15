@@ -1,6 +1,7 @@
-import com.raquo.domtypes.codegen.{CanonicalCache, CanonicalDefGroups, CanonicalGenerator, CodeFormatting, SourceRepr}
-import com.raquo.domtypes.codegen.DefType.LazyVal
-import com.raquo.domtypes.common.{HtmlTagType, SvgTagType}
+import com.raquo.domtypes.codegen.DefType.{InlineProtectedDef, LazyVal}
+import com.raquo.domtypes.codegen.generators.PropsTraitGenerator
+import com.raquo.domtypes.codegen.{CanonicalCache, CanonicalDefGroups, CanonicalGenerator, CodeFormatting, DefType, SourceRepr}
+import com.raquo.domtypes.common.{HtmlTagType, PropDef, SvgTagType}
 import com.raquo.domtypes.defs.styles.StyleTraitDefs
 
 object DomDefsGenerator {
@@ -21,6 +22,99 @@ object DomDefsGenerator {
     override def settersPackagePath: String = basePackagePath + ".modifiers.KeySetter"
 
     override def scalaJsElementTypeParam: String = "Ref"
+
+    override def generatePropsTrait(
+      defGroups: List[(String, List[PropDef])],
+      printDefGroupComments: Boolean,
+      traitCommentLines: List[String],
+      traitModifiers: List[String],
+      traitName: String,
+      keyKind: String,
+      implNameSuffix: String,
+      baseImplDefComments: List[String],
+      baseImplName: String,
+      defType: DefType
+    ): String = {
+      val (defs, defGroupComments) = defsAndGroupComments(defGroups, printDefGroupComments)
+
+      val baseImplDef = List(
+        s"""def ${baseImplName}[V, DomV](""",
+        s"""  $keyImplNameArgName: String,""",
+        s"""  attrName: Option[String] = None,""",
+        s"""  codec: Codec[V, DomV]""",
+        s"""): ${keyKind}[V, DomV] = {""",
+        s"""  ${keyKindConstructor(keyKind)}($keyImplNameArgName, attrName, codec)""",
+        s"""}"""
+      )
+
+      val headerLines = List(
+        s"package $propDefsPackagePath",
+        "",
+        keyTypeImport(keyKind),
+        codecsImport,
+        ""
+      ) ++ standardTraitCommentLines.map("// " + _)
+
+      def transformCodecName(codecName: String): String = codecName + "Codec"
+
+      val propsGenerator = new PropsTraitGenerator(
+        defs = defs,
+        defGroupComments = defGroupComments,
+        headerLines = headerLines,
+        traitCommentLines = traitCommentLines,
+        traitModifiers = traitModifiers,
+        traitName = traitName,
+        traitExtends = Nil,
+        traitThisType = None,
+        defType = _ => defType,
+        keyKind = keyKind,
+        keyImplName = prop => propImplName(prop.codec, implNameSuffix),
+        keyImplNameArgName = keyImplNameArgName,
+        baseImplDefComments = baseImplDefComments,
+        baseImplName = baseImplName,
+        baseImplDef = baseImplDef,
+        transformCodecName = transformCodecName,
+        outputImplDefs = true,
+        format = format
+      ) {
+
+        override protected def impl(keyDef: PropDef): String = {
+          val attrNameArg = keyDef.reflectedAttr match {
+            case Some(attrDef) => ", attrName = " + repr(attrDef.domName)
+            case None => ""
+          }
+          List[String](
+            keyImplName(keyDef),
+            "(",
+            repr(keyDef.domName),
+            attrNameArg,
+            ")"
+          ).mkString
+        }
+
+        override protected def printImplDef(implName: String): Unit = {
+          line(
+            InlineProtectedDef.codeStr,
+            " ",
+            implName,
+            s"""($keyImplNameArgName: String, attrName: String = null)""",
+            ": ",
+            keyKind,
+            "[",
+            scalaValueTypeByImplName(implName),
+            ", ",
+            domValueTypeByImplName(implName),
+            "]",
+            " = ",
+            baseImplName,
+            s"""($keyImplNameArgName, Option(attrName), ${transformCodecName(codecByImplName(implName))})""",
+          )
+          line()
+        }
+      }
+
+      propsGenerator.printTrait().getOutput()
+    }
   }
 
   private val cache = new CanonicalCache("project") {
@@ -236,11 +330,13 @@ object DomDefsGenerator {
         baseImplDefComments = List(
           "Create custom HTML element property",
           "",
-          "@param name  - name of the prop in JS, e.g. \"value\"",
-          "@param codec - used to encode V into DomV, e.g. StringAsIsCodec,",
+          "@param name     - name of the prop in JS, e.g. \"formNoValidate\"",
+          "@param attrName - name of reflected attr, if any, e.g. \"formnovalidate\"",
+          "                  (use `None` if property is not reflected)",
+          "@param codec    - used to encode V into DomV, e.g. StringAsIsCodec,",
           "",
-          "@tparam V    - value type for this prop in Scala",
-          "@tparam DomV - value type for this prop in the underlying JS DOM.",
+          "@tparam V       - value type for this prop in Scala",
+          "@tparam DomV    - value type for this prop in the underlying JS DOM.",
         ),
         baseImplName = "htmlProp",
         defType = LazyVal

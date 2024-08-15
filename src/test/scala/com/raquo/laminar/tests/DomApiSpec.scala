@@ -103,4 +103,137 @@ class DomApiSpec extends UnitSpec {
     svg.svg.jsTagName == svg.svg().ref.tagName
     svg.circle.jsTagName == svg.circle().ref.tagName
   }
+
+  describe("deletes html props") {
+
+    it("indeterminate") {
+      val el = input(
+        typ("checkbox"),
+        indeterminate(true)
+      )
+
+      mount(el)
+
+      expectNode(input of (
+        typ is "checkbox",
+        indeterminate is true
+      ))
+
+      DomApi.unsetHtmlProperty(el, indeterminate)
+
+      expectNode(input of (
+        typ is "checkbox",
+        indeterminate is false
+      ))
+    }
+
+    it("checked & defaultChecked") {
+      val el = input(
+        typ("checkbox"),
+        defaultChecked(true),
+        checked(true)
+      )
+
+      mount(el)
+
+      expectNode(input of (
+        typ is "checkbox",
+        defaultChecked is true,
+        checked is true
+      ))
+
+      DomApi.unsetHtmlProperty(el, checked)
+
+      expectNode(input of (
+        typ is "checkbox",
+        defaultChecked is true,
+        checked is false
+      ))
+
+      DomApi.unsetHtmlProperty(el, defaultChecked)
+
+      expectNode(input of (
+        typ is "checkbox",
+        defaultChecked is false,
+        checked is false
+      ))
+
+      assertEquals(el.ref.hasAttribute("checked"), false)
+    }
+
+    it("value") {
+
+      val el = input(
+        typ("input"),
+        defaultValue("default"),
+        value("hello")
+      )
+
+      mount(el)
+
+      expectNode(input of (
+        typ is "input",
+        defaultValue is "default",
+        value is "hello"
+      ))
+
+      DomApi.unsetHtmlProperty(el, value)
+
+      expectNode(input of (
+        typ is "input",
+        defaultValue is "default",
+        value.isEmpty
+      ))
+
+      assertEquals(el.ref.value, "") // just to be sure that we'll read the default empty strnig value
+    }
+
+    it("select.value & option.selected") {
+
+      val options = List(
+        option(value("v1"), "V1"),
+        option(value("v2"), "V2"),
+        option(value("v3"), "V3")
+      )
+
+      val el = select(
+        options,
+        value("v2")
+      )
+
+      mount(el)
+
+      expectNode(select of (
+        option of (value is "v1", selected is false, "V1"),
+        option of (value is "v2", selected is true, "V2"),
+        option of (value is "v3", selected is false, "V3")
+      ))
+
+      DomApi.unsetHtmlProperty(el, value)
+
+      expectNode(select of (
+        option of (value is "v1", selected is false, "V1"),
+        option of (value is "v2", selected is false, "V2"),
+        option of (value is "v3", selected is false, "V3")
+      ))
+
+      DomApi.setHtmlProperty(options(2), selected, true)
+
+      expectNode(select of (
+        option of (value is "v1", selected is false, "V1"),
+        option of (value is "v2", selected is false, "V2"),
+        option of (value is "v3", selected is true, "V3")
+      ))
+
+      // #TODO[Test] The below appears to work in a real browser, but JSDOM does not simulate it correctly
+
+      // DomApi.unsetHtmlProperty(options(2), selected)
+      //
+      // expectNode(select of(
+      //   option of (value is "v1", selected is false, "V1"),
+      //   option of (value is "v2", selected is false, "V2"),
+      //   option of (value is "v3", selected is false, "V3")
+      // ))
+    }
+  }
 }

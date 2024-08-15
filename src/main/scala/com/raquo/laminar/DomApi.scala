@@ -236,6 +236,19 @@ object DomApi {
     setHtmlPropertyRaw(element, prop, domValue)
   }
 
+  def unsetHtmlProperty(
+    element: ReactiveHtmlElement.Base,
+    prop: HtmlProp[_, _]
+  ): Unit = {
+    // #TODO[Integrity] Not sure if setting the property to `null` works universally.
+    //  - We may need to implement custom adjustments later.
+    prop.reflectedAttrName.fold(
+      ifEmpty = element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(null)
+    ) { attrName =>
+      element.ref.removeAttribute(attrName)
+    }
+  }
+
   private[laminar] def setHtmlPropertyRaw[V, DomV](
     element: ReactiveHtmlElement.Base,
     prop: HtmlProp[V, DomV],
