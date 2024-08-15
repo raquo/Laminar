@@ -134,4 +134,56 @@ class StyleReceiverSpec extends UnitSpec {
     expectNode(div.of(backgroundImage is "url(foo.jpg)", "Yo"))
   }
 
+  describe("scala.js union type inference") {
+
+    it("numbers") {
+      val heightS = Val(10)
+      val opacityS = Val(0.5)
+
+      val el = div(
+        opacity <-- opacityS,
+        height <-- heightS.map(style.px)
+      )
+
+      mount(el)
+
+      expectNode(div of (
+        opacity is 0.5,
+        height is "10px"
+      ))
+    }
+
+    it("strings") {
+      val heightS = Val("10px")
+      val opacityS = Val("0.5")
+      val colorS = Val("blue")
+      val intS = Val(1)
+      def makeColor(int: Int): String = {
+        int match {
+          case 1 => "red"
+          case 2 => "green"
+          case 3 => "blue"
+        }
+      }
+
+      val el = div(
+        opacity <-- opacityS,
+        height <-- heightS,
+        color <-- intS.map(makeColor),
+        backgroundColor <-- intS.map(_ + 1).map(makeColor),
+        borderColor <-- colorS
+      )
+
+      mount(el)
+
+      expectNode(div of (
+        opacity is 0.5,
+        height is "10px",
+        color is "red",
+        backgroundColor is "green",
+        borderColor is "blue"
+      ))
+    }
+  }
+
 }
