@@ -1203,4 +1203,22 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     )
   }
 
+  it("Supports Option-s as Seq-s") {
+    val childBus = new EventBus[Option[ChildNode.Base]]
+    val childSource = childBus.events
+
+    mount(div("Hello, ", children <-- childSource))
+    expectNode(div.of("Hello, ", sentinel))
+
+    withClue("First event:") {
+      childBus.writer.onNext(Some(span(text1)))
+      expectNode(div.of("Hello, ", sentinel, span of text1))
+    }
+
+    withClue("Second event, changing node type (span->div):") {
+      childBus.writer.onNext(Some(div(text2)))
+      expectNode(div.of("Hello, ", sentinel, div of text2))
+    }
+  }
+
 }

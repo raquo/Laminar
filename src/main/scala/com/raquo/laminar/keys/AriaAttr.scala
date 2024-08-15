@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{optionToSetter, Element}
+import com.raquo.laminar.api.L.{seqToSetter, Element}
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 import com.raquo.laminar.modifiers.KeySetter.AriaAttrSetter
@@ -29,7 +29,7 @@ class AriaAttr[V](
   }
 
   def maybe(value: Option[V]): Setter[Element] = {
-    optionToSetter(value.map(v => this := v))
+    seqToSetter[Option, Element](value.map(v => this := v))
   }
 
   def <--(values: Source[V]): AriaAttrUpdater[V] = {

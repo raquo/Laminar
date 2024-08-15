@@ -54,12 +54,20 @@ object ChildrenReceiver {
       renderableNode: RenderableNode[Component],
       renderableSeq: RenderableSeq[Collection]
     ): DynamicInserter = {
-      ChildrenInserter(
-        childrenSource.toObservable,
-        renderableSeq,
-        renderableNode,
-        initialHooks = js.undefined
-      )
+      // Route the Option case to simpler more efficient child.maybe receiver.
+      if (renderableSeq == RenderableSeq.optionRenderable) {
+        ChildOptionReceiver <-- childrenSource.asInstanceOf[Source[Option[Component]]]
+        // #TODO child.maybe can't handle js.UndefOr yet
+        // } else if (renderableSeq == RenderableSeq.jsUndefOrRenderable) {
+        //   ChildOptionReceiver <-- childrenSource.asInstanceOf[Source[js.UndefOr[Component]]]
+      } else {
+        ChildrenInserter(
+          childrenSource.toObservable,
+          renderableSeq,
+          renderableNode,
+          initialHooks = js.undefined
+        )
+      }
     }
   }
 

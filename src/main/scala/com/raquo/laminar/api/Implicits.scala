@@ -63,9 +63,9 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   //
 
   /** Create a [[Setter]] that applies the optionally provided [[Setter]], or else does nothing. */
-  implicit def optionToSetter[El <: ReactiveElement.Base](maybeSetter: Option[Setter[El]]): Setter[El] = {
-    Setter(element => maybeSetter.foreach(_.apply(element)))
-  }
+  // implicit def optionToSetter[El <: ReactiveElement.Base](maybeSetter: Option[Setter[El]]): Setter[El] = {
+  //   Setter(element => maybeSetter.foreach(_.apply(element)))
+  // }
 
   /** Combine a js.Array of [[Setter]]-s into a single [[Setter]] that applies them all. */
   implicit def seqToSetter[Collection[_], El <: ReactiveElement.Base](
@@ -74,8 +74,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     renderableSeq: RenderableSeq[Collection]
   ): Setter[El] = {
     Setter { element =>
-      val settersSeq = renderableSeq.toSeq(setters)
-      settersSeq.foreach(_.apply(element))
+      renderableSeq.foreach(setters)(_.apply(element))
     }
   }
 
@@ -88,13 +87,13 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   // -- Methods to convert collections of Modifier[El]-like things to Modifier[El] --
 
   /** Create a modifier that applies an optional modifier, or does nothing if option is empty */
-  implicit def optionToModifier[A, El <: ReactiveElement.Base](
-    maybeModifier: Option[A]
-  )(implicit
-    asModifier: A => Modifier[El]
-  ): Modifier[El] = {
-    Modifier(element => maybeModifier.foreach(asModifier(_).apply(element)))
-  }
+  // implicit def optionToModifier[A, El <: ReactiveElement.Base](
+  //   maybeModifier: Option[A]
+  // )(implicit
+  //   asModifier: A => Modifier[El]
+  // ): Modifier[El] = {
+  //   Modifier(element => maybeModifier.foreach(asModifier(_).apply(element)))
+  // }
 
   /** Create a modifier that applies each of the modifiers in a seq */
   implicit def seqToModifier[A, Collection[_], El <: ReactiveElement.Base](
@@ -103,7 +102,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     asModifier: A => Modifier[El],
     renderableSeq: RenderableSeq[Collection]
   ): Modifier[El] = {
-    Modifier(element => renderableSeq.toSeq(modifiers).foreach(asModifier(_).apply(element)))
+    Modifier(element => renderableSeq.foreach(modifiers)(asModifier(_).apply(element)))
   }
 
   // The various collection-to-modifier conversions below are cheaper and better equivalents of
@@ -120,9 +119,9 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
 
   // -- Methods to convert collections of nodes to modifiers --
 
-  implicit def nodeOptionToModifier(nodes: Option[ChildNode.Base]): Modifier.Base = {
-    Modifier(element => nodes.foreach(_.apply(element)))
-  }
+  // implicit def nodeOptionToModifier(nodes: Option[ChildNode.Base]): Modifier.Base = {
+  //   Modifier(element => nodes.foreach(_.apply(element)))
+  // }
 
   // #Note: the case of Collection[Component] is covered by `seqToModifier` above
   implicit def nodeSeqToModifier[Collection[_]](
@@ -131,8 +130,7 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     renderableSeq: RenderableSeq[Collection]
   ): Modifier.Base = {
     Modifier { element =>
-      val nodesSeq = renderableSeq.toSeq(nodes)
-      nodesSeq.foreach(_.apply(element))
+      renderableSeq.foreach(nodes)(_.apply(element))
     }
   }
 }
@@ -193,13 +191,13 @@ object Implicits {
 
     // -- Methods to convert collections of nodes and components to inserters --
 
-    implicit def componentOptionToInserter[Component](
-      maybeComponent: Option[Component]
-    )(implicit
-      renderableNode: RenderableNode[Component]
-    ): StaticChildrenInserter = {
-      componentSeqToInserter(maybeComponent.toList)
-    }
+    // implicit def componentOptionToInserter[Component](
+    //   maybeComponent: Option[Component]
+    // )(implicit
+    //   renderableNode: RenderableNode[Component]
+    // ): StaticChildrenInserter = {
+    //   componentSeqToInserter(maybeComponent.toList)
+    // }
 
     implicit def componentSeqToInserter[Collection[_], Component](
       components: Collection[Component]
