@@ -2,11 +2,11 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{Element, optionToSetter}
+import com.raquo.laminar.api.L.{optionToSetter, Element}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 import com.raquo.laminar.modifiers.KeySetter.AriaAttrSetter
 import com.raquo.laminar.modifiers.KeyUpdater.AriaAttrUpdater
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
 /**
  * This class represents an HTML Element Attribute. Meaning the key that can be set, not the whole a key-value pair.

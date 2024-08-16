@@ -21,7 +21,7 @@ object ChildrenCommandInserter {
   @deprecated("`ChildrenCommand` type alias is deprecated. Use CollectionCommand[Node]", "15.0.0-M5")
   type ChildrenCommand = CollectionCommand[ChildNode.Base]
 
-  def apply[Component] (
+  def apply[Component](
     commands: EventStream[CollectionCommand[Component]],
     renderableNode: RenderableNode[Component],
     initialHooks: js.UndefOr[InserterHooks]
@@ -116,4 +116,3 @@ object ChildrenCommandInserter {
     nodeCountDiff
   }
 }
-

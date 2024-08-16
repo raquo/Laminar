@@ -28,8 +28,8 @@ object ChildrenReceiver {
       */
     def apply[Collection[_], Component](
       components: Collection[Component]
-    )(
-      implicit renderableNode: RenderableNode[Component],
+    )(implicit
+      renderableNode: RenderableNode[Component],
       renderableSeq: RenderableSeq[Collection]
     ): LockedChildrenReceiver = {
       val nodes = renderableNode.asNodeSeq(renderableSeq.toSeq(components))
@@ -50,8 +50,8 @@ object ChildrenReceiver {
 
     def <--[Collection[_], Component](
       childrenSource: Source[Collection[Component]]
-    )(
-      implicit renderableNode: RenderableNode[Component],
+    )(implicit
+      renderableNode: RenderableNode[Component],
       renderableSeq: RenderableSeq[Collection]
     ): DynamicInserter = {
       ChildrenInserter(

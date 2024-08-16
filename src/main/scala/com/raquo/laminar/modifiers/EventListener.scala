@@ -37,21 +37,24 @@ class EventListener[Ev <: dom.Event, Out](
 
   private[laminar] def bind(element: ReactiveElement.Base, unsafePrepend: Boolean): DynamicSubscription = {
     if (element.indexOfEventListener(this) == -1) {
-      //println(s"> bind ${EventProcessor.eventProp(eventProcessor).name} listener to " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
+      // println(s"> bind ${EventProcessor.eventProp(eventProcessor).name} listener to " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
       val subscribe = (ctx: MountContext[ReactiveElement.Base]) => {
-        //println(s"> add ${EventProcessor.eventProp(eventProcessor).name} listener to " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
+        // println(s"> add ${EventProcessor.eventProp(eventProcessor).name} listener to " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
         DomApi.addEventListener(element.ref, this)
-        new Subscription(ctx.owner, cleanup = () => {
-          val listenerIndex = element.indexOfEventListener(this)
-          if (listenerIndex != -1) {
-            //println(s"> remove ${EventProcessor.eventProp(eventProcessor).name} listener from " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
-            element.removeEventListener(listenerIndex)
-            DomApi.removeEventListener(element.ref, this)
-          } else {
-            // @TODO[Warn] Issue a warning, this isn't supposed to happen
-            //println(">> Trying to remove an listener that isn't there...")
+        new Subscription(
+          ctx.owner,
+          cleanup = () => {
+            val listenerIndex = element.indexOfEventListener(this)
+            if (listenerIndex != -1) {
+              // println(s"> remove ${EventProcessor.eventProp(eventProcessor).name} listener from " + element.ref.outerHTML + s" (prepend = $unsafePrepend)")
+              element.removeEventListener(listenerIndex)
+              DomApi.removeEventListener(element.ref, this)
+            } else {
+              // @TODO[Warn] Issue a warning, this isn't supposed to happen
+              // println(">> Trying to remove an listener that isn't there...")
+            }
           }
-        })
+        )
       }
 
       val sub = if (unsafePrepend) {
@@ -65,7 +68,7 @@ class EventListener[Ev <: dom.Event, Out](
       sub
     } else {
       // @TODO[Warn] Issue a warning, this isn't supposed to happen
-      //println(">> Trying to add an listener that's already there...")
+      // println(">> Trying to add an listener that's already there...")
       ReactiveElement.bindCallback(element)(_ => ())
     }
   }
@@ -73,12 +76,12 @@ class EventListener[Ev <: dom.Event, Out](
   override def toString: String = s"EventListener(${EventProcessor.eventProp(eventProcessor).name})"
 
   // I don't think this is needed, it rounds down to reference equality anyway.
-  //override def equals(that: Any): Boolean = {
-  //  that match {
-  //    case setter: EventListener[_, _] if (eventProcessor == setter.eventProcessor) && (domCallback == setter.domCallback) => true
-  //    case _ => false
-  //  }
-  //}
+  // override def equals(that: Any): Boolean = {
+  //   that match {
+  //     case setter: EventListener[_, _] if (eventProcessor == setter.eventProcessor) && (domCallback == setter.domCallback) => true
+  //     case _ => false
+  //   }
+  // }
 }
 
 object EventListener {

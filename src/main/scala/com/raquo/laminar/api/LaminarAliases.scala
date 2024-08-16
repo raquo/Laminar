@@ -1,8 +1,8 @@
 package com.raquo.laminar.api
 
+import com.raquo.laminar.{inserters, keys, lifecycle, modifiers, nodes}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.nodes.ReactiveElement
-import com.raquo.laminar.{inserters, keys, lifecycle, modifiers, nodes}
 import org.scalajs.dom
 
 import scala.collection.immutable
@@ -48,21 +48,25 @@ trait LaminarAliases {
 
   type SvgMod = Mod[SvgElement]
 
+  //
 
   type Modifier[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
 
   val Modifier: modifiers.Modifier.type = modifiers.Modifier
 
+  //
 
   type Setter[-El <: Element] = modifiers.Setter[El]
 
   val Setter: modifiers.Setter.type = modifiers.Setter
 
+  //
 
   type Binder[-El <: Element] = modifiers.Binder[El]
 
   val Binder: modifiers.Binder.type = modifiers.Binder
 
+  //
 
   type Inserter = inserters.Inserter
 
@@ -70,20 +74,23 @@ trait LaminarAliases {
 
   type DynamicInserter = inserters.DynamicInserter
 
-
+  //
   // Events
+  //
 
   type EventProcessor[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
 
-
+  //
   // Lifecycle
+  //
 
   type MountContext[+El <: Element] = lifecycle.MountContext[El]
 
   type InsertContext = inserters.InsertContext
 
-
+  //
   // Keys
+  //
 
   type EventProp[Ev <: dom.Event] = keys.EventProp[Ev]
 
@@ -99,8 +106,9 @@ trait LaminarAliases {
 
   type CompositeSvgAttr = ComplexSvgKeys.CompositeSvgAttr
 
-
+  //
   // Specific HTML elements
+  //
 
   type Anchor = nodes.ReactiveHtmlElement[dom.html.Anchor]
 

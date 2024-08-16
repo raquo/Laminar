@@ -5,7 +5,7 @@ import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.ReactiveSvgElement
 import org.scalajs.dom
 
-class SvgTag[+Ref <: dom.svg.Element] (
+class SvgTag[+Ref <: dom.svg.Element](
   override val name: String,
   override val void: Boolean = false
 ) extends Tag[ReactiveSvgElement[Ref]] {

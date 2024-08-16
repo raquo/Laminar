@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 object ChildTextInserter {
 
-  def apply[Component] (
+  def apply[Component](
     textSource: Observable[Component],
     renderable: RenderableText[Component]
   ): DynamicInserter = {

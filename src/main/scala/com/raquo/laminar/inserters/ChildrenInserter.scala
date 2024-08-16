@@ -163,7 +163,8 @@ object ChildrenInserter {
             // - This loop should never go out of bounds on `liveNodeList` because we know that `nextChild.ref` is still in that list somewhere
             // - In `containsNode` call we only start looking at `index` because we know that all nodes before `index` are already in place.
             while (
-              nextChild.ref != prevChildRef && !containsRef(nextChildrenMap, prevChildRef)
+              nextChild.ref != prevChildRef &&
+              !containsRef(nextChildrenMap, prevChildRef)
             ) {
               // Loop logic:
               // - prevChild should be deleted, so we remove it from the DOM,
@@ -172,7 +173,7 @@ object ChildrenInserter {
               //   present in nextChildren.
 
               // println(s"> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
-              val nextPrevChildRef = prevChildRef.nextSibling //@TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
+              val nextPrevChildRef = prevChildRef.nextSibling // @TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
 
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)

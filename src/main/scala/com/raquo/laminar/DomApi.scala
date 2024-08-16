@@ -11,7 +11,7 @@ import org.scalajs.dom
 import scala.annotation.tailrec
 import scala.collection.immutable
 import scala.scalajs.js
-import scala.scalajs.js.{JavaScriptException, |}
+import scala.scalajs.js.{|, JavaScriptException}
 
 /** Low level DOM APIs used by Laminar.
   *
@@ -89,8 +89,9 @@ object DomApi {
     }
   }
 
-
-  /** Tree query functions */
+  //
+  // Tree query functions
+  //
 
   def indexOfChild(
     parent: dom.Node,
@@ -118,15 +119,15 @@ object DomApi {
     }
   }
 
-
-
-  /** Events */
+  //
+  // Events
+  //
 
   def addEventListener[Ev <: dom.Event](
     element: dom.Element,
     listener: EventListener[Ev, _]
   ): Unit = {
-    //println(s"> Adding listener on ${DomApi.debugNodeDescription(element.ref)} for `${eventPropSetter.key.name}` with useCapture=${eventPropSetter.useCapture}")
+    // println(s"> Adding listener on ${DomApi.debugNodeDescription(element.ref)} for `${eventPropSetter.key.name}` with useCapture=${eventPropSetter.useCapture}")
     element.addEventListener(
       `type` = EventProcessor.eventProp(listener.eventProcessor).name,
       listener = listener.domCallback,
@@ -145,15 +146,17 @@ object DomApi {
     )
   }
 
-
-  /** HTML Elements */
+  //
+  // HTML Elements
+  //
 
   def createHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref]): Ref = {
     dom.document.createElement(tag.name).asInstanceOf[Ref]
   }
 
-
-  /** HTML Attributes */
+  //
+  // HTML Attributes
+  //
 
   def getHtmlAttribute[V](
     element: ReactiveHtmlElement.Base,
@@ -202,8 +205,9 @@ object DomApi {
     element.ref.removeAttribute(attr.name)
   }
 
-
-  /** HTML Properties */
+  //
+  // HTML Properties
+  //
 
   /** Returns `js.undefined` when the property is missing on the element.
     * If the element type supports this property, it should never be js.undefined.
@@ -240,8 +244,9 @@ object DomApi {
     element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(value.asInstanceOf[js.Any])
   }
 
-
-  /** CSS Style Properties */
+  //
+  // CSS Style Properties
+  //
 
   /** Note: this only gets inline style values – those set via the `style` attribute, which includes
     * all style props set by Laminar. It does not account for CSS declarations in `<style>` tags.
@@ -290,13 +295,13 @@ object DomApi {
       //  - According to the API, yes, but in practice browsers are ok with raw values too it seems.
       value.toString
     }
-    //value match {
-    //  case str: String => str
-    //  case int: Int => int
-    //  case double: Double => double
-    //  case null => null // @TODO[API] Setting a style to null unsets it. Maybe have a better API for this?
-    //  case _ => value.toString
-    //}
+    // value match {
+    //   case str: String => str
+    //   case int: Int => int
+    //   case double: Double => double
+    //   case null => null // @TODO[API] Setting a style to null unsets it. Maybe have a better API for this?
+    //   case _ => value.toString
+    // }
   }
 
   @inline private[laminar] def setRefStyle(
@@ -317,8 +322,9 @@ object DomApi {
     }
   }
 
-
-  /** SVG Elements */
+  //
+  // SVG Elements
+  //
 
   def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
     dom.document
@@ -326,8 +332,9 @@ object DomApi {
       .asInstanceOf[Ref]
   }
 
-
-  /** SVG Attributes */
+  //
+  // SVG Attributes
+  //
 
   def getSvgAttribute[V](
     element: ReactiveSvgElement.Base,
@@ -445,8 +452,9 @@ object DomApi {
     element.ref.removeAttribute(attr.name)
   }
 
-
-  /** Comment Nodes */
+  //
+  // Comment Nodes
+  //
 
   def createCommentNode(text: String): dom.Comment = dom.document.createComment(text)
 
@@ -454,8 +462,9 @@ object DomApi {
     node.ref.textContent = text
   }
 
-
-  /** Text Nodes */
+  //
+  // Text Nodes
+  //
 
   def createTextNode(text: String): dom.Text = dom.document.createTextNode(text)
 
@@ -463,15 +472,17 @@ object DomApi {
     node.ref.textContent = text
   }
 
-
-  /** Custom Elements */
+  //
+  // Custom Elements
+  //
 
   def isCustomElement(element: dom.Element): Boolean = {
     element.tagName.contains('-')
   }
 
-
-  /** Input related stuff */
+  //
+  // Input related stuff
+  //
 
   def getChecked(element: dom.Element): js.UndefOr[Boolean] = {
     element match {
@@ -567,8 +578,9 @@ object DomApi {
     }
   }
 
-
-  /** DOM Parser */
+  //
+  // DOM Parser
+  //
 
   private val htmlParserContainer: dom.HTMLTemplateElement = {
     dom.document.createElement("template").asInstanceOf[dom.HTMLTemplateElement]
@@ -724,8 +736,9 @@ object DomApi {
     }
   }
 
-
-  /** Random utils */
+  //
+  // Random utils
+  //
 
   private val classNamesSeparatorRegex = new js.RegExp(" ", flags = "g")
 

@@ -1,21 +1,22 @@
-import com.raquo.domtypes.codegen.DefType.LazyVal
 import com.raquo.domtypes.codegen.{CanonicalCache, CanonicalDefGroups, CanonicalGenerator, CodeFormatting, SourceRepr}
+import com.raquo.domtypes.codegen.DefType.LazyVal
 import com.raquo.domtypes.common.{HtmlTagType, SvgTagType}
 import com.raquo.domtypes.defs.styles.StyleTraitDefs
 
 object DomDefsGenerator {
 
-  private object generator extends CanonicalGenerator(
-    baseOutputDirectoryPath = "src/main/scala/com/raquo/laminar",
-    basePackagePath = "com.raquo.laminar",
-    standardTraitCommentLines = List(
-      "#NOTE: GENERATED CODE",
-      s" - This file is generated at compile time from the data in Scala DOM Types",
-      " - See `project/DomDefsGenerator.scala` for code generation params",
-      " - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.",
-    ),
-    format = CodeFormatting()
-  ) {
+  private object generator
+    extends CanonicalGenerator(
+      baseOutputDirectoryPath = "src/main/scala/com/raquo/laminar",
+      basePackagePath = "com.raquo.laminar",
+      standardTraitCommentLines = List(
+        "#NOTE: GENERATED CODE",
+        s" - This file is generated at compile time from the data in Scala DOM Types",
+        " - See `project/DomDefsGenerator.scala` for code generation params",
+        " - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.",
+      ),
+      format = CodeFormatting()
+    ) {
 
     override def settersPackagePath: String = basePackagePath + ".modifiers.KeySetter"
 

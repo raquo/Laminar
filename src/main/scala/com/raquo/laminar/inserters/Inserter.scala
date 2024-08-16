@@ -34,7 +34,6 @@ trait StaticInserter extends Inserter {
   def renderInContext(ctx: InsertContext): Unit
 }
 
-
 // @TODO[API] Inserter really wants to extend Binder. And yet.
 
 /** Inserter is a modifier that lets you insert child node(s) on mount.

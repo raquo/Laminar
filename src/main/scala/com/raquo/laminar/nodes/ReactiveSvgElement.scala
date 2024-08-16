@@ -13,7 +13,7 @@ class ReactiveSvgElement[+Ref <: dom.svg.Element](
 
   override def toString: String = {
     // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.
-    s"ReactiveSvgElement(${ if (ref != null) ref.outerHTML else s"tag=${tag.name}"})"
+    s"ReactiveSvgElement(${if (ref != null) ref.outerHTML else s"tag=${tag.name}"})"
   }
 }
 

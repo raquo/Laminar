@@ -72,7 +72,7 @@ class InputController[Ref <: dom.html.Element, A, B](
 
   private[laminar] def bind(): DynamicSubscription = {
     ReactiveElement.bindSubscriptionUnsafe(element) { ctx =>
-
+      // #TODO[Format] - keep an empty line here
       // This should be run when the element's type property has already been set,
       // and doing this on bind gives the highest chance of that.
       checkControllerCompatibility()
@@ -285,12 +285,12 @@ object InputController {
           ifEmpty = throw new Exception(errorMessage(propDomName, eventPropName, element)(
             reason = "This element does not support any controlled input props."
           ))
-        )(
-          controllableProps => throw new Exception(errorMessage(propDomName, eventPropName, element)(
+        ) { controllableProps =>
+          throw new Exception(errorMessage(propDomName, eventPropName, element)(
             reason = s"This element does not support `${propDomName}` controlled property",
             suggestion = s"Use `${controllableProps.join("` or `")}` controlled property instead"
           ))
-        )
+        }
       }
     }
   }
@@ -311,7 +311,7 @@ object InputController {
           case "text" => textValueConfig // Tiny perf shortcut for the most common case
           case "checkbox" | "radio" => checkedConfig
           case "file" => js.undefined
-          case _ => textValueConfig// All the other input types: email, color, date, etc.
+          case _ => textValueConfig // All the other input types: email, color, date, etc.
         }
 
       case _: dom.html.TextArea =>
@@ -350,4 +350,3 @@ object InputController {
   }
 
 }
-

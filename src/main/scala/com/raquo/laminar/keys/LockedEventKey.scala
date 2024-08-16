@@ -19,10 +19,10 @@ class LockedEventKey[Ev <: dom.Event, -In, +Out](
   }
 
   @inline def -->(onNext: Out => Unit): Binder.Base = {
-    -->(Observer(onNext))
+    this --> (Observer(onNext))
   }
 
   @inline def -->(onNext: => Unit)(implicit evidence: UnitArrowsFeature): Binder.Base = {
-    -->(Observer[Any](_ => onNext))
+    this --> (Observer[Any](_ => onNext))
   }
 }

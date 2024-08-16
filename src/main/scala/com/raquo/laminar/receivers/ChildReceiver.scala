@@ -29,8 +29,8 @@ object ChildReceiver {
 
     def <--[Component](
       childSource: Source[Component]
-    )(
-      implicit renderable: RenderableNode[Component]
+    )(implicit
+      renderable: RenderableNode[Component]
     ): DynamicInserter = {
       ChildInserter(childSource.toObservable, renderable, initialHooks = js.undefined)
     }

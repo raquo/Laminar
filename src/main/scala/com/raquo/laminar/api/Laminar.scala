@@ -1,6 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
+import com.raquo.laminar.{nodes, DomApi}
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
@@ -13,22 +14,21 @@ import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
 import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
-import com.raquo.laminar.{DomApi, nodes}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
 trait Laminar
   extends HtmlTags
-    with HtmlAttrs
-    with HtmlProps
-    with GlobalEventProps
-    with StyleProps
-    with ComplexHtmlKeys
-    with MountHooks // onMountFocus, onMountSet, onMountBind, OnMountCallback, OnUnmountCallback, etc.
-    with AirstreamAliases
-    with LaminarAliases
-    with Implicits {
+  with HtmlAttrs
+  with HtmlProps
+  with GlobalEventProps
+  with StyleProps
+  with ComplexHtmlKeys
+  with MountHooks // onMountFocus, onMountSet, onMountBind, OnMountCallback, OnUnmountCallback, etc.
+  with AirstreamAliases
+  with LaminarAliases
+  with Implicits {
 
   /** Contains Helpers like `style.px(12)` // returns "12px" */
   object style
@@ -43,11 +43,12 @@ trait Laminar
   /** Contains SVG tags and attrs */
   object svg
     extends SvgTags
-      with SvgAttrs
-      with ComplexSvgKeys
+    with SvgAttrs
+    with ComplexSvgKeys
 
-
-  // -- Document & window events --
+  //
+  // Document & window events
+  //
 
   protected val documentEventProps = new GlobalEventProps with DocumentEventProps
 
@@ -67,6 +68,7 @@ trait Laminar
       .collectOpt(EventProcessor.processor(p))
   }
 
+  //
 
   /** An owner that never kills its possessions.
     *
@@ -77,8 +79,9 @@ trait Laminar
     */
   object unsafeWindowOwner extends Owner {}
 
-
-  // -- Rendering --
+  //
+  // Rendering
+  //
 
   /** Render a Laminar element into a container DOM node, right now.
     * You must make sure that the container node already exists
@@ -153,6 +156,8 @@ trait Laminar
     */
   val nbsp: String = "\u00a0"
 
+  //
+
   /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
   def foreignHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref], element: Ref): ReactiveHtmlElement[Ref] = {
     DomApi.assertTagMatches(tag, element, "Unable to init foreign html element")
@@ -177,6 +182,7 @@ trait Laminar
     foreignSvgElement(tag, element)
   }
 
+  //
 
   val child: ChildReceiver.type = ChildReceiver
 
@@ -187,12 +193,14 @@ trait Laminar
   /** Focus or blur an element: `focus <-- EventStream[Boolean]` (true = focus, false = blur) */
   val focus: FocusReceiver.type = FocusReceiver
 
+  //
 
   /** Use this when you need a reference to current element. See docs. */
   def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
     Modifier[El] { element => makeModifier(element).apply(element) }
   }
 
+  //
 
   /** Modifier that applies one or more modifiers if `condition` is true */
   def when[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = {
@@ -206,6 +214,7 @@ trait Laminar
   /** Modifier that applies one or more modifiers if `condition` is true */
   @inline def whenNot[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = when(!condition)(mods)
 
+  //
 
   /** Creates controlled input block.
     * See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]]

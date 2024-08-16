@@ -8,7 +8,6 @@ import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
 import scala.scalajs.js
 
-
 trait MountHooks {
 
   /** Focus this element on mount */
@@ -58,8 +57,10 @@ trait MountHooks {
       // We start the context in loose mode for performance, because it's cheaper to go from there
       // to strict mode, than the other way. The inserters are able to handle any initial mode.
       val lockedInsertContext = InsertContext.reserveSpotContext(
-        element, strictMode = false, hooks = js.undefined
-      )
+        element,
+        strictMode = false,
+        hooks = js.undefined
+      ) // #TODO[Format]
       element.amend(
         onMountUnmountCallback[El](
           mount = { mountContext =>

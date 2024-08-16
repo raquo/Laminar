@@ -44,10 +44,13 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
   }
 
   @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[K, El] = {
-    this.:=(items: _*)
+    this.:= (items: _*)
   }
 
-  @deprecated("""cls.toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""", since = "17.0.0-M1")
+  @deprecated(
+    """cls.toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""",
+    since = "17.0.0-M1"
+  )
   def toggle(items: String*): LockedCompositeKey[K, El] = {
     new LockedCompositeKey(this, items.toList)
   }

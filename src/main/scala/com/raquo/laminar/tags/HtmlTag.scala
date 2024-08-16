@@ -5,7 +5,7 @@ import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom
 
-class HtmlTag[+Ref <: dom.html.Element] (
+class HtmlTag[+Ref <: dom.html.Element](
   override val name: String,
   override val void: Boolean = false
 ) extends Tag[ReactiveHtmlElement[Ref]] {
