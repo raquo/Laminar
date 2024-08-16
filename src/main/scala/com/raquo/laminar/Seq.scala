@@ -1,6 +1,6 @@
 package com.raquo.laminar
 
-import com.raquo.ew.{JsArray, JsVector, ewArray}
+import com.raquo.ew.{ewArray, JsArray, JsVector}
 
 import scala.scalajs.js
 

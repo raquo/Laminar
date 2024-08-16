@@ -13,7 +13,7 @@ import scala.scalajs.js.|
  * @param update (element, newValue, reason) => ()
  *               The reason is used for updating CompositeKey-s.
  */
-class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V] (
+class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V](
   val key: K,
   val values: Observable[V],
   val update: (El, V, Modifier.Any) => Unit

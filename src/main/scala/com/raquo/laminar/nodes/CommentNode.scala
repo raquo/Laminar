@@ -9,4 +9,3 @@ class CommentNode(initialText: String) extends ChildNode[dom.Comment] {
 
   final def text: String = ref.data
 }
-

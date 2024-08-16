@@ -181,7 +181,7 @@ trait ReactiveElement[+Ref <: dom.Element]
   private[laminar] def onBoundKeyUpdater(key: Key): Unit
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    //println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
+    // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
     // @Note this should cover ALL cases not covered by setParent
     if (isUnmounting(maybePrevParent = maybeParent, maybeNextParent = maybeNextParent)) {
@@ -191,7 +191,7 @@ trait ReactiveElement[+Ref <: dom.Element]
 
   /** Don't call setParent directly – willSetParent will not be called. Use methods like `appendChild` defined on `ParentNode` instead. */
   override private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
-    //println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
+    // println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
     val maybePrevParent = maybeParent
     super.setParent(maybeNextParent)
@@ -274,9 +274,10 @@ object ReactiveElement {
   )(
     subscribe: MountContext[El] => Subscription
   ): DynamicSubscription = {
-    DynamicSubscription.unsafe(element.dynamicOwner, { owner =>
-      subscribe(new MountContext[El](element, owner))
-    })
+    DynamicSubscription.unsafe(
+      element.dynamicOwner,
+      owner => subscribe(new MountContext[El](element, owner))
+    )
   }
 
   @inline def bindCallback[El <: ReactiveElement.Base](
@@ -284,9 +285,10 @@ object ReactiveElement {
   )(
     activate: MountContext[El] => Unit
   ): DynamicSubscription = {
-    DynamicSubscription.subscribeCallback(element.dynamicOwner, owner => {
-      activate(new MountContext[El](element, owner))
-    })
+    DynamicSubscription.subscribeCallback(
+      element.dynamicOwner,
+      owner => activate(new MountContext[El](element, owner))
+    )
   }
 
   /** Bind subscription such that it will appear first in the list of dynamicOwner's subscriptions.
@@ -298,19 +300,21 @@ object ReactiveElement {
   )(
     subscribe: MountContext[El] => Subscription
   ): DynamicSubscription = {
-    DynamicSubscription.unsafe(element.dynamicOwner, { owner =>
-      subscribe(new MountContext[El](element, owner))
-    }, prepend = true)
+    DynamicSubscription.unsafe(
+      element.dynamicOwner,
+      owner => subscribe(new MountContext[El](element, owner)),
+      prepend = true
+    )
   }
 
   // @TODO Maybe later. Wanted to make a seqToBinder.
-  //@inline def bindCombinedSubscription[El <: ReactiveElement.Base](
-  //  element: El
-  //)(
-  //  subscriptions: DynamicOwner => collection.Seq[DynamicSubscription]
-  //): DynamicSubscription = {
-  //  DynamicSubscription.combine(element.dynamicOwner, subscriptions)
-  //}
+  // @inline def bindCombinedSubscription[El <: ReactiveElement.Base](
+  //   element: El
+  // )(
+  //   subscriptions: DynamicOwner => collection.Seq[DynamicSubscription]
+  // ): DynamicSubscription = {
+  //   DynamicSubscription.combine(element.dynamicOwner, subscriptions)
+  // }
 
   def isActive(element: ReactiveElement.Base): Boolean = {
     element.dynamicOwner.isActive

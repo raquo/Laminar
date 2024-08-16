@@ -2,11 +2,11 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{HtmlElement, optionToSetter}
+import com.raquo.laminar.api.L.{optionToSetter, HtmlElement}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Modifier, Setter}
 import com.raquo.laminar.modifiers.KeySetter.PropSetter
 import com.raquo.laminar.modifiers.KeyUpdater.PropUpdater
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Modifier, Setter}
 
 /**
   * This class represents a DOM Element Property. Meaning the key that can be set, not a key-value pair.
@@ -42,9 +42,8 @@ class HtmlProp[V, DomV](
           DomApi.setHtmlPropertyRaw(element, this, nextDomValue)
         }
     } else {
-      (element: HtmlElement, nextValue: V, reason: Modifier.Any) => {
+      (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
         DomApi.setHtmlProperty(element, this, nextValue)
-      }
     }
     new KeyUpdater[HtmlElement, HtmlProp[V, DomV], V](
       key = this,

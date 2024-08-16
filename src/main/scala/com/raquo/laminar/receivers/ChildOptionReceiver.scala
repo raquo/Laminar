@@ -17,8 +17,8 @@ object ChildOptionReceiver {
 
     def <--[Component](
       maybeChildSource: Source[Option[Component]]
-    )(
-      implicit renderable: RenderableNode[Component]
+    )(implicit
+      renderable: RenderableNode[Component]
     ): DynamicInserter = {
       val emptyNode = new CommentNode("")
       child <-- {

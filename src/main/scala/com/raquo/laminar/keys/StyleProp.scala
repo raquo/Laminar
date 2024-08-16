@@ -2,11 +2,11 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{HtmlElement, optionToSetter}
+import com.raquo.laminar.api.L.{optionToSetter, HtmlElement}
 import com.raquo.laminar.defs.styles.traits.GlobalKeywords
+import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 import com.raquo.laminar.modifiers.KeyUpdater.StyleUpdater
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 import scala.scalajs.js.|
@@ -38,7 +38,7 @@ class StyleProp[V](
 
   /** Create a new key for this style with these prefixes */
   def withPrefixes(ps: (StyleVendorPrefixes.type => String)*): StyleProp[V] = {
-    new StyleProp[V](name, ps.map(_ (StyleVendorPrefixes)))
+    new StyleProp[V](name, ps.map(_(StyleVendorPrefixes)))
   }
 
   override protected def styleSetter(value: String): StyleSetter = {
