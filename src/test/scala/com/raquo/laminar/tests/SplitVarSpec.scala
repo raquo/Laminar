@@ -464,4 +464,325 @@ class SplitVarSpec extends UnitSpec {
     assert(arrRef eq foosVar.now())
   }
 
+  it("standard child Var behaviour for splitByIndex") {
+
+    val effects: mutable.Buffer[String] = mutable.Buffer()
+
+    val fooVars: mutable.Map[Int, Var[Foo]] = mutable.Map()
+
+    val foosVar = Var[List[Foo]](Nil)
+
+    def clickOnItem(index: Int): Unit = {
+      dom.document.getElementById(s"item-${index}").asInstanceOf[dom.html.Element].click()
+    }
+
+    mount(div(
+      children <-- foosVar.splitByIndex((index, initial, fooVar) => {
+        fooVar.setDisplayName(s"fooVar-${index}")
+        effects += s"create-${initial.toString}"
+        fooVars.update(index, fooVar)
+        div(
+          idAttr("item-" + index.toString),
+          fooVar.signal --> { f => effects += s"update-${f.toString}" },
+          text <-- fooVar.signal.map(f => f.name + "." + f.version),
+          onClick --> fooVar.update(f => f.copy(version = f.version + 1))
+        )
+      })
+    ))
+
+    expectNode(div of (
+      sentinel
+    ))
+
+    assertEquals(effects.toList, Nil)
+
+    // --
+
+    foosVar.update(_ :+ Foo(1, "One", 1))
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "One.1"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "create-Foo(1,One,1)",
+      "update-Foo(1,One,1)",
+    ))
+    effects.clear()
+
+    // --
+
+    clickOnItem(0)
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "One.2"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(1,One,2)",
+    ))
+    effects.clear()
+
+    // --
+
+    foosVar.update(_.appended(Foo(2, "Two", 1)).appended(Foo(3, "Three", 1)))
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "One.2"
+      ),
+      div of (
+        idAttr is s"item-1",
+        "Two.1"
+      ),
+      div of (
+        idAttr is s"item-2",
+        "Three.1"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "create-Foo(2,Two,1)",
+      "create-Foo(3,Three,1)",
+      "update-Foo(2,Two,1)",
+      "update-Foo(3,Three,1)",
+    ))
+    effects.clear()
+
+    assertEquals(fooVars(0).now(), Foo(1, "One", 2))
+    assertEquals(fooVars(1).now(), Foo(2, "Two", 1))
+    assertEquals(fooVars(2).now(), Foo(3, "Three", 1))
+
+    assertEquals(effects.toList, Nil)
+
+    // --
+
+    clickOnItem(1)
+    clickOnItem(1)
+    clickOnItem(2)
+    clickOnItem(1)
+    clickOnItem(2)
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "One.2"
+      ),
+      div of (
+        idAttr is s"item-1",
+        "Two.4"
+      ),
+      div of (
+        idAttr is s"item-2",
+        "Three.3"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(2,Two,2)",
+      "update-Foo(2,Two,3)",
+      "update-Foo(3,Three,2)",
+      "update-Foo(2,Two,4)",
+      "update-Foo(3,Three,3)",
+    ))
+    effects.clear()
+
+    // --
+
+    foosVar.update(_.sortBy(_.version))
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "One.2"
+      ),
+      div of (
+        idAttr is s"item-1",
+        "Three.3"
+      ),
+      div of (
+        idAttr is s"item-2",
+        "Two.4"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(3,Three,3)",
+      "update-Foo(2,Two,4)",
+    ))
+    effects.clear()
+
+    // --
+
+    foosVar.update(_.reverse)
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "Two.4"
+      ),
+      div of (
+        idAttr is s"item-1",
+        "Three.3"
+      ),
+      div of (
+        idAttr is s"item-2",
+        "One.2"
+      ),
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(2,Two,4)",
+      "update-Foo(1,One,2)",
+    ))
+    effects.clear()
+
+    assertEquals(fooVars(0).now(), Foo(2, "Two", 4))
+    assertEquals(fooVars(1).now(), Foo(3, "Three", 3))
+    assertEquals(fooVars(2).now(), Foo(1, "One", 2))
+
+    // --
+
+    foosVar.set(foosVar.now().reverse.updated(0, Foo(1, "One", 1)))
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is s"item-0",
+        "One.1"
+      ),
+      div of (
+        idAttr is s"item-1",
+        "Three.3"
+      ),
+      div of (
+        idAttr is s"item-2",
+        "Two.4"
+      ),
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(1,One,1)",
+      "update-Foo(2,Two,4)",
+    ))
+    effects.clear()
+
+  }
+
+  it("standard child Var behaviour for splitOption") {
+
+    val effects: mutable.Buffer[String] = mutable.Buffer()
+
+    var childVar: Option[Var[Foo]] = None
+
+    val maybeFooVar = Var[Option[Foo]](None)
+
+    def clickOnChild: Unit = {
+      dom.document.getElementById(s"some-child").asInstanceOf[dom.html.Element].click()
+    }
+
+    mount(div(
+      child <-- maybeFooVar.splitOption(
+        (initial, fooVar) => {
+          fooVar.setDisplayName(s"some")
+          effects += s"create-${initial.toString}"
+          childVar = Some(fooVar)
+          div(
+            idAttr("some-child"),
+            fooVar.signal --> { f => effects += s"update-${f.toString}" },
+            text <-- fooVar.signal.map(f => f.name + "." + f.version),
+            onClick --> fooVar.update(f => f.copy(version = f.version + 1))
+          )
+        },
+        ifEmpty = div("empty")
+      )
+    ))
+
+    expectNode(div of (
+      sentinel,
+      div of ("empty")
+    ))
+
+    assertEquals(effects.toList, Nil)
+
+    // --
+
+    maybeFooVar.set(Some(Foo(1, "One", 1)))
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is "some-child",
+        "One.1"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "create-Foo(1,One,1)",
+      "update-Foo(1,One,1)",
+    ))
+    effects.clear()
+
+    // --
+
+    clickOnChild
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is "some-child",
+        "One.2"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(1,One,2)",
+    ))
+    effects.clear()
+
+    // --
+
+    maybeFooVar.set(Some(Foo(2, "Two", 1)))
+
+    expectNode(div of (
+      sentinel,
+      div of (
+        idAttr is "some-child",
+        "Two.1"
+      )
+    ))
+
+    assertEquals(effects.toList, List(
+      "update-Foo(2,Two,1)",
+    ))
+    effects.clear()
+
+    assertEquals(childVar.get.now(), Foo(2, "Two", 1))
+
+    // --
+
+    maybeFooVar.set(None)
+
+    expectNode(div of (
+      sentinel,
+      div of ("empty")
+    ))
+
+    assertEquals(effects.toList, Nil)
+    effects.clear()
+
+  }
 }
