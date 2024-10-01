@@ -1214,6 +1214,8 @@ div(
 )
 ```
 
+`child(div("Hello")) <-- boolSignal` is equivalent to `val el = div("Hello"); child <-- boolSignal.map(if (_) el else emptyNode)`. Note that `el` is evaluated strictly, eagerly, and only once – when you call `child()`. Thus, the same element will be re-mounted if `boolSignal` switches from `true` to `false` and back to `true` again. Similarly for the `children()` helper.
+
 
 ## Rendering Loading State
 
