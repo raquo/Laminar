@@ -436,6 +436,19 @@ trait HtmlProps {
     *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-loading iframe#attr-loading @ MDN]]
     */
   lazy val loadingAttr: HtmlProp[String, String] = stringProp("loading")
+  
+  /**
+    * Indicates how the browser should decode the image:
+    * 
+    * "sync": Decode the image synchronously for atomic presentation with other content.
+    * 
+    * "async": Decode the image asynchronously and allow other content to be rendered before this completes.
+    * 
+    * "auto": No preference for the decoding mode; the browser decides what is best for the user. This is the default value, but different browsers have different defaults
+    * 
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/decoding @ MDN]]
+    */
+  lazy val decodingAttrAttr: HtmlProp[String, String] = stringProp("decoding")
 
 
   /**
