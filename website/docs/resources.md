@@ -61,6 +61,8 @@ title: Resources
 
 ## Open Source Laminar Apps
 
+* **[ScalaIO's website](https://scala.io)** - ScalaIO conference website ([github](https://github.com/ScalaIO/scala.io))
+
 * **[TodoMVC](https://demo.laminar.dev/app/apps/todomvc)** – Standard todo app demonstrating basic state management etc.
 
 * **[Wind Gradient](https://demo.laminar.dev/app/weather/gradient/squamish)** – Simple full stack weather app.
