@@ -4,8 +4,8 @@ import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.laminar.api.Implicits.RichSource
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
 import com.raquo.laminar.inserters._
-import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.keys._
+import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.modifiers._
 import com.raquo.laminar.nodes._
 import org.scalajs.dom
@@ -17,8 +17,9 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     new RichSource(source)
   }
 
-
+  //
   // -- CSS Styles --
+  //
 
   /** Allow both Int-s and Double-s in numeric style props */
   @inline implicit def derivedStyleIntToDouble(style: DerivedStyleProp[Int]): DerivedStyleProp[Double] = {
@@ -32,8 +33,9 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     encoder.asInstanceOf[StyleEncoder[Double]]
   }
 
-
+  //
   // -- Basic laminar syntax --
+  //
 
   /** Add [[EventProcessor]] methods (mapToValue / filter / preventDefault / etc.) to event props (e.g. onClick) */
   @inline implicit def eventPropToProcessor[Ev <: dom.Event](eventProp: EventProp[Ev]): EventProcessor[Ev, Ev] = {
@@ -50,8 +52,9 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
     r.asNode(component)
   }
 
-
+  //
   // -- Methods to convert collections of Setter[El] to a single Setter[El] --
+  //
 
   /** Create a [[Setter]] that applies the optionally provided [[Setter]], or else does nothing. */
   implicit def optionToSetter[El <: ReactiveElement.Base](maybeSetter: Option[Setter[El]]): Setter[El] = {
@@ -61,8 +64,8 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   /** Combine a js.Array of [[Setter]]-s into a single [[Setter]] that applies them all. */
   implicit def seqToSetter[Collection[_], El <: ReactiveElement.Base](
     setters: Collection[Setter[El]]
-  )(
-    implicit renderableSeq: RenderableSeq[Collection]
+  )(implicit
+    renderableSeq: RenderableSeq[Collection]
   ): Setter[El] = {
     Setter { element =>
       val settersSeq = renderableSeq.toSeq(setters)
@@ -72,18 +75,17 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
 
   /** Create a binder that combines several binders */
   // This can only be implemented with significant caveats, I think. See https://gitter.im/Laminar_/Lobby?at=631a58b4cf6cfd27af7c96b4
-  //implicit def seqToBinder[El <: ReactiveElement.Base](binders: collection.Seq[Binder[El]]): Binder[El] = {
-  //  Binder[El] { ??? }
-  //}
-
+  // implicit def seqToBinder[El <: ReactiveElement.Base](binders: collection.Seq[Binder[El]]): Binder[El] = {
+  //   Binder[El] { ??? }
+  // }
 
   // -- Methods to convert collections of Modifier[El]-like things to Modifier[El] --
 
   /** Create a modifier that applies an optional modifier, or does nothing if option is empty */
   implicit def optionToModifier[A, El <: ReactiveElement.Base](
     maybeModifier: Option[A]
-  )(
-    implicit asModifier: A => Modifier[El]
+  )(implicit
+    asModifier: A => Modifier[El]
   ): Modifier[El] = {
     Modifier(element => maybeModifier.foreach(asModifier(_).apply(element)))
   }
@@ -91,8 +93,8 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   /** Create a modifier that applies each of the modifiers in a seq */
   implicit def seqToModifier[A, Collection[_], El <: ReactiveElement.Base](
     modifiers: Collection[A]
-  )(
-    implicit asModifier: A => Modifier[El],
+  )(implicit
+    asModifier: A => Modifier[El],
     renderableSeq: RenderableSeq[Collection]
   ): Modifier[El] = {
     Modifier(element => renderableSeq.toSeq(modifiers).foreach(asModifier(_).apply(element)))
@@ -119,8 +121,8 @@ trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMapper
   // #Note: the case of Collection[Component] is covered by `seqToModifier` above
   implicit def nodeSeqToModifier[Collection[_]](
     nodes: Collection[ChildNode.Base]
-  )(
-    implicit renderableSeq: RenderableSeq[Collection]
+  )(implicit
+    renderableSeq: RenderableSeq[Collection]
   ): Modifier.Base = {
     Modifier { element =>
       val nodesSeq = renderableSeq.toSeq(nodes)
@@ -180,16 +182,16 @@ object Implicits {
 
     implicit def componentOptionToInserter[Component](
       maybeComponent: Option[Component]
-    )(
-      implicit renderableNode: RenderableNode[Component]
+    )(implicit
+      renderableNode: RenderableNode[Component]
     ): StaticChildrenInserter = {
       componentSeqToInserter(maybeComponent.toList)
     }
 
     implicit def componentSeqToInserter[Collection[_], Component](
       components: Collection[Component]
-    )(
-      implicit renderableSeq: RenderableSeq[Collection],
+    )(implicit
+      renderableSeq: RenderableSeq[Collection],
       renderableNode: RenderableNode[Component]
     ): StaticChildrenInserter = {
       StaticChildrenInserter.noHooks(components, renderableSeq, renderableNode)

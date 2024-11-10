@@ -299,8 +299,8 @@ class EventProcessor[Ev <: dom.Event, V](
     */
   def flatMap[Out, Obs[_] <: Observable[_]](
     operator: V => Obs[Out]
-  )(
-    implicit strategy: SwitchingStrategy[EventStream, Obs, Observable]
+  )(implicit
+    strategy: SwitchingStrategy[EventStream, Obs, Observable]
   ): LockedEventKey[Ev, V, Out] = {
     new LockedEventKey[Ev, V, Out](
       this,
@@ -314,8 +314,8 @@ class EventProcessor[Ev <: dom.Event, V](
     */
   @inline def flatMapTo[Out, Obs[_] <: Observable[_]](
     observable: => Obs[Out]
-  )(
-    implicit strategy: SwitchingStrategy[EventStream, Obs, Observable]
+  )(implicit
+    strategy: SwitchingStrategy[EventStream, Obs, Observable]
   ): LockedEventKey[Ev, V, Out] = {
     flatMap(_ => observable)(strategy)
   }
@@ -323,8 +323,8 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Similar to `flatMap`, but restricted to streams only. */
   @inline def flatMapStream[Out](
     operator: V => EventStream[Out]
-  )(
-    implicit strategy: SwitchingStrategy[EventStream, EventStream, Observable]
+  )(implicit
+    strategy: SwitchingStrategy[EventStream, EventStream, Observable]
   ): LockedEventKey[Ev, V, Out] = {
     flatMap(operator)(strategy)
   }
@@ -332,8 +332,8 @@ class EventProcessor[Ev <: dom.Event, V](
   /** Similar to `flatMap`, but restricted to signals only. */
   @inline def flatMapSignal[Out](
     operator: V => Signal[Out]
-  )(
-    implicit strategy: SwitchingStrategy[EventStream, Signal, Observable]
+  )(implicit
+    strategy: SwitchingStrategy[EventStream, Signal, Observable]
   ): LockedEventKey[Ev, V, Out] = {
     flatMap(operator)(strategy)
   }

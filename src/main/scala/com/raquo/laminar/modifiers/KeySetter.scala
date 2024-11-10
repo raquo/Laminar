@@ -12,7 +12,7 @@ import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSv
   * instead of *setting* it. Such `cls` modifiers are [[CompositeKeySetter]], which
   * does not extend [[KeySetter]]. // #TODO the naming of these traits is confusing...
   */
-class KeySetter[K <: Key, V, -El <: ReactiveElement.Base] (
+class KeySetter[K <: Key, V, -El <: ReactiveElement.Base](
   val key: K,
   val value: V,
   val action: (El, K, V) => Unit

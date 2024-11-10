@@ -12,8 +12,8 @@ package object api extends Implicits {
 
   @implicitNotFound(
     "You must `import com.raquo.laminar.api.features.unitArrows` to allow expressions of type `Unit` " +
-    "on the right hand side of `-->` methods, because this is not completely safe in Scala 3. " +
-    "Please read the documentation first to learn about the caveats: https://laminar.dev/documentation#-unit-sinks"
+      "on the right hand side of `-->` methods, because this is not completely safe in Scala 3. " +
+      "Please read the documentation first to learn about the caveats: https://laminar.dev/documentation#-unit-sinks"
   )
   trait UnitArrowsFeature
 

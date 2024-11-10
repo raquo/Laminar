@@ -8,7 +8,7 @@ import scala.scalajs.js
 
 object ChildInserter {
 
-  def apply[Component] (
+  def apply[Component](
     childSource: Observable[Component],
     renderable: RenderableNode[Component],
     initialHooks: js.UndefOr[InserterHooks]

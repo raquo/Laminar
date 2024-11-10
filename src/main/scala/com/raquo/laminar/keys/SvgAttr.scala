@@ -2,11 +2,11 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{SvgElement, optionToSetter}
+import com.raquo.laminar.api.L.{optionToSetter, SvgElement}
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 import com.raquo.laminar.modifiers.KeySetter.SvgAttrSetter
 import com.raquo.laminar.modifiers.KeyUpdater.SvgAttrUpdater
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
 
 /**
   * This class represents an Svg Element Attribute. Meaning the key that can be set, not the whole a key-value pair.

@@ -10,8 +10,8 @@ object ChildrenCommandReceiver {
 
   def <--[Component](
     commands: EventSource[CollectionCommand[Component]]
-  )(
-    implicit renderableNode: RenderableNode[Component]
+  )(implicit
+    renderableNode: RenderableNode[Component]
   ): DynamicInserter = {
     ChildrenCommandInserter(commands.toObservable, renderableNode, initialHooks = js.undefined)
   }

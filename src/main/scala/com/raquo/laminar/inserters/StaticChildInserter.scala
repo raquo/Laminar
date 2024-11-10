@@ -40,8 +40,8 @@ object StaticChildInserter {
 
   def noHooksC[Component](
     component: Component
-  )(
-    implicit renderable: RenderableNode[Component]
+  )(implicit
+    renderable: RenderableNode[Component]
   ): StaticChildInserter = {
     new StaticChildInserter(renderable.asNode(component), hooks = js.undefined)
   }
