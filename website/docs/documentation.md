@@ -486,6 +486,8 @@ If that is what you wanted, that's fine, Laminar will not break, it's just weird
 
 ### Missing Keys
 
+What do you do if you want to use a less-popular HTML attribute or prop that Laminar does not (yet) have? How do you define custom attributes, custom html props, styles, etc.?
+
 Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from [Scala DOM Types](https://github.com/raquo/scala-dom-types). These definitions provide hundreds of keys, but they are not exhaustive. For example, we don't have CSS grid properties like `grid-area` defined, so those are not available to be put on the left hand side of `:=` methods.
 
 To work around this, you can contribute definitions of missing attrs / props / etc. to Scala DOM Types. It's easy – you don't even need to code any logic, just need to specify the names and types of the things you want to add. For example, the `value` property is defined at the bottom of [PropDefs.scala](https://github.com/raquo/scala-dom-types/blob/master/shared/src/main/scala/com/raquo/domtypes/defs/props/PropDefs.scala). Read [this](https://github.com/raquo/scala-dom-types/#reflected-attributes) to understand the difference between props and attributes and reflected attributes.
@@ -493,6 +495,7 @@ To work around this, you can contribute definitions of missing attrs / props / e
 Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:
 
 ```scala
+import com.raquo.laminar.codecs.*
 val superValue: HtmlProp[String] = htmlProp("superValue", StringAsIsCodec) // imaginary prop
 val onTouchMove: EventProp[dom.TouchEvent] = eventProp("touchmove")
 
@@ -505,6 +508,18 @@ div(
 And similarly with `styleProp`, `htmlAttr`, `htmlTag`, `svgAttr`, `svgTag`.
 
 I mentioned `onTouchMove` as an example, but you don't have to do this for touch events specifically, because [@felher](https://github.com/felher) already [added](https://github.com/raquo/scala-dom-types/pull/102) them to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.
+
+Some more examples of real attrs / props (that may already exist in Laminar):
+
+```scala
+import com.raquo.laminar.codecs.*
+
+val tabIndex: HtmlProp[Int, Int] = htmlProp("tabIndex", IntAsIsCodec) // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex
+
+val asyncAttr: HtmlAttr[Boolean] = htmlAttr("async", BooleanAsAttrPresenceCodec) // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#async
+
+val decodingAttr: HtmlProp[String, String] = htmlProp("decoding", StringAsIsCodec) // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#decoding
+```
 
 
 ### Modifiers FAQ
