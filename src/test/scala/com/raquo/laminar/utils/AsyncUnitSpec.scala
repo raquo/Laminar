@@ -9,10 +9,10 @@ import scala.scalajs.js
 import scala.util.Try
 
 class AsyncUnitSpec
-  extends AsyncFunSpec
-  with LaminarSpec
-  with AsyncMountSpec
-  with Utils {
+extends AsyncFunSpec
+with LaminarSpec
+with AsyncMountSpec
+with Utils {
 
   // @TODO[Test] Extract this to a more generic place
   def delay[V](value: => V): Future[V] = {

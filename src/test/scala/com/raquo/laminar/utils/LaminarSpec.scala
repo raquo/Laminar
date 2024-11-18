@@ -12,9 +12,9 @@ import com.raquo.laminar.tags.Tag
 import org.scalactic
 
 trait LaminarSpec
-  extends MountOps
-  with RuleImplicits[Tag.Base, CommentNode, HtmlProp, HtmlAttr, SvgAttr, StyleProp]
-  with EventSimulator {
+extends MountOps
+with RuleImplicits[Tag.Base, CommentNode, HtmlProp, HtmlAttr, SvgAttr, StyleProp]
+with EventSimulator {
   // === On nullable variables ===
   // `root` is nullable because if it was an Option it would be too easy to
   // forget to handle the `None` case when mapping or foreach-ing over it.

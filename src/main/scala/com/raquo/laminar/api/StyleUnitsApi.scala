@@ -5,10 +5,10 @@ import com.raquo.laminar.defs.styles.units
 import com.raquo.laminar.keys.DerivedStyleBuilder
 
 trait StyleUnitsApi extends DerivedStyleBuilder[String, StyleEncoder]
-  with units.Color[String, StyleEncoder]
-  with units.Length[StyleEncoder, Int]
-  with units.Time[StyleEncoder]
-  with units.Url[StyleEncoder] {
+with units.Color[String, StyleEncoder]
+with units.Length[StyleEncoder, Int]
+with units.Time[StyleEncoder]
+with units.Url[StyleEncoder] {
 
   override protected def styleSetter(value: String): String = value
 

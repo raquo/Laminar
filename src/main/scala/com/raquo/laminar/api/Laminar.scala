@@ -19,32 +19,32 @@ import org.scalajs.dom
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
 trait Laminar
-  extends HtmlTags
-  with HtmlAttrs
-  with HtmlProps
-  with GlobalEventProps
-  with StyleProps
-  with ComplexHtmlKeys
-  with MountHooks // onMountFocus, onMountSet, onMountBind, OnMountCallback, OnUnmountCallback, etc.
-  with AirstreamAliases
-  with LaminarAliases
-  with Implicits {
+extends HtmlTags
+with HtmlAttrs
+with HtmlProps
+with GlobalEventProps
+with StyleProps
+with ComplexHtmlKeys
+with MountHooks // onMountFocus, onMountSet, onMountBind, OnMountCallback, OnUnmountCallback, etc.
+with AirstreamAliases
+with LaminarAliases
+with Implicits {
 
   /** Contains Helpers like `style.px(12)` // returns "12px" */
   object style
-    extends StyleUnitsApi
+  extends StyleUnitsApi
 
   /** Contains ARIA attrs for accessibility */
   object aria
-    extends AriaAttrs
+  extends AriaAttrs
 
   // @TODO[API] Add GlobalEventProps to SVG as well?
   //  Regular event props work fine, but they might be hard to import if you also import svg._
   /** Contains SVG tags and attrs */
   object svg
-    extends SvgTags
-    with SvgAttrs
-    with ComplexSvgKeys
+  extends SvgTags
+  with SvgAttrs
+  with ComplexSvgKeys
 
   //
   // Document & window events

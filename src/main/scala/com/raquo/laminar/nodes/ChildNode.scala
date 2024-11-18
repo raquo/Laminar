@@ -7,8 +7,8 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 
 trait ChildNode[+Ref <: dom.Node]
-  extends ReactiveNode[Ref]
-  with Modifier[ReactiveElement[dom.Element]] {
+extends ReactiveNode[Ref]
+with Modifier[ReactiveElement[dom.Element]] {
 
   private var _maybeParent: Option[ParentNode.Base] = None
 

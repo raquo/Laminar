@@ -13,8 +13,8 @@ import org.scalajs.dom
 import scala.scalajs.js
 
 trait ReactiveElement[+Ref <: dom.Element]
-  extends ChildNode[Ref]
-  with ParentNode[Ref] {
+extends ChildNode[Ref]
+with ParentNode[Ref] {
 
   // @Warning[Fragile] deactivate should not need an isActive guard.
   //  If Laminar starts to cause exceptions here, we need to find the root cause.
