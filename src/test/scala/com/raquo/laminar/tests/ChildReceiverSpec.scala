@@ -291,7 +291,7 @@ class ChildReceiverSpec extends UnitSpec {
     // --
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         sentinel
       )
@@ -305,7 +305,7 @@ class ChildReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "a",
         sentinel,
@@ -320,7 +320,7 @@ class ChildReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "d",
         sentinel
@@ -335,7 +335,7 @@ class ChildReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         sentinel,
         span of "a"
@@ -350,7 +350,7 @@ class ChildReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "a",
         sentinel,
@@ -365,7 +365,7 @@ class ChildReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "a",
         sentinel,
@@ -381,7 +381,7 @@ class ChildReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "c",
         sentinel,
@@ -397,7 +397,7 @@ class ChildReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "d",
         sentinel,
@@ -411,7 +411,7 @@ class ChildReceiverSpec extends UnitSpec {
     bus2.emit(spanC)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "d",
         sentinel,
@@ -425,7 +425,7 @@ class ChildReceiverSpec extends UnitSpec {
     bus1.emit(spanC)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         span of "c",
         sentinel,
@@ -476,7 +476,6 @@ class ChildReceiverSpec extends UnitSpec {
     }
 
     implicit val componentRenderable: RenderableNode[Component] = RenderableNode(_.node)
-
 
     val v = Var(true)
 

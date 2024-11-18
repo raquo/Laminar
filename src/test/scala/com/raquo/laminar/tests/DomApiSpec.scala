@@ -1,8 +1,8 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.utils.UnitSpec
 
 class DomApiSpec extends UnitSpec {
@@ -42,7 +42,6 @@ class DomApiSpec extends UnitSpec {
     }
     assert(caught.getMessage == "Error parsing HTML string: expected tag name `span`, got `DIV`")
   }
-
 
   it("SVG: parses SVG tag") {
     expectNode(

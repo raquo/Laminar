@@ -1,9 +1,9 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.matching._
 import com.raquo.domtestutils.{EventSimulator, MountOps}
-import com.raquo.laminar.api.L.CompositeSvgAttr
+import com.raquo.domtestutils.matching._
 import com.raquo.laminar.api._
+import com.raquo.laminar.api.L.CompositeSvgAttr
 import com.raquo.laminar.codecs.StringAsIsCodec
 import com.raquo.laminar.defs.complex.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeHtmlProp}
 import com.raquo.laminar.keys.{HtmlAttr, HtmlProp, StyleProp, SvgAttr}
@@ -14,8 +14,7 @@ import org.scalactic
 trait LaminarSpec
   extends MountOps
   with RuleImplicits[Tag.Base, CommentNode, HtmlProp, HtmlAttr, SvgAttr, StyleProp]
-  with EventSimulator
-{
+  with EventSimulator {
   // === On nullable variables ===
   // `root` is nullable because if it was an Option it would be too easy to
   // forget to handle the `None` case when mapping or foreach-ing over it.
@@ -31,8 +30,8 @@ trait LaminarSpec
   def mount(
     node: ReactiveElement.Base,
     clue: String = defaultMountedElementClue
-  )(
-    implicit prettifier: scalactic.Prettifier,
+  )(implicit
+    prettifier: scalactic.Prettifier,
     pos: scalactic.source.Position
   ): Unit = {
     mountedElementClue = clue
@@ -43,8 +42,8 @@ trait LaminarSpec
   def mount(
     clue: String,
     node: ReactiveElement.Base
-  )(
-    implicit prettifier: scalactic.Prettifier,
+  )(implicit
+    prettifier: scalactic.Prettifier,
     pos: scalactic.source.Position
   ): Unit = {
     mount(node, clue)(prettifier, pos)
@@ -52,8 +51,8 @@ trait LaminarSpec
 
   override def unmount(
     clue: String = "unmount"
-  )(
-    implicit prettifier: scalactic.Prettifier,
+  )(implicit
+    prettifier: scalactic.Prettifier,
     pos: scalactic.source.Position
   ): Unit = {
     assertRootNodeMounted("unmount:" + clue)

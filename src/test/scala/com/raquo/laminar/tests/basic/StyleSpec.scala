@@ -24,10 +24,13 @@ class StyleSpec extends UnitSpec {
     expectNode(div.of(display is "inline"))
     unmount()
 
-    mount("div [width, height]", div(
-      width := expectedWidth,
-      height := expectedHeight
-    ))
+    mount(
+      "div [width, height]",
+      div(
+        width := expectedWidth,
+        height := expectedHeight
+      )
+    )
     expectNode(
       div.of(
         width is expectedWidth,
@@ -43,10 +46,13 @@ class StyleSpec extends UnitSpec {
     val expectedHeight = s"${expectedHeightNum}px"
     val expectedWidth = s"${expectedWidthNum}px"
 
-    mount("span [width.px, height.px] as int", span(
-      width.px := expectedWidthNum,
-      height.px := expectedHeightNum
-    ))
+    mount(
+      "span [width.px, height.px] as int",
+      span(
+        width.px := expectedWidthNum,
+        height.px := expectedHeightNum
+      )
+    )
     expectNode(
       span.of(
         width is expectedWidth,
@@ -55,10 +61,13 @@ class StyleSpec extends UnitSpec {
     )
     unmount()
 
-    mount("span [width.px, height.px] as double", span(
-      width.px := expectedWidthNum.toDouble,
-      height.px := expectedHeightNum.toDouble
-    ))
+    mount(
+      "span [width.px, height.px] as double",
+      span(
+        width.px := expectedWidthNum.toDouble,
+        height.px := expectedHeightNum.toDouble
+      )
+    )
     expectNode(
       span.of(
         width is expectedWidth,
@@ -75,9 +84,12 @@ class StyleSpec extends UnitSpec {
     assertEquals(style.url("""example".com"""), """url("example%22.com")""")
     assertEquals(style.url("""exa\mple.com\"""), """url("exa%5Cmple.com%5C")""")
 
-    mount("span [backgroundImage.url]", span(
-      backgroundImage.url := "example.jpg",
-    ))
+    mount(
+      "span [backgroundImage.url]",
+      span(
+        backgroundImage.url := "example.jpg",
+      )
+    )
     expectNode(
       span.of(
         backgroundImage is """url(example.jpg)"""
@@ -142,7 +154,7 @@ class StyleSpec extends UnitSpec {
   }
 
   // #TODO[Test] Safari seemed to work in practice, but jsdom does not seem to support prefixes
-  //it("sets styles with prefixes") {
+  // it("sets styles with prefixes") {
   //
   //  val el = span(
   //    backgroundClip.withPrefixes(_.webkit) := "text",
@@ -156,5 +168,5 @@ class StyleSpec extends UnitSpec {
   //      customStyle("-moz-background-clip") is "text"
   //    )
   //  )
-  //}
+  // }
 }

@@ -1,8 +1,8 @@
 package com.raquo.laminar.tests
 
+import com.raquo.laminar.api._
 import com.raquo.laminar.api.A._
 import com.raquo.laminar.api.L.svg._
-import com.raquo.laminar.api._
 import com.raquo.laminar.keys.SvgAttr
 import com.raquo.laminar.utils.UnitSpec
 
@@ -138,7 +138,7 @@ class SvgSpec extends UnitSpec {
       svg.of(
         xmlns is SvgAttr.svgNamespaceUri,
         xmlnsXlink is SvgAttr.xlinkNamespaceUri,
-        a of(
+        a of (
           xlinkHref is "https://example.com"
         )
       )

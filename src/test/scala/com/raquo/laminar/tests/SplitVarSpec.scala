@@ -60,10 +60,13 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(1,One,1)",
-      "update-Foo(1,One,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(1,One,1)",
+        "update-Foo(1,One,1)",
+      )
+    )
     effects.clear()
 
     // --
@@ -78,9 +81,12 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(1,One,2)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(1,One,2)",
+      )
+    )
     effects.clear()
 
     // --
@@ -103,12 +109,15 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(2,Two,1)",
-      "create-Foo(3,Three,1)",
-      "update-Foo(2,Two,1)",
-      "update-Foo(3,Three,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(2,Two,1)",
+        "create-Foo(3,Three,1)",
+        "update-Foo(2,Two,1)",
+        "update-Foo(3,Three,1)",
+      )
+    )
     effects.clear()
 
     assertEquals(fooVars(1).now(), Foo(1, "One", 2))
@@ -141,13 +150,16 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(2,Two,2)",
-      "update-Foo(2,Two,3)",
-      "update-Foo(3,Three,2)",
-      "update-Foo(2,Two,4)",
-      "update-Foo(3,Three,3)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(2,Two,2)",
+        "update-Foo(2,Two,3)",
+        "update-Foo(3,Three,2)",
+        "update-Foo(2,Two,4)",
+        "update-Foo(3,Three,3)",
+      )
+    )
     effects.clear()
 
     // --
@@ -220,9 +232,12 @@ class SplitVarSpec extends UnitSpec {
       ),
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(1,One,1)"
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(1,One,1)"
+      )
+    )
     effects.clear()
 
   }
@@ -266,11 +281,14 @@ class SplitVarSpec extends UnitSpec {
       div of (idAttr is s"item-3"),
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(1,One,1)",
-      "create-Foo(2,Two,1)",
-      "create-Foo(3,Three,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(1,One,1)",
+        "create-Foo(2,Two,1)",
+        "create-Foo(3,Three,1)",
+      )
+    )
     effects.clear()
 
     // --
@@ -321,7 +339,7 @@ class SplitVarSpec extends UnitSpec {
 
     expectNode(div of (
       sentinel
-      ))
+    ))
 
     assertEquals(effects.toList, Nil)
 
@@ -341,12 +359,15 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(1,One,1)",
-      "create-Foo(2,Two,1)",
-      "update-Foo(1,One,1)",
-      "update-Foo(2,Two,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(1,One,1)",
+        "create-Foo(2,Two,1)",
+        "update-Foo(1,One,1)",
+        "update-Foo(2,Two,1)",
+      )
+    )
     effects.clear()
 
     // --
@@ -367,9 +388,12 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(1,One,2)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(1,One,2)",
+      )
+    )
     effects.clear()
 
     // Assert that new array was created, instead of being mutated in-place
@@ -406,9 +430,12 @@ class SplitVarSpec extends UnitSpec {
       sentinel
     ))
 
-    assertEquals(effects.toList, List(
-      "result-event"
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "result-event"
+      )
+    )
     effects.clear()
 
     // --
@@ -427,13 +454,16 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(1,One,1)",
-      "create-Foo(2,Two,1)",
-      "result-event",
-      "update-Foo(1,One,1)",
-      "update-Foo(2,Two,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(1,One,1)",
+        "create-Foo(2,Two,1)",
+        "result-event",
+        "update-Foo(1,One,1)",
+        "update-Foo(2,Two,1)",
+      )
+    )
     effects.clear()
 
     // --
@@ -454,10 +484,13 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "result-event",
-      "update-Foo(1,One,2)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "result-event",
+        "update-Foo(1,One,2)",
+      )
+    )
     effects.clear()
 
     // Assert that the array was mutated in-place, instead of a copy being created
@@ -508,10 +541,13 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(1,One,1)",
-      "update-Foo(1,One,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(1,One,1)",
+        "update-Foo(1,One,1)",
+      )
+    )
     effects.clear()
 
     // --
@@ -526,9 +562,12 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(1,One,2)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(1,One,2)",
+      )
+    )
     effects.clear()
 
     // --
@@ -551,12 +590,15 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(2,Two,1)",
-      "create-Foo(3,Three,1)",
-      "update-Foo(2,Two,1)",
-      "update-Foo(3,Three,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(2,Two,1)",
+        "create-Foo(3,Three,1)",
+        "update-Foo(2,Two,1)",
+        "update-Foo(3,Three,1)",
+      )
+    )
     effects.clear()
 
     assertEquals(fooVars(0).now(), Foo(1, "One", 2))
@@ -589,13 +631,16 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(2,Two,2)",
-      "update-Foo(2,Two,3)",
-      "update-Foo(3,Three,2)",
-      "update-Foo(2,Two,4)",
-      "update-Foo(3,Three,3)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(2,Two,2)",
+        "update-Foo(2,Two,3)",
+        "update-Foo(3,Three,2)",
+        "update-Foo(2,Two,4)",
+        "update-Foo(3,Three,3)",
+      )
+    )
     effects.clear()
 
     // --
@@ -618,10 +663,13 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(3,Three,3)",
-      "update-Foo(2,Two,4)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(3,Three,3)",
+        "update-Foo(2,Two,4)",
+      )
+    )
     effects.clear()
 
     // --
@@ -644,10 +692,13 @@ class SplitVarSpec extends UnitSpec {
       ),
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(2,Two,4)",
-      "update-Foo(1,One,2)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(2,Two,4)",
+        "update-Foo(1,One,2)",
+      )
+    )
     effects.clear()
 
     assertEquals(fooVars(0).now(), Foo(2, "Two", 4))
@@ -674,10 +725,13 @@ class SplitVarSpec extends UnitSpec {
       ),
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(1,One,1)",
-      "update-Foo(2,Two,4)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(1,One,1)",
+        "update-Foo(2,Two,4)",
+      )
+    )
     effects.clear()
 
   }
@@ -730,10 +784,13 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "create-Foo(1,One,1)",
-      "update-Foo(1,One,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "create-Foo(1,One,1)",
+        "update-Foo(1,One,1)",
+      )
+    )
     effects.clear()
 
     // --
@@ -748,9 +805,12 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(1,One,2)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(1,One,2)",
+      )
+    )
     effects.clear()
 
     // --
@@ -765,9 +825,12 @@ class SplitVarSpec extends UnitSpec {
       )
     ))
 
-    assertEquals(effects.toList, List(
-      "update-Foo(2,Two,1)",
-    ))
+    assertEquals(
+      effects.toList,
+      List(
+        "update-Foo(2,Two,1)",
+      )
+    )
     effects.clear()
 
     assertEquals(childVar.get.now(), Foo(2, "Two", 1))

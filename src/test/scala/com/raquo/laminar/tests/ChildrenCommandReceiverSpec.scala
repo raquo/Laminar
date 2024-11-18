@@ -1,8 +1,8 @@
 package com.raquo.laminar.tests
 
 import com.raquo.domtestutils.matching.Rule
-import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, Replace}
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, Replace}
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.immutable

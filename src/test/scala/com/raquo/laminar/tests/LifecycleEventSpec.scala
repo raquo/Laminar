@@ -102,7 +102,7 @@ class LifecycleEventSpec extends UnitSpec {
     textBus.writer.onNext("world")
 
     events shouldBe mutable.Buffer(NodeDidMount, NodeWillUnmount, NodeDidMount)
-    expectNode(sectionTag.of("Hello, ", sentinel, div.of( span.of("world"))))
+    expectNode(sectionTag.of("Hello, ", sentinel, div.of(span.of("world"))))
   }
 
   it("Changing parent on a node fires appropriate events") {
@@ -292,9 +292,9 @@ class LifecycleEventSpec extends UnitSpec {
     expectNewEvents(
       "parent3 was moved into parent5 which is unmounted",
       Seq(
-        (grandChild3, NodeWillUnmount),
-        (child3, NodeWillUnmount),
-        (parent3, NodeWillUnmount)
+        grandChild3 -> NodeWillUnmount,
+        child3 -> NodeWillUnmount,
+        parent3 -> NodeWillUnmount
       )
     )
   }

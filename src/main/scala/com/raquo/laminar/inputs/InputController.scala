@@ -72,7 +72,7 @@ class InputController[Ref <: dom.html.Element, A, B](
 
   private[laminar] def bind(): DynamicSubscription = {
     ReactiveElement.bindSubscriptionUnsafe(element) { ctx =>
-      // #TODO[Format] - keep an empty line here
+      //
       // This should be run when the element's type property has already been set,
       // and doing this on bind gives the highest chance of that.
       checkControllerCompatibility()

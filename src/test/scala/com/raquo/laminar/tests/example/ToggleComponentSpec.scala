@@ -8,7 +8,7 @@ import scala.util.Random
 
 class ToggleComponentSpec extends UnitSpec {
 
-  class Toggle private(
+  class Toggle private (
     val checkedStream: EventStream[Boolean],
     val node: HtmlElement
   )
@@ -17,7 +17,7 @@ class ToggleComponentSpec extends UnitSpec {
     // @TODO how do we make this a controlled component?
     def apply(caption: String = "TOGGLE MEEEE"): Toggle = {
       val clickBus = new EventBus[dom.MouseEvent]
-      val checkedStream = clickBus.events.map(ev => ev.target.asInstanceOf[dom.HTMLInputElement].checked) //.debug("checked")
+      val checkedStream = clickBus.events.map(ev => ev.target.asInstanceOf[dom.HTMLInputElement].checked) // .debug("checked")
 
       // This will only be evaluated once
       val rand = Random.nextInt(99)
@@ -42,7 +42,6 @@ class ToggleComponentSpec extends UnitSpec {
       new Toggle(checkedStream, node)
     }
   }
-
 
   it("renders") {
     val caption = "Caption_" + Random.nextString(5)

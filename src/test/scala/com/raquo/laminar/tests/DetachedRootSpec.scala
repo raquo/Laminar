@@ -40,7 +40,7 @@ class DetachedRootSpec extends UnitSpec {
 
     expectNode(
       root.node.ref,
-      div of("hello", "world")
+      div of ("hello", "world")
     )
 
     assertEquals(root.isActive, false)
@@ -68,7 +68,7 @@ class DetachedRootSpec extends UnitSpec {
 
     expectNode(
       root.node.ref,
-      div of("hello", "you")
+      div of ("hello", "you")
     )
 
     // --
@@ -79,7 +79,7 @@ class DetachedRootSpec extends UnitSpec {
 
     expectNode(
       root.node.ref,
-      div of("hello", "you")
+      div of ("hello", "you")
     )
   }
 }

@@ -18,7 +18,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         sentinel
       )
@@ -29,7 +29,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     bus.emit("a")
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "a"
       )
@@ -40,7 +40,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     bus.emit("b")
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "b"
       )
@@ -61,7 +61,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         sentinel,
         sentinel
@@ -73,7 +73,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     bus1.emit("a")
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "a",
         sentinel
@@ -85,7 +85,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     bus1.emit("b")
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "b",
         sentinel
@@ -97,7 +97,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     bus2.emit("1")
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "b",
         "1"
@@ -109,7 +109,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     bus2.emit("2")
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "b",
         "2"
@@ -124,7 +124,7 @@ class ChildTextReceiverSpec extends UnitSpec {
     )
 
     expectNode(
-      div of(
+      div of (
         "Hello",
         "c",
         "3"

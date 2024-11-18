@@ -16,10 +16,13 @@ class HtmlAttrSpec extends UnitSpec {
     expectNode(div.of(title is expectedTitle))
     unmount()
 
-    mount("td [colSpan, rowSpan]", td(
-      colSpan := expectedColSpan,
-      rowSpan := expectedRowSpan
-    ))
+    mount(
+      "td [colSpan, rowSpan]",
+      td(
+        colSpan := expectedColSpan,
+        rowSpan := expectedRowSpan
+      )
+    )
     expectNode(
       td.of(
         colSpan is expectedColSpan,

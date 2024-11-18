@@ -148,18 +148,19 @@ class SyntaxSpec extends UnitSpec {
       mixed
     )
 
-    expectNode(actualNode.ref, div.of(
-      "a", "b",
-      "aa", "bb",
-      "aaa", "bbb",
-      "aaaa", "bbbb",
-      span of "ya", articleTag of "yo",
-      span of "boo",
-      span of "foo",
-      span of "bar",
-      span of "js",
-      "c", input
-    ))
+    expectNode(actualNode.ref,
+      div.of(
+        "a", "b",
+        "aa", "bb",
+        "aaa", "bbb",
+        "aaaa", "bbbb",
+        span of "ya", articleTag of "yo",
+        span of "boo",
+        span of "foo",
+        span of "bar",
+        span of "js",
+        "c", input
+      ))
   }
 
   it("inContext modifier infers precise type") {
@@ -205,16 +206,19 @@ class SyntaxSpec extends UnitSpec {
 
   it("onMountUnmountCallback infers precise type") {
 
-    val el = div("Hello world", onMountUnmountCallback(
-      mount = c => {
-        val proof: MountContext[Div] = c
-        ()
-      },
-      unmount = n => {
-        val proof: Div = n
-        ()
-      }
-    ))
+    val el = div(
+      "Hello world",
+      onMountUnmountCallback(
+        mount = c => {
+          val proof: MountContext[Div] = c
+          ()
+        },
+        unmount = n => {
+          val proof: Div = n
+          ()
+        }
+      )
+    )
 
     el.amend(
       onMountUnmountCallback(
@@ -362,7 +366,6 @@ class SyntaxSpec extends UnitSpec {
     val textObs = Observer.empty[String]
     val textObservable = textStream: Observable[String]
 
-
     // #Note using defs to avoid element reuse
 
     def divObservable: Observable[Div] = EventStream.fromValue(div())
@@ -383,11 +386,9 @@ class SyntaxSpec extends UnitSpec {
     val xhrBus = new EventBus[dom.XMLHttpRequest]
     val ajaxObs = Observer.empty[dom.XMLHttpRequest]
 
-
-
     assertTypeError("focus <-- boolSignal")
 
-    //implicit def xxxx[A](obs: Observable[_]#Self[A]): Source[A] = obs: Observable[A]
+    // implicit def xxxx[A](obs: Observable[_]#Self[A]): Source[A] = obs: Observable[A]
 
     div(
       cls("cls1") <-- boolSignal,
@@ -410,7 +411,7 @@ class SyntaxSpec extends UnitSpec {
       child.maybe <-- divObservable.map(Some(_)),
       child.maybe <-- Signal.fromFuture(divFuture),
       child.maybe <-- Signal.fromJsPromise(divPromise),
-      //child.int <-- periodicInt,
+      // child.int <-- periodicInt,
       child.text <-- periodicInt,
       child.text <-- boolBus,
       child.text <-- doubleBus.events,
@@ -438,7 +439,7 @@ class SyntaxSpec extends UnitSpec {
     div(
       onClick --> (_ => println("yo")),
       onClick.mapTo(0) --> (_ => println("yo")),
-      //onClick --> Observer(_ => println("yo")), // This didn't work pre-0.12.0 either :(
+      // onClick --> Observer(_ => println("yo")), // This didn't work pre-0.12.0 either :(
     )
 
     div(

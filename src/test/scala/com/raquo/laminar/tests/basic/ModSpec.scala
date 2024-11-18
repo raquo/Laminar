@@ -77,6 +77,4 @@ class ModSpec extends UnitSpec {
     )
   }
 
-
-
 }

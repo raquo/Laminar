@@ -16,10 +16,13 @@ class ReflectedAttrSpec extends UnitSpec {
     expectNode(div.of(rel is expectedRel))
     unmount()
 
-    mount("td [colSpan, rowSpan]", td(
-      href := expectedHref,
-      alt := expectedAlt
-    ))
+    mount(
+      "td [colSpan, rowSpan]",
+      td(
+        href := expectedHref,
+        alt := expectedAlt
+      )
+    )
     expectNode(
       td.of(
         href is expectedHref,

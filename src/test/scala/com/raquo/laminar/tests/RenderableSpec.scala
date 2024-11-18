@@ -35,7 +35,7 @@ class RenderableSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "0001", // Int – using custom implicit val
         "TRUE", // Boolean – using custom implicit val
         "2", // Double – using built-in implicit val
@@ -63,7 +63,6 @@ class RenderableSpec extends UnitSpec {
   }
 
   implicit val componentRenderable: RenderableNode[Component] = RenderableNode(_.node)
-
 
   it("Component rendering") {
 
@@ -121,7 +120,7 @@ class RenderableSpec extends UnitSpec {
     mount(el1, "Static values")
 
     expectNode(
-      div of(
+      div of (
         input of (idAttr is "Solo"),
         input of (idAttr is "Option"),
         input of (idAttr is "List"),
@@ -151,7 +150,7 @@ class RenderableSpec extends UnitSpec {
     mount(el2, "Dynamic children")
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         input of (idAttr is "Solo.child"),
         sentinel,
@@ -181,7 +180,7 @@ class RenderableSpec extends UnitSpec {
     mount(el3)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         input of (idAttr is "Solo.onMountInsert"),
         sentinel,
@@ -258,7 +257,7 @@ class RenderableSpec extends UnitSpec {
     mount(el1, "Static values")
 
     expectNode(
-      div of(
+      div of (
         input of (idAttr is "Solo"),
         input of (idAttr is "Option"),
         input of (idAttr is "List"),
@@ -402,7 +401,7 @@ class RenderableSpec extends UnitSpec {
     bus.emit(1)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         div of ("div-0"),
         sentinel,
@@ -452,7 +451,7 @@ class RenderableSpec extends UnitSpec {
     bus.emit(0)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         sentinel,
         sentinel,
@@ -469,7 +468,7 @@ class RenderableSpec extends UnitSpec {
     bus.emit(1)
 
     expectNode(
-      div of(
+      div of (
         sentinel,
         div of ("div-0"),
         sentinel,

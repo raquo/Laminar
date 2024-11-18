@@ -7,18 +7,21 @@ import com.raquo.laminar.utils.UnitSpec
 
 class MountHooksSpec extends UnitSpec {
 
-  it ("onMountCallback infers precise type and provides implicit owner") {
+  it("onMountCallback infers precise type and provides implicit owner") {
 
     var value = 0
 
     val bus = new EventBus[Int]
     val observer = Observer[Int](ev => value = ev)
 
-    val el = div("Hello", onMountCallback(ctx => {
-      import ctx.owner
-      val x: Div = ctx.thisNode
-      bus.events.addObserver(observer) // using owner implicitly
-    }))
+    val el = div(
+      "Hello",
+      onMountCallback(ctx => {
+        import ctx.owner
+        val x: Div = ctx.thisNode
+        bus.events.addObserver(observer) // using owner implicitly
+      })
+    )
 
     // --
 
@@ -33,7 +36,7 @@ class MountHooksSpec extends UnitSpec {
     assert(value == 2)
   }
 
-  it ("onMountBind works and infers precise type") {
+  it("onMountBind works and infers precise type") {
 
     var value = 0
     var numMountCalls = 0
@@ -41,11 +44,14 @@ class MountHooksSpec extends UnitSpec {
     val bus = new EventBus[Int]
     val observer = Observer[Int](ev => value = ev)
 
-    val el = div("Hello", onMountBind(ctx => {
-      val x: Div = ctx.thisNode
-      numMountCalls += 1
-      bus.events --> observer
-    }))
+    val el = div(
+      "Hello",
+      onMountBind(ctx => {
+        val x: Div = ctx.thisNode
+        numMountCalls += 1
+        bus.events --> observer
+      })
+    )
 
     // --
 
@@ -102,7 +108,7 @@ class MountHooksSpec extends UnitSpec {
     assert(numMountCalls == 0)
   }
 
-  it ("onMountCallback and onUnmountCallback work for repeated mounting") {
+  it("onMountCallback and onUnmountCallback work for repeated mounting") {
 
     var numMounts = 0
     var numUnmounts = 0
@@ -205,7 +211,6 @@ class MountHooksSpec extends UnitSpec {
       expectNode(el.ref, div.of("Hello ", sentinel, span.of("Yan"), sentinel, div.of("Yan"), " world"), "unmounted")
       assert(numMountCalls == 0)
     }
-
 
     withClue("unmounted event with other obs:") {
 
@@ -489,7 +494,7 @@ class MountHooksSpec extends UnitSpec {
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x2",
@@ -515,7 +520,7 @@ class MountHooksSpec extends UnitSpec {
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x3",
@@ -538,7 +543,7 @@ class MountHooksSpec extends UnitSpec {
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/1",
@@ -559,7 +564,7 @@ class MountHooksSpec extends UnitSpec {
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 8
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -581,7 +586,7 @@ class MountHooksSpec extends UnitSpec {
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -606,7 +611,7 @@ class MountHooksSpec extends UnitSpec {
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x3",
@@ -616,7 +621,6 @@ class MountHooksSpec extends UnitSpec {
         " world"
       )
     )
-
 
     assert(numModCalls == 1)
     assert(numBindCalls == 4)
@@ -668,7 +672,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         " world"
@@ -686,7 +690,7 @@ class MountHooksSpec extends UnitSpec {
     xChildIx.emit(1)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x1",
@@ -705,7 +709,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x1",
@@ -715,13 +719,12 @@ class MountHooksSpec extends UnitSpec {
 
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
 
-
     // --
 
     yChildrenIx.emit(1)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/1",
@@ -736,7 +739,7 @@ class MountHooksSpec extends UnitSpec {
     yChildrenIx.emit(2)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -754,7 +757,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -774,7 +777,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -790,7 +793,7 @@ class MountHooksSpec extends UnitSpec {
     xChildIx.emit(2)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x2",
@@ -807,7 +810,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x2",
@@ -826,7 +829,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x2",
@@ -841,7 +844,7 @@ class MountHooksSpec extends UnitSpec {
     yChildrenIx.emit(1)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/1",
@@ -860,7 +863,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/1",
@@ -875,7 +878,7 @@ class MountHooksSpec extends UnitSpec {
     xChildIx.emit(3)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         span of "x3",
@@ -884,7 +887,6 @@ class MountHooksSpec extends UnitSpec {
     )
 
     ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
-
 
     assert(numModCalls == 1)
     assert(numBindCalls == 7)
@@ -926,7 +928,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         " world"
@@ -942,7 +944,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         " world"
@@ -954,7 +956,7 @@ class MountHooksSpec extends UnitSpec {
     yChildrenIx.emit(1)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/1",
@@ -967,7 +969,7 @@ class MountHooksSpec extends UnitSpec {
     yChildrenIx.emit(2)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -985,7 +987,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/2",
@@ -999,7 +1001,7 @@ class MountHooksSpec extends UnitSpec {
     xChildIx.emit(1)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         // Note: no extra sentinel node! For performance.
         "x1",
@@ -1012,7 +1014,7 @@ class MountHooksSpec extends UnitSpec {
     xChildIx.emit(2)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         // Note: no extra sentinel node! For performance.
         "x2",
@@ -1029,7 +1031,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel, // sentinel node already re-inserted by the children inserter
         "x2",
@@ -1042,7 +1044,7 @@ class MountHooksSpec extends UnitSpec {
     yChildrenIx.emit(3)
 
     expectNode(
-      div of(
+      div of (
         "Hello ",
         sentinel,
         div of "y1/3",
@@ -1064,7 +1066,7 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
   }
 
-  it ("Element lifecycle owners can not be used after unmount") {
+  it("Element lifecycle owners can not be used after unmount") {
 
     var cleanedCounter = 0
 

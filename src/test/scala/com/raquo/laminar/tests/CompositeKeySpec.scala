@@ -11,37 +11,37 @@ class CompositeKeySpec extends UnitSpec {
     expectNode(div.of(cls is "foo"))
 
     withClue("Append, not replace (1)") {
-      (cls := "bar") (el)
+      (cls := "bar")(el)
       expectNode(div.of(cls is "foo bar"))
     }
 
     withClue("Append, not replace (2):") {
-      (cls := "baz") (el)
+      (cls := "baz")(el)
       expectNode(div.of(cls is "foo bar baz"))
     }
 
     withClue("No duplicates:") {
-      (cls := "bar") (el)
+      (cls := "bar")(el)
       expectNode(div.of(cls is "foo bar baz"))
     }
 
     withClue("Adding empty class does nothing:") {
-      (cls := "") (el)
+      (cls := "")(el)
       expectNode(div.of(cls is "foo bar baz"))
     }
 
     withClue("Adding empty class does nothing:") {
-      (cls := " ") (el)
+      (cls := " ")(el)
       expectNode(div.of(cls is "foo bar baz"))
     }
 
     withClue("Adding two space separated classes works, even with an extra space:") {
-      (cls := "fox  box") (el)
+      (cls := "fox  box")(el)
       expectNode(div.of(cls is "foo bar baz fox box"))
     }
 
     withClue("Adding again in different order does not produce duplicates:") {
-      (cls := "box fox") (el)
+      (cls := "box fox")(el)
       expectNode(div.of(cls is "foo bar baz fox box"))
     }
   }
@@ -332,7 +332,7 @@ class CompositeKeySpec extends UnitSpec {
     expectNode(
       div.of(
         cls is ("always foo external2 bar")
-        )
+      )
     )
   }
 
@@ -350,7 +350,7 @@ class CompositeKeySpec extends UnitSpec {
     }
 
     withClue("Append, not replace (2):") {
-      poly.amend(svg.cls := "baz") (el)
+      poly.amend(svg.cls := "baz")(el)
       expectNode(svg.svg.of(svg.polyline.of(svg.cls is "foo bar baz")))
     }
 

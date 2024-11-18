@@ -2,8 +2,8 @@ package com.raquo.laminar.tests.basic
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -105,7 +105,7 @@ class ElementSpec extends UnitSpec {
           cls is "foo",
           "world"
         ),
-        span of(
+        span of (
           cls is "bar",
           "sun"
         ),
@@ -167,7 +167,7 @@ class ElementSpec extends UnitSpec {
             s.r is "30",
             s.fill is "red"
           ),
-          s.circle of(
+          s.circle of (
             s.cx is "2000",
             s.cy is "150",
             s.r is "300",

@@ -85,11 +85,15 @@ class WeirdCasesSpec extends UnitSpec {
       )
     )
 
-    expectNode(div.of("hello", sentinel, span.of(
-      "num: 0",
+    expectNode(div.of(
+      "hello",
       sentinel,
-      articleTag of "innerNum: 0"
-    )))
+      span.of(
+        "num: 0",
+        sentinel,
+        articleTag of "innerNum: 0"
+      )
+    ))
 
     // --
 
@@ -202,11 +206,14 @@ class WeirdCasesSpec extends UnitSpec {
     )
 
     withClue("before first mount:") {
-      expectNode(el.ref, div.of(
-        "Hello ",
-        sentinel,
-        " world"
-      ))
+      expectNode(
+        el.ref,
+        div.of(
+          "Hello ",
+          sentinel,
+          " world"
+        )
+      )
     }
 
     assert(!ReactiveElement.isActive(el))
@@ -243,8 +250,8 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
-        " world")
-      )
+        " world"
+      ))
 
       assert(ReactiveElement.isActive(el))
       assert(ReactiveElement.isActive(alpha))
@@ -267,15 +274,18 @@ class WeirdCasesSpec extends UnitSpec {
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
-      expectNode(el.ref, div.of(
-        "Hello ",
-        sentinel,
-        span.of("Alpha"),
-        span.of("Bravo"),
-        span.of("Charlie"),
-        span.of("Delta"),
-        span.of("Eagle"),
-        " world")
+      expectNode(
+        el.ref,
+        div.of(
+          "Hello ",
+          sentinel,
+          span.of("Alpha"),
+          span.of("Bravo"),
+          span.of("Charlie"),
+          span.of("Delta"),
+          span.of("Eagle"),
+          " world"
+        )
       )
 
       assert(!ReactiveElement.isActive(el))
@@ -301,8 +311,8 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Delta"),
         span.of("Bravo"),
         span.of("Tor"),
-        " world")
-      )
+        " world"
+      ))
 
       assert(ReactiveElement.isActive(john))
       assert(ReactiveElement.isActive(alpha))
@@ -330,8 +340,8 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Alpha"),
         span.of("Elan"),
         span.of("John"),
-        " world")
-      )
+        " world"
+      ))
     }
 
     assert(ReactiveElement.isActive(tor))
@@ -370,17 +380,20 @@ class WeirdCasesSpec extends UnitSpec {
       onMountInsert { _ =>
         children <-- signal
       },
-      onMountInsert { _ => children <-- copyStream},
+      onMountInsert { _ => children <-- copyStream },
       " world"
     )
 
     withClue("before first mount:") {
-      expectNode(el.ref, div.of(
-        "Hello ",
-        sentinel,
-        sentinel,
-        " world"
-      ))
+      expectNode(
+        el.ref,
+        div.of(
+          "Hello ",
+          sentinel,
+          sentinel,
+          " world"
+        )
+      )
     }
 
     assert(!ReactiveElement.isActive(el))
@@ -424,8 +437,8 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
-        " world")
-      )
+        " world"
+      ))
 
       // @TODO[Test] we don't have references to stream elements handy so we don't test those yet
 
@@ -450,21 +463,24 @@ class WeirdCasesSpec extends UnitSpec {
       // Var updates, but element won't be populated until re-mounted
       nameVar.writer.onNext(axel :: alpha :: delta :: dick :: bravo :: eric :: Nil)
 
-      expectNode(el.ref, div.of(
-        "Hello ",
-        sentinel,
-        span.of("Alpha"),
-        span.of("Bravo"),
-        span.of("Charlie"),
-        span.of("Delta"),
-        span.of("Eagle"),
-        sentinel,
-        span.of("Alpha"),
-        span.of("Bravo"),
-        span.of("Charlie"),
-        span.of("Delta"),
-        span.of("Eagle"),
-        " world")
+      expectNode(
+        el.ref,
+        div.of(
+          "Hello ",
+          sentinel,
+          span.of("Alpha"),
+          span.of("Bravo"),
+          span.of("Charlie"),
+          span.of("Delta"),
+          span.of("Eagle"),
+          sentinel,
+          span.of("Alpha"),
+          span.of("Bravo"),
+          span.of("Charlie"),
+          span.of("Delta"),
+          span.of("Eagle"),
+          " world"
+        )
       )
 
       assert(!ReactiveElement.isActive(el))
@@ -487,21 +503,24 @@ class WeirdCasesSpec extends UnitSpec {
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
-      expectNode(el.ref, div.of(
-        "Hello ",
-        sentinel,
-        span.of("Alpha"),
-        span.of("Bravo"),
-        span.of("Charlie"),
-        span.of("Delta"),
-        span.of("Eagle"),
-        sentinel,
-        span.of("Alpha"),
-        span.of("Bravo"),
-        span.of("Charlie"),
-        span.of("Delta"),
-        span.of("Eagle"),
-        " world")
+      expectNode(
+        el.ref,
+        div.of(
+          "Hello ",
+          sentinel,
+          span.of("Alpha"),
+          span.of("Bravo"),
+          span.of("Charlie"),
+          span.of("Delta"),
+          span.of("Eagle"),
+          sentinel,
+          span.of("Alpha"),
+          span.of("Bravo"),
+          span.of("Charlie"),
+          span.of("Delta"),
+          span.of("Eagle"),
+          " world"
+        )
       )
 
       assert(!ReactiveElement.isActive(el))
@@ -534,8 +553,8 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
-        " world")
-      )
+        " world"
+      ))
 
       assert(ReactiveElement.isActive(john))
       assert(ReactiveElement.isActive(alpha))
@@ -573,8 +592,8 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Alpha"),
         span.of("Elan"),
         span.of("John"),
-        " world")
-      )
+        " world"
+      ))
     }
 
     assert(ReactiveElement.isActive(tor))

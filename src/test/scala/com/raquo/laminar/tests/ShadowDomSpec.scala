@@ -57,28 +57,37 @@ class ShadowDomSpec extends UnitSpec {
         assert(DomApi.isDescendantOf(app.ref, shadowRoot))
         assert(DomApi.isDescendantOf(app.ref, dom.document))
 
-        expectNode(app.ref, div.of(
-          "Hello, ",
-          span.of(sentinel))
+        expectNode(
+          app.ref,
+          div.of(
+            "Hello, ",
+            span.of(sentinel)
+          )
         )
 
         // --
 
         bus.writer.onNext("world")
 
-        expectNode(app.ref, div.of(
-          "Hello, ",
-          span.of("world")
-        ))
+        expectNode(
+          app.ref,
+          div.of(
+            "Hello, ",
+            span.of("world")
+          )
+        )
 
         // --
 
         bus.writer.onNext("you")
 
-        expectNode(app.ref, div.of(
-          "Hello, ",
-          span.of("you")
-        ))
+        expectNode(
+          app.ref,
+          div.of(
+            "Hello, ",
+            span.of("you")
+          )
+        )
 
         // --
 
