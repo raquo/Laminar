@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: "22"
       - name: Setup JVM
         uses: actions/setup-java@v3
         with:
@@ -26,3 +26,5 @@ jobs:
           distribution: 'adopt'
       - name: Run tests
         run: sbt +test
+      - name: Code formatting check
+        run: sbt scalafmtCheckAll

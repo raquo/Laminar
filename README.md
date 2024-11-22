@@ -28,6 +28,15 @@ Sales pitch, quick start, documentation, live examples, and other resources, all
 Live demo, with examples, code snippets, and a fully working client + server, dev + prod build setup that you can experiment with, and then deploy to the cloud for free.
 
 
+## Contributing
+
+Please run `sbt +test` and `sbt scalafmtAll` locally before submitting the PR.
+
+Note that all files under `com.raquo.laminar.defs` are generated, and should not be edited directly – for how to add more attributes / props, etc., see [Missing Keys](https://laminar.dev/documentation#missing-keys) and then [contribute to Scala DOM Types](https://github.com/raquo/scala-dom-types?tab=readme-ov-file#contributing).
+
+
+
+
 ## Sponsorships
 
 Huge thanks to [all of our sponsors](https://github.com/sponsors/raquo) – your backing enables me to spend more time on Laminar, Airstream, various add-ons, as well as documentation, learning materials, and community support.

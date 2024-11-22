@@ -23,6 +23,8 @@ jobs:
           distribution: 'adopt'
       - name: Tests
         run: sbt +test
+      - name: Code formatting check
+        run: sbt scalafmtCheckAll
       - name: Release
         run: sbt ci-release
         env:
