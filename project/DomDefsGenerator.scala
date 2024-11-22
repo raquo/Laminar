@@ -23,7 +23,9 @@ object DomDefsGenerator {
     override def scalaJsElementTypeParam: String = "Ref"
   }
 
-  private val cache = new CanonicalCache("project")
+  private val cache = new CanonicalCache("project") {
+    override val fileName: String = "../.downloads/domtypes.version"
+  }
 
   def cachedGenerate(): Unit = {
     cache.triggerIfCacheKeyUpdated(
