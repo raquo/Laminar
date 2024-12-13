@@ -101,21 +101,9 @@
 <li><a href="#troubleshooting">Troubleshooting</a></li>
 </ul>
 <h2><a class="anchor" aria-hidden="true" id="introduction"></a><a href="#introduction" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Introduction</h2>
-<p>This documentation is for Laminar version <strong>v17.1.0</strong>. For older versions, see below.</p>
-<table>
-<thead>
-<tr><th style="text-align:left">Laminar</th><th style="text-align:left">Airstream</th></tr>
-</thead>
-<tbody>
-<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v17.1.0/docs/Documentation.md">v17.1.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v17.1.0/README.md">v17.1.0</a></strong></td></tr>
-<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v17.0.0/docs/Documentation.md">v17.0.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v17.0.0/README.md">v17.0.0</a></strong></td></tr>
-<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v16.0.0/docs/Documentation.md">v16.0.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v16.0.0/README.md">v16.0.0</a></strong></td></tr>
-<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v15.0.0/docs/Documentation.md">v15.0.0</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v15.0.0/README.md">v15.0.0</a></strong></td></tr>
-<tr><td style="text-align:left"><strong><a href="https://github.com/raquo/Laminar/blob/v0.14.2/docs/Documentation.md">v0.14.2</a></strong></td><td style="text-align:left"><strong><a href="https://github.com/raquo/Airstream/blob/v0.14.2/README.md">v0.14.2</a></strong></td></tr>
-</tbody>
-</table>
-<p>For documentation of older versions, see git tags.</p>
-<p><a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/index.html">Laminar API doc</a> • <a href="https://javadoc.io/doc/com.raquo/airstream_sjs1_3/latest/com/raquo/airstream/index.html">Airstream API doc</a></p>
+<p>This documentation is for Laminar version <strong>v17.2.0</strong>. For documentation of older versions, open the corresponding git tag, and use file search to find the documentation.md file. For example: <a href="https://github.com/raquo/Laminar/blob/v17.0.0/website/docs/documentation.md">v17.0.0 docs</a>.</p>
+<p>Laminar depends on Airstream – usually but not always on the same-numbered version of Airstream. If neeeded, you can check the exact Airstream version in the <code>project/Versions.scala</code> file.</p>
+<p><a href="https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html">Laminar API doc</a> • <a href="https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/com/raquo/airstream/index.html">Airstream API doc</a></p>
 <p>Laminar is very simple under the hood. Don't be afraid to use &quot;Go to definition&quot; functionality of your IDE to see how a certain method works. That said, the documentation provided here explains the mechanics of Laminar in great detail. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.</p>
 <p>If you're new here, watching <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">the Laminar video</a> will be time well spent – it's a good introduction to Laminar, covering both the big ideas and some inner workings.</p>
 <p>See also: <a href="https://laminar.dev/quick-start">Quick start</a>, <a href="https://laminar.dev/examples/hello-world">Live examples</a>.</p>
@@ -343,10 +331,12 @@ div(el, div(el))
 </code></pre>
 <p>If that is what you wanted, that's fine, Laminar will not break, it's just weird. However, you probably intended to render &quot;hello&quot; twice, in both the outer and inner div, and for that you want to make <code>el</code> a <code>def</code> instead of a <code>val</code>, so that when it's used the second time, a new element is created instead of reusing the first instance of <code>el</code>.</p>
 <h3><a class="anchor" aria-hidden="true" id="missing-keys"></a><a href="#missing-keys" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Missing Keys</h3>
+<p>What do you do if you want to use a less-popular HTML attribute or prop that Laminar does not (yet) have? How do you define custom attributes, custom html props, styles, etc.?</p>
 <p>Laminar gets the definition of HTML and SVG DOM tags, attributes, properties, events and CSS styles from <a href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a>. These definitions provide hundreds of keys, but they are not exhaustive. For example, we don't have CSS grid properties like <code>grid-area</code> defined, so those are not available to be put on the left hand side of <code>:=</code> methods.</p>
 <p>To work around this, you can contribute definitions of missing attrs / props / etc. to Scala DOM Types. It's easy – you don't even need to code any logic, just need to specify the names and types of the things you want to add. For example, the <code>value</code> property is defined at the bottom of <a href="https://github.com/raquo/scala-dom-types/blob/master/shared/src/main/scala/com/raquo/domtypes/defs/props/PropDefs.scala">PropDefs.scala</a>. Read <a href="https://github.com/raquo/scala-dom-types/#reflected-attributes">this</a> to understand the difference between props and attributes and reflected attributes.</p>
 <p>Alternatively, you can define the keys locally in your project in the same manner as Laminar does it, for example:</p>
-<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> superValue: <span class="hljs-type">HtmlProp</span>[<span class="hljs-type">String</span>] = htmlProp(<span class="hljs-string">"superValue"</span>, <span class="hljs-type">StringAsIsCodec</span>) <span class="hljs-comment">// imaginary prop</span>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.codecs.*
+<span class="hljs-keyword">val</span> superValue: <span class="hljs-type">HtmlProp</span>[<span class="hljs-type">String</span>] = htmlProp(<span class="hljs-string">"superValue"</span>, <span class="hljs-type">StringAsIsCodec</span>) <span class="hljs-comment">// imaginary prop</span>
 <span class="hljs-keyword">val</span> onTouchMove: <span class="hljs-type">EventProp</span>[dom.<span class="hljs-type">TouchEvent</span>] = eventProp(<span class="hljs-string">"touchmove"</span>)
 
 div(
@@ -356,6 +346,15 @@ div(
 </code></pre>
 <p>And similarly with <code>styleProp</code>, <code>htmlAttr</code>, <code>htmlTag</code>, <code>svgAttr</code>, <code>svgTag</code>.</p>
 <p>I mentioned <code>onTouchMove</code> as an example, but you don't have to do this for touch events specifically, because <a href="https://github.com/felher">@felher</a> already <a href="https://github.com/raquo/scala-dom-types/pull/102">added</a> them to address this particular shortcoming. Unless you want touch events regardless of that, in which case, you're welcome to it.</p>
+<p>Some more examples of real attrs / props (that may already exist in Laminar):</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">import</span> com.raquo.laminar.codecs.*
+
+<span class="hljs-keyword">val</span> tabIndex: <span class="hljs-type">HtmlProp</span>[<span class="hljs-type">Int</span>, <span class="hljs-type">Int</span>] = htmlProp(<span class="hljs-string">"tabIndex"</span>, <span class="hljs-type">IntAsIsCodec</span>) <span class="hljs-comment">// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex</span>
+
+<span class="hljs-keyword">val</span> asyncAttr: <span class="hljs-type">HtmlAttr</span>[<span class="hljs-type">Boolean</span>] = htmlAttr(<span class="hljs-string">"async"</span>, <span class="hljs-type">BooleanAsAttrPresenceCodec</span>) <span class="hljs-comment">// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#async</span>
+
+<span class="hljs-keyword">val</span> decodingAttr: <span class="hljs-type">HtmlProp</span>[<span class="hljs-type">String</span>, <span class="hljs-type">String</span>] = htmlProp(<span class="hljs-string">"decoding"</span>, <span class="hljs-type">StringAsIsCodec</span>) <span class="hljs-comment">// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img#decoding</span>
+</code></pre>
 <h3><a class="anchor" aria-hidden="true" id="modifiers-faq"></a><a href="#modifiers-faq" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Modifiers FAQ</h3>
 <ol>
 <li><p>Yes, you can create custom Modifiers by simply extending the Modifier trait. However, if your modifier creates <strong>multiple</strong> subscriptions / binds <strong>multiple</strong> observables, you should look at the implementation of <code>Modifier.apply</code>, and if applicable, wrap the part of your code that creates several subscriptions at once in <code>Transaction.onStart.shared</code>.</p></li>

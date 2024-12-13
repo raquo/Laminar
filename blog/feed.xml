@@ -4,7 +4,7 @@
         <title>Laminar Blog</title>
         <link>https://laminar.dev/blog</link>
         <description>The best place to stay up-to-date with the latest Laminar news and events.</description>
-        <lastBuildDate>Wed, 14 Aug 2024 06:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 13 Dec 2024 06:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <image>
@@ -13,6 +13,14 @@
             <link>https://laminar.dev/blog</link>
         </image>
         <copyright>Copyright © 2024 Nikita Gazarov</copyright>
+        <item>
+            <title><![CDATA[Laminar v17.2.0]]></title>
+            <link>https://laminar.dev/blog/2024/12/13/laminar-v17.2.0.html</link>
+            <guid>https://laminar.dev/blog/2024/12/13/laminar-v17.2.0.html</guid>
+            <pubDate>Fri, 13 Dec 2024 06:00:00 GMT</pubDate>
+            <description><![CDATA[<p>New Airstream features: splitting by pattern match; LocalStorage Vars, other derived Vars, mapping strict signals without an owner, and more.</p>
+]]></description>
+        </item>
         <item>
             <title><![CDATA[Laminar v17.1.0, News & Stickers]]></title>
             <link>https://laminar.dev/blog/2024/08/14/laminar-v17.1.0.html</link>

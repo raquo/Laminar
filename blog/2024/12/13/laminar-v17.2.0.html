@@ -1,0 +1,283 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v17.2.0 · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="New Airstream features: splitting by pattern match; LocalStorage Vars, other derived Vars, mapping strict signals without an owner, and more."/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v17.2.0 · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2024/12/13/laminar-v17.2.0"/><meta property="og:description" content="New Airstream features: splitting by pattern match; LocalStorage Vars, other derived Vars, mapping strict signals without an owner, and more."/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="https://demo.laminar.dev" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2024/12/13/laminar-v17.2.0">Laminar v17.2.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2024/08/14/laminar-v17.1.0">Laminar v17.1.0, News &amp; Stickers</a></li><li class="navListItem"><a class="navItem" href="/blog/2024/05/14/laminar-v17.0.0">Laminar v17.0.0 &amp; Shoelace Web Components v0.1.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/11/02/laminar-full-stack-demo">Laminar &amp; Scala.js Full Stack Demo &amp; More</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/07/13/laminar-v16.0.0">Laminar v16.0.0</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2024/12/13/laminar-v17.2.0">Laminar v17.2.0</a></h1><p class="post-meta">December 13, 2024</p><div class="authorBlock"><p class="post-authorName"><a href="https://twitter.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>New Airstream features: splitting by pattern match; LocalStorage Vars, other derived Vars, mapping strict signals without an owner, and more.</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a Scala.js library for building web application interfaces and managing UI state. Learn more in <a href="https://demo.laminar.dev">a few short examples</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one long video</a>.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="releases"></a><a href="#releases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Releases</h2>
+<ul>
+<li><a href="https://github.com/raquo/laminar">Laminar</a> 17.2.0</li>
+<li><a href="https://github.com/raquo/airstream">Airstream</a> 17.2.0</li>
+<li><a href="https://github.com/raquo/waypoint">Waypoint</a> 9.0.0</li>
+<li><a href="https://github.com/raquo/buildkit">raquo/buildkit</a> 0.1.0</li>
+<li><a href="https://github.com/raquo/scalafmt-config">raquo/scalafmt-config</a> 0.1.0</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="news"></a><a href="#news" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>News</h2>
+<h3><a class="anchor" aria-hidden="true" id="joining-heartai"></a><a href="#joining-heartai" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Joining HeartAI</h3>
+<p>I am very excited to announce that I have joined the <a href="https://heartai.net/">HeartAI</a> team! 🎉 Together we will be working on complex Laminar applications – primarily for ICU wards and other hospital settings. HeartAI have been sponsoring Laminar development for more than a year now, enabling me to work on more Laminar and Airstream features, as well as learning materials like the Laminar <a href="https://demo.laminar.dev/">full stack demo</a>.</p>
+<h3><a class="anchor" aria-hidden="true" id="ecosystem-news"></a><a href="#ecosystem-news" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Ecosystem News</h3>
+<p>Very impressive developments from our community members – check them out!</p>
+<p><strong>Libraries</strong></p>
+<ul>
+<li><a href="https://github.com/cheleb/laminar-form-derivation">Laminar Form Derivation</a> – Derive Laminar web forms with Magnolia by <a href="https://github.com/cheleb">Olivier Nouguier</a></li>
+<li><a href="https://github.com/felher/laminouter">Laminouter</a> – New Laminar URL router by <a href="https://github.com/felher">@felher</a></li>
+<li><a href="https://github.com/nguyenyou/scalawind">Scalawind</a> – Zero-Runtime Typesafe Tailwindcss in Scala by <a href="https://github.com/nguyenyou">Tu Nguyen</a></li>
+</ul>
+<p><strong>Web components</strong></p>
+<ul>
+<li><a href="https://github.com/elgca/laminar-mdui-components">Laminar MDUI components</a> – Bindings for <a href="https://www.mdui.org/en/docs/2/">MDUI</a> web components by <a href="https://github.com/elgca">Kewenchao</a></li>
+<li><a href="https://github.com/cornerman/scala-web-components-codegen">scala-web-components-codegen</a> – A more generic web components generator by <a href="https://github.com/cornerman">Johannes Karoff</a></li>
+</ul>
+<p><strong>Templates</strong></p>
+<ul>
+<li><a href="https://github.com/raquo/scalajs.g8">raquo/scalajs.g8</a> – My own Scala.js / Laminar / CSS template, with the latter two optional.</li>
+<li><a href="https://github.com/cheleb/zio-scalajs-laminar.g8">zio-scalajs-laminar.g8</a> – Template by <a href="https://github.com/cheleb">Olivier Nouguier</a></li>
+</ul>
+<p><strong>Open source apps</strong></p>
+<ul>
+<li><a href="https://scala.io/">Scala.io website</a> – <a href="https://github.com/ScalaIO/scala.io">source</a> – By <a href="https://github.com/iusildra">Lucas Nouguier</a> et al.</li>
+<li><a href="https://github.com/keynmol/scalajs-talk-at-imperial/">Imperial Todo App</a> – Demo app with ✨AI✨ by <a href="https://github.com/keynmol">Anton Sviridov</a> from his talk below</li>
+<li><a href="https://github.com/keynmol/mimalyzer">Mimalyzer</a> – Are your changes binary/TASTY compatible in Scala? – by <a href="https://github.com/keynmol">Anton Sviridov</a></li>
+<li><a href="https://github.com/felher/sainte-lague?tab=readme-ov-file">Sainte-Laguë</a> – Open source Laminar app to compute seat allocation used in some elections by <a href="https://github.com/felher">@felher</a></li>
+<li><a href="https://github.com/keynmol/planet-of-the-apes">Planet of the Apes</a> – Test your franchise knowledge – by <a href="https://github.com/keynmol">Anton Sviridov</a></li>
+<li><a href="https://github.com/cheleb/zio-laminar-tapir">Zio, Laminar and Tapir</a> example app by <a href="https://github.com/cheleb">Olivier Nouguier</a></li>
+</ul>
+<p><strong>Articles, Tutorials, etc.</strong></p>
+<ul>
+<li><a href="https://github.com/keynmol/scalajs-talk-at-imperial">Scala.js talk at Imperial College</a> – Slides, code, live demo app – by <a href="https://github.com/keynmol">Anton Sviridov</a></li>
+<li><a href="https://rockthejvm.com/articles/zio-full-stack-webapp">How to Build a ZIO Full-Stack Web Application</a> by <a href="https://github.com/cheleb">Olivier Nouguier</a></li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="new-airstream-features"></a><a href="#new-airstream-features" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Airstream Features</h2>
+<h3><a class="anchor" aria-hidden="true" id="mapping-strictsignal-s"></a><a href="#mapping-strictsignal-s" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Mapping StrictSignal-s</h3>
+<p>You can now <code>mapLazy</code> strict signals similarly to how you can <code>zoomLazy</code> into a Var, <strong>and get back another StrictSignal without needing an owner</strong>:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> formVar = <span class="hljs-type">Var</span>(<span class="hljs-type">Form</span>(...))
+<span class="hljs-keyword">val</span> formSignal: <span class="hljs-type">StrictSignal</span>[<span class="hljs-type">Form</span>] = formVar.signal 
+<span class="hljs-keyword">val</span> fieldSignal: <span class="hljs-type">StrictSignal</span>[<span class="hljs-type">FieldValue</span>] = formSignal.mapLazy(_.field) <span class="hljs-comment">// Still a StrictSignal!</span>
+    
+fieldSignal.now() <span class="hljs-comment">// FieldValue</span>
+</code></pre>
+<p>This helps manage more of your state without messing with owners / subscriptions and observable composition.</p>
+<p>Q: Nikita, these types and method names don't make sense anymore.</p>
+<p>A: Yes. Just as with <code>zoomLazy</code>, we are evolving core Airstream capabilities within the 17.x line, which means that I can't just rename the type <code>StrictSignal</code>, and can't make the old <code>map</code> method return a more specific subtype of <code>Signal</code>. I plan to clean this up and expand the owner-less functionality in the next major version, so please bear with the <em>lazy</em> naming for now.</p>
+<h3><a class="anchor" aria-hidden="true" id="splitting-observables-by-pattern-match-by-type"></a><a href="#splitting-observables-by-pattern-match-by-type" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Splitting Observables by pattern match (&quot;by type&quot;)</h3>
+<p>You know how in Airstream you can <code>split</code> a <code>Signal[Seq[Item]]</code> into N individual <code>Signal[Item]</code>-s, one for every unique item, identified by a key like <code>_.id</code> – to efficiently render it in Laminar? Well, <a href="https://github.com/hollanddm">Hoang Dinh</a> has implemented a similar transformation, but for splitting an <code>Observable[ADT]</code> – where <code>ADT</code> is e.g. a sealed trait with several subclasses – into N <code>Signal[Subtype]</code>, one for each subtype.</p>
+<p>Take a look at a very simple example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">sealed</span> <span class="hljs-class"><span class="hljs-keyword">trait</span> <span class="hljs-title">Page</span></span>
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">HomePage</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Page</span></span>
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">LoginPage</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Page</span></span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPage</span>(<span class="hljs-params">userId: <span class="hljs-type">Int</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">Page</span></span>
+
+<span class="hljs-keyword">val</span> pageSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Page</span>] = ??? <span class="hljs-comment">// router.currentPageSignal</span>
+
+<span class="hljs-keyword">val</span> elementSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">HtmlElement</span>] =
+  pageSignal
+    .splitMatchOne
+    .handleValue(<span class="hljs-type">HomePage</span>) {
+      div(h1(<span class="hljs-string">"Home page"</span>))
+    }
+    .handleValue(<span class="hljs-type">LoginPage</span>) {
+      div(h1(<span class="hljs-string">"Login page"</span>))
+    }
+    .handleType[<span class="hljs-type">UserPage</span>] { (initialUserPage, userPageSignal) =&gt;
+      div(
+        h1(<span class="hljs-string">"User #"</span>, text &lt;-- userPageSignal.map(_.id))
+      )
+    }
+    .toSignal
+</code></pre>
+<p>Under the hood, this is equivalent to something like:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> elementSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">HtmlElement</span>] =
+  pageSignal
+    .map {
+      <span class="hljs-comment">// condition =&gt; (handlerIndex, handlerInput)</span>
+      <span class="hljs-keyword">case</span> <span class="hljs-type">HomePage</span> =&gt; (<span class="hljs-number">0</span>, ())
+      <span class="hljs-keyword">case</span> <span class="hljs-type">LoginPage</span> =&gt; (<span class="hljs-number">1</span>, ())
+      <span class="hljs-keyword">case</span> up: <span class="hljs-type">UserPage</span> =&gt; (<span class="hljs-number">2</span>, up)
+    }
+    .splitOne(key = _._1) { (..., ..., ...) =&gt;
+      <span class="hljs-comment">// Return one of the div-s, properly wired and precisely typed</span>
+    }
+</code></pre>
+<p>You may recognize that this looks similar to <a href="https://github.com/raquo/Waypoint">Waypoint</a>'s <code>SplitRender</code> functionality, and you'll be right –<code>handleValue</code> is similar to Waypoint's <code>collectStatic</code> and <code>handleType</code> is similar to <code>collectSignal</code> – but, importantly, Waypoint's implementation has several problems:</p>
+<ul>
+<li>For <code>collectSignal</code>, it relied on <code>ClassTag</code> for type matching, so it isn't super safe around generic type params</li>
+<li>It could not warn you about non-exhaustive matches</li>
+</ul>
+<p>The new implementation is macro-based, and it works by rebuilding / rearranging the <code>case</code> statements you provide into a single <code>match</code> block, so you get all the features and guarantees of regular Scala pattern matching.</p>
+<p>Yes, this new functionality is actually more generalized than just matching by type or value: you can generate arbitrary case statements using <code>handleCase</code> (not shown here) – <strong>see the <a href="https://github.com/raquo/airstream?tab=readme-ov-file#splitting-with-pattern-match">new documentation section</a> for that.</strong></p>
+<p><strong>But that's not all!</strong></p>
+<p>You can split-by-pattern-match not only an <code>Observable[ADT]</code>, but also an <code>Observable[Seq[ADT]]</code> – so if you have an observable with a list of items, and you need a separate render callback for each item, <strong>and</strong> each item in the collection can be one of several types, each requiring different rendering – yes, you can do that now, all in one go, with <code>splitMatchSeq</code>, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-class"><span class="hljs-keyword">trait</span> <span class="hljs-title">Item</span> </span>{ <span class="hljs-keyword">val</span> id: <span class="hljs-type">String</span> }
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Stock</span>(<span class="hljs-params">ticker: <span class="hljs-type">String</span>, currency: <span class="hljs-type">String</span>, value: <span class="hljs-type">Double</span></span>) </span>{
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> id: <span class="hljs-type">String</span> = ticker
+}
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FxRate</span>(<span class="hljs-params">currency1: <span class="hljs-type">String</span>, currency2: <span class="hljs-type">String</span>, rate: <span class="hljs-type">Double</span></span>) </span>{
+  <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> id: <span class="hljs-type">String</span> = currency1 + <span class="hljs-string">"-"</span> + currency2 
+}
+
+<span class="hljs-keyword">val</span> itemsSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Seq</span>[<span class="hljs-type">Item</span>]] = ???
+<span class="hljs-keyword">val</span> elementsSignal: <span class="hljs-type">Signal</span>[<span class="hljs-type">Seq</span>[<span class="hljs-type">HtmlElement</span>]] =
+  modelsSignal
+    .splitMatchSeq(_.id)
+    .handleType[<span class="hljs-type">Stock</span>] { (initialStock, stockSignal) =&gt;
+      div(
+        initialStock.id + <span class="hljs-string">": "</span>,
+        text &lt;-- stockSignal.map(_.value),
+        <span class="hljs-string">" "</span> + initialStock.currency
+      )
+    }
+    .handleType[<span class="hljs-type">FxRate</span>] { (initialRate, rateSignal) =&gt;
+      div(initialRate.id, <span class="hljs-string">": "</span>, text &lt;-- rateSignal.map(_.rate))
+    }
+    .toSignal
+
+children &lt;-- elementsSignal <span class="hljs-comment">// in Laminar</span>
+</code></pre>
+<p>I am super pumped that such advanced Observable transformations are now a part of Airstream core. This is the first usage of macros in Airstream, and it's a good use case for them. Huge thanks to Hoang for working through all this!</p>
+<p>While the rest of Airstream is cross compiled for both Scala 2.13 and Scala 3, these new macro-based features are for Scala 3 only. We do not plan to port this new functionality to Scala 2.13 as we are not proficient in Scala 2 macros. In Scala 2.13, you can use Waypoint's general-purpose <code>SplitRender</code> functionality to similar effect (except for <code>splitMatchSeq</code>, which is not available).</p>
+<h3><a class="anchor" aria-hidden="true" id="local-storage-vars"></a><a href="#local-storage-vars" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Local Storage Vars</h3>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage">Local Storage</a> is a browser API that lets you persist data to a key-value client-side storage. This storage is shared between and is available to all tabs and frames from the same <a href="https://developer.mozilla.org/en-US/docs/Glossary/Origin">origin</a> within the same browser.</p>
+<p>Airstream now offers persistent Vars backed by LocalStorage, accessed via <code>WebStorageVar.localStorage</code>, e.g.:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> showSidebarVar: <span class="hljs-type">WebStorageVar</span>[<span class="hljs-type">Boolean</span>] =
+  <span class="hljs-type">WebStorageVar</span>
+    .localStorage(key = <span class="hljs-string">"showSidebar"</span>, syncOwner = <span class="hljs-type">None</span>)
+    .bool(<span class="hljs-keyword">default</span> = <span class="hljs-literal">true</span>)
+</code></pre>
+<p>LocalStorage Vars can automatically sync their values between multiple browser tabs. See <a href="https://demo.laminar.dev/app/integrations/localstorage">live demo</a>. For details, see the <a href="https://github.com/raquo/Airstream/?tab=readme-ov-file#localstorage">new documentation section</a>.</p>
+<p>And yes, we support <a href="https://github.com/raquo/Airstream/?tab=readme-ov-file#sessionstorage">SessionStorage</a> too.</p>
+<h3><a class="anchor" aria-hidden="true" id="more-var-features"></a><a href="#more-var-features" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>More Var Features</h3>
+<h4><a class="anchor" aria-hidden="true" id="distinct-vars"></a><a href="#distinct-vars" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Distinct Vars</h4>
+<p>The <code>distinct</code> operator (including all its <a href="https://github.com/raquo/Airstream/?tab=readme-ov-file#distinction-operators">variations</a> like <code>distinctByFn</code>) is now available on Vars. For Vars, it filters both reads and writes, making it easy to create a state Var that only updates when its content actually changes to a different value: <code>val formVar = Var(initial = Form.empty).distinct</code>.</p>
+<p>For implementation details, see the <a href="https://github.com/raquo/Airstream/?tab=readme-ov-file#vardistinct">new documentation section</a>.</p>
+<h4><a class="anchor" aria-hidden="true" id="isomorphic-transformations"></a><a href="#isomorphic-transformations" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Isomorphic Transformations</h4>
+<p>You could already <code>zoomLazy</code> into a Var to e.g. focus on a particular field, and now you can also <code>bimap</code> the Var to apply an isomorphic transformation, for example:</p>
+<pre><code class="hljs css language-scala"><span class="hljs-keyword">val</span> fooVar: <span class="hljs-type">Var</span>[<span class="hljs-type">Foo</span>] = <span class="hljs-type">Var</span>(<span class="hljs-type">Foo</span>(<span class="hljs-number">123</span>, <span class="hljs-string">"yo"</span>))
+<span class="hljs-keyword">val</span> jsonVar: <span class="hljs-type">Var</span>[<span class="hljs-type">String</span>] = fooVar.bimap(getThis = <span class="hljs-type">Foo</span>.toJson)(getParent = <span class="hljs-type">Foo</span>.fromJson)
+</code></pre>
+<p>See the <a href="https://github.com/raquo/Airstream/?tab=readme-ov-file#varbimap">new documentation section</a>.</p>
+<h4><a class="anchor" aria-hidden="true" id="var-splitbyindex-and-splitoption"></a><a href="#var-splitbyindex-and-splitoption" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Var splitByIndex and splitOption</h4>
+<p>These useful <code>split</code> variations were ported from Signals to Var-s by <a href="https://github.com/phfroidmont">Paul-Henri Froidmont</a> – thanks!</p>
+<h4><a class="anchor" aria-hidden="true" id="you-can-now-subclass-sourcevar"></a><a href="#you-can-now-subclass-sourcevar" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>You Can Now Subclass SourceVar</h4>
+<p>This lets you create Var-s with custom public methods, for example the new WebStorageVar is <a href="https://github.com/raquo/Airstream/blob/master/src/main/scala/com/raquo/airstream/web/WebStorageVar.scala">implemented</a> that way.</p>
+<h2><a class="anchor" aria-hidden="true" id="small-laminar-fixes"></a><a href="#small-laminar-fixes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Small Laminar Fixes</h2>
+<ul>
+<li>Fix: Avoid instantiating some internal comment nodes unless / until they are needed.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="new-waypoint-features"></a><a href="#new-waypoint-features" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>New Waypoint Features</h2>
+<ul>
+<li><strong>Build: Waypoint depends on Laminar now (not just Airstream)</strong>
+<ul>
+<li>New: <code>navigateTo</code> example method from the docs is now available on <code>Router</code> – it provides a convenient modifier for Laminar elements that sets a reasonable onClick handler and href on the element. <a href="">Documentation</a></li>
+<li>Unlike the previous example in the docs, it does not reset scroll position – do that yourself by observing <code>currentPageSignal</code></li>
+<li><em><strong>Migration:</strong> <code>Router</code> constructor is now a single argument list, <code>popStateEvents</code> and <code>owner</code> now have default values.</em></li>
+</ul></li>
+<li><strong>New: Total and Partial route types, to improve type-safety for the total routes – by <a href="https://github.com/arturaz/">Artūras Šlajus</a> – thank you!</strong>
+<ul>
+<li>New: <code>route.argsFromPageTotal</code> and <code>route.relativeUrlForPage</code> available on <code>Route.Total</code> subtype of <code>Route</code>.</li>
+<li><em><strong>Migration:</strong> If <code>Route.static</code> complains that it can't find <code>ValueOf</code> for your page type, it's because your type is not a singleton like <code>object LoginPage</code>, so we can't make a total route for it. Use <code>Route.staticPartial</code> instead.</em></li>
+</ul></li>
+<li>New: <code>Router.replacePageTitle</code> – useful when you need to fetch data before you know what the page title should be.</li>
+<li>Fix: <code>SplitRender.signal</code> should be a lazy val, not def.</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="scalajs--laminar-giter8-template"></a><a href="#scalajs--laminar-giter8-template" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Scala.js &amp; Laminar giter8 Template</h2>
+<p>A few people asked for a bare-bones Laminar giter8 template – and here it is:  <a href="https://github.com/raquo/scalajs.g8">raquo/scalajs.g8</a> – and you can actually opt-out of Laminar here, so it's good for plain Scala.js too. The main value here is the quick sbt + Vite setup that gets you to writing Laminar apps in a moment.</p>
+<p>Scala.js has its own <a href="https://github.com/scala-js/vite.g8/">vite.g8</a>. Compared to that, my template adds Laminar as well as my own preferred setup for CSS (both are optional). I may add more optional features like TailwindCSS setup later.</p>
+<h2><a class="anchor" aria-hidden="true" id="buildkit--scalafmt-config"></a><a href="#buildkit--scalafmt-config" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Buildkit &amp; Scalafmt Config</h2>
+<p>As the number of my open source projects keeps growing, I get more tired of copying various build-related things across them. Sbt plugins are ok to share Scala code, but I've recently wanted to add scalafmt configs to all my projects, and did not find an easy way to do that.</p>
+<p>So, I published my standard scalafmt config in <a href="https://github.com/raquo/scalafmt-config/">raquo/scalafmt-config</a> – it captures the prevailing Laminar &amp; Airstream formatting style, and should work well for both Scala 2 and Scala 3. Personally I think it's a better starting point than some of the defaults I've seen, but of course it's a matter of personal preference.</p>
+<p>To distribute this shared config to my open source projects, I made <a href="https://github.com/raquo/buildkit/">raquo/buildkit</a> – a tiny project that you add as a compile-time dependency to your build. At the moment, all it can do is download (and cache locally) any URL-versioned file into your project. You can then <code>include</code> this now-local <code>.scalafmt.shared.conf</code> file from your main <code>.scalafmt.conf</code> file, and live happily thereafter.</p>
+<p>The minimalistic design of this downloader is intended for low-overhead sharing of non-source files such as configs and assets. I don't want to spend the time publishing such things to sbt or npm – I'm happy to just use Github URLs and version tags for this.</p>
+<p>Eventually I would like to explore this kind of low-overhead publishing further, because I feel that our community could benefit from reducing the barrier to sharing e.g. manually written Scala.js facade definitions, but for now, this is just a small tool, mostly for my own consumption, similarly to <a href="https://github.com/raquo/scala-dom-testutils">scala-dom-testutils</a>.</p>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank you</h2>
+<p>Note the large external contributions in this release – thank you all!</p>
+<p>Laminar development is kindly supported by <a href="https://github.com/sponsors/raquo">my sponsors</a>, and I am very grateful to be able to work on all this.</p>
+<p><h4 class="x-like-h3">DIAMOND sponsor:</h4></p>
+<div class="-sponsorsList x-alignItemsStart x-justifyContentCenter">
+<div class="-sponsor x-diamond x-company x-heartai">
+  <a class="x-noHover" href="https://www.heartai.net/">
+    <img class="-logo" src="/img/sponsors/heartai.svg" alt="" />
+    <div class="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+  </a>
+</div>
+</div>
+<p><strong>GOLD sponsors</strong>:</p>
+<div class="-sponsorsList x-alignItemsEnd">
+  <div class="-sponsor x-person x-yurique">
+    <img class="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
+    </div>
+  </div>
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-250px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+  <a class="-sponsor x-person x-tawasal" href="https://tawasal.ae">
+    <img class="-avatar" src="/img/sponsors/tawasal.svg" alt="" />
+    <div class="-text">
+      <div class="-name">Tawasal</div>
+      <div class="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+    </div>
+  </a>
+  <div class="-sponsor x-empty">
+    <!-- filler for layout purposes -->
+  </div>
+</div>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#releases">Releases</a></li><li><a href="#news">News</a><ul class="toc-headings"><li><a href="#joining-heartai">Joining HeartAI</a></li><li><a href="#ecosystem-news">Ecosystem News</a></li></ul></li><li><a href="#new-airstream-features">New Airstream Features</a><ul class="toc-headings"><li><a href="#mapping-strictsignal-s">Mapping StrictSignal-s</a></li><li><a href="#splitting-observables-by-pattern-match-by-type">Splitting Observables by pattern match (&quot;by type&quot;)</a></li><li><a href="#local-storage-vars">Local Storage Vars</a></li><li><a href="#more-var-features">More Var Features</a></li></ul></li><li><a href="#small-laminar-fixes">Small Laminar Fixes</a></li><li><a href="#new-waypoint-features">New Waypoint Features</a></li><li><a href="#scalajs--laminar-giter8-template">Scala.js &amp; Laminar giter8 Template</a></li><li><a href="#buildkit--scalafmt-config">Buildkit &amp; Scalafmt Config</a></li><li><a href="#thank-you">Thank you</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chat</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Waypoint">Waypoint</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/laminar-full-stack-demo">Laminar Demo</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2024 Nikita Gazarov</section></footer></div></body></html>
