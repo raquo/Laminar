@@ -87,20 +87,12 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v17.1.0**. For older versions, see below.
+This documentation is for Laminar version **v17.2.0**. For documentation of older versions, open the corresponding git tag, and use file search to find the documentation.md file. For example: [v17.0.0 docs](https://github.com/raquo/Laminar/blob/v17.0.0/website/docs/documentation.md).
 
-| Laminar                                                                            | Airstream                                                                |
-|:-----------------------------------------------------------------------------------|:-------------------------------------------------------------------------|
-| **[v17.1.0](https://github.com/raquo/Laminar/blob/v17.1.0/docs/Documentation.md)** | **[v17.1.0](https://github.com/raquo/Airstream/blob/v17.1.0/README.md)** |
-| **[v17.0.0](https://github.com/raquo/Laminar/blob/v17.0.0/docs/Documentation.md)** | **[v17.0.0](https://github.com/raquo/Airstream/blob/v17.0.0/README.md)** |
-| **[v16.0.0](https://github.com/raquo/Laminar/blob/v16.0.0/docs/Documentation.md)** | **[v16.0.0](https://github.com/raquo/Airstream/blob/v16.0.0/README.md)** |
-| **[v15.0.0](https://github.com/raquo/Laminar/blob/v15.0.0/docs/Documentation.md)** | **[v15.0.0](https://github.com/raquo/Airstream/blob/v15.0.0/README.md)** |
-| **[v0.14.2](https://github.com/raquo/Laminar/blob/v0.14.2/docs/Documentation.md)** | **[v0.14.2](https://github.com/raquo/Airstream/blob/v0.14.2/README.md)** |
+Laminar depends on Airstream – usually but not always on the same-numbered version of Airstream. If neeeded, you can check the exact Airstream version in the `project/Versions.scala` file.
 
 
-For documentation of older versions, see git tags.
-
-[Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_3/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_3/latest/com/raquo/airstream/index.html)
+[Laminar API doc](https://javadoc.io/doc/com.raquo/laminar_sjs1_2.13/latest/com/raquo/laminar/index.html) • [Airstream API doc](https://javadoc.io/doc/com.raquo/airstream_sjs1_2.13/latest/com/raquo/airstream/index.html)
 
 Laminar is very simple under the hood. Don't be afraid to use "Go to definition" functionality of your IDE to see how a certain method works. That said, the documentation provided here explains the mechanics of Laminar in great detail. Documentation sections progress from basic to advanced, so each next section usually assumes that you've read all previous sections.
 

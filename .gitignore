@@ -1,4 +1,7 @@
 .idea
+.vscode
+*.code-workspace
+
 .DS_Store
 
 target
@@ -9,7 +12,6 @@ target
 
 project/metals.sbt
 project/.bloop
-project/project/target
 
 yarn.lock
 !website/yarn.lock
