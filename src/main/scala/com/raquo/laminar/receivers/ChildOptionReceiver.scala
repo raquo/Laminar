@@ -9,7 +9,7 @@ import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 object ChildOptionReceiver {
 
   def <--(maybeChildSource: Source[Option[ChildNode.Base]]): DynamicInserter = {
-   lazy val emptyNode = new CommentNode("")
+    lazy val emptyNode = new CommentNode("")
     child <-- maybeChildSource.toObservable.map(_.getOrElse(emptyNode))
   }
 
