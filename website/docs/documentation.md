@@ -488,7 +488,7 @@ Alternatively, you can define the keys locally in your project in the same manne
 
 ```scala
 import com.raquo.laminar.codecs.*
-val superValue: HtmlProp[String] = htmlProp("superValue", StringAsIsCodec) // imaginary prop
+val superValue: HtmlProp[String, String] = htmlProp("superValue", StringAsIsCodec) // imaginary prop
 val onTouchMove: EventProp[dom.TouchEvent] = eventProp("touchmove")
 
 div(
