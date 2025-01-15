@@ -95,8 +95,10 @@ with Implicits {
   }
 
   /** Wait for `DOMContentLoaded` event to fire, then render a Laminar
-    * element into a container DOM node. This is probably what you want
-    * to initialize your Laminar application on page load.
+    * element into a container DOM node. Or, if this event has already
+    * fired, render immediately.
+    *
+    * This is probably what you want to initialize your Laminar application on page load.
     *
     * See https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event
     */
@@ -104,9 +106,13 @@ with Implicits {
     container: => dom.Element,
     rootNode: => nodes.ReactiveElement.Base
   ): Unit = {
-    documentEvents(_.onDomContentLoaded).foreach { _ =>
+    if (dom.document.readyState == dom.DocumentReadyState.loading) {
+      documentEvents(_.onDomContentLoaded).foreach { _ =>
+        new RootNode(container, rootNode)
+      }(unsafeWindowOwner)
+    } else {
       new RootNode(container, rootNode)
-    }(unsafeWindowOwner)
+    }
   }
 
   /** Wrap a Laminar element in [[DetachedRoot]], which allows you to
