@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
-import com.raquo.laminar.{nodes, DomApi}
+import com.raquo.laminar.{DomApi, nodes}
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
@@ -133,6 +133,49 @@ with Implicits {
   }
 
   /**
+    * This method returns a Seq of modifiers, each of which is created from the same `input`.
+    *
+    * This is convenient when you e.g. want to bind multiple listeners to
+    * the same observable, keeping related together, without repeating yourself:
+    *
+    * {{{
+    * div(
+    *   modSeqWith(coordinatesSignal.map(process).distinct)(
+    *     left.px <-- _.map(_.x),
+    *     top.px <-- _.map(_.y),
+    *     _.map(_.z) --> zObserver
+    *   )
+    * )
+    * }}}
+    *
+    * You can use the output of such a modSeqWith call directly in Laminar because
+    * Laminar implicitly converts `Seq[Modifier]` to `Modifier`.
+    *
+    * The above snippet is equivalent to:
+    *
+    * {{{
+    * lazy val coords = coordinatesSignal.map(process).distinct
+    * div(
+    *   left.px <-- coords.map(_.x),
+    *   top.px <-- coords.map(_.y),
+    *   coords.map(_.z) --> zObserver
+    * )
+    * }}}
+    *
+    * See also [[seqWith]] for a more generalized version.
+    */
+  def modSeqWith[El <: Element, In](input: In)(outputs: (In => Modifier[El])*): Seq[Modifier[El]] = {
+    outputs.map(_(input))
+  }
+
+  /** Like [[modSeqWith]], but works for arbitrary output types.
+    * Downside is that type inference that requires Modifier implicit conversions may not work.
+    */
+  def seqWith[In, Out](input: In)(outputs: (In => Out)*): Seq[Out] = {
+    outputs.map(_(input))
+  }
+
+  /**
     * Get a Seq of modifiers. You could just use Seq(...), but this helper
     * has better type inference in some cases.
     */
@@ -241,4 +284,5 @@ with Implicits {
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)
   }
+
 }
