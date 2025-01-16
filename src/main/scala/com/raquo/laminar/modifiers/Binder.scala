@@ -4,9 +4,9 @@ import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Binder is a Modifier that creates a subscription when invoked.
-  * - Note, this Modifier is NOT idempotent:
-  *   Calling it N times will create and bind N subscriptions
-  * - `onMountBind` can take care of this, see the docs
+  *  - Note, this Modifier is NOT idempotent:
+  *    Calling it N times will create and bind N subscriptions
+  *  - `onMountBind` can take care of this, see the docs
   */
 trait Binder[-El <: ReactiveElement.Base] extends Modifier[El] {
 

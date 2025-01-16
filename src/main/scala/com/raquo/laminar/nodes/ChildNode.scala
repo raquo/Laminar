@@ -20,7 +20,7 @@ with Modifier[ReactiveElement[dom.Element]] {
   }
 
   /** This is called as a notification, BEFORE changes to the real DOM or to the Scala DOM tree are applied.
-    * - Corollary: When this is called, this node's maybeParent reference has not been updated yet.
+    *  - Corollary: When this is called, this node's maybeParent reference has not been updated yet.
     *
     * Default implementation is a noop. You can override this to implement DOM lifecycle hooks similar to
     * React's `componentWillUnmount`.

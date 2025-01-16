@@ -13,8 +13,8 @@ import scala.scalajs.js
   *
   * If you are trying to create a Laminar RootNode inside a
   * React.js component, make sure to call:
-  * - mount() when componentDidMount is due, and
-  * - unmount() when componentWillUnmount is due.
+  *  - mount() when componentDidMount is due, and
+  *  - unmount() when componentWillUnmount is due.
   *
   * Other libraries' integration follows the same principle.
   */
