@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
-import com.raquo.laminar.{DomApi, nodes}
+import com.raquo.laminar.{nodes, DomApi}
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
@@ -19,7 +19,8 @@ import org.scalajs.dom
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
 trait Laminar
-extends HtmlTags
+extends LaminarPlatformSpecific
+with HtmlTags
 with HtmlAttrs
 with HtmlProps
 with GlobalEventProps
@@ -248,20 +249,6 @@ with Implicits {
   def inContext[El <: Element](makeModifier: El => Modifier[El]): Modifier[El] = {
     Modifier[El] { element => makeModifier(element).apply(element) }
   }
-
-  //
-
-  /** Modifier that applies one or more modifiers if `condition` is true */
-  def when[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = {
-    if (condition) {
-      mods // implicitly converted to a single modifier
-    } else {
-      emptyMod
-    }
-  }
-
-  /** Modifier that applies one or more modifiers if `condition` is true */
-  @inline def whenNot[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = when(!condition)(mods)
 
   //
 
