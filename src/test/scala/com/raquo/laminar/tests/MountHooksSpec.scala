@@ -1066,6 +1066,62 @@ class MountHooksSpec extends UnitSpec {
     mount(el)
   }
 
+  it("onMountCallback ignoreAlreadyMounted=true") {
+    var numMounts = 0
+    var numUnmounts = 0
+
+    val el = div(
+      "Hello",
+      onUnmountCallback(_ => numUnmounts += 1)
+    )
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 0)
+
+    // --
+
+    mount(el)
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 0)
+
+    // --
+
+    el.amend(
+      onMountCallback(_ => numMounts += 1, ignoreAlreadyMounted = true)
+    )
+
+    assert(numMounts == 0) // !!!
+    assert(numUnmounts == 0)
+
+    // --
+
+    unmount()
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 1)
+
+    numUnmounts = 0
+
+    // --
+
+    mount(el)
+
+    assert(numMounts == 1)
+    assert(numUnmounts == 0)
+
+    numMounts = 0
+
+    // --
+
+    unmount()
+
+    assert(numMounts == 0)
+    assert(numUnmounts == 1)
+
+    numUnmounts = 0
+  }
+
   it("Element lifecycle owners can not be used after unmount") {
 
     var cleanedCounter = 0

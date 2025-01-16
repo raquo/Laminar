@@ -4,6 +4,7 @@ import com.raquo.laminar.api.L._
 import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.nodes.{ParentNode, ReactiveElement}
 import com.raquo.laminar.utils.UnitSpec
+import org.scalactic.source
 import org.scalajs.dom
 
 import scala.collection.mutable
@@ -191,7 +192,10 @@ class LifecycleEventSpec extends UnitSpec {
 
     def subscribeToEvents(node: ReactiveElement[dom.html.Element]): Unit = {
       node.amend(
-        onMountCallback(_ => lifecycleEvents = lifecycleEvents :+ ((node, NodeDidMount))),
+        onMountCallback(
+          _ => lifecycleEvents = lifecycleEvents :+ ((node, NodeDidMount)),
+          ignoreAlreadyMounted = true
+        ),
         onUnmountCallback(_ => lifecycleEvents = lifecycleEvents :+ ((node, NodeWillUnmount)))
       )
     }
@@ -199,6 +203,7 @@ class LifecycleEventSpec extends UnitSpec {
     def expectNewEvents(
       clue: String,
       expectedEvents: Seq[(ReactiveElement[dom.html.Element], LifecycleEvent)]
+    )(implicit pos: source.Position
     ): Unit = {
       withClue(clue + ": ") {
         lifecycleEvents shouldBe expectedEvents
