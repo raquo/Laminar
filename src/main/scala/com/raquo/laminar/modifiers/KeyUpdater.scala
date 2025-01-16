@@ -10,7 +10,7 @@ import scala.scalajs.js.|
 /**
  * A modifier that updates a key from a source, e.g. `value <-- valueStream`
  *
- * @param update (element, newValue, reason) => ()
+ * @param update `(element, newValue, reason) => ()`
  *               The reason is used for updating CompositeKey-s.
  */
 class KeyUpdater[-El <: ReactiveElement.Base, +K <: Key, V](

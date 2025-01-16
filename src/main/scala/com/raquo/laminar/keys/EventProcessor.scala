@@ -146,17 +146,19 @@ class EventProcessor[Ev <: dom.Event, V](
 
   /** Filter events by `event.target`
     *
-    * For example, discard clicks on child <a> links with something like:
+    * For example, discard clicks on child `<a>` links with something like:
     *
-    *     div(
-    *       onClick.filterByTarget {
-    *         case dom.html.Anchor => false
-    *         case _ => true
-    *       } --> observer,
-    *       "A bunch of clickable stuff",
-    *       a("Some link", href("..."))
-    *     )
-    * */
+    * {{{
+    * div(
+    *   onClick.filterByTarget {
+    *     case dom.html.Anchor => false
+    *     case _ => true
+    *   } --> observer,
+    *   "A bunch of clickable stuff",
+    *   a("Some link", href("..."))
+    * )
+    * }}}
+    */
   def filterByTarget(passes: dom.EventTarget => Boolean): EventProcessor[Ev, V] = {
     withNewProcessor(ev => if (passes(ev.target)) processor(ev) else None)
   }
@@ -256,18 +258,19 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * Use this when you need to apply stream operators on this element's events, e.g.:
     *
-    *     div(onScroll.compose(_.throttle(100)) --> observer)
-    *
-    *     a(onClick.preventDefault.compose(_.delay(100)) --> observer)
+    * {{{
+    * div(onScroll.compose(_.throttle(100)) --> observer)
+    * a(onClick.preventDefault.compose(_.delay(100)) --> observer)
+    * }}}
     *
     * Note: can also use with more compact `apply` alias:
     *
-    *     div(onScroll(_.throttle(100)) --> observer)
-    *
-    *     a(onClick.preventDefault(_.delay(100)) --> observer)
+    * {{{
+    * div(onScroll(_.throttle(100)) --> observer)
+    * a(onClick.preventDefault(_.delay(100)) --> observer)
+    * }}}
     *
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback.
-    *
     */
   def compose[Out](
     operator: EventStream[V] => Observable[Out]
@@ -376,7 +379,9 @@ class EventProcessor[Ev <: dom.Event, V](
 
   /** Evaluate `f` if the value was filtered out up the chain. For example:
     *
-    *     onClick.filter(isRightClick).orElseEval(_.preventDefault()) --> observer
+    * {{{
+    * onClick.filter(isRightClick).orElseEval(_.preventDefault()) --> observer
+    * }}}
     *
     * This observer will fire only on right clicks, and for events that aren't right
     * clicks, ev.preventDefault() will be called instead.
@@ -391,7 +396,9 @@ class EventProcessor[Ev <: dom.Event, V](
     }
   }
 
-  /** (originalEvent, accumulatedValue) => newAccumulatedValue
+  /** {{{
+    * (originalEvent, accumulatedValue) => newAccumulatedValue
+    * }}}
     *
     * Unlike other processors, this one will fire regardless of .filter-s up the chain.
     * Instead, if the event was filtered, project will receive None as accumulatedValue.

@@ -13,8 +13,10 @@ object ChildrenReceiver {
   val command: ChildrenCommandReceiver.type = ChildrenCommandReceiver
 
   /** Example usages:
-    *     children(node1, node2) <-- signalOfBoolean
-    *     children(component1, component2) <-- signalOfBoolean
+    * {{{
+    * children(node1, node2) <-- signalOfBoolean
+    * children(component1, component2) <-- signalOfBoolean
+    * }}}
     */
   def apply(nodes: ChildNode.Base*): LockedChildrenReceiver = {
     new LockedChildrenReceiver(laminar.Seq.from(nodes))
@@ -23,8 +25,10 @@ object ChildrenReceiver {
   implicit class RichChildrenReceiver(val self: ChildrenReceiver.type) extends AnyVal {
 
     /** Example usages:
-      *     children(listOfNodes) <-- signalOfBoolean
-      *     children(arrayOfComponents) <-- signalOfBoolean
+      * {{{
+      * children(listOfNodes) <-- signalOfBoolean
+      * children(arrayOfComponents) <-- signalOfBoolean
+      * }}}
       */
     def apply[Collection[_], Component](
       components: Collection[Component]

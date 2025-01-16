@@ -14,8 +14,10 @@ object ChildReceiver {
   val text: ChildTextReceiver.type = ChildTextReceiver
 
   /** Example usages:
-    *     child(element) <-- signalOfBoolean
-    *     child(component) <-- signalOfBoolean
+    * {{{
+    * child(element) <-- signalOfBoolean
+    * child(component) <-- signalOfBoolean
+    * }}}
     */
   def apply(node: ChildNode.Base): LockedChildReceiver = {
     new LockedChildReceiver(node)

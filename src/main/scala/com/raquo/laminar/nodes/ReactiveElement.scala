@@ -80,6 +80,7 @@ with ParentNode[Ref] {
     *
     * Structure:
     *
+    * {{{
     * Map(
     *   cls: List(
     *     "always" -> null,
@@ -92,6 +93,7 @@ with ParentNode[Ref] {
     *   rel: List( ... ),
     *   role: List( ... )
     * )
+    * }}}
     *
     * Note that `mod` key can be null if the mod is not reactive, e.g. in the simple case of `cls` := "always"
     * This is to avoid keeping the mod in memory after it has served its purpose.
