@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.StringSeqValueMapper
-import com.raquo.laminar.modifiers.{CompositeKeySetter, KeyUpdater, Setter}
+import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater, Setter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Laminar key specific to a particular set of CompositeAttr values */
@@ -10,8 +10,8 @@ import com.raquo.laminar.nodes.ReactiveElement
   """LockedCompositeKey is deprecated. cls.toggle("foo") method is not necessary anymore: use cls("foo"), CompositeKeySetter now supports everything that LockedCompositeKey supported.""",
   since = "17.0.0-M1"
 )
-class LockedCompositeKey[K <: Key, -El <: ReactiveElement.Base](
-  val key: CompositeKey[K, El],
+class LockedCompositeKey[-El <: ReactiveElement.Base](
+  val key: CompositeKey[El],
   val items: List[String]
 ) {
 
@@ -21,7 +21,7 @@ class LockedCompositeKey[K <: Key, -El <: ReactiveElement.Base](
   }
 
   /** If `include` is true, the value(s) will be added, if false, they will not be added */
-  def :=(include: Boolean): CompositeKeySetter[K, El] = {
+  def :=(include: Boolean): CompositeKeySetter[El] = {
     if (include) {
       key.:= (items: _*)
     } else {
@@ -30,7 +30,7 @@ class LockedCompositeKey[K <: Key, -El <: ReactiveElement.Base](
   }
 
   /** If the `include` observable emits true, value(s) will be added, if false, they will be removed. */
-  def <--(include: Source[Boolean]): KeyUpdater[El, CompositeKey[K, El], List[String]] = {
+  def <--(include: Source[Boolean]): CompositeKeyUpdater[El, List[String]] = {
     key <-- include.toObservable.map(include => if (include) items else Nil)
   }
 }

@@ -35,5 +35,5 @@ trait ComplexSvgKeys {
 
 object ComplexSvgKeys {
 
-  type CompositeSvgAttr = CompositeKey[SvgAttr[String], ReactiveSvgElement.Base]
+  type CompositeSvgAttr = CompositeKey[ReactiveSvgElement.Base]
 }

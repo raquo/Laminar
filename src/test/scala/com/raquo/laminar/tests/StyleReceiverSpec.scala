@@ -6,9 +6,9 @@ import com.raquo.laminar.utils.UnitSpec
 class StyleReceiverSpec extends UnitSpec {
 
   it("updates style") {
-    val display1 = display.none.value
-    val display2 = display.inlineFlex.value
-    val display3 = display.table.value
+    val display1 = display.none.cssValue
+    val display2 = display.inlineFlex.cssValue
+    val display3 = display.table.cssValue
     val displayBus = new EventBus[String]
 
     mount(span(display <-- displayBus.events, "Hello"))

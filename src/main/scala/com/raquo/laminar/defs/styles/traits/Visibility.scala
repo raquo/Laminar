@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,20 +11,20 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait Visibility { this: StyleProp[_] =>
 
   /** Default value, the box is visible */
-  lazy val visible: StyleSetter = this := "visible"
+  lazy val visible: StyleSetter[_] = this := "visible"
 
   /**
     * The box is invisible (fully transparent, nothing is drawn), but still
     * affects layout.  Descendants of the element will be visible if they have
     * visibility:visible
     */
-  lazy val hidden: StyleSetter = this := "hidden"
+  lazy val hidden: StyleSetter[_] = this := "hidden"
 
   /**
     * For table rows, columns, column groups, and row groups the row(s) or
     * column(s) are hidden and the space they would have occupied is (as if
     * display: none were applied to the column/row of the table)
     */
-  lazy val collapse: StyleSetter = this := "collapse"
+  lazy val collapse: StyleSetter[_] = this := "collapse"
 
 }

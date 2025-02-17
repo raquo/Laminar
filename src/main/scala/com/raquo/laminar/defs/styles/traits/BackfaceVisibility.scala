@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait BackfaceVisibility { this: StyleProp[_] =>
 
   /** The back face is visible. */
-  lazy val visible: StyleSetter = this := "visible"
+  lazy val visible: StyleSetter[_] = this := "visible"
 
   /** The back face is not visible. */
-  lazy val hidden: StyleSetter = this := "hidden"
+  lazy val hidden: StyleSetter[_] = this := "hidden"
 
 }

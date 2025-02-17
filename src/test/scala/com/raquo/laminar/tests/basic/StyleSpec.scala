@@ -2,7 +2,7 @@ package com.raquo.laminar.tests.basic
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
-import com.raquo.laminar.keys.DerivedStyleBuilder
+import com.raquo.laminar.keys.StyleBuilder
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.util.Random
@@ -13,8 +13,8 @@ class StyleSpec extends UnitSpec {
     val expectedHeight = s"${1 + Random.nextInt(15)}px"
     val expectedWidth = s"${15 + Random.nextInt(7)}px"
 
-    assert(display.block.value == "block")
-    assert(display.inline.value == "inline")
+    assert(display.block.cssValue == "block")
+    assert(display.inline.cssValue == "inline")
 
     mount("div [display.block]", div(display.block))
     expectNode(div.of(display is "block"))
@@ -101,7 +101,7 @@ class StyleSpec extends UnitSpec {
   it("encoding of CSS values") {
 
     // Expose methods to the public so that we can test them
-    class TestableBuilder extends DerivedStyleBuilder[String, StyleEncoder] {
+    class TestableBuilder extends StyleBuilder[String, StyleEncoder] {
 
       override protected def styleSetter(value: String): String = value
 

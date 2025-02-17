@@ -119,7 +119,7 @@ class DomApiSpec extends UnitSpec {
         indeterminate is true
       ))
 
-      DomApi.unsetHtmlProperty(el, indeterminate)
+      DomApi.removeHtmlProperty(el, indeterminate)
 
       expectNode(input of (
         typ is "checkbox",
@@ -142,7 +142,7 @@ class DomApiSpec extends UnitSpec {
         checked is true
       ))
 
-      DomApi.unsetHtmlProperty(el, checked)
+      DomApi.removeHtmlProperty(el, checked)
 
       expectNode(input of (
         typ is "checkbox",
@@ -150,7 +150,7 @@ class DomApiSpec extends UnitSpec {
         checked is false
       ))
 
-      DomApi.unsetHtmlProperty(el, defaultChecked)
+      DomApi.removeHtmlProperty(el, defaultChecked)
 
       expectNode(input of (
         typ is "checkbox",
@@ -177,7 +177,7 @@ class DomApiSpec extends UnitSpec {
         value is "hello"
       ))
 
-      DomApi.unsetHtmlProperty(el, value)
+      DomApi.removeHtmlProperty(el, value)
 
       expectNode(input of (
         typ is "input",
@@ -209,7 +209,7 @@ class DomApiSpec extends UnitSpec {
         option of (value is "v3", selected is false, "V3")
       ))
 
-      DomApi.unsetHtmlProperty(el, value)
+      DomApi.removeHtmlProperty(el, value)
 
       expectNode(select of (
         option of (value is "v1", selected is false, "V1"),

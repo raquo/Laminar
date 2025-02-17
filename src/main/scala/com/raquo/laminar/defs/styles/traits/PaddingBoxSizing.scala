@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -10,6 +10,6 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 
 trait PaddingBoxSizing extends BoxSizing { this: StyleProp[_] =>
 
-  lazy val paddingBox: StyleSetter = this := "padding-box"
+  lazy val paddingBox: StyleSetter[_] = this := "padding-box"
 
 }

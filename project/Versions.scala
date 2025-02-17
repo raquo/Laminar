@@ -17,7 +17,7 @@ object Versions {
 
   // -- Test --
 
-  val ScalaDomTestUtils = "18.0.0"
+  val ScalaDomTestUtils = "18.1.0-SNAPSHOT"
 
   val ScalaTest = "3.2.14"
 

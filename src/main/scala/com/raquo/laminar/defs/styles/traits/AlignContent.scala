@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -10,10 +10,10 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 
 trait AlignContent extends FlexPosition { this: StyleProp[_] =>
 
-  lazy val spaceBetween: StyleSetter = this := "space-between"
+  lazy val spaceBetween: StyleSetter[_] = this := "space-between"
 
-  lazy val spaceAround: StyleSetter = this := "space-around"
+  lazy val spaceAround: StyleSetter[_] = this := "space-around"
 
-  lazy val spaceEvenly: StyleSetter = this := "space-evenly"
+  lazy val spaceEvenly: StyleSetter[_] = this := "space-evenly"
 
 }

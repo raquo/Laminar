@@ -4,7 +4,7 @@ import com.raquo.laminar.keys.StyleProp
 import com.raquo.laminar.keys.DerivedStyleProp
 import com.raquo.laminar.defs.styles.{traits => s}
 import com.raquo.laminar.defs.styles.{units => u}
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -16,7 +16,7 @@ trait StyleProps {
 
   protected type DSP[V] = DerivedStyleProp[V]
 
-  protected type SS = StyleSetter
+  protected type SS = StyleSetter[_]
 
 
   /**

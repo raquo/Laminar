@@ -19,7 +19,7 @@ object DomDefsGenerator {
       format = CodeFormatting()
     ) {
 
-    override def settersPackagePath: String = basePackagePath + ".modifiers.KeySetter"
+    override def settersPackagePath: String = basePackagePath + ".modifiers.SimpleKeySetter"
 
     override def scalaJsElementTypeParam: String = "Ref"
 
@@ -425,7 +425,7 @@ object DomDefsGenerator {
         traitName = traitName,
         keyKind = "StyleProp",
         keyKindAlias = "StyleProp",
-        setterType = "StyleSetter",
+        setterType = "StyleSetter[_]",
         setterTypeAlias = "SS",
         derivedKeyKind = "DerivedStyleProp",
         derivedKeyKindAlias = "DSP",
@@ -464,7 +464,7 @@ object DomDefsGenerator {
           extendsTraits = styleTrait.extendsTraits.map(_.replace("[_]", "")),
           extendsUnitTraits = styleTrait.extendsUnits,
           propKind = "StyleProp",
-          keywordType = "StyleSetter",
+          keywordType = "StyleSetter[_]",
           derivedKeyKind = "DerivedStyleProp",
           lengthUnitsNumType = "Int",
           defType = LazyVal,

@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait BorderCollapse { this: StyleProp[_] =>
 
   /** Use separated-border table rendering model. This is the default. */
-  lazy val separate: StyleSetter = this := "separate"
+  lazy val separate: StyleSetter[_] = this := "separate"
 
   /** Use collapsed-border table rendering model. */
-  lazy val collapse: StyleSetter = this := "collapse"
+  lazy val collapse: StyleSetter[_] = this := "collapse"
 
 }

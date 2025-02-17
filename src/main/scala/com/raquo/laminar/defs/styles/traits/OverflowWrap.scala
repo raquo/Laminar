@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,7 +11,7 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait OverflowWrap extends Normal { this: StyleProp[_] =>
 
   /** Indicates that lines may only break at normal word break points. */
-  override lazy val normal: StyleSetter = this := "normal"
+  override lazy val normal: StyleSetter[_] = this := "normal"
 
   /**
     * Indicates that normally unbreakable words may be broken at any points
@@ -20,12 +20,12 @@ trait OverflowWrap extends Normal { this: StyleProp[_] =>
     * opportunities introduced by the word break are considered when calculating
     * min-content intrinsic sizes.
     */
-  lazy val anywhere: StyleSetter = this := "anywhere"
+  lazy val anywhere: StyleSetter[_] = this := "anywhere"
 
   /**
     * Indicates that normally unbreakable words may be broken at arbitrary
     * points if there are no otherwise acceptable break points in the line.
     */
-  lazy val breakWord: StyleSetter = this := "break-word"
+  lazy val breakWord: StyleSetter[_] = this := "break-word"
 
 }

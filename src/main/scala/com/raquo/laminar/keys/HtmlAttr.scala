@@ -2,11 +2,12 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{seqToSetter, HtmlElement}
+import com.raquo.laminar.api.L.HtmlElement
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
-import com.raquo.laminar.modifiers.KeySetter.HtmlAttrSetter
-import com.raquo.laminar.modifiers.KeyUpdater.HtmlAttrUpdater
+import com.raquo.laminar.modifiers.SimpleKeySetter.HtmlAttrSetter
+import com.raquo.laminar.modifiers.SimpleKeyUpdater
+import com.raquo.laminar.modifiers.SimpleKeyUpdater.HtmlAttrUpdater
+import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 /**
   * This class represents an HTML Element Attribute. Meaning the key that can be set, not the whole a key-value pair.
@@ -16,22 +17,15 @@ import com.raquo.laminar.modifiers.KeyUpdater.HtmlAttrUpdater
 class HtmlAttr[V](
   override val name: String,
   val codec: Codec[V, String]
-) extends Key {
-
-  @inline def apply(value: V): HtmlAttrSetter[V] = {
-    this := value
-  }
-
-  def maybe(value: Option[V]): Setter[HtmlElement] = {
-    seqToSetter[Option, HtmlElement](value.map(v => this := v))
-  }
+) extends SimpleKey[V, String, ReactiveHtmlElement.Base] {
 
   def :=(value: V): HtmlAttrSetter[V] = {
-    new KeySetter[HtmlAttr[V], V, HtmlElement](this, value, DomApi.setHtmlAttribute)
+    // new KeySetter[HtmlAttr[V], V, String, HtmlElement](this, value, DomApi.setHtmlAttribute)
+    new HtmlAttrSetter[V](this, value)
   }
 
   def <--(values: Source[V]): HtmlAttrUpdater[V] = {
-    new KeyUpdater[HtmlElement, HtmlAttr[V], V](
+    new SimpleKeyUpdater[HtmlElement, HtmlAttr[V], V](
       key = this,
       values = values.toObservable,
       update = (el, v, _) => DomApi.setHtmlAttribute(el, this, v)

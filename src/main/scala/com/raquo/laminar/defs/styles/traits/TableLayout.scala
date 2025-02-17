@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -15,13 +15,13 @@ trait TableLayout extends Auto { this: StyleProp[_] =>
     * table layout. The width of the table and its cells depends on the content
     * thereof.
     */
-  override lazy val auto: StyleSetter = this := "auto"
+  override lazy val auto: StyleSetter[_] = this := "auto"
 
   /**
     * Table and column widths are set by the widths of table and col elements
     * or by the width of the first row of cells. Cells in subsequent rows do
     * not affect column widths.
     */
-  lazy val fixed: StyleSetter = this := "fixed"
+  lazy val fixed: StyleSetter[_] = this := "fixed"
 
 }

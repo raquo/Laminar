@@ -1,8 +1,8 @@
 package com.raquo.laminar.defs.styles.units
 
-import com.raquo.laminar.keys.DerivedStyleBuilder
+import com.raquo.laminar.keys.StyleBuilder
 
-trait Calc[DSP[_]] { this: DerivedStyleBuilder[_, DSP] =>
+trait Calc[DSP[_]] { this: StyleBuilder[_, DSP] =>
 
   /** Wrap the provided expression in CSS calc() function.
    *

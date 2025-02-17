@@ -7,7 +7,7 @@ import com.raquo.laminar.inserters._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.modifiers._
-import com.raquo.laminar.modifiers.KeyUpdater.StyleUpdater
+import com.raquo.laminar.modifiers.SimpleKeyUpdater.StyleUpdater
 import com.raquo.laminar.nodes._
 import org.scalajs.dom
 

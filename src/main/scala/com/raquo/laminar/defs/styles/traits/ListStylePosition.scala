@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,12 +11,12 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait ListStylePosition { this: StyleProp[_] =>
 
   /** The marker box is outside the principal block box. */
-  lazy val outside: StyleSetter = this := "outside"
+  lazy val outside: StyleSetter[_] = this := "outside"
 
   /**
     * The marker box is the first inline box in the principal block box, after
     * which the element's content flows.
     */
-  lazy val inside: StyleSetter = this := "inside"
+  lazy val inside: StyleSetter[_] = this := "inside"
 
 }

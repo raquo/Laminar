@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.laminar.keys.Key
+import com.raquo.laminar.keys.SimpleKey
 import com.raquo.laminar.tags.SvgTag
 import org.scalajs.dom
 
@@ -9,7 +9,7 @@ class ReactiveSvgElement[+Ref <: dom.svg.Element](
   final override val ref: Ref
 ) extends ReactiveElement[Ref] {
 
-  override private[laminar] def onBoundKeyUpdater(key: Key): Unit = ()
+  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit = ()
 
   override def toString: String = {
     // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.

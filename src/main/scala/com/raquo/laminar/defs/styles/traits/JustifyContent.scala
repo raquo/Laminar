@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -10,8 +10,8 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 
 trait JustifyContent extends AlignContent { this: StyleProp[_] =>
 
-  lazy val left: StyleSetter = this := "left"
+  lazy val left: StyleSetter[_] = this := "left"
 
-  lazy val right: StyleSetter = this := "right"
+  lazy val right: StyleSetter[_] = this := "right"
 
 }

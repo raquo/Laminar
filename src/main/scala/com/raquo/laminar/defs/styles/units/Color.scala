@@ -1,10 +1,10 @@
 package com.raquo.laminar.defs.styles.units
 
-import com.raquo.laminar.keys.DerivedStyleBuilder
+import com.raquo.laminar.keys.StyleBuilder
 
 // #TODO[API] Is it possible to remove the DSP type param from this trait?
 
-trait Color[SS, DSP[_]] { this: DerivedStyleBuilder[SS, DSP] =>
+trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
 
   /** @param red   0..255
     * @param green 0..255

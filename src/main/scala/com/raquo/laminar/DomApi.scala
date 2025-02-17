@@ -236,7 +236,7 @@ object DomApi {
     setHtmlPropertyRaw(element, prop, domValue)
   }
 
-  def unsetHtmlProperty(
+  def removeHtmlProperty(
     element: ReactiveHtmlElement.Base,
     prop: HtmlProp[_, _]
   ): Unit = {
@@ -279,9 +279,9 @@ object DomApi {
   def setHtmlStyle[V](
     element: ReactiveHtmlElement.Base,
     styleProp: StyleProp[V],
-    value: V
+    value: V | String
   ): Unit = {
-    setRefStyle(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
+    setHtmlStyleRaw(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
   }
 
   def setHtmlStringStyle(
@@ -289,15 +289,23 @@ object DomApi {
     styleProp: StyleProp[_],
     value: String
   ): Unit = {
-    setRefStyle(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
+    setHtmlStyleRaw(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
   }
 
+  @deprecated("setHtmlAnyStyle was renamed to setHtmlStyle", "18.0.0-M1")
   def setHtmlAnyStyle[V](
     element: ReactiveHtmlElement.Base,
     style: StyleProp[V],
     value: V | String
   ): Unit = {
-    setRefStyle(element.ref, style.name, style.prefixes, cssValue(value))
+    setHtmlStyleRaw(element.ref, style.name, style.prefixes, cssValue(value))
+  }
+
+  def removeHtmlStyle[V](
+    element: ReactiveHtmlElement.Base,
+    style: StyleProp[V]
+  ): Unit = {
+    setHtmlStyleRaw(element.ref, style.name, style.prefixes, styleValue = null)
   }
 
   @inline private[laminar] def cssValue(value: Any): String = {
@@ -317,7 +325,7 @@ object DomApi {
     // }
   }
 
-  @inline private[laminar] def setRefStyle(
+  @inline private[laminar] def setHtmlStyleRaw(
     ref: dom.html.Element,
     styleCssName: String,
     prefixes: immutable.Seq[String],

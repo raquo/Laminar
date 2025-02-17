@@ -4,18 +4,18 @@ import com.raquo.ew._
 
 import scala.scalajs.js
 
-trait DerivedStyleBuilder[SS, DSP[_]] {
+trait StyleBuilder[SS, DSP[_]] {
 
   protected def styleSetter(value: String): SS
 
   // #Note: You can make this public if you wish
-  protected def derivedStyle[A](encode: (A => String)): DSP[A]
+  protected def derivedStyle[InputV](encode: InputV => String): DSP[InputV]
 
   protected def encodeUrlValue(url: String): String = {
     // #TODO[Security] Review this.
     val escaped = url.ew.replace(
-      DerivedStyleBuilder.urlPattern,
-      DerivedStyleBuilder.urlReplacer
+      StyleBuilder.urlPattern,
+      StyleBuilder.urlReplacer
     ).str
     s""""$escaped"""" // #Note output is wrapped in double quotes
   }
@@ -23,14 +23,14 @@ trait DerivedStyleBuilder[SS, DSP[_]] {
   protected def encodeCalcValue(exp: String): String = {
     // #TODO[Security] Review this.
     val escaped = exp.ew.replace(
-      DerivedStyleBuilder.calcPattern,
-      DerivedStyleBuilder.calcReplacer
+      StyleBuilder.calcPattern,
+      StyleBuilder.calcReplacer
     ).str
     s"$escaped" // #Note output is NOT wrapped in double quotes
   }
 }
 
-object DerivedStyleBuilder {
+object StyleBuilder {
 
   private val calcPattern = new js.RegExp("[\"\'\n\r\f\\\\;]", flags = "g")
 

@@ -4,7 +4,7 @@ import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.ew.JsArray
 import com.raquo.laminar.DomApi
 import com.raquo.laminar.inputs.InputController
-import com.raquo.laminar.keys.{HtmlProp, Key}
+import com.raquo.laminar.keys.{HtmlProp, SimpleKey}
 import com.raquo.laminar.tags.{CustomHtmlTag, HtmlTag}
 import org.scalajs.dom
 
@@ -73,7 +73,7 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
     controllers.exists(_.asScalaJs.exists(_.propDomName == propDomName))
   }
 
-  override private[laminar] def onBoundKeyUpdater(key: Key): Unit = {
+  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit = {
     key match {
       case p: HtmlProp[_, _] =>
         if (isControllableProp(p.name)) {
