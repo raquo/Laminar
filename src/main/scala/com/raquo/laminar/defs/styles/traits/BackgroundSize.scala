@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.defs.styles.{units => u}
 import com.raquo.laminar.keys.DerivedStyleProp
 
@@ -18,13 +18,13 @@ trait BackgroundSize extends Auto with u.Length[DerivedStyleProp, Int] { this: S
     * or equal to the corresponding dimensions of the background positioning
     * area.
     */
-  lazy val cover: StyleSetter = this := "cover"
+  lazy val cover: StyleSetter[_] = this := "cover"
 
   /**
     * This keyword specifies that the background image should be scaled to be
     * as large as possible while ensuring both its dimensions are less than or
     * equal to the corresponding dimensions of the background positioning area.
     */
-  lazy val contain: StyleSetter = this := "contain"
+  lazy val contain: StyleSetter[_] = this := "contain"
 
 }

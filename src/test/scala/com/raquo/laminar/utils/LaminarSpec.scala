@@ -5,15 +5,25 @@ import com.raquo.domtestutils.matching._
 import com.raquo.laminar.api._
 import com.raquo.laminar.api.L.CompositeSvgAttr
 import com.raquo.laminar.codecs.StringAsIsCodec
-import com.raquo.laminar.defs.complex.ComplexHtmlKeys.{CompositeHtmlAttr, CompositeHtmlProp}
-import com.raquo.laminar.keys.{HtmlAttr, HtmlProp, StyleProp, SvgAttr}
-import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, RootNode}
+import com.raquo.laminar.defs.complex.ComplexHtmlKeys.CompositeHtmlAttr
+import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
+import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, RootNode}
 import com.raquo.laminar.tags.Tag
 import org.scalactic
+import org.scalajs.dom
 
 trait LaminarSpec
 extends MountOps
-with RuleImplicits[Tag.Base, CommentNode, HtmlProp, HtmlAttr, SvgAttr, StyleProp]
+with RuleImplicits[
+  Tag.Base,
+  CommentNode,
+  HtmlProp,
+  HtmlAttr,
+  SvgAttr,
+  StyleProp,
+  CompositeKey[ReactiveHtmlElement.Base],
+  CompositeKey[ReactiveSvgElement.Base]
+]
 with EventSimulator {
   // === On nullable variables ===
   // `root` is nullable because if it was an Option it would be too easy to
@@ -97,15 +107,15 @@ with EventSimulator {
     new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespaceUri)
   }
 
-  implicit def makeCompositePropTestable(prop: CompositeHtmlProp): TestableProp[String, String] = {
-    new TestableProp(prop.name, StringAsIsCodec.decode)
+  override implicit def makeCompositeHtmlKeyTestable(key: CompositeKey[ReactiveHtmlElement.Base]): TestableCompositeKey = {
+    new TestableCompositeKey(key.name, key.separator, getRawDomValue = {
+      case htmlEl: dom.html.Element => htmlEl.getAttribute(key.name)
+    })
   }
 
-  implicit def makeCompositeHtmlAttrTestable(attr: CompositeHtmlAttr): TestableHtmlAttr[String] = {
-    new TestableHtmlAttr(attr.name, StringAsIsCodec.encode, StringAsIsCodec.decode)
-  }
-
-  implicit def makeCompositeSvgAttrTestable(attr: CompositeSvgAttr): TestableSvgAttr[String] = {
-    new TestableSvgAttr(attr.name, StringAsIsCodec.encode, StringAsIsCodec.decode, namespace = None)
+  override implicit def makeCompositeSvgKeyTestable(key: CompositeKey[ReactiveSvgElement.Base]): TestableCompositeKey = {
+    new TestableCompositeKey(key.name, key.separator, getRawDomValue = {
+      case svgEl: dom.svg.Element => svgEl.getAttributeNS(namespaceURI = null, key.name)
+    })
   }
 }

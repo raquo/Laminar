@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -14,10 +14,10 @@ trait Overflow extends Auto { this: StyleProp[_] =>
     * Default value. Content is not clipped, it may be rendered outside the
     * content box.
     */
-  lazy val visible: StyleSetter = this := "visible"
+  lazy val visible: StyleSetter[_] = this := "visible"
 
   /** The content is clipped and no scrollbars are provided. */
-  lazy val hidden: StyleSetter = this := "hidden"
+  lazy val hidden: StyleSetter[_] = this := "hidden"
 
   /**
     * The content is clipped and desktop browsers use scrollbars, whether or
@@ -25,6 +25,6 @@ trait Overflow extends Auto { this: StyleProp[_] =>
     * appearing and disappearing in a dynamic environment. Printers may print
     * overflowing content.
     */
-  lazy val scroll: StyleSetter = this := "scroll"
+  lazy val scroll: StyleSetter[_] = this := "scroll"
 
 }

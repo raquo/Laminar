@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.defs.styles.{units => u}
 import com.raquo.laminar.keys.DerivedStyleProp
 
@@ -13,12 +13,12 @@ import com.raquo.laminar.keys.DerivedStyleProp
 trait LineWidth extends u.Length[DerivedStyleProp, Int] { this: StyleProp[_] =>
 
   /** Typically 1px in desktop browsers like Firefox. */
-  lazy val thin: StyleSetter = this := "thin"
+  lazy val thin: StyleSetter[_] = this := "thin"
 
   /** Typically 3px in desktop browsers like Firefox. */
-  lazy val medium: StyleSetter = this := "medium"
+  lazy val medium: StyleSetter[_] = this := "medium"
 
   /** Typically 5px in desktop browsers like Firefox. */
-  lazy val thick: StyleSetter = this := "thick"
+  lazy val thick: StyleSetter[_] = this := "thick"
 
 }

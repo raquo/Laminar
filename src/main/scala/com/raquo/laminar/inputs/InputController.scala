@@ -7,7 +7,7 @@ import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L
 import com.raquo.laminar.inputs.InputController.InputControllerConfig
 import com.raquo.laminar.keys.{EventProcessor, EventProp, HtmlProp}
-import com.raquo.laminar.modifiers.{Binder, EventListener, KeyUpdater}
+import com.raquo.laminar.modifiers.{Binder, EventListener, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 import com.raquo.laminar.tags.CustomHtmlTag
 import org.scalajs.dom
@@ -18,7 +18,7 @@ import scala.scalajs.js.JSConverters.JSRichOption
 class InputController[Ref <: dom.html.Element, A, B](
   config: InputControllerConfig[Ref, A],
   element: ReactiveHtmlElement[Ref],
-  updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A],
+  updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A],
   listener: EventListener[_ <: dom.Event, B]
 ) {
 
@@ -230,7 +230,7 @@ object InputController {
 
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, A, B](
     listener: EventListener[Ev, B],
-    updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A]
+    updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     Binder[ReactiveHtmlElement[Ref]] { element =>
       val propDomName = updater.key.name

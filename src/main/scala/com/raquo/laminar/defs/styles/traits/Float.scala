@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait Float extends None { this: StyleProp[_] =>
 
   /** Element must float on the left side of its containing block. */
-  lazy val left: StyleSetter = this := "left"
+  lazy val left: StyleSetter[_] = this := "left"
 
   /** Element must float on the right side of its containing block. */
-  lazy val right: StyleSetter = this := "right"
+  lazy val right: StyleSetter[_] = this := "right"
 
 }

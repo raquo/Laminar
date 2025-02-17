@@ -2,37 +2,26 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{seqToSetter, HtmlElement}
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
-import com.raquo.laminar.modifiers.KeyUpdater.DerivedStyleUpdater
+import com.raquo.laminar.modifiers.SimpleKeySetter.DerivedStyleSetter
+import com.raquo.laminar.modifiers.SimpleKeyUpdater
+import com.raquo.laminar.modifiers.SimpleKeyUpdater.DerivedStyleUpdater
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 /** This class represents derived style props like `height.px` or `backgroundImage.url` */
 class DerivedStyleProp[InputV](
   val key: StyleProp[_],
   val encode: InputV => String
-) {
+) extends SimpleKey[InputV, String, ReactiveHtmlElement.Base] {
 
-  @inline def apply(value: InputV): StyleSetter = {
-    this := value
+  override val name: String = key.name
+
+  override def :=(value: InputV): DerivedStyleSetter[InputV] = {
+    new DerivedStyleSetter(key = this, value)
   }
 
-  def :=(value: InputV): StyleSetter = {
-    new KeySetter[StyleProp[_], String, HtmlElement](
-      key,
-      encode(value),
-      DomApi.setHtmlStringStyle
-    )
-  }
-
-  def maybe(value: Option[InputV]): Setter[HtmlElement] = {
-    seqToSetter[Option, HtmlElement](value.map(v => this := v))
-  }
-
-  def <--(values: Source[InputV]): DerivedStyleUpdater[InputV] = {
-    new KeyUpdater[ReactiveHtmlElement.Base, StyleProp[_], InputV](
-      key = key,
+  override def <--(values: Source[InputV]): DerivedStyleUpdater[InputV] = {
+    new SimpleKeyUpdater[ReactiveHtmlElement.Base, DerivedStyleProp[InputV], InputV](
+      key = this,
       values = values.toObservable,
       update = (el, v, _) => DomApi.setHtmlStringStyle(el, key, encode(v))
     )

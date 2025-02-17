@@ -11,4 +11,4 @@ import org.scalajs.dom
   *
   * @tparam Ev type of DOM Events that the event handler callback for this event prop accepts
   */
-class EventProp[Ev <: dom.Event](override val name: String) extends Key
+class EventProp[Ev <: dom.Event](val name: String)

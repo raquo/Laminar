@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.defs.styles.{units => u}
 import com.raquo.laminar.keys.DerivedStyleProp
 
@@ -13,15 +13,15 @@ import com.raquo.laminar.keys.DerivedStyleProp
 trait MinMaxLength extends u.Length[DerivedStyleProp, Int] { this: StyleProp[_] =>
 
   /** The intrinsic preferred length. */
-  lazy val maxContent: StyleSetter = this := "max-content"
+  lazy val maxContent: StyleSetter[_] = this := "max-content"
 
   /** The intrinsic minimum length. */
-  lazy val minContent: StyleSetter = this := "min-content"
+  lazy val minContent: StyleSetter[_] = this := "min-content"
 
   /** Defined as min(max-content, max(min-content, fill-available)). */
-  lazy val fitContent: StyleSetter = this := "fit-content"
+  lazy val fitContent: StyleSetter[_] = this := "fit-content"
 
   /** The containing block width minus margin, border and padding. */
-  lazy val fillAvailable: StyleSetter = this := "fill-available"
+  lazy val fillAvailable: StyleSetter[_] = this := "fill-available"
 
 }

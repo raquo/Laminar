@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait Direction { this: StyleProp[_] =>
 
   /** Text and other elements go from left to right. */
-  lazy val ltr: StyleSetter = this := "ltr"
+  lazy val ltr: StyleSetter[_] = this := "ltr"
 
   /** Text and other elements go from right to left. */
-  lazy val rtl: StyleSetter = this := "rtl"
+  lazy val rtl: StyleSetter[_] = this := "rtl"
 
 }

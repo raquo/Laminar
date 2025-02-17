@@ -1,8 +1,8 @@
 package com.raquo.laminar.defs.styles.units
 
-import com.raquo.laminar.keys.DerivedStyleBuilder
+import com.raquo.laminar.keys.StyleBuilder
 
-trait Length[DSP[_], Num] extends Calc[DSP] { this: DerivedStyleBuilder[_, DSP] =>
+trait Length[DSP[_], Num] extends Calc[DSP] { this: StyleBuilder[_, DSP] =>
 
   // -- Most common units --
 

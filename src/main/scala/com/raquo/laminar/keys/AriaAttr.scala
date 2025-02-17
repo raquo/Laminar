@@ -2,11 +2,12 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{seqToSetter, Element}
+import com.raquo.laminar.api.L.Element
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
-import com.raquo.laminar.modifiers.KeySetter.AriaAttrSetter
-import com.raquo.laminar.modifiers.KeyUpdater.AriaAttrUpdater
+import com.raquo.laminar.modifiers.SimpleKeySetter.AriaAttrSetter
+import com.raquo.laminar.modifiers.SimpleKeyUpdater
+import com.raquo.laminar.modifiers.SimpleKeyUpdater.AriaAttrUpdater
+import com.raquo.laminar.nodes.ReactiveElement
 
 /**
  * This class represents an HTML Element Attribute. Meaning the key that can be set, not the whole a key-value pair.
@@ -16,24 +17,17 @@ import com.raquo.laminar.modifiers.KeyUpdater.AriaAttrUpdater
 class AriaAttr[V](
   suffix: String,
   val codec: Codec[V, String]
-) extends Key {
+) extends SimpleKey[V, String, ReactiveElement.Base] {
 
   override val name: String = "aria-" + suffix
 
-  def :=(value: V): AriaAttrSetter[V] = {
-    new KeySetter[AriaAttr[V], V, Element](this, value, DomApi.setAriaAttribute)
+  override def :=(value: V): AriaAttrSetter[V] = {
+    // new KeySetter[AriaAttr[V], V, String, Element](this, value, DomApi.setAriaAttribute)
+    new AriaAttrSetter(this, value)
   }
 
-  @inline def apply(value: V): AriaAttrSetter[V] = {
-    this := value
-  }
-
-  def maybe(value: Option[V]): Setter[Element] = {
-    seqToSetter[Option, Element](value.map(v => this := v))
-  }
-
-  def <--(values: Source[V]): AriaAttrUpdater[V] = {
-    new KeyUpdater[Element, AriaAttr[V], V](
+  override def <--(values: Source[V]): AriaAttrUpdater[V] = {
+    new SimpleKeyUpdater[Element, AriaAttr[V], V](
       key = this,
       values = values.toObservable,
       update = (el, v, _) => DomApi.setAriaAttribute(el, this, v)

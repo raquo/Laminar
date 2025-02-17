@@ -99,7 +99,8 @@ trait ComplexHtmlKeys {
 
 object ComplexHtmlKeys {
 
-  type CompositeHtmlProp = CompositeKey[HtmlProp[String, String], ReactiveHtmlElement.Base]
+  @deprecated("CompositeHtmlProp is now the same type as CompositeHtmlAttr – use the latter instead", "18.0.0-M1")
+  type CompositeHtmlProp = CompositeKey[ReactiveHtmlElement.Base]
 
-  type CompositeHtmlAttr = CompositeKey[HtmlAttr[String], ReactiveHtmlElement.Base]
+  type CompositeHtmlAttr = CompositeKey[ReactiveHtmlElement.Base]
 }

@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -15,30 +15,30 @@ trait WhiteSpace extends Normal { this: StyleProp[_] =>
     * are handled as other whitespace. Breaks lines as necessary to fill line
     * boxes.
     */
-  override lazy val normal: StyleSetter = this := "normal"
+  override lazy val normal: StyleSetter[_] = this := "normal"
 
   /**
     * Collapses whitespace as for normal, but suppresses line breaks (text
     * wrapping) within text.
     */
-  lazy val nowrap: StyleSetter = this := "nowrap"
+  lazy val nowrap: StyleSetter[_] = this := "nowrap"
 
   /**
     * Sequences of whitespace are preserved, lines are only broken at newline
     * characters in the source and at br elements.
     */
-  lazy val pre: StyleSetter = this := "pre"
+  lazy val pre: StyleSetter[_] = this := "pre"
 
   /**
     * Sequences of whitespace are preserved. Lines are broken at newline
     * characters, at br, and as necessary to fill line boxes.
     */
-  lazy val preWrap: StyleSetter = this := "pre-wrap"
+  lazy val preWrap: StyleSetter[_] = this := "pre-wrap"
 
   /**
     * Sequences of whitespace are collapsed. Lines are broken at newline
     * characters, at br, and as necessary to fill line boxes.
     */
-  lazy val preLine: StyleSetter = this := "pre-line"
+  lazy val preLine: StyleSetter[_] = this := "pre-line"
 
 }

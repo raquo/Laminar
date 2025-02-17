@@ -10,7 +10,7 @@ import com.raquo.laminar.defs.styles.StyleProps
 import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
-import com.raquo.laminar.modifiers.{EventListener, KeyUpdater}
+import com.raquo.laminar.modifiers.{EventListener, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}
@@ -257,7 +257,7 @@ with Implicits {
     */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
     listener: EventListener[Ev, _],
-    updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V]
+    updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)
   }
@@ -266,7 +266,7 @@ with Implicits {
     * See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]]
     */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
-    updater: KeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V],
+    updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V],
     listener: EventListener[Ev, _]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)

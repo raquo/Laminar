@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -15,7 +15,7 @@ trait BackgroundAttachment { this: StyleProp[_] =>
     * a scrolling mechanism, the background doesn't move with the element.
     * (This is not compatible with background-clip: text.)
     */
-  lazy val fixed: StyleSetter = this := "fixed"
+  lazy val fixed: StyleSetter[_] = this := "fixed"
 
   /**
     * The background is fixed relative to the element's contents. If the element
@@ -24,12 +24,12 @@ trait BackgroundAttachment { this: StyleProp[_] =>
     * are relative to the scrollable area of the element rather than to the
     * border framing them.
     */
-  lazy val local: StyleSetter = this := "local"
+  lazy val local: StyleSetter[_] = this := "local"
 
   /**
     * The background is fixed relative to the element itself and does not scroll
     * with its contents. (It is effectively attached to the element's border.)
     */
-  lazy val scroll: StyleSetter = this := "scroll"
+  lazy val scroll: StyleSetter[_] = this := "scroll"
 
 }

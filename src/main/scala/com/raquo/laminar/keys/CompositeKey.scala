@@ -3,10 +3,9 @@ package com.raquo.laminar.keys
 import com.raquo.airstream.core.Source
 import com.raquo.ew.ewArray
 import com.raquo.laminar.api.L.{MapValueMapper, StringValueMapper}
-import com.raquo.laminar.api.StringSeqValueMapper
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.keys.CompositeKey.{CompositeCodec, CompositeValueMapper}
-import com.raquo.laminar.modifiers.{CompositeKeySetter, KeyUpdater}
+import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
@@ -14,36 +13,36 @@ import scala.scalajs.js.JSStringOps._
 
 // #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 
-class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
-  override val name: String,
+class CompositeKey[-El <: ReactiveElement.Base](
+  val name: String,
   private[laminar] val getRawDomValue: El => String,
   private[laminar] val setRawDomValue: (El, String) => Unit,
   val separator: String
-) extends Key {
+) {
 
   val codec: CompositeCodec = new CompositeCodec(separator)
 
-  def :=(items: String): CompositeKeySetter[K, El] = {
+  def :=(items: String): CompositeKeySetter[El] = {
     addStaticItems(StringValueMapper.toNormalizedList(items, separator))
   }
 
-  def :=(items: Map[String, Boolean]): CompositeKeySetter[K, El] = {
+  def :=(items: Map[String, Boolean]): CompositeKeySetter[El] = {
     addStaticItems(MapValueMapper.toNormalizedList(items, separator))
   }
 
-  def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[K, El] = {
+  def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[El] = {
     addStaticItems(mapper.toNormalizedList(value, separator))
   }
 
-  @inline def apply(items: String): CompositeKeySetter[K, El] = {
+  @inline def apply(items: String): CompositeKeySetter[El] = {
     this := items
   }
 
-  @inline def apply(items: Map[String, Boolean]): CompositeKeySetter[K, El] = {
+  @inline def apply(items: Map[String, Boolean]): CompositeKeySetter[El] = {
     this := items
   }
 
-  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[K, El] = {
+  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[El] = {
     this.:= (items: _*)
   }
 
@@ -51,32 +50,19 @@ class CompositeKey[K <: Key, -El <: ReactiveElement.Base](
     """cls.toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""",
     since = "17.0.0-M1"
   )
-  def toggle(items: String*): LockedCompositeKey[K, El] = {
+  def toggle(items: String*): LockedCompositeKey[El] = {
     new LockedCompositeKey(this, items.toList)
   }
 
-  def <--[V](items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): KeyUpdater[El, this.type, V] = {
-    new KeyUpdater[El, this.type, V](
+  def <--[V](items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): CompositeKeyUpdater[El, V] = {
+    new CompositeKeyUpdater[El, V](
       key = this,
       values = items.toObservable,
-      update = (element, nextRawItems, thisBinder) => {
-        val currentNormalizedItems = element.compositeValueItems(this, reason = thisBinder)
-        val nextNormalizedItems = valueMapper.toNormalizedList(nextRawItems, separator)
-
-        val itemsToAdd = nextNormalizedItems.filterNot(currentNormalizedItems.contains)
-        val itemsToRemove = currentNormalizedItems.filterNot(nextNormalizedItems.contains)
-
-        element.updateCompositeValue(
-          key = this,
-          reason = thisBinder,
-          addItems = itemsToAdd,
-          removeItems = itemsToRemove
-        )
-      }
+      valueMapper = valueMapper
     )
   }
 
-  private def addStaticItems(normalizedItems: List[String]): CompositeKeySetter[K, El] = {
+  private def addStaticItems(normalizedItems: List[String]): CompositeKeySetter[El] = {
     new CompositeKeySetter(
       key = this,
       itemsToAdd = normalizedItems

@@ -2,11 +2,12 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.{seqToSetter, SvgElement}
+import com.raquo.laminar.api.L.SvgElement
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.modifiers.{KeySetter, KeyUpdater, Setter}
-import com.raquo.laminar.modifiers.KeySetter.SvgAttrSetter
-import com.raquo.laminar.modifiers.KeyUpdater.SvgAttrUpdater
+import com.raquo.laminar.modifiers.SimpleKeySetter.SvgAttrSetter
+import com.raquo.laminar.modifiers.SimpleKeyUpdater
+import com.raquo.laminar.modifiers.SimpleKeyUpdater.SvgAttrUpdater
+import com.raquo.laminar.nodes.ReactiveSvgElement
 
 /**
   * This class represents an Svg Element Attribute. Meaning the key that can be set, not the whole a key-value pair.
@@ -20,7 +21,7 @@ class SvgAttr[V](
   val localName: String,
   val codec: Codec[V, String],
   val namespacePrefix: Option[String]
-) extends Key {
+) extends SimpleKey[V, String, ReactiveSvgElement.Base] {
 
   /** Qualified name, including namespace */
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
@@ -28,19 +29,12 @@ class SvgAttr[V](
   val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
 
   def :=(value: V): SvgAttrSetter[V] = {
-    new KeySetter[SvgAttr[V], V, SvgElement](this, value, DomApi.setSvgAttribute)
-  }
-
-  @inline def apply(value: V): SvgAttrSetter[V] = {
-    this := value
-  }
-
-  def maybe(value: Option[V]): Setter[SvgElement] = {
-    seqToSetter[Option, SvgElement](value.map(v => this := v))
+    // new KeySetter[SvgAttr[V], V, String, SvgElement](this, value, DomApi.setSvgAttribute)
+    new SvgAttrSetter(this, value)
   }
 
   def <--(values: Source[V]): SvgAttrUpdater[V] = {
-    new KeyUpdater[SvgElement, SvgAttr[V], V](
+    new SimpleKeyUpdater[SvgElement, SvgAttr[V], V](
       key = this,
       values = values.toObservable,
       update = (el, v, _) => DomApi.setSvgAttribute(el, this, v)

@@ -1,7 +1,7 @@
 package com.raquo.laminar.defs.styles.traits
 
 import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
@@ -11,12 +11,12 @@ import com.raquo.laminar.modifiers.KeySetter.StyleSetter
 trait TextDecoration extends None { this: StyleProp[_] =>
 
   /** Each line of text is underlined. */
-  lazy val underline: StyleSetter = this := "underline"
+  lazy val underline: StyleSetter[_] = this := "underline"
 
   /** Each line of text has a line above it. */
-  lazy val overline: StyleSetter = this := "overline"
+  lazy val overline: StyleSetter[_] = this := "overline"
 
   /** Each line of text has a line through the middle. */
-  lazy val lineThrough: StyleSetter = this := "line-through"
+  lazy val lineThrough: StyleSetter[_] = this := "line-through"
 
 }

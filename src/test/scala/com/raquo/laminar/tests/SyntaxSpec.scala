@@ -5,7 +5,7 @@ import com.raquo.laminar
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.keys.DerivedStyleProp
-import com.raquo.laminar.modifiers.KeySetter.StyleSetter
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
@@ -89,25 +89,25 @@ class SyntaxSpec extends UnitSpec {
 
     // CSS keywords
 
-    val s1: StyleSetter = display.none
-    val v1: String = display.none.value
-    assert(display.none.value == "none")
+    val s1: StyleSetter[_] = display.none
+    val v1: String = display.none.cssValue
+    assert(display.none.cssValue == "none")
 
     // Base CSS keywords
-    val s2: StyleSetter = padding.inherit
-    val v2: String = padding.inherit.value
-    assert(display.inherit.value == "inherit")
+    val s2: StyleSetter[_] = padding.inherit
+    val v2: String = padding.inherit.cssValue
+    assert(display.inherit.cssValue == "inherit")
 
     // Derived CSS props (units)
 
     val p1: StyleProp[String] = padding
     val p2: DerivedStyleProp[Int] = padding.px
-    assert((padding.px := 12).value == "12px")
+    assert((padding.px := 12).cssValue == "12px")
 
     maxHeight.calc := "12px + 20em" // Length inherits Calc
 
     background.url: DerivedStyleProp[String]
-    (background.url := "https://laminar.dev").value == """url("https://laminar.dev")"""
+    (background.url := "https://laminar.dev").cssValue == """url("https://laminar.dev")"""
 
     assert(style.percent(55) == "55%")
     assert(style.calc("12px + 20em") == "calc(12px + 20em)")
@@ -115,8 +115,8 @@ class SyntaxSpec extends UnitSpec {
     // Multi-parameter derived CSS props (units)
 
     val p3: StyleProp[String] = color
-    val s3: StyleSetter = color.rgb(200, 100, 0)
-    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
+    val s3: StyleSetter[_] = color.rgb(200, 100, 0)
+    assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
 
     assert(style.rgb(200, 100, 0) == "rgb(200, 100, 0)")
   }

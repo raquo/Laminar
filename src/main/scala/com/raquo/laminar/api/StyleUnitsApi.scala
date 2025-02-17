@@ -2,9 +2,10 @@ package com.raquo.laminar.api
 
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
 import com.raquo.laminar.defs.styles.units
-import com.raquo.laminar.keys.DerivedStyleBuilder
+import com.raquo.laminar.keys.StyleBuilder
 
-trait StyleUnitsApi extends DerivedStyleBuilder[String, StyleEncoder]
+trait StyleUnitsApi
+extends StyleBuilder[String, StyleEncoder]
 with units.Color[String, StyleEncoder]
 with units.Length[StyleEncoder, Int]
 with units.Time[StyleEncoder]

@@ -4,7 +4,7 @@ import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink, Transa
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicOwner, DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.ew.JsArray
-import com.raquo.laminar.keys.{CompositeKey, EventProcessor, Key}
+import com.raquo.laminar.keys.{CompositeKey, EventProcessor, SimpleKey}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{EventListener, Modifier}
 import com.raquo.laminar.tags.Tag
@@ -100,11 +100,11 @@ with ParentNode[Ref] {
     *
     * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
     */
-  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier.Any)]] =
+  private[this] var _compositeValues: Map[CompositeKey[this.type], List[(String, Modifier.Any)]] =
     Map.empty
 
   private[laminar] def compositeValueItems(
-    prop: CompositeKey[_, this.type],
+    prop: CompositeKey[this.type],
     reason: Modifier.Any
   ): List[String] = {
     _compositeValues
@@ -113,7 +113,7 @@ with ParentNode[Ref] {
   }
 
   private[laminar] def updateCompositeValue(
-    key: CompositeKey[_, this.type],
+    key: CompositeKey[this.type],
     reason: Modifier.Any,
     addItems: List[String],
     removeItems: List[String]
@@ -180,7 +180,7 @@ with ParentNode[Ref] {
     this
   }
 
-  private[laminar] def onBoundKeyUpdater(key: Key): Unit
+  private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit
 
   override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
