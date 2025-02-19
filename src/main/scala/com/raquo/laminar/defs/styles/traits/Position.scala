@@ -8,14 +8,14 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait Position { this: StyleProp[_] =>
+trait Position { this: StyleProp[String] =>
 
   /**
     * This keyword let the element use the normal behavior, that is it is laid
     * out in its current position in the flow.  The top, right, bottom, and left
     * properties do not apply.
     */
-  lazy val static: StyleSetter[_] = this := "static"
+  lazy val static: StyleSetter[String] = this := "static"
 
   /**
     * This keyword lays out all elements as though the element were not
@@ -25,7 +25,7 @@ trait Position { this: StyleProp[_] =>
     * table-*-group, table-row, table-column, table-cell, and table-caption
     * elements is undefined.
     */
-  lazy val relative: StyleSetter[_] = this := "relative"
+  lazy val relative: StyleSetter[String] = this := "relative"
 
   /**
     * Do not leave space for the element. Instead, position it at a specified
@@ -33,13 +33,13 @@ trait Position { this: StyleProp[_] =>
     * block. Absolutely positioned boxes can have margins, they do not collapse
     * with any other margins.
     */
-  lazy val absolute: StyleSetter[_] = this := "absolute"
+  lazy val absolute: StyleSetter[String] = this := "absolute"
 
   /**
     * Do not leave space for the element. Instead, position it at a specified
     * position relative to the screen's viewport and doesn't move when scrolled.
     * When printing, position it at that fixed position on every page.
     */
-  lazy val fixed: StyleSetter[_] = this := "fixed"
+  lazy val fixed: StyleSetter[String] = this := "fixed"
 
 }

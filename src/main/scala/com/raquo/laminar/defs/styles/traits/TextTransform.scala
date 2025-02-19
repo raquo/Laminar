@@ -8,18 +8,18 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait TextTransform extends None { this: StyleProp[_] =>
+trait TextTransform extends None[String] { this: StyleProp[String] =>
 
   /**
     * Forces the first letter of each word to be converted to
     * uppercase. Other characters are unchanged.
     */
-  lazy val capitalize: StyleSetter[_] = this := "capitalize"
+  lazy val capitalize: StyleSetter[String] = this := "capitalize"
 
   /** Forces all characters to be converted to uppercase. */
-  lazy val uppercase: StyleSetter[_] = this := "uppercase"
+  lazy val uppercase: StyleSetter[String] = this := "uppercase"
 
   /** Forces all characters to be converted to lowercase. */
-  lazy val lowercase: StyleSetter[_] = this := "lowercase"
+  lazy val lowercase: StyleSetter[String] = this := "lowercase"
 
 }

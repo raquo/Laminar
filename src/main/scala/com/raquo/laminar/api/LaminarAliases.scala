@@ -102,9 +102,9 @@ trait LaminarAliases {
 
   type SvgAttr[V] = keys.SvgAttr[V]
 
-  type CompositeHtmlAttr = ComplexHtmlKeys.CompositeHtmlAttr
+  type CompositeHtmlAttr = keys.CompositeHtmlAttr
 
-  type CompositeSvgAttr = ComplexSvgKeys.CompositeSvgAttr
+  type CompositeSvgAttr = keys.CompositeSvgAttr
 
   //
   // Specific HTML elements

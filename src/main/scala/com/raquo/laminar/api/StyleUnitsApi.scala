@@ -7,7 +7,7 @@ import com.raquo.laminar.keys.StyleBuilder
 trait StyleUnitsApi
 extends StyleBuilder[String, StyleEncoder]
 with units.Color[String, StyleEncoder]
-with units.Length[StyleEncoder, Int]
+with units.Length[StyleEncoder]
 with units.Time[StyleEncoder]
 with units.Url[StyleEncoder] {
 

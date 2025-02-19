@@ -8,12 +8,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait Direction { this: StyleProp[_] =>
+trait Direction { this: StyleProp[String] =>
 
   /** Text and other elements go from left to right. */
-  lazy val ltr: StyleSetter[_] = this := "ltr"
+  lazy val ltr: StyleSetter[String] = this := "ltr"
 
   /** Text and other elements go from right to left. */
-  lazy val rtl: StyleSetter[_] = this := "rtl"
+  lazy val rtl: StyleSetter[String] = this := "rtl"
 
 }

@@ -8,12 +8,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait Float extends None { this: StyleProp[_] =>
+trait Float extends None[String] { this: StyleProp[String] =>
 
   /** Element must float on the left side of its containing block. */
-  lazy val left: StyleSetter[_] = this := "left"
+  lazy val left: StyleSetter[String] = this := "left"
 
   /** Element must float on the right side of its containing block. */
-  lazy val right: StyleSetter[_] = this := "right"
+  lazy val right: StyleSetter[String] = this := "right"
 
 }

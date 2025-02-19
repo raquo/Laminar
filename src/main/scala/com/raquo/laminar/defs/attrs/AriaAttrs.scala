@@ -73,7 +73,7 @@ trait AriaAttrs {
     * widgets. See related [[pressed]] and [[selected]].
     * 
     * Enumerated: Tristate – "true" | "false" | "mixed" | undefined (default)
-    * - undefined means the element does not support being checked
+    *  - undefined means the element does not support being checked
     * 
     * [[https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-checked aria-checked @ MDN]]
     */
@@ -276,7 +276,7 @@ trait AriaAttrs {
     * Indicates the current "pressed" state of toggle buttons. See related [[checked]] and [[selected]].
     * 
     * Enumerated: Tristate – "true" | "false" | "mixed" | undefined (default)
-    * - undefined means the element does not support being pressed
+    *  - undefined means the element does not support being pressed
     * 
     * [[https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-pressed aria-pressed @ MDN]]
     */

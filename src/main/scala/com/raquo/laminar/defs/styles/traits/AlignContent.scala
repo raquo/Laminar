@@ -8,12 +8,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait AlignContent extends FlexPosition { this: StyleProp[_] =>
+trait AlignContent extends FlexPosition { this: StyleProp[String] =>
 
-  lazy val spaceBetween: StyleSetter[_] = this := "space-between"
+  lazy val spaceBetween: StyleSetter[String] = this := "space-between"
 
-  lazy val spaceAround: StyleSetter[_] = this := "space-around"
+  lazy val spaceAround: StyleSetter[String] = this := "space-around"
 
-  lazy val spaceEvenly: StyleSetter[_] = this := "space-evenly"
+  lazy val spaceEvenly: StyleSetter[String] = this := "space-evenly"
 
 }

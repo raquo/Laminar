@@ -8,46 +8,46 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait Color { this: StyleProp[_] =>
+trait Color { this: StyleProp[String] =>
 
   /**
     * The `currentcolor` keyword represents the value of an element's color property.
     * This lets you use the color value on properties that do not receive it by default.
     */
-  lazy val currentColor: StyleSetter[_] = this := "currentcolor"
+  lazy val currentColor: StyleSetter[String] = this := "currentcolor"
 
-  lazy val aqua: StyleSetter[_] = this := "aqua"
+  lazy val aqua: StyleSetter[String] = this := "aqua"
 
-  lazy val black: StyleSetter[_] = this := "black"
+  lazy val black: StyleSetter[String] = this := "black"
 
-  lazy val blue: StyleSetter[_] = this := "blue"
+  lazy val blue: StyleSetter[String] = this := "blue"
 
-  lazy val cyan: StyleSetter[_] = this := "cyan"
+  lazy val cyan: StyleSetter[String] = this := "cyan"
 
-  lazy val fuchsia: StyleSetter[_] = this := "fuchsia"
+  lazy val fuchsia: StyleSetter[String] = this := "fuchsia"
 
-  lazy val gray: StyleSetter[_] = this := "gray"
+  lazy val gray: StyleSetter[String] = this := "gray"
 
-  lazy val green: StyleSetter[_] = this := "green"
+  lazy val green: StyleSetter[String] = this := "green"
 
-  lazy val lime: StyleSetter[_] = this := "lime"
+  lazy val lime: StyleSetter[String] = this := "lime"
 
-  lazy val maroon: StyleSetter[_] = this := "maroon"
+  lazy val maroon: StyleSetter[String] = this := "maroon"
 
-  lazy val navy: StyleSetter[_] = this := "navy"
+  lazy val navy: StyleSetter[String] = this := "navy"
 
-  lazy val olive: StyleSetter[_] = this := "olive"
+  lazy val olive: StyleSetter[String] = this := "olive"
 
-  lazy val purple: StyleSetter[_] = this := "purple"
+  lazy val purple: StyleSetter[String] = this := "purple"
 
-  lazy val silver: StyleSetter[_] = this := "silver"
+  lazy val silver: StyleSetter[String] = this := "silver"
 
-  lazy val teal: StyleSetter[_] = this := "teal"
+  lazy val teal: StyleSetter[String] = this := "teal"
 
-  lazy val red: StyleSetter[_] = this := "red"
+  lazy val red: StyleSetter[String] = this := "red"
 
-  lazy val white: StyleSetter[_] = this := "white"
+  lazy val white: StyleSetter[String] = this := "white"
 
-  lazy val yellow: StyleSetter[_] = this := "yellow"
+  lazy val yellow: StyleSetter[String] = this := "yellow"
 
 }

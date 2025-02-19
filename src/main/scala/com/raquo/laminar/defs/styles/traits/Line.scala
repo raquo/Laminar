@@ -8,7 +8,7 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait Line { this: StyleProp[_] =>
+trait Line { this: StyleProp[String] =>
 
 
 
@@ -17,17 +17,17 @@ trait Line { this: StyleProp[_] =>
     * defined by the specification and are implementation-specific. The radius
     * of the dots is half the calculated border-right-width.
     */
-  lazy val dotted: StyleSetter[_] = this := "dotted"
+  lazy val dotted: StyleSetter[String] = this := "dotted"
 
   /**
     * Displays a series of short square-ended dashes or line segments. The exact
     * size and Length of the segments are not defined by the specification and
     * are implementation-specific.
     */
-  lazy val dashed: StyleSetter[_] = this := "dashed"
+  lazy val dashed: StyleSetter[String] = this := "dashed"
 
   /** Displays a single, straight, solid line. */
-  lazy val solid: StyleSetter[_] = this := "solid"
+  lazy val solid: StyleSetter[String] = this := "solid"
 
 
 
@@ -35,18 +35,18 @@ trait Line { this: StyleProp[_] =>
     * Displays two straight lines that add up to the pixel amount defined as
     * border-width or border-right-width.
     */
-  lazy val double: StyleSetter[_] = this := "double"
+  lazy val double: StyleSetter[String] = this := "double"
 
 
 
   /** Displays a border leading to a carved effect. It is the opposite of ridge. */
-  lazy val groove: StyleSetter[_] = this := "groove"
+  lazy val groove: StyleSetter[String] = this := "groove"
 
   /**
     * Displays a border with a 3D effect, like if it is coming out of the page.
     * It is the opposite of groove.
     */
-  lazy val ridge: StyleSetter[_] = this := "ridge"
+  lazy val ridge: StyleSetter[String] = this := "ridge"
 
 
 
@@ -55,13 +55,13 @@ trait Line { this: StyleProp[_] =>
     * of outset. When applied to a table cell with border-collapse set to
     * collapsed, this value behaves like groove.
     */
-  lazy val inset: StyleSetter[_] = this := "inset"
+  lazy val inset: StyleSetter[String] = this := "inset"
 
   /**
     * Displays a border that makes the box appear in 3D, embossed. It is the
     * opposite of inset. When applied to a table cell with border-collapse set
     * to collapsed, this value behaves like ridge.
     */
-  lazy val outset: StyleSetter[_] = this := "outset"
+  lazy val outset: StyleSetter[String] = this := "outset"
 
 }

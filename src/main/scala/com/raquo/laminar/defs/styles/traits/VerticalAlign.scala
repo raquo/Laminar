@@ -10,7 +10,7 @@ import com.raquo.laminar.keys.DerivedStyleProp
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait VerticalAlign extends u.Length[DerivedStyleProp, Int] { this: StyleProp[_] =>
+trait VerticalAlign extends u.Length[DerivedStyleProp] { this: StyleProp[String] =>
 
   /**
     * Aligns the baseline of the element with the baseline of its parent. The
@@ -18,45 +18,45 @@ trait VerticalAlign extends u.Length[DerivedStyleProp, Int] { this: StyleProp[_]
     * the HTML specification, meaning that their behavior with this keyword may
     * change from one browser to the other.
     */
-  lazy val baseline: StyleSetter[_] = this := "baseline"
+  lazy val baseline: StyleSetter[String] = this := "baseline"
 
   /**
     * Aligns the baseline of the element with the subscript-baseline of its
     * parent.
     */
-  lazy val sub: StyleSetter[_] = this := "sub"
+  lazy val sub: StyleSetter[String] = this := "sub"
 
   /**
     * Aligns the baseline of the element with the superscript-baseline of its
     * parent.
     */
-  lazy val `super`: StyleSetter[_] = this := "super"
+  lazy val `super`: StyleSetter[String] = this := "super"
 
   /** Aligns the top of the element with the top of the parent element's font. */
-  lazy val textTop: StyleSetter[_] = this := "text-top"
+  lazy val textTop: StyleSetter[String] = this := "text-top"
 
   /**
     * Aligns the bottom of the element with the bottom of the parent element's
     * font.
     */
-  lazy val textBottom: StyleSetter[_] = this := "text-bottom"
+  lazy val textBottom: StyleSetter[String] = this := "text-bottom"
 
   /**
     * Aligns the middle of the element with the middle of lowercase letters in
     * the parent.
     */
-  lazy val middle: StyleSetter[_] = this := "middle"
+  lazy val middle: StyleSetter[String] = this := "middle"
 
   /**
     * Aligns the top of the element and its descendants with the top of the
     * entire line.
     */
-  lazy val top: StyleSetter[_] = this := "top"
+  lazy val top: StyleSetter[String] = this := "top"
 
   /**
     * Aligns the bottom of the element and its descendants with the bottom of
     * the entire line.
     */
-  lazy val bottom: StyleSetter[_] = this := "bottom"
+  lazy val bottom: StyleSetter[String] = this := "bottom"
 
 }

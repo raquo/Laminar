@@ -8,15 +8,15 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait ListStylePosition { this: StyleProp[_] =>
+trait ListStylePosition { this: StyleProp[String] =>
 
   /** The marker box is outside the principal block box. */
-  lazy val outside: StyleSetter[_] = this := "outside"
+  lazy val outside: StyleSetter[String] = this := "outside"
 
   /**
     * The marker box is the first inline box in the principal block box, after
     * which the element's content flows.
     */
-  lazy val inside: StyleSetter[_] = this := "inside"
+  lazy val inside: StyleSetter[String] = this := "inside"
 
 }

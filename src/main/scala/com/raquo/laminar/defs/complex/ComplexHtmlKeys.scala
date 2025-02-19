@@ -1,9 +1,8 @@
 package com.raquo.laminar.defs.complex
 
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.codecs.StringAsIsCodec
-import com.raquo.laminar.defs.complex.ComplexHtmlKeys._
-import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, HtmlProp}
+import com.raquo.laminar.keys
+import com.raquo.laminar.keys.{CompositeHtmlAttr, CompositeKey, HtmlAttr}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 trait ComplexHtmlKeys {
@@ -76,31 +75,16 @@ trait ComplexHtmlKeys {
 
   // --
 
-  // protected def stringCompositeHtmlProp(name: String, separator: String): CompositeHtmlProp = {
-  //   val prop = new HtmlProp(name, StringAsIsCodec)
-  //   new CompositeKey(
-  //     name = prop.name,
-  //     getRawDomValue = el => DomApi.getHtmlProperty(el, prop).getOrElse(""),
-  //     setRawDomValue = (el, value) => DomApi.setHtmlProperty(el, prop, value),
-  //     separator = separator
-  //   )
-  // }
-
   protected def stringCompositeHtmlAttr(name: String, separator: String): CompositeHtmlAttr = {
-    val attr = new HtmlAttr(name, StringAsIsCodec)
-    new CompositeKey(
-      name = attr.name,
-      getRawDomValue = el => DomApi.getHtmlAttribute(el, attr).getOrElse(""),
-      setRawDomValue = (el, value) => DomApi.setHtmlAttribute(el, attr, value),
-      separator = separator
-    )
+    new CompositeHtmlAttr(name, separator)
   }
 }
 
 object ComplexHtmlKeys {
 
-  @deprecated("CompositeHtmlProp is now the same type as CompositeHtmlAttr – use the latter instead", "18.0.0-M1")
+  @deprecated("CompositeHtmlProp is dropped for lack of need in favor of CompositeHtmlAttr – use the latter instead", "18.0.0-M1")
   type CompositeHtmlProp = CompositeKey[ReactiveHtmlElement.Base]
 
-  type CompositeHtmlAttr = CompositeKey[ReactiveHtmlElement.Base]
+  @deprecated("CompositeHtmlAttr type was moved to com.raquo.laminar.keys, and is now a class.", "18.0.0-M1")
+  type CompositeHtmlAttr = keys.CompositeHtmlAttr
 }

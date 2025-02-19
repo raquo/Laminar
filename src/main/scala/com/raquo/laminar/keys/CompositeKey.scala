@@ -10,15 +10,20 @@ import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
 import scala.scalajs.js.JSStringOps._
+import scala.scalajs.js.|
 
 // #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 
-class CompositeKey[-El <: ReactiveElement.Base](
-  val name: String,
-  private[laminar] val getRawDomValue: El => String,
-  private[laminar] val setRawDomValue: (El, String) => Unit,
+// #nc rename to CompositeAttr for clarity? Or not, because we'll have a common Attr type?
+abstract class CompositeKey[-El <: ReactiveElement.Base] {
+
+  val name: String
+
+  private[laminar] def getRawDomValue(element: El): String | Unit
+
+  private[laminar] def setRawDomValue(element: El, value: String): Unit
+
   val separator: String
-) {
 
   val codec: CompositeCodec = new CompositeCodec(separator)
 
@@ -71,6 +76,8 @@ class CompositeKey[-El <: ReactiveElement.Base](
 }
 
 object CompositeKey {
+
+  // #nc split all this into their own files?
 
   // #TODO[Perf] Consider switching `normalize` from List-s to JsArrays.
   //  - Not sure if this would win us anything because user-facing API is based on scala collections

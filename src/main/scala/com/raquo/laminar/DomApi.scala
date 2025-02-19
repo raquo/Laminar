@@ -162,18 +162,19 @@ object DomApi {
     element: ReactiveHtmlElement.Base,
     attr: HtmlAttr[V]
   ): js.UndefOr[V] = {
-    getHtmlAttributeRaw(element, attr).map(attr.codec.decode)
+    getHtmlAttributeRaw(element.ref, attr.name).map(attr.codec.decode)
   }
 
+  // #nc changed api
   def getHtmlAttributeRaw(
-    element: ReactiveHtmlElement.Base,
-    attr: HtmlAttr[_]
-  ): js.UndefOr[String] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    element: dom.html.Element,
+    name: String
+  ): String | Unit = {
+    val domValue = element.getAttributeNS(namespaceURI = null, localName = name)
     if (domValue != null) {
       domValue
     } else {
-      js.undefined
+      ()
     }
   }
 
@@ -183,18 +184,19 @@ object DomApi {
     value: V
   ): Unit = {
     val domValue = attr.codec.encode(value)
-    setHtmlAttributeRaw(element, attr, domValue)
+    setHtmlAttributeRaw(element.ref, attr.name, domValue)
   }
 
+  /** @param domValue nullable */
   private[laminar] def setHtmlAttributeRaw(
-    element: ReactiveHtmlElement.Base,
-    attr: HtmlAttr[_],
+    element: dom.html.Element,
+    name: String,
     domValue: String
   ): Unit = {
     if (domValue == null) { // End users should use `removeHtmlAttribute` instead. This is to support boolean attributes.
-      removeHtmlAttribute(element, attr)
+      element.removeAttribute(name)
     } else {
-      element.ref.setAttribute(attr.name, domValue)
+      element.setAttribute(name, domValue.asInstanceOf[String])
     }
   }
 
@@ -202,7 +204,7 @@ object DomApi {
     element: ReactiveHtmlElement.Base,
     attr: HtmlAttr[_]
   ): Unit = {
-    element.ref.removeAttribute(attr.name)
+    setHtmlAttributeRaw(element.ref, attr.name, domValue = null)
   }
 
   //
@@ -216,15 +218,15 @@ object DomApi {
     element: ReactiveHtmlElement.Base,
     prop: HtmlProp[V, DomV]
   ): js.UndefOr[V] = {
-    val domValue = getHtmlPropertyRaw(element, prop)
+    val domValue = getHtmlPropertyRaw[DomV](element.ref, prop.name)
     domValue.map(prop.codec.decode)
   }
 
-  def getHtmlPropertyRaw[V, DomV](
-    element: ReactiveHtmlElement.Base,
-    prop: HtmlProp[V, DomV]
+  def getHtmlPropertyRaw[DomV](
+    element: dom.html.Element,
+    name: String
   ): js.UndefOr[DomV] = {
-    element.ref.asInstanceOf[js.Dynamic].selectDynamic(prop.name).asInstanceOf[js.UndefOr[DomV]]
+    element.asInstanceOf[js.Dynamic].selectDynamic(name).asInstanceOf[js.UndefOr[DomV]]
   }
 
   def setHtmlProperty[V, DomV](
@@ -233,34 +235,44 @@ object DomApi {
     value: V
   ): Unit = {
     val domValue = prop.codec.encode(value)
-    setHtmlPropertyRaw(element, prop, domValue)
+    setHtmlPropertyRaw(element.ref, prop.name, domValue)
   }
 
   def removeHtmlProperty(
     element: ReactiveHtmlElement.Base,
     prop: HtmlProp[_, _]
   ): Unit = {
+    removeHtmlPropertyRaw(element.ref, prop.name, prop.reflectedAttrName)
+  }
+
+  def removeHtmlPropertyRaw(
+    element: dom.html.Element,
+    propName: String,
+    reflectedAttrName: Option[String]
+  ): Unit = {
     // #TODO[Integrity] Not sure if setting the property to `null` works universally.
     //  - We may need to implement custom adjustments later.
-    prop.reflectedAttrName.fold(
-      ifEmpty = element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(null)
+    reflectedAttrName.fold(
+      ifEmpty = element.asInstanceOf[js.Dynamic].updateDynamic(propName)(null)
     ) { attrName =>
-      element.ref.removeAttribute(attrName)
+      element.removeAttribute(attrName)
     }
   }
 
-  private[laminar] def setHtmlPropertyRaw[V, DomV](
-    element: ReactiveHtmlElement.Base,
-    prop: HtmlProp[V, DomV],
+  // #nc change api
+  private[laminar] def setHtmlPropertyRaw[DomV](
+    element: dom.html.Element,
+    name: String,
     value: DomV
   ): Unit = {
-    element.ref.asInstanceOf[js.Dynamic].updateDynamic(prop.name)(value.asInstanceOf[js.Any])
+    element.asInstanceOf[js.Dynamic].updateDynamic(name)(value.asInstanceOf[js.Any])
   }
 
   //
   // CSS Style Properties
   //
 
+  // #nc changed api
   /** Note: this only gets inline style values – those set via the `style` attribute, which includes
     * all style props set by Laminar. It does not account for CSS declarations in `<style>` tags.
     *
@@ -270,16 +282,16 @@ object DomApi {
     * Contrast with https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle
     */
   def getHtmlStyleRaw(
-    element: ReactiveHtmlElement.Base,
-    styleProp: StyleProp[_]
+    element: dom.html.Element,
+    styleCssName: String
   ): String = {
-    element.ref.style.getPropertyValue(styleProp.name)
+    element.style.getPropertyValue(styleCssName)
   }
 
   def setHtmlStyle[V](
     element: ReactiveHtmlElement.Base,
     styleProp: StyleProp[V],
-    value: V | String
+    value: V
   ): Unit = {
     setHtmlStyleRaw(element.ref, styleProp.name, styleProp.prefixes, cssValue(value))
   }
@@ -296,7 +308,7 @@ object DomApi {
   def setHtmlAnyStyle[V](
     element: ReactiveHtmlElement.Base,
     style: StyleProp[V],
-    value: V | String
+    value: V
   ): Unit = {
     setHtmlStyleRaw(element.ref, style.name, style.prefixes, cssValue(value))
   }
@@ -326,20 +338,20 @@ object DomApi {
   }
 
   @inline private[laminar] def setHtmlStyleRaw(
-    ref: dom.html.Element,
+    element: dom.html.Element,
     styleCssName: String,
     prefixes: immutable.Seq[String],
     styleValue: String
   ): Unit = {
     // #Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
     if (styleValue == null) {
-      prefixes.foreach(prefix => ref.style.removeProperty(prefix + styleCssName))
-      ref.style.removeProperty(styleCssName)
+      prefixes.foreach(prefix => element.style.removeProperty(prefix + styleCssName))
+      element.style.removeProperty(styleCssName)
     } else {
       prefixes.foreach { prefix =>
-        ref.style.setProperty(prefix + styleCssName, styleValue)
+        element.style.setProperty(prefix + styleCssName, styleValue)
       }
-      ref.style.setProperty(styleCssName, styleValue)
+      element.style.setProperty(styleCssName, styleValue)
     }
   }
 
@@ -361,16 +373,24 @@ object DomApi {
     element: ReactiveSvgElement.Base,
     attr: SvgAttr[V]
   ): js.UndefOr[V] = {
-    getSvgAttributeRaw(element, attr).map(attr.codec.decode)
+    getSvgAttributeRaw(
+      element = element.ref,
+      localName = attr.localName,
+      namespaceUri = attr.namespaceUri.orNull
+    ).map(attr.codec.decode)
   }
 
+  // #nc this is a change in api
+
+  /** @param namespaceUri nullable */
   def getSvgAttributeRaw(
-    element: ReactiveSvgElement.Base,
-    attr: SvgAttr[_]
+    element: dom.svg.Element,
+    localName: String,
+    namespaceUri: String
   ): js.UndefOr[String] = {
-    val domValue = element.ref.getAttributeNS(
-      namespaceURI = attr.namespaceUri.orNull,
-      localName = attr.localName
+    val domValue = element.getAttributeNS(
+      namespaceURI = namespaceUri,
+      localName = localName
     )
     if (domValue != null) {
       domValue
@@ -385,28 +405,40 @@ object DomApi {
     value: V
   ): Unit = {
     val domValue = attr.codec.encode(value)
-    setSvgAttributeRaw(element, attr, domValue)
+    setSvgAttributeRaw(
+      element = element.ref,
+      localName = attr.localName,
+      qualifiedName = attr.name,
+      namespaceUri = attr.namespaceUri.orNull,
+      domValue = domValue
+    )
   }
 
+  // #nc
+  /** @param namespaceUri nullable */
   private[laminar] def setSvgAttributeRaw(
-    element: ReactiveSvgElement.Base,
-    attr: SvgAttr[_],
+    element: dom.svg.Element,
+    localName: String,
+    qualifiedName: String,
+    namespaceUri: String,
     domValue: String
   ): Unit = {
     if (domValue == null) {
-      // End users should use `removeSvgAttribute` instead. This is to support boolean attributes.
-      removeSvgAttribute(element, attr)
+      element.removeAttributeNS(
+        namespaceURI = namespaceUri, // Tested that this works in Chrome & FF
+        localName = localName
+      )
     } else {
-      attr.namespaceUri.fold {
+      if (namespaceUri == null) {
         // See https://github.com/raquo/Laminar/issues/143
-        element.ref.setAttribute(
-          name = attr.name,
+        element.setAttribute(
+          name = qualifiedName,
           value = domValue
         )
-      } { namespaceUri =>
-        element.ref.setAttributeNS(
+      } else {
+        element.setAttributeNS(
           namespaceURI = namespaceUri,
-          qualifiedName = attr.name,
+          qualifiedName = qualifiedName,
           value = domValue
         )
       }
@@ -417,9 +449,12 @@ object DomApi {
     element: ReactiveSvgElement.Base,
     attr: SvgAttr[_]
   ): Unit = {
-    element.ref.removeAttributeNS(
-      namespaceURI = attr.namespaceUri.orNull, // Tested that this works in Chrome & FF
-      localName = attr.localName
+    setSvgAttributeRaw(
+      element.ref,
+      localName = attr.localName,
+      qualifiedName = attr.name,
+      namespaceUri = attr.namespaceUri.orNull,
+      domValue = null
     )
   }
 
@@ -429,18 +464,18 @@ object DomApi {
     element: ReactiveElement.Base,
     attr: AriaAttr[V]
   ): js.UndefOr[V] = {
-    getAriaAttributeRaw(element, attr).map(attr.codec.decode)
+    getAriaAttributeRaw(element.ref, attr.name).map(attr.codec.decode)
   }
 
   def getAriaAttributeRaw(
-    element: ReactiveElement.Base,
-    attr: AriaAttr[_]
-  ): js.UndefOr[String] = {
-    val domValue = element.ref.getAttributeNS(namespaceURI = null, localName = attr.name)
+    element: dom.Element,
+    name: String
+  ): String | Unit = {
+    val domValue = element.getAttributeNS(namespaceURI = null, localName = name)
     if (domValue != null) {
       domValue
     } else {
-      js.undefined
+      ()
     }
   }
 
@@ -450,19 +485,19 @@ object DomApi {
     value: V
   ): Unit = {
     val domValue = attr.codec.encode(value)
-    setAriaAttributeRaw(element, attr, domValue)
+    setAriaAttributeRaw(element.ref, attr.name, domValue)
   }
 
   private[laminar] def setAriaAttributeRaw(
-    element: ReactiveElement.Base,
-    attr: AriaAttr[_],
+    element: dom.Element,
+    name: String,
     domValue: String
   ): Unit = {
     if (domValue == null) {
       // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
-      removeAriaAttribute(element, attr)
+      element.removeAttribute(name)
     } else {
-      element.ref.setAttribute(attr.name, domValue)
+      element.setAttribute(name, domValue)
     }
   }
 

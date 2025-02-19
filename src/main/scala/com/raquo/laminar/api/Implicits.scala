@@ -4,39 +4,22 @@ import com.raquo.airstream.core.{Sink, Source}
 import com.raquo.laminar.api.Implicits.RichSource
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
 import com.raquo.laminar.inserters._
-import com.raquo.laminar.keys._
 import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
+import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers._
-import com.raquo.laminar.modifiers.SimpleKeyUpdater.StyleUpdater
 import com.raquo.laminar.nodes._
 import org.scalajs.dom
 
-trait Implicits extends Implicits.LowPriorityImplicits with CompositeValueMappers {
+import scala.scalajs.js.|
+
+trait Implicits
+extends Implicits.StyleImplicits
+with Implicits.LowPriorityImplicits
+with CompositeValueMappers {
 
   /** Add --> methods to Observables */
   @inline implicit def enrichSource[A](source: Source[A]): RichSource[A] = {
     new RichSource(source)
-  }
-
-  //
-  // -- CSS Styles --
-  //
-
-  /** Allow both Int-s and Double-s in numeric style props */
-  @inline implicit def derivedStyleIntToDouble(style: DerivedStyleProp[Int]): DerivedStyleProp[Double] = {
-    // Safe because Int-s and Double-s have identical runtime representation in Scala.js
-    style.asInstanceOf[DerivedStyleProp[Double]]
-  }
-
-  /** Allow both Int-s and Double-s in numeric style props */
-  @inline implicit def styleEncoderIntToDouble(encoder: StyleEncoder[Int]): StyleEncoder[Double] = {
-    // Safe because Int-s and Double-s have identical runtime representation in Scala.js
-    encoder.asInstanceOf[StyleEncoder[Double]]
-  }
-
-  // #TODO[Scala2] This is only needed in Scala 2, for type inference
-  implicit class RichStyleProp1[V](val prop: StyleProp[V]) {
-    def <--(values: Source[V]): StyleUpdater[V] = prop <-- values
   }
 
   //
@@ -155,6 +138,63 @@ object Implicits {
 
   }
 
+  trait StyleImplicits {
+    //
+    // -- CSS Styles --
+    //
+
+    /** Allow both Int-s and Double-s in numeric style props */
+    // @inline implicit def derivedStyleIntToDouble(style: DerivedStyleProp[Int]): DerivedStyleProp[Double] = {
+    //   // Safe because Int-s and Double-s have identical runtime representation in Scala.js
+    //   style.asInstanceOf[DerivedStyleProp[Double]]
+    // }
+    //
+    // /** Allow both Int-s and Double-s in numeric style props */
+    // @inline implicit def styleEncoderIntToDouble(encoder: StyleEncoder[Int]): StyleEncoder[Double] = {
+    //   // Safe because Int-s and Double-s have identical runtime representation in Scala.js
+    //   encoder.asInstanceOf[StyleEncoder[Double]]
+    // }
+
+    @inline implicit def derivedStyleNumToInt(style: DerivedStyleProp[Int | Double]): DerivedStyleProp[Int] = {
+      // #nc is this actually safe?
+      // Safe because Int-s and Double-s have identical runtime representation in Scala.js
+      style.asInstanceOf[DerivedStyleProp[Int]]
+    }
+
+    @inline implicit def derivedStyleNumToDouble(style: DerivedStyleProp[Int | Double]): DerivedStyleProp[Double] = {
+      // #nc is this actually safe?
+      // Safe because Int-s and Double-s have identical runtime representation in Scala.js
+      style.asInstanceOf[DerivedStyleProp[Double]]
+    }
+
+    @inline implicit def styleUnionToV[V](style: StyleProp[V | String]): StyleProp[V] = {
+      // Safe because ... #nc
+      style.asInstanceOf[StyleProp[V]]
+    }
+
+    @inline implicit def styleVToString(style: StyleProp[_]): StyleProp[String] = {
+      // Safe because ... #nc
+      style.asInstanceOf[StyleProp[String]]
+    }
+
+    @inline implicit def styleEncoderUnionToInt(encoder: StyleEncoder[Int | Double]): StyleEncoder[Int] = {
+      // Safe because Int-s and Double-s have identical runtime representation in Scala.js
+      encoder.asInstanceOf[StyleEncoder[Int]]
+    }
+
+    @inline implicit def styleEncoderUnionToDouble(encoder: StyleEncoder[Int | Double]): StyleEncoder[Double] = {
+      // Safe because Int-s and Double-s have identical runtime representation in Scala.js
+      encoder.asInstanceOf[StyleEncoder[Double]]
+    }
+
+    // #nc >>> test this
+    // #nc what do we need this for? How to change now that V includes `| String`?
+    // #TODO[Scala2] This is only needed in Scala 2, for type inference
+    // implicit class RichStyleProp1[V](val prop: StyleProp[V]) {
+    //   def <--(values: Source[V]): StyleUpdater[V] = prop <-- values
+    // }
+  }
+
   /** Implicit conversions from X to Inserter are primarily needed for
     * `onMountInsert`, but they are relatively expensive compared to simpler
     * alternatives when a mere Modifier would suffice. And so, the conversions
@@ -170,10 +210,11 @@ object Implicits {
 
     // -- CSS Styles --
 
+    // #nc I think the other implicit conversion takes care of it
     // #TODO[Scala2] This is only needed in Scala 2, for type inference
-    implicit class RichStyleProp2[V](val prop: StyleProp[V]) {
-      def <--(values: Source[String]): StyleUpdater[V] = prop <-- values
-    }
+    // implicit class RichStyleProp2[V](val prop: StyleProp[V]) {
+    //   def <--(values: Source[String]): StyleUpdater[V] = prop <-- values
+    // }
 
     // -- Methods to convert individual values / nodes / components to inserters --
 

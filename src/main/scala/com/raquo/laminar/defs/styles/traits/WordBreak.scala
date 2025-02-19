@@ -8,19 +8,19 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait WordBreak extends Normal { this: StyleProp[_] =>
+trait WordBreak extends Normal[String] { this: StyleProp[String] =>
 
   /**
     * To prevent overflow, word breaks should be inserted between any two
     * characters (excluding Chinese/Japanese/Korean text).
     */
-  lazy val breakAll: StyleSetter[_] = this := "break-all"
+  lazy val breakAll: StyleSetter[String] = this := "break-all"
 
   /**
     * Word breaks should not be used for Chinese/Japanese/Korean (CJK) text.
     * Non-CJK text behavior is the same as for normal.
     */
-  lazy val keepAll: StyleSetter[_] = this := "keep-all"
+  lazy val keepAll: StyleSetter[String] = this := "keep-all"
 
   /**
     * To prevent overflow, normally unbreakable words may be broken at
@@ -29,6 +29,6 @@ trait WordBreak extends Normal { this: StyleProp[_] =>
     * 
     * Note: IE does not support this value
     */
-  lazy val breakWord: StyleSetter[_] = this := "break-word"
+  lazy val breakWord: StyleSetter[String] = this := "break-word"
 
 }

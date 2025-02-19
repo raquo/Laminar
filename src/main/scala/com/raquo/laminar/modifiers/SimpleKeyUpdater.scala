@@ -13,7 +13,7 @@ import scala.scalajs.js.|
  * @param update `(element, newValue, reason) => ()`
  *               The reason is used for updating CompositeKey-s.
  */
-class SimpleKeyUpdater[-El <: ReactiveElement.Base, +K <: SimpleKey[V, ?, El], V](
+class SimpleKeyUpdater[-El <: ReactiveElement.Base, +K <: SimpleKey[V, _, El], V](
   val key: K,
   val values: Observable[V],
   val update: (El, V, Modifier.Any) => Unit
@@ -37,7 +37,7 @@ object SimpleKeyUpdater {
 
   type AriaAttrUpdater[V] = SimpleKeyUpdater[ReactiveElement.Base, AriaAttr[V], V]
 
-  type StyleUpdater[V] = SimpleKeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V | String]
+  type StyleUpdater[V] = SimpleKeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V]
 
   type DerivedStyleUpdater[InputV] = SimpleKeyUpdater[ReactiveHtmlElement.Base, DerivedStyleProp[InputV], InputV]
 

@@ -14,6 +14,7 @@ import scala.collection.{immutable, mutable}
 import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 class SyntaxSpec extends UnitSpec {
 
@@ -87,22 +88,30 @@ class SyntaxSpec extends UnitSpec {
     assert(cls.name == "class")
     // assert((cls := List("class1", "class2")).value == "class1 class2")
 
+
+    // For CSS stuff, see test below
+  }
+
+  it("CSS types and values") {
     // CSS keywords
 
     val s1: StyleSetter[_] = display.none
-    val v1: String = display.none.cssValue
-    assert(display.none.cssValue == "none")
+    val s11: StyleSetter[String] = display.none
+    val v1: String = display.none.value
+    assert(display.none.value == "none")
+    // assert(display.none.cssValue == "none")
 
     // Base CSS keywords
     val s2: StyleSetter[_] = padding.inherit
-    val v2: String = padding.inherit.cssValue
-    assert(display.inherit.cssValue == "inherit")
+    val v2: String = padding.inherit.value
+    assert(display.inherit.value == "inherit")
 
     // Derived CSS props (units)
 
     val p1: StyleProp[String] = padding
     val p2: DerivedStyleProp[Int] = padding.px
-    assert((padding.px := 12).cssValue == "12px")
+    assert((padding.px := 12).value == 12) // #nc does this warn in Scala 3 too, where the union type is proper?
+    assert((padding.px := 12).cssValue == "12px") // #nc does this warn in Scala 3 too, where the union type is proper?
 
     maxHeight.calc := "12px + 20em" // Length inherits Calc
 
@@ -116,9 +125,27 @@ class SyntaxSpec extends UnitSpec {
 
     val p3: StyleProp[String] = color
     val s3: StyleSetter[_] = color.rgb(200, 100, 0)
-    assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
+    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
 
     assert(style.rgb(200, 100, 0) == "rgb(200, 100, 0)")
+
+    // Non-String CSS props
+
+    val x: String = zIndex.auto.value
+    val x1: Int | String = (zIndex := 1).value
+    // val x2: String = (zIndex := 1).cssValue
+
+    div(
+      zIndex := 1,
+      zIndex := "auto",
+      zIndex.auto,
+      zIndex.auto.value,
+      // zIndex.auto.cssValue,
+      zIndex <-- Val(1),
+      zIndex <-- Val("auto"),
+      zIndex <-- Val("auto": Int | String),
+      zIndex <-- Val("auto": String | Int)
+    )
   }
 
   it("seqToModifier, seqToNode implicit conversion works for both strings and nodes") {

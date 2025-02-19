@@ -8,8 +8,8 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait Auto { this: StyleProp[_] =>
+trait Auto[V] { this: StyleProp[V] =>
 
-  lazy val auto: StyleSetter[_] = this := "auto"
+  lazy val auto: StyleSetter[String] = this := "auto"
 
 }

@@ -8,12 +8,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait EmptyCells { this: StyleProp[_] =>
+trait EmptyCells { this: StyleProp[String] =>
 
   /** Borders and backgrounds should be drawn like in a normal cells. */
-  lazy val show: StyleSetter[_] = this := "show"
+  lazy val show: StyleSetter[String] = this := "show"
 
   /** No border or backgrounds of empty cells should be drawn. */
-  lazy val hide: StyleSetter[_] = this := "hide"
+  lazy val hide: StyleSetter[String] = this := "hide"
 
 }

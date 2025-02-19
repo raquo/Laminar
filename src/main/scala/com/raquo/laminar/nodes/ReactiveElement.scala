@@ -130,7 +130,7 @@ with ParentNode[Ref] {
       .getOrElse(key, Nil)
       .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
 
-    val domValues = key.codec.decode(key.getRawDomValue(this))
+    val domValues = key.getRawDomValue(this).map(key.codec.decode).getOrElse(Nil)
 
     val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
 

@@ -8,15 +8,15 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait TextDecoration extends None { this: StyleProp[_] =>
+trait TextDecoration extends None[String] { this: StyleProp[String] =>
 
   /** Each line of text is underlined. */
-  lazy val underline: StyleSetter[_] = this := "underline"
+  lazy val underline: StyleSetter[String] = this := "underline"
 
   /** Each line of text has a line above it. */
-  lazy val overline: StyleSetter[_] = this := "overline"
+  lazy val overline: StyleSetter[String] = this := "overline"
 
   /** Each line of text has a line through the middle. */
-  lazy val lineThrough: StyleSetter[_] = this := "line-through"
+  lazy val lineThrough: StyleSetter[String] = this := "line-through"
 
 }

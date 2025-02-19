@@ -13,8 +13,8 @@ class StyleSpec extends UnitSpec {
     val expectedHeight = s"${1 + Random.nextInt(15)}px"
     val expectedWidth = s"${15 + Random.nextInt(7)}px"
 
-    assert(display.block.cssValue == "block")
-    assert(display.inline.cssValue == "inline")
+    assert(display.block.value == "block")
+    assert(display.inline.value == "inline")
 
     mount("div [display.block]", div(display.block))
     expectNode(div.of(display is "block"))

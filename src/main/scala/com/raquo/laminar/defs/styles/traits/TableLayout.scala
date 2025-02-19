@@ -8,20 +8,20 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait TableLayout extends Auto { this: StyleProp[_] =>
+trait TableLayout extends Auto[String] { this: StyleProp[String] =>
 
   /**
     * An automatic table layout algorithm is commonly used by most browsers for
     * table layout. The width of the table and its cells depends on the content
     * thereof.
     */
-  override lazy val auto: StyleSetter[_] = this := "auto"
+  override lazy val auto: StyleSetter[String] = this := "auto"
 
   /**
     * Table and column widths are set by the widths of table and col elements
     * or by the width of the first row of cells. Cells in subsequent rows do
     * not affect column widths.
     */
-  lazy val fixed: StyleSetter[_] = this := "fixed"
+  lazy val fixed: StyleSetter[String] = this := "fixed"
 
 }

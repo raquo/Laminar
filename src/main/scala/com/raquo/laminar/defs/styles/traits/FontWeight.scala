@@ -8,24 +8,24 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait FontWeight extends Normal { this: StyleProp[_] =>
+trait FontWeight extends Normal[String] { this: StyleProp[String] =>
 
   /** Normal font weight. Same as 400. */
-  override lazy val normal: StyleSetter[_] = this := "normal"
+  override lazy val normal: StyleSetter[String] = this := "normal"
 
   /** Bold font weight. Same as 700. */
-  lazy val bold: StyleSetter[_] = this := "bold"
+  lazy val bold: StyleSetter[String] = this := "bold"
 
   /**
     * One font weight lighter than the parent element (among the available
     * weights of the font).
     */
-  lazy val lighter: StyleSetter[_] = this := "lighter"
+  lazy val lighter: StyleSetter[String] = this := "lighter"
 
   /**
     * One font weight darker than the parent element (among the available
     * weights of the font)
     */
-  lazy val bolder: StyleSetter[_] = this := "bolder"
+  lazy val bolder: StyleSetter[String] = this := "bolder"
 
 }

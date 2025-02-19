@@ -47,6 +47,15 @@ trait DocumentEventProps { this: GlobalEventProps =>
 
 
   /**
+    * The readystatechange event is fired when the readyState attribute of a Document is changed.
+    * This event is not cancelable and does not bubble.
+    * 
+    * [[https://developer.mozilla.org/en-US/docs/Web/API/Document/readystatechange_event readystatechange_event @ MDN]]
+    */
+  lazy val onReadyStateChange: EventProp[dom.Event] = eventProp("readystatechange")
+
+
+  /**
     * The selectionchange event is fired when the current Selection of a Document is changed.
     * This event is not cancelable and does not bubble.
     * 
