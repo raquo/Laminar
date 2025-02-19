@@ -8,66 +8,66 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait ListStyleType extends None { this: StyleProp[_] =>
+trait ListStyleType extends None[String] { this: StyleProp[String] =>
 
   /** A filled circle (default value) */
-  lazy val disc: StyleSetter[_] = this := "disc"
+  lazy val disc: StyleSetter[String] = this := "disc"
 
   /** A hollow circle */
-  lazy val circle: StyleSetter[_] = this := "circle"
+  lazy val circle: StyleSetter[String] = this := "circle"
 
   /** A filled square */
-  lazy val square: StyleSetter[_] = this := "square"
+  lazy val square: StyleSetter[String] = this := "square"
 
   /** Decimal numbers begining with 1 */
-  lazy val decimal: StyleSetter[_] = this := "decimal"
+  lazy val decimal: StyleSetter[String] = this := "decimal"
 
   /** Han decimal numbers */
-  lazy val cjkDecimal: StyleSetter[_] = this := "cjk-decimal"
+  lazy val cjkDecimal: StyleSetter[String] = this := "cjk-decimal"
 
   /** Decimal numbers padded by initial zeros */
-  lazy val decimalLeadingZero: StyleSetter[_] = this := "decimal-leading-zero"
+  lazy val decimalLeadingZero: StyleSetter[String] = this := "decimal-leading-zero"
 
   /** Lowercase roman numerals */
-  lazy val lowerRoman: StyleSetter[_] = this := "lower-roman"
+  lazy val lowerRoman: StyleSetter[String] = this := "lower-roman"
 
   /** Uppercase roman numerals */
-  lazy val upperRoman: StyleSetter[_] = this := "upper-roman"
+  lazy val upperRoman: StyleSetter[String] = this := "upper-roman"
 
   /** Lowercase classical greek */
-  lazy val lowerGreek: StyleSetter[_] = this := "lower-greek"
+  lazy val lowerGreek: StyleSetter[String] = this := "lower-greek"
 
   /** Lowercase ASCII letters */
-  lazy val lowerAlpha: StyleSetter[_] = this := "lower-alpha"
+  lazy val lowerAlpha: StyleSetter[String] = this := "lower-alpha"
 
   /** Lowercase ASCII letters */
-  lazy val lowerLatin: StyleSetter[_] = this := "lower-latin"
+  lazy val lowerLatin: StyleSetter[String] = this := "lower-latin"
 
   /** Uppercase ASCII letters */
-  lazy val upperAlpha: StyleSetter[_] = this := "upper-alpha"
+  lazy val upperAlpha: StyleSetter[String] = this := "upper-alpha"
 
   /** Uppercase ASCII letters */
-  lazy val upperLatin: StyleSetter[_] = this := "upper-latin"
+  lazy val upperLatin: StyleSetter[String] = this := "upper-latin"
 
   /** Traditional Armenian numbering */
-  lazy val armenian: StyleSetter[_] = this := "armenian"
+  lazy val armenian: StyleSetter[String] = this := "armenian"
 
   /** Traditional Georgian numbering */
-  lazy val georgian: StyleSetter[_] = this := "georgian"
+  lazy val georgian: StyleSetter[String] = this := "georgian"
 
   /** Traditional Hebrew numbering */
-  lazy val hebrew: StyleSetter[_] = this := "hebrew"
+  lazy val hebrew: StyleSetter[String] = this := "hebrew"
 
   /** Japanese Hiragana */
-  lazy val hiragana: StyleSetter[_] = this := "hiragana"
+  lazy val hiragana: StyleSetter[String] = this := "hiragana"
 
   /** Japanese Hiragana. Iroha is the old japanese ordering of syllables */
-  lazy val hiraganaIroha: StyleSetter[_] = this := "hiragana-iroha"
+  lazy val hiraganaIroha: StyleSetter[String] = this := "hiragana-iroha"
 
   /** Japanese Katakana */
-  lazy val katakana: StyleSetter[_] = this := "katakana"
+  lazy val katakana: StyleSetter[String] = this := "katakana"
 
   /** Japanese Katakana. Iroha is the old japanese ordering of syllables */
-  lazy val katakanaIroha: StyleSetter[_] = this := "katakana-iroha"
+  lazy val katakanaIroha: StyleSetter[String] = this := "katakana-iroha"
 
 }

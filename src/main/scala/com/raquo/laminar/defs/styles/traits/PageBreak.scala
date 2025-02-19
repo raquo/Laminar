@@ -8,18 +8,18 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait PageBreak extends Auto { this: StyleProp[_] =>
+trait PageBreak extends Auto[String] { this: StyleProp[String] =>
 
   /** Always force page breaks. */
-  lazy val always: StyleSetter[_] = this := "always"
+  lazy val always: StyleSetter[String] = this := "always"
 
   /** Avoid page breaks. */
-  lazy val avoid: StyleSetter[_] = this := "avoid"
+  lazy val avoid: StyleSetter[String] = this := "avoid"
 
   /** Force page breaks so that the next page is formatted as a left page. */
-  lazy val left: StyleSetter[_] = this := "left"
+  lazy val left: StyleSetter[String] = this := "left"
 
   /** Force page breaks so that the next page is formatted as a right page. */
-  lazy val right: StyleSetter[_] = this := "right"
+  lazy val right: StyleSetter[String] = this := "right"
 
 }

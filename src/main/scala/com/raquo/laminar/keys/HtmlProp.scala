@@ -1,12 +1,8 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Source
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.HtmlElement
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.modifiers.SimpleKeySetter.PropSetter
-import com.raquo.laminar.modifiers.SimpleKeyUpdater.PropUpdater
-import com.raquo.laminar.modifiers.{Modifier, SimpleKeyUpdater}
+import com.raquo.laminar.domapi.{KeyDomApi, RWKeyDomApi}
+import com.raquo.laminar.domapi.KeyDomApi.HtmlPropDomApi
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 /**
@@ -23,28 +19,42 @@ class HtmlProp[V, DomV](
   val codec: Codec[V, DomV]
 ) extends SimpleKey[V, DomV, ReactiveHtmlElement.Base] {
 
-  def :=(value: V): PropSetter[V, DomV] = {
-    // new KeySetter[HtmlProp[V, DomV], V, DomV, HtmlElement](this, value, DomApi.setHtmlProperty)
-    new PropSetter(this, value)
-  }
+  override type Self[VV] = HtmlProp[VV, DomV]
 
-  def <--(values: Source[V]): PropUpdater[V, DomV] = {
-    val update = if (name == "value") {
-      (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
-        // Deduplicating updates against current DOM value prevents cursor position reset in Safari
-        val nextDomValue = codec.encode(nextValue)
-        if (!DomApi.getHtmlPropertyRaw(element, this).contains(nextDomValue)) {
-          DomApi.setHtmlPropertyRaw(element, this, nextDomValue)
-        }
-    } else {
-      (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
-        DomApi.setHtmlProperty(element, this, nextValue)
-    }
-    new SimpleKeyUpdater[HtmlElement, HtmlProp[V, DomV], V](
-      key = this,
-      values = values.toObservable,
-      update = update
-    )
-  }
+  override val domApi: RWKeyDomApi[Self, ReactiveHtmlElement.Base] = {
+    HtmlPropDomApi.asInstanceOf[RWKeyDomApi[Self, ReactiveHtmlElement.Base]]
+  } // #nc safe?
 
+  // def :=(value: V): PropSetter[V, DomV] = {
+  //   // new KeySetter[HtmlProp[V, DomV], V, DomV, HtmlElement](this, value, DomApi.setHtmlProperty)
+  //   new PropSetter(this, value)
+  // }
+
+  // #nc BRING THIS VALUE SPECIAL CASE BACK BUT MOVE IT
+
+  // override def <--(values: Source[V]): PropUpdater[V, DomV] = {
+  //   // #nc can we move this to keyapi?
+  //   val update = if (name == "value") {
+  //     (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
+  //       // Deduplicating updates against current DOM value prevents cursor position reset in Safari
+  //       val nextDomValue = codec.encode(nextValue)
+  //       if (!DomApi.getHtmlPropertyRaw(element.ref, name).contains(nextDomValue)) {
+  //         DomApi.setHtmlPropertyRaw(element.ref, name, nextDomValue)
+  //       }
+  //   } else {
+  //     (element: HtmlElement, nextValue: V, reason: Modifier.Any) =>
+  //       DomApi.setHtmlProperty(element, this, nextValue)
+  //   }
+  //   new SimpleKeyUpdater[HtmlElement, HtmlProp[V, DomV], V](
+  //     key = this,
+  //     values = values.toObservable,
+  //     update = update
+  //   )
+  // }
+
+}
+
+object HtmlProp {
+
+  type Of[V] = HtmlProp[V, _]
 }

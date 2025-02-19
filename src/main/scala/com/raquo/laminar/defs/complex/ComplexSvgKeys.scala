@@ -1,10 +1,7 @@
 package com.raquo.laminar.defs.complex
 
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.codecs.StringAsIsCodec
-import com.raquo.laminar.defs.complex.ComplexSvgKeys._
-import com.raquo.laminar.keys.{CompositeKey, SvgAttr}
-import com.raquo.laminar.nodes.ReactiveSvgElement
+import com.raquo.laminar.keys
+import com.raquo.laminar.keys.CompositeSvgAttr
 
 trait ComplexSvgKeys {
 
@@ -22,18 +19,17 @@ trait ComplexSvgKeys {
 
   // --
 
-  protected def stringCompositeSvgAttr(name: String, separator: String): CompositeSvgAttr = {
-    val attr = new SvgAttr(name, StringAsIsCodec, namespacePrefix = None)
-    new CompositeKey(
-      name = attr.name,
-      getRawDomValue = el => DomApi.getSvgAttribute(el, attr).getOrElse(""),
-      setRawDomValue = (el, value) => DomApi.setSvgAttribute(el, attr, value),
-      separator = separator
-    )
+  protected def stringCompositeSvgAttr(
+    name: String,
+    separator: String,
+    namespacePrefix: Option[String] = None
+  ): CompositeSvgAttr = {
+    new CompositeSvgAttr(name, namespacePrefix, separator)
   }
 }
 
 object ComplexSvgKeys {
 
-  type CompositeSvgAttr = CompositeKey[ReactiveSvgElement.Base]
+  @deprecated("CompositeSvgAttr was moved to import com.raquo.laminar.keys, and is now a concrete class", "18.0.0-M1")
+  type CompositeSvgAttr = keys.CompositeSvgAttr
 }

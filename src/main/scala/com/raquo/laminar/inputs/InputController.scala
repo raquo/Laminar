@@ -329,7 +329,7 @@ object InputController {
   }
 
   private def nodeDescription(element: ReactiveHtmlElement.Base): String = {
-    val maybeTyp = DomApi.getHtmlAttributeRaw(element, L.typ)
+    val maybeTyp = DomApi.getHtmlAttributeRaw(element.ref, L.typ.name)
     val typSuffix = maybeTyp.map(t => s" [type=$t]").getOrElse("")
     s"${DomApi.debugNodeDescription(element.ref)}$typSuffix"
   }

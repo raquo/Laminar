@@ -425,7 +425,7 @@ object DomDefsGenerator {
         traitName = traitName,
         keyKind = "StyleProp",
         keyKindAlias = "StyleProp",
-        setterType = "StyleSetter[_]",
+        setterType = "StyleSetter[String]",
         setterTypeAlias = "SS",
         derivedKeyKind = "DerivedStyleProp",
         derivedKeyKindAlias = "DSP",
@@ -440,7 +440,7 @@ object DomDefsGenerator {
         ),
         baseImplName = "styleProp",
         defType = LazyVal,
-        lengthUnitsNumType = "Int",
+        lengthUnitsNumType = None,
         outputUnitTraits = true
       )
 
@@ -455,18 +455,28 @@ object DomDefsGenerator {
 
     {
       StyleTraitDefs.defs.foreach { styleTrait =>
+
+        val traitThisType = if (styleTrait.scalaName.contains("[_]")) {
+          Some("StyleProp[V]")
+        } else {
+          Some("StyleProp[String]")
+        }
+
         val fileContent = generator.generateStyleKeywordsTrait(
           defSources = styleTrait.keywordDefGroups,
           printDefGroupComments = styleTrait.keywordDefGroups.length > 1,
           traitCommentLines = Nil,
           traitModifiers = Nil,
-          traitName = styleTrait.scalaName.replace("[_]", ""),
-          extendsTraits = styleTrait.extendsTraits.map(_.replace("[_]", "")),
+          traitName = styleTrait.scalaName,
+          traitTypeParam = Some("V"),
+          traitThisType = traitThisType,
+          extendsTraits = styleTrait.extendsTraits,
+          traitExtendsFallbackTypeParam = Some("String"),
           extendsUnitTraits = styleTrait.extendsUnits,
           propKind = "StyleProp",
-          keywordType = "StyleSetter[_]",
+          keywordType = "StyleSetter[String]",
           derivedKeyKind = "DerivedStyleProp",
-          lengthUnitsNumType = "Int",
+          lengthUnitsNumType = None,
           defType = LazyVal,
           outputUnitTypes = true,
           allowSuperCallInOverride = false // can't access lazy val from `super`

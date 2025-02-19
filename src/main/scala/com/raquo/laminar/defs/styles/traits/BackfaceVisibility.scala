@@ -8,12 +8,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait BackfaceVisibility { this: StyleProp[_] =>
+trait BackfaceVisibility { this: StyleProp[String] =>
 
   /** The back face is visible. */
-  lazy val visible: StyleSetter[_] = this := "visible"
+  lazy val visible: StyleSetter[String] = this := "visible"
 
   /** The back face is not visible. */
-  lazy val hidden: StyleSetter[_] = this := "hidden"
+  lazy val hidden: StyleSetter[String] = this := "hidden"
 
 }

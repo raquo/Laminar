@@ -10,15 +10,15 @@ import com.raquo.laminar.keys.DerivedStyleProp
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait LineWidth extends u.Length[DerivedStyleProp, Int] { this: StyleProp[_] =>
+trait LineWidth extends u.Length[DerivedStyleProp] { this: StyleProp[String] =>
 
   /** Typically 1px in desktop browsers like Firefox. */
-  lazy val thin: StyleSetter[_] = this := "thin"
+  lazy val thin: StyleSetter[String] = this := "thin"
 
   /** Typically 3px in desktop browsers like Firefox. */
-  lazy val medium: StyleSetter[_] = this := "medium"
+  lazy val medium: StyleSetter[String] = this := "medium"
 
   /** Typically 5px in desktop browsers like Firefox. */
-  lazy val thick: StyleSetter[_] = this := "thick"
+  lazy val thick: StyleSetter[String] = this := "thick"
 
 }

@@ -1,13 +1,10 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Source
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.api.L.SvgElement
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.modifiers.SimpleKeySetter.SvgAttrSetter
-import com.raquo.laminar.modifiers.SimpleKeyUpdater
-import com.raquo.laminar.modifiers.SimpleKeyUpdater.SvgAttrUpdater
+import com.raquo.laminar.domapi.KeyDomApi
+import com.raquo.laminar.domapi.KeyDomApi.SvgAttrDomApi
 import com.raquo.laminar.nodes.ReactiveSvgElement
+import com.raquo.laminar.nodes.ReactiveSvgElement.Base
 
 /**
   * This class represents an Svg Element Attribute. Meaning the key that can be set, not the whole a key-value pair.
@@ -23,23 +20,27 @@ class SvgAttr[V](
   val namespacePrefix: Option[String]
 ) extends SimpleKey[V, String, ReactiveSvgElement.Base] {
 
+  override type Self[VV] = SvgAttr[VV]
+
+  override val domApi: KeyDomApi[SvgAttr, Base] = SvgAttrDomApi
+
   /** Qualified name, including namespace */
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
 
   val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
 
-  def :=(value: V): SvgAttrSetter[V] = {
-    // new KeySetter[SvgAttr[V], V, String, SvgElement](this, value, DomApi.setSvgAttribute)
-    new SvgAttrSetter(this, value)
-  }
-
-  def <--(values: Source[V]): SvgAttrUpdater[V] = {
-    new SimpleKeyUpdater[SvgElement, SvgAttr[V], V](
-      key = this,
-      values = values.toObservable,
-      update = (el, v, _) => DomApi.setSvgAttribute(el, this, v)
-    )
-  }
+  // def :=(value: V): SvgAttrSetter[V] = {
+  //   // new KeySetter[SvgAttr[V], V, String, SvgElement](this, value, DomApi.setSvgAttribute)
+  //   new SvgAttrSetter(this, value)
+  // }
+  //
+  // def <--(values: Source[V]): SvgAttrUpdater[V] = {
+  //   new SimpleKeyUpdater[SvgElement, SvgAttr[V], V](
+  //     key = this,
+  //     values = values.toObservable,
+  //     update = (el, v, _) => DomApi.setSvgAttribute(el, this, v)
+  //   )
+  // }
 
 }
 

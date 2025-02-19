@@ -8,7 +8,7 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 //  - See `project/DomDefsGenerator.scala` for code generation params
 //  - Contribute to https://github.com/raquo/scala-dom-types to add missing tags / attrs / props / etc.
 
-trait TextOverflow { this: StyleProp[_] =>
+trait TextOverflow { this: StyleProp[String] =>
 
   /**
     * This keyword value indicates to truncate the text at the limit of the
@@ -17,7 +17,7 @@ trait TextOverflow { this: StyleProp[_] =>
     * empty string value must be used. The value clip is the default for
     * this property.
     */
-  lazy val clip: StyleSetter[_] = this := "clip"
+  lazy val clip: StyleSetter[String] = this := "clip"
 
   /**
     * This keyword value indicates to display an ellipsis ('…', U+2026 HORIZONTAL
@@ -25,6 +25,6 @@ trait TextOverflow { this: StyleProp[_] =>
     * content area, decreasing the amount of text displayed. If there is not
     * enough space to display the ellipsis, it is clipped.
     */
-  lazy val ellipsis: StyleSetter[_] = this := "ellipsis"
+  lazy val ellipsis: StyleSetter[String] = this := "ellipsis"
 
 }
