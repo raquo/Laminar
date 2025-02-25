@@ -13,13 +13,19 @@ class CompositeHtmlAttr(
   override private[laminar] def getRawDomValue(
     element: ReactiveHtmlElement.Base
   ): String | Unit = {
-    DomApi.getHtmlAttributeRaw(element.ref, name)
+    DomApi.getAttributeRaw(element.ref, name, namespaceUri = null)
   }
 
   override private[laminar] def setRawDomValue(
     element: ReactiveHtmlElement.Base,
     value: String
   ): Unit = {
-    DomApi.setHtmlAttributeRaw(element.ref, name, value)
+    DomApi.setAttributeRaw(
+      element = element.ref,
+      localName = name,
+      qualifiedName = name,
+      namespaceUri = null,
+      domValue = value
+    )
   }
 }

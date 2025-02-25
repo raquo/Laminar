@@ -1,10 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.domapi.KeyDomApi
-import com.raquo.laminar.domapi.KeyDomApi.SvgAttrDomApi
 import com.raquo.laminar.nodes.ReactiveSvgElement
-import com.raquo.laminar.nodes.ReactiveSvgElement.Base
 
 /**
   * This class represents an Svg Element Attribute. Meaning the key that can be set, not the whole a key-value pair.
@@ -15,33 +12,15 @@ import com.raquo.laminar.nodes.ReactiveSvgElement.Base
   * @tparam V type of values that this Attribute can be set to
   */
 class SvgAttr[V](
-  val localName: String,
-  val codec: Codec[V, String],
+  override val localName: String,
+  override val codec: Codec[V, String],
   val namespacePrefix: Option[String]
-) extends SimpleKey[V, String, ReactiveSvgElement.Base] {
-
-  override type Self[VV] = SvgAttr[VV]
-
-  override val domApi: KeyDomApi[SvgAttr, Base] = SvgAttrDomApi
+) extends SimpleAttr[V, ReactiveSvgElement.Base] {
 
   /** Qualified name, including namespace */
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
 
-  val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
-
-  // def :=(value: V): SvgAttrSetter[V] = {
-  //   // new KeySetter[SvgAttr[V], V, String, SvgElement](this, value, DomApi.setSvgAttribute)
-  //   new SvgAttrSetter(this, value)
-  // }
-  //
-  // def <--(values: Source[V]): SvgAttrUpdater[V] = {
-  //   new SimpleKeyUpdater[SvgElement, SvgAttr[V], V](
-  //     key = this,
-  //     values = values.toObservable,
-  //     update = (el, v, _) => DomApi.setSvgAttribute(el, this, v)
-  //   )
-  // }
-
+  override val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
 }
 
 object SvgAttr {

@@ -14,7 +14,11 @@ import scala.scalajs.js.|
 
 // #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 
-// #nc rename to CompositeAttr for clarity? Or not, because we'll have a common Attr type?
+/** Attribute that we can set to multiple values, often
+  * space-separated strings, e.g. `cls` / `className`.
+  *
+  * Subtypes: [[CompositeHtmlAttr]], [[CompositeSvgAttr]]
+  */
 abstract class CompositeKey[-El <: ReactiveElement.Base] {
 
   val name: String
