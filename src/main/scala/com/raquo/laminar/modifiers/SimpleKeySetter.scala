@@ -1,12 +1,8 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.domapi.KeyDomApi
-import com.raquo.laminar.keys.{AriaAttr, DerivedStyleProp, HtmlAttr, HtmlProp, SimpleKey, StyleProp, SvgAttr}
-import com.raquo.laminar.nodes.ReactiveHtmlElement.Base
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
-
-import scala.scalajs.js.|
+import com.raquo.laminar.domapi.KeyDomApi.DerivedStylePropDomApi
+import com.raquo.laminar.keys.{DerivedStyleProp, SimpleKey}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
 /** This class represents a modifier that sets a [[SimpleKey]] (e.g. an attribute or a style)
   * to a specific value on a [[El]]. [[set]] is what performs this change.
@@ -36,6 +32,9 @@ extends Setter[El] {
 
 object SimpleKeySetter {
 
+  // #TODO[Naming,Org] This used to be a more specific type,
+  //  but now it's just a type alias that does not involve StyleProp-s
+  //  in principle, it shares this type with e.g. HtmlAttr-s.
   type StyleSetter[V] = SimpleKeySetter[V, String, ReactiveHtmlElement.Base]
 
   // type Of[V, DomV, -El <: ReactiveElement.Base] = SimpleKeySetter[V, DomV, El]
@@ -60,62 +59,6 @@ object SimpleKeySetter {
   //   }
   // }
 
-  // class PropSetter[V, DomV](
-  //   override val key: HtmlProp[V, DomV],
-  //   override val value: V
-  // ) extends SimpleKeySetter[V, DomV, ReactiveHtmlElement.Base] {
-  //
-  //   override def set(el: ReactiveHtmlElement.Base): Unit = {
-  //     DomApi.setHtmlProperty(el, key, value)
-  //   }
-  //
-  //   override def unset(el: Base): Unit = {
-  //     DomApi.removeHtmlProperty(el, key)
-  //   }
-  // }
-  //
-  // class HtmlAttrSetter[V](
-  //   override val key: HtmlAttr[V],
-  //   override val value: V
-  // ) extends SimpleKeySetter[V, String, ReactiveHtmlElement.Base] {
-  //
-  //   override def set(el: ReactiveHtmlElement.Base): Unit = {
-  //     DomApi.setHtmlAttribute(el, key, value)
-  //   }
-  //
-  //   override def unset(el: Base): Unit = {
-  //     DomApi.removeHtmlAttribute(el, key)
-  //   }
-  // }
-  //
-  // class SvgAttrSetter[V](
-  //   override val key: SvgAttr[V],
-  //   override val value: V
-  // ) extends SimpleKeySetter[V, String, ReactiveSvgElement.Base] {
-  //
-  //   override def set(el: ReactiveSvgElement.Base): Unit = {
-  //     DomApi.setSvgAttribute(el, key, value)
-  //   }
-  //
-  //   override def unset(el: ReactiveSvgElement.Base): Unit = {
-  //     DomApi.removeSvgAttribute(el, key)
-  //   }
-  // }
-  //
-  // class AriaAttrSetter[V](
-  //   override val key: AriaAttr[V],
-  //   override val value: V
-  // ) extends SimpleKeySetter[V, String, ReactiveElement.Base] {
-  //
-  //   override def set(el: ReactiveElement.Base): Unit = {
-  //     DomApi.setAriaAttribute(el, key, value)
-  //   }
-  //
-  //   override def unset(el: ReactiveElement.Base): Unit = {
-  //     DomApi.removeAriaAttribute(el, key)
-  //   }
-  // }
-  //
   // class StyleSetter[V](
   //   override val key: StyleProp[V],
   //   override val value: V
@@ -146,12 +89,12 @@ object SimpleKeySetter {
 
     lazy val cssValue: String = key.encode(value)
 
-    override def set(el: Base): Unit = {
-      DomApi.setHtmlStringStyle(el, key.key, cssValue)
+    override def set(el: ReactiveHtmlElement.Base): Unit = {
+      DerivedStylePropDomApi.set(el, key, value)
     }
 
-    override def remove(el: Base): Unit = {
-      DomApi.removeHtmlStyle(el, key.key)
+    override def remove(el: ReactiveHtmlElement.Base): Unit = {
+      DerivedStylePropDomApi.remove(el, key)
     }
   }
 

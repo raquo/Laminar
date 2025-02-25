@@ -147,64 +147,72 @@ object DomApi {
   }
 
   //
-  // HTML Elements
+  // Elements
   //
 
   def createHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref]): Ref = {
     dom.document.createElement(tag.name).asInstanceOf[Ref]
   }
 
-  //
-  // HTML Attributes
-  //
-
-  def getHtmlAttribute[V](
-    element: ReactiveHtmlElement.Base,
-    attr: HtmlAttr[V]
-  ): js.UndefOr[V] = {
-    getHtmlAttributeRaw(element.ref, attr.name).map(attr.codec.decode)
+  def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
+    dom.document
+      .createElementNS(namespaceURI = SvgAttr.svgNamespaceUri, qualifiedName = tag.name)
+      .asInstanceOf[Ref]
   }
 
-  // #nc changed api
-  def getHtmlAttributeRaw(
-    element: dom.html.Element,
-    name: String
+  // All Attributes
+
+  def getAttributeRaw(
+    element: dom.Element,
+    localName: String,
+    namespaceUri: String // nullable
   ): String | Unit = {
-    val domValue = element.getAttributeNS(namespaceURI = null, localName = name)
-    if (domValue != null) {
-      domValue
+    val domValue = if (namespaceUri == null) {
+      element.getAttribute(
+        name = localName
+      )
     } else {
-      ()
+      element.getAttributeNS(
+        namespaceURI = namespaceUri,
+        localName = localName
+      )
     }
+    if (domValue != null) domValue else ()
   }
 
-  def setHtmlAttribute[V](
-    element: ReactiveHtmlElement.Base,
-    attr: HtmlAttr[V],
-    value: V
+  def setAttributeRaw(
+    element: dom.Element,
+    localName: String,
+    qualifiedName: String,
+    namespaceUri: String, // nullable
+    domValue: String // nullable
   ): Unit = {
-    val domValue = attr.codec.encode(value)
-    setHtmlAttributeRaw(element.ref, attr.name, domValue)
-  }
-
-  /** @param domValue nullable */
-  private[laminar] def setHtmlAttributeRaw(
-    element: dom.html.Element,
-    name: String,
-    domValue: String
-  ): Unit = {
-    if (domValue == null) { // End users should use `removeHtmlAttribute` instead. This is to support boolean attributes.
-      element.removeAttribute(name)
+    if (domValue == null) {
+      if (namespaceUri == null) {
+        element.removeAttribute(
+          name = localName
+        )
+      } else {
+        element.removeAttributeNS(
+          namespaceURI = namespaceUri, // Tested that this works in Chrome & FF
+          localName = localName
+        )
+      }
     } else {
-      element.setAttribute(name, domValue.asInstanceOf[String])
+      if (namespaceUri == null) {
+        // See https://github.com/raquo/Laminar/issues/143
+        element.setAttribute(
+          name = qualifiedName,
+          value = domValue
+        )
+      } else {
+        element.setAttributeNS(
+          namespaceURI = namespaceUri,
+          qualifiedName = qualifiedName,
+          value = domValue
+        )
+      }
     }
-  }
-
-  def removeHtmlAttribute(
-    element: ReactiveHtmlElement.Base,
-    attr: HtmlAttr[_]
-  ): Unit = {
-    setHtmlAttributeRaw(element.ref, attr.name, domValue = null)
   }
 
   //
@@ -217,7 +225,7 @@ object DomApi {
   def getHtmlProperty[V, DomV](
     element: ReactiveHtmlElement.Base,
     prop: HtmlProp[V, DomV]
-  ): js.UndefOr[V] = {
+  ): V | Unit = {
     val domValue = getHtmlPropertyRaw[DomV](element.ref, prop.name)
     domValue.map(prop.codec.decode)
   }
@@ -225,7 +233,7 @@ object DomApi {
   def getHtmlPropertyRaw[DomV](
     element: dom.html.Element,
     name: String
-  ): js.UndefOr[DomV] = {
+  ): DomV | Unit = {
     element.asInstanceOf[js.Dynamic].selectDynamic(name).asInstanceOf[js.UndefOr[DomV]]
   }
 
@@ -337,7 +345,7 @@ object DomApi {
     // }
   }
 
-  @inline private[laminar] def setHtmlStyleRaw(
+  def setHtmlStyleRaw(
     element: dom.html.Element,
     styleCssName: String,
     prefixes: immutable.Seq[String],
@@ -353,159 +361,6 @@ object DomApi {
       }
       element.style.setProperty(styleCssName, styleValue)
     }
-  }
-
-  //
-  // SVG Elements
-  //
-
-  def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
-    dom.document
-      .createElementNS(namespaceURI = SvgAttr.svgNamespaceUri, qualifiedName = tag.name)
-      .asInstanceOf[Ref]
-  }
-
-  //
-  // SVG Attributes
-  //
-
-  def getSvgAttribute[V](
-    element: ReactiveSvgElement.Base,
-    attr: SvgAttr[V]
-  ): js.UndefOr[V] = {
-    getSvgAttributeRaw(
-      element = element.ref,
-      localName = attr.localName,
-      namespaceUri = attr.namespaceUri.orNull
-    ).map(attr.codec.decode)
-  }
-
-  // #nc this is a change in api
-
-  /** @param namespaceUri nullable */
-  def getSvgAttributeRaw(
-    element: dom.svg.Element,
-    localName: String,
-    namespaceUri: String
-  ): js.UndefOr[String] = {
-    val domValue = element.getAttributeNS(
-      namespaceURI = namespaceUri,
-      localName = localName
-    )
-    if (domValue != null) {
-      domValue
-    } else {
-      js.undefined
-    }
-  }
-
-  def setSvgAttribute[V](
-    element: ReactiveSvgElement.Base,
-    attr: SvgAttr[V],
-    value: V
-  ): Unit = {
-    val domValue = attr.codec.encode(value)
-    setSvgAttributeRaw(
-      element = element.ref,
-      localName = attr.localName,
-      qualifiedName = attr.name,
-      namespaceUri = attr.namespaceUri.orNull,
-      domValue = domValue
-    )
-  }
-
-  // #nc
-  /** @param namespaceUri nullable */
-  private[laminar] def setSvgAttributeRaw(
-    element: dom.svg.Element,
-    localName: String,
-    qualifiedName: String,
-    namespaceUri: String,
-    domValue: String
-  ): Unit = {
-    if (domValue == null) {
-      element.removeAttributeNS(
-        namespaceURI = namespaceUri, // Tested that this works in Chrome & FF
-        localName = localName
-      )
-    } else {
-      if (namespaceUri == null) {
-        // See https://github.com/raquo/Laminar/issues/143
-        element.setAttribute(
-          name = qualifiedName,
-          value = domValue
-        )
-      } else {
-        element.setAttributeNS(
-          namespaceURI = namespaceUri,
-          qualifiedName = qualifiedName,
-          value = domValue
-        )
-      }
-    }
-  }
-
-  def removeSvgAttribute(
-    element: ReactiveSvgElement.Base,
-    attr: SvgAttr[_]
-  ): Unit = {
-    setSvgAttributeRaw(
-      element.ref,
-      localName = attr.localName,
-      qualifiedName = attr.name,
-      namespaceUri = attr.namespaceUri.orNull,
-      domValue = null
-    )
-  }
-
-  /** Aria attributes */
-
-  def getAriaAttribute[V](
-    element: ReactiveElement.Base,
-    attr: AriaAttr[V]
-  ): js.UndefOr[V] = {
-    getAriaAttributeRaw(element.ref, attr.name).map(attr.codec.decode)
-  }
-
-  def getAriaAttributeRaw(
-    element: dom.Element,
-    name: String
-  ): String | Unit = {
-    val domValue = element.getAttributeNS(namespaceURI = null, localName = name)
-    if (domValue != null) {
-      domValue
-    } else {
-      ()
-    }
-  }
-
-  def setAriaAttribute[V](
-    element: ReactiveElement.Base,
-    attr: AriaAttr[V],
-    value: V
-  ): Unit = {
-    val domValue = attr.codec.encode(value)
-    setAriaAttributeRaw(element.ref, attr.name, domValue)
-  }
-
-  private[laminar] def setAriaAttributeRaw(
-    element: dom.Element,
-    name: String,
-    domValue: String
-  ): Unit = {
-    if (domValue == null) {
-      // End users should use `removeAriaAttribute` instead. This is to support boolean attributes.
-      element.removeAttribute(name)
-    } else {
-      element.setAttribute(name, domValue)
-    }
-  }
-
-  def removeAriaAttribute(
-    element: ReactiveElement.Base,
-    attr: AriaAttr[_]
-  ): Unit = {
-    element.ref.removeAttribute(attr.name)
   }
 
   //
@@ -540,7 +395,7 @@ object DomApi {
   // Input related stuff
   //
 
-  def getChecked(element: dom.Element): js.UndefOr[Boolean] = {
+  def getChecked(element: dom.Element): Boolean | Unit = {
     element match {
       case input: dom.html.Input if input.`type` == "checkbox" || input.`type` == "radio" =>
         input.checked
@@ -550,7 +405,7 @@ object DomApi {
           .asInstanceOf[js.UndefOr[Any]]
           .collect { case b: Boolean => b }
       case _ =>
-        js.undefined
+        ()
     }
   }
 
