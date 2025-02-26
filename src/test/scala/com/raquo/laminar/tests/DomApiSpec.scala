@@ -1,8 +1,9 @@
 package com.raquo.laminar.tests
 
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.L.{svg => s}
+import com.raquo.laminar.domapi.DomApi
+import com.raquo.laminar.domapi.keyapi.HtmlPropDomApi
 import com.raquo.laminar.utils.UnitSpec
 
 class DomApiSpec extends UnitSpec {
@@ -119,7 +120,7 @@ class DomApiSpec extends UnitSpec {
         indeterminate is true
       ))
 
-      DomApi.removeHtmlProperty(el, indeterminate)
+      HtmlPropDomApi.remove(el, indeterminate)
 
       expectNode(input of (
         typ is "checkbox",
@@ -142,7 +143,7 @@ class DomApiSpec extends UnitSpec {
         checked is true
       ))
 
-      DomApi.removeHtmlProperty(el, checked)
+      HtmlPropDomApi.remove(el, checked)
 
       expectNode(input of (
         typ is "checkbox",
@@ -150,7 +151,7 @@ class DomApiSpec extends UnitSpec {
         checked is false
       ))
 
-      DomApi.removeHtmlProperty(el, defaultChecked)
+      HtmlPropDomApi.remove(el, defaultChecked)
 
       expectNode(input of (
         typ is "checkbox",
@@ -177,7 +178,7 @@ class DomApiSpec extends UnitSpec {
         value is "hello"
       ))
 
-      DomApi.removeHtmlProperty(el, value)
+      HtmlPropDomApi.remove(el, value)
 
       expectNode(input of (
         typ is "input",
@@ -209,7 +210,7 @@ class DomApiSpec extends UnitSpec {
         option of (value is "v3", selected is false, "V3")
       ))
 
-      DomApi.removeHtmlProperty(el, value)
+      HtmlPropDomApi.remove(el, value)
 
       expectNode(select of (
         option of (value is "v1", selected is false, "V1"),
@@ -217,7 +218,7 @@ class DomApiSpec extends UnitSpec {
         option of (value is "v3", selected is false, "V3")
       ))
 
-      DomApi.setHtmlProperty(options(2), selected, true)
+      HtmlPropDomApi.set(options(2), selected, true)
 
       expectNode(select of (
         option of (value is "v1", selected is false, "V1"),

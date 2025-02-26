@@ -2,7 +2,7 @@ package com.raquo.laminar.nodes
 
 import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.ew.JsArray
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys.{HtmlProp, SimpleKey}
 import com.raquo.laminar.tags.{CustomHtmlTag, HtmlTag}

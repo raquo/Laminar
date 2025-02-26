@@ -1,6 +1,6 @@
 package com.raquo.laminar.tags
 
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import org.scalajs.dom

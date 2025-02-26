@@ -3,6 +3,7 @@ package com.raquo.laminar.inserters
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
 import com.raquo.laminar
+import com.raquo.laminar.domapi.{DomApi, DomTree}
 import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
@@ -124,7 +125,7 @@ object ChildrenInserter {
         // println("> overflow: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
         // @Note: DOM update
         // ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
-        ParentNode.insertChildAfter(
+        DomApi.insertChildAfter(
           parent = parentNode,
           newChild = nextChild,
           referenceChild = lastIndexChild,
@@ -145,7 +146,7 @@ object ChildrenInserter {
             // nextChild not found in prevChildren, so it's a new child, so we need to insert it
             // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
             // @Note: DOM update
-            ParentNode.insertChildAfter(
+            DomApi.insertChildAfter(
               parent = parentNode,
               newChild = nextChild,
               referenceChild = lastIndexChild,
@@ -178,7 +179,7 @@ object ChildrenInserter {
               val prevChild = prevChildFromRef(prevChildren, prevChildRef)
               // println("> removing " + prevChild.ref.textContent)
               // @Note: DOM update
-              ParentNode.removeChild(
+              DomApi.removeChild(
                 parent = parentNode,
                 child = prevChild
               )
@@ -190,7 +191,7 @@ object ChildrenInserter {
               // nextChild is still not in the right place, so let's move it to the correct index
               // println("> order: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
               // @Note: DOM update
-              ParentNode.insertChildAfter(
+              DomApi.insertChildAfter(
                 parent = parentNode,
                 newChild = nextChild,
                 referenceChild = lastIndexChild,
@@ -237,7 +238,7 @@ object ChildrenInserter {
       // @Note: DOM update
       val prevChild = prevChildFromRef(prevChildren, prevChildRef)
       // println(s"> removing(2) ${prevChild.ref.textContent}")
-      ParentNode.removeChild(parent = parentNode, child = prevChild)
+      DomApi.removeChild(parent = parentNode, child = prevChild)
       // println(s"setting(2) prevChildRef=${if (nextPrevChildRef == null) "null!" else nextPrevChildRef.textContent}")
       prevChildRef = nextPrevChildRef
       currentChildrenCount -= 1

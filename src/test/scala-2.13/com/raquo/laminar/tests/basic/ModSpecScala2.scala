@@ -1,7 +1,6 @@
 package com.raquo.laminar.tests.basic
 
 import com.raquo.laminar.api.L._
-
 import com.raquo.laminar.utils.UnitSpec
 
 class ModSpecScala2 extends UnitSpec {

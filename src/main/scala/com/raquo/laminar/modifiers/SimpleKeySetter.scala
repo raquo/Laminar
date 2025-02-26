@@ -1,6 +1,6 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.domapi.KeyDomApi.DerivedStylePropDomApi
+import com.raquo.laminar.domapi.keyapi.DerivedStylePropDomApi
 import com.raquo.laminar.keys.{DerivedStyleProp, SimpleKey}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 

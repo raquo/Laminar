@@ -3,8 +3,8 @@ package com.raquo.laminar.keys
 import com.raquo.airstream.core.{EventStream, Observable, Signal, Sink}
 import com.raquo.airstream.flatten.SwitchingStrategy
 import com.raquo.airstream.status.Status
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.UnitArrowsFeature
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.EventListener
 import org.scalajs.dom
 

@@ -3,8 +3,9 @@ package com.raquo.laminar.inputs
 import com.raquo.airstream.core.Observer
 import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.ew.JsArray
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L
+import com.raquo.laminar.domapi.DomApi
+import com.raquo.laminar.domapi.keyapi.HtmlPropDomApi
 import com.raquo.laminar.inputs.InputController.InputControllerConfig
 import com.raquo.laminar.keys.{EventProcessor, EventProp, HtmlProp}
 import com.raquo.laminar.modifiers.{Binder, EventListener, SimpleKeyUpdater}
@@ -81,7 +82,9 @@ class InputController[Ref <: dom.html.Element, A, B](
       //  - This does not touch `element.maybeEventSubscriptions` or `dynamicOwner.subscriptions`
       //  - We want to maintain the same DynamicSubscription references because users might be holding them too
       //    (e.g. as a result of calling .bind() on a listener), so we shouldn't kill them
-      element.foreachEventListener(listener => DomApi.removeEventListener(element.ref, listener))
+      element.foreachEventListener { listener =>
+        DomApi.removeEventListener(element.ref, listener)
+      }
 
       // Add the controller listener as the first one
       //  - `unsafePrepend` is safe here because we've just removed event listeners from the DOM
@@ -93,7 +96,9 @@ class InputController[Ref <: dom.html.Element, A, B](
       //  - After this, the order of subscriptions and listeners is the same everywhere
       //  - Note that listener caches the js.Function so we're adding the same exact listener back to the DOM.
       //    So, other than the desired side effect, this whole patch is very transparent to the users.
-      element.foreachEventListener(listener => DomApi.addEventListener(element.ref, listener))
+      element.foreachEventListener { listener =>
+        DomApi.addEventListener(element.ref, listener)
+      }
 
       // @TODO[Performance] This rearrangement of listeners can be micro-optimized later, e.g.
       //  - Reduce scope of events that we're moving (we move all of them to maintain relative order between them)
@@ -223,8 +228,8 @@ object InputController {
       initialValue = initial,
       prop = prop,
       allowedEventProps = eventProps,
-      getDomValue = el => DomApi.getHtmlProperty(el, prop).get,
-      setDomValue = (el, v) => DomApi.setHtmlProperty(el, prop, v)
+      getDomValue = el => HtmlPropDomApi.get(el, prop).get,
+      setDomValue = (el, v) => HtmlPropDomApi.set(el, prop, v)
     )
   }
 

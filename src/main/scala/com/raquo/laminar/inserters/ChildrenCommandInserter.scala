@@ -1,11 +1,12 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.EventStream
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
-import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 /** Note: this is a low level inserter. It is the fastest one in certain cases,
   * but due to its rather imperative API, its usefulness is very limited.
@@ -51,10 +52,10 @@ object ChildrenCommandInserter {
     sentinelNode: ChildNode.Base,
     extraNodeCount: Int,
     renderableNode: RenderableNode[Component],
-    hooks: js.UndefOr[InserterHooks]
+    hooks: InserterHooks | Unit
   ): Int = {
     var nodeCountDiff = 0
-    def findSentinelIndex(): Int = DomApi.indexOfChild(
+    def findSentinelIndex(): Int = DomApi.raw.indexOfChild(
       parent = parentNode.ref,
       child = sentinelNode.ref
     )
@@ -62,7 +63,7 @@ object ChildrenCommandInserter {
     command match {
 
       case CollectionCommand.Append(node) =>
-        val inserted = ParentNode.insertChildAtIndex(
+        val inserted = DomApi.insertChildAtIndex(
           parent = parentNode,
           child = renderableNode.asNode(node),
           index = findSentinelIndex() + extraNodeCount + 1,
@@ -74,7 +75,7 @@ object ChildrenCommandInserter {
         nodeCountDiff = 1
 
       case CollectionCommand.Prepend(node) =>
-        val inserted = ParentNode.insertChildAfter(
+        val inserted = DomApi.insertChildAfter(
           parent = parentNode,
           newChild = renderableNode.asNode(node),
           referenceChild = sentinelNode,
@@ -85,7 +86,7 @@ object ChildrenCommandInserter {
         }
 
       case CollectionCommand.Insert(node, atIndex) =>
-        val inserted = ParentNode.insertChildAtIndex(
+        val inserted = DomApi.insertChildAtIndex(
           parent = parentNode,
           child = renderableNode.asNode(node),
           index = findSentinelIndex() + atIndex + 1,
@@ -96,7 +97,7 @@ object ChildrenCommandInserter {
         }
 
       case CollectionCommand.Remove(node) =>
-        val removed = ParentNode.removeChild(
+        val removed = DomApi.removeChild(
           parent = parentNode,
           child = renderableNode.asNode(node)
         )
@@ -105,7 +106,7 @@ object ChildrenCommandInserter {
         }
 
       case CollectionCommand.Replace(node, withNode) =>
-        ParentNode.replaceChild(
+        DomApi.replaceChild(
           parent = parentNode,
           oldChild = renderableNode.asNode(node),
           newChild = renderableNode.asNode(withNode),

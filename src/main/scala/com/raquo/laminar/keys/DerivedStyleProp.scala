@@ -1,7 +1,6 @@
 package com.raquo.laminar.keys
 
-import com.raquo.laminar.domapi.KeyDomApi
-import com.raquo.laminar.domapi.KeyDomApi.DerivedStylePropDomApi
+import com.raquo.laminar.domapi.keyapi.{DerivedStylePropDomApi, DomKeyApi}
 import com.raquo.laminar.modifiers.SimpleKeySetter.DerivedStyleSetter
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
@@ -13,7 +12,7 @@ class DerivedStyleProp[V](
 
   override type Self[VV] = DerivedStyleProp[VV]
 
-  override val domApi: KeyDomApi[DerivedStyleProp, ReactiveHtmlElement.Base] = DerivedStylePropDomApi
+  override val domApi: DomKeyApi[DerivedStyleProp, ReactiveHtmlElement.Base] = DerivedStylePropDomApi
 
   override val name: String = key.name
 

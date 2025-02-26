@@ -1,9 +1,7 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import org.scalajs.dom
-
-import scala.scalajs.js
 
 /** RootNode will mount itself (and the child) if the container node
   * is attached to the DOM at RootNode initialization time.
@@ -27,7 +25,7 @@ class RootNode(
     throw new Exception("Unable to mount Laminar RootNode into a null container. See https://laminar.dev/documentation#waiting-for-the-dom-to-load")
   }
 
-  if (!DomApi.isDescendantOf(container, dom.document)) {
+  if (!DomApi.raw.isDescendantOf(container, dom.document)) {
     throw new Exception("Unable to mount Laminar RootNode into an unmounted container. See https://laminar.dev/documentation#rendering")
   }
 
@@ -41,13 +39,13 @@ class RootNode(
   /** @return Whether child was successfully mounted */
   def mount(): Boolean = {
     dynamicOwner.activate()
-    ParentNode.appendChild(parent = this, child, hooks = js.undefined)
+    DomApi.appendChild(parent = this, child, hooks = ())
   }
 
   /** @return Whether child was successfully unmounted */
   def unmount(): Boolean = {
     dynamicOwner.deactivate()
-    ParentNode.removeChild(parent = this, child = child)
+    DomApi.removeChild(parent = this, child = child)
   }
 
 }
