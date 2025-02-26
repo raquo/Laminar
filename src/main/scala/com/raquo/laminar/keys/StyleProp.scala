@@ -2,8 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.laminar.api.Implicits
 import com.raquo.laminar.defs.styles.traits.GlobalKeywords
-import com.raquo.laminar.domapi.KeyDomApi
-import com.raquo.laminar.domapi.KeyDomApi.StylePropDomApi
+import com.raquo.laminar.domapi.keyapi.{DomKeyApi, StylePropDomApi}
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
@@ -14,14 +13,13 @@ class StyleProp[V](
 extends SimpleKey[V, String, ReactiveHtmlElement.Base]
 with GlobalKeywords[V]
 with StyleBuilder[StyleSetter[String], DerivedStyleProp]
-with Implicits.StyleImplicits
-{
+with Implicits.StyleImplicits {
 
   // @inline def asStringProp: StyleProp[String] = this
 
   override type Self[VV] = StyleProp[VV]
 
-  override val domApi: KeyDomApi[StyleProp, ReactiveHtmlElement.Base] = StylePropDomApi
+  override val domApi: DomKeyApi[StyleProp, ReactiveHtmlElement.Base] = StylePropDomApi
 
   // #nc special impl for the sake of existential type? Or... not sure...
   // override def :=(value: V): StyleSetter[V] = {
@@ -45,7 +43,7 @@ with Implicits.StyleImplicits
   }
 
   override protected def styleSetter(value: String): StyleSetter[String] = {
-    this := value //.asInstanceOf[V] // #nc explain why safe... is it?
+    this := value // .asInstanceOf[V] // #nc explain why safe... is it?
   }
 
   // override protected def valueAsString(value: StyleSetter[V]): String = {
@@ -55,16 +53,4 @@ with Implicits.StyleImplicits
   override protected def derivedStyle[InputV](encode: InputV => String): DerivedStyleProp[InputV] = {
     new DerivedStyleProp[InputV](key = this, encode)
   }
-}
-
-object StyleProp {
-
-  // implicit def styleToStringStyle[V](p: StyleProp[V]): StyleProp[String] = p.asInstanceOf[StyleProp[String]]
-
-
-  //
-  // implicit class StylePropExtensions[V](val p: StyleProp[V]) {
-  //
-  //   def
-  // }
 }

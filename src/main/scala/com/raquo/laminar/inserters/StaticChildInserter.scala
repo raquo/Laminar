@@ -18,7 +18,7 @@ class StaticChildInserter(
 
   def renderInContext(ctx: InsertContext): Unit = {
     ChildInserter.switchToChild(
-      maybeLastSeenChild = js.undefined,
+      maybeLastSeenChild = (),
       newChildNode = child,
       ctx,
       hooks
@@ -35,7 +35,7 @@ object StaticChildInserter {
   def noHooks(
     node: ChildNode.Base,
   ): StaticChildInserter = {
-    new StaticChildInserter(node, hooks = js.undefined)
+    new StaticChildInserter(node, hooks = ())
   }
 
   def noHooksC[Component](

@@ -2,8 +2,8 @@ package com.raquo.laminar.inserters
 
 import com.raquo.ew.JsMap
 import com.raquo.laminar
-import com.raquo.laminar.DomApi
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
+import com.raquo.laminar.domapi.DomApi
+import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -97,7 +97,7 @@ final class InsertContext(
       // it as such for the strict mode, and insert a new sentinel node into the DOM.
       val contentNode = sentinelNode
       val newSentinelNode = new CommentNode("")
-      DomApi.insertBefore(
+      DomApi.raw.insertBefore(
         parent = parentNode.ref,
         newChild = newSentinelNode.ref,
         referenceChild = contentNode.ref
@@ -134,7 +134,7 @@ final class InsertContext(
         } else {
           maybePrevChild.foreach { prevChild =>
             // @Note: DOM update
-            ParentNode.removeChild(parent = parentNode, child = prevChild)
+            DomApi.removeChild(parent = parentNode, child = prevChild)
             remainingOldExtraNodeCount -= 1
           }
         }
@@ -153,7 +153,7 @@ object InsertContext {
   ): InsertContext = {
     val sentinelNode = new CommentNode("")
 
-    ParentNode.appendChild(parent = parentNode, child = sentinelNode, hooks)
+    DomApi.appendChild(parent = parentNode, child = sentinelNode, hooks)
 
     unsafeMakeReservedSpotContext(
       parentNode = parentNode,

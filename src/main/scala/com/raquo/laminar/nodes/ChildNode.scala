@@ -1,10 +1,10 @@
 package com.raquo.laminar.nodes
 
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.Modifier
 import org.scalajs.dom
 
 import scala.annotation.tailrec
-import scala.scalajs.js
 
 trait ChildNode[+Ref <: dom.Node]
 extends ReactiveNode[Ref]
@@ -15,7 +15,7 @@ with Modifier[ReactiveElement[dom.Element]] {
   def maybeParent: Option[ParentNode.Base] = _maybeParent
 
   /** Note: Make sure to call [[willSetParent]] before calling this method manually */
-  private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  private[laminar] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     _maybeParent = maybeNextParent
   }
 
@@ -33,10 +33,10 @@ with Modifier[ReactiveElement[dom.Element]] {
     *
     * @param maybeNextParent  `None` means this node is about to be detached form its parent
     */
-  @inline private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
+  @inline private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
   override def apply(parentNode: ReactiveElement.Base): Unit = {
-    ParentNode.appendChild(parent = parentNode, child = this, hooks = js.undefined)
+    DomApi.appendChild(parent = parentNode, child = this, hooks = ())
   }
 
 }
@@ -46,7 +46,7 @@ object ChildNode {
   type Base = ChildNode[dom.Node]
 
   /** Note: This walks up Laminar's element tree, not the real DOM tree.
-    * See [[com.raquo.laminar.DomApi.isDescendantOf]] if you want to check the real DOM tree.
+    * See [[com.raquo.laminar.domapi.DomApi.raw.isDescendantOf]] if you want to check the real DOM tree.
     */
   @tailrec final def isDescendantOf(
     child: ChildNode.Base,

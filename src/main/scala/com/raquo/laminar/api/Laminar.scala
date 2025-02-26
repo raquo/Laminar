@@ -1,16 +1,17 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
-import com.raquo.laminar.{nodes, DomApi}
 import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
 import com.raquo.laminar.defs.props.HtmlProps
 import com.raquo.laminar.defs.styles.StyleProps
 import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers.{EventListener, SimpleKeyUpdater}
+import com.raquo.laminar.nodes
 import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, SvgTag}

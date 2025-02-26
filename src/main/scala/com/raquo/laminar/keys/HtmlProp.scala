@@ -1,8 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.domapi.{KeyDomApi, RWKeyDomApi}
-import com.raquo.laminar.domapi.KeyDomApi.HtmlPropDomApi
+import com.raquo.laminar.domapi.keyapi.{HtmlPropDomApi, RWDomKeyApi}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 
 /**
@@ -21,8 +20,8 @@ class HtmlProp[V, DomV](
 
   override type Self[VV] = HtmlProp[VV, DomV]
 
-  override val domApi: RWKeyDomApi[Self, ReactiveHtmlElement.Base] = {
-    HtmlPropDomApi.asInstanceOf[RWKeyDomApi[Self, ReactiveHtmlElement.Base]]
+  override val domApi: RWDomKeyApi[Self, ReactiveHtmlElement.Base] = {
+    HtmlPropDomApi.asInstanceOf[RWDomKeyApi[Self, ReactiveHtmlElement.Base]]
   } // #nc safe?
 
   // def :=(value: V): PropSetter[V, DomV] = {

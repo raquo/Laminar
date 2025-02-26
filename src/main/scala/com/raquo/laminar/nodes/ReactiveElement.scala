@@ -182,7 +182,7 @@ with ParentNode[Ref] {
 
   private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit
 
-  override private[nodes] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  override private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
     // @Note this should cover ALL cases not covered by setParent
@@ -192,7 +192,7 @@ with ParentNode[Ref] {
   }
 
   /** Don't call setParent directly – willSetParent will not be called. Use methods like `appendChild` defined on `ParentNode` instead. */
-  override private[nodes] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  override private[laminar] def setParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // println(s"> setParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
     val maybePrevParent = maybeParent

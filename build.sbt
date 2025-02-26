@@ -166,6 +166,7 @@ lazy val laminar = project.in(file("."))
 
     (startWebpackDevServer / version) := Versions.WebpackDevServer,
 
+    // #TODO remove
     useYarn := true,
 
     scalaJSUseMainModuleInitializer := true

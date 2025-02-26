@@ -1,7 +1,7 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription}
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.keys.EventProcessor
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.nodes.ReactiveElement

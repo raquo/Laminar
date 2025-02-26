@@ -1,8 +1,9 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Observable
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableText
-import com.raquo.laminar.nodes.{ParentNode, TextNode}
+import com.raquo.laminar.nodes.TextNode
 
 import scala.scalajs.js
 
@@ -30,17 +31,17 @@ object ChildTextInserter {
           }
         }(owner)
       },
-      hooks = js.undefined
+      hooks = ()
     )
   }
 
   def switchToText(newTextNode: TextNode, ctx: InsertContext): Unit = {
     // First event: inserting the child for the first time: replace sentinel comment node with new TextNode
-    ParentNode.replaceChild(
+    DomApi.replaceChild(
       parent = ctx.parentNode,
       oldChild = ctx.sentinelNode,
       newChild = newTextNode,
-      hooks = js.undefined
+      hooks = ()
     )
 
     ctx.sentinelNode = newTextNode

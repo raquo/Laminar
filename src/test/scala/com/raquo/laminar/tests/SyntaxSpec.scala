@@ -88,7 +88,6 @@ class SyntaxSpec extends UnitSpec {
     assert(cls.name == "class")
     // assert((cls := List("class1", "class2")).value == "class1 class2")
 
-
     // For CSS stuff, see test below
   }
 

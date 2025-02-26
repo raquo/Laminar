@@ -1,10 +1,12 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Observable
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
-import com.raquo.laminar.nodes.{ChildNode, ParentNode}
+import com.raquo.laminar.nodes.ChildNode
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 object ChildInserter {
 
@@ -32,10 +34,10 @@ object ChildInserter {
   }
 
   def switchToChild(
-    maybeLastSeenChild: js.UndefOr[ChildNode.Base],
+    maybeLastSeenChild: ChildNode.Base | Unit,
     newChildNode: ChildNode.Base,
     ctx: InsertContext,
-    hooks: js.UndefOr[InserterHooks]
+    hooks: InserterHooks | Unit
   ): Unit = {
     if (!ctx.strictMode) {
       // #Note: previously in ChildInserter we only did this once in insertFn.
@@ -49,7 +51,7 @@ object ChildInserter {
       .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
       .fold {
         // Inserting the child for the first time, OR after the previous child was externally moved / removed.
-        ParentNode.insertChildAfter(
+        DomApi.insertChildAfter(
           parent = ctx.parentNode,
           newChild = newChildNode,
           referenceChild = ctx.sentinelNode,
@@ -61,7 +63,7 @@ object ChildInserter {
         // Just need to check that the new child is actually different from the old one
         // Replace the child with new one.
         // #Note: auto-distinction inside (`lastSeenChild ne newChildNode` filter)
-        val replaced = ParentNode.replaceChild(
+        val replaced = DomApi.replaceChild(
           parent = ctx.parentNode,
           oldChild = lastSeenChild,
           newChild = newChildNode,

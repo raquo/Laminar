@@ -1,9 +1,7 @@
 package com.raquo.laminar.tests
 
-import com.raquo.domtestutils.matching.ExpectedNode
-import com.raquo.laminar.DomApi
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.nodes.ChildNode
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -31,15 +29,15 @@ class ShadowDomSpec extends UnitSpec {
         assert(shadowRoot.parentNode == null)
         assert(shadowRoot.asInstanceOf[js.Dynamic].host.asInstanceOf[Any] == parentDiv)
 
-        assert(DomApi.isDescendantOf(childDiv, parentDiv))
-        assert(DomApi.isDescendantOf(childDiv, shadowRoot))
-        assert(!DomApi.isDescendantOf(childDiv, dom.document))
+        assert(DomApi.raw.isDescendantOf(childDiv, parentDiv))
+        assert(DomApi.raw.isDescendantOf(childDiv, shadowRoot))
+        assert(!DomApi.raw.isDescendantOf(childDiv, dom.document))
 
         // --
 
         dom.document.body.appendChild(parentDiv)
 
-        assert(DomApi.isDescendantOf(childDiv, dom.document))
+        assert(DomApi.raw.isDescendantOf(childDiv, dom.document))
 
         // --
 
@@ -53,9 +51,9 @@ class ShadowDomSpec extends UnitSpec {
         val laminarRoot = render(container = childDiv, app)
 
         assert(app.ref.parentNode == childDiv)
-        assert(DomApi.isDescendantOf(app.ref, parentDiv))
-        assert(DomApi.isDescendantOf(app.ref, shadowRoot))
-        assert(DomApi.isDescendantOf(app.ref, dom.document))
+        assert(DomApi.raw.isDescendantOf(app.ref, parentDiv))
+        assert(DomApi.raw.isDescendantOf(app.ref, shadowRoot))
+        assert(DomApi.raw.isDescendantOf(app.ref, dom.document))
 
         expectNode(
           app.ref,
@@ -93,18 +91,18 @@ class ShadowDomSpec extends UnitSpec {
 
         dom.document.body.removeChild(parentDiv)
 
-        assert(DomApi.isDescendantOf(app.ref, parentDiv))
-        assert(DomApi.isDescendantOf(app.ref, shadowRoot))
-        assert(!DomApi.isDescendantOf(app.ref, dom.document))
+        assert(DomApi.raw.isDescendantOf(app.ref, parentDiv))
+        assert(DomApi.raw.isDescendantOf(app.ref, shadowRoot))
+        assert(!DomApi.raw.isDescendantOf(app.ref, dom.document))
 
         // --
 
         laminarRoot.unmount()
 
         assert(app.ref.parentNode == null)
-        assert(!DomApi.isDescendantOf(app.ref, parentDiv))
-        assert(!DomApi.isDescendantOf(app.ref, shadowRoot))
-        assert(!DomApi.isDescendantOf(app.ref, dom.document))
+        assert(!DomApi.raw.isDescendantOf(app.ref, parentDiv))
+        assert(!DomApi.raw.isDescendantOf(app.ref, shadowRoot))
+        assert(!DomApi.raw.isDescendantOf(app.ref, dom.document))
       }
     }
   }

@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.L.seqToSetter
-import com.raquo.laminar.domapi.KeyDomApi
+import com.raquo.laminar.domapi.keyapi.DomKeyApi
 import com.raquo.laminar.modifiers.{Setter, SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
@@ -35,11 +35,11 @@ trait SimpleKey[V, DomV, -El <: ReactiveElement.Base] { self =>
 
   val name: String
 
-  val domApi: KeyDomApi[Self, El]
+  val domApi: DomKeyApi[Self, El]
 
   def :=(value: V): SimpleKeySetter[V, DomV, El] = {
     val _value = value
-    val _self = self.asInstanceOf[Self[V]]  // #nc asinstanceof - safe?
+    val _self = self.asInstanceOf[Self[V]] // #nc asinstanceof - safe?
     new SimpleKeySetter[V, DomV, El] {
       override val key: Self[V] = _self
       override val value: V = _value

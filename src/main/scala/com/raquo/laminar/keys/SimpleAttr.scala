@@ -1,8 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.laminar.codecs.Codec
-import com.raquo.laminar.domapi.KeyDomApi.SimpleAttrDomApi
-import com.raquo.laminar.domapi.RWKeyDomApi
+import com.raquo.laminar.domapi.keyapi.{RWDomKeyApi, SimpleAttrDomApi}
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Common type of all simple (non-composite) attributes:
@@ -27,7 +26,7 @@ extends SimpleKey[V, String, El] {
 
   val namespaceUri: Option[String] = None
 
-  override val domApi: RWKeyDomApi[Self, El] = SimpleAttrDomApi
+  override val domApi: RWDomKeyApi[Self, El] = SimpleAttrDomApi
 }
 
 object SimpleAttr {

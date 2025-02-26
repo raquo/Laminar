@@ -1,6 +1,6 @@
 package com.raquo.laminar.keys
 
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.nodes.ReactiveSvgElement
 
 import scala.scalajs.js.|

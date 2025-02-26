@@ -9,8 +9,8 @@ import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
 import scala.scalajs.js
-import scala.scalajs.js.JSStringOps._
 import scala.scalajs.js.|
+import scala.scalajs.js.JSStringOps._
 
 // #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 

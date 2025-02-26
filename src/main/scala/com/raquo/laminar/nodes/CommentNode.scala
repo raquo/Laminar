@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.laminar.DomApi
+import com.raquo.laminar.domapi.DomApi
 import org.scalajs.dom
 
 class CommentNode(initialText: String) extends ChildNode[dom.Comment] {
