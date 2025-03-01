@@ -68,7 +68,11 @@ Huge thanks to [all of our sponsors](https://github.com/sponsors/raquo) – your
 <b><a href="https://tawasal.ae">Tawasal</a></b> is a secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.
 <br />
 <br />
-
+<br />
+<a href="https://www.ossuminc.com/"><img src="https://laminar.dev/img/sponsors/ossum-square-200px.jpg" width="80"></a><br />
+<b><a href="https://www.ossuminc.com">Ossum Inc.</a></b> is dedicated to creating Ossum experiences for businesses that use software.
+<br />
+<br />
 
 ## Author
 

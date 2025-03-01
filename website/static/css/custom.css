@@ -299,6 +299,7 @@ textarea::placeholder {
   display: flex;
   flex-direction: row;
   column-gap: 40px;
+  row-gap: 20px;
   margin-bottom: 40px;
   flex-wrap: wrap;
 }
@@ -328,6 +329,10 @@ textarea::placeholder {
 
   .-sponsorsList.x-justifyContentCenter {
     justify-content: normal !important;
+  }
+
+  .-sponsorsList .-sponsor.x-alignSelfEnd {
+    align-self: inherit !important;
   }
 
   .-sponsorsList .-sponsor.x-aurinko {
@@ -402,6 +407,10 @@ textarea::placeholder {
   /* This empty "sponsor" fills the 2x2 grid. */
   /* Because it's empty, we allow the sibling sponsor to use up some of its space */
   margin-left: -80px;
+}
+
+.-sponsorsList .-sponsor.x-alignSelfEnd {
+  align-self: end;
 }
 
 .-sponsorsList .-sponsor.x-company a {

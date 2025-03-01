@@ -240,8 +240,8 @@ class Index extends React.Component {
                 </div>
               </div>
               <h2>GOLD Sponsors:</h2>
-              <div className="-sponsorsList x-alignItemsEnd">
-                <div className="-sponsor x-person x-yurique">
+              <div className="-sponsorsList x-alignItemsStart">
+                <div className="-sponsor x-person x-yurique x-alignSelfEnd">
                   <img className="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
                   <div className="-text">
                     <div className="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
@@ -258,6 +258,13 @@ class Index extends React.Component {
                   <div className="-text">
                     <div className="-name"><a href="https://tawasal.ae">Tawasal</a></div>
                     <div className="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+                  </div>
+                </div>
+                <div className="-sponsor x-person x-ossum">
+                  <img className="-avatar" src="/img/sponsors/ossum-square-200px.jpg" alt="" />
+                  <div className="-text">
+                    <div className="-name"><a href="https://www.ossuminc.com/">Ossum Inc.</a></div>
+                    <div className="-description">A corporation dedicated to creating Ossum experiences for businesses that use software.</div>
                   </div>
                 </div>
                 <div className="-sponsor x-empty">
