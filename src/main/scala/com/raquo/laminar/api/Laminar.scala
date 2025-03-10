@@ -203,7 +203,7 @@ with Implicits {
   //
 
   /** Modifier that applies one or more modifiers if `condition` is true */
-  def when[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = {
+  def when[El <: Element](condition: Boolean)(mods: => Modifier[El]*): Modifier[El] = {
     if (condition) {
       mods // implicitly converted to a single modifier
     } else {
@@ -212,7 +212,7 @@ with Implicits {
   }
 
   /** Modifier that applies one or more modifiers if `condition` is true */
-  @inline def whenNot[El <: Element](condition: Boolean)(mods: Modifier[El]*): Modifier[El] = when(!condition)(mods)
+  @inline def whenNot[El <: Element](condition: Boolean)(mods: => Modifier[El]*): Modifier[El] = when(!condition)(mods)
 
   //
 
