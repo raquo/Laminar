@@ -241,12 +241,6 @@ class Index extends React.Component {
               </div>
               <h2>GOLD Sponsors:</h2>
               <div className="-sponsorsList x-alignItemsStart">
-                <div className="-sponsor x-person x-yurique x-alignSelfEnd">
-                  <img className="-avatar x-rounded" src="/img/sponsors/yurique.jpg" alt="" />
-                  <div className="-text">
-                    <div className="-name"><a href="https://github.com/yurique">Iurii Malchenko</a></div>
-                  </div>
-                </div>
                 <div className="-sponsor x-company x-aurinko">
                   <a className="x-noHover" href="https://www.aurinko.io/">
                     <img className="-logo" src="/img/sponsors/aurinko-dark-250px.png" alt="" />

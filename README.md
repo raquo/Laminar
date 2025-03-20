@@ -54,11 +54,6 @@ Huge thanks to [all of our sponsors](https://github.com/sponsors/raquo) – your
 
 <br />
 
-[![Yurique](https://laminar.dev/img/sponsors/yurique-80px.jpg?)](https://github.com/yurique)<br />
-**[Iurii Malchenko](https://github.com/yurique)**
-<br />
-<br />
-<br />
 [![Aurinko.io](https://laminar.dev/img/sponsors/aurinko-light-250px.png)](https://www.aurinko.io/)<br />
 **[Aurinko](https://aurinko.io/)** is an API platform for workplace addons and integrations.
 <br />
