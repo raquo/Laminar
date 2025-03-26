@@ -433,6 +433,10 @@ textarea::placeholder {
   border-radius: 17px;
 }
 
+.-sponsorsList .-sponsor.x-person .-avatar.x-rounded-sm {
+  border-radius: 6px;
+}
+
 .-sponsorsList .-sponsor.x-person .-text {
   text-align: left;
 }
@@ -446,17 +450,17 @@ textarea::placeholder {
   font-size: 90%;
 }
 
-.-sponsorsList .-sponsor.x-ossum .-avatar {
-  border-radius: 6px;
-}
-
 .-sponsorsList .-sponsor.x-aurinko {
   text-align: center;
 }
 
 .-homeSection .-sponsorsList .-sponsor.x-aurinko {
   position: relative;
-  top: 10px;
+  top: 0;
+
+  &:first-of-type {
+    max-width: 280px;
+  }
 }
 
 .-homeSection .-sponsorsList {
@@ -466,6 +470,10 @@ textarea::placeholder {
 .post .-sponsorsList .-sponsor.x-aurinko {
   position: relative;
   top: 5px;
+
+  &:first-of-type {
+    max-width: 300px;
+  }
 }
 
 .post .-sponsorsList .-sponsor.x-company .-tagline {

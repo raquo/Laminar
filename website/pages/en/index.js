@@ -240,7 +240,7 @@ class Index extends React.Component {
                 </div>
               </div>
               <h2>GOLD Sponsors:</h2>
-              <div className="-sponsorsList x-alignItemsStart">
+              <div className="-sponsorsList x-alignItemsCenter">
                 <div className="-sponsor x-company x-aurinko">
                   <a className="x-noHover" href="https://www.aurinko.io/">
                     <img className="-logo" src="/img/sponsors/aurinko-dark-250px.png" alt="" />
