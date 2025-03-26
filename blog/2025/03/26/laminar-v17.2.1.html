@@ -1,0 +1,120 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Laminar v17.2.1 · Laminar</title><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="generator" content="Docusaurus"/><meta name="description" content="Airstream bug fixes! "/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Laminar v17.2.1 · Laminar"/><meta property="og:type" content="website"/><meta property="og:url" content="https://laminar.dev/blog/2025/03/26/laminar-v17.2.1"/><meta property="og:description" content="Airstream bug fixes! "/><meta property="og:image" content="https://laminar.dev/img/brand/laminar-opengraph-opt.png"/><meta name="twitter:card" content="summary"/><link rel="shortcut icon" href="/undefined"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css"/><link rel="alternate" type="application/atom+xml" href="https://laminar.dev/blog/atom.xml" title="Laminar Blog ATOM Feed"/><link rel="alternate" type="application/rss+xml" href="https://laminar.dev/blog/feed.xml" title="Laminar Blog RSS Feed"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons&amp;display=block"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"/><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="/js/scrollSpy.js"></script><link rel="stylesheet" href="/css/main.css"/><script src="/js/codetabs.js"></script></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/"><h2 class="headerTitle">Laminar</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class=""><a href="/documentation" target="_self">Docs</a></li><li class=""><a href="https://demo.laminar.dev" target="_self">Examples</a></li><li class=""><a href="/resources" target="_self">Resources</a></li><li class="siteNavGroupActive"><a href="/blog/" target="_self">News</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><div class="hamburger-menu"><div class="line1"></div><div class="line2"></div><div class="line3"></div></div></div><h2><i>›</i><span>Recent News</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Recent News</h3><ul class=""><li class="navListItem navListItemActive"><a class="navItem" href="/blog/2025/03/26/laminar-v17.2.1">Laminar v17.2.1</a></li><li class="navListItem"><a class="navItem" href="/blog/2024/12/13/laminar-v17.2.0">Laminar v17.2.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2024/08/14/laminar-v17.1.0">Laminar v17.1.0, News &amp; Stickers</a></li><li class="navListItem"><a class="navItem" href="/blog/2024/05/14/laminar-v17.0.0">Laminar v17.0.0 &amp; Shoelace Web Components v0.1.0</a></li><li class="navListItem"><a class="navItem" href="/blog/2023/11/02/laminar-full-stack-demo">Laminar &amp; Scala.js Full Stack Demo &amp; More</a></li></ul></div></div></section></div><script>
+            var coll = document.getElementsByClassName('collapsible');
+            var checkActiveCategory = true;
+            for (var i = 0; i < coll.length; i++) {
+              var links = coll[i].nextElementSibling.getElementsByTagName('*');
+              if (checkActiveCategory){
+                for (var j = 0; j < links.length; j++) {
+                  if (links[j].classList.contains('navListItemActive')){
+                    coll[i].nextElementSibling.classList.toggle('hide');
+                    coll[i].childNodes[1].classList.toggle('rotate');
+                    checkActiveCategory = false;
+                    break;
+                  }
+                }
+              }
+
+              coll[i].addEventListener('click', function() {
+                var arrow = this.childNodes[1];
+                arrow.classList.toggle('rotate');
+                var content = this.nextElementSibling;
+                content.classList.toggle('hide');
+              });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              var headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                var el = event.target;
+                while(el !== headings){
+                  if (el.tagName === 'A') {
+                    document.body.classList.remove('tocActive');
+                    break;
+                  } else{
+                    el = el.parentNode;
+                  }
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer postContainer blogContainer"><div class="wrapper"><div class="lonePost"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle"><a href="/blog/2025/03/26/laminar-v17.2.1">Laminar v17.2.1</a></h1><p class="post-meta">March 26, 2025</p><div class="authorBlock"><p class="post-authorName"><a href="https://github.com/raquo" target="_blank" rel="noreferrer noopener">Nikita</a></p></div></header><div><span><p>Airstream bug fixes!</p>
+<!--truncate-->
+<blockquote>
+<p>Laminar is a Scala.js library for building web application interfaces and managing UI state. Learn more in <a href="https://demo.laminar.dev">a few short examples</a> or <a href="https://www.youtube.com/watch?v=L_AHCkl6L-Q">one long video</a>.</p>
+</blockquote>
+<h2><a class="anchor" aria-hidden="true" id="releases"></a><a href="#releases" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Releases</h2>
+<ul>
+<li><a href="https://github.com/raquo/laminar">Laminar</a> 17.2.1</li>
+<li><a href="https://github.com/raquo/airstream">Airstream</a> 17.2.1</li>
+</ul>
+<h2><a class="anchor" aria-hidden="true" id="airstream-bug-fixes"></a><a href="#airstream-bug-fixes" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Airstream Bug Fixes</h2>
+<p>Laminar 17.2.1 release consists entirely of two Airstream bug fixes. The fix slightly changes Airstream behaviour, although you are unlikely to be relying on the current incorrect behaviour.</p>
+<h3><a class="anchor" aria-hidden="true" id="fixed-flattenswitch--flatmapswitch-unwanted-restart-issue"></a><a href="#fixed-flattenswitch--flatmapswitch-unwanted-restart-issue" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fixed: flattenSwitch / flatMapSwitch unwanted restart issue</h3>
+<p>When <code>flattenSwitch</code> (or <code>flatMapSwitch</code>) operator switches from <code>signal1</code> to <code>signal2</code>, it first disconnects from <code>signal1</code> before connecting to <code>signal2</code>. Usually this is the right thing to do.</p>
+<p>Our code already had a special case – we don't do this if <code>signal1 == signal2</code> – in that case we don't need to restart the same signal for no reason, so we just keep it active, without power-cycling it.</p>
+<p>However, there is a more advanced variation of this special case that we failed to consider previously – if both <code>signal1</code> and <code>signal2</code> have a common ancestor <code>signal0</code>, and <code>signal0</code> has no other observers, switching from <code>signal1</code> to <code>signal2</code> will cause <code>signal0</code> to briefly stop and then re-start.</p>
+<p>This is undesirable because some signals may have custom onStart logic in them – for example, <code>EventStream.fromValue(1).toSignal(0)</code> will emit <code>1</code> every time it's started (by design), so we don't want to re-start such a signal when the user does not explicit mean to, as it would produce an unexpected event – a glitch.</p>
+<p>The 17.2.1 release fixes this with a make-before-break mechanism – now, when <code>flattenSwitch</code> switches from <code>signal1</code> to <code>signal2</code>, it first connects to the new <code>signal2</code> source before disconnecting from the old <code>signal1</code> source. This ensures that any common ancestors of the old and new signals remain active and are not re-started unnecessarily.</p>
+<p>All of this applies to streams just as well as signals.</p>
+<p><strong>Migration:</strong> You may have <code>flattenSwitch</code> / <code>flatMapSwitch</code> signals (or streams) that currently emit extra events due to this bug, and they will stop emitting those events. I believe those glitchy events are entirely undesirable, so if everything is working fine for you right now, chances are it will continue working fine, but if you have experienced weird / unexplained events when flattening observables, this may just fix it.</p>
+<h3><a class="anchor" aria-hidden="true" id="fixed-split-signals-child-looking-at-inactive-split-signal"></a><a href="#fixed-split-signals-child-looking-at-inactive-split-signal" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Fixed: split signal's child looking at inactive split signal</h3>
+<p><code>SplitChildSignal</code> (the signal that the <code>split</code> operator's callback gives you for each item) reads the internal state of <code>SplitSignal</code> (the result of the <code>.split</code> operator itself) to do its thing, but does not formally depend on it as an observable.</p>
+<p>This means that if <code>SplitChildSignal</code> has observers, and <code>SplitSignal</code> does not, then <code>SplitSignal</code> is not running and so it is not updating its internal state. IN this scenario, <code>SplitChildSignal</code> can potentially read stale/incorrect state from <code>SplitSignal</code>, resulting in <code>SplitSignal</code> emitting a stale/incorrect version of its item, or failing to emit when it's due.</p>
+<p>We fixed this by properly emulating <code>SplitChildSignal</code>'s dependency on <code>SplitSignal</code>. Our <code>SplitChildSignal</code> is perhaps the weirdest signal in Airstream on a technical/implementation level, so it needed special care for this.</p>
+<p><strong>Migration:</strong> In practice, you are unlikely to encounter this bug when using typical Laminar patterns. And if you did, you would likely notice <code>SplitChildSignal</code> emitting incorrect values.</p>
+<p>Artūras Šlajus has provided a <a href="https://github.com/raquo/Airstream/issues/140">great example</a> of these two bugs working together to sabotage two nested <code>split</code>-s followed by a <code>map</code> and a <code>flattenSwitch</code>.</p>
+<h2><a class="anchor" aria-hidden="true" id="thank-you"></a><a href="#thank-you" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Thank you</h2>
+<p>Laminar development is kindly supported by <a href="https://github.com/sponsors/raquo">my sponsors</a>, and I am very grateful to be able to work on all this.</p>
+<p><h4 class="x-like-h3">DIAMOND sponsor:</h4></p>
+<div class="-sponsorsList x-alignItemsStart x-justifyContentCenter">
+<div class="-sponsor x-diamond x-company x-heartai">
+  <a class="x-noHover" href="https://www.heartai.net/">
+    <img class="-logo" src="/img/sponsors/heartai.svg" alt="" />
+    <div class="-tagline"><u>HeartAI</u> is a data and analytics platform for digital health and clinical care.</div>
+  </a>
+</div>
+</div>
+<p><strong>GOLD sponsors</strong>:</p>
+<div class="-sponsorsList x-alignItemsCenter">
+  <div class="-sponsor x-company x-aurinko">
+    <a class="x-noHover" href="https://www.aurinko.io/">
+      <img class="-logo" src="/img/sponsors/aurinko-light-250px.png" alt="" />
+      <div class="-tagline"><u>Aurinko</u> is an API platform for workplace addons and integrations.</div>
+    </a>
+  </div>
+  <a class="-sponsor x-person x-tawasal" href="https://tawasal.ae">
+    <img class="-avatar" src="/img/sponsors/tawasal.svg" alt="" />
+    <div class="-text">
+      <div class="-name">Tawasal</div>
+      <div class="-description">Secure multi-purpose messenger and superapp, offering free voice, text, video conferencing and lifestyle services.</div>
+    </div>
+  </a>
+  <div class="-sponsor x-person x-ossum">
+    <img class="-avatar x-rounded-sm" src="/img/sponsors/ossum-square-200px.jpg" alt="" />
+    <div class="-text">
+      <div class="-name"><a href="https://www.ossuminc.com/">Ossum Inc.</a></div>
+      <div className="-description">A corporation dedicated to creating Ossum experiences for businesses that use software.</div>
+    </div>
+  </div>
+  <div class="-sponsor x-empty">
+    <!-- filler for layout purposes -->
+  </div>
+</div>
+</span></div></div><div class="blogSocialSection"></div></div><div class="blog-recent"><a class="button" href="/blog/">Recent News</a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#releases">Releases</a></li><li><a href="#airstream-bug-fixes">Airstream Bug Fixes</a><ul class="toc-headings"><li><a href="#fixed-flattenswitch--flatmapswitch-unwanted-restart-issue">Fixed: flattenSwitch / flatMapSwitch unwanted restart issue</a></li><li><a href="#fixed-split-signals-child-looking-at-inactive-split-signal">Fixed: split signal's child looking at inactive split signal</a></li></ul></li><li><a href="#thank-you">Thank you</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="sitemap"><a href="/" class="nav-home"></a><div class="community-column"><h5>Community</h5><a href="https://discord.gg/JTrUxhq7sj">Discord chat</a><a href="https://github.com/sponsors/raquo">Sponsor the project</a></div><div class="github-column"><h5>Github</h5><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Laminar">Laminar</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Airstream">Airstream</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/Waypoint">Waypoint</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/scala-dom-types">Scala DOM Types</a></p><p><a class="github-button" data-icon="octicon" href="https://github.com/raquo/laminar-full-stack-demo">Laminar Demo</a></p><p><a class="github-button" href="https://github.com/raquo/Laminar" data-icon="octicon-star" data-count-href="/raquo/Laminar/stargazers" data-show-count="true" data-count-aria-label="# stargazers on GitHub" aria-label="Star this project on GitHub">Star</a></p></div></section><section class="copyright">Copyright © 2025 Nikita Gazarov</section></footer></div></body></html>
