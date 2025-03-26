@@ -87,7 +87,7 @@ title: Documentation
 
 ## Introduction
 
-This documentation is for Laminar version **v17.2.0**. For documentation of older versions, open the corresponding git tag, and use file search to find the documentation.md file. For example: [v17.0.0 docs](https://github.com/raquo/Laminar/blob/v17.0.0/website/docs/documentation.md).
+This documentation is for Laminar version **v17.2.1**. For documentation of older versions, open the corresponding git tag, and use file search to find the documentation.md file. For example: [v17.0.0 docs](https://github.com/raquo/Laminar/blob/v17.0.0/website/docs/documentation.md).
 
 Laminar depends on Airstream – usually but not always on the same-numbered version of Airstream. If neeeded, you can check the exact Airstream version in the `project/Versions.scala` file.
 
@@ -108,7 +108,7 @@ If you want to follow along with an IDE, download one of the starter kit project
 
 Add Laminar to `libraryDependencies` of your Scala.js project in `build.sbt`:
 
-    "com.raquo" %%% "laminar" % "16.0.0"  // Requires Scala.js 1.13.2+
+    "com.raquo" %%% "laminar" % "<version>"  // Requires recent Scala.js
 
 Laminar depends on Airstream. Every Laminar version includes the latest version of Airstream that was available at the time it was published. If you ever have a reason to use a slightly newer version of Airstream without upgrading Laminar, add this to your `build.sbt` as well:
 
