@@ -415,7 +415,7 @@ Note: all the unfamiliar syntax used here will be explained in subsequent sectio
 
 You don't need to use `inContext` to get an input element's current value: use the `mapToValue` event processor, e.g. `input(onInput.mapToValue --> stringBus)`.
 
-Similarly, don't use `inContext` to get a checkbox's `checked` status, use the `mapToChecked`, e.g. `input(typ := "checkbox", onClick.mapToValue --> stringBus)`.
+Similarly, don't use `inContext` to get a checkbox's `checked` status, use the `mapToChecked`, e.g. `input(typ := "checkbox", onClick.mapToChecked --> boolBus)`.
 
 Under the hood, `mapToValue` and `mapToChecked` look at `event.target.value` and `event.target.checked`.
 
