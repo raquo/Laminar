@@ -5,7 +5,6 @@ import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
 import com.raquo.ew.JsArray
 import com.raquo.laminar.api.L
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.domapi.keyapi.HtmlPropDomApi
 import com.raquo.laminar.inputs.InputController.InputControllerConfig
 import com.raquo.laminar.keys.{EventProcessor, EventProp, HtmlProp}
 import com.raquo.laminar.modifiers.{Binder, EventListener, SimpleKeyUpdater}
@@ -19,7 +18,7 @@ import scala.scalajs.js.JSConverters.JSRichOption
 class InputController[Ref <: dom.html.Element, A, B](
   config: InputControllerConfig[Ref, A],
   element: ReactiveHtmlElement[Ref],
-  updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A],
+  updater: SimpleKeyUpdater[HtmlProp[A], A, ReactiveHtmlElement[Ref]],
   listener: EventListener[_ <: dom.Event, B]
 ) {
 
@@ -186,7 +185,7 @@ object InputController {
 
   final class InputControllerConfig[-Ref <: dom.html.Element, A](
     val initialValue: A,
-    val prop: HtmlProp[A, _],
+    val prop: HtmlProp[A],
     val allowedEventProps: JsArray[EventProp[_]],
     val getDomValue: ReactiveHtmlElement[Ref] => A,
     val setDomValue: (ReactiveHtmlElement[Ref], A) => Unit,
@@ -220,7 +219,7 @@ object InputController {
     * This method is used to add input controller support to web components.
     */
   def customConfig[A](
-    prop: HtmlProp[A, _],
+    prop: HtmlProp[A],
     eventProps: JsArray[EventProp[_]],
     initial: A
   ): InputControllerConfig[dom.html.Element, A] = {
@@ -228,14 +227,14 @@ object InputController {
       initialValue = initial,
       prop = prop,
       allowedEventProps = eventProps,
-      getDomValue = el => HtmlPropDomApi.get(el, prop).get,
-      setDomValue = (el, v) => HtmlPropDomApi.set(el, prop, v)
+      getDomValue = el => DomApi.getHtmlProperty(el, prop).get,
+      setDomValue = (el, v) => DomApi.setHtmlProperty(el, prop, v)
     )
   }
 
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, A, B](
     listener: EventListener[Ev, B],
-    updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[A, _], A]
+    updater: SimpleKeyUpdater[HtmlProp[A], A, ReactiveHtmlElement[Ref]]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     Binder[ReactiveHtmlElement[Ref]] { element =>
       val propDomName = updater.key.name

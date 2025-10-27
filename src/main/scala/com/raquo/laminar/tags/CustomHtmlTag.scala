@@ -56,7 +56,7 @@ class CustomHtmlTag[Ref <: dom.html.Element](
     allowableInputControllerConfigs.map(props => props.map(_.prop.name))
   }
 
-  private[laminar] def allowableControllerConfigForProp[A](prop: HtmlProp[A, _]): js.UndefOr[InputControllerConfig[Ref, A]] = {
+  private[laminar] def allowableControllerConfigForProp[A](prop: HtmlProp[A]): js.UndefOr[InputControllerConfig[Ref, A]] = {
     allowableInputControllerConfigs.flatMap { configs =>
       // We force the type to have `A`, because we know that this prop's config is a config of `A`.
       configs.asScalaJs.find(_.prop == prop).orUndefined.asInstanceOf[js.UndefOr[InputControllerConfig[Ref, A]]]
@@ -72,7 +72,7 @@ object CustomHtmlTag {
 
   def withControlledInput[Ref <: dom.html.Element, A, Ev <: dom.Event](
     tagName: String,
-    prop: HtmlProp[A, _],
+    prop: HtmlProp[A],
     initial: A,
     eventProp: EventProp[Ev]
   ): CustomHtmlTag[Ref] = {
@@ -83,7 +83,7 @@ object CustomHtmlTag {
 
   def withControlledInputs[Ref <: dom.html.Element, A, Ev <: dom.Event](
     tagName: String,
-    prop: HtmlProp[A, _],
+    prop: HtmlProp[A],
     initial: A,
     eventProps: EventProp[Ev]*
   ): CustomHtmlTag[Ref] = {

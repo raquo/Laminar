@@ -15,7 +15,7 @@ class SvgAttr[V](
   override val localName: String,
   override val codec: Codec[V, String],
   val namespacePrefix: Option[String]
-) extends SimpleAttr[V, ReactiveSvgElement.Base] {
+) extends SimpleAttr[SvgAttr[V], V, ReactiveSvgElement.Base] {
 
   /** Qualified name, including namespace */
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)

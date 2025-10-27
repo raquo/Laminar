@@ -2,10 +2,10 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.L.seqToSetter
-import com.raquo.laminar.domapi.keyapi.DomKeyApi
 import com.raquo.laminar.modifiers.{Setter, SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
+// #nc TODO explain the type params
 /**
   * This class represents a Key typically found on the left hand side of the key-value pair `key := value`
   *
@@ -25,33 +25,17 @@ import com.raquo.laminar.nodes.ReactiveElement
   *     - [[CompositeHtmlAttr]]
   *     - [[CompositeSvgAttr]]
   */
-trait SimpleKey[V, DomV, -El <: ReactiveElement.Base] { self =>
-
-  /** #Warning: subtypes MUST specify their own type (or supertype) in `Self`. It's used for `val domApi`. */
-  type Self[VV] <: SimpleKey[VV, DomV, El]
+trait SimpleKey[ //
+  +Self <: SimpleKey[Self, V, El],
+  V,
+  -El <: ReactiveElement.Base
+] { self: Self =>
 
   val name: String
 
-  val domApi: DomKeyApi[Self, El]
+  def :=(value: V): SimpleKeySetter[Self, V, El]
 
-  def :=(value: V): SimpleKeySetter[V, DomV, El] = {
-    val _value = value
-    val _self = self.asInstanceOf[Self[V]] // #Safe if warning above is heeded
-    new SimpleKeySetter[V, DomV, El] {
-      override val key: Self[V] = _self
-      override val value: V = _value
-
-      override def set(el: El): Unit = {
-        domApi.set[V](el, _self, _value)
-      }
-
-      override def remove(el: El): Unit = {
-        domApi.remove[V](el, _self)
-      }
-    }
-  }
-
-  @inline def apply(value: V): SimpleKeySetter[V, DomV, El] = {
+  @inline def apply(value: V): SimpleKeySetter[Self, V, El] = {
     this := value
   }
 
@@ -59,14 +43,6 @@ trait SimpleKey[V, DomV, -El <: ReactiveElement.Base] { self =>
     seqToSetter[Option, El](value.map(v => this := v))
   }
 
-  def <--(values: Source[V]): SimpleKeyUpdater[El, Self[V], V] = {
-    new SimpleKeyUpdater[El, Self[V], V](
-      key = self.asInstanceOf[Self[V]],
-      values = values.toObservable,
-      update = (el, value, reason) => {
-        domApi.set(el, self.asInstanceOf[Self[V]], value)
-      }
-    )
-  }
+  def <--(values: Source[V]): SimpleKeyUpdater[Self, V, El]
 
 }

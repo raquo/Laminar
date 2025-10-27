@@ -258,7 +258,7 @@ with Implicits {
     */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
     listener: EventListener[Ev, _],
-    updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V]
+    updater: SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement[Ref]]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)
   }
@@ -267,7 +267,7 @@ with Implicits {
     * See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]]
     */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
-    updater: SimpleKeyUpdater[ReactiveHtmlElement[Ref], HtmlProp[V, _], V],
+    updater: SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement[Ref]],
     listener: EventListener[Ev, _]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)

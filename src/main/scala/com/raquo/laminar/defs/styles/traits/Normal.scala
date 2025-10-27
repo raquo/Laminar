@@ -10,6 +10,6 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 trait Normal[V] { this: StyleProp[V] =>
 
-  lazy val normal: StyleSetter[String] = this := "normal"
+  lazy val normal: StyleSetter[V] = this := "normal"
 
 }

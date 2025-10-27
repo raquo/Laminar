@@ -2,9 +2,12 @@ package com.raquo.laminar.tests.basic
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
-import com.raquo.laminar.keys.StyleBuilder
+import com.raquo.laminar.defs.styles.units
+import com.raquo.laminar.keys.{DerivedStyleProp, StyleBuilder}
+import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.utils.UnitSpec
 
+import scala.scalajs.js.|
 import scala.util.Random
 
 class StyleSpec extends UnitSpec {
@@ -151,6 +154,21 @@ class StyleSpec extends UnitSpec {
       x.encodeUrlValue("https://example.com\"\\\n); evil"),
       "\"https://example.com%22%5C ); evil\""
     )
+  }
+
+  it("type safety") {
+
+    assertEquals((columnSpan := 2).value: Int | String, 2)
+    assertEquals((flexGrow := 12.5).value: Double | String, 12.5)
+
+    assertEquals((columnSpan := "none").value: Int | String, "none")
+    assertEquals((flexGrow := "inherit").value: Double | String, "inherit")
+
+
+    // val fakeStyle = background.asInstanceOf[StyleProp[Double | String] with units.Color[StyleSetter[Double | String], DerivedStyleProp]]
+    flexGrow2.rgb(1, 2, 3).key
+
+    // styleProp()
   }
 
   // #TODO[Test] Safari seemed to work in practice, but jsdom does not seem to support prefixes

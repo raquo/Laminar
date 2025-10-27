@@ -180,7 +180,7 @@ with ParentNode[Ref] {
     this
   }
 
-  private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit
+  private[laminar] def onBoundKeyUpdater(key: SimpleKey[_, _, _]): Unit
 
   override private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")

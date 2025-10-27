@@ -3,9 +3,6 @@ package com.raquo.laminar.utils
 import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtestutils.matching._
 import com.raquo.laminar.api._
-import com.raquo.laminar.api.L.CompositeSvgAttr
-import com.raquo.laminar.codecs.StringAsIsCodec
-import com.raquo.laminar.defs.complex.ComplexHtmlKeys.CompositeHtmlAttr
 import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, RootNode}
 import com.raquo.laminar.tags.Tag
@@ -95,8 +92,8 @@ with EventSimulator {
     new TestableHtmlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
-  override implicit def makePropTestable[V, DomV](prop: HtmlProp[V, DomV]): TestableProp[V, DomV] = {
-    new TestableProp[V, DomV](prop.name, prop.codec.decode)
+  override implicit def makePropTestable[V](prop: HtmlProp[V]): TestableProp[V] = {
+    new TestableProp[V](prop.name, prop.codec.decodeAny) // #nc unsafe...
   }
 
   override implicit def makeStyleTestable[V](style: StyleProp[V]): TestableStyleProp[V] = {

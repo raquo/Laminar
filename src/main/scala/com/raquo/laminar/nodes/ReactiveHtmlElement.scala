@@ -73,9 +73,9 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
     controllers.exists(_.asScalaJs.exists(_.propDomName == propDomName))
   }
 
-  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit = {
+  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[_, _, _]): Unit = {
     key match {
-      case p: HtmlProp[_, _] =>
+      case p: HtmlProp[_] =>
         if (isControllableProp(p.name)) {
           if (hasController(p.name)) {
             throw new Exception(s"Can not add uncontrolled `${p.name} <-- ???` to element `${DomApi.debugNodeDescription(ref)}` that already has an input controller for `${p.name}` property.")

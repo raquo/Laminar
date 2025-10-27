@@ -2,10 +2,9 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
+import com.raquo.laminar.PlatformSpecific.StringOr
 import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
-
-import scala.scalajs.js.|
 
 /**
  * A modifier that updates a key from a source, e.g. `value <-- valueStream`
@@ -13,46 +12,34 @@ import scala.scalajs.js.|
  * @param update `(element, newValue, reason) => ()`
  *               The reason is used for updating CompositeKey-s.
  */
-class SimpleKeyUpdater[-El <: ReactiveElement.Base, +K <: SimpleKey[V, _, El], V](
+class SimpleKeyUpdater[+K <: SimpleKey[_, _, El], V, -El <: ReactiveElement.Base](
   val key: K,
   val values: Observable[V],
-  val update: (El, V, Modifier.Any) => Unit
+  val update: (El, V) => Unit
 ) extends Binder[El] { self =>
 
   override def bind(element: El): DynamicSubscription = {
     element.onBoundKeyUpdater(key)
     ReactiveElement.bindFn(element, values) { value =>
-      update(element, value, self)
+      update(element, value)
     }
   }
 }
 
 object SimpleKeyUpdater {
 
-  type PropUpdater[V, DomV] = SimpleKeyUpdater[ReactiveHtmlElement.Base, HtmlProp[V, DomV], V]
+  // #nc add tests to make sure we're getting precise types from `:=` and `<--`
 
-  type HtmlAttrUpdater[V] = SimpleKeyUpdater[ReactiveHtmlElement.Base, HtmlAttr[V], V]
+  type OfHtmlProp[V] = SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement.Base]
 
-  type SvgAttrUpdater[V] = SimpleKeyUpdater[ReactiveSvgElement.Base, SvgAttr[V], V]
+  type OfHtmlAttr[V] = SimpleKeyUpdater[HtmlAttr[V], V, ReactiveHtmlElement.Base]
 
-  type AriaAttrUpdater[V] = SimpleKeyUpdater[ReactiveElement.Base, AriaAttr[V], V]
+  type OfSvgAttr[V] = SimpleKeyUpdater[SvgAttr[V], V, ReactiveSvgElement.Base]
 
-  type StyleUpdater[V] = SimpleKeyUpdater[ReactiveHtmlElement.Base, StyleProp[V], V]
+  type OfAriaAttr[V] = SimpleKeyUpdater[AriaAttr[V], V, ReactiveElement.Base]
 
-  type DerivedStyleUpdater[InputV] = SimpleKeyUpdater[ReactiveHtmlElement.Base, DerivedStyleProp[InputV], InputV]
+  type OfStyleProp[V] = SimpleKeyUpdater[StyleProp[V], StringOr[V], ReactiveHtmlElement.Base]
 
-  // class DerivedStyleUpdater[V, InputV](
-  //   val key: StyleProp[V],
-  //   val values: Observable[InputV],
-  //   // val encode: InputV => V,
-  //   val update: (ReactiveHtmlElement.Base, InputV, Modifier.Any) => Unit
-  // ) extends Binder[ReactiveHtmlElement.Base] { self =>
-  //
-  //   override def bind(element: ReactiveHtmlElement.Base): DynamicSubscription = {
-  //     element.onBoundKeyUpdater(key)
-  //     ReactiveElement.bindFn(element, values) { value =>
-  //       update(element, value, self)
-  //     }
-  //   }
-  // }
+  type OfDerivedStyleProp[InputV] = SimpleKeyUpdater[DerivedStyleProp[InputV], InputV, ReactiveHtmlElement.Base]
+
 }

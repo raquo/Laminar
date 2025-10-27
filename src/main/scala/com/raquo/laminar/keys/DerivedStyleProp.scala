@@ -1,37 +1,36 @@
 package com.raquo.laminar.keys
 
-import com.raquo.laminar.domapi.keyapi.{DerivedStylePropDomApi, DomKeyApi}
+import com.raquo.airstream.core.Source
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.SimpleKeySetter.DerivedStyleSetter
+import com.raquo.laminar.modifiers.SimpleKeyUpdater
 import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.nodes.ReactiveHtmlElement.Base
 
 /** This class represents derived style props like `height.px` or `backgroundImage.url` */
 class DerivedStyleProp[V](
   val key: StyleProp[_],
   val encode: V => String
-) extends SimpleKey[V, String, ReactiveHtmlElement.Base] {
-
-  override type Self[VV] = DerivedStyleProp[VV]
-
-  override val domApi: DomKeyApi[DerivedStyleProp, ReactiveHtmlElement.Base] = DerivedStylePropDomApi
+) extends SimpleKey[DerivedStyleProp[V], V, ReactiveHtmlElement.Base] {
 
   override val name: String = key.name
 
-  // #nc special impl for the sake of existential type? Or... not sure... I guess it provides .cssValue? Can't we have a generic .domValue?
   override def :=(value: V): DerivedStyleSetter[V] = {
-    // new KeySetter[StyleProp[V], V | String, String, HtmlElement](this, value.toString, DomApi.setHtmlAnyStyle)
+    // More specific return type that offers with .cssValue: String
+    // I think the concrete Type[V] also helps us avoid problems with existential types in Scala 3.
     new DerivedStyleSetter(key = this, value)
   }
 
-  // #nc remove
-  // override def :=(value: InputV): DerivedStyleSetter[InputV] = {
-  //   new DerivedStyleSetter(key = this, value)
-  // }
-  //
-  // override def <--(values: Source[InputV]): DerivedStyleUpdater[InputV] = {
-  //   new SimpleKeyUpdater[ReactiveHtmlElement.Base, DerivedStyleProp[InputV], InputV](
-  //     key = this,
-  //     values = values.toObservable,
-  //     update = (el, v, _) => DomApi.setHtmlStringStyle(el, key, encode(v))
-  //   )
-  // }
+  override def apply(value: V): DerivedStyleSetter[V] =
+    this := value // Same impl. as super, just more specific return type
+
+  override def <--(values: Source[V]): SimpleKeyUpdater[DerivedStyleProp[V], V, Base] =
+    new SimpleKeyUpdater[DerivedStyleProp[V], V, ReactiveHtmlElement.Base](
+      key = this,
+      values = values.toObservable,
+      update = (el, value) => {
+        DomApi.setHtmlDerivedStyle(el, this, value)
+      }
+    )
+
 }

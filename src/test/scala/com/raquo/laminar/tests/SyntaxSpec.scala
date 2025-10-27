@@ -2,11 +2,13 @@ package com.raquo.laminar.tests
 
 import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.laminar
+import com.raquo.laminar.PlatformSpecific.StringOr
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
-import com.raquo.laminar.keys.DerivedStyleProp
+import com.raquo.laminar.keys.{DerivedStyleProp, StyleProp}
+import com.raquo.laminar.modifiers.SimpleKeySetter
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -93,24 +95,30 @@ class SyntaxSpec extends UnitSpec {
 
   it("CSS types and values") {
     // CSS keywords
-
     val s1: StyleSetter[_] = display.none
     val s11: StyleSetter[String] = display.none
     val v1: String = display.none.value
-    assert(display.none.value == "none")
-    // assert(display.none.cssValue == "none")
+    assert(display.none.value == "none") // #Note[Scala2] this prints warning, same as #Note below
+    assert(display.none.cssValue == "none")
 
     // Base CSS keywords
     val s2: StyleSetter[_] = padding.inherit
     val v2: String = padding.inherit.value
-    assert(display.inherit.value == "inherit")
+    assert(display.inherit.value == "inherit") // #Note[Scala2] this prints warning, same as #Note below
+    assert(display.inherit.cssValue == "inherit")
+
+    // Unitless props
+    assert((padding := "12px").value == "12px") // #Note[Scala2] this prints warning in because .value is String | String and Scala is not picking up the implicit conversion for equality comparison
+    // assert(mergeUnion((padding := "12px").value) == "12px") // #Note[Scala2] no warning because conversion triggered explicitly // #Warning: Does not work in Scala 3
+    // assert((padding := "12px").value.merge[String] == "12px") // #Note[Scala2] .merge is Scala2-only Scala.js union op
+    assert((padding := "12px").cssValue == "12px")
 
     // Derived CSS props (units)
 
     val p1: StyleProp[String] = padding
-    val p2: DerivedStyleProp[Int] = padding.px
-    assert((padding.px := 12).value == 12) // #nc does this warn in Scala 3 too, where the union type is proper?
-    assert((padding.px := 12).cssValue == "12px") // #nc does this warn in Scala 3 too, where the union type is proper?
+    val p2: DerivedStyleProp[Int | Double] = padding.px // #Note this used to assert DerivedStyleProp[Int] But I don't think that conversion is safe.
+    assert((padding.px := 12).value == 12) // #Note[Scala2] Same warning as above but for Int | Double vs Int
+    assert((padding.px := 12).cssValue == "12px")
 
     maxHeight.calc := "12px + 20em" // Length inherits Calc
 
@@ -124,22 +132,23 @@ class SyntaxSpec extends UnitSpec {
 
     val p3: StyleProp[String] = color
     val s3: StyleSetter[_] = color.rgb(200, 100, 0)
-    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
+    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)") // #Note[Scala2] this prints warning, same as above
+    assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
 
     assert(style.rgb(200, 100, 0) == "rgb(200, 100, 0)")
 
     // Non-String CSS props
 
-    val x: String = zIndex.auto.value
+    val x0: Int | String = zIndex.auto.value // #Note – this used to be String, but I can't seem to make it safe
     val x1: Int | String = (zIndex := 1).value
-    // val x2: String = (zIndex := 1).cssValue
+    val x2: String = (zIndex := 1).cssValue
 
     div(
       zIndex := 1,
       zIndex := "auto",
       zIndex.auto,
-      zIndex.auto.value,
-      // zIndex.auto.cssValue,
+      // zIndex.auto.value, // #nc[Test] – fix this API – convert Modifiers from unions.
+      zIndex.auto.cssValue,
       zIndex <-- Val(1),
       zIndex <-- Val("auto"),
       zIndex <-- Val("auto": Int | String),

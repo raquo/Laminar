@@ -19,7 +19,7 @@ class CompositeSvgAttr(
   override private[laminar] def getRawDomValue(
     element: ReactiveSvgElement.Base
   ): String | Unit = {
-    DomApi.getAttributeRaw(element.ref, localName, namespaceUri.orNull)
+    DomApi.getAttributeRaw(element.ref, localName, namespaceUri.orNull[String])
   }
 
   override private[laminar] def setRawDomValue(
@@ -30,7 +30,7 @@ class CompositeSvgAttr(
       element = element.ref,
       localName = localName,
       qualifiedName = name,
-      namespaceUri = namespaceUri.orNull,
+      namespaceUri = namespaceUri.orNull[String],
       domValue = value
     )
   }

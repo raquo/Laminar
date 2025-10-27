@@ -1,7 +1,6 @@
 package com.raquo.laminar.api
 
 import com.raquo.laminar.{inserters, keys, lifecycle, modifiers, nodes}
-import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.nodes.ReactiveElement
 import org.scalajs.dom
 
@@ -96,7 +95,7 @@ trait LaminarAliases {
 
   type HtmlAttr[V] = keys.HtmlAttr[V]
 
-  type HtmlProp[V, DomV] = keys.HtmlProp[V, DomV]
+  type HtmlProp[V] = keys.HtmlProp[V]
 
   type StyleProp[V] = keys.StyleProp[V]
 

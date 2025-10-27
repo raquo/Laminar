@@ -21,5 +21,5 @@ with units.Url[StyleEncoder] {
 object StyleUnitsApi {
 
   /** This marker trait is used for implicit conversions. For all intents and purposes it's just a function. */
-  trait StyleEncoder[A] extends Function1[A, String]
+  trait StyleEncoder[-A] extends Function1[A, String]
 }

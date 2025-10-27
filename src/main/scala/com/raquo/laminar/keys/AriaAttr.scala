@@ -11,7 +11,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 class AriaAttr[V](
   val suffix: String,
   override val codec: Codec[V, String]
-) extends SimpleAttr[V, ReactiveElement.Base] {
+) extends SimpleAttr[AriaAttr[V], V, ReactiveElement.Base] {
 
   override val name: String = "aria-" + suffix
 }

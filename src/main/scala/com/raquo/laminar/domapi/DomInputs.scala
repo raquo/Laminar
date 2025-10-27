@@ -14,7 +14,7 @@ trait DomInputs { this: DomTags =>
       case el if isCustomElement(el) =>
         el.asInstanceOf[js.Dynamic]
           .selectDynamic("checked")
-          .asInstanceOf[Any | Unit]
+          .asInstanceOf[js.UndefOr[Any]]
           .collect { case b: Boolean => b }
       case _ =>
         ()
