@@ -125,13 +125,13 @@ class StyleReceiverSpec extends UnitSpec {
     expectNode(div.of(backgroundImage is "", "Yo"))
 
     urlBus.emit(url1)
-    expectNode(div.of(backgroundImage is "url(/example.png)", "Yo"))
+    expectNode(div.of(backgroundImage is """url("/example.png")""", "Yo"))
 
     urlBus.emit(url2)
-    expectNode(div.of(backgroundImage is "url(https://example.com)", "Yo"))
+    expectNode(div.of(backgroundImage is """url("https://example.com")""", "Yo"))
 
     urlBus.emit(url3)
-    expectNode(div.of(backgroundImage is "url(foo.jpg)", "Yo"))
+    expectNode(div.of(backgroundImage is """url("foo.jpg")""", "Yo"))
   }
 
   describe("scala.js union type inference") {

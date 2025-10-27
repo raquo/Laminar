@@ -92,7 +92,7 @@ class StyleSpec extends UnitSpec {
     )
     expectNode(
       span.of(
-        backgroundImage is """url(example.jpg)"""
+        backgroundImage is """url("example.jpg")"""
       )
     )
     unmount()
