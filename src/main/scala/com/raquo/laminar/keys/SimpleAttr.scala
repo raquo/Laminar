@@ -16,6 +16,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 trait SimpleAttr[V, -El <: ReactiveElement.Base]
 extends SimpleKey[V, String, El] {
 
+  /** We override this here and not in subclasses in order to provide it to a universal SimpleAttrDomApi below */
   override type Self[VV] = SimpleAttr.Of[VV]
 
   val name: String

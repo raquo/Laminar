@@ -5,7 +5,6 @@ import com.raquo.laminar.api.Implicits.RichSource
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
 import com.raquo.laminar.inserters._
 import com.raquo.laminar.keys._
-import com.raquo.laminar.keys.CompositeKey.CompositeValueMappers
 import com.raquo.laminar.modifiers._
 import com.raquo.laminar.nodes._
 import org.scalajs.dom
@@ -15,7 +14,7 @@ import scala.scalajs.js.|
 trait Implicits
 extends Implicits.StyleImplicits
 with Implicits.LowPriorityImplicits
-with CompositeValueMappers {
+with CompositeValueMapper.Implicits {
 
   /** Add --> methods to Observables */
   @inline implicit def enrichSource[A](source: Source[A]): RichSource[A] = {

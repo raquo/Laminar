@@ -2,8 +2,7 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
-import com.raquo.laminar.keys.CompositeKey
-import com.raquo.laminar.keys.CompositeKey.CompositeValueMapper
+import com.raquo.laminar.keys.{CompositeKey, CompositeValueMapper}
 import com.raquo.laminar.nodes.ReactiveElement
 
 /**

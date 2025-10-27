@@ -27,11 +27,8 @@ import com.raquo.laminar.nodes.ReactiveElement
   */
 trait SimpleKey[V, DomV, -El <: ReactiveElement.Base] { self =>
 
-  // #nc naming
-  /** `this` must be an instance of Self[V] */
+  /** #Warning: subtypes MUST specify their own type (or supertype) in `Self`. It's used for `val domApi`. */
   type Self[VV] <: SimpleKey[VV, DomV, El]
-
-  // type Self = SelfKind[V]
 
   val name: String
 
@@ -39,7 +36,7 @@ trait SimpleKey[V, DomV, -El <: ReactiveElement.Base] { self =>
 
   def :=(value: V): SimpleKeySetter[V, DomV, El] = {
     val _value = value
-    val _self = self.asInstanceOf[Self[V]] // #nc asinstanceof - safe?
+    val _self = self.asInstanceOf[Self[V]] // #Safe if warning above is heeded
     new SimpleKeySetter[V, DomV, El] {
       override val key: Self[V] = _self
       override val value: V = _value

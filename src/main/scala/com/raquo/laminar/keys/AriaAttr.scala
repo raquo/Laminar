@@ -9,7 +9,7 @@ import com.raquo.laminar.nodes.ReactiveElement
  * @tparam V type of values that this Attribute can be set to
  */
 class AriaAttr[V](
-  suffix: String,
+  val suffix: String,
   override val codec: Codec[V, String]
 ) extends SimpleAttr[V, ReactiveElement.Base] {
 
