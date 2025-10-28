@@ -27,7 +27,12 @@ trait HtmlProps {
     attrName: Option[String] = None,
     codec: Codec[V, DomV]
   ): HtmlProp[V] = {
-    new HtmlProp(name, attrName, codec)
+    val _codec = codec
+    type _DomV = DomV
+    new HtmlProp[V](name, attrName) {
+      type DomV = _DomV
+      override val codec: Codec[V, DomV] = _codec
+    }
   }
 
 

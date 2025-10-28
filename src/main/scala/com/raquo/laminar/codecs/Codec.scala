@@ -21,8 +21,6 @@ trait Codec[ScalaType, DomType] {
    */
   def decode(domValue: DomType): ScalaType
 
-  def decodeAny(domValue: Any): ScalaType = decode(domValue.asInstanceOf[DomType]) // #nc unsafe
-
   /** Convert desired attribute value to appropriate DOM type. The resulting value should
    * be passed to `dom.Node.setAttribute` call, EXCEPT when resulting value is a `null`.
    * In that case you should call `dom.Node.removeAttribute` instead.

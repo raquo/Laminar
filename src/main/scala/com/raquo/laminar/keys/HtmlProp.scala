@@ -14,11 +14,15 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement.Base
   *
   * @tparam V type of values that this Property can be set to
   */
-class HtmlProp[V](
+abstract class HtmlProp[V](
   override val name: String,
-  val reflectedAttrName: Option[String],
-  val codec: Codec[V, _]
+  val reflectedAttrName: Option[String]
 ) extends SimpleKey[HtmlProp[V], V, ReactiveHtmlElement.Base] {
+
+  /** This prop's type in the native JS DOM */
+  type DomV
+
+  val codec: Codec[V, DomV]
 
   override def :=(value: V): SimpleKeySetter[HtmlProp[V], V, ReactiveHtmlElement.Base] =
     SimpleKeySetter(this, value)(DomApi.setHtmlProperty)

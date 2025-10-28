@@ -92,8 +92,8 @@ with EventSimulator {
     new TestableHtmlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
-  override implicit def makePropTestable[V](prop: HtmlProp[V]): TestableProp[V] = {
-    new TestableProp[V](prop.name, prop.codec.decodeAny) // #nc unsafe...
+  override implicit def makePropTestable[V, _DomV](prop: HtmlProp[V] { type DomV = _DomV }): TestableProp[V, _DomV] = {
+    new TestableProp[V, _DomV](prop.name, prop.codec.decode)
   }
 
   override implicit def makeStyleTestable[V](style: StyleProp[V]): TestableStyleProp[V] = {
