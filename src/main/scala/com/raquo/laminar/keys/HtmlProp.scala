@@ -27,9 +27,9 @@ class HtmlProp[V](
     val update = if (name == "value") {
       (element: ReactiveHtmlElement.Base, nextValue: V) =>
         // Deduplicating updates against current DOM value prevents cursor position reset in Safari https://github.com/raquo/Laminar/issues/110
-        val nextDomValue = codec.encode(nextValue)
-        if (!DomApi.getHtmlPropertyRaw(element.ref, name).contains(nextDomValue)) {
-          DomApi.setHtmlPropertyRaw(element.ref, name, nextDomValue)
+        // #nc[Test] Verify that I didn't break this in Safari (I switched to non-raw DOM API). Also verify that Safari still needs this.
+        if (!DomApi.getHtmlProperty(element, this).contains(nextValue)) {
+          DomApi.setHtmlProperty(element, this, nextValue)
         }
     } else {
       (element: ReactiveHtmlElement.Base, nextValue: V) =>

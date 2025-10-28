@@ -11,4 +11,5 @@ with DomDebug {
 
   object raw
   extends DomTreeRaw
+  with DomKeysRaw
 }

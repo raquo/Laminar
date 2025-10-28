@@ -12,8 +12,9 @@ import com.raquo.laminar.nodes.ReactiveElement
   *  - [[AriaAttr]]
   *
   * See also attrs that are NOT simple:
-  *  - [[CompositeHtmlAttr]]
-  *  - [[CompositeSvgAttr]]
+  *  - [[CompositeAttr]]
+  *    - [[CompositeHtmlAttr]]
+  *    - [[CompositeSvgAttr]]
   */
 trait SimpleAttr[+Self <: SimpleAttr[Self, V, El], V, -El <: ReactiveElement.Base]
 extends SimpleKey[Self, V, El] { self: Self =>

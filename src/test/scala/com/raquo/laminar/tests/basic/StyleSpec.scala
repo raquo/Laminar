@@ -166,7 +166,7 @@ class StyleSpec extends UnitSpec {
 
 
     // val fakeStyle = background.asInstanceOf[StyleProp[Double | String] with units.Color[StyleSetter[Double | String], DerivedStyleProp]]
-    flexGrow2.rgb(1, 2, 3).key
+    // flexGrow2.rgb(1, 2, 3).key
 
     // styleProp()
   }

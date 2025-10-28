@@ -7,7 +7,7 @@ import scala.scalajs.js.|
 
 trait DomTree {
 
-  val raw: DomTreeRaw
+  protected val raw: DomTreeRaw
 
   // @Note End users, you should achieve your DOM manipulation goals using the many <-- and --> methods that Laminar offers.
   //  Those arrow methods are in fact very flexible. Only use the methods below when really needed, and even then, very carefully.

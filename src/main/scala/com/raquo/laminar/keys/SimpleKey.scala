@@ -22,8 +22,8 @@ import com.raquo.laminar.nodes.ReactiveElement
   *     - [[StyleProp]]
   *     - [[DerivedStyleProp]]
   *  - [[CompositeKey]]
-  *     - [[CompositeHtmlAttr]]
-  *     - [[CompositeSvgAttr]]
+  *     - [[CompositeAttr]]
+  *       - [[CompositeHtmlAttr]], [[CompositeSvgAttr]]
   */
 trait SimpleKey[ //
   +Self <: SimpleKey[Self, V, El],
