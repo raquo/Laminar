@@ -2,13 +2,11 @@ package com.raquo.laminar.tests
 
 import com.raquo.airstream.custom.{CustomSource, CustomStreamSource}
 import com.raquo.laminar
-import com.raquo.laminar.PlatformSpecific.StringOr
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.keys.{DerivedStyleProp, StyleProp}
-import com.raquo.laminar.modifiers.SimpleKeySetter
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 

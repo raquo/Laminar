@@ -1,6 +1,5 @@
 package com.raquo.laminar.modifiers
 
-import com.raquo.laminar.PlatformSpecific.StringOr
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.keys.{AriaAttr, DerivedStyleProp, HtmlAttr, HtmlProp, SimpleKey, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
