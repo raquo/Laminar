@@ -1,50 +1,68 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.api.unionOrNull
 import com.raquo.laminar.defs.styles.traits.GlobalKeywords
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.modifiers.SimpleKeyUpdater
 import com.raquo.laminar.nodes.ReactiveHtmlElement
-import com.raquo.laminar.nodes.ReactiveHtmlElement.Base
-
-import scala.scalajs.js.|
 
 class StyleProp[V](
   override val name: String,
   val prefixes: Seq[String] = Nil
-)
-extends SimpleKey[StyleProp[V], V | String, ReactiveHtmlElement.Base]
+) extends SimpleKey[StyleProp[V], V, ReactiveHtmlElement.Base]
 with GlobalKeywords[V]
-with StyleBuilder[StyleSetter[V], DerivedStyleProp] {
+with StyleBuilder[V, StyleSetter[V, String]]
+with DerivedStyleBuilder[DerivedStyleProp] { self =>
 
-  override def :=(value: V | String): StyleSetter[V] = {
+  override def :=[ThisV <: V](value: ThisV): StyleSetter[V, ThisV] = {
     // More specific return type that offers with .cssValue: String
     // I think the concrete Type[V] also helps us avoid problems with existential types in Scala 3.
-    new StyleSetter(this, value)
+    new StyleSetter[V, ThisV](this, value)
   }
 
-  override def <--(values: Source[V | String]): SimpleKeyUpdater[StyleProp[V], V | String, Base] =
-    new SimpleKeyUpdater[StyleProp[V], V | String, ReactiveHtmlElement.Base](
+  // #Note This overload is needed for Scala 2 (but it's also active in Scala 3)
+  def :=[ThisV](value: ThisV)(implicit ev: ThisV => V): StyleSetter[V, V] =
+    this := ev(value)
+
+  override def apply[ThisV <: V](value: ThisV): StyleSetter[V, ThisV] =
+    this := value // Same impl. as super, just more specific return type
+
+  // #Note This overload is needed for Scala 2 (but it's also active in Scala 3)
+  def apply[ThisV](value: ThisV)(implicit ev: ThisV => V): StyleSetter[V, V] =
+    this := ev(value)
+
+  override def <--[ThisV](
+    values: Source[ThisV]
+  )(implicit
+    ev: ThisV => V
+  ): SimpleKeyUpdater[StyleProp[V], ThisV, ReactiveHtmlElement.Base] =
+    new SimpleKeyUpdater(
       key = this,
       values = values.toObservable,
       update = (el, value) => {
-        DomApi.setHtmlStyle(el, this, unionOrNull(value))
+        DomApi.setHtmlStyle(el, this, DomApi.cssValue(ev(value)))
       }
     )
 
-  override def apply(value: V | String): StyleSetter[V] =
-    this := value // Same impl. as super, just more specific return type
+  override lazy val maybe: DerivedStyleProp[Option[V]] = {
+    new DerivedStyleProp[Option[V]](
+      this, _.map(DomApi.cssValue).orNull.asInstanceOf[String] // #safe Because we expect nulls here
+    )
+  }
 
   /** Create a new key for this style with these prefixes */
   def withPrefixes(ps: (StyleVendorPrefixes.type => String)*): StyleProp[V] = {
     new StyleProp[V](name, ps.map(_(StyleVendorPrefixes)))
   }
 
-  override protected def styleSetter(value: String): StyleSetter[V] = {
-    this := value
-  }
+  // #nc test that I can :=, (), and <-- into StyleProp[_] or something equally generic...
+
+  // #nc if this has to be public, rename to `:=`?
+  // #nc scala 3 does not allow access
+   // #TODO[Scala3] bug – Scala does not allow me to use the parent method of this from trait Auto. Make a small reproduction. This method should be protected.
+  override def styleSetter(value: String): StyleSetter[V, String] =
+    new StyleSetter(this, value)
 
   override protected def derivedStyle[InputV](encode: InputV => String): DerivedStyleProp[InputV] = {
     new DerivedStyleProp[InputV](key = this, encode)

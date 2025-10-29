@@ -15,7 +15,7 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * specified. In SVG content, this value and the value visiblePainted have
     * the same effect.
     */
-  override lazy val auto: StyleSetter[String] = this := "auto"
+  override lazy val auto: StyleSetter[String, String] = this := "auto"
 
   /**
     * The element is never the target of mouse events; however, mouse events
@@ -24,7 +24,7 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * event listeners on this parent element as appropriate on their way to/from
     * the descendant during the event capture/bubble phases.
     */
-  override lazy val none: StyleSetter[String] = this := "none"
+  override lazy val none: StyleSetter[String, String] = this := "none"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
@@ -34,7 +34,7 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * (i.e., 'stroke') of the element and the stroke property is set to a value
     * other than none.
     */
-  lazy val visiblePainted: StyleSetter[String] = this := "visiblePainted"
+  lazy val visiblePainted: StyleSetter[String, String] = this := "visiblePainted"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
@@ -42,7 +42,7 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * the interior (i.e., fill) of the element. The value of the fill property
     * does not effect event processing.
     */
-  lazy val visibleFill: StyleSetter[String] = this := "visibleFill"
+  lazy val visibleFill: StyleSetter[String, String] = this := "visibleFill"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
@@ -50,7 +50,7 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * the perimeter (i.e., stroke) of the element. The value of the stroke
     * property does not effect event processing.
     */
-  lazy val visibleStroke: StyleSetter[String] = this := "visibleStroke"
+  lazy val visibleStroke: StyleSetter[String, String] = this := "visibleStroke"
 
   /**
     * SVG only. The element can be the target of a mouse event when the
@@ -58,7 +58,7 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * the interior (i.e., fill) or the perimeter (i.e., stroke) of the element.
     * The values of the fill and stroke do not effect event processing.
     */
-  lazy val visible: StyleSetter[String] = this := "visible"
+  lazy val visible: StyleSetter[String, String] = this := "visible"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
@@ -68,21 +68,21 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * property is set to a value other than none. The value of the visibility
     * property does not effect event processing.
     */
-  lazy val painted: StyleSetter[String] = this := "painted"
+  lazy val painted: StyleSetter[String, String] = this := "painted"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
     * pointer is over the interior (i.e., fill) of the element. The values of
     * the fill and visibility properties do not effect event processing.
     */
-  lazy val fill: StyleSetter[String] = this := "fill"
+  lazy val fill: StyleSetter[String, String] = this := "fill"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
     * pointer is over the perimeter (i.e., stroke) of the element. The values
     * of the stroke and visibility properties do not effect event processing.
     */
-  lazy val stroke: StyleSetter[String] = this := "stroke"
+  lazy val stroke: StyleSetter[String, String] = this := "stroke"
 
   /**
     * SVG only. The element can only be the target of a mouse event when the
@@ -90,6 +90,6 @@ trait PointerEvents extends None[String] with Auto[String] { this: StyleProp[Str
     * of the element. The values of the fill, stroke and visibility properties
     * do not effect event processing.
     */
-  lazy val all: StyleSetter[String] = this := "all"
+  lazy val all: StyleSetter[String, String] = this := "all"
 
 }

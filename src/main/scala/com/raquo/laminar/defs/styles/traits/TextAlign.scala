@@ -11,24 +11,24 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait TextAlign { this: StyleProp[String] =>
 
   /** `left` if direction is left-to-right and `right` otherwise. */
-  lazy val start: StyleSetter[String] = this := "start"
+  lazy val start: StyleSetter[String, String] = this := "start"
 
   /** `right` if direction is left-to-right and `left` otherwise. */
-  lazy val end: StyleSetter[String] = this := "end"
+  lazy val end: StyleSetter[String, String] = this := "end"
 
   /** The inline contents are aligned to the left edge of the line box. */
-  lazy val left: StyleSetter[String] = this := "left"
+  lazy val left: StyleSetter[String, String] = this := "left"
 
   /** The inline contents are aligned to the right edge of the line box. */
-  lazy val right: StyleSetter[String] = this := "right"
+  lazy val right: StyleSetter[String, String] = this := "right"
 
   /** The inline contents are centered within the line box. */
-  lazy val center: StyleSetter[String] = this := "center"
+  lazy val center: StyleSetter[String, String] = this := "center"
 
   /**
     * The text is justified. Text should line up their left and right edges to
     * the left and right content edges of the paragraph.
     */
-  lazy val justify: StyleSetter[String] = this := "justify"
+  lazy val justify: StyleSetter[String, String] = this := "justify"
 
 }

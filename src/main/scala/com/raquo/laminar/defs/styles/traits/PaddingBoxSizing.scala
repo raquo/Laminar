@@ -10,6 +10,6 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 trait PaddingBoxSizing extends BoxSizing { this: StyleProp[String] =>
 
-  lazy val paddingBox: StyleSetter[String] = this := "padding-box"
+  lazy val paddingBox: StyleSetter[String, String] = this := "padding-box"
 
 }

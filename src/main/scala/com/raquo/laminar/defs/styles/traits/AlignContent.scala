@@ -10,10 +10,10 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 trait AlignContent extends FlexPosition { this: StyleProp[String] =>
 
-  lazy val spaceBetween: StyleSetter[String] = this := "space-between"
+  lazy val spaceBetween: StyleSetter[String, String] = this := "space-between"
 
-  lazy val spaceAround: StyleSetter[String] = this := "space-around"
+  lazy val spaceAround: StyleSetter[String, String] = this := "space-around"
 
-  lazy val spaceEvenly: StyleSetter[String] = this := "space-evenly"
+  lazy val spaceEvenly: StyleSetter[String, String] = this := "space-evenly"
 
 }

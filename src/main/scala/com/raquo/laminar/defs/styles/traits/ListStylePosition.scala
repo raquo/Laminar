@@ -11,12 +11,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait ListStylePosition { this: StyleProp[String] =>
 
   /** The marker box is outside the principal block box. */
-  lazy val outside: StyleSetter[String] = this := "outside"
+  lazy val outside: StyleSetter[String, String] = this := "outside"
 
   /**
     * The marker box is the first inline box in the principal block box, after
     * which the element's content flows.
     */
-  lazy val inside: StyleSetter[String] = this := "inside"
+  lazy val inside: StyleSetter[String, String] = this := "inside"
 
 }

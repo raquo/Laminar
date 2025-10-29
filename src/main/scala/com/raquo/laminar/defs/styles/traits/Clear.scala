@@ -11,12 +11,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait Clear extends None[String] { this: StyleProp[String] =>
 
   /** The element is moved down to clear past left floats. */
-  lazy val left: StyleSetter[String] = this := "left"
+  lazy val left: StyleSetter[String, String] = this := "left"
 
   /** The element is moved down to clear past right floats. */
-  lazy val right: StyleSetter[String] = this := "right"
+  lazy val right: StyleSetter[String, String] = this := "right"
 
   /** The element is moved down to clear past both left and right floats. */
-  lazy val both: StyleSetter[String] = this := "both"
+  lazy val both: StyleSetter[String, String] = this := "both"
 
 }

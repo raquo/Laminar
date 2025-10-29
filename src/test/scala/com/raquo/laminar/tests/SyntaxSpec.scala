@@ -93,20 +93,20 @@ class SyntaxSpec extends UnitSpec {
 
   it("CSS types and values") {
     // CSS keywords
-    val s1: StyleSetter[_] = display.none
-    val s11: StyleSetter[String] = display.none
+    val s1: StyleSetter[_, _] = display.none
+    val s11: StyleSetter[String, String] = display.none
     val v1: String = display.none.value
-    assert(display.none.value == "none") // #Note[Scala2] this prints warning, same as #Note below
+    assert(display.none.value == "none")
     assert(display.none.cssValue == "none")
 
     // Base CSS keywords
-    val s2: StyleSetter[_] = padding.inherit
+    val s2: StyleSetter[_, _] = padding.inherit
     val v2: String = padding.inherit.value
-    assert(display.inherit.value == "inherit") // #Note[Scala2] this prints warning, same as #Note below
+    assert(display.inherit.value == "inherit")
     assert(display.inherit.cssValue == "inherit")
 
     // Unitless props
-    assert((padding := "12px").value == "12px") // #Note[Scala2] this prints warning in because .value is String | String and Scala is not picking up the implicit conversion for equality comparison
+    assert((padding := "12px").value == "12px")
     // assert(mergeUnion((padding := "12px").value) == "12px") // #Note[Scala2] no warning because conversion triggered explicitly // #Warning: Does not work in Scala 3
     // assert((padding := "12px").value.merge[String] == "12px") // #Note[Scala2] .merge is Scala2-only Scala.js union op
     assert((padding := "12px").cssValue == "12px")
@@ -115,7 +115,7 @@ class SyntaxSpec extends UnitSpec {
 
     val p1: StyleProp[String] = padding
     val p2: DerivedStyleProp[Int | Double] = padding.px // #Note this used to assert DerivedStyleProp[Int] But I don't think that conversion is safe.
-    assert((padding.px := 12).value == 12) // #Note[Scala2] Same warning as above but for Int | Double vs Int
+    assert((padding.px := 12).value == 12)// #Note[Scala2] this prints warning in because .value is Int | Double and Scala is not picking up the implicit conversion for equality comparison
     assert((padding.px := 12).cssValue == "12px")
 
     maxHeight.calc := "12px + 20em" // Length inherits Calc
@@ -129,7 +129,7 @@ class SyntaxSpec extends UnitSpec {
     // Multi-parameter derived CSS props (units)
 
     val p3: StyleProp[String] = color
-    val s3: StyleSetter[_] = color.rgb(200, 100, 0)
+    val s3: StyleSetter[_, _] = color.rgb(200, 100, 0)
     assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)") // #Note[Scala2] this prints warning, same as above
     assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
 

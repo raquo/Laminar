@@ -14,21 +14,21 @@ trait WordBreak extends Normal[String] { this: StyleProp[String] =>
     * To prevent overflow, word breaks should be inserted between any two
     * characters (excluding Chinese/Japanese/Korean text).
     */
-  lazy val breakAll: StyleSetter[String] = this := "break-all"
+  lazy val breakAll: StyleSetter[String, String] = this := "break-all"
 
   /**
     * Word breaks should not be used for Chinese/Japanese/Korean (CJK) text.
     * Non-CJK text behavior is the same as for normal.
     */
-  lazy val keepAll: StyleSetter[String] = this := "keep-all"
+  lazy val keepAll: StyleSetter[String, String] = this := "keep-all"
 
   /**
     * To prevent overflow, normally unbreakable words may be broken at
     * arbitrary points if there are no otherwise acceptable break points
     * in the line.
-    * 
+    *
     * Note: IE does not support this value
     */
-  lazy val breakWord: StyleSetter[String] = this := "break-word"
+  lazy val breakWord: StyleSetter[String, String] = this := "break-word"
 
 }

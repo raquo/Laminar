@@ -5,7 +5,7 @@ import com.raquo.laminar.keys.StyleBuilder
 // #TODO[API] Is it possible to remove the DSP type param from this trait?
 //  - Probably should split the DSB trait into two? So far we never needed both in the same file.
 
-trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
+trait Color[SSS] { this: StyleBuilder[String, SSS] =>
 
   /** @param red   0..255
     * @param green 0..255
@@ -13,7 +13,7 @@ trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
     *
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
     */
-  def rgb(red: Int, green: Int, blue: Int): SS =
+  def rgb(red: Int, green: Int, blue: Int): SSS =
     styleSetter(s"rgb($red, $green, $blue)")
 
 
@@ -24,7 +24,7 @@ trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
     *
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgb
     */
-  def rgb(red: Int, green: Int, blue: Int, alpha: Double): SS = {
+  def rgb(red: Int, green: Int, blue: Int, alpha: Double): SSS = {
     val alphaStr = if (alpha < 0.999999999) s" / $alpha" else ""
     styleSetter(s"rgb($red $green $blue$alphaStr)")
   }
@@ -37,7 +37,7 @@ trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
     *
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/rgba
     */
-  def rgba(red: Int, green: Int, blue: Int, alpha: Double): SS =
+  def rgba(red: Int, green: Int, blue: Int, alpha: Double): SSS =
     styleSetter(s"rgba($red, $green, $blue, $alpha)")
 
 
@@ -47,7 +47,7 @@ trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
     *
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
     */
-  def hsl(hue: Double, saturation: Double, lightness: Double): SS =
+  def hsl(hue: Double, saturation: Double, lightness: Double): SSS =
     styleSetter(s"hsl($hue, $saturation%, $lightness%)")
 
 
@@ -58,7 +58,7 @@ trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
     *
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsl
     */
-  def hsl(hue: Double, saturation: Double, lightness: Double, alpha: Double): SS = {
+  def hsl(hue: Double, saturation: Double, lightness: Double, alpha: Double): SSS = {
     val alphaStr = if (alpha < 0.999999999) s" / $alpha" else ""
     styleSetter(s"hsl($hue $saturation% $lightness%$alphaStr)")
   }
@@ -71,7 +71,7 @@ trait Color[SS, DSP[_]] { this: StyleBuilder[SS, DSP] =>
     *
     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/hsla
     */
-  def hsla(hue: Double, saturation: Double, lightness: Double, alpha: Double): SS =
+  def hsla(hue: Double, saturation: Double, lightness: Double, alpha: Double): SSS =
     styleSetter(s"hsla($hue, $saturation%, $lightness%, $alpha)")
 
 }

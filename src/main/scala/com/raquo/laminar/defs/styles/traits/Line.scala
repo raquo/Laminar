@@ -17,17 +17,17 @@ trait Line { this: StyleProp[String] =>
     * defined by the specification and are implementation-specific. The radius
     * of the dots is half the calculated border-right-width.
     */
-  lazy val dotted: StyleSetter[String] = this := "dotted"
+  lazy val dotted: StyleSetter[String, String] = this := "dotted"
 
   /**
     * Displays a series of short square-ended dashes or line segments. The exact
     * size and Length of the segments are not defined by the specification and
     * are implementation-specific.
     */
-  lazy val dashed: StyleSetter[String] = this := "dashed"
+  lazy val dashed: StyleSetter[String, String] = this := "dashed"
 
   /** Displays a single, straight, solid line. */
-  lazy val solid: StyleSetter[String] = this := "solid"
+  lazy val solid: StyleSetter[String, String] = this := "solid"
 
 
 
@@ -35,18 +35,18 @@ trait Line { this: StyleProp[String] =>
     * Displays two straight lines that add up to the pixel amount defined as
     * border-width or border-right-width.
     */
-  lazy val double: StyleSetter[String] = this := "double"
+  lazy val double: StyleSetter[String, String] = this := "double"
 
 
 
   /** Displays a border leading to a carved effect. It is the opposite of ridge. */
-  lazy val groove: StyleSetter[String] = this := "groove"
+  lazy val groove: StyleSetter[String, String] = this := "groove"
 
   /**
     * Displays a border with a 3D effect, like if it is coming out of the page.
     * It is the opposite of groove.
     */
-  lazy val ridge: StyleSetter[String] = this := "ridge"
+  lazy val ridge: StyleSetter[String, String] = this := "ridge"
 
 
 
@@ -55,13 +55,13 @@ trait Line { this: StyleProp[String] =>
     * of outset. When applied to a table cell with border-collapse set to
     * collapsed, this value behaves like groove.
     */
-  lazy val inset: StyleSetter[String] = this := "inset"
+  lazy val inset: StyleSetter[String, String] = this := "inset"
 
   /**
     * Displays a border that makes the box appear in 3D, embossed. It is the
     * opposite of inset. When applied to a table cell with border-collapse set
     * to collapsed, this value behaves like ridge.
     */
-  lazy val outset: StyleSetter[String] = this := "outset"
+  lazy val outset: StyleSetter[String, String] = this := "outset"
 
 }

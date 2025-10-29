@@ -14,10 +14,10 @@ trait Overflow extends Auto[String] { this: StyleProp[String] =>
     * Default value. Content is not clipped, it may be rendered outside the
     * content box.
     */
-  lazy val visible: StyleSetter[String] = this := "visible"
+  lazy val visible: StyleSetter[String, String] = this := "visible"
 
   /** The content is clipped and no scrollbars are provided. */
-  lazy val hidden: StyleSetter[String] = this := "hidden"
+  lazy val hidden: StyleSetter[String, String] = this := "hidden"
 
   /**
     * The content is clipped and desktop browsers use scrollbars, whether or
@@ -25,6 +25,6 @@ trait Overflow extends Auto[String] { this: StyleProp[String] =>
     * appearing and disappearing in a dynamic environment. Printers may print
     * overflowing content.
     */
-  lazy val scroll: StyleSetter[String] = this := "scroll"
+  lazy val scroll: StyleSetter[String, String] = this := "scroll"
 
 }

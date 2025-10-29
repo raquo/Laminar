@@ -13,12 +13,12 @@ import com.raquo.laminar.keys.DerivedStyleProp
 trait LineWidth extends u.Length[DerivedStyleProp] { this: StyleProp[String] =>
 
   /** Typically 1px in desktop browsers like Firefox. */
-  lazy val thin: StyleSetter[String] = this := "thin"
+  lazy val thin: StyleSetter[String, String] = this := "thin"
 
   /** Typically 3px in desktop browsers like Firefox. */
-  lazy val medium: StyleSetter[String] = this := "medium"
+  lazy val medium: StyleSetter[String, String] = this := "medium"
 
   /** Typically 5px in desktop browsers like Firefox. */
-  lazy val thick: StyleSetter[String] = this := "thick"
+  lazy val thick: StyleSetter[String, String] = this := "thick"
 
 }

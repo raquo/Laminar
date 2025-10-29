@@ -15,7 +15,7 @@ trait BackgroundAttachment { this: StyleProp[String] =>
     * a scrolling mechanism, the background doesn't move with the element.
     * (This is not compatible with background-clip: text.)
     */
-  lazy val fixed: StyleSetter[String] = this := "fixed"
+  lazy val fixed: StyleSetter[String, String] = this := "fixed"
 
   /**
     * The background is fixed relative to the element's contents. If the element
@@ -24,12 +24,12 @@ trait BackgroundAttachment { this: StyleProp[String] =>
     * are relative to the scrollable area of the element rather than to the
     * border framing them.
     */
-  lazy val local: StyleSetter[String] = this := "local"
+  lazy val local: StyleSetter[String, String] = this := "local"
 
   /**
     * The background is fixed relative to the element itself and does not scroll
     * with its contents. (It is effectively attached to the element's border.)
     */
-  lazy val scroll: StyleSetter[String] = this := "scroll"
+  lazy val scroll: StyleSetter[String, String] = this := "scroll"
 
 }

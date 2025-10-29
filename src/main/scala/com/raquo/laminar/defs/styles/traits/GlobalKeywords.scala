@@ -14,20 +14,20 @@ trait GlobalKeywords[V] { this: StyleProp[V] =>
     * The initial CSS keyword applies the initial (or default) value of a
     * property to an element.
     */
-  lazy val initial: StyleSetter[V] = this := "initial"
+  lazy val initial: StyleSetter[V, String] = styleSetter("initial")
 
   /**
     * The inherit CSS keyword causes the element for which it is specified to
     * take the computed value of the property from its parent element.
     */
-  lazy val inherit: StyleSetter[V] = this := "inherit"
+  lazy val inherit: StyleSetter[V, String] = styleSetter("inherit")
 
   /**
     * The revert CSS keyword reverts the cascaded value of the property from its
     * current value to the value the property would have had if no changes had
     * been made by the current style origin to the current element.
     */
-  lazy val revert: StyleSetter[V] = this := "revert"
+  lazy val revert: StyleSetter[V, String] = styleSetter("revert")
 
   /**
     * The unset CSS keyword resets a property to its inherited value if the
@@ -36,6 +36,6 @@ trait GlobalKeywords[V] { this: StyleProp[V] =>
     * when the property is an inherited property, and like the initial keyword in
     * the second case, when the property is a non-inherited property.
     */
-  lazy val unset: StyleSetter[V] = this := "unset"
+  lazy val unset: StyleSetter[V, String] = styleSetter("unset")
 
 }

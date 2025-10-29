@@ -10,6 +10,6 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 trait Auto[V] { this: StyleProp[V] =>
 
-  lazy val auto: StyleSetter[V] = this := "auto"
+  lazy val auto: StyleSetter[V, String] = styleSetter("auto")
 
 }

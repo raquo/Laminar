@@ -10,6 +10,6 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 trait None[V] { this: StyleProp[V] =>
 
-  lazy val none: StyleSetter[V] = this := "none"
+  lazy val none: StyleSetter[V, String] = styleSetter("none")
 
 }

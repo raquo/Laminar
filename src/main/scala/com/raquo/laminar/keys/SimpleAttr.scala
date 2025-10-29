@@ -30,16 +30,18 @@ extends SimpleKey[Self, V, El] { self: Self =>
 
   val namespaceUri: Option[String] = None
 
-  override def :=(value: V): SimpleKeySetter[Self, V, El] =
-    SimpleKeySetter[Self, V, El](this, value)(DomApi.setAttribute)
+  override def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] =
+    SimpleKeySetter[Self, ThisV, El](this, value)(DomApi.setAttribute)
 
-  override def <--(values: Source[V]): SimpleKeyUpdater[Self, V, El] =
-    new SimpleKeyUpdater[Self, V, El](
+  override def <--[ThisV](
+    values: Source[ThisV]
+  )(implicit
+    ev: ThisV => V
+  ): SimpleKeyUpdater[Self, ThisV, El] =
+    new SimpleKeyUpdater(
       key = self,
       values = values.toObservable,
-      update = (el, value) => {
-        DomApi.setAttribute(el, self, value)
-      }
+      update = (el, value) => DomApi.setAttribute(el, self, ev(value))
     )
 }
 

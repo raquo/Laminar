@@ -1,10 +1,10 @@
 package com.raquo.laminar.defs.styles.units
 
-import com.raquo.laminar.keys.StyleBuilder
+import com.raquo.laminar.keys.DerivedStyleBuilder
 
 import scala.scalajs.js.|
 
-trait Length[DSP[_]] extends Calc[DSP] { this: StyleBuilder[_, DSP] =>
+trait Length[DSP[_]] extends Calc[DSP] { this: DerivedStyleBuilder[DSP] =>
 
   // -- Most common units --
 

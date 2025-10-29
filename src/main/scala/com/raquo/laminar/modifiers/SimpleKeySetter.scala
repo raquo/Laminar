@@ -16,7 +16,7 @@ import scala.scalajs.js.|
   * does not extend [[SimpleKeySetter]]. // #TODO the naming of these traits is confusing...
   */
 class SimpleKeySetter[ //
-  +K <: SimpleKey[K, V, El],
+  +K <: SimpleKey[K, _, El],
   V,
   -El <: ReactiveElement.Base
 ](
@@ -39,9 +39,9 @@ object SimpleKeySetter {
 
   type OfAriaAttr[V] = SimpleKeySetter[AriaAttr[V], V, ReactiveElement.Base]
 
-  type OfStyleProp[V] = StyleSetter[V]
+  type OfStyleProp[V] = StyleSetter[V, _]
 
-  type OfDerivedStyleProp[V] = DerivedStyleSetter[V]
+  type OfDerivedStyleProp[V] = DerivedStyleSetter[V, _]
 
   def apply[K <: SimpleKey[K, V, El], V, El <: ReactiveElement.Base](
     key: K,
@@ -57,13 +57,28 @@ object SimpleKeySetter {
     ) {}
   }
 
-  class StyleSetter[V](
+  // #Note – constructor is private, because we expect ThisV <: V,
+  //  however this is exceptionally hard to properly encode in types
+  //  in Scala 2, because our `V`-s are union types like Int | String,
+  //  and in Scala 2 those unions are not real, they are implemented
+  //  in userland by Scala.js, and their subtyping is faked via
+  //  implicit conversions, which do not work on type relationships,
+  //  they only work on values, i.e. they don't help us fix compiler
+  //  errors caused by passing bad types in type params.
+  // #Note – this bit of unsafety allows us to create StyleSetter-s
+  //  with a specific type of their value...
+  // #nc ^^^ Why do we actually need that? We got rid of String | String,
+  //  so what do we stand to gain? Double-check, because ThisV being separate
+  //  is causing us to use weird types and overloads, which is more problematic
+  // #nc BUT before then, implement comprehensive syntax tests for styles,
+  //  focusing on issues with unions.
+  class StyleSetter[V, ThisV] private[laminar] (
     override val key: StyleProp[V],
-    override val value: V | String
-  ) extends SimpleKeySetter[StyleProp[V], V | String, ReactiveHtmlElement.Base](
+    override val value: ThisV
+  ) extends SimpleKeySetter[StyleProp[V], ThisV, ReactiveHtmlElement.Base](
     key,
     value,
-    el => DomApi.setHtmlStyle(el, key, value.asInstanceOf[V | String | Null]), // #Safe
+    el => DomApi.setHtmlStyle(el, key, DomApi.cssValue(value)),
     el => DomApi.setHtmlStyle(el, key, null)
   ) {
 
@@ -72,14 +87,15 @@ object SimpleKeySetter {
     }
   }
 
-  class DerivedStyleSetter[V](
+  // #nc does this really need ThisV type param? – see above too
+  class DerivedStyleSetter[V, ThisV <: V](
     override val key: DerivedStyleProp[V],
-    override val value: V
-  ) extends SimpleKeySetter[DerivedStyleProp[V], V, ReactiveHtmlElement.Base](
+    override val value: ThisV
+  ) extends SimpleKeySetter[DerivedStyleProp[V], ThisV, ReactiveHtmlElement.Base](
     key,
     value,
     el => DomApi.setHtmlDerivedStyle(el, key, value),
-    el => DomApi.setHtmlDerivedStyle(el, key, null.asInstanceOf[V])
+    el => DomApi.setHtmlDerivedStyle(el, key, null.asInstanceOf[ThisV])
   ) {
 
     lazy val cssValue: String = key.encode(value)

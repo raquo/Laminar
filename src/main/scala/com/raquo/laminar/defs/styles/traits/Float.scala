@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait Float extends None[String] { this: StyleProp[String] =>
 
   /** Element must float on the left side of its containing block. */
-  lazy val left: StyleSetter[String] = this := "left"
+  lazy val left: StyleSetter[String, String] = this := "left"
 
   /** Element must float on the right side of its containing block. */
-  lazy val right: StyleSetter[String] = this := "right"
+  lazy val right: StyleSetter[String, String] = this := "right"
 
 }

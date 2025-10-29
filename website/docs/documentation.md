@@ -1956,7 +1956,7 @@ div(
 )
 ```
 
-If you want less boilerplate for this use case, define a trivial implicit conversion from `StyleSetter[String]` to `String`, and you won't need to call `.value` manually. This is a bit too magicky to be included in Laminar core though.
+If you want less boilerplate for this use case, define a trivial implicit conversion from `StyleSetter[String, String]` to `String`, and you won't need to call `.value` manually. This is a bit too magicky to be included in Laminar core though.
 
 
 ### Unit and Function Helpers

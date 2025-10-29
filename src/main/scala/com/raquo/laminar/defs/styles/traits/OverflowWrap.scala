@@ -11,7 +11,7 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait OverflowWrap extends Normal[String] { this: StyleProp[String] =>
 
   /** Indicates that lines may only break at normal word break points. */
-  override lazy val normal: StyleSetter[String] = this := "normal"
+  override lazy val normal: StyleSetter[String, String] = this := "normal"
 
   /**
     * Indicates that normally unbreakable words may be broken at any points
@@ -20,12 +20,12 @@ trait OverflowWrap extends Normal[String] { this: StyleProp[String] =>
     * opportunities introduced by the word break are considered when calculating
     * min-content intrinsic sizes.
     */
-  lazy val anywhere: StyleSetter[String] = this := "anywhere"
+  lazy val anywhere: StyleSetter[String, String] = this := "anywhere"
 
   /**
     * Indicates that normally unbreakable words may be broken at arbitrary
     * points if there are no otherwise acceptable break points in the line.
     */
-  lazy val breakWord: StyleSetter[String] = this := "break-word"
+  lazy val breakWord: StyleSetter[String, String] = this := "break-word"
 
 }

@@ -11,114 +11,114 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait Cursor extends Auto[String] with None[String] { this: StyleProp[String] =>
 
   /** Default cursor, typically an arrow. */
-  lazy val default: StyleSetter[String] = this := "default"
+  lazy val default: StyleSetter[String, String] = this := "default"
 
   /** A context menu is available under the cursor. */
-  lazy val contextMenu: StyleSetter[String] = this := "context-menu"
+  lazy val contextMenu: StyleSetter[String, String] = this := "context-menu"
 
   /** Indicating help is available. */
-  lazy val help: StyleSetter[String] = this := "help"
+  lazy val help: StyleSetter[String, String] = this := "help"
 
   /** E.g. used when hovering over links, typically a hand. */
-  lazy val pointer: StyleSetter[String] = this := "pointer"
+  lazy val pointer: StyleSetter[String, String] = this := "pointer"
 
   /**
     * The program is busy in the background but the user can still interact
     * with the interface (unlike for wait).
     */
-  lazy val progress: StyleSetter[String] = this := "progress"
+  lazy val progress: StyleSetter[String, String] = this := "progress"
 
   /** The program is busy (sometimes an hourglass or a watch). */
-  lazy val waitCss: StyleSetter[String] = this := "wait"
+  lazy val waitCss: StyleSetter[String, String] = this := "wait"
 
   /** Indicating that cells can be selected. */
-  lazy val cell: StyleSetter[String] = this := "cell"
+  lazy val cell: StyleSetter[String, String] = this := "cell"
 
   /** Cross cursor, often used to indicate selection in a bitmap. */
-  lazy val crosshair: StyleSetter[String] = this := "crosshair"
+  lazy val crosshair: StyleSetter[String, String] = this := "crosshair"
 
   /** Indicating text can be selected, typically an I-beam. */
-  lazy val text: StyleSetter[String] = this := "text"
+  lazy val text: StyleSetter[String, String] = this := "text"
 
   /** Indicating that vertical text can be selected, typically a sideways I-beam */
-  lazy val verticalText: StyleSetter[String] = this := "vertical-text"
+  lazy val verticalText: StyleSetter[String, String] = this := "vertical-text"
 
   /** Indicating an alias or shortcut is to be created. */
-  lazy val alias: StyleSetter[String] = this := "alias"
+  lazy val alias: StyleSetter[String, String] = this := "alias"
 
   /** Indicating that something can be copied */
-  lazy val copy: StyleSetter[String] = this := "copy"
+  lazy val copy: StyleSetter[String, String] = this := "copy"
 
   /** The hovered object may be moved. */
-  lazy val move: StyleSetter[String] = this := "move"
+  lazy val move: StyleSetter[String, String] = this := "move"
 
   /** Cursor showing that a drop is not allowed at the current location. */
-  lazy val noDrop: StyleSetter[String] = this := "no-drop"
+  lazy val noDrop: StyleSetter[String, String] = this := "no-drop"
 
   /** Cursor showing that something cannot be done. */
-  lazy val notAllowed: StyleSetter[String] = this := "not-allowed"
+  lazy val notAllowed: StyleSetter[String, String] = this := "not-allowed"
 
   /** Cursor showing that something can be scrolled in any direction (panned). */
-  lazy val allScroll: StyleSetter[String] = this := "all-scroll"
+  lazy val allScroll: StyleSetter[String, String] = this := "all-scroll"
 
   /**
     * The item/column can be resized horizontally. Often rendered as arrows
     * pointing left and right with a vertical separating.
     */
-  lazy val colResize: StyleSetter[String] = this := "col-resize"
+  lazy val colResize: StyleSetter[String, String] = this := "col-resize"
 
   /**
     * The item/row can be resized vertically. Often rendered as arrows pointing
     * up and down with a horizontal bar separating them.
     */
-  lazy val rowResize: StyleSetter[String] = this := "row-resize"
+  lazy val rowResize: StyleSetter[String, String] = this := "row-resize"
 
   /** The top edge is to be moved. */
-  lazy val nResize: StyleSetter[String] = this := "n-resize"
+  lazy val nResize: StyleSetter[String, String] = this := "n-resize"
 
   /** The right edge is to be moved. */
-  lazy val eResize: StyleSetter[String] = this := "e-resize"
+  lazy val eResize: StyleSetter[String, String] = this := "e-resize"
 
   /** The bottom edge is to be moved. */
-  lazy val sResize: StyleSetter[String] = this := "s-resize"
+  lazy val sResize: StyleSetter[String, String] = this := "s-resize"
 
   /** The left edge is to be moved. */
-  lazy val wResize: StyleSetter[String] = this := "w-resize"
+  lazy val wResize: StyleSetter[String, String] = this := "w-resize"
 
   /** The top-right corner is to be moved. */
-  lazy val neResize: StyleSetter[String] = this := "ne-resize"
+  lazy val neResize: StyleSetter[String, String] = this := "ne-resize"
 
   /** The top-left corner is to be moved. */
-  lazy val nwResize: StyleSetter[String] = this := "nw-resize"
+  lazy val nwResize: StyleSetter[String, String] = this := "nw-resize"
 
   /** The bottom-right corner is to be moved. */
-  lazy val seResize: StyleSetter[String] = this := "se-resize"
+  lazy val seResize: StyleSetter[String, String] = this := "se-resize"
 
   /** The bottom-left corner is to be moved. */
-  lazy val swResize: StyleSetter[String] = this := "sw-resize"
+  lazy val swResize: StyleSetter[String, String] = this := "sw-resize"
 
   /** The left and right edges are to be moved. */
-  lazy val ewResize: StyleSetter[String] = this := "ew-resize"
+  lazy val ewResize: StyleSetter[String, String] = this := "ew-resize"
 
   /** The top and bottom edges are to be moved. */
-  lazy val nsResize: StyleSetter[String] = this := "ns-resize"
+  lazy val nsResize: StyleSetter[String, String] = this := "ns-resize"
 
   /** The top right and bottom left corners are to be moved. */
-  lazy val neswResize: StyleSetter[String] = this := "nesw-resize"
+  lazy val neswResize: StyleSetter[String, String] = this := "nesw-resize"
 
   /** The top left and bottom right corners are to be moved. */
-  lazy val nwseResize: StyleSetter[String] = this := "nwse-resize"
+  lazy val nwseResize: StyleSetter[String, String] = this := "nwse-resize"
 
   /** Indicates that something can be zoomed (magnified) in. */
-  lazy val zoomIn: StyleSetter[String] = this := "zoom-in"
+  lazy val zoomIn: StyleSetter[String, String] = this := "zoom-in"
 
   /** Indicates that something can be zoomed (magnified) out. */
-  lazy val zoomOut: StyleSetter[String] = this := "zoom-out"
+  lazy val zoomOut: StyleSetter[String, String] = this := "zoom-out"
 
   /** Indicates that something can be grabbed (dragged to be moved). */
-  lazy val grab: StyleSetter[String] = this := "grab"
+  lazy val grab: StyleSetter[String, String] = this := "grab"
 
   /** Indicates that something can be grabbed (dragged to be moved). */
-  lazy val grabbing: StyleSetter[String] = this := "grabbing"
+  lazy val grabbing: StyleSetter[String, String] = this := "grabbing"
 
 }

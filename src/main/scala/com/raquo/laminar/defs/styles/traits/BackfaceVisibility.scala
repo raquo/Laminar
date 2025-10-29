@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait BackfaceVisibility { this: StyleProp[String] =>
 
   /** The back face is visible. */
-  lazy val visible: StyleSetter[String] = this := "visible"
+  lazy val visible: StyleSetter[String, String] = this := "visible"
 
   /** The back face is not visible. */
-  lazy val hidden: StyleSetter[String] = this := "hidden"
+  lazy val hidden: StyleSetter[String, String] = this := "hidden"
 
 }

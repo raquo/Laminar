@@ -14,9 +14,9 @@ trait FontStyle extends Normal[String] { this: StyleProp[String] =>
     * Selects a font that is labeled italic, if that is not available,
     * one labeled oblique
     */
-  lazy val italic: StyleSetter[String] = this := "italic"
+  lazy val italic: StyleSetter[String, String] = this := "italic"
 
   /** Selects a font that is labeled oblique */
-  lazy val oblique: StyleSetter[String] = this := "oblique"
+  lazy val oblique: StyleSetter[String, String] = this := "oblique"
 
 }

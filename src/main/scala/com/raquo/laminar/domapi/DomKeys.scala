@@ -17,15 +17,15 @@ trait DomKeys {
     domValue.map(attr.codec.decode)
   }
 
-  def setAttribute[V, El <: ReactiveElement.Base](
+  def setAttribute[ThisV <: V, V, El <: ReactiveElement.Base](
     element: El,
     attr: SimpleAttr[_, V, El],
-    value: V | Null
+    value: ThisV | Null
   ): Unit = {
     val domValue = if (value == null) {
       null
     } else {
-      attr.codec.encode(value.asInstanceOf[V]) // #Safe because null check above
+      attr.codec.encode(value.asInstanceOf[ThisV]) // #Safe because null check above
     }
     raw.setAttribute(
       element = element.ref,
@@ -43,15 +43,15 @@ trait DomKeys {
     raw.getHtmlProperty(element.ref, prop.name).map(prop.codec.decode)
   }
 
-  def setHtmlProperty[V, El <: ReactiveHtmlElement.Base](
+  def setHtmlProperty[ThisV <: V, V, El <: ReactiveHtmlElement.Base](
     element: El,
     prop: HtmlProp[V],
-    value: V | Null
+    value: ThisV | Null // #nc why do we need ThisV?
   ): Unit = {
     val domValue = if (value == null) {
       null
     } else {
-      prop.codec.encode(value.asInstanceOf[V]) // #Safe because null check above
+      prop.codec.encode(value.asInstanceOf[ThisV]) // #Safe because null check above
     }
     raw.setHtmlProperty(
       element = element.ref,
@@ -64,13 +64,13 @@ trait DomKeys {
   def setHtmlStyle[V](
     element: ReactiveHtmlElement.Base,
     prop: StyleProp[V],
-    value: V | String | Null
+    value: String | Null
   ): Unit = {
     raw.setHtmlStyle(
       element = element.ref,
       styleCssName = prop.name,
       prefixes = prop.prefixes,
-      styleValue = DomApi.cssValue(value)
+      styleValue = value
     )
   }
 

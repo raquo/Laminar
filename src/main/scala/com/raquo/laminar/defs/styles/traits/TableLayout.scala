@@ -15,13 +15,13 @@ trait TableLayout extends Auto[String] { this: StyleProp[String] =>
     * table layout. The width of the table and its cells depends on the content
     * thereof.
     */
-  override lazy val auto: StyleSetter[String] = this := "auto"
+  override lazy val auto: StyleSetter[String, String] = this := "auto"
 
   /**
     * Table and column widths are set by the widths of table and col elements
     * or by the width of the first row of cells. Cells in subsequent rows do
     * not affect column widths.
     */
-  lazy val fixed: StyleSetter[String] = this := "fixed"
+  lazy val fixed: StyleSetter[String, String] = this := "fixed"
 
 }

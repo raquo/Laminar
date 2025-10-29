@@ -14,7 +14,7 @@ trait TextUnderlinePosition extends Auto[String] { this: StyleProp[String] =>
     * This keyword allows the browser to use an algorithm to choose between
     * under and alphabetic.
     */
-  override lazy val auto: StyleSetter[String] = this := "auto"
+  override lazy val auto: StyleSetter[String, String] = this := "auto"
 
   /**
     * This keyword forces the line to be set below the alphabetic baseline, at
@@ -22,24 +22,24 @@ trait TextUnderlinePosition extends Auto[String] { this: StyleProp[String] =>
     * chemical or mathematical formulas, which make a large use of subscripts,
     * to be illegible.
     */
-  lazy val under: StyleSetter[String] = this := "under"
+  lazy val under: StyleSetter[String, String] = this := "under"
 
   /**
     * In vertical writing-modes, this keyword forces the line to be placed on
     * the left of the characters. In horizontal writing-modes, it is a synonym
     * of under.
     */
-  lazy val left: StyleSetter[String] = this := "left"
+  lazy val left: StyleSetter[String, String] = this := "left"
 
   /**
     * In vertical writing-modes, this keyword forces the line to be placed on
     * the right of the characters. In horizontal writing-modes, it is a synonym
     * of under.
     */
-  lazy val right: StyleSetter[String] = this := "right"
+  lazy val right: StyleSetter[String, String] = this := "right"
 
-  lazy val underLeft: StyleSetter[String] = this := "under left"
+  lazy val underLeft: StyleSetter[String, String] = this := "under left"
 
-  lazy val underRight: StyleSetter[String] = this := "under right"
+  lazy val underRight: StyleSetter[String, String] = this := "under right"
 
 }

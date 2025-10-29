@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.core.{Sink, Source}
-import com.raquo.laminar.api.Implicits.RichSource
+import com.raquo.laminar.api.Implicits.SourceArrowSyntax
 import com.raquo.laminar.inserters._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers._
@@ -13,9 +13,10 @@ extends ImplicitsPlatformSpecific
 with Implicits.LowPriorityImplicits
 with CompositeValueMapper.Implicits {
 
+  // #TODO[Airstream] should probably provide this itself?
   /** Add --> methods to Observables */
-  @inline implicit def enrichSource[A](source: Source[A]): RichSource[A] = {
-    new RichSource(source)
+  @inline implicit def arrowSyntax[A](source: Source[A]): SourceArrowSyntax[A] = {
+    new SourceArrowSyntax(source)
   }
 
   //
@@ -40,11 +41,6 @@ with CompositeValueMapper.Implicits {
   //
   // -- Methods to convert collections of Setter[El] to a single Setter[El] --
   //
-
-  /** Create a [[Setter]] that applies the optionally provided [[Setter]], or else does nothing. */
-  // implicit def optionToSetter[El <: ReactiveElement.Base](maybeSetter: Option[Setter[El]]): Setter[El] = {
-  //   Setter(element => maybeSetter.foreach(_.apply(element)))
-  // }
 
   /** Combine a js.Array of [[Setter]]-s into a single [[Setter]] that applies them all. */
   implicit def seqToSetter[Collection[_], El <: ReactiveElement.Base](
@@ -105,7 +101,7 @@ object Implicits {
 
   /** Some of these methods are redundant, but we need them for type inference to work. */
 
-  class RichSource[A](val source: Source[A]) extends AnyVal {
+  class SourceArrowSyntax[A](val source: Source[A]) extends AnyVal {
 
     def -->(sink: Sink[A]): Binder.Base = {
       Binder(ReactiveElement.bindSink(_, source.toObservable)(sink))

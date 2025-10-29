@@ -1,11 +1,9 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.api.L.seqToSetter
-import com.raquo.laminar.modifiers.{Setter, SimpleKeySetter, SimpleKeyUpdater}
+import com.raquo.laminar.modifiers.{SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
-// #nc TODO explain the type params
 /**
   * This class represents a Key typically found on the left hand side of the key-value pair `key := value`
   *
@@ -27,22 +25,20 @@ import com.raquo.laminar.nodes.ReactiveElement
   */
 trait SimpleKey[ //
   +Self <: SimpleKey[Self, V, El],
-  V,
+  -V,
   -El <: ReactiveElement.Base
 ] { self: Self =>
 
   val name: String
 
-  def :=(value: V): SimpleKeySetter[Self, V, El]
+  def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El]
 
-  @inline def apply(value: V): SimpleKeySetter[Self, V, El] = {
+  @inline def apply[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] = {
     this := value
   }
 
-  def maybe(value: Option[V]): Setter[El] = {
-    seqToSetter[Option, El](value.map(v => this := v))
-  }
+  def maybe: SimpleKey[_, Option[V], El]
 
-  def <--(values: Source[V]): SimpleKeyUpdater[Self, V, El]
+  def <--[ThisV](values: Source[ThisV])(implicit ev: ThisV => V): SimpleKeyUpdater[Self, ThisV, El]
 
 }

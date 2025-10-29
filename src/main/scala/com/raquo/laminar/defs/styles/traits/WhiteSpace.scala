@@ -15,30 +15,30 @@ trait WhiteSpace extends Normal[String] { this: StyleProp[String] =>
     * are handled as other whitespace. Breaks lines as necessary to fill line
     * boxes.
     */
-  override lazy val normal: StyleSetter[String] = this := "normal"
+  override lazy val normal: StyleSetter[String, String] = this := "normal"
 
   /**
     * Collapses whitespace as for normal, but suppresses line breaks (text
     * wrapping) within text.
     */
-  lazy val nowrap: StyleSetter[String] = this := "nowrap"
+  lazy val nowrap: StyleSetter[String, String] = this := "nowrap"
 
   /**
     * Sequences of whitespace are preserved, lines are only broken at newline
     * characters in the source and at br elements.
     */
-  lazy val pre: StyleSetter[String] = this := "pre"
+  lazy val pre: StyleSetter[String, String] = this := "pre"
 
   /**
     * Sequences of whitespace are preserved. Lines are broken at newline
     * characters, at br, and as necessary to fill line boxes.
     */
-  lazy val preWrap: StyleSetter[String] = this := "pre-wrap"
+  lazy val preWrap: StyleSetter[String, String] = this := "pre-wrap"
 
   /**
     * Sequences of whitespace are collapsed. Lines are broken at newline
     * characters, at br, and as necessary to fill line boxes.
     */
-  lazy val preLine: StyleSetter[String] = this := "pre-line"
+  lazy val preLine: StyleSetter[String, String] = this := "pre-line"
 
 }

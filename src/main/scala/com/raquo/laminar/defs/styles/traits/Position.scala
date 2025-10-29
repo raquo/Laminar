@@ -15,7 +15,7 @@ trait Position { this: StyleProp[String] =>
     * out in its current position in the flow.  The top, right, bottom, and left
     * properties do not apply.
     */
-  lazy val static: StyleSetter[String] = this := "static"
+  lazy val static: StyleSetter[String, String] = this := "static"
 
   /**
     * This keyword lays out all elements as though the element were not
@@ -25,7 +25,7 @@ trait Position { this: StyleProp[String] =>
     * table-*-group, table-row, table-column, table-cell, and table-caption
     * elements is undefined.
     */
-  lazy val relative: StyleSetter[String] = this := "relative"
+  lazy val relative: StyleSetter[String, String] = this := "relative"
 
   /**
     * Do not leave space for the element. Instead, position it at a specified
@@ -33,13 +33,13 @@ trait Position { this: StyleProp[String] =>
     * block. Absolutely positioned boxes can have margins, they do not collapse
     * with any other margins.
     */
-  lazy val absolute: StyleSetter[String] = this := "absolute"
+  lazy val absolute: StyleSetter[String, String] = this := "absolute"
 
   /**
     * Do not leave space for the element. Instead, position it at a specified
     * position relative to the screen's viewport and doesn't move when scrolled.
     * When printing, position it at that fixed position on every page.
     */
-  lazy val fixed: StyleSetter[String] = this := "fixed"
+  lazy val fixed: StyleSetter[String, String] = this := "fixed"
 
 }

@@ -11,21 +11,21 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait FontWeight extends Normal[String] { this: StyleProp[String] =>
 
   /** Normal font weight. Same as 400. */
-  override lazy val normal: StyleSetter[String] = this := "normal"
+  override lazy val normal: StyleSetter[String, String] = this := "normal"
 
   /** Bold font weight. Same as 700. */
-  lazy val bold: StyleSetter[String] = this := "bold"
+  lazy val bold: StyleSetter[String, String] = this := "bold"
 
   /**
     * One font weight lighter than the parent element (among the available
     * weights of the font).
     */
-  lazy val lighter: StyleSetter[String] = this := "lighter"
+  lazy val lighter: StyleSetter[String, String] = this := "lighter"
 
   /**
     * One font weight darker than the parent element (among the available
     * weights of the font)
     */
-  lazy val bolder: StyleSetter[String] = this := "bolder"
+  lazy val bolder: StyleSetter[String, String] = this := "bolder"
 
 }

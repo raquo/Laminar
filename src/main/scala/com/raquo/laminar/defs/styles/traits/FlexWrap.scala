@@ -15,7 +15,7 @@ trait FlexWrap { this: StyleProp[String] =>
     * flex container to overflow. The cross-start is either equivalent
     * to start or before depending flex-direction value.
     */
-  lazy val nowrap: StyleSetter[String] = this := "nowrap"
+  lazy val nowrap: StyleSetter[String, String] = this := "nowrap"
 
   /**
     * The flex items break into multiple lines. The cross-start is
@@ -23,12 +23,12 @@ trait FlexWrap { this: StyleProp[String] =>
     * value and the cross-end is the opposite of the specified
     * cross-start.
     */
-  lazy val wrap: StyleSetter[String] = this := "wrap"
+  lazy val wrap: StyleSetter[String, String] = this := "wrap"
 
   /**
     * Behaves the same as wrap but cross-start and cross-end are
     * permuted.
     */
-  lazy val wrapReverse: StyleSetter[String] = this := "wrap-reverse"
+  lazy val wrapReverse: StyleSetter[String, String] = this := "wrap-reverse"
 
 }

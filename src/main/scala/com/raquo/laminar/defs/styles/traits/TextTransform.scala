@@ -14,12 +14,12 @@ trait TextTransform extends None[String] { this: StyleProp[String] =>
     * Forces the first letter of each word to be converted to
     * uppercase. Other characters are unchanged.
     */
-  lazy val capitalize: StyleSetter[String] = this := "capitalize"
+  lazy val capitalize: StyleSetter[String, String] = this := "capitalize"
 
   /** Forces all characters to be converted to uppercase. */
-  lazy val uppercase: StyleSetter[String] = this := "uppercase"
+  lazy val uppercase: StyleSetter[String, String] = this := "uppercase"
 
   /** Forces all characters to be converted to lowercase. */
-  lazy val lowercase: StyleSetter[String] = this := "lowercase"
+  lazy val lowercase: StyleSetter[String, String] = this := "lowercase"
 
 }

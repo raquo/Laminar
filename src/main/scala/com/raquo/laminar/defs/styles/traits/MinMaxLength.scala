@@ -13,15 +13,15 @@ import com.raquo.laminar.keys.DerivedStyleProp
 trait MinMaxLength extends u.Length[DerivedStyleProp] { this: StyleProp[String] =>
 
   /** The intrinsic preferred length. */
-  lazy val maxContent: StyleSetter[String] = this := "max-content"
+  lazy val maxContent: StyleSetter[String, String] = this := "max-content"
 
   /** The intrinsic minimum length. */
-  lazy val minContent: StyleSetter[String] = this := "min-content"
+  lazy val minContent: StyleSetter[String, String] = this := "min-content"
 
   /** Defined as min(max-content, max(min-content, fill-available)). */
-  lazy val fitContent: StyleSetter[String] = this := "fit-content"
+  lazy val fitContent: StyleSetter[String, String] = this := "fit-content"
 
   /** The containing block width minus margin, border and padding. */
-  lazy val fillAvailable: StyleSetter[String] = this := "fill-available"
+  lazy val fillAvailable: StyleSetter[String, String] = this := "fill-available"
 
 }

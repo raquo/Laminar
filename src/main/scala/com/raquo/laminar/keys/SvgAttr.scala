@@ -21,6 +21,10 @@ class SvgAttr[V](
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
 
   override val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
+
+  override lazy val maybe: SvgAttr[Option[V]] = {
+    new SvgAttr[Option[V]](localName, codec.optAsNull, namespacePrefix)
+  }
 }
 
 object SvgAttr {

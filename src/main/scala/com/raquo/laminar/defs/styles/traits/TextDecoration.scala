@@ -11,12 +11,12 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait TextDecoration extends None[String] { this: StyleProp[String] =>
 
   /** Each line of text is underlined. */
-  lazy val underline: StyleSetter[String] = this := "underline"
+  lazy val underline: StyleSetter[String, String] = this := "underline"
 
   /** Each line of text has a line above it. */
-  lazy val overline: StyleSetter[String] = this := "overline"
+  lazy val overline: StyleSetter[String, String] = this := "overline"
 
   /** Each line of text has a line through the middle. */
-  lazy val lineThrough: StyleSetter[String] = this := "line-through"
+  lazy val lineThrough: StyleSetter[String, String] = this := "line-through"
 
 }

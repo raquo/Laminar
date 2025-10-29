@@ -18,45 +18,45 @@ trait VerticalAlign extends u.Length[DerivedStyleProp] { this: StyleProp[String]
     * the HTML specification, meaning that their behavior with this keyword may
     * change from one browser to the other.
     */
-  lazy val baseline: StyleSetter[String] = this := "baseline"
+  lazy val baseline: StyleSetter[String, String] = this := "baseline"
 
   /**
     * Aligns the baseline of the element with the subscript-baseline of its
     * parent.
     */
-  lazy val sub: StyleSetter[String] = this := "sub"
+  lazy val sub: StyleSetter[String, String] = this := "sub"
 
   /**
     * Aligns the baseline of the element with the superscript-baseline of its
     * parent.
     */
-  lazy val `super`: StyleSetter[String] = this := "super"
+  lazy val `super`: StyleSetter[String, String] = this := "super"
 
   /** Aligns the top of the element with the top of the parent element's font. */
-  lazy val textTop: StyleSetter[String] = this := "text-top"
+  lazy val textTop: StyleSetter[String, String] = this := "text-top"
 
   /**
     * Aligns the bottom of the element with the bottom of the parent element's
     * font.
     */
-  lazy val textBottom: StyleSetter[String] = this := "text-bottom"
+  lazy val textBottom: StyleSetter[String, String] = this := "text-bottom"
 
   /**
     * Aligns the middle of the element with the middle of lowercase letters in
     * the parent.
     */
-  lazy val middle: StyleSetter[String] = this := "middle"
+  lazy val middle: StyleSetter[String, String] = this := "middle"
 
   /**
     * Aligns the top of the element and its descendants with the top of the
     * entire line.
     */
-  lazy val top: StyleSetter[String] = this := "top"
+  lazy val top: StyleSetter[String, String] = this := "top"
 
   /**
     * Aligns the bottom of the element and its descendants with the bottom of
     * the entire line.
     */
-  lazy val bottom: StyleSetter[String] = this := "bottom"
+  lazy val bottom: StyleSetter[String, String] = this := "bottom"
 
 }

@@ -14,4 +14,8 @@ class AriaAttr[V](
 ) extends SimpleAttr[AriaAttr[V], V, ReactiveElement.Base] {
 
   override val name: String = "aria-" + suffix
+
+  override lazy val maybe: AriaAttr[Option[V]] = {
+    new AriaAttr[Option[V]](suffix, codec.optAsNull)
+  }
 }

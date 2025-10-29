@@ -2,9 +2,7 @@ package com.raquo.laminar.tests.basic
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
-import com.raquo.laminar.defs.styles.units
-import com.raquo.laminar.keys.{DerivedStyleProp, StyleBuilder}
-import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
+import com.raquo.laminar.keys.DerivedStyleBuilder
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.scalajs.js.|
@@ -104,9 +102,9 @@ class StyleSpec extends UnitSpec {
   it("encoding of CSS values") {
 
     // Expose methods to the public so that we can test them
-    class TestableBuilder extends StyleBuilder[String, StyleEncoder] {
+    class TestableBuilder extends DerivedStyleBuilder[StyleEncoder] {
 
-      override protected def styleSetter(value: String): String = value
+      // override protected def styleSetter(value: String): String = value
 
       override protected def derivedStyle[A](encode: A => String): StyleEncoder[A] = {
         new StyleEncoder[A] {
@@ -164,6 +162,13 @@ class StyleSpec extends UnitSpec {
     assertEquals((columnSpan := "none").value: Int | String, "none")
     assertEquals((flexGrow := "inherit").value: Double | String, "inherit")
 
+    // #nc
+    // val sp: StyleProp[_] = display
+    // val sp2: StyleProp[_] = flexGrow
+    // enrichStyleProp(sp) := "foo"
+    // sp.typeCompat := "inherit"
+    // sp2.typeCompat := "inherit"
+    // sp.maybe
 
     // val fakeStyle = background.asInstanceOf[StyleProp[Double | String] with units.Color[StyleSetter[Double | String], DerivedStyleProp]]
     // flexGrow2.rgb(1, 2, 3).key

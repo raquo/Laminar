@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait EmptyCells { this: StyleProp[String] =>
 
   /** Borders and backgrounds should be drawn like in a normal cells. */
-  lazy val show: StyleSetter[String] = this := "show"
+  lazy val show: StyleSetter[String, String] = this := "show"
 
   /** No border or backgrounds of empty cells should be drawn. */
-  lazy val hide: StyleSetter[String] = this := "hide"
+  lazy val hide: StyleSetter[String, String] = this := "hide"
 
 }

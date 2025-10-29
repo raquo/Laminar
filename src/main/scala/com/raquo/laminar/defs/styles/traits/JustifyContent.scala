@@ -10,8 +10,8 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 trait JustifyContent extends AlignContent { this: StyleProp[String] =>
 
-  lazy val left: StyleSetter[String] = this := "left"
+  lazy val left: StyleSetter[String, String] = this := "left"
 
-  lazy val right: StyleSetter[String] = this := "right"
+  lazy val right: StyleSetter[String, String] = this := "right"
 
 }

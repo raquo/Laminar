@@ -2,11 +2,12 @@ package com.raquo.laminar.api
 
 import com.raquo.laminar.api.StyleUnitsApi.StyleEncoder
 import com.raquo.laminar.defs.styles.units
-import com.raquo.laminar.keys.StyleBuilder
+import com.raquo.laminar.keys.{DerivedStyleBuilder, StyleBuilder}
 
 trait StyleUnitsApi
-extends StyleBuilder[String, StyleEncoder]
-with units.Color[String, StyleEncoder]
+extends StyleBuilder[String, String]
+with DerivedStyleBuilder[StyleEncoder]
+with units.Color[String]
 with units.Length[StyleEncoder]
 with units.Time[StyleEncoder]
 with units.Url[StyleEncoder] {

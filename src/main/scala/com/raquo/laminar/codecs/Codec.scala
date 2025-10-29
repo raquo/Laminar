@@ -11,7 +11,7 @@ package com.raquo.laminar.codecs
  * Scala DOM Types hides all this mess from you using codecs. All those pseudo-boolean
  * attributes would be simply `Attr[Boolean](name, codec)` in your code.
  * */
-trait Codec[ScalaType, DomType] {
+trait Codec[ScalaType, DomType] { self =>
 
   /** Convert the result of a `dom.Node.getAttribute` call to appropriate Scala type.
    *
@@ -30,4 +30,18 @@ trait Codec[ScalaType, DomType] {
    * call this method under the hood.
    */
   def encode(scalaValue: ScalaType): DomType
+
+  lazy val optAsNull: Codec[Option[ScalaType], DomType] = {
+    new Codec[Option[ScalaType], DomType] {
+
+      override def decode(domValue: DomType): Option[ScalaType] = {
+        Option(domValue).map(self.decode)
+      }
+
+      override def encode(scalaValue: Option[ScalaType]): DomType = {
+        // #Safe – `encode` is SUPPOSED to return `null` (remove-key command) when input scalaValue is None.
+        scalaValue.map(self.encode).getOrElse(null).asInstanceOf[DomType]
+      }
+    }
+  }
 }

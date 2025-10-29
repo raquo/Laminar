@@ -1,10 +1,7 @@
 package com.raquo.laminar.defs.styles
 
-import com.raquo.laminar.defs.styles.units.Color
-import com.raquo.laminar.keys.StyleProp
-import com.raquo.laminar.keys.DerivedStyleProp
-import com.raquo.laminar.defs.styles.{traits => s}
-import com.raquo.laminar.defs.styles.{units => u}
+import com.raquo.laminar.defs.styles.{traits => s, units => u}
+import com.raquo.laminar.keys.{DerivedStyleProp, StyleProp}
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 
 import scala.scalajs.js.|
@@ -16,11 +13,9 @@ import scala.scalajs.js.|
 
 trait StyleProps {
 
+  type DSP[V] = DerivedStyleProp[V]
 
-  protected type DSP[V] = DerivedStyleProp[V]
-
-  protected type SS[V] = StyleSetter[V]
-
+  type SSS = StyleSetter[String, String]
 
   /**
     * Create custom CSS property
@@ -33,7 +28,6 @@ trait StyleProps {
     */
   def styleProp[V](name: String): StyleProp[V] = new StyleProp(name)
 
-
   // -- Basic types --
 
   protected def doubleStyle(key: String): StyleProp[Double | String] =
@@ -45,14 +39,13 @@ trait StyleProps {
   protected def stringStyle(key: String): StyleProp[String] =
     new StyleProp[String](key)
 
-
   // -- Shared types --
 
   protected def autoStyle[V](key: String): StyleProp[V] with s.Auto[V] =
-    new StyleProp[V](key) with s.Auto[V]
+    new StyleProp[V](key, prefixes = Nil) with s.Auto[V]
 
-  protected def colorStyle(key: String): StyleProp[String] with s.Color with u.Color[SS[String], DSP] =
-    new StyleProp[String](key) with s.Color with u.Color[SS[String], DSP]
+  protected def colorStyle(key: String): StyleProp[String] with s.Color with u.Color[SSS] =
+    new StyleProp[String](key) with s.Color with u.Color[SSS]
 
   protected def flexPositionStyle(key: String): StyleProp[String] with s.FlexPosition =
     new StyleProp[String](key) with s.FlexPosition
@@ -99,7 +92,6 @@ trait StyleProps {
   protected def urlStyle(key: String): StyleProp[String] with u.Url[DSP] =
     new StyleProp[String](key) with u.Url[DSP]
 
-
   // -- Unique types --
 
   protected def alignContentStyle(key: String): StyleProp[String] with s.AlignContent =
@@ -123,8 +115,8 @@ trait StyleProps {
   protected def clearStyle(key: String): StyleProp[String] with s.Clear =
     new StyleProp[String](key) with s.Clear
 
-  protected def colorUrlStyle(key: String): StyleProp[String] with s.Color with u.Color[SS[String], DSP] with u.Url[DSP] =
-    new StyleProp[String](key) with s.Color with u.Color[SS[String], DSP] with u.Url[DSP]
+  protected def colorUrlStyle(key: String): StyleProp[String] with s.Color with u.Color[SSS] with u.Url[DSP] =
+    new StyleProp[String](key) with s.Color with u.Color[SSS] with u.Url[DSP]
 
   protected def cursorStyle(key: String): StyleProp[String] with s.Cursor =
     new StyleProp[String](key) with s.Cursor
@@ -207,10 +199,7 @@ trait StyleProps {
   protected def wordBreakStyle(key: String): StyleProp[String] with s.WordBreak =
     new StyleProp[String](key) with s.WordBreak
 
-
-
   // -- Style Props --
-
 
   /**
     * The all shorthand CSS property resets all of an element's properties except
@@ -224,7 +213,6 @@ trait StyleProps {
     */
   lazy val all: StyleProp[String] = stringStyle("all")
 
-
   /**
     * The animation CSS property is a shorthand property for animation-name,
     * animation-duration, animation-timing-function, animation-delay,
@@ -233,7 +221,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/animation animation @ MDN]]
     */
   lazy val animation: StyleProp[String] = stringStyle("animation")
-
 
   /**
     * The animation-delay CSS property specifies when the animation should start.
@@ -259,7 +246,6 @@ trait StyleProps {
     */
   lazy val animationDelay: StyleProp[String] with u.Time[DSP] = timeStyle("animation-delay")
 
-
   /**
     * The animation-direction CSS property indicates whether the animation should
     * play in reverse on alternate cycles.
@@ -267,7 +253,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction animation-direction @ MDN]]
     */
   lazy val animationDirection: StyleProp[String] = stringStyle("animation-direction")
-
 
   /**
     * The animation-duration CSS property specifies the Length of time that an
@@ -280,7 +265,6 @@ trait StyleProps {
     */
   lazy val animationDuration: StyleProp[String] with u.Time[DSP] = timeStyle("animation-duration")
 
-
   /**
     * The animation-fill-mode CSS property specifies how a CSS animation should
     * apply styles to its target before and after it is executing.
@@ -288,7 +272,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode animation-fill-mode @ MDN]]
     */
   lazy val animationFillMode: StyleProp[String] = stringStyle("animation-fill-mode")
-
 
   /**
     * The animation-iteration-count CSS property defines the number of times an
@@ -298,7 +281,6 @@ trait StyleProps {
     */
   lazy val animationIterationCount: StyleProp[Double | String] = doubleStyle("animation-iteration-count")
 
-
   /**
     * The animation-name CSS property specifies a list of animations that should
     * be applied to the selected element. Each name indicates a @keyframes at-rule
@@ -307,7 +289,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name animation-name @ MDN]]
     */
   lazy val animationName: StyleProp[String] = stringStyle("animation-name")
-
 
   /**
     * The animation-play-state CSS property determines whether an animation is
@@ -322,7 +303,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state animation-play-state @ MDN]]
     */
   lazy val animationPlayState: StyleProp[String] = stringStyle("animation-play-state")
-
 
   /**
     * The CSS animation-timing-function property specifies how a CSS animation
@@ -341,7 +321,6 @@ trait StyleProps {
     */
   lazy val animationTimingFunction: StyleProp[String] = stringStyle("animation-timing-function")
 
-
   /**
     * The CSS align-content property sets the distribution of space between and
     * around content items along a flexbox's cross-axis or a grid's block axis.
@@ -350,7 +329,6 @@ trait StyleProps {
     *  - [[https://css-tricks.com/snippets/css/a-guide-to-flexbox/ Guide to Flexbox @ CSS-Tricks]]
     */
   lazy val alignContent: StyleProp[String] with s.AlignContent = alignContentStyle("align-content")
-
 
   /**
     * The CSS align-items property sets the align-self value on all direct children
@@ -363,7 +341,6 @@ trait StyleProps {
     */
   lazy val alignItems: StyleProp[String] with s.FlexPosition = flexPositionStyle("align-items")
 
-
   /**
     * The align-self CSS property overrides a grid or flex item's align-items
     * value. In Grid, it aligns the item inside the grid area. In Flexbox,
@@ -374,7 +351,6 @@ trait StyleProps {
     */
   lazy val alignSelf: StyleProp[String] with s.FlexPosition = flexPositionStyle("align-self")
 
-
   /**
     * The background CSS property is a shorthand for setting the individual
     * background values in a single place in the style sheet. background can be
@@ -384,8 +360,7 @@ trait StyleProps {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/background background @ MDN]]
     */
-  lazy val background: StyleProp[String] with s.Color with u.Color[SS[String], DSP] with u.Url[DSP] = colorUrlStyle("background")
-
+  lazy val background: StyleProp[String] with s.Color with u.Color[SSS] with u.Url[DSP] = colorUrlStyle("background")
 
   /**
     * If a background-image is specified, the background-attachment CSS
@@ -395,7 +370,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/background-attachment background-attachment @ MDN]]
     */
   lazy val backgroundAttachment: StyleProp[String] with s.BackgroundAttachment = backgroundAttachmentStyle("background-attachment")
-
 
   /**
     * The background-clip CSS property specifies whether an element's background,
@@ -409,15 +383,13 @@ trait StyleProps {
     */
   lazy val backgroundClip: StyleProp[String] with s.PaddingBoxSizing = paddingBoxSizingStyle("background-clip")
 
-
   /**
     * The background-color CSS property sets the background color of an element,
     * either through a color value or the keyword transparent.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/background-color background-color @ MDN]]
     */
-  lazy val backgroundColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("background-color")
-
+  lazy val backgroundColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("background-color")
 
   /**
     * The background-image CSS property sets one or more background images on an
@@ -430,7 +402,6 @@ trait StyleProps {
     */
   lazy val backgroundImage: StyleProp[String] with u.Url[DSP] = urlStyle("background-image")
 
-
   /**
     * The background-origin CSS property determines the background positioning
     * area, that is the position of the origin of an image specified using the
@@ -442,7 +413,6 @@ trait StyleProps {
     */
   lazy val backgroundOrigin: StyleProp[String] with s.PaddingBoxSizing = paddingBoxSizingStyle("background-origin")
 
-
   /**
     * The background-position CSS property sets the initial position, relative to
     * the background position layer defined by background-origin for each defined
@@ -451,7 +421,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/background-position background-position @ MDN]]
     */
   lazy val backgroundPosition: StyleProp[String] = stringStyle("background-position")
-
 
   /**
     * The background-repeat CSS property defines how background images are repeated.
@@ -466,7 +435,6 @@ trait StyleProps {
     */
   lazy val backgroundRepeat: StyleProp[String] = stringStyle("background-repeat")
 
-
   /**
     * The background-size CSS property specifies the size of the background
     * images. The size of the image can be fully constrained or only partially in
@@ -475,7 +443,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/background-size background-size @ MDN]]
     */
   lazy val backgroundSize: StyleProp[String] with s.BackgroundSize = backgroundSizeStyle("background-size")
-
 
   /**
     * The CSS backface-visibility property determines whether or not the back
@@ -487,7 +454,6 @@ trait StyleProps {
     */
   lazy val backfaceVisibility: StyleProp[String] with s.BackfaceVisibility = backfaceVisibilityStyle("backface-visibility")
 
-
   /**
     * The border CSS property is a shorthand property for setting the individual
     * border property values in a single place in the style sheet. border can be
@@ -498,7 +464,6 @@ trait StyleProps {
     */
   lazy val border: StyleProp[String] = stringStyle("border")
 
-
   /**
     * The border-top CSS property is a shorthand that sets the values of
     * border-top-color, border-top-style, and border-top-width. These
@@ -507,7 +472,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-top border-top @ MDN]]
     */
   lazy val borderTop: StyleProp[String] = stringStyle("border-top")
-
 
   /**
     * The border-right CSS property is a shorthand that sets the values of
@@ -518,7 +482,6 @@ trait StyleProps {
     */
   lazy val borderRight: StyleProp[String] = stringStyle("border-right")
 
-
   /**
     * The border-bottom CSS property is a shorthand that sets the values of
     * border-bottom-color, border-bottom-style, and border-bottom-width. These
@@ -527,7 +490,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom border-bottom @ MDN]]
     */
   lazy val borderBottom: StyleProp[String] = stringStyle("border-bottom")
-
 
   /**
     * The border-left CSS property is a shorthand that sets the values of
@@ -538,7 +500,6 @@ trait StyleProps {
     */
   lazy val borderLeft: StyleProp[String] = stringStyle("border-left")
 
-
   /**
     * The border-color CSS property is a shorthand for setting the color of the
     * four sides of an element's border: border-top-color, border-right-color,
@@ -546,40 +507,35 @@ trait StyleProps {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-color border-color @ MDN]]
     */
-  lazy val borderColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("border-color")
-
+  lazy val borderColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("border-color")
 
   /**
     * The border-top-color CSS property sets the color of the top border of an element.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-color border-top-color @ MDN]]
     */
-  lazy val borderTopColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("border-top-color")
-
+  lazy val borderTopColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("border-top-color")
 
   /**
     * The border-right-color CSS property sets the color of the right border of an element.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-right-color border-right-color @ MDN]]
     */
-  lazy val borderRightColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("border-right-color")
-
+  lazy val borderRightColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("border-right-color")
 
   /**
     * The border-bottom-color CSS property sets the color of the bottom border of an element.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-bottom-color border-bottom-color @ MDN]]
     */
-  lazy val borderBottomColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("border-bottom-color")
-
+  lazy val borderBottomColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("border-bottom-color")
 
   /**
     * The border-left-color CSS property sets the color of the left border of an element.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-color border-left-color @ MDN]]
     */
-  lazy val borderLeftColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("border-left-color")
-
+  lazy val borderLeftColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("border-left-color")
 
   /**
     * The border-image CSS property draws an image around a given element.
@@ -589,7 +545,6 @@ trait StyleProps {
     */
   lazy val borderImage: StyleProp[String] with u.Url[DSP] = urlStyle("border-image")
 
-
   /**
     * The border-style CSS property is a shorthand property for setting the line
     * style for all four sides of the element's border.
@@ -598,14 +553,12 @@ trait StyleProps {
     */
   lazy val borderStyle: StyleProp[String] with s.Line = lineStyle("border-style")
 
-
   /**
     * The border-top-style CSS property sets the line style of the top border of a box.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-style border-top-style @ MDN]]
     */
   lazy val borderTopStyle: StyleProp[String] with s.Line = lineStyle("border-top-style")
-
 
   /**
     * The border-right-style CSS property sets the line style of the right border of a box.
@@ -614,7 +567,6 @@ trait StyleProps {
     */
   lazy val borderRightStyle: StyleProp[String] with s.Line = lineStyle("border-right-style")
 
-
   /**
     * The border-bottom-style CSS property sets the line style of the bottom border of a box.
     *
@@ -622,14 +574,12 @@ trait StyleProps {
     */
   lazy val borderBottomStyle: StyleProp[String] with s.Line = lineStyle("border-bottom-style")
 
-
   /**
     * The border-left-style CSS property sets the line style of the left border of a box.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-style border-left-style @ MDN]]
     */
   lazy val borderLeftStyle: StyleProp[String] with s.Line = lineStyle("border-left-style")
-
 
   /**
     * The border-width CSS property is a shorthand property for setting the width
@@ -639,14 +589,12 @@ trait StyleProps {
     */
   lazy val borderWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("border-width")
 
-
   /**
     * The border-top-width CSS property sets the line width of the top border of a box.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-width border-top-width @ MDN]]
     */
   lazy val borderTopWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("border-top-width")
-
 
   /**
     * The border-right-width CSS property sets the line width of the right border of a box.
@@ -655,7 +603,6 @@ trait StyleProps {
     */
   lazy val borderRightWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("border-right-width")
 
-
   /**
     * The border-bottom-width CSS property sets the line width of the bottom border of a box.
     *
@@ -663,14 +610,12 @@ trait StyleProps {
     */
   lazy val borderBottomWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("border-bottom-width")
 
-
   /**
     * The border-left-width CSS property sets the line width of the left border of a box.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-left-width border-left-width @ MDN]]
     */
   lazy val borderLeftWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("border-left-width")
-
 
   /**
     * The border-radius CSS property allows Web authors to define how rounded
@@ -680,7 +625,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius border-radius @ MDN]]
     */
   lazy val borderRadius: StyleProp[String] with u.Length[DSP] = lengthStyle("border-radius")
-
 
   /**
     * The border-top-left-radius CSS property sets the rounding of the
@@ -692,7 +636,6 @@ trait StyleProps {
     */
   lazy val borderTopLeftRadius: StyleProp[String] with u.Length[DSP] = lengthStyle("border-top-left-radius")
 
-
   /**
     * The border-top-right-radius CSS property sets the rounding of the top-right
     * corner of the element. The rounding can be a circle or an ellipse, or if
@@ -701,7 +644,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-top-right-radius border-top-right-radius @ MDN]]
     */
   lazy val borderTopRightRadius: StyleProp[String] with u.Length[DSP] = lengthStyle("border-top-right-radius")
-
 
   /**
     * The border-bottom-right-radius CSS property sets the rounding of the
@@ -713,7 +655,6 @@ trait StyleProps {
     */
   lazy val borderBottomRightRadius: StyleProp[String] with u.Length[DSP] = lengthStyle("border-bottom-right-radius")
 
-
   /**
     * The border-bottom-left-radius CSS property sets the rounding of the
     * bottom-left corner of the element. The rounding can be a circle or an
@@ -724,7 +665,6 @@ trait StyleProps {
     */
   lazy val borderBottomLeftRadius: StyleProp[String] with u.Length[DSP] = lengthStyle("border-bottom-left-radius")
 
-
   /**
     * The border-collapse CSS property selects a table's border model. This has
     * a big influence on the look and style of the table cells.
@@ -732,7 +672,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-collapse border-collapse @ MDN]]
     */
   lazy val borderCollapse: StyleProp[String] with s.BorderCollapse = borderCollapseStyle("border-collapse")
-
 
   /**
     * The border-spacing CSS property specifies the distance between the borders
@@ -743,7 +682,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/border-spacing border-spacing @ MDN]]
     */
   lazy val borderSpacing: StyleProp[String] with u.Length[DSP] = lengthStyle("border-spacing")
-
 
   /**
     * The bottom CSS property participates in specifying the position of
@@ -764,7 +702,6 @@ trait StyleProps {
     */
   lazy val bottom: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("bottom")
 
-
   /**
     * The box-shadow CSS property describes one or more shadow effects as a
     * comma-separated list. It allows casting a drop shadow from the frame of
@@ -777,7 +714,6 @@ trait StyleProps {
     */
   lazy val boxShadow: StyleProp[String] = stringStyle("box-shadow")
 
-
   /**
     * The box-sizing CSS property is used to alter the default CSS box model used
     * to calculate widths and heights of elements. It is possible to use this
@@ -788,7 +724,6 @@ trait StyleProps {
     */
   lazy val boxSizing: StyleProp[String] with s.BoxSizing = boxSizingStyle("box-sizing")
 
-
   /**
     * The caption-side CSS property positions the content of a table's caption
     * on the specified side (top or bottom).
@@ -796,7 +731,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/caption-side caption-side @ MDN]]
     */
   lazy val captionSide: StyleProp[String] = stringStyle("caption-side")
-
 
   /**
     * The clear CSS property specifies whether an element can be next to floating
@@ -808,7 +742,6 @@ trait StyleProps {
     */
   lazy val clear: StyleProp[String] with s.Clear = clearStyle("clear")
 
-
   /**
     * The clip CSS property defines what portion of an element is visible. The
     * clip property applies only to elements with position:absolute.
@@ -816,7 +749,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/clip clip @ MDN]]
     */
   lazy val clip: StyleProp[String] = stringStyle("clip")
-
 
   /**
     * The CSS color property sets the foreground color of an element's text
@@ -826,8 +758,7 @@ trait StyleProps {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/color color @ MDN]]
     */
-  lazy val color: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("color")
-
+  lazy val color: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("color")
 
   /**
     * The columns CSS property is a shorthand property allowing to set both the
@@ -837,14 +768,12 @@ trait StyleProps {
     */
   lazy val columns: StyleProp[String] = stringStyle("columns")
 
-
   /**
     * The column-count CSS property describes the number of columns of the element.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/column-count column-count @ MDN]]
     */
   lazy val columnCount: StyleProp[Int | String] with s.Auto[Int | String] = autoStyle("column-count")
-
 
   /**
     * The column-fill CSS property controls how contents are partitioned into
@@ -856,7 +785,6 @@ trait StyleProps {
     */
   lazy val columnFill: StyleProp[String] = stringStyle("column-fill")
 
-
   /**
     * The column-gap CSS property sets the size of the gap (gutter) between an element's columns.
     *
@@ -864,7 +792,6 @@ trait StyleProps {
     *  - [[https://css-tricks.com/snippets/css/a-guide-to-flexbox/#aa-gap-row-gap-column-gap Guide to Flexbox @ CSS-Tricks]]
     */
   lazy val columnGap: StyleProp[String] with u.Length[DSP] = lengthStyle("column-gap")
-
 
   /**
     * The column-span CSS property makes it possible for an element to span across
@@ -874,7 +801,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/column-span column-span @ MDN]]
     */
   lazy val columnSpan: StyleProp[Int | String] = intStyle("column-span")
-
 
   /**
     * The column-width CSS property suggests an optimal column width. This is not
@@ -889,7 +815,6 @@ trait StyleProps {
     */
   lazy val columnWidth: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("column-width")
 
-
   /**
     * In multi-column layouts, the column-rule CSS property specifies a straight
     * line, or "rule", to be drawn between each column. It is a convenient
@@ -900,15 +825,13 @@ trait StyleProps {
     */
   lazy val columnRule: StyleProp[String] = stringStyle("column-rule")
 
-
   /**
     * The column-rule-color CSS property lets you set the color of the rule drawn
     * between columns in multi-column layouts.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-color column-rule-color @ MDN]]
     */
-  lazy val columnRuleColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("column-rule-color")
-
+  lazy val columnRuleColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("column-rule-color")
 
   /**
     * The column-rule-width CSS property lets you set the width of the rule drawn
@@ -918,7 +841,6 @@ trait StyleProps {
     */
   lazy val columnRuleWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("column-rule-width")
 
-
   /**
     * The column-rule-style CSS property lets you set the style of the rule drawn
     * between columns in multi-column layouts.
@@ -926,7 +848,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/column-rule-style column-rule-style @ MDN]]
     */
   lazy val columnRuleStyle: StyleProp[String] with s.Line = lineStyle("column-rule-style")
-
 
   /**
     * The `content` CSS property is used with the ::before and ::after pseudo-elements
@@ -937,7 +858,6 @@ trait StyleProps {
     */
   lazy val contentCss: StyleProp[String] with s.None[String] with u.Url[DSP] = urlNoneStyle("content")
 
-
   /**
     * The counter-increment CSS property is used to increase the value of CSS
     * Counters by a given value. The counter's value can be reset using the
@@ -947,7 +867,6 @@ trait StyleProps {
     */
   lazy val counterIncrement: StyleProp[String] = stringStyle("counter-increment")
 
-
   /**
     * The counter-reset CSS property is used to reset CSS Counters to a given
     * value.
@@ -956,7 +875,6 @@ trait StyleProps {
     */
   lazy val counterReset: StyleProp[String] = stringStyle("counter-reset")
 
-
   /**
     * The cursor CSS property specifies the mouse cursor displayed when the mouse
     * pointer is over an element.
@@ -964,7 +882,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/cursor cursor @ MDN]]
     */
   lazy val cursor: StyleProp[String] with s.Cursor = cursorStyle("cursor")
-
 
   /**
     * Set the direction CSS property to match the direction of the text: rtl for
@@ -989,7 +906,6 @@ trait StyleProps {
     */
   lazy val direction: StyleProp[String] with s.Direction = directionStyle("direction")
 
-
   /**
     * The display CSS property specifies the type of rendering box used for an
     * element. In HTML, default display property values are taken from behaviors
@@ -1005,7 +921,6 @@ trait StyleProps {
     */
   lazy val display: StyleProp[String] with s.Display = displayStyle("display")
 
-
   /**
     * The empty-cells CSS property specifies how user agents should render borders
     * and backgrounds around cells that have no visible content.
@@ -1013,7 +928,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/empty-cells empty-cells @ MDN]]
     */
   lazy val emptyCells: StyleProp[String] with s.EmptyCells = emptyCellsStyle("empty-cells")
-
 
   /**
     * The flex CSS property is a shorthand property specifying the ability of a
@@ -1026,7 +940,6 @@ trait StyleProps {
     */
   lazy val flex: StyleProp[String] = stringStyle("flex")
 
-
   /**
     * The CSS flex-basis property specifies the flex basis which is the initial
     * main size of a flex item. The property determines the size of the
@@ -1036,7 +949,6 @@ trait StyleProps {
     *  - [[https://css-tricks.com/snippets/css/a-guide-to-flexbox/ Guide to Flexbox @ CSS-Tricks]]
     */
   lazy val flexBasis: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("flex-basis")
-
 
   /**
     * The CSS flex-direction property specifies how flex items are placed in the
@@ -1053,7 +965,6 @@ trait StyleProps {
     *  - [[https://css-tricks.com/snippets/css/a-guide-to-flexbox/ Guide to Flexbox @ CSS-Tricks]]
     */
   lazy val flexDirection: StyleProp[String] with s.FlexDirection = flexDirectionStyle("flex-direction")
-
 
   /**
     * The CSS flex-grow property specifies the flex grow factor of a flex item.
@@ -1075,7 +986,6 @@ trait StyleProps {
     */
   lazy val flexShrink: StyleProp[Double | String] = doubleStyle("flex-shrink")
 
-
   /**
     * The CSS flex-wrap property specifies whether the children are forced into
     * a single line or if the items can be flowed on multiple lines.
@@ -1084,7 +994,6 @@ trait StyleProps {
     *  - [[https://css-tricks.com/snippets/css/a-guide-to-flexbox/ Guide to Flexbox @ CSS-Tricks]]
     */
   lazy val flexWrap: StyleProp[String] with s.FlexWrap = flexWrapStyle("flex-wrap")
-
 
   /**
     * The float CSS property specifies that an element should be taken from the
@@ -1096,7 +1005,6 @@ trait StyleProps {
     */
   lazy val float: StyleProp[String] with s.Float = floatStyle("float")
 
-
   /**
     * The font CSS property is either a shorthand property for setting font-style,
     * font-variant, font-weight, font-size, line-height and font-family, or a way
@@ -1105,7 +1013,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/font font @ MDN]]
     */
   lazy val font: StyleProp[String] = stringStyle("font")
-
 
   /**
     * The font-family CSS property allows for a prioritized list of font family
@@ -1119,7 +1026,6 @@ trait StyleProps {
     */
   lazy val fontFamily: StyleProp[String] = stringStyle("font-family")
 
-
   /**
     * The font-feature-settings CSS property allows control over advanced
     * typographic features in OpenType fonts.
@@ -1127,7 +1033,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/font-feature-settings font-feature-settings @ MDN]]
     */
   lazy val fontFeatureSettings: StyleProp[String] = stringStyle("font-feature-settings")
-
 
   /**
     * The font-size CSS property specifies the size of the font – specifically
@@ -1138,7 +1043,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/font-size font-size @ MDN]]
     */
   lazy val fontSize: StyleProp[String] with s.FontSize = fontSizeStyle("font-size")
-
 
   /**
     * The font-size-adjust CSS property sets the size of lower-case letters
@@ -1157,7 +1061,6 @@ trait StyleProps {
     */
   lazy val fontSizeAdjust: StyleProp[Double | String] with s.None[Double | String] = noneStyle("font-size-adjust")
 
-
   /**
     * The font-style CSS property allows italic or oblique faces to be selected
     * within a font-family.
@@ -1165,7 +1068,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/font-style font-style @ MDN]]
     */
   lazy val fontStyle: StyleProp[String] with s.FontStyle = fontStyleStyle("font-style")
-
 
   /**
     * The font-weight CSS property specifies the weight or boldness of the font.
@@ -1184,7 +1086,6 @@ trait StyleProps {
     */
   lazy val fontWeight: StyleProp[String] with s.FontWeight = fontWeightStyle("font-weight")
 
-
   /**
     * The gap CSS shorthand property sets the gaps (gutters) between rows and columns.
     * This property lets you set both `column-gap` and `row-gap` at the same time.
@@ -1193,7 +1094,6 @@ trait StyleProps {
     *  - [[https://css-tricks.com/snippets/css/a-guide-to-flexbox/#aa-gap-row-gap-column-gap Guide to Flexbox @ CSS-Tricks]]
     */
   lazy val gap: StyleProp[String] with u.Length[DSP] = lengthStyle("gap")
-
 
   /**
     * The height CSS property specifies the height of the content area of an
@@ -1206,7 +1106,6 @@ trait StyleProps {
     */
   lazy val height: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("height")
 
-
   /**
     * This property determines whether an element must create a new stacking context.
     * It is especially helpful when used in conjunction with mix-blend-mode and z-index.
@@ -1216,7 +1115,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/isolation isolation @ MDN]]
     */
   lazy val isolation: StyleProp[String] with s.Auto[String] = autoStyle("isolation")
-
 
   /**
     * The CSS justify-content property defines how a browser distributes available
@@ -1231,7 +1129,6 @@ trait StyleProps {
     */
   lazy val justifyContent: StyleProp[String] with s.JustifyContent = justifyContentStyle("justify-content")
 
-
   /**
     * The left CSS property specifies part of the position of positioned elements.
     *
@@ -1243,7 +1140,6 @@ trait StyleProps {
     */
   lazy val left: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("left")
 
-
   /**
     * The letter-spacing CSS property specifies spacing behavior between text
     * characters.
@@ -1251,7 +1147,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/letter-spacing letter-spacing @ MDN]]
     */
   lazy val letterSpacing: StyleProp[String] with s.Normal[String] = normalStyle("letter-spacing")
-
 
   /**
     * On block level elements, the line-height CSS property specifies the minimal
@@ -1267,7 +1162,6 @@ trait StyleProps {
     */
   lazy val lineHeight: StyleProp[String] with s.Normal[String] with u.Length[DSP] = lengthNormalStyle("line-height")
 
-
   /**
     * The list-style CSS property is a shorthand property for setting
     * list-style-type, list-style-image and list-style-position.
@@ -1275,7 +1169,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/list-style list-style @ MDN]]
     */
   lazy val listStyle: StyleProp[String] = stringStyle("list-style")
-
 
   /**
     * The list-style-image CSS property sets the image that will be used as the
@@ -1285,7 +1178,6 @@ trait StyleProps {
     */
   lazy val listStyleImage: StyleProp[String] with s.None[String] with u.Url[DSP] = urlNoneStyle("list-style-image")
 
-
   /**
     * The list-style-position CSS property specifies the position of the marker
     * box in the principal block box.
@@ -1294,7 +1186,6 @@ trait StyleProps {
     */
   lazy val listStylePosition: StyleProp[String] with s.ListStylePosition = listStylePositionStyle("list-style-position")
 
-
   /**
     * The list-style-type CSS property sets the marker (such as a disc, character,
     * or custom counter style) of a list item element.
@@ -1302,7 +1193,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/list-style-type list-style-type @ MDN]]
     */
   lazy val listStyleType: StyleProp[String] with s.ListStyleType = listStyleTypeStyle("list-style-type")
-
 
   /**
     * The margin CSS property sets the margin for all four sides. It is a
@@ -1315,7 +1205,6 @@ trait StyleProps {
     */
   lazy val margin: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("margin")
 
-
   /**
     * The margin-top CSS property of an element sets the margin space required on
     * the top of an element. A negative value is also allowed.
@@ -1323,7 +1212,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/margin-top margin-top @ MDN]]
     */
   lazy val marginTop: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("margin-top")
-
 
   /**
     * The margin-right CSS property of an element sets the margin space required on
@@ -1333,7 +1221,6 @@ trait StyleProps {
     */
   lazy val marginRight: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("margin-right")
 
-
   /**
     * The margin-bottom CSS property of an element sets the margin space required on
     * the bottom of an element. A negative value is also allowed.
@@ -1341,7 +1228,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/margin-bottom margin-bottom @ MDN]]
     */
   lazy val marginBottom: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("margin-bottom")
-
 
   /**
     * The margin-left CSS property of an element sets the margin space required on
@@ -1351,7 +1237,6 @@ trait StyleProps {
     */
   lazy val marginLeft: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("margin-left")
 
-
   /**
     * If the value is a URI value, the element pointed to by the URI is used as
     * an SVG mask.
@@ -1359,7 +1244,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/mask mask @ MDN]]
     */
   lazy val mask: StyleProp[String] with s.None[String] with u.Url[DSP] = urlNoneStyle("mask")
-
 
   /**
     * The max-height CSS property is used to set the maximum height of a given
@@ -1372,7 +1256,6 @@ trait StyleProps {
     */
   lazy val maxHeight: StyleProp[String] with s.MinMaxLength with s.None[String] = maxLengthStyle("max-height")
 
-
   /**
     * The max-width CSS property is used to set the maximum width of a given
     * element. It prevents the used value of the width property from becoming
@@ -1383,7 +1266,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/max-width max-width @ MDN]]
     */
   lazy val maxWidth: StyleProp[String] with s.MinMaxLength with s.None[String] = maxLengthStyle("max-width")
-
 
   /**
     * The min-height CSS property is used to set the minimum height of a given
@@ -1396,7 +1278,6 @@ trait StyleProps {
     */
   lazy val minHeight: StyleProp[String] with s.MinMaxLength with s.Auto[String] = minLengthStyle("min-height")
 
-
   /**
     * The min-width CSS property is used to set the minimum width of a given
     * element. It prevents the used value of the width property from becoming
@@ -1408,7 +1289,6 @@ trait StyleProps {
     */
   lazy val minWidth: StyleProp[String] with s.MinMaxLength with s.Auto[String] = minLengthStyle("min-width")
 
-
   /**
     * This property sets how an element's content should blend with
     * the content of the element's parent and the element's background.
@@ -1418,7 +1298,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/mix-blend-mode mix-blend-mode @ MDN]]
     */
   lazy val mixBlendMode: StyleProp[String] with s.MixBlendMode = mixBlendModeStyle("mix-blend-mode")
-
 
   /**
     * The opacity CSS property specifies the transparency of an element, that is,
@@ -1439,7 +1318,6 @@ trait StyleProps {
     */
   lazy val opacity: StyleProp[Double | String] = doubleStyle("opacity")
 
-
   /**
     * The orphans CSS property refers to the minimum number of lines in a block
     * container that must be left at the bottom of the page. This property is
@@ -1450,7 +1328,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/orphans orphans @ MDN]]
     */
   lazy val orphans: StyleProp[Int | String] = intStyle("orphans")
-
 
   /**
     * The CSS outline property is a shorthand property for setting one or more of
@@ -1464,7 +1341,6 @@ trait StyleProps {
     */
   lazy val outline: StyleProp[String] = stringStyle("outline")
 
-
   /**
     * The outline-style CSS property is used to set the style of the outline of
     * an element. An outline is a line that is drawn around elements, outside the
@@ -1473,7 +1349,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/outline-style outline-style @ MDN]]
     */
   lazy val outlineStyle: StyleProp[String] with s.Line = lineStyle("outline-style")
-
 
   /**
     * The outline-width CSS property is used to set the width of the outline of
@@ -1484,7 +1359,6 @@ trait StyleProps {
     */
   lazy val outlineWidth: StyleProp[String] with u.Length[DSP] = lengthStyle("outline-width")
 
-
   /**
     * The outline-color CSS property sets the color of the outline of an element.
     * An outline is a line that is drawn around elements, outside the border edge,
@@ -1494,8 +1368,7 @@ trait StyleProps {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/outline-color outline-color @ MDN]]
     */
-  lazy val outlineColor: StyleProp[String] with s.Color with u.Color[SS[String], DSP] = colorStyle("outline-color")
-
+  lazy val outlineColor: StyleProp[String] with s.Color with u.Color[SSS] = colorStyle("outline-color")
 
   /**
     * The overflow CSS property specifies whether to clip content, render scroll
@@ -1504,7 +1377,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/overflow overflow @ MDN]]
     */
   lazy val overflow: StyleProp[String] with s.Overflow = overflowStyle("overflow")
-
 
   /**
     * The overflow-x CSS property specifies whether to clip content, render a
@@ -1515,7 +1387,6 @@ trait StyleProps {
     */
   lazy val overflowX: StyleProp[String] with s.Overflow = overflowStyle("overflow-x")
 
-
   /**
     * The overflow-y CSS property specifies whether to clip content, render a
     * scroll bar, or display overflow content of a block-level element, when it
@@ -1524,7 +1395,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/overflow-y overflow-y @ MDN]]
     */
   lazy val overflowY: StyleProp[String] with s.Overflow = overflowStyle("overflow-y")
-
 
   /**
     * The overflow-wrap CSS property specifies whether or not the browser should
@@ -1537,9 +1407,7 @@ trait StyleProps {
     */
   lazy val overflowWrap: StyleProp[String] with s.OverflowWrap = overflowWrapStyle("overflow-wrap")
 
-
   lazy val wordWrap: StyleProp[String] with s.OverflowWrap = overflowWrap
-
 
   /**
     * The padding CSS property sets the required padding space on all sides of an
@@ -1553,7 +1421,6 @@ trait StyleProps {
     */
   lazy val padding: StyleProp[String] with u.Length[DSP] = lengthStyle("padding")
 
-
   /**
     * The padding-top CSS property of an element sets the padding space required
     * on the top of an element. The padding area is the space between the content
@@ -1563,7 +1430,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/padding-top padding-top @ MDN]]
     */
   lazy val paddingTop: StyleProp[String] with u.Length[DSP] = lengthStyle("padding-top")
-
 
   /**
     * The padding-right CSS property of an element sets the padding space
@@ -1575,7 +1441,6 @@ trait StyleProps {
     */
   lazy val paddingRight: StyleProp[String] with u.Length[DSP] = lengthStyle("padding-right")
 
-
   /**
     * The padding-bottom CSS property of an element sets the height of the padding
     * area at the bottom of an element. The padding area is the space between the
@@ -1586,7 +1451,6 @@ trait StyleProps {
     */
   lazy val paddingBottom: StyleProp[String] with u.Length[DSP] = lengthStyle("padding-bottom")
 
-
   /**
     * The padding-left CSS property of an element sets the padding space required
     * on the left side of an element. The padding area is the space between the
@@ -1596,7 +1460,6 @@ trait StyleProps {
     */
   lazy val paddingLeft: StyleProp[String] with u.Length[DSP] = lengthStyle("padding-left")
 
-
   /**
     * The page-break-after CSS property adjusts page breaks after the current
     * element.
@@ -1604,7 +1467,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/page-break-after page-break-after @ MDN]]
     */
   lazy val pageBreakAfter: StyleProp[String] with s.PageBreak = pageBreakStyle("page-break-after")
-
 
   /**
     * The page-break-before CSS property adjusts page breaks before the current
@@ -1617,7 +1479,6 @@ trait StyleProps {
     */
   lazy val pageBreakBefore: StyleProp[String] with s.PageBreak = pageBreakStyle("page-break-before")
 
-
   /**
     * The page-break-inside CSS property adjusts page breaks inside the current
     * element.
@@ -1625,7 +1486,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/page-break-inside page-break-inside @ MDN]]
     */
   lazy val pageBreakInside: StyleProp[String] with s.PageBreak = pageBreakStyle("page-break-inside")
-
 
   /**
     * The perspective CSS property determines the distance between the z=0 plane
@@ -1638,7 +1498,6 @@ trait StyleProps {
     */
   lazy val perspective: StyleProp[String] with s.None[String] = noneStyle("perspective")
 
-
   /**
     * The perspective-origin CSS property determines the position the viewer is
     * looking at. It is used as the vanishing point by the perspective property.
@@ -1646,7 +1505,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/perspective-origin perspective-origin @ MDN]]
     */
   lazy val perspectiveOrigin: StyleProp[String] = stringStyle("perspective-origin")
-
 
   /**
     * The CSS property pointer-events allows authors to control under what
@@ -1662,7 +1520,6 @@ trait StyleProps {
     */
   lazy val pointerEvents: StyleProp[String] with s.PointerEvents = pointerEventsStyle("pointer-events")
 
-
   /**
     * The position CSS property chooses alternative rules for positioning elements,
     * designed to be useful for scripted animation effects.
@@ -1670,7 +1527,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/position position @ MDN]]
     */
   lazy val position: StyleProp[String] with s.Position = positionStyle("position")
-
 
   /**
     * The quotes CSS property sets how the browser should render quotation marks
@@ -1681,7 +1537,6 @@ trait StyleProps {
     */
   lazy val quotes: StyleProp[String] = stringStyle("quotes")
 
-
   /**
     * The resize CSS property sets whether an element is resizable, and if so,
     * in which direction(s).
@@ -1689,7 +1544,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/resize resize @ MDN]]
     */
   lazy val resize: StyleProp[String] = stringStyle("resize")
-
 
   /**
     * The right CSS property specifies part of the position of positioned elements.
@@ -1711,7 +1565,6 @@ trait StyleProps {
     */
   lazy val right: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("right")
 
-
   /**
     * The scroll-margin-top property defines the top margin of the scroll snap
     * area that is used for snapping this box to the snapport. The scroll snap
@@ -1723,7 +1576,6 @@ trait StyleProps {
     */
   lazy val scrollMarginTop: StyleProp[String] with u.Length[DSP] = lengthStyle("scroll-margin-top")
 
-
   /**
     * The row-gap CSS property sets the size of the gap (gutter) between an element's rows.
     *
@@ -1732,7 +1584,6 @@ trait StyleProps {
     */
   lazy val rowGap: StyleProp[String] with u.Length[DSP] = lengthStyle("row-gap")
 
-
   /**
     * The table-layout CSS property sets the algorithm used to lay out `<table>`
     * cells, rows, and columns.
@@ -1740,7 +1591,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/table-layout table-layout @ MDN]]
     */
   lazy val tableLayout: StyleProp[String] with s.TableLayout = tableLayoutStyle("table-layout")
-
 
   /**
     * The text-align CSS property describes how inline content like text is
@@ -1751,7 +1601,6 @@ trait StyleProps {
     */
   lazy val textAlign: StyleProp[String] with s.TextAlign = textAlignStyle("text-align")
 
-
   /**
     * The text-align-last CSS property describes how the last line of a block or
     * a line, right before a forced line break, is aligned.
@@ -1760,7 +1609,6 @@ trait StyleProps {
     */
   lazy val textAlignLast: StyleProp[String] with s.TextAlign = textAlignStyle("text-align-last")
 
-
   /**
     * The text-decoration CSS property is used to set the text formatting to
     * underline, overline, line-through or blink.
@@ -1768,7 +1616,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/text-decoration text-decoration @ MDN]]
     */
   lazy val textDecoration: StyleProp[String] with s.TextDecoration = textDecorationStyle("text-decoration")
-
 
   /**
     * The text-indent CSS property specifies how much horizontal space should be
@@ -1780,7 +1627,6 @@ trait StyleProps {
     */
   lazy val textIndent: StyleProp[String] = stringStyle("text-indent")
 
-
   /**
     * The text-overflow CSS property determines how overflowed content that is
     * not displayed is signaled to the users. It can be clipped, or display an
@@ -1789,7 +1635,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow text-overflow @ MDN]]
     */
   lazy val textOverflow: StyleProp[String] with s.TextOverflow = textOverflowStyle("text-overflow")
-
 
   /**
     * The text-shadow CSS property adds shadows to text. It accepts a comma-separated
@@ -1805,7 +1650,6 @@ trait StyleProps {
     */
   lazy val textShadow: StyleProp[String] with s.None[String] = noneStyle("text-shadow")
 
-
   /**
     * The text-transform CSS property specifies how to capitalize an element's
     * text. It can be used to make text appear in all-uppercase or all-lowercase,
@@ -1814,7 +1658,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform text-transform @ MDN]]
     */
   lazy val textTransform: StyleProp[String] with s.TextTransform = textTransformStyle("text-transform")
-
 
   /**
     * The CSS text-underline-position property specifies the position of the
@@ -1826,7 +1669,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/text-underline-position text-underline-position @ MDN]]
     */
   lazy val textUnderlinePosition: StyleProp[String] with s.TextUnderlinePosition = textUnderlinePositionStyle("text-underline-position")
-
 
   /**
     * The top CSS property specifies part of the position of positioned elements.
@@ -1847,7 +1689,6 @@ trait StyleProps {
     */
   lazy val top: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("top")
 
-
   /**
     * The CSS transform property lets you modify the coordinate space of the CSS
     * visual formatting model. Using it, elements can be translated, rotated,
@@ -1860,7 +1701,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/transform transform @ MDN]]
     */
   lazy val transform: StyleProp[String] = stringStyle("transform")
-
 
   /**
     * The transform-origin CSS property lets you modify the origin for
@@ -1875,7 +1715,6 @@ trait StyleProps {
     */
   lazy val transformOrigin: StyleProp[String] = stringStyle("transform-origin")
 
-
   /**
     * The transform-style CSS property determines if the children of the element
     * are positioned in the 3D-space or are flattened in the plane of the element.
@@ -1883,7 +1722,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/transform-style transform-style @ MDN]]
     */
   lazy val transformStyle: StyleProp[String] = stringStyle("transform-style")
-
 
   /**
     * The CSS transition property is a shorthand property for transition-property,
@@ -1895,7 +1733,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/transition transition @ MDN]]
     */
   lazy val transition: StyleProp[String] = stringStyle("transition")
-
 
   /**
     * The transition-delay CSS property specifies the amount of time to wait
@@ -1919,7 +1756,6 @@ trait StyleProps {
     */
   lazy val transitionDelay: StyleProp[String] with u.Time[DSP] = timeStyle("transition-delay")
 
-
   /**
     * The transition-duration CSS property specifies the number of seconds or
     * milliseconds a transition animation should take to complete. By default,
@@ -1936,7 +1772,6 @@ trait StyleProps {
     */
   lazy val transitionDuration: StyleProp[String] with u.Time[DSP] = timeStyle("transition-duration")
 
-
   /**
     * The CSS transition-timing-function property is used to describe how the
     * intermediate values of the CSS properties being affected by a transition
@@ -1947,7 +1782,6 @@ trait StyleProps {
     */
   lazy val transitionTimingFunction: StyleProp[String] = stringStyle("transition-timing-function")
 
-
   /**
     * The transition-property CSS property is used to specify the names of CSS
     * properties to which a transition effect should be applied.
@@ -1955,7 +1789,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/transition-property transition-property @ MDN]]
     */
   lazy val transitionProperty: StyleProp[String] = stringStyle("transition-property")
-
 
   /**
     * The unicode-bidi CSS property together with the `direction` property relates
@@ -1969,7 +1802,6 @@ trait StyleProps {
     */
   lazy val unicodeBidi: StyleProp[String] = stringStyle("unicode-bidi")
 
-
   /**
     * The vertical-align CSS property specifies the vertical alignment of an
     * inline or table-cell box. It does not apply to block-level elements.
@@ -1978,7 +1810,6 @@ trait StyleProps {
     */
   lazy val verticalAlign: StyleProp[String] with s.VerticalAlign = verticalAlignStyle("vertical-align")
 
-
   /**
     * The visibility CSS property shows or hides an element without changing the
     * layout of a document. The property can also hide rows or columns in a `<table>`.
@@ -1986,7 +1817,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/visibility visibility @ MDN]]
     */
   lazy val visibility: StyleProp[String] with s.Visibility = visibilityStyle("visibility")
-
 
   /**
     * The width CSS property specifies the width of the content area of an element.
@@ -1998,7 +1828,6 @@ trait StyleProps {
     */
   lazy val width: StyleProp[String] with s.Auto[String] with u.Length[DSP] = lengthAutoStyle("width")
 
-
   /**
     * The white-space CSS property is used to to describe how whitespace inside
     * the element is handled.
@@ -2006,7 +1835,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/white-space white-space @ MDN]]
     */
   lazy val whiteSpace: StyleProp[String] with s.WhiteSpace = whiteSpaceStyle("white-space")
-
 
   /**
     * The widows CSS property defines how many minimum lines must be left on top
@@ -2022,7 +1850,6 @@ trait StyleProps {
     */
   lazy val widows: StyleProp[Int | String] = intStyle("widows")
 
-
   /**
     * The word-break CSS property specifies whether or not the browser should
     * insert line breaks wherever the text would otherwise overflow its content
@@ -2032,7 +1859,6 @@ trait StyleProps {
     */
   lazy val wordBreak: StyleProp[String] with s.WordBreak = wordBreakStyle("word-break")
 
-
   /**
     * The word-spacing CSS property specifies spacing behavior between tags and
     * words.
@@ -2040,7 +1866,6 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/word-spacing word-spacing @ MDN]]
     */
   lazy val wordSpacing: StyleProp[String] with s.Normal[String] = normalStyle("word-spacing")
-
 
   /**
     * The z-index CSS property specifies the z-order of an element and its
@@ -2050,7 +1875,6 @@ trait StyleProps {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/z-index z-index @ MDN]]
     */
-  lazy val zIndex: StyleProp[Int] with s.Auto[Int] = autoStyle("z-index")
-
+  lazy val zIndex: StyleProp[Int | String] with s.Auto[Int | String] = autoStyle("z-index")
 
 }

@@ -11,9 +11,9 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait Direction { this: StyleProp[String] =>
 
   /** Text and other elements go from left to right. */
-  lazy val ltr: StyleSetter[String] = this := "ltr"
+  lazy val ltr: StyleSetter[String, String] = this := "ltr"
 
   /** Text and other elements go from right to left. */
-  lazy val rtl: StyleSetter[String] = this := "rtl"
+  lazy val rtl: StyleSetter[String, String] = this := "rtl"
 
 }

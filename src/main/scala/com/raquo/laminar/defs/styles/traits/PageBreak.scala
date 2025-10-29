@@ -11,15 +11,15 @@ import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 trait PageBreak extends Auto[String] { this: StyleProp[String] =>
 
   /** Always force page breaks. */
-  lazy val always: StyleSetter[String] = this := "always"
+  lazy val always: StyleSetter[String, String] = this := "always"
 
   /** Avoid page breaks. */
-  lazy val avoid: StyleSetter[String] = this := "avoid"
+  lazy val avoid: StyleSetter[String, String] = this := "avoid"
 
   /** Force page breaks so that the next page is formatted as a left page. */
-  lazy val left: StyleSetter[String] = this := "left"
+  lazy val left: StyleSetter[String, String] = this := "left"
 
   /** Force page breaks so that the next page is formatted as a right page. */
-  lazy val right: StyleSetter[String] = this := "right"
+  lazy val right: StyleSetter[String, String] = this := "right"
 
 }

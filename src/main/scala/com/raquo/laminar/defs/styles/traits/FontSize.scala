@@ -12,30 +12,30 @@ import com.raquo.laminar.keys.DerivedStyleProp
 
 trait FontSize extends u.Length[DerivedStyleProp] { this: StyleProp[String] =>
 
-  lazy val xxSmall: StyleSetter[String] = this := "xx-small"
+  lazy val xxSmall: StyleSetter[String, String] = this := "xx-small"
 
-  lazy val xSmall: StyleSetter[String] = this := "x-small"
+  lazy val xSmall: StyleSetter[String, String] = this := "x-small"
 
-  lazy val small: StyleSetter[String] = this := "small"
+  lazy val small: StyleSetter[String, String] = this := "small"
 
-  lazy val medium: StyleSetter[String] = this := "medium"
+  lazy val medium: StyleSetter[String, String] = this := "medium"
 
-  lazy val large: StyleSetter[String] = this := "large"
+  lazy val large: StyleSetter[String, String] = this := "large"
 
-  lazy val xLarge: StyleSetter[String] = this := "x-large"
+  lazy val xLarge: StyleSetter[String, String] = this := "x-large"
 
-  lazy val xxLarge: StyleSetter[String] = this := "xx-large"
+  lazy val xxLarge: StyleSetter[String, String] = this := "xx-large"
 
   /**
     * Larger than the parent element's font size, by roughly the ratio used to
     * separate the absolute size keywords above.
     */
-  lazy val larger: StyleSetter[String] = this := "larger"
+  lazy val larger: StyleSetter[String, String] = this := "larger"
 
   /**
     * Smaller than the parent element's font size, by roughly the ratio used to
     * separate the absolute size keywords above.
     */
-  lazy val smaller: StyleSetter[String] = this := "smaller"
+  lazy val smaller: StyleSetter[String, String] = this := "smaller"
 
 }

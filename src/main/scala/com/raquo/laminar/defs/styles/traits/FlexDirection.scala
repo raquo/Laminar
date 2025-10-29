@@ -15,18 +15,18 @@ trait FlexDirection { this: StyleProp[String] =>
     * The main-start and main-end points are the same as the before
     * and after points of the writing-mode.
     */
-  lazy val column: StyleSetter[String] = this := "column"
+  lazy val column: StyleSetter[String, String] = this := "column"
 
   /** Behaves the same as column but the main-start and main-end are permuted. */
-  lazy val columnReverse: StyleSetter[String] = this := "column-reverse"
+  lazy val columnReverse: StyleSetter[String, String] = this := "column-reverse"
 
   /**
     * The flex container's main-axis is defined to be the same as the text direction.
     * The main-start and main-end points are the same as the content direction.
     */
-  lazy val row: StyleSetter[String] = this := "row"
+  lazy val row: StyleSetter[String, String] = this := "row"
 
   /** Behaves the same as row but the main-start and main-end points are permuted. */
-  lazy val rowReverse: StyleSetter[String] = this := "row-reverse"
+  lazy val rowReverse: StyleSetter[String, String] = this := "row-reverse"
 
 }

@@ -8,7 +8,7 @@ import com.raquo.laminar.nodes.ReactiveElement
 /**
   * This is like [[SimpleKeySetter]], but for composite attributes like `cls` and `role`.
   *
-  * CompositeKeySetter can not be a subtype of KeySetter because we can not implement
+  * CompositeKeySetter can not be a subtype of [[SimpleKeySetter]] because we can not implement
   * `val value` – the actual value to be set is dynamic, depending on the current
   * value of the element's composite attribute.
   *
@@ -49,17 +49,17 @@ class CompositeKeySetter[-El <: ReactiveElement.Base](
   // which sets one or more classes conditionally.
 
   /** If `include` is true, the items will be added, if false, they will not be added */
-  @inline def apply(include: Boolean): CompositeKeySetter[El] = {
-    this := include
-  }
-
-  /** If `include` is true, the items will be added, if false, they will not be added */
   def :=(include: Boolean): CompositeKeySetter[El] = {
     if (include) {
       key(itemsToAdd: _*)
     } else {
       key()
     }
+  }
+
+  /** If `include` is true, the items will be added, if false, they will not be added */
+  @inline def apply(include: Boolean): CompositeKeySetter[El] = {
+    this := include
   }
 
   /** If the `include` observable emits true, value(s) will be added,

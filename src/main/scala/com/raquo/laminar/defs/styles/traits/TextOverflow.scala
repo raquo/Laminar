@@ -17,7 +17,7 @@ trait TextOverflow { this: StyleProp[String] =>
     * empty string value must be used. The value clip is the default for
     * this property.
     */
-  lazy val clip: StyleSetter[String] = this := "clip"
+  lazy val clip: StyleSetter[String, String] = this := "clip"
 
   /**
     * This keyword value indicates to display an ellipsis ('…', U+2026 HORIZONTAL
@@ -25,6 +25,6 @@ trait TextOverflow { this: StyleProp[String] =>
     * content area, decreasing the amount of text displayed. If there is not
     * enough space to display the ellipsis, it is clipped.
     */
-  lazy val ellipsis: StyleSetter[String] = this := "ellipsis"
+  lazy val ellipsis: StyleSetter[String, String] = this := "ellipsis"
 
 }

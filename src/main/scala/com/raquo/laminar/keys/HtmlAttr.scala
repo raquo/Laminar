@@ -11,4 +11,9 @@ import com.raquo.laminar.nodes.ReactiveHtmlElement
 class HtmlAttr[V](
   override val name: String,
   override val codec: Codec[V, String]
-) extends SimpleAttr[HtmlAttr[V], V, ReactiveHtmlElement.Base]
+) extends SimpleAttr[HtmlAttr[V], V, ReactiveHtmlElement.Base] {
+
+  override lazy val maybe: HtmlAttr[Option[V]] = {
+    new HtmlAttr[Option[V]](name, codec.optAsNull)
+  }
+}
