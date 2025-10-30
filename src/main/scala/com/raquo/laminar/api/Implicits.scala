@@ -86,15 +86,15 @@ with CompositeValueMapper.Implicits {
   // -- Methods to convert collections of nodes to modifiers --
 
   // #Note: the case of Collection[Component] is covered by `seqToModifier` above
-  implicit def nodeSeqToModifier[Collection[_]](
-    nodes: Collection[ChildNode.Base]
-  )(implicit
-    renderableSeq: RenderableSeq[Collection]
-  ): Modifier.Base = {
-    Modifier { element =>
-      renderableSeq.foreach(nodes)(_.apply(element))
-    }
-  }
+  // implicit def nodeSeqToModifier[Collection[_]](
+  //   nodes: Collection[ChildNode.Base]
+  // )(implicit
+  //   renderableSeq: RenderableSeq[Collection]
+  // ): Modifier.Base = {
+  //   Modifier { element =>
+  //     renderableSeq.foreach(nodes)(_.apply(element))
+  //   }
+  // }
 }
 
 object Implicits {
