@@ -53,11 +53,19 @@ trait DomKeys {
     } else {
       prop.codec.encode(value.asInstanceOf[ThisV]) // #Safe because null check above
     }
-    raw.setHtmlProperty(
-      element = element.ref,
-      name = prop.name,
-      value = domValue
-    )
+    if (domValue == null) {
+      raw.removeHtmlProperty(
+        element = element.ref,
+        propName = prop.name,
+        reflectedAttrName = prop.reflectedAttrName
+      )
+    } else {
+      raw.setHtmlProperty(
+        element = element.ref,
+        name = prop.name,
+        value = domValue
+      )
+    }
   }
 
   /** If you don't have a String value, pass `prop(scalaValue).cssValue` to value`. */

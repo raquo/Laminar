@@ -60,7 +60,8 @@ with DerivedStyleBuilder[DerivedStyleProp] { self =>
 
   // #nc if this has to be public, rename to `:=`?
   // #nc scala 3 does not allow access
-   // #TODO[Scala3] bug – Scala does not allow me to use the parent method of this from trait Auto. Make a small reproduction. This method should be protected.
+  // #TODO[Scala3] bug – Scala does not allow me to use the parent method of this from trait Auto. Make a small reproduction. This method should be protected.
+  //  https://github.com/scala/scala3/issues/24305
   override def styleSetter(value: String): StyleSetter[V, String] =
     new StyleSetter(this, value)
 
