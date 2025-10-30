@@ -48,9 +48,23 @@ abstract class HtmlProp[V](
   }
 
   override lazy val maybe: HtmlProp[Option[V]] = {
-    new HtmlProp[Option[V]](name, reflectedAttrName) {
-      override type DomV = self.DomV
-      override val codec: Codec[Option[V], DomV] = self.codec.optAsNull
+    HtmlProp[Option[V], self.DomV](
+      name, reflectedAttrName, self.codec.optAsNull
+    )
+  }
+}
+
+object HtmlProp {
+
+  def apply[V, _DomV](
+    name: String,
+    reflectedAttrName: Option[String],
+    codec: Codec[V, _DomV]
+  ): HtmlProp[V] { type DomV = _DomV } = {
+    val _codec = codec
+    new HtmlProp[V](name, reflectedAttrName) {
+      type DomV = _DomV
+      override val codec: Codec[V, DomV] = _codec
     }
   }
 }

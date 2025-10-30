@@ -3,6 +3,8 @@ package com.raquo.laminar.defs.props
 import com.raquo.laminar.keys.HtmlProp
 import com.raquo.laminar.codecs._
 
+import scala.scalajs.js.|
+
 // #NOTE: GENERATED CODE
 //  - This file is generated at compile time from the data in Scala DOM Types
 //  - See `project/DomDefsGenerator.scala` for code generation params
@@ -12,37 +14,56 @@ trait HtmlProps {
 
 
   /**
-    * Create custom HTML element property
+    * Create custom HTML element property (reflected)
     *
-    * @param name     - name of the prop in JS, e.g. "formNoValidate"
-    * @param attrName - name of reflected attr, if any, e.g. "formnovalidate"
-    *                   (use `None` if property is not reflected)
-    * @param codec    - used to encode V into DomV, e.g. StringAsIsCodec,
+    * @param name              - name of the prop in JS, e.g. "formNoValidate"
+    * @param reflectedAttrName - name of reflected attr, if any, e.g. "formnovalidate"
+    *                            (use `None` if property is not reflected)
+    * @param codec             - used to encode V into DomV, e.g. StringAsIsCodec,
     *
-    * @tparam V       - value type for this prop in Scala
-    * @tparam DomV    - value type for this prop in the underlying JS DOM.
+    * @see https://github.com/raquo/scala-dom-types?tab=readme-ov-file#reflected-attributes
+    *
+    * @tparam V                - value type for this prop in Scala
+    * @tparam DomV             - value type for this prop in the underlying JS DOM.
     */
   def htmlProp[V, DomV](
     name: String,
-    attrName: Option[String] = None,
+    reflectedAttrName: String | Null,
     codec: Codec[V, DomV]
   ): HtmlProp[V] = {
-    val _codec = codec
-    type _DomV = DomV
-    new HtmlProp[V](name, attrName) {
-      type DomV = _DomV
-      override val codec: Codec[V, DomV] = _codec
-    }
+    HtmlProp[V, DomV](
+      name,
+      Option(reflectedAttrName.asInstanceOf[String]), // #Safe asInstanceOf needed in Scala 2 because `|` there is not a real union type.
+      codec
+    )
+  }
+
+  /**
+    * Create custom HTML element property (non-reflected)
+    *
+    * @param name              - name of the prop in JS, e.g. "formNoValidate"
+    * @param codec             - used to encode V into DomV, e.g. StringAsIsCodec,
+    *
+    * @see https://github.com/raquo/scala-dom-types?tab=readme-ov-file#reflected-attributes
+    *
+    * @tparam V                - value type for this prop in Scala
+    * @tparam DomV             - value type for this prop in the underlying JS DOM.
+    */
+  def htmlProp[V, DomV](
+    name: String,
+    codec: Codec[V, DomV]
+  ): HtmlProp[V] = {
+    HtmlProp[V, DomV](name, reflectedAttrName = None, codec)
   }
 
 
-  @inline protected def boolProp(name: String, attrName: String = null): HtmlProp[Boolean] = htmlProp(name, Option(attrName), BooleanAsIsCodec)
+  @inline protected def boolProp(name: String, attrName: String | Null = null): HtmlProp[Boolean] = htmlProp(name, attrName, BooleanAsIsCodec)
 
-  @inline protected def doubleProp(name: String, attrName: String = null): HtmlProp[Double] = htmlProp(name, Option(attrName), DoubleAsIsCodec)
+  @inline protected def doubleProp(name: String, attrName: String | Null = null): HtmlProp[Double] = htmlProp(name, attrName, DoubleAsIsCodec)
 
-  @inline protected def intProp(name: String, attrName: String = null): HtmlProp[Int] = htmlProp(name, Option(attrName), IntAsIsCodec)
+  @inline protected def intProp(name: String, attrName: String | Null = null): HtmlProp[Int] = htmlProp(name, attrName, IntAsIsCodec)
 
-  @inline protected def stringProp(name: String, attrName: String = null): HtmlProp[String] = htmlProp(name, Option(attrName), StringAsIsCodec)
+  @inline protected def stringProp(name: String, attrName: String | Null = null): HtmlProp[String] = htmlProp(name, attrName, StringAsIsCodec)
 
 
 

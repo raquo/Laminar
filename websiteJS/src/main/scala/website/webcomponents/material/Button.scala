@@ -28,7 +28,7 @@ object Button {
 
   private val tag: HtmlTag[Ref] = htmlTag("mwc-button")
 
-  val id: HtmlProp[String, String] = idAttr
+  val id: HtmlProp[String] = idAttr
 
   val label: HtmlAttr[String]   = htmlAttr("label", StringAsIsCodec)
   val raised: HtmlAttr[Boolean] = htmlAttr("raised", BooleanAsAttrPresenceCodec)
