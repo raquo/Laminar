@@ -45,3 +45,73 @@ trait Codec[ScalaType, DomType] { self =>
     }
   }
 }
+
+object Codec {
+
+  /** "as-is" codecs are identity functions – they read / write the value directly. */
+  def asIsCodec[V](): Codec[V, V] = new Codec[V, V] {
+    override def encode(scalaValue: V): V = scalaValue
+
+    override def decode(domValue: V): V = domValue
+  }
+
+  val stringAsIs: Codec[String, String] = asIsCodec()
+
+  // --
+
+  val intAsIs: Codec[Int, Int] = asIsCodec()
+
+  lazy val intAsString: Codec[Int, String] = new Codec[Int, String] {
+
+    override def decode(domValue: String): Int = domValue.toInt // @TODO this can throw exception. How do we handle this?
+
+    override def encode(scalaValue: Int): String = scalaValue.toString
+  }
+
+  // --
+
+  lazy val doubleAsIs: Codec[Double, Double] = asIsCodec()
+
+  lazy val doubleAsString: Codec[Double, String] = new Codec[Double, String] {
+
+    override def decode(domValue: String): Double = domValue.toDouble // @TODO this can throw exception. How do we handle this?
+
+    override def encode(scalaValue: Double): String = scalaValue.toString
+  }
+
+  // --
+
+  val booleanAsIs: Codec[Boolean, Boolean] = asIsCodec()
+
+  /** Codec for certain HTML attributes.
+    *  - If you set `true` in Scala, attribute will be added with empty value.
+    *  - If you set `false` in Scala, attribute will be removed from the DOM
+    */
+  val booleanAsAttrPresenceCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
+
+    override def decode(domValue: String): Boolean = domValue != null
+
+    override def encode(scalaValue: Boolean): String = if (scalaValue) "" else null
+  }
+
+  lazy val booleanAsTrueFalseString: Codec[Boolean, String] = new Codec[Boolean, String] {
+
+    override def decode(domValue: String): Boolean = domValue == "true"
+
+    override def encode(scalaValue: Boolean): String = if (scalaValue) "true" else "false"
+  }
+
+  lazy val booleanAsYesNoString: Codec[Boolean, String] = new Codec[Boolean, String] {
+
+    override def decode(domValue: String): Boolean = domValue == "yes"
+
+    override def encode(scalaValue: Boolean): String = if (scalaValue) "yes" else "no"
+  }
+
+  lazy val booleanAsOnOffString: Codec[Boolean, String] = new Codec[Boolean, String] {
+
+    override def decode(domValue: String): Boolean = domValue == "on"
+
+    override def encode(scalaValue: Boolean): String = if (scalaValue) "on" else "off"
+  }
+}

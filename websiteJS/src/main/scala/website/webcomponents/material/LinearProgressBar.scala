@@ -1,7 +1,7 @@
 package website.webcomponents.material
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.codecs.{BooleanAsIsCodec, DoubleAsIsCodec}
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
@@ -29,11 +29,11 @@ object LinearProgressBar {
 
   private val tag: HtmlTag[Ref] = htmlTag("mwc-linear-progress")
 
-  val indeterminate: HtmlProp[Boolean] = htmlProp("indeterminate", BooleanAsIsCodec)
-  val reverse: HtmlProp[Boolean]       = htmlProp("reverse", BooleanAsIsCodec)
-  val closed: HtmlProp[Boolean]        = htmlProp("closed", BooleanAsIsCodec)
-  val progress: HtmlProp[Double]        = htmlProp("progress", DoubleAsIsCodec)
-  val buffer: HtmlProp[Double]          = htmlProp("buffer", DoubleAsIsCodec)
+  val indeterminate: HtmlProp[Boolean] = htmlProp("indeterminate", None, Codec.booleanAsIs)
+  val reverse: HtmlProp[Boolean]       = htmlProp("reverse", None, Codec.booleanAsIs)
+  val closed: HtmlProp[Boolean]        = htmlProp("closed", None, Codec.booleanAsIs)
+  val progress: HtmlProp[Double]        = htmlProp("progress", None, Codec.doubleAsIs)
+  val buffer: HtmlProp[Double]          = htmlProp("buffer", None, Codec.doubleAsIs)
 
   object styles {
     val mdcThemePrimary: StyleProp[String] = styleProp("--mdc-theme-primary")

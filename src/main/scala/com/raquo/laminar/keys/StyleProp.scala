@@ -12,7 +12,7 @@ class StyleProp[V](
   val prefixes: Seq[String] = Nil
 ) extends SimpleKey[StyleProp[V], V, ReactiveHtmlElement.Base]
 with GlobalKeywords[V]
-with StyleBuilder[V, StyleSetter[V, String]]
+with StyleBuilder[StyleSetter[V, String]]
 with DerivedStyleBuilder[DerivedStyleProp] { self =>
 
   override def :=[ThisV <: V](value: ThisV): StyleSetter[V, ThisV] = {

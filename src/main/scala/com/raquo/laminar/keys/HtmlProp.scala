@@ -56,6 +56,9 @@ abstract class HtmlProp[V](
 
 object HtmlProp {
 
+  @deprecated("HtmlProp.Of[V] is not needed anymore – use HtmlProp[V]", since = "18.0.0-M1")
+  type Of[V] = HtmlProp[V]
+
   def apply[V, _DomV](
     name: String,
     reflectedAttrName: Option[String],

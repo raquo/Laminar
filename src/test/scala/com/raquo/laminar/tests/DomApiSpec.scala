@@ -7,6 +7,8 @@ import com.raquo.laminar.utils.UnitSpec
 
 class DomApiSpec extends UnitSpec {
 
+  color.rgb(200, 100, 0, 0.5).value == "rgb(200 100 0 / 0.5)"
+
   it("HTML: parses") {
     expectNode(
       DomApi.unsafeParseHtmlString("<div class='foo bar'>Hello <b>world</b></div>"),

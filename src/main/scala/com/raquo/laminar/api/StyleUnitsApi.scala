@@ -5,7 +5,7 @@ import com.raquo.laminar.defs.styles.units
 import com.raquo.laminar.keys.{DerivedStyleBuilder, StyleBuilder}
 
 trait StyleUnitsApi
-extends StyleBuilder[String, String]
+extends StyleBuilder[String]
 with DerivedStyleBuilder[StyleEncoder]
 with units.Color[String]
 with units.Length[StyleEncoder]

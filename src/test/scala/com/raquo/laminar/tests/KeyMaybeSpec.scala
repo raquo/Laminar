@@ -1,14 +1,14 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.codecs.IntAsIsCodec
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.utils.UnitSpec
 
 class KeyMaybeSpec extends UnitSpec {
 
   it("maybe :=") {
 
-    val fooProp = htmlProp("foo", IntAsIsCodec)
+    val fooProp = htmlProp("foo", None, Codec.intAsIs)
 
     val el = input(
       fooProp.maybe := Some(20), // non-reflected prop
@@ -52,7 +52,7 @@ class KeyMaybeSpec extends UnitSpec {
 
   it("maybe apply") {
 
-    val fooProp = htmlProp("foo", IntAsIsCodec)
+    val fooProp = htmlProp("foo", None, Codec.intAsIs)
 
     val el = input(
       fooProp.maybe(Some(20)), // non-reflected prop
@@ -96,7 +96,7 @@ class KeyMaybeSpec extends UnitSpec {
 
   it("maybe <--") {
 
-    val fooProp = htmlProp("foo", IntAsIsCodec)
+    val fooProp = htmlProp("foo", None, Codec.intAsIs)
 
     val fooVar = Var(Option(20))
     val titleVar = Var(Option("Hello"))

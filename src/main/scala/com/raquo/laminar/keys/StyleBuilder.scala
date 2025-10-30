@@ -1,9 +1,9 @@
 package com.raquo.laminar.keys
 
 /** This trait is extended by:
-  *  - `class StyleProp[V] ... with StyleBuilder[V, StyleSetter[V, String]]`
+  *  - `class StyleProp[V] ... with StyleBuilder[StyleSetter[V, String]]`
   *      - def styleSetter returns `key := value` setters
-  *  - `L.style` via trait StyleUnitsApi[String, StyleEncoder] extends StyleBuilder[String, String]`
+  *  - `L.style` via `trait StyleUnitsApi[String, StyleEncoder] extends StyleBuilder[String, String]`
   *      - def styleSetter returns raw string values
   *
   * Shared usage of def styleSetter via units:
@@ -31,7 +31,7 @@ package com.raquo.laminar.keys
   *  - styleSetter can accept multiple named arguments of any types,
   *    but it returns a single type SSS (e.g. StyleSetter[String, String] or String)
   */
-trait StyleBuilder[V, SSS] {
+trait StyleBuilder[SSS] {
 
   protected def styleSetter(value: String): SSS
 }

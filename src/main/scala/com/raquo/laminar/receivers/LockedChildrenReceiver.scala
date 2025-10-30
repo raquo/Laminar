@@ -7,8 +7,10 @@ import com.raquo.laminar.inserters.DynamicInserter
 import com.raquo.laminar.nodes.ChildNode
 
 class LockedChildrenReceiver(
-  val nodes: laminar.Seq[ChildNode.Base]
+  _nodes: => laminar.Seq[ChildNode.Base]
 ) {
+
+  @inline def nodes: laminar.Seq[ChildNode.Base] = _nodes
 
   /** If `include` is true, the nodes will be added. */
   @inline def apply(include: Boolean): laminar.Seq[ChildNode.Base] = {

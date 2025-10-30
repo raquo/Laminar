@@ -5,85 +5,44 @@ package object codecs {
   @deprecated("This used to be a subtrait of Codec, but now it's just a type alias. It will be removed later.")
   type AsIsCodec[V] = Codec[V, V]
 
-  def AsIsCodec[V](): Codec[V, V] = new Codec[V, V] {
-    override def encode(scalaValue: V): V = scalaValue
-
-    override def decode(domValue: V): V = domValue
-  }
+  @deprecated("Moved to Codec.asIsCodec", "18.0.0-M1")
+  def AsIsCodec[V](): Codec[V, V] = Codec.asIsCodec()
 
   // String Codecs
 
-  val StringAsIsCodec: Codec[String, String] = AsIsCodec()
+  @deprecated("Moved to Codec.stringAsIs", "18.0.0-M1")
+  lazy val StringAsIsCodec: Codec[String, String] = Codec.stringAsIs
 
   // Int Codecs
 
-  val IntAsIsCodec: Codec[Int, Int] = AsIsCodec()
+  @deprecated("Moved to Codec.intAsIs", "18.0.0-M1")
+  lazy val IntAsIsCodec: Codec[Int, Int] = Codec.intAsIs
 
-  lazy val IntAsStringCodec: Codec[Int, String] = new Codec[Int, String] {
-
-    override def decode(domValue: String): Int = domValue.toInt // @TODO this can throw exception. How do we handle this?
-
-    override def encode(scalaValue: Int): String = scalaValue.toString
-  }
+  @deprecated("Moved to Codec.intAsString", "18.0.0-M1")
+  lazy val IntAsStringCodec: Codec[Int, String] = Codec.intAsString
 
   // Double Codecs
 
-  lazy val DoubleAsIsCodec: Codec[Double, Double] = AsIsCodec()
+  @deprecated("Moved to Codec.doubleAsIs", "18.0.0-M1")
+  lazy val DoubleAsIsCodec: Codec[Double, Double] = Codec.doubleAsIs
 
-  lazy val DoubleAsStringCodec: Codec[Double, String] = new Codec[Double, String] {
-
-    override def decode(domValue: String): Double = domValue.toDouble // @TODO this can throw exception. How do we handle this?
-
-    override def encode(scalaValue: Double): String = scalaValue.toString
-  }
+  @deprecated("Moved to Codec.doubleAsString", "18.0.0-M1")
+  lazy val DoubleAsStringCodec: Codec[Double, String] = Codec.doubleAsString
 
   // Boolean Codecs
 
-  val BooleanAsIsCodec: Codec[Boolean, Boolean] = AsIsCodec()
+  @deprecated("Moved to Codec.booleanAsIs", "18.0.0-M1")
+  lazy val BooleanAsIsCodec: Codec[Boolean, Boolean] = Codec.booleanAsIs
 
-  val BooleanAsAttrPresenceCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
+  @deprecated("Moved to Codec.booleanAsAttrPresenceCodec", "18.0.0-M1")
+  lazy val BooleanAsAttrPresenceCodec: Codec[Boolean, String] = Codec.booleanAsAttrPresenceCodec
 
-    override def decode(domValue: String): Boolean = domValue != null
+  @deprecated("Moved to Codec.booleanAsTrueFalseString", "18.0.0-M1")
+  lazy val BooleanAsTrueFalseStringCodec: Codec[Boolean, String] = Codec.booleanAsTrueFalseString
 
-    override def encode(scalaValue: Boolean): String = if (scalaValue) "" else null
-  }
+  @deprecated("Moved to Codec.booleanAsYesNoString", "18.0.0-M1")
+  lazy val BooleanAsYesNoStringCodec: Codec[Boolean, String] = Codec.booleanAsYesNoString
 
-  lazy val BooleanAsTrueFalseStringCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
-
-    override def decode(domValue: String): Boolean = domValue == "true"
-
-    override def encode(scalaValue: Boolean): String = if (scalaValue) "true" else "false"
-  }
-
-  lazy val BooleanAsYesNoStringCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
-
-    override def decode(domValue: String): Boolean = domValue == "yes"
-
-    override def encode(scalaValue: Boolean): String = if (scalaValue) "yes" else "no"
-  }
-
-  lazy val BooleanAsOnOffStringCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
-
-    override def decode(domValue: String): Boolean = domValue == "on"
-
-    override def encode(scalaValue: Boolean): String = if (scalaValue) "on" else "off"
-  }
-
-  // Iterable Codecs
-
-  @deprecated("Laminar no longer uses IterableAsSpaceSeparatedStringCodec so I plan to remove it; if you need it, please let me know", "15.0.0-M7")
-  lazy val IterableAsSpaceSeparatedStringCodec: Codec[Iterable[String], String] = new Codec[Iterable[String], String] { // could use for e.g. className
-
-    override def decode(domValue: String): Iterable[String] = if (domValue == "") Nil else domValue.split(' ')
-
-    override def encode(scalaValue: Iterable[String]): String = scalaValue.mkString(" ")
-  }
-
-  @deprecated("Laminar no longer uses IterableAsCommaSeparatedStringCodec so I plan to remove it; if you need it, please let me know", "15.0.0-M7")
-  lazy val IterableAsCommaSeparatedStringCodec: Codec[Iterable[String], String] = new Codec[Iterable[String], String] { // could use for lists of IDs
-
-    override def decode(domValue: String): Iterable[String] = if (domValue == "") Nil else domValue.split(',')
-
-    override def encode(scalaValue: Iterable[String]): String = scalaValue.mkString(",")
-  }
+  @deprecated("Moved to Codec.booleanAsOnOffString", "18.0.0-M1")
+  lazy val BooleanAsOnOffStringCodec: Codec[Boolean, String] = Codec.booleanAsOnOffString
 }

@@ -5,7 +5,7 @@ import com.raquo.laminar.keys.StyleBuilder
 // #TODO[API] Is it possible to remove the DSP type param from this trait?
 //  - Probably should split the DSB trait into two? So far we never needed both in the same file.
 
-trait Color[SSS] { this: StyleBuilder[String, SSS] =>
+trait Color[SSS] { this: StyleBuilder[SSS] =>
 
   /** @param red   0..255
     * @param green 0..255

@@ -19,7 +19,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run after the document is printed
-    * 
+    *
     * [[https://developer.mozilla.org/en-US/docs/Web/API/Window/afterprint_event afterprint_event @ MDN]]
     */
   lazy val onAfterPrint: EventProp[dom.Event] = eventProp("afterprint")
@@ -27,7 +27,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run before the document is printed
-    * 
+    *
     * [[https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeprint_event beforeprint_event @ MDN]]
     */
   lazy val onBeforePrint: EventProp[dom.Event] = eventProp("beforeprint")
@@ -35,7 +35,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when the document is about to be unloaded
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event beforeunload_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/BeforeUnloadEvent BeforeUnloadEvent @ MDN]]
     */
@@ -44,7 +44,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when there has been changes to the anchor part of the a URL
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event hashchange_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HashChangeEvent HashChangeEvent @ MDN]]
     */
@@ -53,7 +53,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when an object receives a message
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/message_event message_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent MessageEvent @ MDN]]
     */
@@ -63,7 +63,7 @@ trait WindowEventProps { this: GlobalEventProps =>
   /**
     * Script to be run when an object receives a message that cannot be
     * deserialized and therefore raises an error
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/messageerror_event messageerror_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent MessageEvent @ MDN]]
     */
@@ -72,7 +72,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when the browser starts to work offline
-    * 
+    *
     * [[https://developer.mozilla.org/en-US/docs/Web/API/Window/offline_event offline_event @ MDN]]
     */
   lazy val onOffline: EventProp[dom.Event] = eventProp("offline")
@@ -80,7 +80,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when the browser starts to work online
-    * 
+    *
     * [[https://developer.mozilla.org/en-US/docs/Web/API/Window/online_event online_event @ MDN]]
     */
   lazy val onOnline: EventProp[dom.Event] = eventProp("online")
@@ -88,7 +88,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when a user navigates away from a page
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/pagehide_event pagehide_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/PageTransitionEvent PageTransitionEvent @ MDN]]
     */
@@ -97,7 +97,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when a user navigates to a page
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/pageshow_event pageshow_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/PageTransitionEvent PageTransitionEvent @ MDN]]
     */
@@ -106,7 +106,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when the window's history changes
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/popstate_event popstate_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/PopStateEvent PopStateEvent @ MDN]]
     */
@@ -115,7 +115,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Script to be run when a Web Storage area is updated
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/storage_event storage_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/StorageEvent StorageEvent @ MDN]]
     */
@@ -124,7 +124,7 @@ trait WindowEventProps { this: GlobalEventProps =>
 
   /**
     * Fires once a page has unloaded (or the browser window has been closed)
-    * 
+    *
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/Window/unload_event unload_event @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/API/UIEvent UIEvent @ MDN]]
     */

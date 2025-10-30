@@ -145,7 +145,7 @@ class SyntaxSpec extends UnitSpec {
       zIndex := 1,
       zIndex := "auto",
       zIndex.auto,
-      // zIndex.auto.value, // #nc[Test] – fix this API – convert Modifiers from unions.
+      zIndex.auto.value,
       zIndex.auto.cssValue,
       zIndex <-- Val(1),
       zIndex <-- Val("auto"),
