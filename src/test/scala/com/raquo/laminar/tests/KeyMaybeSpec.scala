@@ -6,18 +6,6 @@ import com.raquo.laminar.utils.UnitSpec
 
 class KeyMaybeSpec extends UnitSpec {
 
-  trait Foo[A] {
-    protected def foo(a: A): Unit = ()
-  }
-
-  class Bar extends Foo[Int] {
-    override protected def foo(a: Int): Unit = ()
-  }
-
-  trait BarFeature { this: Foo[Int] =>
-    foo(1)
-  }
-
   it("maybe :=") {
 
     val fooProp = htmlProp("foo", IntAsIsCodec)
