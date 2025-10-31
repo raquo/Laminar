@@ -115,7 +115,7 @@ class SyntaxSpec extends UnitSpec {
 
     val p1: StyleProp[String] = padding
     val p2: DerivedStyleProp[Int | Double] = padding.px // #Note this used to assert DerivedStyleProp[Int] But I don't think that conversion is safe.
-    assert((padding.px := 12).value == 12)// #Note[Scala2] this prints warning in because .value is Int | Double and Scala is not picking up the implicit conversion for equality comparison
+    assert((padding.px := 12).value == 12) // #Note[Scala2] this prints warning in because .value is Int | Double and Scala is not picking up the implicit conversion for equality comparison
     assert((padding.px := 12).cssValue == "12px")
 
     maxHeight.calc := "12px + 20em" // Length inherits Calc
