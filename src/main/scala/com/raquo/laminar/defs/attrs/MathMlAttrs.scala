@@ -45,7 +45,7 @@ trait MathMlAttrs {
     *  - [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/munder#accentunder munder#accentunder @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/munderover#accentunder munderover#accentunder @ MDN]]
     */
-  lazy val accentunder: MathMlAttr[Boolean] = boolAsPresenceMathMlAttr("accentunder")
+  lazy val accentUnder: MathMlAttr[Boolean] = boolAsPresenceMathMlAttr("accentunder")
 
 
   /**
@@ -63,7 +63,7 @@ trait MathMlAttrs {
     *  - [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtd#columnalign mtd#columnalign @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtr#columnalign mtr#columnalign @ MDN]]
     */
-  lazy val columnalign: MathMlAttr[String] = stringMathMlAttr("columnalign")
+  lazy val columnAlign: MathMlAttr[String] = stringMathMlAttr("columnalign")
 
 
   /**
@@ -71,7 +71,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtable#columnlines mtable#columnlines @ MDN]]
     */
-  lazy val columnlines: MathMlAttr[String] = stringMathMlAttr("columnlines")
+  lazy val columnLines: MathMlAttr[String] = stringMathMlAttr("columnlines")
 
 
   /**
@@ -79,7 +79,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtable#columnspacing mtable#columnspacing @ MDN]]
     */
-  lazy val columnspacing: MathMlAttr[String] = stringMathMlAttr("columnspacing")
+  lazy val columnSpacing: MathMlAttr[String] = stringMathMlAttr("columnspacing")
 
 
   /**
@@ -87,7 +87,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtd#columnspan mtd#columnspan @ MDN]]
     */
-  lazy val columnspan: MathMlAttr[Int] = intMathMlAttr("columnspan")
+  lazy val columnSpan: MathMlAttr[Int] = intMathMlAttr("columnspan")
 
 
   /**
@@ -119,7 +119,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/displaystyle displaystyle @ MDN]]
     */
-  lazy val displaystyle: MathMlAttr[Boolean] = boolAsPresenceMathMlAttr("displaystyle")
+  lazy val displayStyle: MathMlAttr[Boolean] = boolAsPresenceMathMlAttr("displaystyle")
 
 
   /**
@@ -144,7 +144,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtable#framespacing mtable#framespacing @ MDN]]
     */
-  lazy val framespacing: MathMlAttr[String] = stringMathMlAttr("framespacing")
+  lazy val frameSpacing: MathMlAttr[String] = stringMathMlAttr("framespacing")
 
 
   /**
@@ -169,7 +169,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id id @ MDN]]
     */
-  lazy val id: MathMlAttr[String] = stringMathMlAttr("id")
+  lazy val idAttr: MathMlAttr[String] = stringMathMlAttr("id")
 
 
   /**
@@ -177,7 +177,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mfrac#linethickness mfrac#linethickness @ MDN]]
     */
-  lazy val linethickness: MathMlAttr[String] = stringMathMlAttr("linethickness")
+  lazy val lineThickness: MathMlAttr[String] = stringMathMlAttr("linethickness")
 
 
   /**
@@ -185,7 +185,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo#lspace mo#lspace @ MDN]]
     */
-  lazy val lspace: MathMlAttr[String] = stringMathMlAttr("lspace")
+  lazy val lSpace: MathMlAttr[String] = stringMathMlAttr("lspace")
 
 
   /**
@@ -193,7 +193,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/mathbackground mathbackground @ MDN]]
     */
-  lazy val mathbackground: MathMlAttr[String] = stringMathMlAttr("mathbackground")
+  lazy val mathBackground: MathMlAttr[String] = stringMathMlAttr("mathbackground")
 
 
   /**
@@ -201,7 +201,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/mathcolor mathcolor @ MDN]]
     */
-  lazy val mathcolor: MathMlAttr[String] = stringMathMlAttr("mathcolor")
+  lazy val mathColor: MathMlAttr[String] = stringMathMlAttr("mathcolor")
 
 
   /**
@@ -209,7 +209,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/mathsize mathsize @ MDN]]
     */
-  lazy val mathsize: MathMlAttr[String] = stringMathMlAttr("mathsize")
+  lazy val mathSize: MathMlAttr[String] = stringMathMlAttr("mathsize")
 
 
   /**
@@ -217,7 +217,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/mathvariant mathvariant @ MDN]]
     */
-  lazy val mathvariant: MathMlAttr[String] = stringMathMlAttr("mathvariant")
+  lazy val mathVariant: MathMlAttr[String] = stringMathMlAttr("mathvariant")
 
 
   /**
@@ -225,7 +225,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo#maxsize mo#maxsize @ MDN]]
     */
-  lazy val maxsize: MathMlAttr[String] = stringMathMlAttr("maxsize")
+  lazy val maxSize: MathMlAttr[String] = stringMathMlAttr("maxsize")
 
 
   /**
@@ -233,7 +233,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo#minsize mo#minsize @ MDN]]
     */
-  lazy val minsize: MathMlAttr[String] = stringMathMlAttr("minsize")
+  lazy val minsize: MathMlAttr[String] = stringMathMlAttr("minSize")
 
 
   /**
@@ -242,7 +242,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo#movablelimits mo#movablelimits @ MDN]]
     */
-  lazy val movablelimits: MathMlAttr[Boolean] = boolAsPresenceMathMlAttr("movablelimits")
+  lazy val movableLimits: MathMlAttr[Boolean] = boolAsPresenceMathMlAttr("movablelimits")
 
 
   /**
@@ -260,7 +260,7 @@ trait MathMlAttrs {
     *  - [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtd#rowalign mtd#rowalign @ MDN]]
     *  - [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtr#rowalign mtr#rowalign @ MDN]]
     */
-  lazy val rowalign: MathMlAttr[String] = stringMathMlAttr("rowalign")
+  lazy val rowAlign: MathMlAttr[String] = stringMathMlAttr("rowalign")
 
 
   /**
@@ -268,7 +268,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtable#rowlines mtable#rowlines @ MDN]]
     */
-  lazy val rowlines: MathMlAttr[String] = stringMathMlAttr("rowlines")
+  lazy val rowLines: MathMlAttr[String] = stringMathMlAttr("rowlines")
 
 
   /**
@@ -276,7 +276,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtable#rowspacing mtable#rowspacing @ MDN]]
     */
-  lazy val rowspacing: MathMlAttr[String] = stringMathMlAttr("rowspacing")
+  lazy val rowSpacing: MathMlAttr[String] = stringMathMlAttr("rowspacing")
 
 
   /**
@@ -284,7 +284,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mtd#rowspan mtd#rowspan @ MDN]]
     */
-  lazy val rowspan: MathMlAttr[Int] = intMathMlAttr("rowspan")
+  lazy val rowSpan: MathMlAttr[Int] = intMathMlAttr("rowspan")
 
 
   /**
@@ -292,7 +292,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo#rspace mo#rspace @ MDN]]
     */
-  lazy val rspace: MathMlAttr[String] = stringMathMlAttr("rspace")
+  lazy val rSpace: MathMlAttr[String] = stringMathMlAttr("rspace")
 
 
   /**
@@ -300,7 +300,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Global_attributes/scriptlevel scriptlevel @ MDN]]
     */
-  lazy val scriptlevel: MathMlAttr[Int] = intMathMlAttr("scriptlevel")
+  lazy val scriptLevel: MathMlAttr[Int] = intMathMlAttr("scriptlevel")
 
 
   /**
@@ -335,7 +335,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mpadded#voffset mpadded#voffset @ MDN]]
     */
-  lazy val voffset: MathMlAttr[String] = stringMathMlAttr("voffset")
+  lazy val vOffset: MathMlAttr[String] = stringMathMlAttr("voffset")
 
 
   /**

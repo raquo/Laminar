@@ -110,7 +110,7 @@ class MathMlSpec extends UnitSpec {
     val el =
       msqrt(
         mrow(
-          displaystyle <-- displayStyleVar,
+          displayStyle <-- displayStyleVar,
           msup(
             mi("a"),
             mn(L.text <-- powerVar.signal)
@@ -125,7 +125,7 @@ class MathMlSpec extends UnitSpec {
     expectNode(
       msqrt of (
         mrow of (
-          displaystyle is true,
+          displayStyle is true,
           msup of (
             mi of ("a"),
             mn of ("2")
@@ -150,7 +150,7 @@ class MathMlSpec extends UnitSpec {
     expectNode(
       msqrt of (
         mrow of (
-          displaystyle is false,
+          displayStyle is false,
           msup of (
             mi of ("a"),
             mn of ("3")
