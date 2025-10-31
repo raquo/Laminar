@@ -12,10 +12,10 @@ trait HtmlAttrs {
 
 
   /**
-    * Create HTML attribute (Note: for SVG attrs, use L.svg.svgAttr)
+    * Create HTML attribute (Note: for SVG attrs, use L.svg.svgAttr. ARIA and MathML – similarly.)
     *
     * @param name  - name of the attribute, e.g. "value"
-    * @param codec - used to encode V into String, e.g. StringAsIsCodec
+    * @param codec - used to encode V into String, e.g. Codec.stringAsIs
     *
     * @tparam V    - value type for this attr in Scala
     */

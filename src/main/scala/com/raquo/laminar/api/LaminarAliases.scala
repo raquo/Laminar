@@ -14,6 +14,8 @@ trait LaminarAliases {
 
   type SvgElement = nodes.ReactiveSvgElement.Base
 
+  type MathMlElement = nodes.ReactiveMathMlElement
+
   type Element = nodes.ReactiveElement.Base
 
   type Node = nodes.ChildNode.Base
@@ -46,6 +48,8 @@ trait LaminarAliases {
   type HtmlMod = Mod[HtmlElement]
 
   type SvgMod = Mod[SvgElement]
+
+  type MathMlMod = Mod[SvgElement]
 
   //
 

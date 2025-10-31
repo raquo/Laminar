@@ -14,7 +14,7 @@ trait SvgTags {
   /**
     * Create SVG tag
     *
-    * Note: this simply creates an instance of HtmlTag.
+    * Note: this simply creates an instance of SvgTag.
     *  - This does not create the element (to do that, call .apply() on the returned tag instance)
     *
     * @param name - e.g. "circle"

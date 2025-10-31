@@ -1,6 +1,6 @@
 import com.raquo.domtypes.codegen.DefType.LazyVal
 import com.raquo.domtypes.codegen.*
-import com.raquo.domtypes.common.{HtmlTagType, SvgTagType}
+import com.raquo.domtypes.common.{HtmlTagType, MathMlTagType, SvgTagType}
 import com.raquo.domtypes.defs.styles.StyleTraitDefs
 
 object DomDefsGenerator {
@@ -49,7 +49,7 @@ object DomDefsGenerator {
         traitCommentLines = Nil,
         traitModifiers = Nil,
         traitName = traitName,
-        keyKind = "HtmlTag",
+        keyKind = "HtmlTag[_]",
         baseImplDefComments = List(
           "Create HTML tag",
           "",
@@ -85,11 +85,11 @@ object DomDefsGenerator {
         traitCommentLines = Nil,
         traitModifiers = Nil,
         traitName = traitName,
-        keyKind = "SvgTag",
+        keyKind = "SvgTag[_]",
         baseImplDefComments = List(
           "Create SVG tag",
           "",
-          "Note: this simply creates an instance of HtmlTag.",
+          "Note: this simply creates an instance of SvgTag.",
           " - This does not create the element (to do that, call .apply() on the returned tag instance)",
           "",
           "@param name - e.g. \"circle\"",
@@ -97,6 +97,38 @@ object DomDefsGenerator {
           "@tparam Ref    - type of elements with this tag, e.g. dom.svg.Circle for \"circle\" tag"
         ),
         keyImplName = "svgTag",
+        defType = LazyVal
+      )
+
+      generator.writeToFile(
+        packagePath = generator.tagDefsPackagePath,
+        fileName = traitName,
+        fileContent = fileContent
+      )
+    }
+
+    // -- MathML tags --
+
+    {
+      val traitName = "MathMlTags"
+
+      val fileContent = generator.generateTagsTrait(
+        tagType = MathMlTagType,
+        defGroups = defGroups.mathMlTagsDefGroups,
+        printDefGroupComments = true,
+        traitCommentLines = Nil,
+        traitModifiers = Nil,
+        traitName = traitName,
+        keyKind = "MathMlTag",
+        baseImplDefComments = List(
+          "Create MathML tag",
+          "",
+          "Note: this simply creates an instance of MathMlTag.",
+          " - This does not create the element (to do that, call .apply() on the returned tag instance)",
+          "",
+          "@param name - e.g. \"mo\" or \"mtext\"",
+        ),
+        keyImplName = "mathMlTag",
         defType = LazyVal
       )
 
@@ -121,10 +153,10 @@ object DomDefsGenerator {
         keyKind = "HtmlAttr",
         implNameSuffix = "HtmlAttr",
         baseImplDefComments = List(
-          "Create HTML attribute (Note: for SVG attrs, use L.svg.svgAttr)",
+          "Create HTML attribute (Note: for SVG attrs, use L.svg.svgAttr. ARIA and MathML – similarly.)",
           "",
           "@param name  - name of the attribute, e.g. \"value\"",
-          "@param codec - used to encode V into String, e.g. StringAsIsCodec",
+          "@param codec - used to encode V into String, e.g. Codec.stringAsIs",
           "",
           "@tparam V    - value type for this attr in Scala",
         ),
@@ -158,7 +190,7 @@ object DomDefsGenerator {
           "Create SVG attribute (Note: for HTML attrs, use L.htmlAttr)",
           "",
           "@param name  - name of the attribute, e.g. \"value\"",
-          "@param codec - used to encode V into String, e.g. StringAsIsCodec",
+          "@param codec - used to encode V into String, e.g. Codec.stringAsIs",
           "",
           "@tparam V    - value type for this attr in Scala",
         ),
@@ -202,7 +234,7 @@ object DomDefsGenerator {
           "Create ARIA attribute (Note: for HTML attrs, use L.htmlAttr)",
           "",
           "@param name  - suffix of the attribute, without \"aria-\" prefix, e.g. \"labelledby\"",
-          "@param codec - used to encode V into String, e.g. StringAsIsCodec",
+          "@param codec - used to encode V into String, e.g. Codec.stringAsIs",
           "",
           "@tparam V    - value type for this attr in Scala",
         ),
@@ -210,6 +242,41 @@ object DomDefsGenerator {
         namespaceImports = Nil,
         namespaceImpl = _ => ???,
         transformAttrDomName = transformAttrDomName,
+        defType = LazyVal
+      )
+
+      generator.writeToFile(
+        packagePath = generator.attrDefsPackagePath,
+        fileName = traitName,
+        fileContent = fileContent
+      )
+    }
+
+    // -- HTML attributes --
+
+    {
+      val traitName = "MathMlAttrs"
+
+      val fileContent = generator.generateAttrsTrait(
+        defGroups = defGroups.mathMLAttrDefGroups,
+        printDefGroupComments = false,
+        traitCommentLines = Nil,
+        traitModifiers = Nil,
+        traitName = traitName,
+        keyKind = "MathMlAttr",
+        implNameSuffix = "MathMlAttr",
+        baseImplDefComments = List(
+          "Create MathML attribute",
+          "",
+          "@param name  - name of the attribute, e.g. \"stretchy\"",
+          "@param codec - used to encode V into String, e.g. Codec.stringAsIs",
+          "",
+          "@tparam V    - value type for this attr in Scala",
+        ),
+        baseImplName = "mathMlAttr",
+        namespaceImports = Nil,
+        namespaceImpl = _ => ???,
+        transformAttrDomName = identity,
         defType = LazyVal
       )
 
@@ -241,7 +308,7 @@ object DomDefsGenerator {
           "@param reflectedAttrName  - name of reflected attr, if any, e.g. \"formnovalidate\"",
           "                           (use `None` if property is not reflected)",
           "                           [[https://github.com/raquo/scala-dom-types?tab=readme-ov-file#reflected-attributes About reflected attributes]]",
-          "@param codec              - used to encode V into DomV, e.g. StringAsIsCodec,",
+          "@param codec              - used to encode V into DomV, e.g. Codec.stringAsIs,",
           "",
           "@tparam V                 - value type for this prop in Scala",
           "@tparam DomV              - value type for this prop in the underlying JS DOM.",

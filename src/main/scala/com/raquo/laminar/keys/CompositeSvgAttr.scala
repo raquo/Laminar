@@ -1,5 +1,6 @@
 package com.raquo.laminar.keys
 
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.nodes.ReactiveSvgElement
 
 class CompositeSvgAttr(
@@ -11,5 +12,5 @@ class CompositeSvgAttr(
   /** Qualified name, including namespace */
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
 
-  val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
+  val namespaceUri: Option[String] = namespacePrefix.map(DomApi.namespaceUri)
 }

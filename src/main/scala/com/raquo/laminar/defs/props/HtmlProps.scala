@@ -18,7 +18,7 @@ trait HtmlProps {
     * @param reflectedAttrName  - name of reflected attr, if any, e.g. "formnovalidate"
     *                            (use `None` if property is not reflected)
     *                            [[https://github.com/raquo/scala-dom-types?tab=readme-ov-file#reflected-attributes About reflected attributes]]
-    * @param codec              - used to encode V into DomV, e.g. StringAsIsCodec,
+    * @param codec              - used to encode V into DomV, e.g. Codec.stringAsIs,
     *
     * @tparam V                 - value type for this prop in Scala
     * @tparam DomV              - value type for this prop in the underlying JS DOM.

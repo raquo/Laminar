@@ -3,9 +3,7 @@ package com.raquo.laminar.modifiers
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.keys._
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
-
-import scala.scalajs.js.|
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
 
 /**
  * A modifier that updates a key from a source, e.g. `value <-- valueStream`
@@ -42,6 +40,8 @@ object SimpleKeyUpdater {
   type OfSvgAttr[V] = SimpleKeyUpdater[SvgAttr[V], V, ReactiveSvgElement.Base]
 
   type OfAriaAttr[V] = SimpleKeyUpdater[AriaAttr[V], V, ReactiveElement.Base]
+
+  type OfMathMlAttr[V] = SimpleKeyUpdater[MathMlAttr[V], V, ReactiveMathMlElement]
 
   type OfStyleProp[V] = SimpleKeyUpdater[StyleProp[V], V, ReactiveHtmlElement.Base]
 

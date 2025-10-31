@@ -20,8 +20,14 @@ trait DomTags {
 
   def createSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref]): Ref = {
     dom.document
-      .createElementNS(namespaceURI = SvgAttr.svgNamespaceUri, qualifiedName = tag.name)
+      .createElementNS(namespaceURI = svgNamespaceUri, qualifiedName = tag.name)
       .asInstanceOf[Ref]
+  }
+
+  def createMathMlElement(tag: MathMlTag): dom.MathMLElement = {
+    dom.document
+      .createElementNS(namespaceURI = mathmlNamespaceUri, qualifiedName = tag.name)
+      .asInstanceOf[dom.MathMLElement]
   }
 
   //
@@ -123,4 +129,27 @@ trait DomTags {
         throw new Exception(s"$clue: expected $expectedElementTypeDesc, got different node type: `$actualNodeTypeDesc`")
     }
   }
+
+  // Namespaces
+
+  final def namespaceUri(namespace: String): String = {
+    namespace match {
+      case "svg" => svgNamespaceUri
+      case "xlink" => xlinkNamespaceUri
+      case "xml" => xmlNamespaceUri
+      case "xmlns" => xmlnsNamespaceUri
+      case "mathml" => mathmlNamespaceUri
+      case _ => throw new Exception(s"Unknown namespace: ${namespace}")
+    }
+  }
+
+  final val svgNamespaceUri: String = "http://www.w3.org/2000/svg"
+
+  final val xlinkNamespaceUri: String = "http://www.w3.org/1999/xlink"
+
+  final val xmlNamespaceUri: String = "http://www.w3.org/XML/1998/namespace"
+
+  final val xmlnsNamespaceUri: String = "http://www.w3.org/2000/xmlns/"
+
+  final val mathmlNamespaceUri: String = "http://www.w3.org/1998/Math/MathML"
 }

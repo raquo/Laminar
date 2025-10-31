@@ -3,7 +3,7 @@ package com.raquo.laminar.tests
 import com.raquo.laminar.api._
 import com.raquo.laminar.api.A._
 import com.raquo.laminar.api.L.svg._
-import com.raquo.laminar.keys.SvgAttr
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.utils.UnitSpec
 
 class SvgSpec extends UnitSpec {
@@ -26,7 +26,7 @@ class SvgSpec extends UnitSpec {
     )
 
     val el = svg(
-      xmlns := SvgAttr.svgNamespaceUri, // kinda tests https://github.com/raquo/Laminar/issues/143
+      xmlns := DomApi.svgNamespaceUri, // kinda tests https://github.com/raquo/Laminar/issues/143
       height := "800",
       width := "500",
       polylineEl
@@ -91,7 +91,7 @@ class SvgSpec extends UnitSpec {
   it("renders el with class and svg with text") {
 
     val el = svg(
-      xmlns := SvgAttr.svgNamespaceUri,
+      xmlns := DomApi.svgNamespaceUri,
       className := "svgClass",
       height := "800",
       width := "500",
@@ -119,8 +119,8 @@ class SvgSpec extends UnitSpec {
   it("correctly sets namespaces") {
 
     val el = svg(
-      xmlns := SvgAttr.svgNamespaceUri,
-      xmlnsXlink := SvgAttr.xlinkNamespaceUri,
+      xmlns := DomApi.svgNamespaceUri,
+      xmlnsXlink := DomApi.xlinkNamespaceUri,
       a(
         xlinkHref := "https://example.com"
       )
@@ -136,8 +136,8 @@ class SvgSpec extends UnitSpec {
     expectNode(L.div.of(
       L.className is "htmlClass",
       svg.of(
-        xmlns is SvgAttr.svgNamespaceUri,
-        xmlnsXlink is SvgAttr.xlinkNamespaceUri,
+        xmlns is DomApi.svgNamespaceUri,
+        xmlnsXlink is DomApi.xlinkNamespaceUri,
         a of (
           xlinkHref is "https://example.com"
         )

@@ -1,12 +1,12 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
-import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, SvgAttrs}
+import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, MathMlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
 import com.raquo.laminar.defs.props.HtmlProps
 import com.raquo.laminar.defs.styles.StyleProps
-import com.raquo.laminar.defs.tags.{HtmlTags, SvgTags}
+import com.raquo.laminar.defs.tags.{HtmlTags, MathMlTags, SvgTags}
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
@@ -47,6 +47,10 @@ with Implicits {
   extends SvgTags
   with SvgAttrs
   with ComplexSvgKeys
+
+  object mathml
+  extends MathMlTags
+  with MathMlAttrs
 
   //
   // Document & window events

@@ -11,4 +11,7 @@ import org.scalajs.dom
   *
   * @tparam Ev type of DOM Events that the event handler callback for this event prop accepts
   */
-class EventProp[Ev <: dom.Event](val name: String)
+class EventProp[Ev <: dom.Event](val name: String) {
+
+  // #Note See EventProcessor for all the methods, as per scaladoc above.
+}

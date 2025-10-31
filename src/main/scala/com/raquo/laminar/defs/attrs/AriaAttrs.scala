@@ -15,7 +15,7 @@ trait AriaAttrs {
     * Create ARIA attribute (Note: for HTML attrs, use L.htmlAttr)
     *
     * @param name  - suffix of the attribute, without "aria-" prefix, e.g. "labelledby"
-    * @param codec - used to encode V into String, e.g. StringAsIsCodec
+    * @param codec - used to encode V into String, e.g. Codec.stringAsIs
     *
     * @tparam V    - value type for this attr in Scala
     */

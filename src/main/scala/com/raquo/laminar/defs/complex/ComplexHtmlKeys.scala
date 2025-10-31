@@ -1,6 +1,6 @@
 package com.raquo.laminar.defs.complex
 
-import com.raquo.laminar.codecs.StringAsIsCodec
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.keys
 import com.raquo.laminar.keys.{CompositeHtmlAttr, CompositeKey, HtmlAttr}
 import com.raquo.laminar.nodes.ReactiveHtmlElement
@@ -63,7 +63,7 @@ trait ComplexHtmlKeys {
    * HTMLElement.dataset.testValue as any dash (U+002D) is replaced by the capitalization
    * of the next letter (camelcase).
    */
-  def dataAttr(suffix: String): HtmlAttr[String] = new HtmlAttr(s"data-$suffix", StringAsIsCodec)
+  def dataAttr(suffix: String): HtmlAttr[String] = new HtmlAttr(s"data-$suffix", Codec.stringAsIs)
 
   /**
    * This attribute contains CSS styling declarations to be applied to the
@@ -71,7 +71,7 @@ trait ComplexHtmlKeys {
    * file or files. This attribute and the style element have mainly the
    * purpose of allowing for quick styling, for example for testing purposes.
    */
-  lazy val styleAttr: HtmlAttr[String] = new HtmlAttr("style", StringAsIsCodec)
+  lazy val styleAttr: HtmlAttr[String] = new HtmlAttr("style", Codec.stringAsIs)
 
   // --
 

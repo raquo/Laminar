@@ -1,6 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.laminar.codecs.Codec
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.nodes.ReactiveSvgElement
 
 /**
@@ -20,7 +21,7 @@ class SvgAttr[V](
   /** Qualified name, including namespace */
   override val name: String = namespacePrefix.map(_ + ":" + localName).getOrElse(localName)
 
-  override val namespaceUri: Option[String] = namespacePrefix.map(SvgAttr.namespaceUri)
+  override val namespaceUri: Option[String] = namespacePrefix.map(DomApi.namespaceUri)
 
   override lazy val maybe: SvgAttr[Option[V]] = {
     new SvgAttr[Option[V]](localName, codec.optAsNull, namespacePrefix)
@@ -31,20 +32,18 @@ object SvgAttr {
 
   // For SVG namespaces info see https://developer.mozilla.org/en-US/docs/Web/SVG/Namespaces_Crash_Course
 
-  final def namespaceUri(namespace: String): String = {
-    namespace match {
-      case "svg" => svgNamespaceUri
-      case "xlink" => xlinkNamespaceUri
-      case "xml" => xmlNamespaceUri
-      case "xmlns" => xmlnsNamespaceUri
-    }
-  }
+  @deprecated("Moved to DomApi.namespaceUri", "18.0.0-M1")
+  final def namespaceUri(namespace: String): String = DomApi.namespaceUri(namespace)
 
-  final val svgNamespaceUri: String = "http://www.w3.org/2000/svg"
+  @deprecated("Moved to DomApi.svgNamespaceUri", "18.0.0-M1")
+  final def svgNamespaceUri: String = "http://www.w3.org/2000/svg"
 
-  final val xlinkNamespaceUri: String = "http://www.w3.org/1999/xlink"
+  @deprecated("Moved to DomApi.xlinkNamespaceUri", "18.0.0-M1")
+  final def xlinkNamespaceUri: String = "http://www.w3.org/1999/xlink"
 
-  final val xmlNamespaceUri: String = "http://www.w3.org/XML/1998/namespace"
+  @deprecated("Moved to DomApi.xmlNamespaceUri", "18.0.0-M1")
+  final def xmlNamespaceUri: String = "http://www.w3.org/XML/1998/namespace"
 
-  final val xmlnsNamespaceUri: String = "http://www.w3.org/2000/xmlns/"
+  @deprecated("Moved to DomApi.xmlnsNamespaceUri", "18.0.0-M1")
+  final def xmlnsNamespaceUri: String = "http://www.w3.org/2000/xmlns/"
 }
