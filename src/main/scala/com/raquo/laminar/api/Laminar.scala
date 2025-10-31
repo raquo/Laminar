@@ -209,10 +209,13 @@ with Implicits {
 
   //
 
-  /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
-  def foreignHtmlElement[Ref <: dom.html.Element](tag: HtmlTag[Ref], element: Ref): ReactiveHtmlElement[Ref] = {
-    DomApi.assertTagMatches(tag, element, "Unable to init foreign html element")
-    new ReactiveHtmlElement[Ref](tag, element)
+  /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element.
+    *
+    * @throws Exception if `element` tag does not match `assertTag`
+    */
+  def foreignHtmlElement[Ref <: dom.html.Element](assertTag: HtmlTag[Ref], element: dom.Element): ReactiveHtmlElement[Ref] = {
+    val goodElement = DomApi.assertTagMatches(assertTag, element, "Unable to init foreign HTML element")
+    new ReactiveHtmlElement[Ref](assertTag, goodElement)
   }
 
   /** Wrap an HTML JS DOM element created by an external library into a reactive Laminar element. */
@@ -221,10 +224,13 @@ with Implicits {
     new ReactiveHtmlElement(tag, element)
   }
 
-  /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element. */
-  def foreignSvgElement[Ref <: dom.svg.Element](tag: SvgTag[Ref], element: Ref): ReactiveSvgElement[Ref] = {
-    DomApi.assertTagMatches(tag, element, "Unable to init foreign svg element")
-    new ReactiveSvgElement[Ref](tag, element)
+  /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element.
+    *
+    * @throws Exception if `element` tag does not match `assertTag`
+    */
+  def foreignSvgElement[Ref <: dom.svg.Element](assertTag: SvgTag[Ref], element: dom.Element): ReactiveSvgElement[Ref] = {
+    val goodElement = DomApi.assertTagMatches(assertTag, element, "Unable to init foreign SVG element")
+    new ReactiveSvgElement[Ref](assertTag, goodElement)
   }
 
   /** Wrap an SVG JS DOM element created by an external library into a reactive Laminar element. */

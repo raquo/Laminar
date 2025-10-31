@@ -89,15 +89,38 @@ trait DomTags {
     node: dom.Node,
     clue: String = "Error"
   ): Ref = {
+    val elementTypeMatches = (node, tag) match {
+      case (_: dom.html.Element, _: HtmlTag[_]) => true
+      case (_: dom.svg.Element, _: SvgTag[_]) => true
+      case _ => false
+    }
+    lazy val expectedElementTypeDesc = {
+      tag match {
+        case t: HtmlTag[_] => s"HTML <${t.name}>"
+        case t: SvgTag[_] => s"SVG <${t.name}>"
+        case t => s"Unknown element <${t.name}>"
+      }
+    }
+    lazy val actualNodeTypeDesc = {
+      node match {
+        case n: dom.html.Element => s"HTML <${n.tagName}>"
+        case n: dom.svg.Element => s"SVG <${n.tagName}>"
+        case n: dom.Element => s"Unknown <${n.tagName}>"
+        case n: dom.Comment => s"CommentNode <${n.text}>"
+        case n: dom.Text => s"TextNode <${n.textContent}>"
+        case n => s"Unknown node `${n.toString.take(20)}`"
+      }
+    }
     node match {
-      case element: dom.Element =>
-        if (tag.name.ew.toLowerCase() != element.tagName.ew.toLowerCase()) {
-          throw new Exception(s"$clue: expected tag name `${tag.name}`, got `${element.tagName}`")
+      case element: dom.Element if elementTypeMatches =>
+        val tagNameMatches = tag.name.ew.toLowerCase() != element.tagName.ew.toLowerCase()
+        if (tagNameMatches) {
+          throw new Exception(s"$clue: expected $expectedElementTypeDesc, got different tag name: `$actualNodeTypeDesc`")
         } else {
           node.asInstanceOf[Ref]
         }
       case _ =>
-        throw new Exception(s"$clue: expected element, got non-element node: ${node.nodeName}")
+        throw new Exception(s"$clue: expected $expectedElementTypeDesc, got different node type: `$actualNodeTypeDesc`")
     }
   }
 }

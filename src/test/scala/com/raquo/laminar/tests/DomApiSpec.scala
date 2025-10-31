@@ -42,7 +42,7 @@ class DomApiSpec extends UnitSpec {
     val caught = intercept[Exception] {
       DomApi.unsafeParseHtmlString(span, "<div class='foo bar'>Hello <b>world</b></div>")
     }
-    assert(caught.getMessage == "Error parsing HTML string: expected tag name `span`, got `DIV`")
+    assert(caught.getMessage == "Error parsing HTML string: expected HTML <span>, got different tag name: `HTML <DIV>`")
   }
 
   it("SVG: parses SVG tag") {
@@ -96,7 +96,7 @@ class DomApiSpec extends UnitSpec {
     val caught = intercept[Exception] {
       DomApi.unsafeParseSvgString(s.svg, "<circle cx='200' cy='15' r='30' fill='red'></circle>")
     }
-    assert(caught.getMessage == "Error parsing SVG string: expected tag name `svg`, got `circle`")
+    assert(caught.getMessage == "Error parsing SVG string: expected SVG <svg>, got different tag name: `SVG <circle>`")
   }
 
   it("jsTagName: matches case for both HTML and SVG elements") {
