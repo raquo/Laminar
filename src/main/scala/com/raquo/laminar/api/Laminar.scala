@@ -6,6 +6,7 @@ import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
 import com.raquo.laminar.defs.props.HtmlProps
 import com.raquo.laminar.defs.styles.StyleProps
+import com.raquo.laminar.defs.symbols.MathMlSymbols
 import com.raquo.laminar.defs.tags.{HtmlTags, MathMlTags, SvgTags}
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inputs.InputController
@@ -50,7 +51,11 @@ with Implicits {
 
   object mathml
   extends MathMlTags
-  with MathMlAttrs
+  with MathMlAttrs {
+
+    object symbols
+    extends MathMlSymbols
+  }
 
   //
   // Document & window events
