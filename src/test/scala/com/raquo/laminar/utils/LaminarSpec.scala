@@ -3,7 +3,7 @@ package com.raquo.laminar.utils
 import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtestutils.matching._
 import com.raquo.laminar.api._
-import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, HtmlProp, StyleProp, SvgAttr}
+import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, HtmlProp, MathMlAttr, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, RootNode}
 import com.raquo.laminar.tags.Tag
 import org.scalactic
@@ -17,6 +17,7 @@ with RuleImplicits[
   HtmlProp,
   HtmlAttr,
   SvgAttr,
+  MathMlAttr,
   StyleProp,
   CompositeKey[ReactiveHtmlElement.Base],
   CompositeKey[ReactiveSvgElement.Base]
@@ -88,7 +89,7 @@ with EventSimulator {
     ExpectedNode.comment
   }
 
-  override implicit def makeAttrTestable[V](attr: HtmlAttr[V]): TestableHtmlAttr[V] = {
+  override implicit def makeHtmlAttrTestable[V](attr: HtmlAttr[V]): TestableHtmlAttr[V] = {
     new TestableHtmlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
@@ -102,6 +103,10 @@ with EventSimulator {
 
   override implicit def makeSvgAttrTestable[V](svgAttr: SvgAttr[V]): TestableSvgAttr[V] = {
     new TestableSvgAttr[V](svgAttr.name, svgAttr.codec.encode, svgAttr.codec.decode, svgAttr.namespaceUri)
+  }
+
+  override implicit def makeMathMlAttrTestable[V](attr: MathMlAttr[V]): TestableMathMlAttr[V] = {
+    new TestableMathMlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
   override implicit def makeCompositeHtmlKeyTestable(key: CompositeKey[ReactiveHtmlElement.Base]): TestableCompositeKey = {
