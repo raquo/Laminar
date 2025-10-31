@@ -35,7 +35,7 @@ package object codecs {
   lazy val BooleanAsIsCodec: Codec[Boolean, Boolean] = Codec.booleanAsIs
 
   @deprecated("Moved to Codec.booleanAsAttrPresenceCodec", "18.0.0-M1")
-  lazy val BooleanAsAttrPresenceCodec: Codec[Boolean, String] = Codec.booleanAsAttrPresenceCodec
+  lazy val BooleanAsAttrPresenceCodec: Codec[Boolean, String] = Codec.booleanAsAttrPresence
 
   @deprecated("Moved to Codec.booleanAsTrueFalseString", "18.0.0-M1")
   lazy val BooleanAsTrueFalseStringCodec: Codec[Boolean, String] = Codec.booleanAsTrueFalseString

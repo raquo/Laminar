@@ -87,7 +87,7 @@ object Codec {
     *  - If you set `true` in Scala, attribute will be added with empty value.
     *  - If you set `false` in Scala, attribute will be removed from the DOM
     */
-  val booleanAsAttrPresenceCodec: Codec[Boolean, String] = new Codec[Boolean, String] {
+  val booleanAsAttrPresence: Codec[Boolean, String] = new Codec[Boolean, String] {
 
     override def decode(domValue: String): Boolean = domValue != null
 
