@@ -33,18 +33,18 @@ object SimpleKeyUpdater {
 
   // #nc add tests to make sure we're getting precise types from `:=` and `<--`
 
-  type OfHtmlProp[V] = SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement.Base]
+  type HtmlPropUpdater[V] = SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement.Base]
 
-  type OfHtmlAttr[V] = SimpleKeyUpdater[HtmlAttr[V], V, ReactiveHtmlElement.Base]
+  type HtmlAttrUpdater[V] = SimpleKeyUpdater[HtmlAttr[V], V, ReactiveHtmlElement.Base]
 
-  type OfSvgAttr[V] = SimpleKeyUpdater[SvgAttr[V], V, ReactiveSvgElement.Base]
+  type SvgAttrUpdater[V] = SimpleKeyUpdater[SvgAttr[V], V, ReactiveSvgElement.Base]
 
-  type OfAriaAttr[V] = SimpleKeyUpdater[AriaAttr[V], V, ReactiveElement.Base]
+  type AriaAttrUpdater[V] = SimpleKeyUpdater[AriaAttr[V], V, ReactiveElement.Base]
 
-  type OfMathMlAttr[V] = SimpleKeyUpdater[MathMlAttr[V], V, ReactiveMathMlElement]
+  type MathMlAttrUpdater[V] = SimpleKeyUpdater[MathMlAttr[V], V, ReactiveMathMlElement]
 
-  type OfStyleProp[V] = SimpleKeyUpdater[StyleProp[V], V, ReactiveHtmlElement.Base]
+  type StylePropUpdater[V] = SimpleKeyUpdater[StyleProp[V], V, ReactiveHtmlElement.Base]
 
-  type OfDerivedStyleProp[InputV] = SimpleKeyUpdater[DerivedStyleProp[InputV], InputV, ReactiveHtmlElement.Base]
+  type DerivedStylePropUpdater[InputV] = SimpleKeyUpdater[DerivedStyleProp[InputV], InputV, ReactiveHtmlElement.Base]
 
 }

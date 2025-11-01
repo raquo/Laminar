@@ -8,8 +8,8 @@ import com.raquo.laminar.nodes.ReactiveElement
 /**
   * A modifier that updates a [[CompositeKey]] from a source, e.g. `value <-- valueStream`
   */
-class CompositeKeyUpdater[-El <: ReactiveElement.Base, V](
-  val key: CompositeKey[El],
+class CompositeKeyUpdater[+K <: CompositeKey[K, El], V, -El <: ReactiveElement.Base](
+  val key: K,
   val values: Observable[V],
   valueMapper: CompositeValueMapper[V]
 ) extends Binder[El] { self =>

@@ -8,7 +8,7 @@ object Versions {
 
   val Airstream = "17.3.0-SNAPSHOT"
 
-  val Ew = "0.2.0"
+  val Ew = "0.3.0-SNAPSHOT"
 
   val ScalaJsDom = "2.8.1"
 

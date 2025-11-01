@@ -100,11 +100,11 @@ with ParentNode[Ref] {
     *
     * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
     */
-  private[this] var _compositeValues: Map[CompositeKey[this.type], List[(String, Modifier.Any)]] =
+  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier.Any)]] =
     Map.empty
 
   private[laminar] def compositeValueItems(
-    prop: CompositeKey[this.type],
+    prop: CompositeKey[_, this.type],
     reason: Modifier.Any
   ): List[String] = {
     _compositeValues
@@ -113,7 +113,7 @@ with ParentNode[Ref] {
   }
 
   private[laminar] def updateCompositeValue(
-    key: CompositeKey[this.type],
+    key: CompositeKey[_, this.type],
     reason: Modifier.Any,
     addItems: List[String],
     removeItems: List[String]

@@ -1,7 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.api.{MapValueMapper, StringValueMapper}
+import com.raquo.laminar.api.{MapValueMapper, StringValueMapper, StringSeqValueMapper}
 import com.raquo.laminar.codecs.CompositeCodec
 import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
@@ -15,7 +15,7 @@ import scala.scalajs.js.|
   *
   * Subtypes: [[CompositeHtmlAttr]], [[CompositeSvgAttr]]
   */
-abstract class CompositeKey[-El <: ReactiveElement.Base] {
+abstract class CompositeKey[+Self <: CompositeKey[Self, El], -El <: ReactiveElement.Base] { this: Self =>
 
   val name: String
 
@@ -27,27 +27,27 @@ abstract class CompositeKey[-El <: ReactiveElement.Base] {
 
   val codec: CompositeCodec = new CompositeCodec(separator)
 
-  def :=(items: String): CompositeKeySetter[El] = {
+  def :=(items: String): CompositeKeySetter[Self, El] = {
     addStaticItems(StringValueMapper.toNormalizedList(items, separator))
   }
 
-  def :=(items: Map[String, Boolean]): CompositeKeySetter[El] = {
+  def :=(items: Map[String, Boolean]): CompositeKeySetter[Self, El] = {
     addStaticItems(MapValueMapper.toNormalizedList(items, separator))
   }
 
-  def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[El] = {
+  def :=[V](value: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[Self, El] = {
     addStaticItems(mapper.toNormalizedList(value, separator))
   }
 
-  @inline def apply(items: String): CompositeKeySetter[El] = {
+  @inline def apply(items: String): CompositeKeySetter[Self, El] = {
     this := items
   }
 
-  @inline def apply(items: Map[String, Boolean]): CompositeKeySetter[El] = {
+  @inline def apply(items: Map[String, Boolean]): CompositeKeySetter[Self, El] = {
     this := items
   }
 
-  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[El] = {
+  @inline def apply[V](items: V*)(implicit mapper: CompositeValueMapper[collection.Seq[V]]): CompositeKeySetter[Self, El] = {
     this.:= (items: _*)
   }
 
@@ -55,19 +55,19 @@ abstract class CompositeKey[-El <: ReactiveElement.Base] {
     """cls.toggle("foo") attribute method is not necessary anymore: use cls("foo"), it now supports everything that toggle supported.""",
     since = "17.0.0-M1"
   )
-  def toggle(items: String*): LockedCompositeKey[El] = {
-    new LockedCompositeKey(this, items.toList)
+  def toggle(items: String*): CompositeKeySetter[Self, El] = {
+    this.:= (items: _*)
   }
 
-  def <--[V](items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): CompositeKeyUpdater[El, V] = {
-    new CompositeKeyUpdater[El, V](
+  def <--[V](items: Source[V])(implicit valueMapper: CompositeValueMapper[V]): CompositeKeyUpdater[Self, V, El] = {
+    new CompositeKeyUpdater[Self, V, El](
       key = this,
       values = items.toObservable,
       valueMapper = valueMapper
     )
   }
 
-  private def addStaticItems(normalizedItems: List[String]): CompositeKeySetter[El] = {
+  private def addStaticItems(normalizedItems: List[String]): CompositeKeySetter[Self, El] = {
     new CompositeKeySetter(
       key = this,
       itemsToAdd = normalizedItems

@@ -31,17 +31,17 @@ class SimpleKeySetter[ //
 
 object SimpleKeySetter {
 
-  type OfHtmlProp[V] = SimpleKeySetter[HtmlProp[V], V, ReactiveHtmlElement.Base]
+  type HtmlPropSetter[V] = SimpleKeySetter[HtmlProp[V], V, ReactiveHtmlElement.Base]
 
-  type OfHtmlAttr[V] = SimpleKeySetter[HtmlAttr[V], V, ReactiveHtmlElement.Base]
+  type HtmlAttrSetter[V] = SimpleKeySetter[HtmlAttr[V], V, ReactiveHtmlElement.Base]
 
-  type OfSvgAttr[V] = SimpleKeySetter[SvgAttr[V], V, ReactiveSvgElement.Base]
+  type SvgAttrSetter[V] = SimpleKeySetter[SvgAttr[V], V, ReactiveSvgElement.Base]
 
-  type OfAriaAttr[V] = SimpleKeySetter[AriaAttr[V], V, ReactiveElement.Base]
+  type AriaAttrSetter[V] = SimpleKeySetter[AriaAttr[V], V, ReactiveElement.Base]
 
-  type OfStyleProp[V] = StyleSetter[V, _]
+  type StylePropSetter[V, ThisV] = StyleSetter[V, ThisV]
 
-  type OfDerivedStyleProp[V] = DerivedStyleSetter[V, _]
+  type DerivedStylePropSetter[V, ThisV <: V] = DerivedStyleSetter[V, ThisV]
 
   def apply[K <: SimpleKey[K, V, El], V, El <: ReactiveElement.Base](
     key: K,
@@ -87,7 +87,7 @@ object SimpleKeySetter {
     }
   }
 
-  // #nc does this really need ThisV type param? – see above too
+  // #Note – this doesn't really need ThisV, except to satisfy SimpleKey := type constraints (which exist for StyleSetter)
   class DerivedStyleSetter[V, ThisV <: V](
     override val key: DerivedStyleProp[V],
     override val value: ThisV

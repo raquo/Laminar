@@ -1,10 +1,10 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.domtestutils.matching._
+import com.raquo.domtestutils.{EventSimulator, MountOps}
 import com.raquo.laminar.api._
-import com.raquo.laminar.keys.{CompositeKey, HtmlAttr, HtmlProp, MathMlAttr, StyleProp, SvgAttr}
-import com.raquo.laminar.nodes.{CommentNode, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement, RootNode}
+import com.raquo.laminar.keys._
+import com.raquo.laminar.nodes._
 import com.raquo.laminar.tags.Tag
 import org.scalactic
 import org.scalajs.dom
@@ -19,8 +19,8 @@ with RuleImplicits[
   SvgAttr,
   MathMlAttr,
   StyleProp,
-  CompositeKey[ReactiveHtmlElement.Base],
-  CompositeKey[ReactiveSvgElement.Base]
+  CompositeHtmlAttr,
+  CompositeSvgAttr
 ]
 with EventSimulator {
   // === On nullable variables ===
@@ -109,13 +109,13 @@ with EventSimulator {
     new TestableMathMlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
-  override implicit def makeCompositeHtmlKeyTestable(key: CompositeKey[ReactiveHtmlElement.Base]): TestableCompositeKey = {
+  override implicit def makeCompositeHtmlKeyTestable(key: CompositeHtmlAttr): TestableCompositeKey = {
     new TestableCompositeKey(key.name, key.separator, getRawDomValue = {
       case htmlEl: dom.html.Element => htmlEl.getAttribute(key.name)
     })
   }
 
-  override implicit def makeCompositeSvgKeyTestable(key: CompositeKey[ReactiveSvgElement.Base]): TestableCompositeKey = {
+  override implicit def makeCompositeSvgKeyTestable(key: CompositeSvgAttr): TestableCompositeKey = {
     new TestableCompositeKey(key.name, key.separator, getRawDomValue = {
       case svgEl: dom.svg.Element => svgEl.getAttributeNS(namespaceURI = null, key.name)
     })

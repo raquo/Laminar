@@ -83,7 +83,7 @@ trait ComplexHtmlKeys {
 object ComplexHtmlKeys {
 
   @deprecated("CompositeHtmlProp is dropped for lack of need in favor of CompositeHtmlAttr – use the latter instead", "18.0.0-M1")
-  type CompositeHtmlProp = CompositeKey[ReactiveHtmlElement.Base]
+  type CompositeHtmlProp = keys.CompositeHtmlAttr
 
   @deprecated("CompositeHtmlAttr type was moved to com.raquo.laminar.keys, and is now a class.", "18.0.0-M1")
   type CompositeHtmlAttr = keys.CompositeHtmlAttr

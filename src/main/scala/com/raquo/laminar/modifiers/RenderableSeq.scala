@@ -87,7 +87,7 @@ object RenderableSeq {
 
   implicit object jsUndefOrRenderable extends RenderableSeq[js.UndefOr] {
     override def toSeq[A](maybeValue: js.UndefOr[A]): laminar.Seq[A] = {
-      laminar.Seq.from(JsArray.from(maybeValue))
+      laminar.Seq.from(JsArray.fromUndefOr(maybeValue))
     }
 
     override def foreach[A](values: js.UndefOr[A])(f: A => Unit): Unit = {

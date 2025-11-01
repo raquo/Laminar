@@ -12,7 +12,7 @@ import scala.scalajs.js.|
   * See also the simple keys under [[SimpleKey]].
   */
 trait CompositeAttr[+Self <: CompositeAttr[Self, El], -El <: ReactiveElement.Base]
-extends CompositeKey[El] { self: Self =>
+extends CompositeKey[Self, El] { self: Self =>
 
   val name: String
 

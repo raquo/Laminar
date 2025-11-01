@@ -10,7 +10,7 @@ package com.raquo.laminar.keys
   *    {{{
   *    trait units.Color {
   *      def rgb(red: Int, green: Int, blue: Int): SSS =
-  *        styleSetter(s"rgb($red, $green, $blue)")
+  *        styleSetter(s"rgb(\$red, \$green, \$blue)")
   *    }
   *    style.rgb(0, 0, 0)      // "rgb(0, 0, 0)" String
   *    background.rgb(0, 0, 0) // StyleSetter[String, String] that sets this rgb color
@@ -19,7 +19,7 @@ package com.raquo.laminar.keys
   * Shared usage of def derivedStyle:
   *    {{{
   *    trait units.Length {
-  *      lazy val px: DSP[Int | Double] = derivedStyle(n => s"${n}px")
+  *      lazy val px: DSP[Int | Double] = derivedStyle(n => s"\${n}px")
   *    }
   *    }}}
   *    style.px(12)      // "12px" String

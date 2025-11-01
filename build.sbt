@@ -141,8 +141,6 @@ lazy val laminar = project.in(file("."))
         "-deprecation",
         "-explain-types",
         "-explain",
-        "-feature",
-        "-language:existentials,experimental.macros,higherKinds,implicitConversions",
         "-unchecked",
         "-Xfatal-warnings",
         "-Ykind-projector",

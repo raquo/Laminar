@@ -21,8 +21,8 @@ import com.raquo.laminar.nodes.ReactiveElement
   *
   * @param itemsToAdd Note: must be normalized (no empty strings; one value per item)
   */
-class CompositeKeySetter[-El <: ReactiveElement.Base](
-  val key: CompositeKey[El],
+class CompositeKeySetter[+K <: CompositeKey[K, El], -El <: ReactiveElement.Base](
+  val key: K,
   val itemsToAdd: List[String]
 ) extends Setter[El] {
 
@@ -49,7 +49,7 @@ class CompositeKeySetter[-El <: ReactiveElement.Base](
   // which sets one or more classes conditionally.
 
   /** If `include` is true, the items will be added, if false, they will not be added */
-  def :=(include: Boolean): CompositeKeySetter[El] = {
+  def :=(include: Boolean): CompositeKeySetter[K, El] = {
     if (include) {
       key(itemsToAdd: _*)
     } else {
@@ -58,7 +58,7 @@ class CompositeKeySetter[-El <: ReactiveElement.Base](
   }
 
   /** If `include` is true, the items will be added, if false, they will not be added */
-  @inline def apply(include: Boolean): CompositeKeySetter[El] = {
+  @inline def apply(include: Boolean): CompositeKeySetter[K, El] = {
     this := include
   }
 
@@ -66,7 +66,7 @@ class CompositeKeySetter[-El <: ReactiveElement.Base](
     * if it emits false, they will be removed (but only if they were
     * previously added - see docs).
     */
-  def <--(include: Source[Boolean]): CompositeKeyUpdater[El, List[String]] = {
+  def <--(include: Source[Boolean]): CompositeKeyUpdater[K, List[String], El] = {
     key <-- include.toObservable.map(include => if (include) itemsToAdd else Nil)
   }
 }
