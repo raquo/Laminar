@@ -904,14 +904,6 @@ trait HtmlTags {
 
 
   /**
-    * Defines a mathematical formula.
-    *
-    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/math math @ MDN]]
-    */
-  lazy val mathTag: HtmlTag[dom.HTMLElement] = htmlTag("math")
-
-
-  /**
     * Represents text highlighted for reference purposes, that is for its
     * relevance in another context.
     *
