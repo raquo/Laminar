@@ -2,6 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.defs.styles.traits.GlobalKeywords
+import com.raquo.laminar.defs.styles.units.GlobalUnits
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.modifiers.SimpleKeyUpdater
@@ -12,6 +13,7 @@ class StyleProp[V](
   val prefixes: Seq[String] = Nil
 ) extends SimpleKey[StyleProp[V], V, ReactiveHtmlElement.Base]
 with GlobalKeywords[V]
+with GlobalUnits[DerivedStyleProp]
 with StyleBuilder[StyleSetter[V, String]]
 with DerivedStyleBuilder[DerivedStyleProp] { self =>
 

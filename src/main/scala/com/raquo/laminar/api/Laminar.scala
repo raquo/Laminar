@@ -8,7 +8,6 @@ import com.raquo.laminar.defs.props.HtmlProps
 import com.raquo.laminar.defs.styles.StyleProps
 import com.raquo.laminar.defs.symbols.MathMlSymbols
 import com.raquo.laminar.defs.tags.{HtmlTags, MathMlTags, SvgTags}
-import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers.{EventListener, SimpleKeyUpdater}

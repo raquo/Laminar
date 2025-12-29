@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.laminar.{inserters, keys, lifecycle, modifiers, nodes}
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.domapi
 import org.scalajs.dom
 
 import scala.collection.immutable
@@ -41,7 +41,7 @@ trait LaminarAliases {
 
   // Modifiers
 
-  type Mod[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
+  type Mod[-El <: nodes.ReactiveElement.Base] = modifiers.Modifier[El]
 
   val Mod: modifiers.Modifier.type = modifiers.Modifier
 
@@ -53,7 +53,7 @@ trait LaminarAliases {
 
   //
 
-  type Modifier[-El <: ReactiveElement.Base] = modifiers.Modifier[El]
+  type Modifier[-El <: nodes.ReactiveElement.Base] = modifiers.Modifier[El]
 
   val Modifier: modifiers.Modifier.type = modifiers.Modifier
 
@@ -136,4 +136,8 @@ trait LaminarAliases {
   type Span = nodes.ReactiveHtmlElement[dom.html.Span]
 
   type TextArea = nodes.ReactiveHtmlElement[dom.html.TextArea]
+
+  //
+
+  @inline def DomApi: domapi.DomApi.type = domapi.DomApi
 }

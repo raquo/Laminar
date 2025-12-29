@@ -1,5 +1,6 @@
 package com.raquo.laminar.domapi
 
+/** These are low-level methods */
 object DomApi
 extends DomTree
 with DomEvents

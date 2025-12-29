@@ -127,6 +127,19 @@ class StyleSpec extends UnitSpec {
       "url(\"https://example.com%22%5C ); evil\")"
     )
 
+    assertEquals(
+      style.cssVar("--var-name"),
+      "var(--var-name)"
+    )
+
+    try {
+      style.cssVar("--var-name); evil")
+      fail("Invalid / unsafe var name should have failed")
+    } catch {
+      case err: Exception =>
+        assert(err.getMessage.startsWith("Invalid CSS var name:"))
+    }
+
     val x = new TestableBuilder
     assertEquals(
       x.encodeCalcValue("20px + 50%"),
