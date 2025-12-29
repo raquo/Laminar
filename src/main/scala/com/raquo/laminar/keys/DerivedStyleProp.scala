@@ -2,15 +2,15 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.modifiers.SimpleKeySetter.{DerivedStyleSetter, StyleSetter}
+import com.raquo.laminar.modifiers.SimpleKeySetter.DerivedStyleSetter
 import com.raquo.laminar.modifiers.SimpleKeyUpdater
-import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.nodes.ReactiveElement
 
 /** This class represents derived style props like `height.px` or `backgroundImage.url` */
 class DerivedStyleProp[V](
   val key: StyleProp[_],
   val encode: V => String
-) extends SimpleKey[DerivedStyleProp[V], V, ReactiveHtmlElement.Base] {
+) extends SimpleKey[DerivedStyleProp[V], V, ReactiveElement.Base] {
 
   override val name: String = key.name
 
@@ -35,12 +35,12 @@ class DerivedStyleProp[V](
     values: Source[ThisV]
   )(implicit
     ev: ThisV => V
-  ): SimpleKeyUpdater[DerivedStyleProp[V], ThisV, ReactiveHtmlElement.Base] =
+  ): SimpleKeyUpdater[DerivedStyleProp[V], ThisV, ReactiveElement.Base] =
     new SimpleKeyUpdater(
       key = this,
       values = values.toObservable,
       update = (el, value) => {
-        DomApi.setHtmlDerivedStyle(el, this, ev(value))
+        DomApi.setDerivedStyle(el, this, ev(value))
       }
     )
 

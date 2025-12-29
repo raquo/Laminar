@@ -1,6 +1,7 @@
 package com.raquo.laminar.domapi
 
 import com.raquo.laminar.domapi.DomKeysRaw._
+import com.raquo.laminar.domext
 import org.scalajs.dom
 
 import scala.collection.immutable
@@ -96,22 +97,24 @@ trait DomKeysRaw {
     }
   }
 
-  def setHtmlStyle(
-    element: dom.html.Element,
+  def setStyle(
+    element: dom.Element,
     styleCssName: String,
     prefixes: immutable.Seq[String],
     styleValue: String | Null
   ): Unit = {
+    /** All dom.Element-s are actually stylable. See [[domext.StylableElement]] */
+    val stylableElement = element.asInstanceOf[domext.StylableElement]
     // #Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
     if (styleValue == null) {
-      prefixes.foreach(prefix => element.style.removeProperty(prefix + styleCssName))
-      element.style.removeProperty(styleCssName)
+      prefixes.foreach(prefix => stylableElement.style.removeProperty(prefix + styleCssName))
+      stylableElement.style.removeProperty(styleCssName)
     } else {
       val _styleValue: String = styleValue.asInstanceOf[String] // #Safe because null check above
       prefixes.foreach { prefix =>
-        element.style.setProperty(prefix + styleCssName, _styleValue)
+        stylableElement.style.setProperty(prefix + styleCssName, _styleValue)
       }
-      element.style.setProperty(styleCssName, _styleValue)
+      stylableElement.style.setProperty(styleCssName, _styleValue)
     }
   }
 

@@ -8,7 +8,7 @@ import com.raquo.laminar.utils.UnitSpec
 
 class SvgSpec extends UnitSpec {
 
-  it("renders sample svg, sets attrs and responds to events") {
+  it("renders sample svg, sets attrs and CSS props, and responds to events") {
 
     val strokeWidthVar = Var("3")
 
@@ -29,6 +29,7 @@ class SvgSpec extends UnitSpec {
       xmlns := DomApi.svgNamespaceUri, // kinda tests https://github.com/raquo/Laminar/issues/143
       height := "800",
       width := "500",
+      L.margin.px(20), // CSS supported on top root SVG elements
       polylineEl
     )
 
@@ -37,6 +38,7 @@ class SvgSpec extends UnitSpec {
     expectNode(L.div.of(svg.of(
       height is "800",
       width is "500",
+      L.margin is "20px",
       polyline.of(
         points is "20,20 40,25 60,40 80,120 120,140 200,180",
         fill is "none",
@@ -53,6 +55,7 @@ class SvgSpec extends UnitSpec {
     expectNode(L.div.of(svg.of(
       height is "800",
       width is "500",
+      L.margin is "20px",
       polyline.of(
         points is "20,20 40,25 60,40 80,120 120,140 200,180",
         fill is "none",
@@ -69,6 +72,7 @@ class SvgSpec extends UnitSpec {
     expectNode(L.div.of(svg.of(
       height is "800",
       width is "500",
+      L.margin is "20px",
       polyline.of(
         points is "20,20 40,25 60,40 80,120 120,140 200,180",
         fill is "none",

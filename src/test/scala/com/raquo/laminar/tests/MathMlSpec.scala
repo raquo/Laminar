@@ -16,7 +16,8 @@ class MathMlSpec extends UnitSpec {
     val el =
       mathTag(
         xmlns(DomApi.mathmlNamespaceUri),
-        display("block"),
+        display("block"), // this `display` is a MathML attribute. Don't confuse with CSS `display` prop!
+        // L.backgroundColor.yellow, // CSS works with MathML // #TODO[Test] JSDOM does not support this fully yet https://github.com/jsdom/jsdom/issues/3515
         mrow(
           mi("x"),
           mo(symbols.equalsSign),
@@ -59,6 +60,7 @@ class MathMlSpec extends UnitSpec {
       mathTag of (
         xmlns is DomApi.mathmlNamespaceUri,
         display is "block",
+        // L.backgroundColor is "yellow", // #TODO[Test] See above – need jsdom support
         mrow of (
           mi of ("x"),
           mo of (symbols.equalsSign),

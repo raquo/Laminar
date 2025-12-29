@@ -75,11 +75,11 @@ object SimpleKeySetter {
   class StyleSetter[V, ThisV] private[laminar] (
     override val key: StyleProp[V],
     override val value: ThisV
-  ) extends SimpleKeySetter[StyleProp[V], ThisV, ReactiveHtmlElement.Base](
+  ) extends SimpleKeySetter[StyleProp[V], ThisV, ReactiveElement.Base](
     key,
     value,
-    el => DomApi.setHtmlStyle(el, key, DomApi.cssValue(value)),
-    el => DomApi.setHtmlStyle(el, key, null)
+    el => DomApi.setStyle(el, key, DomApi.cssValue(value)),
+    el => DomApi.setStyle(el, key, null)
   ) {
 
     lazy val cssValue: String = {
@@ -91,11 +91,11 @@ object SimpleKeySetter {
   class DerivedStyleSetter[V, ThisV <: V](
     override val key: DerivedStyleProp[V],
     override val value: ThisV
-  ) extends SimpleKeySetter[DerivedStyleProp[V], ThisV, ReactiveHtmlElement.Base](
+  ) extends SimpleKeySetter[DerivedStyleProp[V], ThisV, ReactiveElement.Base](
     key,
     value,
-    el => DomApi.setHtmlDerivedStyle(el, key, value),
-    el => DomApi.setHtmlDerivedStyle(el, key, null.asInstanceOf[ThisV])
+    el => DomApi.setDerivedStyle(el, key, value),
+    el => DomApi.setDerivedStyle(el, key, null.asInstanceOf[ThisV])
   ) {
 
     lazy val cssValue: String = key.encode(value)

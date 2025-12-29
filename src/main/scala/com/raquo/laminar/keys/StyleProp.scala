@@ -6,12 +6,12 @@ import com.raquo.laminar.defs.styles.units.GlobalUnits
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
 import com.raquo.laminar.modifiers.SimpleKeyUpdater
-import com.raquo.laminar.nodes.ReactiveHtmlElement
+import com.raquo.laminar.nodes.ReactiveElement
 
 class StyleProp[V](
   override val name: String,
   val prefixes: Seq[String] = Nil
-) extends SimpleKey[StyleProp[V], V, ReactiveHtmlElement.Base]
+) extends SimpleKey[StyleProp[V], V, ReactiveElement.Base]
 with GlobalKeywords[V]
 with GlobalUnits[DerivedStyleProp]
 with StyleBuilder[StyleSetter[V, String]]
@@ -38,12 +38,12 @@ with DerivedStyleBuilder[DerivedStyleProp] { self =>
     values: Source[ThisV]
   )(implicit
     ev: ThisV => V
-  ): SimpleKeyUpdater[StyleProp[V], ThisV, ReactiveHtmlElement.Base] =
+  ): SimpleKeyUpdater[StyleProp[V], ThisV, ReactiveElement.Base] =
     new SimpleKeyUpdater(
       key = this,
       values = values.toObservable,
       update = (el, value) => {
-        DomApi.setHtmlStyle(el, this, DomApi.cssValue(ev(value)))
+        DomApi.setStyle(el, this, DomApi.cssValue(ev(value)))
       }
     )
 

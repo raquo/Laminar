@@ -69,12 +69,12 @@ trait DomKeys {
   }
 
   /** If you don't have a String value, pass `prop(scalaValue).cssValue` to value`. */
-  def setHtmlStyle[V](
-    element: ReactiveHtmlElement.Base,
+  def setStyle[V](
+    element: ReactiveElement.Base,
     prop: StyleProp[V],
     value: String | Null
   ): Unit = {
-    raw.setHtmlStyle(
+    raw.setStyle(
       element = element.ref,
       styleCssName = prop.name,
       prefixes = prop.prefixes,
@@ -82,8 +82,8 @@ trait DomKeys {
     )
   }
 
-  def setHtmlDerivedStyle[V](
-    element: ReactiveHtmlElement.Base,
+  def setDerivedStyle[V](
+    element: ReactiveElement.Base,
     prop: DerivedStyleProp[V],
     value: V | Null
   ): Unit = {
@@ -92,7 +92,7 @@ trait DomKeys {
     } else {
       prop.encode(value.asInstanceOf[V]) // #Safe because null check above
     }
-    raw.setHtmlStyle(
+    raw.setStyle(
       element = element.ref,
       styleCssName = prop.name,
       prefixes = prop.key.prefixes,
