@@ -11,6 +11,8 @@ trait ComplexGlobalKeys {
     * Classes allow CSS and JavaScript to select and access specific elements
     * via the class selectors or functions like the DOM method
     * document.getElementsByClassName
+    *
+    * See: [[https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/class @ MDN]]
     */
   val className: CompositeAttr.Base = compositeAttr("class", separator = " ")
 
@@ -29,7 +31,7 @@ trait ComplexGlobalKeys {
     * semantics, such as p, rather than layering semantics on semantically
     * neutral elements, such as div role="paragraph".
     *
-    * See: [[http://www.w3.org/TR/role-attribute/#s_role_module_attributes]]
+    * See: [[http://www.w3.org/TR/role-attribute/#s_role_module_attributes @ W3.org]]
     */
   lazy val role: CompositeAttr.Base = compositeAttr("role", separator = " ")
 

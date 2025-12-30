@@ -39,15 +39,15 @@ trait RenderableNode[-Component] {
 object RenderableNode {
 
   /**
-   * A `Component` must have a 1-to-1 relationship to a Laminar ChildNode.
-   * Your Component class/trait should have something like `val node: ChildNode.Base`
-   * or `lazy val node: ChildNode.Base` in it, it must not be a `var` or a `def`.
+    * A `Component` must have a 1-to-1 relationship to a Laminar ChildNode.
+    * Your Component class/trait should have something like `val node: ChildNode.Base`
+    * or `lazy val node: ChildNode.Base` in it, it must not be a `var` or a `def`.
     *
     * Note: This implementation works for essentially all use cases,
     *       and while it is USUALLY the most efficient, that is not always the case.
     *       For example, `nodeRenderable` below is a special implementation that
     *       avoids mapping over the input collections because that is not needed.
-   */
+    */
   def apply[Component](
     renderNode: Component => ChildNode.Base
   ): RenderableNode[Component] = new RenderableNode[Component] {

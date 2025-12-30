@@ -15,52 +15,52 @@ import scala.scalajs.js
 //  - Other fields may remain un-updated if they are not needed for a particular use case.
 
 /**
- * InsertContext represents the state of the DOM inside an inserter block like `child <-- ...`,
- * `children <-- ...`, `child.text <-- ...`, etc. The data stored in this context is used
- * by Laminar to efficiently update the DOM, to detect (and recover from) external changes
- * to the DOM, and for other related tasks.
- *
- * InsertContext is a mutable data structure that is created once for each inserter, and the
- * inserter updates it as it processes new data. However, in case of `onMountInsert`, only
- * one context is created, and is then reused for all inserters created inside
- * `onMountInsert`. This allows for intuitive preservation of DOM state if the element is
- * unmounted and mounted again (for example, `onMountInsert(child <-- stream)` will
- * keep the last emitted child in the DOM even if the element is unmounted and re-mounted).
- *
- * #Note: The params that describe `extraNodes` below can get out of sync with the real DOM.
- *
- * This can happen if an child element is removed from the DOM – either externally, or more
- * likely because it was moved from this inserter into another one, and the addition to the
- * other inserter was processed before the removal from this inserter is processed (the
- * order of these operations depends on the propagation order of the observables feeding
- * these two inserters). The Inserter code must account for this and not fail in such cases,
- * and must correct the values accordingly on the next observable update.
- *
- * #Note: The params that describe `extraNodes` below must be kept consistent manually (#Perf)
- *
- *                              Inserter "steals" an element from this one just before the
- *                              observable source of this inserter provides a new list of
- *                              children (with the stolen element removed from the list).
- *
- * @param sentinelNode        - A special invisible comment node that tells Laminar where to
- *                              insert the dynamic children, and where to expect previously
- *                              inserted dynamic children.
- * @param strictMode          - If true, Laminar guarantees that it will keep a dedicated
- *                              sentinel node instead of using the extra node (content node)
- *                              for that purpose. This is needed in order to allow users to
- *                              move an element from one inserter to another, or to externally
- *                              remove some of the elements previously added by an inserter.
- *                              child.text does not need any of that, so for performance it
- *                              does not use strict mode, it replaces the sentinel comment
- *                              node with the subsequent text nodes. Inserters should be able
- *                              to safely switch to their preferred mode when receiving
- *                              context left by the previous inserter in onMountBind.
- * @param extraNodeCount      - Number of child nodes in addition to the sentinel node.
- *                              Warning: can get out of sync with the real DOM!
- * @param extraNodesMap       - Map of child nodes in addition to the sentinel node,
- *                              for more efficient search
- *                              Warning: can get out of sync with the real DOM!
- */
+  * InsertContext represents the state of the DOM inside an inserter block like `child <-- ...`,
+  * `children <-- ...`, `child.text <-- ...`, etc. The data stored in this context is used
+  * by Laminar to efficiently update the DOM, to detect (and recover from) external changes
+  * to the DOM, and for other related tasks.
+  *
+  * InsertContext is a mutable data structure that is created once for each inserter, and the
+  * inserter updates it as it processes new data. However, in case of `onMountInsert`, only
+  * one context is created, and is then reused for all inserters created inside
+  * `onMountInsert`. This allows for intuitive preservation of DOM state if the element is
+  * unmounted and mounted again (for example, `onMountInsert(child <-- stream)` will
+  * keep the last emitted child in the DOM even if the element is unmounted and re-mounted).
+  *
+  * #Note: The params that describe `extraNodes` below can get out of sync with the real DOM.
+  *
+  * This can happen if an child element is removed from the DOM – either externally, or more
+  * likely because it was moved from this inserter into another one, and the addition to the
+  * other inserter was processed before the removal from this inserter is processed (the
+  * order of these operations depends on the propagation order of the observables feeding
+  * these two inserters). The Inserter code must account for this and not fail in such cases,
+  * and must correct the values accordingly on the next observable update.
+  *
+  * #Note: The params that describe `extraNodes` below must be kept consistent manually (#Perf)
+  *
+  *                              Inserter "steals" an element from this one just before the
+  *                              observable source of this inserter provides a new list of
+  *                              children (with the stolen element removed from the list).
+  *
+  * @param sentinelNode        - A special invisible comment node that tells Laminar where to
+  *                              insert the dynamic children, and where to expect previously
+  *                              inserted dynamic children.
+  * @param strictMode          - If true, Laminar guarantees that it will keep a dedicated
+  *                              sentinel node instead of using the extra node (content node)
+  *                              for that purpose. This is needed in order to allow users to
+  *                              move an element from one inserter to another, or to externally
+  *                              remove some of the elements previously added by an inserter.
+  *                              child.text does not need any of that, so for performance it
+  *                              does not use strict mode, it replaces the sentinel comment
+  *                              node with the subsequent text nodes. Inserters should be able
+  *                              to safely switch to their preferred mode when receiving
+  *                              context left by the previous inserter in onMountBind.
+  * @param extraNodeCount      - Number of child nodes in addition to the sentinel node.
+  *                              Warning: can get out of sync with the real DOM!
+  * @param extraNodesMap       - Map of child nodes in addition to the sentinel node,
+  *                              for more efficient search
+  *                              Warning: can get out of sync with the real DOM!
+  */
 final class InsertContext(
   val parentNode: ReactiveElement.Base,
   var sentinelNode: ChildNode.Base,
@@ -71,13 +71,13 @@ final class InsertContext(
 ) {
 
   /**
-   * This method converts the InsertContext from loose mode to strict mode.
-   * ChildrenInserter and ChildInserter call this when receiving a context from
-   * ChildTextInserter. This can happen when switching from `child.text <-- ...`
-   * to e.g. `children <-- ...` inside onMountInsert.
-   *
-   * Prerequisite: context must be in loose mode, and in valid state: no extra nodes allowed.
-   */
+    * This method converts the InsertContext from loose mode to strict mode.
+    * ChildrenInserter and ChildInserter call this when receiving a context from
+    * ChildTextInserter. This can happen when switching from `child.text <-- ...`
+    * to e.g. `children <-- ...` inside onMountInsert.
+    *
+    * Prerequisite: context must be in loose mode, and in valid state: no extra nodes allowed.
+    */
   def forceSetStrictMode(): Unit = {
     if (strictMode || extraNodeCount != 0) {
       // #Note: if extraNodeCount == 0, it is also assumed (but not tested) that extraNodes and extraNodesMap are empty.

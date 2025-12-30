@@ -62,21 +62,21 @@ class EventProcessor[Ev <: dom.Event, V](
   }
 
   /** Use a passive event listener
-   *
-   * Note that unlike `preventDefault` config which applies to individual events,
-   * `passive` is used to install the listener onto the DOM node in the first place.
-   *
-   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive
-   */
+    *
+    * Note that unlike `preventDefault` config which applies to individual events,
+    * `passive` is used to install the listener onto the DOM node in the first place.
+    *
+    * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive
+    */
   def passive: EventProcessor[Ev, V] = {
     new EventProcessor(eventProp, shouldUseCapture = shouldUseCapture, shouldBePassive = true, processor = processor)
   }
 
   /** Use a standard non-passive listener.
-   * You don't need to call this unless you set `passive` previously, and want to revert to non-passive.
-   *
-   * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive
-   */
+    * You don't need to call this unless you set `passive` previously, and want to revert to non-passive.
+    *
+    * See `passive` docs here: https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive
+    */
   def nonPassive: EventProcessor[Ev, V] = {
     new EventProcessor(eventProp, shouldUseCapture = shouldUseCapture, shouldBePassive = false, processor = processor)
   }
@@ -212,9 +212,9 @@ class EventProcessor[Ev <: dom.Event, V](
   }
 
   /** Get the value of `event.target.files`
-   *
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
-   */
+    *
+    * @see https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+    */
   def mapToFiles: EventProcessor[Ev, List[dom.File]] = {
     withNewProcessor { ev =>
       processor(ev).map { _ =>
@@ -224,10 +224,10 @@ class EventProcessor[Ev <: dom.Event, V](
   }
 
   /** Unsafe – Get the value of `event.target`, cast to a certain element type
-   *
-   * You should generally avoid this in favor of other helpers like
-   * `mapToValue` or `inContext { thisNode => ... }`.
-   */
+    *
+    * You should generally avoid this in favor of other helpers like
+    * `mapToValue` or `inContext { thisNode => ... }`.
+    */
   def mapToTargetAs[Ref <: dom.EventTarget]: EventProcessor[Ev, Ref] = {
     withNewProcessor { ev =>
       processor(ev).map { _ =>
@@ -411,9 +411,9 @@ class EventProcessor[Ev <: dom.Event, V](
   }
 
   /**
-   * Write a custom string into `event.target.value`.
-   * You can only do this on elements that have a value property - input, textarea, select
-   */
+    * Write a custom string into `event.target.value`.
+    * You can only do this on elements that have a value property - input, textarea, select
+    */
   def setValue(nextValue: String): EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { result =>
@@ -440,11 +440,11 @@ class EventProcessor[Ev <: dom.Event, V](
   }
 
   /**
-   * Write a custom boolean into `event.target.checked`.
-   * You can only do this on checkbox or radio button elements.
-   *
-   * Warning: if using this, do not use preventDefault. The browser may override the value you set here.
-   */
+    * Write a custom boolean into `event.target.checked`.
+    * You can only do this on checkbox or radio button elements.
+    *
+    * Warning: if using this, do not use preventDefault. The browser may override the value you set here.
+    */
   def setChecked(nextChecked: Boolean): EventProcessor[Ev, V] = {
     withNewProcessor { ev =>
       processor(ev).map { result =>

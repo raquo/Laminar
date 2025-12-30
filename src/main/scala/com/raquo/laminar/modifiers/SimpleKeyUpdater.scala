@@ -6,11 +6,11 @@ import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
 
 /**
- * A modifier that updates a key from a source, e.g. `value <-- valueStream`
- *
- * @param update `(element, newValue, reason) => ()`
- *               The reason is used for updating CompositeKey-s.
- */
+  * A modifier that updates a key from a source, e.g. `value <-- valueStream`
+  *
+  * @param update `(element, newValue, reason) => ()`
+  *               The reason is used for updating CompositeKey-s.
+  */
 class SimpleKeyUpdater[ //
   +K <: SimpleKey[_, _, El],
   V,

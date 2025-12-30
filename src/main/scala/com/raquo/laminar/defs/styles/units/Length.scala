@@ -21,24 +21,24 @@ trait Length[DSP[_]] extends Calc[DSP] { this: DerivedStyleBuilder[DSP] =>
   // -- Font-relative lengths --
 
   /**
-   * `em` represents the calculated font-size of the element. If used on the
-   * font-size property itself, it represents the inherited font-size of the
-   * element.
-   */
+    * `em` represents the calculated font-size of the element. If used on the
+    * font-size property itself, it represents the inherited font-size of the
+    * element.
+    */
   lazy val em: DSP[Int | Double] = derivedStyle(n => s"${n}em")
 
   /**
-   * `rem` represents the font-size of the root element (typically <html>).
-   * When used within the root element font-size, it represents its initial
-   * value (a common browser default is 16px, but user-defined preferences
-   * may modify this).
-   */
+    * `rem` represents the font-size of the root element (typically <html>).
+    * When used within the root element font-size, it represents its initial
+    * value (a common browser default is 16px, but user-defined preferences
+    * may modify this).
+    */
   lazy val rem: DSP[Int | Double] = derivedStyle(n => s"${n}rem")
 
   /**
-   * `ch` represents the width, or more precisely the advance measure, of the
-   * glyph "0" (zero, the Unicode character U+0030) in the element's font.
-   */
+    * `ch` represents the width, or more precisely the advance measure, of the
+    * glyph "0" (zero, the Unicode character U+0030) in the element's font.
+    */
   lazy val ch: DSP[Int | Double] = derivedStyle(n => s"${n}ch")
 
 
