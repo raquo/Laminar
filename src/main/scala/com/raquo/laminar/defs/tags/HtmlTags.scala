@@ -99,12 +99,41 @@ trait HtmlTags {
 
 
   /**
-    * Represents an image.
+    * In conjunction with map, defines an image map
     *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img img @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement HTMLImageElement @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area area @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLAreaElement HTMLAreaElement @ MDN]]
     */
-  lazy val img: HtmlTag[dom.HTMLImageElement] = htmlTag("img", void = true)
+  lazy val areaTag: HtmlTag[dom.HTMLAreaElement] = htmlTag("area", void = true)
+
+
+  /**
+    * Represents a sound or an audio stream.
+    *
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio audio @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement HTMLAudioElement @ MDN]]
+    */
+  lazy val audioTag: HtmlTag[dom.HTMLAudioElement] = htmlTag("audio")
+
+
+  /**
+    * Represents a bitmap area that scripts can use to render graphics like graphs,
+    * games or any visual images on the fly.
+    *
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement @ MDN]]
+    */
+  lazy val canvasTag: HtmlTag[dom.HTMLCanvasElement] = htmlTag("canvas")
+
+
+  /**
+    * Represents a integration point for an external, often non-HTML, application
+    * or interactive content.
+    *
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/embed embed @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLEmbedElement HTMLEmbedElement @ MDN]]
+    */
+  lazy val embedTag: HtmlTag[dom.HTMLEmbedElement] = htmlTag("embed", void = true)
 
 
   /**
@@ -117,13 +146,21 @@ trait HtmlTags {
 
 
   /**
-    * Represents a integration point for an external, often non-HTML, application
-    * or interactive content.
+    * Represents an image.
     *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/embed embed @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLEmbedElement HTMLEmbedElement @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img img @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement HTMLImageElement @ MDN]]
     */
-  lazy val embedTag: HtmlTag[dom.HTMLEmbedElement] = htmlTag("embed", void = true)
+  lazy val img: HtmlTag[dom.HTMLImageElement] = htmlTag("img", void = true)
+
+
+  /**
+    * In conjunction with area, defines an image map.
+    *
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/map map @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLMapElement HTMLMapElement @ MDN]]
+    */
+  lazy val mapTag: HtmlTag[dom.HTMLMapElement] = htmlTag("map")
 
 
   /**
@@ -146,22 +183,12 @@ trait HtmlTags {
 
 
   /**
-    * Represents a video, and its associated audio files and captions, with the
-    * necessary interface to play it.
+    * Placeholder element inside a web component that you can fill with your own markup.
     *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video video @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement HTMLVideoElement @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot slot @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLSlotElement HTMLSlotElement @ MDN]]
     */
-  lazy val videoTag: HtmlTag[dom.HTMLVideoElement] = htmlTag("video")
-
-
-  /**
-    * Represents a sound or an audio stream.
-    *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio audio @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLAudioElement HTMLAudioElement @ MDN]]
-    */
-  lazy val audioTag: HtmlTag[dom.HTMLAudioElement] = htmlTag("audio")
+  lazy val slotTag: HtmlTag[dom.HTMLElement] = htmlTag("slot", void = true)
 
 
   /**
@@ -185,31 +212,13 @@ trait HtmlTags {
 
 
   /**
-    * Represents a bitmap area that scripts can use to render graphics like graphs,
-    * games or any visual images on the fly.
+    * Represents a video, and its associated audio files and captions, with the
+    * necessary interface to play it.
     *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement HTMLCanvasElement @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video video @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement HTMLVideoElement @ MDN]]
     */
-  lazy val canvasTag: HtmlTag[dom.HTMLCanvasElement] = htmlTag("canvas")
-
-
-  /**
-    * In conjunction with area, defines an image map.
-    *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/map map @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLMapElement HTMLMapElement @ MDN]]
-    */
-  lazy val mapTag: HtmlTag[dom.HTMLMapElement] = htmlTag("map")
-
-
-  /**
-    * In conjunction with map, defines an image map
-    *
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/area area @ MDN]]
-    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLAreaElement HTMLAreaElement @ MDN]]
-    */
-  lazy val areaTag: HtmlTag[dom.HTMLAreaElement] = htmlTag("area", void = true)
+  lazy val videoTag: HtmlTag[dom.HTMLVideoElement] = htmlTag("video")
 
 
   // -- Section Tags --
