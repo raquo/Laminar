@@ -818,17 +818,6 @@ trait SvgAttrs {
 
 
   /**
-    * The id attribute assigns a unique name to an element. This can be used for referencing the element
-    * in JavaScript, CSS, and SVG animations. It's also used with fragment identifiers in URLs.
-    *
-    * Value: <id>
-    *
-    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/id id @ MDN]]
-    */
-  lazy val idAttr: SvgAttr[String] = stringSvgAttr("id")
-
-
-  /**
     * The in attribute identifies input for the given filter primitive.
     * The value can be either a reference to a result from a previous filter primitive,
     * or one of the standard filter input keywords.
@@ -1750,17 +1739,6 @@ trait SvgAttrs {
     * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/surfaceScale surfaceScale @ MDN]]
     */
   lazy val surfaceScale: SvgAttr[String] = stringSvgAttr("surfaceScale")
-
-
-  /**
-    * The tabindex attribute allows you to control whether an element is focusable and to define
-    * the relative order of the element for the purposes of sequential focus navigation.
-    *
-    * Value: <integer>
-    *
-    * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/tabindex tabindex @ MDN]]
-    */
-  lazy val tabIndex: SvgAttr[String] = stringSvgAttr("tabindex")
 
 
   /**

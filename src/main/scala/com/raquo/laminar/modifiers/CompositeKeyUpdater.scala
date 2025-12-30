@@ -2,8 +2,8 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Observable
 import com.raquo.airstream.ownership.DynamicSubscription
-import com.raquo.laminar.keys.{CompositeKey, CompositeValueMapper}
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.keys.{CompositeAttr, CompositeKey, CompositeValueMapper}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
 /**
   * A modifier that updates a [[CompositeKey]] from a source, e.g. `value <-- valueStream`
@@ -30,4 +30,13 @@ class CompositeKeyUpdater[+K <: CompositeKey[K, El], V, -El <: ReactiveElement.B
       )
     }
   }
+}
+
+object CompositeKeyUpdater {
+
+  type CompositeAttrUpdater[V] = CompositeKeyUpdater[CompositeAttr.Base, V, ReactiveElement.Base]
+
+  type HtmlCompositeAttrUpdater[V] = CompositeKeyUpdater[CompositeAttr.HtmlCompositeAttr, V, ReactiveHtmlElement.Base]
+
+  // type SvgCompositeAttrUpdater[V] = CompositeKeyUpdater[CompositeAttr.SvgCompositeAttr, V, ReactiveSvgElement.Base]
 }

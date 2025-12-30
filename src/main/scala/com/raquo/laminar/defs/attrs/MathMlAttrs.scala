@@ -165,14 +165,6 @@ trait MathMlAttrs {
 
 
   /**
-    * Sets up a unique identifier associated with the element.
-    *
-    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id id @ MDN]]
-    */
-  lazy val idAttr: MathMlAttr[String] = stringMathMlAttr("id")
-
-
-  /**
     * A length-percentage indicating the thickness of the horizontal fraction line.
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mfrac#linethickness mfrac#linethickness @ MDN]]

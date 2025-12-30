@@ -78,12 +78,6 @@ trait LaminarAliases {
   type DynamicInserter = inserters.DynamicInserter
 
   //
-  // Events
-  //
-
-  type EventProcessor[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
-
-  //
   // Lifecycle
   //
 
@@ -92,22 +86,32 @@ trait LaminarAliases {
   type InsertContext = inserters.InsertContext
 
   //
-  // Keys
+  // Keys & Events
   //
 
   type EventProp[Ev <: dom.Event] = keys.EventProp[Ev]
 
-  type HtmlAttr[V] = keys.HtmlAttr[V]
+  type EventProcessor[Ev <: dom.Event, V] = keys.EventProcessor[Ev, V]
 
   type HtmlProp[V] = keys.HtmlProp[V]
 
-  type StyleProp[V] = keys.StyleProp[V]
+  type HtmlAttr[V] = keys.HtmlAttr[V]
 
   type SvgAttr[V] = keys.SvgAttr[V]
 
-  type CompositeHtmlAttr = keys.CompositeHtmlAttr
+  type GlobalAttr[V] = keys.GlobalAttr[V]
 
-  type CompositeSvgAttr = keys.CompositeSvgAttr
+  type AriaAttr[V] = keys.AriaAttr[V]
+
+  type CompositeAttr[-El <: nodes.ReactiveElement.Base] = keys.CompositeAttr[El]
+
+  val CompositeAttr: keys.CompositeAttr.type = keys.CompositeAttr
+
+  type HtmlCompositeAttr = keys.CompositeAttr.HtmlCompositeAttr
+
+  type StyleProp[V] = keys.StyleProp[V]
+
+  type DerivedStyleProp[V] = keys.DerivedStyleProp[V]
 
   //
   // Specific HTML elements

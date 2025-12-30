@@ -7,7 +7,6 @@ import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes._
 import com.raquo.laminar.tags.Tag
 import org.scalactic
-import org.scalajs.dom
 
 trait LaminarSpec
 extends MountOps
@@ -15,12 +14,12 @@ with RuleImplicits[
   Tag.Base,
   CommentNode,
   HtmlProp,
+  GlobalAttr,
   HtmlAttr,
   SvgAttr,
   MathMlAttr,
   StyleProp,
-  CompositeHtmlAttr,
-  CompositeSvgAttr
+  CompositeAttr[_],
 ]
 with EventSimulator {
   // === On nullable variables ===
@@ -89,16 +88,20 @@ with EventSimulator {
     ExpectedNode.comment
   }
 
-  override implicit def makeHtmlAttrTestable[V](attr: HtmlAttr[V]): TestableHtmlAttr[V] = {
-    new TestableHtmlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
-  }
-
-  override implicit def makePropTestable[V, _DomV](prop: HtmlProp[V] { type DomV = _DomV }): TestableProp[V, _DomV] = {
-    new TestableProp[V, _DomV](prop.name, prop.codec.decode)
+  override implicit def makeHtmlPropTestable[V, _DomV](prop: HtmlProp[V] { type DomV = _DomV }): TestableHtmlProp[V, _DomV] = {
+    new TestableHtmlProp[V, _DomV](prop.name, prop.codec.decode)
   }
 
   override implicit def makeStyleTestable[V](style: StyleProp[V]): TestableStyleProp[V] = {
     new TestableStyleProp[V](style.name)
+  }
+
+  override implicit def makeGlobalAttrTestable[V](attr: GlobalAttr[V]): TestableGlobalAttr[V] = {
+    new TestableGlobalAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
+  }
+
+  override implicit def makeHtmlAttrTestable[V](attr: HtmlAttr[V]): TestableHtmlAttr[V] = {
+    new TestableHtmlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
   override implicit def makeSvgAttrTestable[V](svgAttr: SvgAttr[V]): TestableSvgAttr[V] = {
@@ -109,15 +112,8 @@ with EventSimulator {
     new TestableMathMlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
-  override implicit def makeCompositeHtmlKeyTestable(key: CompositeHtmlAttr): TestableCompositeKey = {
-    new TestableCompositeKey(key.name, key.separator, getRawDomValue = {
-      case htmlEl: dom.html.Element => htmlEl.getAttribute(key.name)
-    })
+  override implicit def makeCompositeKeyTestable(key: CompositeAttr[_]): TestableCompositeKey = {
+    new TestableCompositeKey(key.name, key.separator, getRawDomValue = _.getAttribute(key.name))
   }
 
-  override implicit def makeCompositeSvgKeyTestable(key: CompositeSvgAttr): TestableCompositeKey = {
-    new TestableCompositeKey(key.name, key.separator, getRawDomValue = {
-      case svgEl: dom.svg.Element => svgEl.getAttributeNS(namespaceURI = null, key.name)
-    })
-  }
 }

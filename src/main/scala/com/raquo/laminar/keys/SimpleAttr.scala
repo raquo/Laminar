@@ -7,14 +7,14 @@ import com.raquo.laminar.modifiers.{SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
 /** Common type of all simple (non-composite) attributes:
+  *  - [[GlobalAttr]]
+  *    - [[AriaAttr]]
   *  - [[HtmlAttr]]
   *  - [[SvgAttr]]
-  *  - [[AriaAttr]]
+  *  - [[MathMlAttr]]
   *
   * See also attrs that are NOT simple:
   *  - [[CompositeAttr]]
-  *    - [[CompositeHtmlAttr]]
-  *    - [[CompositeSvgAttr]]
   */
 trait SimpleAttr[+Self <: SimpleAttr[Self, V, El], V, -El <: ReactiveElement.Base]
 extends SimpleKey[Self, V, El] { self: Self =>

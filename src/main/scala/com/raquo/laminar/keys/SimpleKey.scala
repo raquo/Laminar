@@ -15,13 +15,16 @@ import com.raquo.laminar.nodes.ReactiveElement
   * Hierarchy:
   *  - [[SimpleKey]]
   *     - [[SimpleAttr]]
-  *        - [[HtmlAttr]], [[SvgAttr]], [[AriaAttr]]
+  *        - [[GlobalAttr]]
+  *          - [[AriaAttr]]
+  *        - [[HtmlAttr]]
+  *        - [[SvgAttr]]
+  *        - [[MathMlAttr]]
   *     - [[HtmlProp]]
   *     - [[StyleProp]]
   *     - [[DerivedStyleProp]]
   *  - [[CompositeKey]]
   *     - [[CompositeAttr]]
-  *       - [[CompositeHtmlAttr]], [[CompositeSvgAttr]]
   */
 trait SimpleKey[ //
   +Self <: SimpleKey[Self, V, El],

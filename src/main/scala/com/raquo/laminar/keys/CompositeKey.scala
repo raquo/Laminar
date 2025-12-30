@@ -1,7 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.api.{MapValueMapper, StringValueMapper, StringSeqValueMapper}
+import com.raquo.laminar.api.{MapValueMapper, StringSeqValueMapper, StringValueMapper}
 import com.raquo.laminar.codecs.CompositeCodec
 import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
@@ -10,12 +10,19 @@ import scala.scalajs.js.|
 
 // #TODO[Performance] Should we use classList for className attribute instead of splitting strings? That needs IE 10+ (also, complexity)
 
-/** Attribute that we can set to multiple values, often
-  * space-separated strings, e.g. `cls` / `className`.
+/** An attribute or property that we can add multiple values to,
+  * often in the shape of space-separated strings, e.g. `class` (`cls` in Scala).
   *
-  * Subtypes: [[CompositeHtmlAttr]], [[CompositeSvgAttr]]
+  * In Laminar there is only one subtype: [[CompositeAttr]].
+  *
+  * In principle, you may easily define a CompositeHtmlProp subclass if you need it,
+  * but I don't think any HTML props would need it, and Web Component libraries
+  * typically work with attributes rather than props.
   */
-abstract class CompositeKey[+Self <: CompositeKey[Self, El], -El <: ReactiveElement.Base] { this: Self =>
+abstract class CompositeKey[ //
+  +Self <: CompositeKey[Self, El],
+  -El <: ReactiveElement.Base
+] { this: Self =>
 
   val name: String
 

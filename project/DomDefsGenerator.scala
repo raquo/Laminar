@@ -139,6 +139,41 @@ object DomDefsGenerator {
       )
     }
 
+    // -- Global attributes --
+
+    {
+      val traitName = "GlobalAttrs"
+
+      val fileContent = generator.generateAttrsTrait(
+        defGroups = defGroups.globalAttrDefGroups,
+        printDefGroupComments = false,
+        traitCommentLines = Nil,
+        traitModifiers = Nil,
+        traitName = traitName,
+        keyKind = "GlobalAttr",
+        implNameSuffix = "GlobalAttr",
+        baseImplDefComments = List(
+          "Create Global attribute (applies to all types of elements: HTML, SVG, MathML)",
+          "",
+          "@param name  - name of the attribute, e.g. \"id\"",
+          "@param codec - used to encode V into String, e.g. Codec.stringAsIs",
+          "",
+          "@tparam V    - value type for this attr in Scala",
+        ),
+        baseImplName = "globalAttr",
+        namespaceImports = Nil,
+        namespaceImpl = _ => ???,
+        transformAttrDomName = identity,
+        defType = LazyVal
+      )
+
+      generator.writeToFile(
+        packagePath = generator.attrDefsPackagePath,
+        fileName = traitName,
+        fileContent = fileContent
+      )
+    }
+
     // -- HTML attributes --
 
     {

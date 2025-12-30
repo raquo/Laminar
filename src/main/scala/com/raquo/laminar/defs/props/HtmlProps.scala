@@ -381,16 +381,6 @@ trait HtmlProps {
 
 
   /**
-    * This attribute defines a unique identifier (ID) which must be unique in
-    * the whole document. Its purpose is to identify the element when linking
-    * (using a fragment identifier), scripting, or styling (with CSS).
-    *
-    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id id @ MDN]]
-    */
-  lazy val idAttr: HtmlProp[String] = stringProp("id", reflectedAttrName = "id")
-
-
-  /**
     * The inputmode attribute hints at the type of data that might be entered by
     * the user while editing the element or its contents. This allows a browser
     * to display an appropriate virtual keyboard.
@@ -651,29 +641,6 @@ trait HtmlProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/spellcheck spellcheck @ MDN]]
     */
   lazy val spellCheck: HtmlProp[Boolean] = boolProp("spellcheck", reflectedAttrName = "spellcheck")
-
-
-  /**
-    * This integer attribute indicates if the element can take input focus (is
-    * focusable), if it should participate to sequential keyboard navigation, and
-    * if so, at what position. It can takes several values:
-    *
-    *  - a negative value means that the element should be focusable, but should
-    *    not be reachable via sequential keyboard navigation;
-    *  - 0 means that the element should be focusable and reachable via sequential
-    *    keyboard navigation, but its relative order is defined by the platform
-    *    convention;
-    *  - a positive value which means should be focusable and reachable via
-    *    sequential keyboard navigation; its relative order is defined by the value
-    *    of the attribute: the sequential follow the increasing number of the
-    *    tabindex. If several elements share the same tabindex, their relative order
-    *    follows their relative position in the document).
-    *
-    * An element with a 0 value, an invalid value, or no tabindex value should be placed after elements with a positive tabindex in the sequential keyboard navigation order.
-    *
-    * [[https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex tabindex @ MDN]]
-    */
-  lazy val tabIndex: HtmlProp[Int] = intProp("tabIndex", reflectedAttrName = "tabindex")
 
 
   /**

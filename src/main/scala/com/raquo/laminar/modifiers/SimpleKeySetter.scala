@@ -1,8 +1,8 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.keys.{AriaAttr, DerivedStyleProp, HtmlAttr, HtmlProp, SimpleKey, StyleProp, SvgAttr}
-import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
+import com.raquo.laminar.keys.{AriaAttr, DerivedStyleProp, GlobalAttr, HtmlAttr, HtmlProp, MathMlAttr, SimpleKey, StyleProp, SvgAttr}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
 
 import scala.scalajs.js.|
 
@@ -36,6 +36,10 @@ object SimpleKeySetter {
   type HtmlAttrSetter[V] = SimpleKeySetter[HtmlAttr[V], V, ReactiveHtmlElement.Base]
 
   type SvgAttrSetter[V] = SimpleKeySetter[SvgAttr[V], V, ReactiveSvgElement.Base]
+
+  type MathMlAttrSetter[V] = SimpleKeySetter[MathMlAttr[V], V, ReactiveMathMlElement]
+
+  type GlobalAttrSetter[V] = SimpleKeySetter[GlobalAttr[V], V, ReactiveElement.Base]
 
   type AriaAttrSetter[V] = SimpleKeySetter[AriaAttr[V], V, ReactiveElement.Base]
 

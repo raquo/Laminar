@@ -39,9 +39,11 @@ object SimpleKeyUpdater {
 
   type SvgAttrUpdater[V] = SimpleKeyUpdater[SvgAttr[V], V, ReactiveSvgElement.Base]
 
-  type AriaAttrUpdater[V] = SimpleKeyUpdater[AriaAttr[V], V, ReactiveElement.Base]
-
   type MathMlAttrUpdater[V] = SimpleKeyUpdater[MathMlAttr[V], V, ReactiveMathMlElement]
+
+  type GlobalAttrUpdater[V] = SimpleKeyUpdater[GlobalAttr[V], V, ReactiveElement.Base]
+
+  type AriaAttrUpdater[V] = SimpleKeyUpdater[AriaAttr[V], V, ReactiveElement.Base]
 
   type StylePropUpdater[V] = SimpleKeyUpdater[StyleProp[V], V, ReactiveHtmlElement.Base]
 

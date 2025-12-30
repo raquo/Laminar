@@ -2,8 +2,8 @@ package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.StringSeqValueMapper
-import com.raquo.laminar.keys.CompositeKey
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.keys.{CompositeAttr, CompositeKey}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
 /**
   * This is like [[SimpleKeySetter]], but for composite attributes like `cls` and `role`.
@@ -13,13 +13,10 @@ import com.raquo.laminar.nodes.ReactiveElement
   * value of the element's composite attribute.
   *
   * Also, if you call `cls := "class2"` after calling `cls := "class1"`, you end up
-  * with two classes instead of just "class2", which is different fro [[SimpleKeySetter]]
+  * with two classes instead of just "class2", which is different from [[SimpleKeySetter]]
   * semantics.
   *
-  * Note: for dynamic subscriptions (<--), we use [[SimpleKeyUpdater]] for all keys including
-  * composite attributes.
-  *
-  * @param itemsToAdd Note: must be normalized (no empty strings; one value per item)
+  * @param itemsToAdd NOTE: must be normalized (no empty strings; one value per item)
   */
 class CompositeKeySetter[+K <: CompositeKey[K, El], -El <: ReactiveElement.Base](
   val key: K,
@@ -69,4 +66,13 @@ class CompositeKeySetter[+K <: CompositeKey[K, El], -El <: ReactiveElement.Base]
   def <--(include: Source[Boolean]): CompositeKeyUpdater[K, List[String], El] = {
     key <-- include.toObservable.map(include => if (include) itemsToAdd else Nil)
   }
+}
+
+object CompositeKeySetter {
+
+  type CompositeAttrSetter = CompositeKeySetter[CompositeAttr.Base, ReactiveElement.Base]
+
+  type HtmlCompositeAttrSetter = CompositeKeySetter[CompositeAttr.HtmlCompositeAttr, ReactiveHtmlElement.Base]
+
+  // type SvgCompositeAttrSetter = CompositeKeySetter[CompositeAttr.SvgCompositeAttr, ReactiveSvgElement.Base]
 }

@@ -1,8 +1,8 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.web.DomEventStream
-import com.raquo.laminar.defs.attrs.{AriaAttrs, HtmlAttrs, MathMlAttrs, SvgAttrs}
-import com.raquo.laminar.defs.complex.{ComplexHtmlKeys, ComplexSvgKeys}
+import com.raquo.laminar.defs.attrs.{AriaAttrs, GlobalAttrs, HtmlAttrs, MathMlAttrs, SvgAttrs}
+import com.raquo.laminar.defs.complex.{ComplexGlobalKeys, ComplexHtmlKeys}
 import com.raquo.laminar.defs.eventProps.{DocumentEventProps, GlobalEventProps, WindowEventProps}
 import com.raquo.laminar.defs.props.HtmlProps
 import com.raquo.laminar.defs.styles.StyleProps
@@ -22,6 +22,7 @@ import org.scalajs.dom
 trait Laminar
 extends LaminarPlatformSpecific
 with HtmlTags
+with GlobalAttrs
 with HtmlAttrs
 with HtmlProps
 with GlobalEventProps
@@ -30,7 +31,7 @@ with ComplexHtmlKeys
 with MountHooks // onMountFocus, onMountSet, onMountBind, OnMountCallback, OnUnmountCallback, etc.
 with AirstreamAliases
 with LaminarAliases
-with Implicits {
+with Implicits { self =>
 
   /** Contains Helpers like `style.px(12)` // returns "12px" */
   object style
@@ -46,11 +47,18 @@ with Implicits {
   object svg
   extends SvgTags
   with SvgAttrs
-  with ComplexSvgKeys
+  with GlobalAttrs
+  with ComplexGlobalKeys {
+
+    lazy val aria: AriaAttrs = self.aria
+  }
 
   object mathml
   extends MathMlTags
-  with MathMlAttrs {
+  with MathMlAttrs
+  with GlobalAttrs {
+
+    lazy val aria: AriaAttrs = self.aria
 
     object symbols
     extends MathMlSymbols
@@ -65,14 +73,18 @@ with Implicits {
   protected val windowEventProps = new GlobalEventProps with WindowEventProps
 
   /** Typical usage: documentEvents(_.onDomContentLoaded) */
-  def documentEvents[Ev <: dom.Event, V](events: documentEventProps.type => EventProcessor[Ev, V]): EventStream[V] = {
+  def documentEvents[Ev <: dom.Event, V](
+    events: documentEventProps.type => EventProcessor[Ev, V]
+  ): EventStream[V] = {
     val p = events(documentEventProps)
     DomEventStream[Ev](dom.document, EventProcessor.eventProp(p).name, EventProcessor.shouldUseCapture(p))
       .collectOpt(EventProcessor.processor(p))
   }
 
   /** Typical usage: windowEvents(_.onOffline) */
-  def windowEvents[Ev <: dom.Event, V](events: windowEventProps.type => EventProcessor[Ev, V]): EventStream[V] = {
+  def windowEvents[Ev <: dom.Event, V](
+    events: windowEventProps.type => EventProcessor[Ev, V]
+  ): EventStream[V] = {
     val p = events(windowEventProps)
     DomEventStream[Ev](dom.window, EventProcessor.eventProp(p).name, EventProcessor.shouldUseCapture(p))
       .collectOpt(EventProcessor.processor(p))
@@ -100,8 +112,8 @@ with Implicits {
   @inline def render(
     container: dom.Element,
     rootNode: nodes.ReactiveElement.Base
-  ): RootNode = {
-    new RootNode(container, rootNode)
+  ): nodes.RootNode = {
+    new nodes.RootNode(container, rootNode)
   }
 
   /** Wait for `DOMContentLoaded` event to fire, then render a Laminar
@@ -112,16 +124,16 @@ with Implicits {
     *
     * See https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event
     */
-  @inline def renderOnDomContentLoaded(
+  def renderOnDomContentLoaded(
     container: => dom.Element,
     rootNode: => nodes.ReactiveElement.Base
   ): Unit = {
     if (dom.document.readyState == dom.DocumentReadyState.loading) {
       documentEvents(_.onDomContentLoaded).foreach { _ =>
-        new RootNode(container, rootNode)
+        new nodes.RootNode(container, rootNode)
       }(unsafeWindowOwner)
     } else {
-      new RootNode(container, rootNode)
+      new nodes.RootNode(container, rootNode)
     }
   }
 

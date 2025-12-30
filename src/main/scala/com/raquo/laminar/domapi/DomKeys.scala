@@ -102,20 +102,20 @@ trait DomKeys {
 
   def getCompositeAttribute[El <: ReactiveElement.Base](
     element: El,
-    attr: CompositeAttr[_, El]
+    attr: CompositeAttr[El]
   ): String | Unit =
-    raw.getAttribute(element.ref, attr.localName, attr.namespaceUri.orNull[String])
+    raw.getAttribute(element.ref, attr.name, namespaceUri = null)
 
   def setCompositeAttribute[El <: ReactiveElement.Base](
     element: El,
-    attr: CompositeAttr[_, El],
+    attr: CompositeAttr[El],
     value: String | Null
   ): Unit = {
     raw.setAttribute(
       element = element.ref,
-      localName = attr.localName,
+      localName = attr.name,
       qualifiedName = attr.name,
-      namespaceUri = attr.namespaceUri.orNull[String],
+      namespaceUri = null,
       domValue = value
     )
   }

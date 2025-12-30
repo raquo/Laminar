@@ -1,24 +1,27 @@
 package com.raquo.laminar.keys
 
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.nodes.ReactiveElement
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
 import scala.scalajs.js.|
 
-/** Common type of all composite (e.g. space-separated) attributes:
-  *  - [[CompositeHtmlAttr]]
-  *  - [[CompositeSvgAttr]]
+/** An attribute that we can add multiple values to, often in the shape of
+  * space-separated strings, e.g. `class` (`cls` in Scala).
   *
-  * See also the simple keys under [[SimpleKey]].
+  * Includes:
+  *  - HTML-specific ones like `role`, as well as
+  *  - Global attrs that apply to all element types, like `class`
+  *
+  * Note: [[CompositeAttr]] does not support SVG namespaces because
+  * there simply aren't any composite attrs with a non-null namespace.
+  *
+  * See also the simple keys (attrs / props / etc.) under [[SimpleKey]].
   */
-trait CompositeAttr[+Self <: CompositeAttr[Self, El], -El <: ReactiveElement.Base]
-extends CompositeKey[Self, El] { self: Self =>
-
-  val name: String
-
-  val localName: String
-
-  val namespaceUri: Option[String]
+class CompositeAttr[-El <: ReactiveElement.Base](
+  override val name: String,
+  override val separator: String
+)
+extends CompositeKey[CompositeAttr[El], El] {
 
   override private[laminar] def getRawDomValue(
     element: El
@@ -32,4 +35,14 @@ extends CompositeKey[Self, El] { self: Self =>
   ): Unit = {
     DomApi.setCompositeAttribute(element, this, value)
   }
+}
+
+object CompositeAttr {
+
+  type Base = CompositeAttr[ReactiveElement.Base]
+
+  type HtmlCompositeAttr = CompositeAttr[ReactiveHtmlElement.Base]
+
+  // #Note Composite SVG attrs don't actually exist...
+  // type SvgCompositeAttr = CompositeAttr[ReactiveSvgElement.Base]
 }
