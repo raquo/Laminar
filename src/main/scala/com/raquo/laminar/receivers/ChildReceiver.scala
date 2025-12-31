@@ -11,6 +11,8 @@ object ChildReceiver {
 
   val maybe: ChildOptionReceiver.type = ChildOptionReceiver
 
+  // Decided not to deprecate for now. Seems unnecessarily disruptive. Some users might prefer to keep everything under `child.`
+  // @deprecated("Use `text` instead of `child.text`", "18.0.0-M1")
   val text: ChildTextReceiver.type = ChildTextReceiver
 
   /** Example usages:

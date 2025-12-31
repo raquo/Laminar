@@ -31,7 +31,7 @@ def Counter(label: String, initialStep: Int): HtmlElement = {
     ),
     p(
       label + ": ",
-      b(child.text <-- countSignal),
+      b(text <-- countSignal),
       " ",
       // Two different ways to get stepVar's value:
       button(

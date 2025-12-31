@@ -8,7 +8,7 @@ Laminar's most obvious building block are elements:
 import com.raquo.laminar.api.L.{*, given}
  
 val streamOfNames: EventStream[String] = ???
-val helloDiv: Div = div("Hello, ", child.text <-- streamOfNames)
+val helloDiv: Div = div("Hello, ", text <-- streamOfNames)
 ```
 
 `helloDiv` is a Laminar Div element that contains the text "Hello, `<Name>`", where `<Name>` is the latest value emitted by `streamOfNames`. As you see, `helloDiv` is **self-contained**. It depends on a stream, but is not a stream itself. It manages itself, abstracting away the reactive complexity of its innards from the rest of your program.
@@ -26,7 +26,7 @@ def Hello(
     fontSize := "20px", // static CSS property
     color <-- helloColorStream, // dynamic CSS property
     strong("Hello, "), // static child element with a grandchild text node
-    child.text <-- helloNameStream // dynamic child (text node in this case)
+    text <-- helloNameStream // dynamic child (text node in this case)
   )
 }
 ```

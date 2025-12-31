@@ -10,7 +10,7 @@ class DetachedRootSpec extends UnitSpec {
     val nameVar = Var("world")
 
     val root = renderDetached(
-      div("hello", child.text <-- nameVar),
+      div("hello", text <-- nameVar),
       activateNow = false
     )
 
@@ -51,7 +51,7 @@ class DetachedRootSpec extends UnitSpec {
     val nameVar = Var("world")
 
     val root = renderDetached(
-      div("hello", child.text <-- nameVar),
+      div("hello", text <-- nameVar),
       activateNow = true
     )
 

@@ -41,7 +41,7 @@ val app = div(
       _.styles.mdcThemePrimary := "#6200ed",
       _ => onClick --> (_ => dom.window.alert("Click")), // standard event
       _.onMouseOver --> (_ => println("MouseOver")), // "custom" event
-      _.slots.icon(span(child.text <-- iconVar.signal)),
+      _.slots.icon(span(text <-- iconVar.signal)),
       //_ => onMountCallback(ctx => ctx.thisNode.ref.doThing()) // doThing is not implemented, just for reference
     )
   ),

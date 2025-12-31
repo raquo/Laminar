@@ -27,9 +27,9 @@ class RenderableSpec extends UnitSpec {
       1,
       true,
       2.0,
-      child.text <-- Val(3),
-      child.text <-- Val(4.0),
-      child.text <-- Val(false)
+      text <-- Val(3),
+      text <-- Val(4.0),
+      text <-- Val(false)
     )
 
     mount(el)
@@ -338,7 +338,7 @@ class RenderableSpec extends UnitSpec {
     assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 14)
   }
 
-  it("RenderableText with child and child.text") {
+  it("RenderableText with child and text <--") {
 
     val bus = new EventBus[Int]
 
@@ -360,14 +360,14 @@ class RenderableSpec extends UnitSpec {
         case _ => "text-3"
       },
       child <-- bus.events.mapTo(new TextNode("4")),
-      child.text <-- bus.events.mapTo(new TextNode("5")),
+      text <-- bus.events.mapTo(new TextNode("5")),
       child <-- bus.events.map {
         case 0 => 6
         case _ => "text-6"
       },
       // #TODO[Scala] I should not need `TextNode` type param here,
       //  but I can't figure out how to make implicits work.
-      child.text <-- bus.events.map[TextNode] {
+      text <-- bus.events.map[TextNode] {
         case 0 => 7
         case _ => "text-7"
       }

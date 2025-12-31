@@ -23,7 +23,7 @@ val app = div(
   ),
   p(
     "You typed: ",
-    child.text <-- inputTextVar
+    text <-- inputTextVar
   ),
   p(
     label("I like to check boxes: "),
@@ -34,7 +34,7 @@ val app = div(
   ),
   p(
     "You checked the box: ",
-    child.text <-- checkedVar
+    text <-- checkedVar
   )
 )
 
@@ -75,7 +75,7 @@ val app = div(
   ),
   p(
     "Your zip code: ",
-    child.text <-- zipVar
+    text <-- zipVar
   ),
   button(
     onClick.mapTo(zipVar.now()) --> (zip => dom.window.alert(zip)),

@@ -9,6 +9,8 @@ import scala.scalajs.js
 
 object ChildTextReceiver {
 
+  val maybe: ChildTextOptionReceiver.type = ChildTextOptionReceiver
+
   /** Usage example: text("hello") <-- signalOfBoolean */
   def apply(text: String): LockedChildTextReceiver = {
     new LockedChildTextReceiver(text)
@@ -29,7 +31,7 @@ object ChildTextReceiver {
     if (renderable == RenderableText.textNodeRenderable) {
       // #Note: Special case: since we already have TextNode-s, using them in ChildTextInserter would be
       //  inefficient, so we redirect this case to ChildInserter (child <-- textSource) instead.
-      // #TODO[Perf] Test performance vs regular child.text, see if we need to improve this.
+      // #TODO[Perf] Test performance vs regular `text <--`, see if we need to improve this.
       // This .asInstanceOf is safe because `textNodeRenderable` only applies if `TextLike` is `TextNode`.
       val nodes = textSource.toObservable.asInstanceOf[Observable[TextNode]]
       ChildInserter(nodes, RenderableNode.nodeRenderable, initialHooks = js.undefined)

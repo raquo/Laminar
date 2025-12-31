@@ -675,7 +675,7 @@ Technically that would work, but you are needlessly creating a new `span` elemen
 ```scala
 val textStream: EventStream[String] = ???
 div(text <-- textStream)
-div(child.text <-- textStream) // Same thing, original name from before v17
+div(text <-- textStream) // Same thing, original name from before v17
 ```
 
 This is the most efficient way to render dynamic text in Laminar, and you should prefer it every time to using `child <--` whenever possible.

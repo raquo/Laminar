@@ -45,7 +45,7 @@ class ShadowDomSpec extends UnitSpec {
 
         val app = div(
           "Hello, ",
-          span(child.text <-- bus.events)
+          span(text <-- bus.events)
         )
 
         val laminarRoot = render(container = childDiv, app)

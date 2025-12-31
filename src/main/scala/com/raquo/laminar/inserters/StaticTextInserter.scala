@@ -12,7 +12,7 @@ class StaticTextInserter(
   }
 
   def renderInContext(ctx: InsertContext): Unit = {
-    ChildTextInserter.switchToText(new TextNode(text), ctx)
+    ChildTextInserter.switchToChild(new TextNode(text), ctx)
   }
 
 }

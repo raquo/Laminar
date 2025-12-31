@@ -50,7 +50,7 @@ class ModSpec extends UnitSpec {
         left.px <-- _.map(_.x),
         top.px <-- _.map(_.y),
         _.map(_.z) --> zObserver,
-        child.text <-- _.map(_.toString)
+        text <-- _.map(_.toString)
       )
     )
 

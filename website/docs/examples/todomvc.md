@@ -127,7 +127,7 @@ object TodoMvcApp {
         case false =>
           List(
             renderCheckboxInput(itemId, itemSignal),
-            label(child.text <-- itemSignal.map(_.text)),
+            label(text <-- itemSignal.map(_.text)),
             button(
               cls("destroy"),
               onClick.mapTo(Delete(itemId)) --> commandObserver
@@ -167,7 +167,7 @@ object TodoMvcApp {
       cls("footer"),
       span(
         cls("todo-count"),
-        child.text <-- itemsVar.signal
+        text <-- itemsVar.signal
           .map(_.count(!_.completed))
           .map(pluralize(_, "item left", "items left")),
       ),

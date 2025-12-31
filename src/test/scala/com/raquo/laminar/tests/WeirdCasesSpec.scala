@@ -19,7 +19,7 @@ class WeirdCasesSpec extends UnitSpec {
   // - This used to be a problem because pre-v0.8 the mount event system used EventBus-es for mount event propagation
 
   /** See https://github.com/raquo/Laminar/issues/11 for a better approach
-    * (basically, use child.text instead of nested observables)
+    * (basically, use `text <--` instead of nested observables)
     */
   it("nested, synchronously dependent observables work as expected for some reason") {
 

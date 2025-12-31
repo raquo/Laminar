@@ -16,7 +16,7 @@ import scala.scalajs.js
 
 /**
   * InsertContext represents the state of the DOM inside an inserter block like `child <-- ...`,
-  * `children <-- ...`, `child.text <-- ...`, etc. The data stored in this context is used
+  * `children <-- ...`, `text <-- ...`, etc. The data stored in this context is used
   * by Laminar to efficiently update the DOM, to detect (and recover from) external changes
   * to the DOM, and for other related tasks.
   *
@@ -50,7 +50,7 @@ import scala.scalajs.js
   *                              for that purpose. This is needed in order to allow users to
   *                              move an element from one inserter to another, or to externally
   *                              remove some of the elements previously added by an inserter.
-  *                              child.text does not need any of that, so for performance it
+  *                              `text <--` does not need any of that, so for performance it
   *                              does not use strict mode, it replaces the sentinel comment
   *                              node with the subsequent text nodes. Inserters should be able
   *                              to safely switch to their preferred mode when receiving
@@ -73,7 +73,7 @@ final class InsertContext(
   /**
     * This method converts the InsertContext from loose mode to strict mode.
     * ChildrenInserter and ChildInserter call this when receiving a context from
-    * ChildTextInserter. This can happen when switching from `child.text <-- ...`
+    * ChildTextInserter. This can happen when switching from `text <-- ...`
     * to e.g. `children <-- ...` inside onMountInsert.
     *
     * Prerequisite: context must be in loose mode, and in valid state: no extra nodes allowed.

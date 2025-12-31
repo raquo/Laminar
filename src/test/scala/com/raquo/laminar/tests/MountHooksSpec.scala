@@ -893,7 +893,7 @@ class MountHooksSpec extends UnitSpec {
     assert(numChildrenStreamCalls == 3) // due to new re-evaluation semantics of signals as of 0.15.0
   }
 
-  it("onMountInsert switches between children and child.text (streams)") {
+  it("onMountInsert switches between children and text <-- (streams)") {
 
     val xChildIx = new EventBus[Int]()
 
@@ -909,7 +909,7 @@ class MountHooksSpec extends UnitSpec {
 
     // --
 
-    val xChildInserter = child.text <-- xChildTextStream
+    val xChildInserter = text <-- xChildTextStream
 
     val yChildrenInserter = children <-- yChildrenStream
 

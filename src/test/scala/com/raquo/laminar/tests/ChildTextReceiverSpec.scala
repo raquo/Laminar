@@ -6,13 +6,13 @@ import com.raquo.laminar.utils.UnitSpec
 
 class ChildTextReceiverSpec extends UnitSpec {
 
-  it("child.text with stream") {
+  it("text <-- with stream") {
 
     val bus = new EventBus[String]
 
     val el = div(
       "Hello",
-      child.text <-- bus
+      text <-- bus
     )
 
     mount(el)
@@ -47,15 +47,15 @@ class ChildTextReceiverSpec extends UnitSpec {
     )
   }
 
-  it("multiple child.text with stream") {
+  it("multiple text <-- with stream") {
 
     val bus1 = new EventBus[String]
     val bus2 = new EventBus[String]
 
     val el = div(
       "Hello",
-      child.text <-- bus1,
-      child.text <-- bus2,
+      text <-- bus1,
+      text <-- bus2,
     )
 
     mount(el)

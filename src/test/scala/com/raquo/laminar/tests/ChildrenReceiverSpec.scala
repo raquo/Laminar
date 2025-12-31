@@ -307,13 +307,13 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
       div(
         "ID: " + id,
         span(
-          child.text <-- (
+          text <-- (
             fooSignal
               .debugSpyEvents(foo => effects += Effect(s"fooSignal-child1-$id-$thisIx", foo.toString))
               .map(_.id)
           )
         ),
-        child.text <-- (
+        text <-- (
           fooSignal
             .debugSpyEvents(foo => effects += Effect(s"fooSignal-child2-$id-$thisIx", foo.toString))
             .map(_.version)
@@ -491,13 +491,13 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
         "ID: " + id,
         // onMountUnmountCallback(_ => println(s"[] mounted ${id}-${thisI}"), _ => println(s"[] unmounted ${id}-${thisI}")),
         span(
-          child.text <-- (
+          text <-- (
             fooSignal
               .debugSpyEvents(foo => effects += Effect(s"fooSignal-child1-$id-$thisIx", foo.toString))
               .map(_.id)
           )
         ),
-        child.text <-- (
+        text <-- (
           fooSignal
             .debugSpyEvents(foo => effects += Effect(s"fooSignal-child2-$id-$thisIx", foo.toString))
             .map(_.version)
@@ -678,13 +678,13 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
       div(
         "ID: " + id,
         span(
-          child.text <-- (
+          text <-- (
             fooSignal
               .debugSpyEvents(foo => effects += Effect(s"fooSignal-child1-$id-$thisIx", foo.toString))
               .map(_.id)
           )
         ),
-        child.text <-- (
+        text <-- (
           fooSignal
             .debugSpyEvents(foo => effects += Effect(s"fooSignal-child2-$id-$thisIx", foo.toString))
             .map(_.version)

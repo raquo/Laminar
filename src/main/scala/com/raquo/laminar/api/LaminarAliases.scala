@@ -22,6 +22,8 @@ trait LaminarAliases {
 
   type TextNode = nodes.TextNode
 
+  @inline def TextNode: nodes.TextNode.type = nodes.TextNode
+
   type CommentNode = nodes.CommentNode
 
   type RootNode = nodes.RootNode

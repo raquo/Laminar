@@ -30,7 +30,7 @@ with CompositeValueMapper.Implicits {
 
   /** Convert primitive renderable values (strings, numbers, booleans, etc.) to text nodes */
   implicit def textToTextNode[A](value: A)(implicit r: RenderableText[A]): TextNode = {
-    new TextNode(r.asString(value))
+    TextNode(value)(r)
   }
 
   /** Convert a custom component to Laminar DOM node */
@@ -132,11 +132,11 @@ object Implicits {
 
     // -- Methods to convert individual values / nodes / components to inserters --
 
-    implicit def textToInserter[TextLike](value: TextLike)(implicit r: RenderableText[TextLike]): StaticInserter = {
+    implicit def textToInserter[TextLike](textContent: TextLike)(implicit r: RenderableText[TextLike]): StaticInserter = {
       if (r == RenderableText.textNodeRenderable) {
-        StaticChildInserter.noHooks(value.asInstanceOf[TextNode])
+        StaticChildInserter.noHooks(textContent.asInstanceOf[TextNode]) // optimization
       } else {
-        new StaticTextInserter(r.asString(value))
+        new StaticTextInserter(r.asString(textContent))
       }
     }
 
