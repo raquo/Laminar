@@ -28,6 +28,8 @@ trait LaminarAliases {
 
   type RootNode = nodes.RootNode
 
+  type DetachedRoot[+El <: Element] = nodes.DetachedRoot[El]
+
   @deprecated("`Child` type alias is deprecated. Use ChildNode.Base", "15.0.0-M6")
   type Child = nodes.ChildNode.Base
 
@@ -78,6 +80,20 @@ trait LaminarAliases {
   type StaticInserter = inserters.StaticInserter
 
   type DynamicInserter = inserters.DynamicInserter
+
+  //
+
+  type RenderableText[-TextLike] = modifiers.RenderableText[TextLike]
+
+  @inline def RenderableText: modifiers.RenderableText.type = modifiers.RenderableText
+
+  type RenderableNode[-Component] = modifiers.RenderableNode[Component]
+
+  @inline def RenderableNode: modifiers.RenderableNode.type = modifiers.RenderableNode
+
+  type RenderableSeq[-Collection[_]] = modifiers.RenderableSeq[Collection]
+
+  @inline def RenderableSeq: modifiers.RenderableSeq.type = modifiers.RenderableSeq
 
   //
   // Lifecycle
