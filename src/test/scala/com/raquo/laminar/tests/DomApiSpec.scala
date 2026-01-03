@@ -20,9 +20,20 @@ class DomApiSpec extends UnitSpec {
     )
   }
 
+  it("HTML: parses with extra newlines and spaces") {
+    expectNode(
+      DomApi.unsafeParseHtmlString(" \n <div class='foo bar'>Hello <b>world</b></div> \n "),
+      div of (
+        className is "foo bar",
+        "Hello ",
+        b of "world"
+      )
+    )
+  }
+
   it("HTML: parses [div]") {
     expectNode(
-      DomApi.unsafeParseHtmlString(div, "<div class='foo bar'>Hello <b>world</b></div>"),
+      DomApi.unsafeParseHtmlString("<div class='foo bar'>Hello <b>world</b></div>", div),
       div of (
         className is "foo bar",
         "Hello ",
@@ -33,14 +44,14 @@ class DomApiSpec extends UnitSpec {
 
   it("HTML: fails on multiple elements") {
     val caught = intercept[Exception] {
-      DomApi.unsafeParseHtmlString(div, "<div class='foo bar'>Hello <b>world</b></div><span></span")
+      DomApi.unsafeParseHtmlString("<div class='foo bar'>Hello <b>world</b></div><span></span", div)
     }
     assert(caught.getMessage == "Error parsing HTML string: expected exactly 1 element, got 2")
   }
 
   it("HTML: fails on incorrect tag name when expected tag is provided") {
     val caught = intercept[Exception] {
-      DomApi.unsafeParseHtmlString(span, "<div class='foo bar'>Hello <b>world</b></div>")
+      DomApi.unsafeParseHtmlString("<div class='foo bar'>Hello <b>world</b></div>", span)
     }
     assert(caught.getMessage == "Error parsing HTML string: expected HTML <span>, got different tag name: `HTML <DIV>`")
   }
@@ -61,7 +72,32 @@ class DomApiSpec extends UnitSpec {
     )
   }
 
+  it("SVG: parses SVG tag with extra newlines and spaces") {
+    expectNode(
+      DomApi.unsafeParseSvgString(" \n <svg height=\"200\" width='400'><circle cx='200' cy='15' r='30' fill='red'></circle></svg> \n "),
+      s.svg of (
+        s.height is "200",
+        s.width is "400",
+        s.circle of (
+          s.cx is "200",
+          s.cy is "15",
+          s.r is "30",
+          s.fill is "red"
+        )
+      )
+    )
+  }
+
   it("SVG: parses CIRCLE tag") {
+    expectNode(
+      DomApi.unsafeParseSvgString("<circle cx='200' cy='15' r='30' fill='red'></circle>", s.circle),
+      s.circle of (
+        s.cx is "200",
+        s.cy is "15",
+        s.r is "30",
+        s.fill is "red"
+      )
+    )
     expectNode(
       DomApi.unsafeParseSvgString("<circle cx='200' cy='15' r='30' fill='red'></circle>"),
       s.circle of (
@@ -73,28 +109,20 @@ class DomApiSpec extends UnitSpec {
     )
   }
 
-  it("SVG: parses CIRCLE tag [circle]") {
-    expectNode(
-      DomApi.unsafeParseSvgString(s.circle, "<circle cx='200' cy='15' r='30' fill='red'></circle>"),
-      s.circle of (
-        s.cx is "200",
-        s.cy is "15",
-        s.r is "30",
-        s.fill is "red"
-      )
-    )
-  }
-
   it("SVG: fails on multiple elements") {
-    val caught = intercept[Exception] {
-      DomApi.unsafeParseSvgString(s.svg, "<svg height=\"200\" width='400'></svg><circle cx='200' cy='15' r='30' fill='red'></circle>")
+    val caught1 = intercept[Exception] {
+      DomApi.unsafeParseSvgString("<svg height=\"200\" width='400'></svg><circle cx='200' cy='15' r='30' fill='red'></circle>", s.svg)
     }
-    assert(caught.getMessage == "Error parsing SVG string: expected exactly 1 element, got 2")
+    assert(caught1.getMessage == "Error parsing SVG string: expected exactly 1 element, got 2")
+    val caught2 = intercept[Exception] {
+      DomApi.unsafeParseSvgString("<svg height=\"200\" width='400'></svg><circle cx='200' cy='15' r='30' fill='red'></circle>")
+    }
+    assert(caught2.getMessage == "Error parsing SVG string: expected exactly 1 element, got 2")
   }
 
   it("SVG: fails on incorrect tag name when expected tag is provided") {
     val caught = intercept[Exception] {
-      DomApi.unsafeParseSvgString(s.svg, "<circle cx='200' cy='15' r='30' fill='red'></circle>")
+      DomApi.unsafeParseSvgString("<circle cx='200' cy='15' r='30' fill='red'></circle>", s.svg)
     }
     assert(caught.getMessage == "Error parsing SVG string: expected SVG <svg>, got different tag name: `SVG <circle>`")
   }

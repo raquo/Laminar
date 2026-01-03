@@ -26,7 +26,7 @@ trait DomParser { this: DomTags =>
   def unsafeParseHtmlString(
     dangerousHtmlString: String
   ): dom.html.Element = {
-    val nodes = unsafeParseHtmlStringIntoNodeArray(dangerousHtmlString)
+    val nodes = unsafeParseHtmlStringIntoNodeArray(dangerousHtmlString.trim)
     val clue = "Error parsing HTML string"
     val node = assertSingleNode(nodes, clue)
     assertHtmlElement(node, clue)
@@ -41,10 +41,10 @@ trait DomParser { this: DomTags =>
     * element with a different tag name, or multiple elements)
     */
   def unsafeParseHtmlString[Ref <: dom.html.Element](
-    tag: HtmlTag[Ref],
-    dangerousHtmlString: String
+    dangerousHtmlString: String,
+    tag: HtmlTag[Ref]
   ): Ref = {
-    val nodes = unsafeParseHtmlStringIntoNodeArray(dangerousHtmlString)
+    val nodes = unsafeParseHtmlStringIntoNodeArray(dangerousHtmlString.trim)
     val clue = "Error parsing HTML string"
     val node = assertSingleNode(nodes, clue)
     assertTagMatches(tag, node, clue)
@@ -61,7 +61,7 @@ trait DomParser { this: DomTags =>
   def unsafeParseSvgString(
     dangerousSvgString: String
   ): dom.svg.Element = {
-    val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString)
+    val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString.trim)
     val clue = "Error parsing SVG string"
     val node = assertSingleNode(nodes, clue)
     assertSvgElement(node, clue)
@@ -76,10 +76,10 @@ trait DomParser { this: DomTags =>
     * element with a different tag name, or multiple elements)
     */
   def unsafeParseSvgString[Ref <: dom.svg.Element](
-    tag: SvgTag[Ref],
-    dangerousSvgString: String
+    dangerousSvgString: String,
+    tag: SvgTag[Ref]
   ): Ref = {
-    val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString)
+    val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString.trim)
     val clue = "Error parsing SVG string"
     val node = assertSingleNode(nodes, clue)
     assertTagMatches(tag, node, clue)
