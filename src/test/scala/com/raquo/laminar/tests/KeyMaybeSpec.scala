@@ -231,4 +231,219 @@ class KeyMaybeSpec extends UnitSpec {
       )
     )
   }
+
+  it("key(value) :=") {
+
+    val fooProp = htmlProp("foo", None, Codec.intAsIs)
+
+    val el = input(
+      fooProp(20) := true, // non-reflected prop
+      title("Hello") := true, // reflected prop
+      widthAttr(100) := true, // html attribute
+      background("yellow") := true, // style prop
+      value("yo") := true, // value prop
+      alt("foo")(true), // apply syntax
+    )
+
+    mount(el)
+
+    expectNode(
+      input of (
+        fooProp is 20,
+        title is "Hello",
+        widthAttr is 100,
+        background is "yellow",
+        value is "yo",
+        alt is "foo"
+      )
+    )
+
+    el.amend(
+      fooProp(20) := false,
+      title("Hello") := false,
+      widthAttr(100) := false,
+      background("yellow") := false,
+      value("yo") := false,
+      alt("foo")(false),
+    )
+
+    expectNode(
+      input of (
+        fooProp.isEmpty,
+        title.isEmpty,
+        widthAttr.isEmpty,
+        background is "",
+        value.isEmpty,
+        alt.isEmpty
+      )
+    )
+  }
+
+  it("key.value <--") {
+
+    val fooProp = htmlProp("foo", None, Codec.intAsIs)
+
+    val fooVar = Var(true)
+    val titleVar = Var(true)
+    val widthBus = new EventBus[Boolean]
+    val heightBus = new EventBus[Boolean]
+    val backgroundBus = new EventBus[Boolean]
+    val zIndexBus = new EventBus[Boolean]
+    val valueBus = new EventBus[Boolean]
+    val el = input(
+      fooProp(20) <-- fooVar, // non-reflected prop
+      title("Hello") <-- titleVar.signal.map(identity), // reflected prop
+      widthAttr(100) <-- widthBus, // html attribute
+      heightAttr(200) <-- heightBus, // html attribute
+      background("cyan") <-- backgroundBus.events, // style prop
+      zIndex(50) <-- zIndexBus,
+      value("txt") <-- valueBus, // value prop
+    )
+
+    expectNode(
+      el.ref,
+      input of(
+        fooProp.isEmpty,
+        title.isEmpty,
+        widthAttr.isEmpty,
+        heightAttr.isEmpty,
+        background is "",
+        zIndex.isEmpty,
+        value.isEmpty,
+        defaultValue.isEmpty,
+      )
+    )
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      input of(
+        fooProp is 20,
+        title is "Hello",
+        widthAttr.isEmpty,
+        heightAttr.isEmpty,
+        background is "",
+        zIndex.isEmpty,
+        value.isEmpty,
+        defaultValue.isEmpty,
+      )
+    )
+
+    // --
+
+    widthBus.emit(false)
+    zIndexBus.emit(false)
+
+    expectNode(
+      input of(
+        fooProp is 20,
+        title is "Hello",
+        widthAttr.isEmpty,
+        heightAttr.isEmpty,
+        background is "",
+        zIndex.isEmpty,
+        value.isEmpty,
+        defaultValue.isEmpty,
+      )
+    )
+
+    // --
+
+    fooVar.set(false)
+    titleVar.set(false)
+    widthBus.emit(true)
+    heightBus.emit(true)
+    backgroundBus.emit(true)
+    zIndexBus.emit(true)
+    valueBus.emit(true)
+
+    expectNode(
+      input of(
+        fooProp.isEmpty,
+        title.isEmpty,
+        widthAttr is 100,
+        heightAttr is 200,
+        background is "cyan",
+        zIndex is 50,
+        value is "txt",
+        defaultValue.isEmpty,
+      )
+    )
+
+    // --
+
+    fooVar.set(true)
+    titleVar.set(true)
+
+    expectNode(
+      input of(
+        fooProp is 20,
+        title is "Hello",
+        widthAttr is 100,
+        heightAttr is 200,
+        background is "cyan",
+        zIndex is 50,
+        value is "txt",
+        defaultValue.isEmpty,
+      )
+    )
+
+    // --
+
+    unmount()
+
+    // external disruption
+
+    el.amend(
+      fooProp.maybe(None),
+      title.maybe(None),
+      widthAttr.maybe(None),
+      heightAttr.maybe(None),
+      background.maybe(None),
+      zIndex.maybe(None),
+      value.maybe(None),
+      defaultValue.maybe(None),
+    )
+
+    mount(el)
+
+    expectNode(
+      input of(
+        fooProp is 20,
+        title is "Hello",
+        widthAttr.isEmpty,
+        heightAttr.isEmpty,
+        background is "",
+        zIndex.isEmpty,
+        value.isEmpty,
+        defaultValue.isEmpty,
+      )
+    )
+
+    // -- rebuild
+
+    fooVar.set(true)
+    titleVar.set(true)
+    widthBus.emit(true)
+    heightBus.emit(true)
+    backgroundBus.emit(true)
+    zIndexBus.emit(true)
+    valueBus.emit(true)
+
+    expectNode(
+      input of(
+        fooProp is 20,
+        title is "Hello",
+        widthAttr is 100,
+        heightAttr is 200,
+        background is "cyan",
+        zIndex is 50,
+        value is "txt",
+        defaultValue.isEmpty,
+      )
+    )
+
+  }
 }

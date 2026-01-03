@@ -1,5 +1,6 @@
 package com.raquo.laminar.modifiers
 
+import com.raquo.airstream.core.Source
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.keys.{AriaAttr, DerivedStyleProp, GlobalAttr, HtmlAttr, HtmlProp, MathMlAttr, SimpleKey, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
@@ -23,10 +24,51 @@ class SimpleKeySetter[ //
   val key: K,
   val value: V,
   val set: El => Unit, // #Note: this not having K and V lets us have SimpleKeySetter covariant in K
-  val remove: El => Unit // #nc[API] Do we need `remove` on key setter? If not, we can get rid of `apply`.
+  val remove: El => Unit
 ) extends Setter[El] {
 
   @inline override def apply(element: El): Unit = set(element)
+
+  /** If `include` is true, the value will be set, otherwise, it will be unset.
+    *
+    * Example: `display.none := shouldHide`
+    *
+    * `key(value) := include` is functionally equivalent to `key := if (include) Some(value) else None`
+    */
+  def :=(include: Boolean): SimpleKeySetter[K, Boolean, El] = {
+    SimpleKeySetter[K, Boolean, El](key, include){ (el, _, includeArg) =>
+      if (includeArg.asInstanceOf[Boolean] == true) { // #Note: `includeArg` could be null (when the key setter's remove() is called)
+        set(el) // this is setting the underlying key-value pair
+      } else {
+        // this is unsetting the underlying key-value pair...
+        // #TODO[API] ... OR, if `includeArg` is null, this is unsetting the boolean setter.
+        //  It doesn't really make sense, so I'm not sure what it should do in that case.
+        remove(el)
+      }
+    }
+  }
+
+  /** If `include` is true, the value will be set, otherwise, it will be unset.
+    *
+    * `(key := value)(include)` is functionally equivalent to `key := if (include) Some(value) else None`
+    */
+  @inline def apply(include: Boolean): SimpleKeySetter[K, Boolean, El] = {
+    this := include
+  }
+
+  /** If the `include` observable emits true, `value` will be set, if it emits false, it will be unset.
+    *
+    * Example: `display.none <-- shouldHideStream`
+    *
+    * `key(value) <-- include` is functionally equivalent to `key.maybe <-- include.map(if (_) Some(value) else None)`
+    */
+  def <--(include: Source[Boolean]): SimpleKeyUpdater[K, Boolean, El] = {
+    new SimpleKeyUpdater[K, Boolean, El](
+      key,
+      include.toObservable,
+      (el, include) => if (include) set(el) else remove(el)
+    )
+  }
 }
 
 object SimpleKeySetter {
@@ -47,7 +89,7 @@ object SimpleKeySetter {
 
   type DerivedStylePropSetter[V, ThisV <: V] = DerivedStyleSetter[V, ThisV]
 
-  def apply[K <: SimpleKey[K, V, El], V, El <: ReactiveElement.Base](
+  def apply[K <: SimpleKey[K, _, El], V, El <: ReactiveElement.Base](
     key: K,
     value: V
   )(

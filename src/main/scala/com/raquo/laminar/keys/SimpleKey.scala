@@ -40,7 +40,7 @@ trait SimpleKey[ //
     this := value
   }
 
-  def maybe: SimpleKey[_, Option[V], El]
+  def maybe: SimpleKey[_ <: SimpleKey[_, Option[V], El], Option[V], El]
 
   def <--[ThisV](values: Source[ThisV])(implicit ev: ThisV => V): SimpleKeyUpdater[Self, ThisV, El]
 
