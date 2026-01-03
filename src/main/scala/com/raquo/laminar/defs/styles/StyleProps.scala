@@ -53,6 +53,9 @@ trait StyleProps {
   protected def colorStyle(key: String): StyleProp[String] with s.Color with u.Color[SSS] =
     new StyleProp[String](key) with s.Color with u.Color[SSS]
 
+  protected def colorUrlNoneStyle(key: String): StyleProp[String] with s.Color with s.None[String] with u.Color[SSS] with u.Url[DSP] =
+    new StyleProp[String](key) with s.Color with s.None[String] with u.Color[SSS] with u.Url[DSP]
+
   protected def flexPositionStyle(key: String): StyleProp[String] with s.FlexPosition =
     new StyleProp[String](key) with s.FlexPosition
 
@@ -121,9 +124,6 @@ trait StyleProps {
 
   protected def clearStyle(key: String): StyleProp[String] with s.Clear =
     new StyleProp[String](key) with s.Clear
-
-  protected def colorUrlStyle(key: String): StyleProp[String] with s.Color with u.Color[SSS] with u.Url[DSP] =
-    new StyleProp[String](key) with s.Color with u.Color[SSS] with u.Url[DSP]
 
   protected def cursorStyle(key: String): StyleProp[String] with s.Cursor =
     new StyleProp[String](key) with s.Cursor
@@ -386,7 +386,7 @@ trait StyleProps {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/background background @ MDN]]
     */
-  lazy val background: StyleProp[String] with s.Color with u.Color[SSS] with u.Url[DSP] = colorUrlStyle("background")
+  lazy val background: StyleProp[String] with s.Color with s.None[String] with u.Color[SSS] with u.Url[DSP] = colorUrlNoneStyle("background")
 
 
   /**
@@ -1015,6 +1015,42 @@ trait StyleProps {
     * [[https://developer.mozilla.org/en-US/docs/Web/CSS/empty-cells empty-cells @ MDN]]
     */
   lazy val emptyCells: StyleProp[String] with s.EmptyCells = emptyCellsStyle("empty-cells")
+
+
+  /**
+    * The fill CSS property defines how SVG text content and the interior canvas of
+    * SVG shapes are filled or painted. If present, it overrides the element's fill
+    * attribute. Typically, you specify a color value for the fill.
+    *
+    * [[https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/fill fill @ MDN]]
+    */
+  lazy val fill: StyleProp[String] with s.Color with s.None[String] with u.Color[SSS] with u.Url[DSP] = colorUrlNoneStyle("fill")
+
+
+  /**
+    * The fill-opacity CSS property defines the opacity of the painting operation
+    * (color, gradient, pattern, etc.) applied to SVG shapes or text content elements
+    * to fill the element. The property defines the opacity of the element's fill only;
+    * it does not affect the stroke. If present, it overrides the element's fill-opacity
+    * attribute.
+    *
+    * Accepted values: numbers from 0 (transparent) to 1 (opaque)
+    *
+    * [[https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/fill-opacity fill-opacity @ MDN]]
+    */
+  lazy val fillOpacity: StyleProp[Double | String] = doubleStyle("fill-opacity")
+
+
+  /**
+    * The fill-rule CSS property defines the rule used to determine which parts of the
+    * SVG shape's canvas are included inside a shape to be filled. If present, it
+    * overrides the element's fill-rule attribute.
+    *
+    * Accepted values: nonzero, evenodd – see visuals in MDN docs.
+    *
+    * [[https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/fill-rule fill-rule @ MDN]]
+    */
+  lazy val fillRule: StyleProp[String] = stringStyle("fill-rule")
 
 
   /**
