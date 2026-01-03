@@ -220,7 +220,9 @@ with ParentNode[Ref] {
   protected[this] def unsafeSetPilotSubscriptionOwner(maybeNextOwner: Option[DynamicOwner]): Unit = {
     // @Warning[Fragile] I had issues with clearOwner requiring a hasOwner check but that should not be necessary anymore.
     //  - If exceptions crop up caused by this, need to find the root cause before rushing to patch this here.
-    maybeNextOwner.fold(pilotSubscription.clearOwner()) { nextOwner =>
+    maybeNextOwner.fold(
+      ifEmpty = pilotSubscription.clearOwner()
+    ) { nextOwner =>
       pilotSubscription.setOwner(nextOwner)
     }
   }

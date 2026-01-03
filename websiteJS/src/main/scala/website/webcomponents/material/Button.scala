@@ -1,7 +1,7 @@
 package website.webcomponents.material
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.codecs.{BooleanAsAttrPresenceCodec, StringAsIsCodec}
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
@@ -28,11 +28,11 @@ object Button {
 
   private val tag: HtmlTag[Ref] = htmlTag("mwc-button")
 
-  val id: HtmlProp[String] = idAttr
+  val id: GlobalAttr[String] = idAttr
 
-  val label: HtmlAttr[String]   = htmlAttr("label", StringAsIsCodec)
-  val raised: HtmlAttr[Boolean] = htmlAttr("raised", BooleanAsAttrPresenceCodec)
-  val icon: HtmlAttr[String]    = htmlAttr("icon", StringAsIsCodec)
+  val label: HtmlAttr[String]   = htmlAttr("label", Codec.stringAsIs)
+  val raised: HtmlAttr[Boolean] = htmlAttr("raised", Codec.booleanAsAttrPresence)
+  val icon: HtmlAttr[String]    = htmlAttr("icon", Codec.stringAsIs)
 
   val onMouseOver = new EventProp[dom.MouseEvent]("mouseover")
 

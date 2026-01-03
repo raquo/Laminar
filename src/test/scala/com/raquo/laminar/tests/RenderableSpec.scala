@@ -194,11 +194,11 @@ class RenderableSpec extends UnitSpec {
       )
     )
 
-    // Expect three subscriptions per child:
+    // Expect 2 subscriptions per child:
     // - 1 for onMountInsert
-    // - 1 for inserter inside onMountInsert
     // - 1 pilot subscription for child element
-    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 14)
+    // Note: with onMountInsert, `child <-- signal` does NOT create its own dynamic subscription
+    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 10)
   }
 
   it("Regular node rendering") {
@@ -331,11 +331,11 @@ class RenderableSpec extends UnitSpec {
       )
     )
 
-    // Expect three subscriptions per child:
+    // Expect 2 subscriptions per child:
     // - 1 for onMountInsert
-    // - 1 for inserter inside onMountInsert
     // - 1 pilot subscription for child element
-    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 14)
+    // Note: with onMountInsert, `child <-- signal` does NOT create its own dynamic subscription
+    assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 10)
   }
 
   it("RenderableText with child and text <--") {

@@ -876,7 +876,7 @@ Another use case for this is when you want to reset a complex component's state,
 case class Document(id: String, content: DocumentContent, ...)
    
 def editor(
-  documentId: Boolean,
+  documentId: String,
   initialDocument: Document,
   documentSignal: Signal[Document]
 ): HtmlElement = {

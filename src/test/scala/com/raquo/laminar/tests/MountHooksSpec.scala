@@ -1,9 +1,12 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
+
+import scala.collection.mutable
 
 class MountHooksSpec extends UnitSpec {
 
@@ -346,12 +349,12 @@ class MountHooksSpec extends UnitSpec {
 
     assert(el.ref.childNodes.length == 4) // Checks that onMountInsert properly discards of old items
 
-    // 3 subs:
-    // - onMountBind,
-    // - child <-- signal
+    // 2 subs:
+    // - onMountInsert,
     // - child's pilot subscription
-    // Note that el's pilot sub is owned by el's parent, not el.
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    // Note: with onMountInsert, `child <-- signal` does NOT create its own dynamic subscription
+    // Note: el's pilot sub is owned by el's parent, not el.
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
   }
 
   it("onMountInsert children cancels previous dynamic subscriptions on unmount") {
@@ -401,12 +404,12 @@ class MountHooksSpec extends UnitSpec {
     assert(numBindCalls == 10)
     assert(numSignalCalls == 1)
 
-    // 5 subs:
-    // - onMountBind,
-    // - children <-- signal
+    // 4 subs:
+    // - onMountInsert,
     // - 3x subs, for each child's pilot subscription
-    // Note that el's pilot sub is owned by el's parent, not el.
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 5
+    // Note: with onMountInsert, `children <-- signal` does NOT create its own dynamic subscription
+    // Note: el's pilot sub is owned by el's parent, not el.
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 4
   }
 
   it("onMountInsert switches between different types of inserters (signals)") {
@@ -463,14 +466,14 @@ class MountHooksSpec extends UnitSpec {
 
     mount("onMountInsert child <--:", el)
 
-    // 5 subs:
+    // 4 subs:
     // - child element pilot sub (from dynamicInserter)
     // - child element pilot sub (from children <-- zChildrenSignal)
     // - onMountInsert itself
-    // - dynamicInserter
     // - children <-- zChildrenSignal
-    // (Note: el's own pilotSubscription is owned by el's parent, not el itself)
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 5
+    // Note: with onMountInsert, `dynamicInserter` does NOT create its own dynamic subscription
+    // Note: el's own pilotSubscription is owned by el's parent, not el itself
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 4
 
     expectNode(
       div of (
@@ -491,7 +494,7 @@ class MountHooksSpec extends UnitSpec {
 
     // Added one sub:
     // - Child element pilot sub (now we have 2 children instead of 1 from children <-- zChildrenSignal)
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 5
 
     expectNode(
       div of (
@@ -517,7 +520,7 @@ class MountHooksSpec extends UnitSpec {
 
     // Added one sub:
     // - Child element pilot sub (now we have 3 children instead of 1 from children <-- zChildrenSignal)
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
 
     expectNode(
       div of (
@@ -540,7 +543,7 @@ class MountHooksSpec extends UnitSpec {
 
     mount("onMountInsert SWITCH to children <--:", el)
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
 
     expectNode(
       div of (
@@ -561,7 +564,7 @@ class MountHooksSpec extends UnitSpec {
 
     // Added one sub:
     // - Child element pilot sub (now we have 3 children instead of 1 from dynamicInserter (child <-- yChildrenSignal))
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 8
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
 
     expectNode(
       div of (
@@ -583,7 +586,7 @@ class MountHooksSpec extends UnitSpec {
 
     // Removed one sub:
     // - Child element pilot sub (now we have 2 children instead of 3 from children <-- zChildrenSignal)
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 7
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
 
     expectNode(
       div of (
@@ -608,7 +611,7 @@ class MountHooksSpec extends UnitSpec {
 
     // Removed one sub:
     // - Child element pilot sub (now we have 1 child instead of 2 from dynamicInserter)
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 6
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 5
 
     expectNode(
       div of (
@@ -679,11 +682,11 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    // 2 subs:
+    // 1 subs:
     // - onMountInsert itself
-    // - dynamicInserter
+    // Note: with onMountInsert, `dynamicInserter` does NOT create its own dynamic subscription
     // (Note: el's own pilotSubscription is owned by el's parent, not el itself)
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 1
 
     // --
 
@@ -698,7 +701,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // --
 
@@ -717,7 +720,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // --
 
@@ -732,7 +735,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // --
 
@@ -748,7 +751,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 4
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
 
     // -- unmount and re-mount: children <-- inserter elements are retained.
 
@@ -766,7 +769,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 4
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
 
     // -- switching from `children <-- stream` with 2 elements to `child <-- stream`
 
@@ -786,7 +789,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 4
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
 
     // --
 
@@ -801,7 +804,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // -- unmounting and re-mounting: child element is retained
 
@@ -818,7 +821,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // -- switching back to children <-- stream
 
@@ -837,7 +840,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // --
 
@@ -852,7 +855,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // -- switch back to child <-- stream, but now children <-- inserter has only emitted a list of one child
 
@@ -871,7 +874,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     // --
 
@@ -886,7 +889,7 @@ class MountHooksSpec extends UnitSpec {
       )
     )
 
-    ReactiveElement.numDynamicSubscriptions(el) shouldBe 3
+    ReactiveElement.numDynamicSubscriptions(el) shouldBe 2
 
     assert(numModCalls == 1)
     assert(numBindCalls == 7)
@@ -1055,6 +1058,214 @@ class MountHooksSpec extends UnitSpec {
     )
   }
 
+  it("onMountInsert lifecycle events order") { // https://github.com/raquo/Laminar/issues/188
+    var count = 0
+
+    val effects = mutable.Buffer[Effect[String]]()
+
+    val el = div(
+      onMountInsert { _ =>
+        count += 1
+        val thisIx = count
+        effects += Effect(s"child-${thisIx}", "init")
+        Seq(
+          span(
+            onMountUnmountCallback(
+              mount = _ => {
+                effects += Effect(s"child-${thisIx}", "mount")
+              },
+              unmount = _ => {
+                effects += Effect(s"child-${thisIx}", "unmount")
+              }
+            ),
+            s"Child ${thisIx}"
+          )
+        )
+      }
+    )
+
+    expectNode(
+      el.ref,
+      div of (
+        sentinel
+      )
+    )
+
+    assertEquals(count, 0)
+    assertEquals(effects.toList, Nil)
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "Child 1"
+      )
+    )
+
+    assertEquals(count, 1)
+    assertEquals(effects.toList,
+      List(
+        Effect("child-1", "init"),
+        Effect("child-1", "mount")
+      ))
+    effects.clear()
+
+    // --
+
+    unmount()
+
+    assertEquals(count, 1)
+    assertEquals(
+      effects.toList,
+      List(
+        Effect("child-1", "unmount")
+      )
+    )
+    effects.clear()
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "Child 2"
+      )
+    )
+
+    assertEquals(count, 2)
+    assertEquals(
+      effects.toList,
+      List(
+        Effect("child-2", "init"),
+        Effect("child-2", "mount"),
+      )
+    )
+    effects.clear()
+
+    // --
+
+    unmount()
+
+    assertEquals(count, 2)
+    assertEquals(
+      effects.toList,
+      List(
+        Effect("child-2", "unmount")
+      )
+    )
+    effects.clear()
+
+    // --
+
+    mount(el)
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "Child 3"
+      )
+    )
+
+    assertEquals(count, 3)
+    assertEquals(
+      effects.toList,
+      List(
+        Effect("child-3", "init"),
+        Effect("child-3", "mount"),
+      )
+    )
+    effects.clear()
+  }
+
+  it("children lifecycle events order") { // https://github.com/raquo/Laminar/issues/188
+
+    val effects = mutable.Buffer[Effect[String]]()
+
+    def makeChild(thisIx: Int) = {
+      span(
+        onMountUnmountCallback(
+          mount = _ => {
+            effects += Effect(s"child-${thisIx}", "mount")
+          },
+          unmount = _ => {
+            effects += Effect(s"child-${thisIx}", "unmount")
+          }
+        ),
+        s"Child ${thisIx}"
+      )
+    }
+
+    val child1 = makeChild(1)
+    val child2 = makeChild(2)
+    val child3 = makeChild(3)
+    val child4 = makeChild(4)
+
+    val childrenVar = Var(List(child1, child2))
+
+    val el = div(
+      children <-- childrenVar
+    )
+
+    mount(el)
+
+    expectNode(
+      el.ref,
+      div of (
+        sentinel,
+        span of "Child 1",
+        span of "Child 2",
+      )
+    )
+
+    assertEquals(effects.toList,
+      List(
+        Effect("child-1", "mount"),
+        Effect("child-2", "mount"),
+      ))
+    effects.clear()
+
+    // --
+
+    unmount()
+
+    assertEquals(
+      effects.toList,
+      List(
+        Effect("child-1", "unmount"),
+        Effect("child-2", "unmount"),
+      )
+    )
+    effects.clear()
+
+    // --
+
+    childrenVar.set(List(child3, child4))
+
+    mount(el)
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "Child 3",
+        span of "Child 4",
+      )
+    )
+
+    assertEquals(
+      effects.toList,
+      List(
+        Effect("child-3", "mount"),
+        Effect("child-4", "mount"),
+      )
+    )
+    effects.clear()
+  }
+
   it("onFocusMount") {
 
     val el = div(
@@ -1183,4 +1394,5 @@ class MountHooksSpec extends UnitSpec {
 
     log shouldBe Nil
   }
+
 }

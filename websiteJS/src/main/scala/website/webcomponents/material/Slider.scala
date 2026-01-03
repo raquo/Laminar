@@ -1,7 +1,7 @@
 package website.webcomponents.material
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.codecs.{BooleanAsIsCodec, DoubleAsIsCodec}
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.nodes.ReactiveHtmlElement
 import com.raquo.laminar.tags.HtmlTag
 import org.scalajs.dom
@@ -30,12 +30,12 @@ object Slider {
 
   private val tag: HtmlTag[Ref] = htmlTag("mwc-slider")
 
-  val pin: HtmlProp[Boolean]     = htmlProp("pin", BooleanAsIsCodec)
-  val markers: HtmlProp[Boolean] = htmlProp("markers", BooleanAsIsCodec)
-  val value: HtmlProp[Double]     = htmlProp("value", DoubleAsIsCodec)
-  val min: HtmlProp[Double]       = htmlProp("min", DoubleAsIsCodec)
-  val max: HtmlProp[Double]       = htmlProp("max", DoubleAsIsCodec)
-  val step: HtmlProp[Double]      = htmlProp("step", DoubleAsIsCodec)
+  val pin: HtmlProp[Boolean]     = htmlProp("pin", Some("pin"), Codec.booleanAsIs)
+  val markers: HtmlProp[Boolean] = htmlProp("markers", Some("markers"), Codec.booleanAsIs)
+  val value: HtmlProp[Double]     = htmlProp("value", Some("value"), Codec.doubleAsIs)
+  val min: HtmlProp[Double]       = htmlProp("min", Some("min"), Codec.doubleAsIs)
+  val max: HtmlProp[Double]       = htmlProp("max", Some("max"), Codec.doubleAsIs)
+  val step: HtmlProp[Double]      = htmlProp("step", Some("step"), Codec.doubleAsIs)
 
 
   val onInput: EventProp[dom.Event]  = eventProp("input")

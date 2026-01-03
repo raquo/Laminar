@@ -5,6 +5,7 @@ import com.raquo.laminar
 
 import scala.scalajs.js
 
+// #TODO[API] - this seems similar to trait Splittable in Airstream – should we try to unify these? Perhaps in com.raquo.ew? Name SeqLike? Do they handle mutable values the same?
 // #TODO[Naming] - LSeq + RenderableSeq?   RenderableSeq + IsRenderableSeq? // #nc
 trait RenderableSeq[-Collection[_]] {
 

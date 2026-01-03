@@ -80,34 +80,39 @@ trait MountHooks {
     ignoreAlreadyMounted: Boolean = false
   ): Modifier[El] = {
     Modifier[El] { element =>
-      var maybeSubscription: Option[DynamicSubscription] = None
+      var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
       // We start the context in loose mode for performance, because it's cheaper to go from there
       // to strict mode, than the other way. The inserters are able to handle any initial mode.
       val lockedInsertContext = InsertContext.reserveSpotContext(
         element, strictMode = false, hooks = js.undefined
       )
-      element.amend(
-        onMountUnmountCallback[El](
-          mount = { mountContext =>
-            val inserter = fn(mountContext)
-            inserter match {
+      ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
+        val inserterSubOpt =
+          if (ignoreNextActivation) {
+            ignoreNextActivation = false
+            None
+          } else {
+            fn(mountContext) match {
               case dynamicInserter: DynamicInserter =>
-                maybeSubscription = Some(
+                Some(
                   dynamicInserter
                     .withContext(lockedInsertContext)
-                    .bind(mountContext.thisNode)
+                    .subscribe(lockedInsertContext, mountContext.owner)
                 )
               case staticInserter: StaticInserter =>
                 staticInserter.renderInContext(lockedInsertContext)
+                None
             }
-          },
-          unmount = { _ =>
-            maybeSubscription.foreach(_.kill())
-            maybeSubscription = None
-          },
-          ignoreAlreadyMounted
+          }
+        // #Note: We're using this inside `bindSubscriptionUnsafe`,
+        //  so this subscription must not be killed externally!
+        new Subscription(
+          mountContext.owner,
+          cleanup = () => {
+            inserterSubOpt.foreach(_.kill())
+          }
         )
-      )
+      }
     }
   }
 

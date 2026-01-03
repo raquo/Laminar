@@ -6,7 +6,7 @@ import com.raquo.laminar.utils.UnitSpec
 
 import scala.scalajs.js.|
 
-class RenderableTextUnionSpec extends UnitSpec {
+class RenderableTextScala3Spec extends UnitSpec {
 
   it("simple text mod") {
     expectNode(

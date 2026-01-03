@@ -54,10 +54,6 @@ class DynamicInserter(
 ) extends Inserter with Hookable[DynamicInserter] {
 
   def bind(element: ReactiveElement.Base): DynamicSubscription = {
-    // @TODO[Performance] The way it's used in `onMountInsert`, we create a DynSub inside DynSub.
-    //  - Currently this does not seem avoidable as we don't want to expose a `map` on DynSub
-    //  - That would allow you to create leaky resources without having a reference to the owner
-    //  - But maybe we require the user to provide proof of owner: dynSub.map(project)(owner) that must match DynSub
     // #Note we want to remember this context even after subscription is deactivated.
     //  Yes, we expect the subscription to re-activate with this initial state
     //  because it would match the state of the DOM upon reactivation
@@ -70,6 +66,14 @@ class DynamicInserter(
     ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
       insertFn(insertContext, mountContext.owner, hooks)
     }
+  }
+
+  /** Owner typically comes from MountContext of the InsertContext parentNode. */
+  def subscribe(
+    insertContext: InsertContext,
+    owner: Owner
+  ): Subscription = {
+    insertFn(insertContext, owner, hooks)
   }
 
   override def apply(element: ReactiveElement.Base): Unit = {
