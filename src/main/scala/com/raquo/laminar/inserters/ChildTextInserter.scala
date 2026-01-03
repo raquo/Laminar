@@ -14,7 +14,6 @@ object ChildTextInserter {
     renderable: RenderableText[Component]
   ): DynamicInserter = {
     new DynamicInserter(
-      preferStrictMode = false,
       insertFn = (ctx, owner, _) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValue =>
@@ -42,7 +41,6 @@ object ChildTextInserter {
   ): DynamicInserter = {
     lazy val emptyNode = new CommentNode("")
     new DynamicInserter(
-      preferStrictMode = false,
       insertFn = (ctx, owner, _) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValueOpt =>

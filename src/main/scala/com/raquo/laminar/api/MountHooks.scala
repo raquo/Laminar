@@ -83,9 +83,7 @@ trait MountHooks {
       var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
       // We start the context in loose mode for performance, because it's cheaper to go from there
       // to strict mode, than the other way. The inserters are able to handle any initial mode.
-      val lockedInsertContext = InsertContext.reserveSpotContext(
-        element, strictMode = false, hooks = js.undefined
-      )
+      val lockedInsertContext = InsertContext.reserveSpotContext(element, hooks = js.undefined)
       ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
         val inserterSubOpt =
           if (ignoreNextActivation) {

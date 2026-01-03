@@ -48,7 +48,6 @@ trait StaticInserter extends Inserter {
   */
 class DynamicInserter(
   initialContext: Option[InsertContext] = None,
-  preferStrictMode: Boolean,
   insertFn: (InsertContext, Owner, js.UndefOr[InserterHooks]) => Subscription,
   hooks: js.UndefOr[InserterHooks] = js.undefined
 ) extends Inserter with Hookable[DynamicInserter] {
@@ -60,7 +59,7 @@ class DynamicInserter(
     //  (unless some of the managed child elements were externally removed from the DOM,
     //  which Laminar should be able to recover from).
     val insertContext = initialContext.getOrElse(
-      InsertContext.reserveSpotContext(element, strictMode = preferStrictMode, hooks)
+      InsertContext.reserveSpotContext(element, hooks)
     )
 
     ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
@@ -82,7 +81,7 @@ class DynamicInserter(
 
   override def withHooks(addHooks: InserterHooks): DynamicInserter = {
     val newHooks = addHooks.appendTo(hooks)
-    new DynamicInserter(initialContext, preferStrictMode, insertFn, newHooks)
+    new DynamicInserter(initialContext, insertFn, newHooks)
   }
 
   /** Call this to get a copy of Inserter with a context locked to a certain element.
@@ -93,6 +92,6 @@ class DynamicInserter(
     */
   def withContext(context: InsertContext): DynamicInserter = {
     // Note: preferStrictMode has no effect here, because initial context is defined.
-    new DynamicInserter(Some(context), preferStrictMode = false, insertFn, hooks)
+    new DynamicInserter(Some(context), insertFn, hooks)
   }
 }

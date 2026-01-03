@@ -78,38 +78,40 @@ final class InsertContext(
     *
     * Prerequisite: context must be in loose mode, and in valid state: no extra nodes allowed.
     */
-  def forceSetStrictMode(): Unit = {
-    if (strictMode || extraNodeCount != 0) {
-      // #Note: if extraNodeCount == 0, it is also assumed (but not tested) that extraNodes and extraNodesMap are empty.
-      throw new Exception(s"forceSetStrictMode invoked when not allowed, inside parent = ${DomApi.debugNodeOuterHtml(parentNode.ref)}")
-    }
-    if (extraNodesMap == null) {
-      // In loose mode, extraNodesMap is likely to be null, so we need to initialize it.
-      extraNodesMap = new JsMap()
-    }
-    if (sentinelNode.ref.isInstanceOf[dom.Comment]) {
-      // This means there are no content nodes.
-      // We assume that all extraNode fields are properly zeroed, so there is nothing to do.
-    } else {
-      // In loose mode, child content nodes are written to sentinelNode field,
-      // so there are no extraNodes.
-      // So, if we find a content node in sentinelNode, we need to reclassify
-      // it as such for the strict mode, and insert a new sentinel node into the DOM.
-      val contentNode = sentinelNode
-      val newSentinelNode = new CommentNode("")
-      DomApi.raw.insertBefore(
-        parent = parentNode.ref,
-        newChild = newSentinelNode.ref,
-        referenceChild = contentNode.ref
-      )
+  def ensureStrictMode(): Unit = {
+    if (!strictMode) {
+      if (extraNodeCount != 0) {
+        // #Note: if extraNodeCount == 0, it is also assumed (but not tested) that extraNodes and extraNodesMap are empty.
+        throw new Exception(s"forceSetStrictMode invoked when extraNodeCount = ${extraNodeCount} on parent node ${DomApi.debugNodeOuterHtml(parentNode.ref)}")
+      }
+      if (extraNodesMap == null) {
+        // In loose mode, extraNodesMap is likely to be null, so we need to initialize it.
+        extraNodesMap = new JsMap()
+      }
+      if (sentinelNode.ref.isInstanceOf[dom.Comment]) {
+        // This means there are no content nodes.
+        // We assume that all extraNode fields are properly zeroed, so there is nothing to do.
+      } else {
+        // In loose mode, child content nodes are written to sentinelNode field,
+        // so there are no extraNodes.
+        // So, if we find a content node in sentinelNode, we need to reclassify
+        // it as such for the strict mode, and insert a new sentinel node into the DOM.
+        val contentNode = sentinelNode
+        val newSentinelNode = new CommentNode("")
+        DomApi.raw.insertBefore(
+          parent = parentNode.ref,
+          newChild = newSentinelNode.ref,
+          referenceChild = contentNode.ref
+        )
 
-      // Convert loose mode context values to strict mode context values
-      sentinelNode = newSentinelNode
-      extraNodeCount = 1
-      // extraNodes = ChildrenSeq.fromJsVector(JsVector(contentNode))
-      extraNodesMap.set(contentNode.ref, contentNode) // we initialized the map above
+        // Convert loose mode context values to strict mode context values
+        sentinelNode = newSentinelNode
+        extraNodeCount = 1
+        // extraNodes = ChildrenSeq.fromJsVector(JsVector(contentNode))
+        extraNodesMap.set(contentNode.ref, contentNode) // we initialized the map above
+      }
+      strictMode = true
     }
-    strictMode = true
   }
 
   /** #Note: this does NOT update the context to match the DOM. */
@@ -148,7 +150,6 @@ object InsertContext {
   /** Reserve the spot for when we actually insert real nodes later */
   def reserveSpotContext(
     parentNode: ReactiveElement.Base,
-    strictMode: Boolean,
     hooks: js.UndefOr[InserterHooks]
   ): InsertContext = {
     val sentinelNode = new CommentNode("")
@@ -157,8 +158,7 @@ object InsertContext {
 
     unsafeMakeReservedSpotContext(
       parentNode = parentNode,
-      sentinelNode = sentinelNode,
-      strictMode = strictMode
+      sentinelNode = sentinelNode
     )
   }
 
@@ -171,18 +171,17 @@ object InsertContext {
     */
   def unsafeMakeReservedSpotContext(
     parentNode: ReactiveElement.Base,
-    sentinelNode: ChildNode.Base,
-    strictMode: Boolean
+    sentinelNode: ChildNode.Base
   ): InsertContext = {
     // #Warning[Fragile] - We avoid instantiating a JsMap in loose mode, for performance.
     //  The JsMap is initialized if/when needed, in forceSetStrictMode.
     new InsertContext(
       parentNode = parentNode,
       sentinelNode = sentinelNode,
-      strictMode = strictMode,
+      strictMode = false,
       extraNodeCount = 0,
       // extraNodes = ChildrenSeq.empty,
-      extraNodesMap = if (strictMode) new JsMap() else null
+      extraNodesMap = null
     )
   }
 

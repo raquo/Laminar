@@ -28,17 +28,10 @@ object ChildrenCommandInserter {
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
-      preferStrictMode = true,
       insertFn = (ctx, owner, hooks) => {
+        ctx.ensureStrictMode()
         commands.foreach { command =>
-          val nodeCountDiff = updateList(
-            command,
-            parentNode = ctx.parentNode,
-            sentinelNode = ctx.sentinelNode,
-            ctx.extraNodeCount,
-            renderableNode,
-            hooks
-          )
+          val nodeCountDiff = updateList(command, ctx, renderableNode, hooks)
           ctx.extraNodeCount += nodeCountDiff
         }(owner)
       },
@@ -48,25 +41,25 @@ object ChildrenCommandInserter {
 
   def updateList[Component](
     command: CollectionCommand[Component],
-    parentNode: ReactiveElement.Base,
-    sentinelNode: ChildNode.Base,
-    extraNodeCount: Int,
+    ctx: InsertContext,
     renderableNode: RenderableNode[Component],
     hooks: InserterHooks | Unit
   ): Int = {
+    ctx.ensureStrictMode()
+
     var nodeCountDiff = 0
     def findSentinelIndex(): Int = DomApi.raw.indexOfChild(
-      parent = parentNode.ref,
-      child = sentinelNode.ref
+      parent = ctx.parentNode.ref,
+      child = ctx.sentinelNode.ref
     )
 
     command match {
 
       case CollectionCommand.Append(node) =>
         val inserted = DomApi.insertChildAtIndex(
-          parent = parentNode,
+          parent = ctx.parentNode,
           child = renderableNode.asNode(node),
-          index = findSentinelIndex() + extraNodeCount + 1,
+          index = findSentinelIndex() + ctx.extraNodeCount + 1,
           hooks
         )
         if (inserted) {
@@ -76,9 +69,9 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Prepend(node) =>
         val inserted = DomApi.insertChildAfter(
-          parent = parentNode,
+          parent = ctx.parentNode,
           newChild = renderableNode.asNode(node),
-          referenceChild = sentinelNode,
+          referenceChild = ctx.sentinelNode,
           hooks
         )
         if (inserted) {
@@ -87,7 +80,7 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Insert(node, atIndex) =>
         val inserted = DomApi.insertChildAtIndex(
-          parent = parentNode,
+          parent = ctx.parentNode,
           child = renderableNode.asNode(node),
           index = findSentinelIndex() + atIndex + 1,
           hooks
@@ -98,7 +91,7 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Remove(node) =>
         val removed = DomApi.removeChild(
-          parent = parentNode,
+          parent = ctx.parentNode,
           child = renderableNode.asNode(node)
         )
         if (removed) {
@@ -107,7 +100,7 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Replace(node, withNode) =>
         DomApi.replaceChild(
-          parent = parentNode,
+          parent = ctx.parentNode,
           oldChild = renderableNode.asNode(node),
           newChild = renderableNode.asNode(withNode),
           hooks

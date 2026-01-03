@@ -26,12 +26,9 @@ object ChildrenInserter {
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
-      preferStrictMode = true,
       insertFn = (ctx, owner, hooks) => {
         // Reset sentinel node on binding too, don't wait for events
-        if (!ctx.strictMode) {
-          ctx.forceSetStrictMode()
-        }
+        ctx.ensureStrictMode()
         // var maybeLastSeenChildren: js.UndefOr[immutable.Seq[ChildNode.Base]] = ctx.extraNodes
         childrenSource.foreach { components =>
           // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
@@ -65,11 +62,9 @@ object ChildrenInserter {
     ctx: InsertContext,
     hooks: js.UndefOr[InserterHooks]
   ): Unit = {
-    if (!ctx.strictMode) {
-      // #Note: previously in ChildInserter we only did this once in insertFn.
-      //  I think it's cheap and safe to do this check on every childSource.foreach.
-      ctx.forceSetStrictMode()
-    }
+    // #Note: previously in ChildInserter we only did this once in insertFn.
+    //  I think it's cheap and safe to do this check on every childSource.foreach.
+    ctx.ensureStrictMode()
 
     val newChildrenMap = InsertContext.nodesToMap(newChildren)
     ctx.extraNodeCount = updateChildren(
