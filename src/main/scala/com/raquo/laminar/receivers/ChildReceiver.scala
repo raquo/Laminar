@@ -15,16 +15,6 @@ object ChildReceiver {
   // @deprecated("Use `text` instead of `child.text`", "18.0.0-M1")
   val text: ChildTextReceiver.type = ChildTextReceiver
 
-  /** Example usages:
-    * {{{
-    * child(element) <-- signalOfBoolean
-    * child(component) <-- signalOfBoolean
-    * }}}
-    */
-  def apply(node: ChildNode.Base): LockedChildReceiver = {
-    new LockedChildReceiver(node)
-  }
-
   def <--(childSource: Source[ChildNode.Base]): DynamicInserter = {
     ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable, initialHooks = js.undefined)
   }
