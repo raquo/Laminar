@@ -1,5 +1,6 @@
 package com.raquo.laminar.api
 
+import com.raquo.airstream.ownership.ManualOwner
 import com.raquo.airstream.web.DomEventStream
 import com.raquo.laminar.defs.attrs.{AriaAttrs, GlobalAttrs, HtmlAttrs, MathMlAttrs, SvgAttrs}
 import com.raquo.laminar.defs.complex.{ComplexGlobalKeys, ComplexHtmlKeys}
@@ -129,9 +130,11 @@ with Implicits { self =>
     rootNode: => nodes.ReactiveElement.Base
   ): Unit = {
     if (dom.document.readyState == dom.DocumentReadyState.loading) {
+      val owner = new ManualOwner
       documentEvents(_.onDomContentLoaded).foreach { _ =>
+        owner.killSubscriptions() // DOMContentLoaded is a one-time event, no need to keep listening
         new nodes.RootNode(container, rootNode)
-      }(unsafeWindowOwner)
+      }(owner)
     } else {
       new nodes.RootNode(container, rootNode)
     }
