@@ -1,7 +1,6 @@
 package com.raquo.laminar.domapi
 
 import com.raquo.ew._
-
 import org.scalajs.dom
 
 import scala.annotation.tailrec

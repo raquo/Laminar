@@ -302,7 +302,7 @@ class KeyMaybeSpec extends UnitSpec {
 
     expectNode(
       el.ref,
-      input of(
+      input of (
         fooProp.isEmpty,
         title.isEmpty,
         widthAttr.isEmpty,
@@ -319,7 +319,7 @@ class KeyMaybeSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      input of(
+      input of (
         fooProp is 20,
         title is "Hello",
         widthAttr.isEmpty,
@@ -337,7 +337,7 @@ class KeyMaybeSpec extends UnitSpec {
     zIndexBus.emit(false)
 
     expectNode(
-      input of(
+      input of (
         fooProp is 20,
         title is "Hello",
         widthAttr.isEmpty,
@@ -360,7 +360,7 @@ class KeyMaybeSpec extends UnitSpec {
     valueBus.emit(true)
 
     expectNode(
-      input of(
+      input of (
         fooProp.isEmpty,
         title.isEmpty,
         widthAttr is 100,
@@ -378,7 +378,7 @@ class KeyMaybeSpec extends UnitSpec {
     titleVar.set(true)
 
     expectNode(
-      input of(
+      input of (
         fooProp is 20,
         title is "Hello",
         widthAttr is 100,
@@ -410,7 +410,7 @@ class KeyMaybeSpec extends UnitSpec {
     mount(el)
 
     expectNode(
-      input of(
+      input of (
         fooProp is 20,
         title is "Hello",
         widthAttr.isEmpty,
@@ -433,7 +433,7 @@ class KeyMaybeSpec extends UnitSpec {
     valueBus.emit(true)
 
     expectNode(
-      input of(
+      input of (
         fooProp is 20,
         title is "Hello",
         widthAttr is 100,

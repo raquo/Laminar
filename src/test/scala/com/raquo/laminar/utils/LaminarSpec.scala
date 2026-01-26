@@ -1,7 +1,7 @@
 package com.raquo.laminar.utils
 
-import com.raquo.domtestutils.matching._
 import com.raquo.domtestutils.{EventSimulator, MountOps}
+import com.raquo.domtestutils.matching._
 import com.raquo.laminar.api._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes._

@@ -36,7 +36,7 @@ class SimpleKeySetter[ //
     * `key(value) := include` is functionally equivalent to `key := if (include) Some(value) else None`
     */
   def :=(include: Boolean): SimpleKeySetter[K, Boolean, El] = {
-    SimpleKeySetter[K, Boolean, El](key, include){ (el, _, includeArg) =>
+    SimpleKeySetter[K, Boolean, El](key, include) { (el, _, includeArg) =>
       if (includeArg.asInstanceOf[Boolean] == true) { // #Note: `includeArg` could be null (when the key setter's remove() is called)
         set(el) // this is setting the underlying key-value pair
       } else {

@@ -20,4 +20,3 @@ class MathMlTag(
   /** Create a Scala DOM Builder element from this Tag */
   protected def build(): ReactiveMathMlElement = new ReactiveMathMlElement(this, DomApi.createMathMlElement(this))
 }
-
