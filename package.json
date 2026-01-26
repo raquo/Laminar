@@ -1,0 +1,9 @@
+{
+  "name": "test-setup",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "jsdom": "^27.4.0"
+  }
+}
+

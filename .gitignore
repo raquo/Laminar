@@ -13,6 +13,8 @@ target
 project/metals.sbt
 project/.bloop
 
+node_modules
+package-lock.json
 yarn.lock
 !website/yarn.lock
 

@@ -1,8 +1,6 @@
 import com.raquo.buildkit.SourceDownloader
-import VersionHelper.{versionFmt, fallbackVersion}
 
-// Lets me depend on Maven Central artifacts immediately without waiting
-resolvers ++= Resolver.sonatypeOssRepos("public")
+import VersionHelper.{versionFmt, fallbackVersion}
 
 // Replace default sbt-dynver version with a simpler one for easier local development
 // ThisBuild / version ~= (_.replaceFirst("(\\+[a-z0-9-+]*-SNAPSHOT)", "-NEXT-SNAPSHOT"))
@@ -47,6 +45,7 @@ Global / onLoad := {
 SettingKey[Seq[File]]("ide-excluded-directories").withRank(KeyRanks.Invisible) := Seq(
   ".downloads", ".idea", ".metals", ".bloop", ".bsp",
   "target", "project/target", "project/project/target", "project/project/project/target",
+  "node_modules",
   "website/build", "website/target", "websiteJS/target"
 ).map(file)
 
@@ -98,7 +97,7 @@ lazy val website = project
   )
 
 lazy val laminar = project.in(file("."))
-  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "com.raquo" %%% "airstream" % Versions.Airstream,
@@ -156,18 +155,9 @@ lazy val laminar = project.in(file("."))
 
     (Test / parallelExecution) := false,
 
-    (Test / requireJsDomEnv) := true,
+    scalaJSUseMainModuleInitializer := true,
 
-    (installJsdom / version) := Versions.JsDom,
-
-    (webpack / version) := Versions.Webpack,
-
-    (startWebpackDevServer / version) := Versions.WebpackDevServer,
-
-    // #TODO remove
-    useYarn := true,
-
-    scalaJSUseMainModuleInitializer := true
+    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
   )
   .settings(
     name := "Laminar",
@@ -191,6 +181,4 @@ lazy val laminar = project.in(file("."))
     ),
     (Test / publishArtifact) := false,
     pomIncludeRepository := { _ => false },
-    sonatypeCredentialHost := "s01.oss.sonatype.org",
-    sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
   )

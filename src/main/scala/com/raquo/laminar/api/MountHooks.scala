@@ -184,6 +184,8 @@ trait MountHooks {
   /** Combines `onMountCallback` and `onUnmountCallback` for easier integration.
     *  - Note that the same caveats apply as for those individual methods.
     *  - This implementation defaults to `ignoreAlreadyMounted = false`.
+    *    - Because of this, `unmount` is guaranteed to be called only if `mount`
+    *      was previously called, so we can get state as `A` instead of `Option[A]`
     */
   def onMountUnmountCallbackWithState[El <: ReactiveElement.Base, A](
     mount: MountContext[El] => A,
