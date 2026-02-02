@@ -33,9 +33,8 @@ extends SimpleKey[Self, V, El] { self: Self =>
   override def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] =
     SimpleKeySetter[Self, ThisV, El](this, value)(DomApi.setAttribute)
 
-  override def <--[ThisV <: V](
-    values: Source[ThisV]
-  )(implicit
+  override protected def bindSource[ThisV](
+    values: Source[ThisV],
     ev: ThisV => V
   ): SimpleKeyUpdater[Self, ThisV, El] =
     new SimpleKeyUpdater(

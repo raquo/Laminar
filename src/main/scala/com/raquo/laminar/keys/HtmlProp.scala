@@ -26,7 +26,7 @@ abstract class HtmlProp[V](
   override def :=[ThisV <: V](value: ThisV): SimpleKeySetter[HtmlProp[V], ThisV, ReactiveHtmlElement.Base] =
     SimpleKeySetter(this, value)(DomApi.setHtmlProperty)
 
-  override def <--[ThisV <: V](values: Source[ThisV])(implicit ev: ThisV => V): SimpleKeyUpdater[HtmlProp[V], ThisV, ReactiveHtmlElement.Base] = {
+  override protected def bindSource[ThisV](values: Source[ThisV], ev: ThisV => V): SimpleKeyUpdater[HtmlProp[V], ThisV, ReactiveHtmlElement.Base] = {
     val update = if (name == "value") {
       (element: ReactiveHtmlElement.Base, nextValue: ThisV) =>
         // Deduplicating updates against current DOM value prevents cursor position reset in Safari https://github.com/raquo/Laminar/issues/110

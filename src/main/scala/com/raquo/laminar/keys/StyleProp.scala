@@ -34,9 +34,8 @@ with DerivedStyleBuilder[DerivedStyleProp] { self =>
   def apply[ThisV](value: ThisV)(implicit ev: ThisV => V): StyleSetter[V, V] =
     this := ev(value)
 
-  override def <--[ThisV <: V](
-    values: Source[ThisV]
-  )(implicit
+  override protected def bindSource[ThisV](
+    values: Source[ThisV],
     ev: ThisV => V
   ): SimpleKeyUpdater[StyleProp[V], ThisV, ReactiveElement.Base] =
     new SimpleKeyUpdater(
