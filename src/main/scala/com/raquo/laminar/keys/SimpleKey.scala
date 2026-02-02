@@ -42,6 +42,10 @@ trait SimpleKey[ //
 
   def maybe: SimpleKey[_ <: SimpleKey[_, Option[V], El], Option[V], El]
 
-  def <--[ThisV](values: Source[ThisV])(implicit ev: ThisV => V): SimpleKeyUpdater[Self, ThisV, El]
+  // #Note: ThisV <: V bound prevents Scala 3 from widening string literal
+  //  union types (e.g. "a" | "b") to String during type inference.
+  //  The implicit ev is still needed for Scala 2 compatibility where union
+  //  subtyping is emulated via implicit conversions.
+  def <--[ThisV <: V](values: Source[ThisV])(implicit ev: ThisV => V): SimpleKeyUpdater[Self, ThisV, El]
 
 }

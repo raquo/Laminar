@@ -31,7 +31,7 @@ class DerivedStyleProp[V](
   def apply[ThisV](value: ThisV)(implicit ev: ThisV => V): DerivedStyleSetter[V, V] =
     this := ev(value)
 
-  override def <--[ThisV](
+  override def <--[ThisV <: V](
     values: Source[ThisV]
   )(implicit
     ev: ThisV => V
