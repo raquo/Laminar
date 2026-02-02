@@ -17,6 +17,19 @@ class StringLiteralTypeWideningSpec extends UnitSpec {
 
   type ThemeVariant = "brand" | "danger" | "neutral" | "success" | "warning"
 
+  it("string literal union types with := and apply methods") {
+    val variant: HtmlAttr[ThemeVariant] =
+      htmlAttr("variant", UnionAsStringCodec[ThemeVariant])
+
+    div(variant := "neutral").ref.getAttribute("variant") shouldBe "neutral"
+    div(variant := "success").ref.getAttribute("variant") shouldBe "success"
+    assertTypeError("""div(variant := "badvalue")""")
+
+    div(variant("neutral")).ref.getAttribute("variant") shouldBe "neutral"
+    div(variant("success")).ref.getAttribute("variant") shouldBe "success"
+    assertTypeError("""div(variant("badvalue"))""")
+  }
+
   it("string literal union types with typed HtmlAttr") {
     // Key test case: HtmlAttr typed with union type directly
     // Before the fix, the compiler would widen ThemeVariant to String,
