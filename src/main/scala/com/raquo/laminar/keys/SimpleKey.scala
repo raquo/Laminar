@@ -39,7 +39,12 @@ trait SimpleKey[ //
 
   // `ThisV` here is needed primarily for good typing of keywords like opacity.none
   def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] =
-    SimpleKeySetter(this, value)((el, _, value) => set(el, value))
+    new SimpleKeySetter(
+      key = this,
+      value = value,
+      set = set(_, value),
+      remove = set(_, null)
+    )
 
   @inline def apply[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] = {
     this := value

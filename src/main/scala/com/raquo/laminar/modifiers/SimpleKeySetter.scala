@@ -37,19 +37,15 @@ class SimpleKeySetter[ //
     * `key(value) := include` is functionally equivalent to `key := if (include) Some(value) else None`
     */
   def :=(include: Boolean): SimpleKeySetter[K, Boolean, El] = {
-    SimpleKeySetter[K, Boolean, El](key, include) { (el, _, includeArg) =>
-      Codec.foldNullableBoolean(includeArg)(
-        ifTrue = {
-          set(el) // this is setting the underlying key-value pair
-        },
-        ifNullOrFalse = {
-          // this is unsetting the underlying key-value pair...
-          // #TODO[API] ... OR, if `includeArg` is null, this is unsetting the boolean setter.
-          //  It doesn't really make sense, so I'm not sure what it should do in that case.
-          remove(el)
-        }
-      )
-    }
+    new SimpleKeySetter(
+      key = key,
+      value = include,
+      set = Codec.foldNullableBoolean(include)(
+        ifNullOrFalse = remove, // this is unsetting the underlying key-value pair...
+        ifTrue = set // this is setting the underlying key-value pair
+      ),
+      remove = remove // this is unsetting the underlying key-value pair...
+    )
   }
 
   /** If `include` is true, the value will be set, otherwise, it will be unset.
@@ -98,20 +94,19 @@ object SimpleKeySetter {
 
   type DerivedStylePropSetter[V, ThisV <: V] = DerivedStyleSetter[V, ThisV]
 
-  def apply[K <: SimpleKey[K, _, El], V, El <: ReactiveElement.Base](
-    key: K,
-    value: V
-  )(
-    setOrRemoveF: (El, K, V | Null) => Unit
-  ): SimpleKeySetter[K, V, El] = {
-    // #nc remove `key`? unify `set` & `remove`?
-    new SimpleKeySetter[K, V, El](
-      key,
-      value,
-      el => setOrRemoveF(el, key, value),
-      el => setOrRemoveF(el, key, null)
-    ) {}
-  }
+  // def apply[K <: SimpleKey[K, _, El], V, El <: ReactiveElement.Base](
+  //   key: K,
+  //   value: V
+  // )(
+  //   setOrRemoveF: (El, V | Null) => Unit
+  // ): SimpleKeySetter[K, V, El] = {
+  //   new SimpleKeySetter[K, V, El](
+  //     key,
+  //     value,
+  //     el => setOrRemoveF(el, value),
+  //     el => setOrRemoveF(el, null)
+  //   ) {}
+  // }
 
   // #Note – constructor is private, because we expect ThisV <: V,
   //  however this is exceptionally hard to properly encode in types
