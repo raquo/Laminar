@@ -1,6 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.modifiers.{SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
@@ -83,12 +84,7 @@ object SimpleKey {
       new SimpleKeyUpdater[Self, ThisV, El](
         key = key,
         values = values.toObservable,
-        update = (el, value) => key.set(el, ev(value))
-          // #nc do we need to handle nulls in `value`? `ev` probably can't handle them...
-          // key.set(
-          //   el,
-          //   value = if (value == null) null else ev(value.asInstanceOf[ThisV]) // #Safe separation of null
-          // )
+        update = (el, value) => key.set(el, Codec.mapNullable(value, ev))
       )
   }
 }

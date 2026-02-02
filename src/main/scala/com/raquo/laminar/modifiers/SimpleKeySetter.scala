@@ -1,6 +1,7 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.airstream.core.Source
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.keys.{AriaAttr, DerivedStyleProp, GlobalAttr, HtmlAttr, HtmlProp, MathMlAttr, SimpleKey, StyleProp, SvgAttr}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
@@ -37,14 +38,17 @@ class SimpleKeySetter[ //
     */
   def :=(include: Boolean): SimpleKeySetter[K, Boolean, El] = {
     SimpleKeySetter[K, Boolean, El](key, include) { (el, _, includeArg) =>
-      if (includeArg.asInstanceOf[Boolean] == true) { // #Note: `includeArg` could be null (when the key setter's remove() is called)
-        set(el) // this is setting the underlying key-value pair
-      } else {
-        // this is unsetting the underlying key-value pair...
-        // #TODO[API] ... OR, if `includeArg` is null, this is unsetting the boolean setter.
-        //  It doesn't really make sense, so I'm not sure what it should do in that case.
-        remove(el)
-      }
+      Codec.foldNullableBoolean(includeArg)(
+        ifTrue = {
+          set(el) // this is setting the underlying key-value pair
+        },
+        ifNullOrFalse = {
+          // this is unsetting the underlying key-value pair...
+          // #TODO[API] ... OR, if `includeArg` is null, this is unsetting the boolean setter.
+          //  It doesn't really make sense, so I'm not sure what it should do in that case.
+          remove(el)
+        }
+      )
     }
   }
 
@@ -66,7 +70,12 @@ class SimpleKeySetter[ //
     new SimpleKeyUpdater[K, Boolean, El](
       key,
       include.toObservable,
-      (el, include) => if (include) set(el) else remove(el)
+      (el, include) => {
+        Codec.foldNullableBoolean(include)(
+          ifTrue = set(el),
+          ifNullOrFalse = remove(el),
+        )
+      }
     )
   }
 }

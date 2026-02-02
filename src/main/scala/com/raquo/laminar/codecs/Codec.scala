@@ -58,12 +58,29 @@ object Codec {
     if (value == null) null else project(value.asInstanceOf[A])
   }
 
-  @inline def foldNullable[A, B](value: A | Null)(@inline ifNull: => B, @inline ifValue: A => B): B = {
+  @inline def foldNullable[A, B](
+    value: A | Null
+  )(
+    @inline ifNull: => B,
+    @inline ifValue: A => B
+  ): B = {
     if (value == null) {
       ifNull
     } else {
       ifValue(value.asInstanceOf[A])
     }
+  }
+
+  @inline def foldNullableBoolean[A](
+    value: Boolean | Null
+  )(
+    @inline ifNullOrFalse: => A,
+    @inline ifTrue: => A
+  ): A = {
+    Codec.foldNullable(value)(
+      ifNull = ifNullOrFalse,
+      ifValue = if (_) ifTrue else ifNullOrFalse
+    )
   }
 
   /** "as-is" codecs are identity functions – they read / write the value directly.

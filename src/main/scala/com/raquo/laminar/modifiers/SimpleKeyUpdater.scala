@@ -5,6 +5,8 @@ import com.raquo.airstream.ownership.DynamicSubscription
 import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
 
+import scala.scalajs.js.|
+
 /**
   * A modifier that updates a key from a source, e.g. `value <-- valueStream`
   *
@@ -18,7 +20,7 @@ class SimpleKeyUpdater[ //
 ](
   val key: K,
   val values: Observable[V],
-  val update: (El, V) => Unit
+  val update: (El, V | Null) => Unit
 ) extends Binder[El] { self =>
 
   override def bind(element: El): DynamicSubscription = {
