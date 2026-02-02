@@ -48,18 +48,21 @@ trait Codec[ScalaType, DomType] { self =>
 
 object Codec {
 
-  /** "as-is" codecs are identity functions – they read / write the value directly. */
-  def asIsCodec[V](): Codec[V, V] = new Codec[V, V] {
+  /** "as-is" codecs are identity functions – they read / write the value directly.
+    *
+    * Note: Codec.asIsCodec[Foo] creates a new codec instance at every invocation.
+    */
+  def asIsCodec[V]: Codec[V, V] = new Codec[V, V] {
     override def encode(scalaValue: V): V = scalaValue
 
     override def decode(domValue: V): V = domValue
   }
 
-  val stringAsIs: Codec[String, String] = asIsCodec()
+  val stringAsIs: Codec[String, String] = asIsCodec
 
   // --
 
-  val intAsIs: Codec[Int, Int] = asIsCodec()
+  val intAsIs: Codec[Int, Int] = asIsCodec
 
   lazy val intAsString: Codec[Int, String] = new Codec[Int, String] {
 
@@ -70,7 +73,7 @@ object Codec {
 
   // --
 
-  lazy val doubleAsIs: Codec[Double, Double] = asIsCodec()
+  lazy val doubleAsIs: Codec[Double, Double] = asIsCodec
 
   lazy val doubleAsString: Codec[Double, String] = new Codec[Double, String] {
 
@@ -81,7 +84,7 @@ object Codec {
 
   // --
 
-  val booleanAsIs: Codec[Boolean, Boolean] = asIsCodec()
+  val booleanAsIs: Codec[Boolean, Boolean] = asIsCodec
 
   /** Codec for certain HTML attributes.
     *  - If you set `true` in Scala, attribute will be added with empty value.

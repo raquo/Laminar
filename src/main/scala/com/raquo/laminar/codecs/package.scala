@@ -6,7 +6,7 @@ package object codecs {
   type AsIsCodec[V] = Codec[V, V]
 
   @deprecated("Moved to Codec.asIsCodec", "18.0.0-M1")
-  def AsIsCodec[V](): Codec[V, V] = Codec.asIsCodec()
+  def AsIsCodec[V](): Codec[V, V] = Codec.asIsCodec
 
   // String Codecs
 
