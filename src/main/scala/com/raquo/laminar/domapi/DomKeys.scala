@@ -1,5 +1,6 @@
 package com.raquo.laminar.domapi
 
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.keys._
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
 
@@ -17,16 +18,12 @@ trait DomKeys {
     domValue.map(attr.codec.decode)
   }
 
-  def setAttribute[ThisV <: V, V, El <: ReactiveElement.Base](
+  def setAttribute[V, El <: ReactiveElement.Base](
     element: El,
     attr: SimpleAttr[_, V, El],
-    value: ThisV | Null
+    value: V | Null
   ): Unit = {
-    val domValue = if (value == null) {
-      null
-    } else {
-      attr.codec.encode(value.asInstanceOf[ThisV]) // #Safe because null check above
-    }
+    val domValue = Codec.mapNullable(value, attr.codec.encode)
     raw.setAttribute(
       element = element.ref,
       localName = attr.localName,
@@ -43,16 +40,12 @@ trait DomKeys {
     raw.getHtmlProperty(element.ref, prop.name).map(prop.codec.decode)
   }
 
-  def setHtmlProperty[ThisV <: V, V, El <: ReactiveHtmlElement.Base](
+  def setHtmlProperty[V, El <: ReactiveHtmlElement.Base](
     element: El,
     prop: HtmlProp[V],
-    value: ThisV | Null // #nc why do we need ThisV?
+    value: V | Null
   ): Unit = {
-    val domValue = if (value == null) {
-      null
-    } else {
-      prop.codec.encode(value.asInstanceOf[ThisV]) // #Safe because null check above
-    }
+    val domValue = Codec.mapNullable(value, prop.codec.encode)
     if (domValue == null) {
       raw.removeHtmlProperty(
         element = element.ref,
@@ -68,7 +61,7 @@ trait DomKeys {
     }
   }
 
-  /** If you don't have a String value, pass `prop(scalaValue).cssValue` to value`. */
+  /** If you don't have a String value, pass `prop(scalaValue).cssValue` to `value`. */
   def setStyle[V](
     element: ReactiveElement.Base,
     prop: StyleProp[V],
@@ -87,11 +80,7 @@ trait DomKeys {
     prop: DerivedStyleProp[V],
     value: V | Null
   ): Unit = {
-    val encodedValue = if (value == null) {
-      null
-    } else {
-      prop.encode(value.asInstanceOf[V]) // #Safe because null check above
-    }
+    val encodedValue = Codec.mapNullable(value, prop.encode)
     raw.setStyle(
       element = element.ref,
       styleCssName = prop.name,

@@ -1,5 +1,6 @@
 package com.raquo.laminar.domapi
 
+import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.domapi.DomKeysRaw._
 import com.raquo.laminar.domext
 import org.scalajs.dom
@@ -16,16 +17,19 @@ trait DomKeysRaw {
     localName: String,
     namespaceUri: String | Null // nullable
   ): String | Unit = {
-    val domValue = if (namespaceUri == null) {
-      element.getAttribute(
-        name = localName
-      )
-    } else {
-      element.getAttributeNS(
-        namespaceURI = namespaceUri.asInstanceOf[String], // #Safe because null check above
-        localName = localName
-      )
-    }
+    val domValue = Codec.foldNullable(namespaceUri)(
+      ifNull = {
+        element.getAttribute(
+          name = localName
+        )
+      },
+      ifValue = { _namespaceUri =>
+        element.getAttributeNS(
+          namespaceURI = _namespaceUri,
+          localName = localName
+        )
+      }
+    )
     if (domValue != null) domValue else ()
   }
 
@@ -36,32 +40,41 @@ trait DomKeysRaw {
     namespaceUri: String | Null, // nullable
     domValue: String | Null // nullable
   ): Unit = {
-    if (domValue == null) {
-      if (namespaceUri == null) {
-        element.removeAttribute(
-          name = localName
+    Codec.foldNullable(domValue)(
+      ifNull = {
+        Codec.foldNullable(namespaceUri)(
+          ifNull = {
+            element.removeAttribute(
+              name = localName
+            )
+          },
+          ifValue = { _namespaceUri =>
+            element.removeAttributeNS(
+              namespaceURI = _namespaceUri,
+              localName = localName
+            )
+          }
         )
-      } else {
-        element.removeAttributeNS(
-          namespaceURI = namespaceUri.asInstanceOf[String], // #Safe because null check above.
-          localName = localName
+      },
+      ifValue = { _domValue =>
+        Codec.foldNullable(namespaceUri)(
+          ifNull = {
+            // See https://github.com/raquo/Laminar/issues/143
+            element.setAttribute(
+              name = qualifiedName,
+              value = _domValue,
+            )
+          },
+          ifValue = { _namespaceUri =>
+            element.setAttributeNS(
+              namespaceURI = _namespaceUri,
+              qualifiedName = qualifiedName,
+              value = _domValue
+            )
+          }
         )
       }
-    } else {
-      if (namespaceUri == null) {
-        // See https://github.com/raquo/Laminar/issues/143
-        element.setAttribute(
-          name = qualifiedName,
-          value = domValue.asInstanceOf[String], // #Safe because null check above
-        )
-      } else {
-        element.setAttributeNS(
-          namespaceURI = namespaceUri.asInstanceOf[String], // #Safe because null check above
-          qualifiedName = qualifiedName,
-          value = domValue.asInstanceOf[String], // #Safe because null check above
-        )
-      }
-    }
+    )
   }
 
   /** Returns `js.undefined` aka `Unit` when the property is not applicable to the element.
@@ -106,16 +119,18 @@ trait DomKeysRaw {
     /** All dom.Element-s are actually stylable. See [[domext.StylableElement]] */
     val stylableElement = element.asInstanceOf[domext.StylableElement]
     // #Note: we use setProperty / removeProperty instead of mutating ref.style directly to support custom CSS props / variables
-    if (styleValue == null) {
-      prefixes.foreach(prefix => stylableElement.style.removeProperty(prefix + styleCssName))
-      stylableElement.style.removeProperty(styleCssName)
-    } else {
-      val _styleValue: String = styleValue.asInstanceOf[String] // #Safe because null check above
-      prefixes.foreach { prefix =>
-        stylableElement.style.setProperty(prefix + styleCssName, _styleValue)
+    Codec.foldNullable(styleValue)(
+      ifNull = {
+        prefixes.foreach(prefix => stylableElement.style.removeProperty(prefix + styleCssName))
+        stylableElement.style.removeProperty(styleCssName)
+      },
+      ifValue = { _styleValue =>
+        prefixes.foreach { prefix =>
+          stylableElement.style.setProperty(prefix + styleCssName, _styleValue)
+        }
+        stylableElement.style.setProperty(styleCssName, _styleValue)
       }
-      stylableElement.style.setProperty(styleCssName, _styleValue)
-    }
+    )
   }
 
   /** Note: this only gets INLINE style values – those set via the `style` attribute, which includes

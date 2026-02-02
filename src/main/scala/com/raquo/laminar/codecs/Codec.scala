@@ -1,5 +1,7 @@
 package com.raquo.laminar.codecs
 
+import scala.scalajs.js.|
+
 /** This trait represents a way to encode and decode HTML attribute or DOM property values.
   *
   * It is needed because attributes encode all values as strings regardless of their type,
@@ -40,13 +42,29 @@ trait Codec[ScalaType, DomType] { self =>
 
       override def encode(scalaValue: Option[ScalaType]): DomType = {
         // #Safe – `encode` is SUPPOSED to return `null` (remove-key command) when input scalaValue is None.
-        scalaValue.map(self.encode).getOrElse(null).asInstanceOf[DomType]
+        Codec.getOrForceNull(scalaValue.map(self.encode))
       }
     }
   }
 }
 
 object Codec {
+
+  def getOrForceNull[A](valueOpt: Option[A]): A = {
+    valueOpt.getOrElse(null).asInstanceOf[A]
+  }
+
+  def mapNullable[A, B](value: A | Null, project: A => B): B | Null = {
+    if (value == null) null else project(value.asInstanceOf[A])
+  }
+
+  @inline def foldNullable[A, B](value: A | Null)(@inline ifNull: => B, @inline ifValue: A => B): B = {
+    if (value == null) {
+      ifNull
+    } else {
+      ifValue(value.asInstanceOf[A])
+    }
+  }
 
   /** "as-is" codecs are identity functions – they read / write the value directly.
     *
