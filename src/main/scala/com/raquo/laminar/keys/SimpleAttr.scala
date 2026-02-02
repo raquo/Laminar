@@ -1,10 +1,10 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Source
 import com.raquo.laminar.codecs.Codec
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.modifiers.{SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
+
+import scala.scalajs.js.|
 
 /** Common type of all simple (non-composite) attributes:
   *  - [[GlobalAttr]]
@@ -19,9 +19,6 @@ import com.raquo.laminar.nodes.ReactiveElement
 trait SimpleAttr[+Self <: SimpleAttr[Self, V, El], V, -El <: ReactiveElement.Base]
 extends SimpleKey[Self, V, El] { self: Self =>
 
-  /** We override this here and not in subclasses in order to provide it to a universal SimpleAttrDomApi below */
-  // override type Self[VV] = SimpleAttr[VV, ReactiveElement.Base]
-
   val name: String
 
   @inline def localName: String = name
@@ -30,19 +27,9 @@ extends SimpleKey[Self, V, El] { self: Self =>
 
   val namespaceUri: Option[String] = None
 
-  override def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] =
-    SimpleKeySetter[Self, ThisV, El](this, value)(DomApi.setAttribute)
-
-  override def <--[ThisV <: V](
-    values: Source[ThisV]
-  )(implicit
-    ev: ThisV => V
-  ): SimpleKeyUpdater[Self, ThisV, El] =
-    new SimpleKeyUpdater(
-      key = self,
-      values = values.toObservable,
-      update = (el, value) => DomApi.setAttribute(el, self, ev(value))
-    )
+  override protected def set(el: El, value: V | Null): Unit = {
+    DomApi.setAttribute(el, self, value)
+  }
 }
 
 object SimpleAttr {

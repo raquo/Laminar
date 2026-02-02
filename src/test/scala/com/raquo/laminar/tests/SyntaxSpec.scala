@@ -105,6 +105,9 @@ class SyntaxSpec extends UnitSpec {
     assert(display.inherit.value == "inherit")
     assert(display.inherit.cssValue == "inherit")
 
+    // CSS keywords for non-string props
+    val s3: String = opacity.unset.value
+
     // Unitless props
     assert((padding := "12px").value == "12px")
     // assert(mergeUnion((padding := "12px").value) == "12px") // #Note[Scala2] no warning because conversion triggered explicitly // #Warning: Does not work in Scala 3
@@ -129,7 +132,7 @@ class SyntaxSpec extends UnitSpec {
     // Multi-parameter derived CSS props (units)
 
     val p3: StyleProp[String] = color
-    val s3: StyleSetter[_, _] = color.rgb(200, 100, 0)
+    val s4: StyleSetter[_, _] = color.rgb(200, 100, 0)
     assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)") // #Note[Scala2] this prints warning, same as above
     assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
 

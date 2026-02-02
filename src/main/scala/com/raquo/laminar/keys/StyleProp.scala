@@ -1,12 +1,12 @@
 package com.raquo.laminar.keys
 
-import com.raquo.airstream.core.Source
 import com.raquo.laminar.defs.styles.traits.GlobalKeywords
 import com.raquo.laminar.defs.styles.units.GlobalUnits
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.SimpleKeySetter.StyleSetter
-import com.raquo.laminar.modifiers.SimpleKeyUpdater
 import com.raquo.laminar.nodes.ReactiveElement
+
+import scala.scalajs.js.|
 
 class StyleProp[V](
   override val name: String,
@@ -34,18 +34,8 @@ with DerivedStyleBuilder[DerivedStyleProp] { self =>
   def apply[ThisV](value: ThisV)(implicit ev: ThisV => V): StyleSetter[V, V] =
     this := ev(value)
 
-  override def <--[ThisV <: V](
-    values: Source[ThisV]
-  )(implicit
-    ev: ThisV => V
-  ): SimpleKeyUpdater[StyleProp[V], ThisV, ReactiveElement.Base] =
-    new SimpleKeyUpdater(
-      key = this,
-      values = values.toObservable,
-      update = (el, value) => {
-        DomApi.setStyle(el, this, DomApi.cssValue(ev(value)))
-      }
-    )
+  override protected def set(el: ReactiveElement.Base, value: V | Null): Unit =
+    DomApi.setStyle(el, this, DomApi.cssValue(value))
 
   override lazy val maybe: DerivedStyleProp[Option[V]] = {
     new DerivedStyleProp[Option[V]](

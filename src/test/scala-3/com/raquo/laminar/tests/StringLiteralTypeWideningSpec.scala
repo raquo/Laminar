@@ -9,11 +9,11 @@ import com.raquo.laminar.utils.UnitSpec
   * This tests a fix for Scala 3 type inference widening string literal unions
   * to String when using implicit evidence functions.
   */
-class UnionTypeWideningSpec extends UnitSpec {
+class StringLiteralTypeWideningSpec extends UnitSpec {
 
   // Shared codec for union types
   def UnionAsStringCodec[U]: Codec[U, String] =
-    StringAsIsCodec.asInstanceOf[Codec[U, String]]
+    Codec.stringAsIs.asInstanceOf[Codec[U, String]]
 
   type ThemeVariant = "brand" | "danger" | "neutral" | "success" | "warning"
 

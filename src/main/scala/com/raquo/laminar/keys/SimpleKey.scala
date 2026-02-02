@@ -4,6 +4,8 @@ import com.raquo.airstream.core.Source
 import com.raquo.laminar.modifiers.{SimpleKeySetter, SimpleKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
+import scala.scalajs.js.|
+
 /**
   * This class represents a Key typically found on the left hand side of the key-value pair `key := value`
   *
@@ -28,24 +30,65 @@ import com.raquo.laminar.nodes.ReactiveElement
   */
 trait SimpleKey[ //
   +Self <: SimpleKey[Self, V, El],
-  -V,
+  V,
   -El <: ReactiveElement.Base
 ] { self: Self =>
 
   val name: String
 
-  def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El]
+  // `ThisV` here is needed primarily for good typing of keywords like opacity.none
+  def :=[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] =
+    SimpleKeySetter(this, value)((el, _, value) => set(el, value))
 
   @inline def apply[ThisV <: V](value: ThisV): SimpleKeySetter[Self, ThisV, El] = {
     this := value
   }
 
+  def <--(values: Source[V]): SimpleKeyUpdater[Self, V, El] =
+    new SimpleKeyUpdater(
+      key = this,
+      values = values.toObservable,
+      update = (key, value) => set(key, value)
+    )
+
   def maybe: SimpleKey[_ <: SimpleKey[_, Option[V], El], Option[V], El]
 
-  // #Note: ThisV <: V bound prevents Scala 3 from widening string literal
-  //  union types (e.g. "a" | "b") to String during type inference.
-  //  The implicit ev is still needed for Scala 2 compatibility where union
-  //  subtyping is emulated via implicit conversions.
-  def <--[ThisV <: V](values: Source[ThisV])(implicit ev: ThisV => V): SimpleKeyUpdater[Self, ThisV, El]
+  /** `null` means "unset this key" */
+  protected def set(el: El, value: V | Null): Unit
 
+}
+
+object SimpleKey {
+
+  implicit class SimpleKeyExt[ //
+    +Self <: SimpleKey[Self, V, El],
+    V,
+    -El <: ReactiveElement.Base
+  ](
+    val key: SimpleKey[Self, V, El] with Self
+  ) extends AnyVal {
+
+    // #Note: Aside from the general utility, we need this
+    //  implicit-supporting version of the `<--` operator
+    //  to handle Scala 2 union types.
+    // #Note: We can't make this the ONLY implementation of <--,
+    //  or even move it into class body, because it breaks
+    //  type inference for Scala 3 string literal types –
+    //  see StringLiteralTypeWideningSpec.scala
+    def <--[ThisV](
+      values: Source[ThisV]
+    )(implicit
+      ev: ThisV => V
+    ): SimpleKeyUpdater[Self, ThisV, El] =
+      new SimpleKeyUpdater[Self, ThisV, El](
+        key = key,
+        values = values.toObservable,
+        update = (el, value) => key.set(el, ev(value))
+          // #nc do we need to handle nulls in `value`? `ev` probably can't handle them...
+          // key.set(
+          //   el,
+          //   value = if (value == null) null else ev(value.asInstanceOf[ThisV]) // #Safe separation of null
+          // )
+      )
+  }
 }

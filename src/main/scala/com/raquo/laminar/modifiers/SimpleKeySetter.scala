@@ -95,6 +95,7 @@ object SimpleKeySetter {
   )(
     setOrRemoveF: (El, K, V | Null) => Unit
   ): SimpleKeySetter[K, V, El] = {
+    // #nc remove `key`? unify `set` & `remove`?
     new SimpleKeySetter[K, V, El](
       key,
       value,
