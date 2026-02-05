@@ -54,30 +54,18 @@ lazy val websiteJS = project
   .settings(
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % Versions.ScalaJsDom,
     (publish / skip) := true,
-    webpackBundlingMode := BundlingMode.LibraryOnly(),
-    (installJsdom / version) := Versions.JsDom,
-    (webpack / version) := Versions.Webpack,
-    (startWebpackDevServer / version) := Versions.WebpackDevServer,
-    //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
     scalaJSLinkerConfig ~= {
-      _.withModuleKind(ModuleKind.CommonJSModule)
-    },
-    scalaJSLinkerConfig ~= {
-      _.withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
+      _.withModuleKind(ModuleKind.ESModule)
+        .withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
     },
     scalaJSUseMainModuleInitializer := true,
-    (Compile / npmDependencies) ++= Seq(
-      "@material/mwc-button" -> "0.18.0",
-      "@material/mwc-linear-progress" -> "0.18.0",
-      "@material/mwc-slider" -> "0.18.0"
-    ),
     scalacOptions ~= { options: Seq[String] =>
       options.filterNot { o =>
         o.startsWith("-Wvalue-discard") || o.startsWith("-Ywarn-value-discard") || o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
       }
     },
   )
-  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSPlugin)
   .dependsOn(laminar)
 
 lazy val website = project
@@ -85,11 +73,12 @@ lazy val website = project
   .settings(
     mdocIn := file("website/docs"),
     mdocJS := Some(websiteJS),
-    mdocJSLibraries := (websiteJS / Compile / fullOptJS / webpack).value,
+    mdocJSLibraries := Seq(Attributed.blank(file("websiteJS/dist/websitejs-library.js"))),
     (publish / skip) := true,
     mdocVariables := Map(
       "js-mount-node" -> "containerNode",
-      "js-batch-mode" -> "true"
+      "js-batch-mode" -> "true",
+      "js-opt" -> "fast" // Use fastOpt to avoid Closure Compiler (doesn't work with ESModule, mdoc might want to read ClosureCompiler settings as well)
       //  // Use these as @VERSION@ in mdoc-processed .md files
       //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
       //  "SCALA_VERSION" -> scalaVersion.value
