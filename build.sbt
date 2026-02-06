@@ -1,4 +1,5 @@
 import com.raquo.buildkit.SourceDownloader
+import sbtdynver.*
 
 import VersionHelper.{versionFmt, fallbackVersion}
 
@@ -52,32 +53,20 @@ SettingKey[Seq[File]]("ide-excluded-directories").withRank(KeyRanks.Invisible) :
 lazy val websiteJS = project
   .in(file("websiteJS"))
   .settings(
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % Versions.ScalaJsDom,
+    libraryDependencies += "org.scala-js" %% "scalajs-dom" % Versions.ScalaJsDom,
     (publish / skip) := true,
-    webpackBundlingMode := BundlingMode.LibraryOnly(),
-    (installJsdom / version) := Versions.JsDom,
-    (webpack / version) := Versions.Webpack,
-    (startWebpackDevServer / version) := Versions.WebpackDevServer,
-    //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
     scalaJSLinkerConfig ~= {
-      _.withModuleKind(ModuleKind.CommonJSModule)
-    },
-    scalaJSLinkerConfig ~= {
-      _.withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
+      _.withModuleKind(ModuleKind.ESModule)
+        .withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
     },
     scalaJSUseMainModuleInitializer := true,
-    (Compile / npmDependencies) ++= Seq(
-      "@material/mwc-button" -> "0.18.0",
-      "@material/mwc-linear-progress" -> "0.18.0",
-      "@material/mwc-slider" -> "0.18.0"
-    ),
-    scalacOptions ~= { options: Seq[String] =>
+    scalacOptions ~= { (options: Seq[String]) =>
       options.filterNot { o =>
         o.startsWith("-Wvalue-discard") || o.startsWith("-Ywarn-value-discard") || o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
       }
     },
   )
-  .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
+  .enablePlugins(ScalaJSPlugin)
   .dependsOn(laminar)
 
 lazy val website = project
@@ -85,11 +74,12 @@ lazy val website = project
   .settings(
     mdocIn := file("website/docs"),
     mdocJS := Some(websiteJS),
-    mdocJSLibraries := (websiteJS / Compile / fullOptJS / webpack).value,
+    mdocJSLibraries := Seq(Attributed.blank(file("websiteJS/dist/websitejs-library.js"))),
     (publish / skip) := true,
     mdocVariables := Map(
       "js-mount-node" -> "containerNode",
-      "js-batch-mode" -> "true"
+      "js-batch-mode" -> "true",
+      "js-opt" -> "fast" // Use fastOpt to avoid Closure Compiler (doesn't work with ESModule, mdoc might want to read ClosureCompiler settings as well)
       //  // Use these as @VERSION@ in mdoc-processed .md files
       //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
       //  "SCALA_VERSION" -> scalaVersion.value
@@ -100,11 +90,11 @@ lazy val laminar = project.in(file("."))
   .enablePlugins(ScalaJSPlugin)
   .settings(
     libraryDependencies ++= Seq(
-      "com.raquo" %%% "airstream" % Versions.Airstream,
+      "com.raquo" %% "airstream" % Versions.Airstream,
       // "com.raquo" %%% "domtypes" % Versions.ScalaDomTypes, #Note this is a compile-time dependency. See `project/build.sbt`
-      "com.raquo" %%% "ew" % Versions.Ew,
-      "com.raquo" %%% "domtestutils" % Versions.ScalaDomTestUtils % Test,
-      "org.scalatest" %%% "scalatest" % Versions.ScalaTest % Test,
+      "com.raquo" %% "ew" % Versions.Ew,
+      "com.raquo" %% "domtestutils" % Versions.ScalaDomTestUtils % Test,
+      "org.scalatest" %% "scalatest" % Versions.ScalaTest % Test,
     ),
 
     scalacOptions ++= Seq(
@@ -112,7 +102,7 @@ lazy val laminar = project.in(file("."))
       "-language:implicitConversions,higherKinds,existentials",
     ),
 
-    scalacOptions ~= { options: Seq[String] =>
+    scalacOptions ~= { (options: Seq[String]) =>
       options.filterNot(Set(
         "-Ywarn-value-discard",
         "-Wvalue-discard"
@@ -129,7 +119,7 @@ lazy val laminar = project.in(file("."))
 
     //  We do have the stub defined in Airstream, but it throws deprecation errors in Laminar for some reason as if
     //  the unused value is in fact used, but that doesn't seem right.
-    (Test / scalacOptions) ~= { options: Seq[String] =>
+    (Test / scalacOptions) ~= { (options: Seq[String]) =>
       options.filterNot { o =>
         o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
       }
@@ -157,7 +147,7 @@ lazy val laminar = project.in(file("."))
 
     scalaJSUseMainModuleInitializer := true,
 
-    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
+    jsEnv := Def.uncached(new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv()),
   )
   .settings(
     name := "Laminar",

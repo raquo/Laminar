@@ -25,3 +25,4 @@ website/build
 website/i18n/*
 
 websiteJS/package-lock.json
+websiteJS/dist/
