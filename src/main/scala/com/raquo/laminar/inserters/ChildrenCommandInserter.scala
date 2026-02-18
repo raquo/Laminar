@@ -14,7 +14,7 @@ import scala.scalajs.js.|
   * It's good for simple operations on voluminous data, like prepending new
   * log items to a big list, but not much else.
   *
-  * Consider using `children <-- observable.split(...)` instead, it has
+  * Consider using `children <-- observable.splitSeq(...)` instead, it has
   * great performance and is much more convenient.
   */
 object ChildrenCommandInserter {

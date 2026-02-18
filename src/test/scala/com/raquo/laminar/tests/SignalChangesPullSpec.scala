@@ -17,7 +17,7 @@ class SignalChangesPullSpec extends UnitSpec {
   def _changes(v: Var[Int]): EventStream[Int] = {
     v
       .signal.setDisplayName("VarSignal")
-      .changes.setDisplayName("VarSignal.changes")
+      .updates.setDisplayName("VarSignal.changes")
   }
 
   def _isPositive(changes: EventStream[Int], log: mutable.Buffer[String]): EventStream[Boolean] = {

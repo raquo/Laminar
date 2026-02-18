@@ -148,9 +148,7 @@ class ChildReceiverSpec extends UnitSpec {
 
     def MaybeBlogUrl(maybeUrlSignal: Signal[Option[String]]): Signal[HtmlElement] = {
       val noBlog = i("no blog")
-      maybeUrlSignal
-        .split(_ => ())((_, _, urlSignal) => renderBlogLink(urlSignal))
-        .map(_.getOrElse(noBlog))
+      maybeUrlSignal.splitOption(renderBlogLink).someOrElse(noBlog)
     }
 
     val numVar = Var[Option[Int]](Some(1))

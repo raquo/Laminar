@@ -168,7 +168,7 @@ class MountHooksSpec extends UnitSpec {
     var numMountCalls = 0
 
     val signal = nameVar.signal
-    val stream = signal.changes
+    val stream = signal.updates
 
     val el = div(
       "Hello ",

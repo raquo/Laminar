@@ -29,9 +29,9 @@ class SplitVarSpec extends UnitSpec {
     }
 
     mount(div(
-      children <-- foosVar.split(_.id)((id, initial, fooVar) => {
+      children <-- foosVar.splitSeq(_.id) { case fooVar varWithKey id =>
         fooVar.setDisplayName(s"fooVar-${id}")
-        effects += s"create-${initial.toString}"
+        effects += s"create-${fooVar.now().toString}"
         fooVars.update(id, fooVar)
         div(
           idAttr("item-" + id.toString),
@@ -39,7 +39,7 @@ class SplitVarSpec extends UnitSpec {
           text <-- fooVar.signal.map(f => f.name + "." + f.version),
           onClick --> fooVar.update(f => f.copy(version = f.version + 1))
         )
-      })
+      }
     ))
 
     expectNode(div of (
@@ -254,14 +254,14 @@ class SplitVarSpec extends UnitSpec {
     val foosVar = Var[List[Foo]](Nil).setDisplayName("foosVar")
 
     mount(div(
-      children <-- foosVar.split(_.id)((id, initial, fooVar) => {
+      children <-- foosVar.splitSeq(_.id) { case fooVar varWithKey id =>
         fooVar.setDisplayName(s"fooVar-${id}")
-        effects += s"create-${initial.toString}"
+        effects += s"create-${fooVar.now().toString}"
         fooVars.update(id, fooVar)
         div(
           idAttr("item-" + id.toString),
         )
-      })
+      }
     ))
 
     expectNode(div of (
@@ -324,9 +324,9 @@ class SplitVarSpec extends UnitSpec {
     }
 
     mount(div(
-      children <-- foosVar.split(_.id)((id, initial, fooVar) => {
+      children <-- foosVar.splitSeq(_.id) { case varWithKey(fooVar, id) =>
         fooVar.setDisplayName(s"fooVar-${id}")
-        effects += s"create-${initial.toString}"
+        effects += s"create-${fooVar.now().toString}"
         fooVars.update(id, fooVar)
         div(
           idAttr("item-" + id.toString),
@@ -334,7 +334,7 @@ class SplitVarSpec extends UnitSpec {
           text <-- fooVar.signal.map(f => f.name + "." + f.version),
           onClick --> fooVar.update(f => f.copy(version = f.version + 1))
         )
-      })
+      }
     ))
 
     expectNode(div of (
@@ -413,9 +413,9 @@ class SplitVarSpec extends UnitSpec {
     }
 
     mount(div(
-      children <-- foosVar.splitMutate(_.id)((id, initial, fooVar) => {
+      children <-- foosVar.splitSeqMutate(_.id) { case varWithKey(fooVar, id) =>
         fooVar.setDisplayName(s"fooVar-${id}")
-        effects += s"create-${initial.toString}"
+        effects += s"create-${fooVar.now().toString}"
         fooVars.update(id, fooVar)
         div(
           idAttr("item-" + id.toString),
@@ -423,7 +423,7 @@ class SplitVarSpec extends UnitSpec {
           text <-- fooVar.signal.map(f => f.name + "." + f.version),
           onClick --> fooVar.update(f => f.copy(version = f.version + 1))
         )
-      }).tapEach(_ => effects += "result-event")
+      }.tapEach(_ => effects += "result-event")
     ))
 
     expectNode(div of (
@@ -510,9 +510,9 @@ class SplitVarSpec extends UnitSpec {
     }
 
     mount(div(
-      children <-- foosVar.splitByIndex((index, initial, fooVar) => {
+      children <-- foosVar.splitSeqByIndex { case fooVar varWithKey index =>
         fooVar.setDisplayName(s"fooVar-${index}")
-        effects += s"create-${initial.toString}"
+        effects += s"create-${fooVar.now().toString}"
         fooVars.update(index, fooVar)
         div(
           idAttr("item-" + index.toString),
@@ -520,7 +520,7 @@ class SplitVarSpec extends UnitSpec {
           text <-- fooVar.signal.map(f => f.name + "." + f.version),
           onClick --> fooVar.update(f => f.copy(version = f.version + 1))
         )
-      })
+      }
     ))
 
     expectNode(div of (
@@ -749,10 +749,10 @@ class SplitVarSpec extends UnitSpec {
     }
 
     mount(div(
-      child <-- maybeFooVar.splitOption(
-        (initial, fooVar) => {
+      child <-- maybeFooVar
+        .splitOption { fooVar =>
           fooVar.setDisplayName(s"some")
-          effects += s"create-${initial.toString}"
+          effects += s"create-${fooVar.now().toString}"
           childVar = Some(fooVar)
           div(
             idAttr("some-child"),
@@ -760,9 +760,10 @@ class SplitVarSpec extends UnitSpec {
             text <-- fooVar.signal.map(f => f.name + "." + f.version),
             onClick --> fooVar.update(f => f.copy(version = f.version + 1))
           )
-        },
-        ifEmpty = div("empty")
-      )
+        }
+        .someOrElse(
+          div("empty")
+        )
     ))
 
     expectNode(div of (

@@ -6,7 +6,7 @@ object Versions {
 
   // -- Dependencies --
 
-  val Airstream = "18.0.0-M1"
+  val Airstream = "18.0.0-M2-SNAPSHOT"
 
   val Ew = "0.3.0"
 

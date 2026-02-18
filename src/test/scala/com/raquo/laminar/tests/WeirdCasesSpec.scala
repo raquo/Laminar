@@ -373,7 +373,7 @@ class WeirdCasesSpec extends UnitSpec {
     val signal = nameVar.signal
 
     // make a "copy" of each element, we can't put the same element twice into the dom
-    val copyStream = signal.changes.map(_.map(el => span(el.ref.textContent)))
+    val copyStream = signal.updates.map(_.map(el => span(el.ref.textContent)))
 
     val el = div(
       "Hello ",

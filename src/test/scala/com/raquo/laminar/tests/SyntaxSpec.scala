@@ -295,7 +295,7 @@ class SyntaxSpec extends UnitSpec {
     val bus = new EventBus[Int]
     val state = Var(5)
     val signal = state.signal
-    val stream = signal.changes
+    val stream = signal.updates
     val observable: Observable[Int] = stream
 
     el.amend(
@@ -343,7 +343,7 @@ class SyntaxSpec extends UnitSpec {
     val bus = new EventBus[Int]
     val state = Var(5)
     val signal = state.signal
-    val stream = signal.changes
+    val stream = signal.updates
     val observable: Observable[Int] = stream
 
     // @TODO[API] Can we have type inference for this [Int]?

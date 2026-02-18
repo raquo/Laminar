@@ -66,6 +66,16 @@ trait AirstreamAliases {
 
   val DynamicSubscription: airstream.ownership.DynamicSubscription.type = airstream.ownership.DynamicSubscription
 
+  // -- Split
+
+  type KeyedStrictSignal[+K, +A] = airstream.split.KeyedStrictSignal[K, A]
+
+  type KeyedDerivedVar[K, ParentV, ThisV] = airstream.split.KeyedDerivedVar[K, ParentV, ThisV]
+
+  lazy val withKey: airstream.split.KeyedStrictSignal.withKey.type = airstream.split.KeyedStrictSignal.withKey
+
+  lazy val varWithKey: airstream.split.KeyedDerivedVar.varWithKey.type = airstream.split.KeyedDerivedVar.varWithKey
+
   // -- Special streams
 
   lazy val AjaxStream: airstream.web.AjaxStream.type = airstream.web.AjaxStream

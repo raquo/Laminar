@@ -300,10 +300,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     var ix = 0
 
     // #Note: `identity` instead of the `_.distinct` default
-    val splitSignal = bus.events.split(_.id, distinctCompose = identity)((id, initialFoo, fooSignal) => {
+    val splitSignal = bus.events.splitSeq(_.id, distinctOp = identity)(fooSignal => {
+      val id = fooSignal.key
       ix += 1
       val thisIx = ix
-      effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
+      effects += Effect(s"render-$id-$thisIx", fooSignal.now().toString)
       div(
         "ID: " + id,
         span(
@@ -483,10 +484,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     var ix = 0
 
     // #Note: `identity` instead of the `_.distinct` default
-    val splitSignal = modelsVar.signal.split(_.id, distinctCompose = identity)((id, initialFoo, fooSignal) => {
+    val splitSignal = modelsVar.signal.splitSeq(_.id, distinctOp = identity) { fooSignal =>
+      val id = fooSignal.key
       ix += 1
       val thisIx = ix
-      effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
+      effects += Effect(s"render-$id-$thisIx", fooSignal.now().toString)
       div(
         "ID: " + id,
         // onMountUnmountCallback(_ => println(s"[] mounted ${id}-${thisI}"), _ => println(s"[] unmounted ${id}-${thisI}")),
@@ -503,7 +505,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
             .map(_.version)
         )
       )
-    }).debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
+    }.debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
 
     // --
 
@@ -671,10 +673,11 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
     var ix = 0
 
     // #Note: Using `distinct` default now
-    val splitSignal = modelsVar.signal.split(_.id)((id, initialFoo, fooSignal) => {
+    val splitSignal = modelsVar.signal.splitSeq(_.id) { fooSignal =>
+      val id = fooSignal.key
       ix += 1
       val thisIx = ix
-      effects += Effect(s"render-$id-$thisIx", initialFoo.toString)
+      effects += Effect(s"render-$id-$thisIx", fooSignal.now().toString)
       div(
         "ID: " + id,
         span(
@@ -690,7 +693,7 @@ class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
             .map(_.version)
         )
       )
-    }).debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
+    }.debugSpyEvents(els => effects += Effect("splitSignal", els.map(_.ref.outerHTML).toString))
 
     // --
 

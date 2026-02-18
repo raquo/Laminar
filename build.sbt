@@ -109,6 +109,7 @@ lazy val laminar = project.in(file("."))
 
     scalacOptions ++= Seq(
       "-feature",
+      "-deprecation",
       "-language:implicitConversions,higherKinds,existentials",
     ),
 
