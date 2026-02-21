@@ -163,6 +163,28 @@ with ParentNode[Ref] {
     eventBus.events
   }
 
+  /** Select the entier contents of this element, the way browser selects text.
+    *  - For input and textarea elements, this also focuses the element.
+    *
+    * See also: [[com.raquo.laminar.api.L.onMountSelect]]
+    */
+  def select(): Unit = {
+    if (ReactiveElement.isActive(this)) { // Text selection only makes sense if element is mounted.
+      this.ref match {
+        case input: dom.html.Input =>
+          input.select()
+        case textArea: dom.html.TextArea =>
+          textArea.select()
+        case el =>
+          val range = dom.document.createRange()
+          range.selectNodeContents(el)
+          val selection = dom.window.getSelection()
+          selection.removeAllRanges()
+          selection.addRange(range)
+      }
+    }
+  }
+
   // @TODO[Performance] Review scala.js generated code for single-element use case.
   //  - I would like to also have a `def amend(mod: Modifier[this.type])` method
   //  - but then SyntaxSpec / "amend on inlined element" test will fail. Check in Dotty later.

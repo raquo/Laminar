@@ -12,10 +12,24 @@ trait MountHooks {
 
   /** Focus this element on mount.
     *
-    * Starting with Laminar 18.x, the focus is set even if the element
-    * was already mounted by the time this modifier is added to it.
+    * Note: Starting with Laminar 18.x, the focus is set even if the element
+    *       was already mounted by the time this modifier is added to it.
     */
   val onMountFocus: Modifier[ReactiveHtmlElement.Base] = onMountCallback(_.thisNode.ref.focus())
+
+  /** Select the entier contents of this element on mount, the way browser selects text.
+    *  - For input and textarea elements, this also focuses the element.
+    */
+  val onMountSelect: Modifier[ReactiveElement.Base] = {
+    onMountCallback { ctx =>
+      // setTimeout ensures that Laminar runs this AFTER any synchronous `value <--` or `text <--`,
+      // but because of the (very small) delay, we need to check that the element is still mounted
+      // (isActive) when we try to select its contents. This is done routinely inside `select`.
+      js.timers.setTimeout(0) {
+        ctx.thisNode.select()
+      }
+    }
+  }
 
   /** Set a property / attribute / style on mount.
     * Similarly to other onMount methods, you only need this when:
