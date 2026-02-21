@@ -102,10 +102,10 @@ trait AirstreamAliases {
 
   type Pending[+In] = airstream.status.Pending[In]
 
-  @inline def Pending: airstream.status.Pending.type = airstream.status.Pending
+  lazy val Pending: airstream.status.Pending.type = airstream.status.Pending
 
   type Resolved[+In, +Out] = airstream.status.Resolved[In, Out]
 
-  @inline def Resolved: airstream.status.Resolved.type = airstream.status.Resolved
+  lazy val Resolved: airstream.status.Resolved.type = airstream.status.Resolved
 
 }

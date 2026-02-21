@@ -368,14 +368,14 @@ class EventProcessor[Ev <: dom.Event, V](
     * button(onClick.flatMapWithStatus(AjaxStream.get(...)) --> observer
     * }}}
     */
-  def flatMapWithStatus[Out](
-    innerStream: => EventStream[Out]
-  ): LockedEventKey[Ev, V, Status[V, Out]] = {
-    new LockedEventKey[Ev, V, Status[V, Out]](
-      this,
-      eventStream => eventStream.flatMapWithStatus(innerStream)
-    )
-  }
+  // def flatMapWithStatus[Out](
+  //   innerStream: => EventStream[Out]
+  // ): LockedEventKey[Ev, V, Status[V, Out]] = {
+  //   new LockedEventKey[Ev, V, Status[V, Out]](
+  //     this,
+  //     eventStream => eventStream.flatMapWithStatus(innerStream)
+  //   )
+  // }
 
   /** Evaluate `f` if the value was filtered out up the chain. For example:
     *
