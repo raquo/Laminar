@@ -1,10 +1,12 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription}
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inserters.{DynamicInserter, InsertContext, Inserter, StaticInserter}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{Binder, Modifier, Setter}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
+import org.scalajs.dom
 
 import scala.scalajs.js
 
@@ -245,6 +247,43 @@ trait MountHooks {
           cleanup = () => {
             unmount(element, state)
             state = None
+          }
+        )
+      }
+    }
+  }
+
+  /** Print message when this element is mounted or unmounted.
+    *
+    * If you add this modifier to an already mounted element, it will log
+    * "already-mounted" instead of "mount" to distinguish this case.
+    *
+    * Note: Since Laminar v18, other onMount* modifiers default to `ignoreAlreadyMounted = false`.
+    *
+    * @param label
+    *   If not provided, default node description including IDs and classes will be used.
+    */
+  def debugLogLifecycle(label: String = ""): Modifier.Base = {
+    def debugNodeDescription(el: ReactiveElement.Base): String = {
+      if (label.nonEmpty)
+        label
+      else
+        DomApi.debugNodeDescription(el.ref)
+    }
+    Modifier { element =>
+      val alreadyMounted = ReactiveElement.isActive(element)
+      var mountIx = 0
+      ReactiveElement.bindSubscriptionUnsafe(element) { c =>
+        mountIx += 1
+        if (alreadyMounted) {
+          dom.console.log(s"${debugNodeDescription(element)}: [already-mounted #$mountIx]")
+        } else {
+          dom.console.log(s"${debugNodeDescription(element)}: [mount #$mountIx]")
+        }
+        new Subscription(
+          c.owner,
+          cleanup = () => {
+            dom.console.log(s"${debugNodeDescription(element)}: [unmount #$mountIx]")
           }
         )
       }
