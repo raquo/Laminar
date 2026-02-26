@@ -43,6 +43,32 @@ lazy val `bench-v18` = project
 // Micro benchmarks: 4 tiny files each, isolating one pattern
 // ---------------------------------------------------------------------------
 
+lazy val `bench-v18-A` = project
+  .in(file("bench-v18-A"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(commonSettings)
+  .settings(
+    name := "bench-v18-A",
+    libraryDependencies ++= Seq(
+      "com.raquo" %%% "laminar" % "18.0.0-bench-A",
+    ),
+  )
+
+lazy val `bench-v18-B` = project
+  .in(file("bench-v18-B"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(commonSettings)
+  .settings(
+    name := "bench-v18-B",
+    libraryDependencies ++= Seq(
+      "com.raquo" %%% "laminar" % "18.0.0-bench-B",
+    ),
+  )
+
+// ---------------------------------------------------------------------------
+// Micro benchmarks: 4 tiny files each, isolating one pattern
+// ---------------------------------------------------------------------------
+
 lazy val `micro-v17` = project
   .in(file("micro-v17"))
   .enablePlugins(ScalaJSPlugin)
