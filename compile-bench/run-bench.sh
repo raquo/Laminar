@@ -95,16 +95,16 @@ echo "[6/6] Final compile with -Vprofile..."
 mkdir -p profiles
 
 $SBT "bench-v17/clean" >/dev/null 2>&1
-$SBT 'set bench-v17/scalacOptions += "-Vprofile"' "bench-v17/compile" 2>&1 | tee profiles/v17-profile.txt | tail -3
+$SBT 'set `bench-v17`/scalacOptions += "-Vprofile"' "bench-v17/compile" 2>&1 | tee profiles/v17-profile.txt | tail -3
 
 $SBT "bench-v18/clean" >/dev/null 2>&1
-$SBT 'set bench-v18/scalacOptions += "-Vprofile"' "bench-v18/compile" 2>&1 | tee profiles/v18-profile.txt | tail -3
+$SBT 'set `bench-v18`/scalacOptions += "-Vprofile"' "bench-v18/compile" 2>&1 | tee profiles/v18-profile.txt | tail -3
 
 $SBT "micro-v17/clean" >/dev/null 2>&1
-$SBT 'set micro-v17/scalacOptions += "-Vprofile"' "micro-v17/compile" 2>&1 | tee profiles/micro-v17-profile.txt | tail -3
+$SBT 'set `micro-v17`/scalacOptions += "-Vprofile"' "micro-v17/compile" 2>&1 | tee profiles/micro-v17-profile.txt | tail -3
 
 $SBT "micro-v18/clean" >/dev/null 2>&1
-$SBT 'set micro-v18/scalacOptions += "-Vprofile"' "micro-v18/compile" 2>&1 | tee profiles/micro-v18-profile.txt | tail -3
+$SBT 'set `micro-v18`/scalacOptions += "-Vprofile"' "micro-v18/compile" 2>&1 | tee profiles/micro-v18-profile.txt | tail -3
 
 echo ""
 
