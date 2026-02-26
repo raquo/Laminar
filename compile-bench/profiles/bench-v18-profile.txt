@@ -1,0 +1,66 @@
+[info] welcome to sbt 1.10.7 (Homebrew Java 25.0.2)
+[info] loading settings for project compile-bench-build from plugins.sbt...
+[info] loading project definition from /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/project
+[info] loading settings for project compile-bench from build.sbt...
+[info] set current project to compile-bench (in build file:/Users/tunguyen/Documents/GitHub/Laminar/compile-bench/)
+[info] Defining bench-v18 / scalacOptions
+[info] The new value will be used by bench-v18 / Compile / scalacOptions
+[info] Reapplying settings...
+[info] set current project to compile-bench (in build file:/Users/tunguyen/Documents/GitHub/Laminar/compile-bench/)
+[info] compiling 51 Scala sources to /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/target/scala-3.3.7/classes ...
+[info] Sourcefile               Lines   Tokens   Tasty  Complexity/Line    Directory
+[info] HeavyCombine_05.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_06.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_03.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_09.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_04.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_01.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_07.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_08.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_10.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] HeavyCombine_02.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_09.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_02.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_05.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_10.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_08.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_07.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_04.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_01.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_06.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] StyleHeavy_03.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_08.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_02.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_03.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_10.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_01.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_06.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_07.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_09.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_04.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] ReactiveDSL_05.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_07.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_06.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_10.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_03.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_02.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_08.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_05.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_04.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_01.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] SplitPattern_09.scala      118     1435     323   2.74  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_05.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_04.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_03.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_06.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_10.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_01.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_08.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_02.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_07.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] MixedComponent_09.scala    215     1742     325   1.51  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] Model.scala                 26      428     851  32.73  extreme     /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18/src/main/scala/bench
+[info] -----------------------------------------------------------------
+[info] Total                     6736    64218   12917   1.92  moderate    
+[info] done compiling
+[success] Total time: 37 s, completed Feb 26, 2026, 5:41:39 PM

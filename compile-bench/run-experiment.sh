@@ -11,7 +11,7 @@ ITERATIONS=${1:-3}
 SBT="sbt -batch -no-colors"
 
 # Collect project names to benchmark
-PROJECTS=("bench-v17" "bench-v18" "bench-v18-A" "bench-v18-B")
+PROJECTS=("bench-v17" "bench-v18" "bench-v18-A" "bench-v18-C")
 
 echo "=============================================="
 echo " Experiment: Compile-Time Benchmark"

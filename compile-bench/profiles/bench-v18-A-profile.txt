@@ -1,0 +1,307 @@
+[info] welcome to sbt 1.10.7 (Homebrew Java 25.0.2)
+[info] loading settings for project compile-bench-build from plugins.sbt...
+[info] loading project definition from /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/project
+[info] loading settings for project compile-bench from build.sbt...
+[info] set current project to compile-bench (in build file:/Users/tunguyen/Documents/GitHub/Laminar/compile-bench/)
+[info] Defining bench-v18-A / scalacOptions
+[info] The new value will be used by bench-v18-A / Compile / scalacOptions
+[info] Reapplying settings...
+[info] set current project to compile-bench (in build file:/Users/tunguyen/Documents/GitHub/Laminar/compile-bench/)
+[info] compiling 51 Scala sources to /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/target/scala-3.3.7/classes ...
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_01.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_01.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_02.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_02.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_03.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_03.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_04.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_04.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_05.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_05.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_06.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_06.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_07.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_07.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_08.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_08.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_09.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_09.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/MixedComponent_10.scala:102:33 
+[warn] 102 |      children <-- sortedDocs_10.split(_.id) { (id, initial, docSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_01.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_01.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_01.scala:83:35 
+[warn] 83 |      children <-- pages_01.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_01.scala:98:35 
+[warn] 98 |      children <-- texts_01.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_01.scala:116:30 
+[warn] 116 |      children <-- grouped_01.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_01.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_02.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_02.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_02.scala:83:35 
+[warn] 83 |      children <-- pages_02.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_02.scala:98:35 
+[warn] 98 |      children <-- texts_02.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_02.scala:116:30 
+[warn] 116 |      children <-- grouped_02.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_02.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_03.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_03.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_03.scala:83:35 
+[warn] 83 |      children <-- pages_03.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_03.scala:98:35 
+[warn] 98 |      children <-- texts_03.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_03.scala:116:30 
+[warn] 116 |      children <-- grouped_03.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_03.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_04.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_04.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_04.scala:83:35 
+[warn] 83 |      children <-- pages_04.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_04.scala:98:35 
+[warn] 98 |      children <-- texts_04.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_04.scala:116:30 
+[warn] 116 |      children <-- grouped_04.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_04.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_05.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_05.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_05.scala:83:35 
+[warn] 83 |      children <-- pages_05.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_05.scala:98:35 
+[warn] 98 |      children <-- texts_05.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_05.scala:116:30 
+[warn] 116 |      children <-- grouped_05.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_05.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_06.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_06.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_06.scala:83:35 
+[warn] 83 |      children <-- pages_06.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_06.scala:98:35 
+[warn] 98 |      children <-- texts_06.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_06.scala:116:30 
+[warn] 116 |      children <-- grouped_06.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_06.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_07.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_07.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_07.scala:83:35 
+[warn] 83 |      children <-- pages_07.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_07.scala:98:35 
+[warn] 98 |      children <-- texts_07.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_07.scala:116:30 
+[warn] 116 |      children <-- grouped_07.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_07.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_08.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_08.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_08.scala:83:35 
+[warn] 83 |      children <-- pages_08.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_08.scala:98:35 
+[warn] 98 |      children <-- texts_08.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_08.scala:116:30 
+[warn] 116 |      children <-- grouped_08.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_08.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_09.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_09.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_09.scala:83:35 
+[warn] 83 |      children <-- pages_09.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_09.scala:98:35 
+[warn] 98 |      children <-- texts_09.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_09.scala:116:30 
+[warn] 116 |      children <-- grouped_09.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_09.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_10.scala:73:36 
+[warn] 73 |      children <-- sortedObjects_10.split(_.id) { (id, initial, objSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_10.scala:83:35 
+[warn] 83 |      children <-- pages_10.signal.split(_.id) { (id, initial, pageSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_10.scala:98:35 
+[warn] 98 |      children <-- texts_10.signal.split(_.id) { (id, initial, textSignal) =>
+[warn]    |                   ^^^^^^^^^^^^^^^^^^^^^
+[warn]    |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_10.scala:116:30 
+[warn] 116 |      children <-- grouped_10.split(_._1) { (groupName, initial, groupSignal) =>
+[warn]     |                   ^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[warn] -- Deprecation Warning: /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench/SplitPattern_10.scala:122:47 
+[warn] 122 |            children <-- groupSignal.map(_._2).split(_.id) { (id, initial, objSignal) =>
+[warn]     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[warn]     |method split in class SplittableSeqObservable is deprecated since 18.0.0-M3: Instead of `.split(...) { (key, initial, signal) => ... }`, use `.splitSeq(...)(strictSignal => ...)` – you can now read `.key` and `.now()` from `strictSignal`, but note that `.now()` updates over time, unlike `initial` before.
+[info] Sourcefile               Lines   Tokens   Tasty  Complexity/Line    Directory
+[info] HeavyCombine_01.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_09.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_05.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_07.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_02.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_08.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_03.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_04.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_10.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] HeavyCombine_06.scala       51      987     159   3.12  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_01.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_06.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_07.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_03.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_04.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_10.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_05.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_09.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_02.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] StyleHeavy_08.scala        167     1112     182   1.09  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_09.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_07.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_04.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_02.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_10.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_03.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_08.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_01.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_05.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] ReactiveDSL_06.scala       120     1103     220   1.83  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_06.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_03.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_05.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_02.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_09.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_01.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_07.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_08.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_04.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] SplitPattern_10.scala      118     1435     325   2.75  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_05.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_02.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_03.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_08.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_09.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_04.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_07.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_10.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_01.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] MixedComponent_06.scala    215     1742     327   1.52  moderate    /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] Model.scala                 26      428     851  32.73  extreme     /Users/tunguyen/Documents/GitHub/Laminar/compile-bench/bench-v18-A/src/main/scala/bench
+[info] -----------------------------------------------------------------
+[info] Total                     6736    64218   12953   1.92  moderate    
+[warn] 60 warnings found
+[info] done compiling
+[success] Total time: 10 s, completed Feb 26, 2026, 5:41:54 PM
