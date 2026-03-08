@@ -10,6 +10,12 @@ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.5.4")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
 
+addSbtPlugin("com.raquo" % "sbt-buildkit" % "0.2.0-M1")
+
+addSbtPlugin("com.raquo" % "sbt-buildkit-scalajs" % "0.2.0-M1")
+
+addSbtPlugin("com.raquo" % "sbt-buildkit-dynver" % "0.2.0-M1")
+
 // #TODO Removed pending https://github.com/typelevel/sbt-tpolecat/issues/102
 // addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.4.11")
 

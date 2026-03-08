@@ -1,49 +1,28 @@
-import com.raquo.buildkit.SourceDownloader
+import com.raquo.buildkit.sbt.BuildKitOnLoadPlugin.autoImport.buildKitOnLoadActions
 
-import VersionHelper.{versionFmt, fallbackVersion}
+ThisBuild / version := buildKitDynVer.version.value // Auto-increment version for local development
 
-// Replace default sbt-dynver version with a simpler one for easier local development
-// ThisBuild / version ~= (_.replaceFirst("(\\+[a-z0-9-+]*-SNAPSHOT)", "-NEXT-SNAPSHOT"))
-
-// Makes sure to increment the version for local development
-ThisBuild / version := dynverGitDescribeOutput.value
-  .mkVersion(out => versionFmt(out, dynverSonatypeSnapshots.value), fallbackVersion(dynverCurrentDate.value))
-
-ThisBuild / dynver := {
-  val d = new java.util.Date
-  sbtdynver.DynVer
-    .getGitDescribeOutput(d)
-    .mkVersion(out => versionFmt(out, dynverSonatypeSnapshots.value), fallbackVersion(d))
-}
+ThisBuild / dynver := buildKitDynVer.dynver.value // Auto-increment version for local development
 
 ThisBuild / scalaVersion := Versions.Scala_3
 
 ThisBuild / crossScalaVersions := Seq(Versions.Scala_2_13, Versions.Scala_3)
 
-lazy val preload = taskKey[Unit]("runs Laminar-specific pre-load tasks")
+ThisBuild / buildKitDownloads := Seq(
+  _.fromGithubTag(
+    repo = "raquo/scalafmt-config",
+    filePath = ".scalafmt.shared.conf",
+    tag = "v0.1.0"
+  ).withDoNotEditComment(_.`#`)
+)
 
-preload := {
-  val projectDir = (ThisBuild / baseDirectory).value
-
+Global / buildKitOnLoadActions += { (_: Extracted) =>
   DomDefsGenerator.cachedGenerate()
-
-  SourceDownloader.downloadVersionedFile(
-    name = "scalafmt-shared-conf",
-    version = "v0.1.0",
-    urlPattern = version => s"https://raw.githubusercontent.com/raquo/scalafmt-config/refs/tags/$version/.scalafmt.shared.conf",
-    versionFile = projectDir / ".downloads" / ".scalafmt.shared.conf.version",
-    outputFile = projectDir / ".downloads" / ".scalafmt.shared.conf",
-    processOutput = "#\n# DO NOT EDIT. See SourceDownloader in build.sbt\n" + _
-  )
-}
-
-Global / onLoad := {
-  (Global / onLoad).value andThen { state => preload.key.label :: state }
 }
 
 // https://github.com/JetBrains/sbt-ide-settings
 SettingKey[Seq[File]]("ide-excluded-directories").withRank(KeyRanks.Invisible) := Seq(
-  ".downloads", ".idea", ".metals", ".bloop", ".bsp",
+  ".buildkit", ".idea", ".metals", ".bloop", ".bsp",
   "target", "project/target", "project/project/target", "project/project/project/target",
   "node_modules",
   "website/build", "website/target", "websiteJS/target"
@@ -58,7 +37,7 @@ lazy val websiteJS = project
     (installJsdom / version) := Versions.JsDom,
     (webpack / version) := Versions.Webpack,
     (startWebpackDevServer / version) := Versions.WebpackDevServer,
-    //webpackBundlingMode := BundlingMode.LibraryAndApplication(),
+    // webpackBundlingMode := BundlingMode.LibraryAndApplication(),
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.CommonJSModule)
     },
@@ -120,13 +99,7 @@ lazy val laminar = project.in(file("."))
       ))
     },
 
-    scalacOptions ++= sys.env.get("CI").map { _ =>
-      val localSourcesPath = (LocalRootProject / baseDirectory).value.toURI
-      val remoteSourcesPath = s"https://raw.githubusercontent.com/raquo/Laminar/${git.gitHeadCommit.value.get}/"
-      val sourcesOptionName = if (scalaVersion.value.startsWith("2.")) "-P:scalajs:mapSourceURI" else "-scalajs-mapSourceURI"
-
-      s"${sourcesOptionName}:$localSourcesPath->$remoteSourcesPath"
-    },
+    scalacOptions += pointScalaJsSourceMapsToGithub("raquo/Laminar").value,
 
     //  We do have the stub defined in Airstream, but it throws deprecation errors in Laminar for some reason as if
     //  the unused value is in fact used, but that doesn't seem right.

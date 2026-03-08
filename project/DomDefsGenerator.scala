@@ -24,7 +24,7 @@ object DomDefsGenerator {
   }
 
   private val cache = new CanonicalCache("project") {
-    override val fileName: String = "../.downloads/domtypes.version"
+    override val fileName: String = "../.buildkit/domtypes.version"
   }
 
   def cachedGenerate(): Unit = {
