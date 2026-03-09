@@ -1471,11 +1471,12 @@ input(
 
 There is no magic to it, these `--> methods` simply accept a `Unit` expression, which is then re-evaluated on every event (that's what `:=>` does in the function signature).
 
-Unfortunately, while this kind of API is perfectly safe in Scala 2, that is not the case in Scala 3. Specifically, in Scala 2, the expression `if (true) observer` is typed as `Any` and returns `observer`, whereas in Scala 3, it is typed as `Unit` and returns `()`. 
+Unfortunately, while this kind of API is perfectly safe in Scala 2, it isn't always so for Scala 3. Specifically, in Scala 2, the expression `if (true) observer` is typed as `Any` and returns `observer`, whereas in Scala 3, it could be discarded to match `Unit` type - it returns `()` and the connection to `observer` is lost.
 
-So, in Scala 3, code like `div(onClick --> if (bool) observer)` would compile without warnings, but will not actually call the observer, because Scala 3 does not return the `observer` from the `else`-less `if` branch. This is unfortunate for our use case, because beginners might legitimately try to write such code when what they really want is e.g. `div(onClick.filter(_ => bool) --> observer)`.
+So, in Scala 2 code like `div(onClick --> if (bool) observer)` would either not compile or run as expected with that `:=> Unit` sink sugar.
+In Scala 3 both cases could compile, but `observer` is discarded when it's not of `Unit` type, so it never receives events. Beginners might legitimately try to write such code when they really want `div(onClick.filter(_ => bool) --> observer)`.
 
-To prevent such accidents, this new unit-based API requires a special import. If you forget the import, the compiler will give you an error pointing to this section of the documentation. It's up to you to choose between extra brevity and extra safety. With IntelliJ, importing the required implicit is only one command away, so it's not much of an annoyance.
+To prevent such accidents, this unit-based API requires a special import, otherwise the compiler will point to this section of the documentation. It's up to you to choose between extra brevity and extra safety. It worth noting that compiler warns about these mistakes with c `-Wvalue-discard` flag and you're totally safe when there's also `-Xfatal-warnings`.
 
 
 ### Transforming Observers
