@@ -167,7 +167,7 @@ object DomKeysRaw {
   // #TODO[scalajsdom] SVG and MathML elements should have .style property too (but not base Element IIUC)
   type DomStylableElement = dom.html.Element | dom.svg.Element
 
-  implicit class DomStylableElementExt(val el: DomStylableElement) extends AnyVal {
+  implicit class DomStylableElementExt(private val el: DomStylableElement) extends AnyVal {
     def style: dom.CSSStyleDeclaration = el.asInstanceOf[dom.html.Element].style
   }
 }

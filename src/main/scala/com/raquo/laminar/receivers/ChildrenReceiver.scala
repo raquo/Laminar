@@ -11,7 +11,7 @@ object ChildrenReceiver {
 
   val command: ChildrenCommandReceiver.type = ChildrenCommandReceiver
 
-  implicit class RichChildrenReceiver(val self: ChildrenReceiver.type) extends AnyVal {
+  implicit class RichChildrenReceiver(private val self: ChildrenReceiver.type) extends AnyVal {
 
     // #TODO[UX] Can I remove this method, to improve error messages, get rid of "none of the overloaded alternatives" error?
     def <--(

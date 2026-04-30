@@ -19,7 +19,7 @@ object ChildReceiver {
     ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable, initialHooks = js.undefined)
   }
 
-  implicit class RichChildReceiver(val self: ChildReceiver.type) extends AnyVal {
+  implicit class RichChildReceiver(private val self: ChildReceiver.type) extends AnyVal {
 
     def <--[Component](
       childSource: Source[Component]

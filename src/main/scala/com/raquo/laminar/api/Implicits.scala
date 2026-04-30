@@ -101,7 +101,7 @@ object Implicits {
 
   /** Some of these methods are redundant, but we need them for type inference to work. */
 
-  class SourceArrowSyntax[A](val source: Source[A]) extends AnyVal {
+  class SourceArrowSyntax[A](private val source: Source[A]) extends AnyVal {
 
     def -->(sink: Sink[A]): Binder.Base = {
       Binder(ReactiveElement.bindSink(_, source.toObservable)(sink))

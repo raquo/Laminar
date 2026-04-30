@@ -71,7 +71,7 @@ object SimpleKey {
     V,
     -El <: ReactiveElement.Base
   ](
-    val key: SimpleKey[Self, V, El] with Self
+    private val key: SimpleKey[Self, V, El] with Self
   ) extends AnyVal {
 
     // #Note: Aside from the general utility, we need this
