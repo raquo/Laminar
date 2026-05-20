@@ -3,7 +3,10 @@ package com.raquo.laminar.tests
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.domapi.DomApi
+import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
+
+import scala.scalajs.js
 
 class DomApiSpec extends UnitSpec {
 
@@ -132,6 +135,40 @@ class DomApiSpec extends UnitSpec {
     div.jsTagName == div().ref.tagName
     svg.svg.jsTagName == svg.svg().ref.tagName
     svg.circle.jsTagName == svg.circle().ref.tagName
+  }
+
+  // https://github.com/raquo/Laminar/issues/196
+  it("insertChildAfter: does not update maybeParent when insertion fails") {
+    val noHooks: js.UndefOr[InserterHooks] = js.undefined
+
+    val childInParent = span("in parent")
+    val parent = div(childInParent)
+
+    // referenceChild lives in a separate container, so referenceChild.nextSibling
+    // is referenceChildSibling, which is NOT a child of parent. The resulting
+    // parent.insertBefore(newChild, referenceChildSibling) throws NotFoundError.
+    val referenceChildSibling = span("sibling")
+    val referenceChild = span("reference")
+    val _otherContainer = div(referenceChild, referenceChildSibling)
+
+    val newChild = span("new")
+
+    mount(parent)
+
+    assertEquals(newChild.maybeParent, None)
+
+    val inserted = DomApi.insertChildAfter(
+      parent = parent,
+      newChild = newChild,
+      referenceChild = referenceChild,
+      hooks = noHooks
+    )
+
+    assert(!inserted)
+    // Before the fix, setParent was called unconditionally, so newChild.maybeParent
+    // would be incorrectly set to Some(parent) despite the insertion never happening.
+    assertEquals(newChild.maybeParent, None)
+    expectNode(div.of(span of "in parent"))
   }
 
   describe("deletes html props") {

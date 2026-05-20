@@ -48,7 +48,9 @@ trait DomTree {
     if (child.ref.parentNode == parent.ref) {
       child.willSetParent(None)
       removed = raw.removeChild(parent = parent.ref, child = child.ref)
-      child.setParent(None)
+      if (removed) {
+        child.setParent(None)
+      }
     }
     removed
   }
@@ -67,7 +69,9 @@ trait DomTree {
       newChild = newChild.ref,
       referenceChild = referenceChild.ref
     )
-    newChild.setParent(nextParent)
+    if (inserted) {
+      newChild.setParent(nextParent)
+    }
     inserted
   }
 
@@ -85,7 +89,9 @@ trait DomTree {
       newChild = newChild.ref,
       referenceChild = referenceChild.ref
     )
-    newChild.setParent(nextParent)
+    if (inserted) {
+      newChild.setParent(nextParent)
+    }
     inserted
   }
 
