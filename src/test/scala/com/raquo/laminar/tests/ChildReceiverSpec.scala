@@ -3,10 +3,12 @@ package com.raquo.laminar.tests
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.modifiers.RenderableNode
+import com.raquo.laminar.domapi.DomError
 import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
+
+import scala.collection.mutable
 
 class ChildReceiverSpec extends UnitSpec {
 
@@ -430,6 +432,44 @@ class ChildReceiverSpec extends UnitSpec {
         span of "d"
       )
     )
+  }
+
+  // Followup to https://github.com/raquo/Laminar/issues/196
+  it("reports DOM errors") {
+    val errors = mutable.Buffer[Throwable]()
+    val collectingCallback: Throwable => Unit = errors += _
+
+    try {
+      // Swap rethrow callback for collecting callback so errors don't fail the test immediately
+      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+      AirstreamError.registerUnhandledErrorCallback(collectingCallback)
+
+      val bus = new EventBus[HtmlElement]
+      val outerDiv = div(child <-- bus)
+      mount(outerDiv)
+
+      // -- reportDomErrors = true (default)
+
+      // Attempting to insert outerDiv inside itself creates a cycle (HierarchyRequestError)
+      bus.writer.onNext(outerDiv)
+
+      assertEquals(errors.size, 1)
+      assert(errors.head.isInstanceOf[DomError])
+
+      errors.clear()
+
+      // -- reportDomErrors = false
+
+      DomApi.shouldReportDomErrors = false
+      bus.writer.onNext(outerDiv)
+
+      errors shouldBe Nil
+    } finally {
+      // -- restore
+      DomApi.shouldReportDomErrors = true
+      AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
+      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+    }
   }
 
 }

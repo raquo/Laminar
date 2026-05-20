@@ -2,10 +2,11 @@ package com.raquo.laminar.tests
 
 import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.domapi.DomError
 import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, Replace}
 import com.raquo.laminar.utils.UnitSpec
 
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 
 class ChildrenCommandReceiverSpec extends UnitSpec {
 
@@ -72,56 +73,73 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
 
   // https://github.com/raquo/Laminar/issues/195
   it("does not drift extraNodeCount when Append fails") {
-    val commandBus = new EventBus[CollectionCommand[Node]]
+    val errors = mutable.Buffer[Throwable]()
+    val collectingCallback: Throwable => Unit = errors += _
 
-    val spanA = span(text0)
-    val spanB = span(text1)
-    val spanC = div(text2)
+    try {
+      // Swap rethrow callback for collecting callback so errors don't fail the test immediately
+      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+      AirstreamError.registerUnhandledErrorCallback(collectingCallback)
 
-    val el = div(
-      "Hello",
-      children.command <-- commandBus.events,
-      div("World")
-    )
+      val commandBus = new EventBus[CollectionCommand[Node]]
 
-    mount(el)
-    expectChildren(clue = "initial:")()
+      val spanA = span(text0)
+      val spanB = span(text1)
+      val spanC = div(text2)
 
-    commandBus.writer.onNext(Append(spanA))
-    expectChildren(clue = "after append A:")(
-      span of text0
-    )
+      val el = div(
+        "Hello",
+        children.command <-- commandBus.events,
+        div("World")
+      )
 
-    commandBus.writer.onNext(Append(spanB))
-    expectChildren(clue = "after append B:")(
-      span of text0,
-      span of text1
-    )
+      mount(el)
+      expectChildren(clue = "initial:")()
 
-    // Appending el to itself throws a HierarchyRequestError DOMException,
-    // so insertChildAtIndex returns false and nothing is inserted.
-    commandBus.writer.onNext(Append(el))
-    expectChildren(clue = "after failed self-append:")(
-      span of text0,
-      span of text1
-    )
+      commandBus.writer.onNext(Append(spanA))
+      expectChildren(clue = "after append A:")(
+        span of text0
+      )
 
-    // With the bug, extraNodeCount was incorrectly incremented by the failed
-    // append, so this next append lands after div("World") instead of before it.
-    commandBus.writer.onNext(Append(spanC))
-    expectChildren(clue = "after append C:")(
-      span of text0,
-      span of text1,
-      div of text2
-    )
+      commandBus.writer.onNext(Append(spanB))
+      expectChildren(clue = "after append B:")(
+        span of text0,
+        span of text1
+      )
 
-    def expectChildren(clue: String)(childRules: Rule*): Unit = {
-      withClue(clue) {
-        val first: Rule = "Hello"
-        val last: Rule = div of "World"
-        val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ last
-        expectNode(div.of(rules: _*))
+      // Appending el to itself throws a HierarchyRequestError DOMException,
+      // so insertChildAtIndex returns false and nothing is inserted.
+      commandBus.writer.onNext(Append(el))
+      expectChildren(clue = "after failed self-append:")(
+        span of text0,
+        span of text1
+      )
+
+      // With the bug, extraNodeCount was incorrectly incremented by the failed
+      // append, so this next append lands after div("World") instead of before it.
+      commandBus.writer.onNext(Append(spanC))
+      expectChildren(clue = "after append C:")(
+        span of text0,
+        span of text1,
+        div of text2
+      )
+
+      assertEquals(errors.size, 1)
+      assert(errors.head.isInstanceOf[DomError])
+
+      errors.clear()
+
+      def expectChildren(clue: String)(childRules: Rule*): Unit = {
+        withClue(clue) {
+          val first: Rule = "Hello"
+          val last: Rule = div of "World"
+          val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ last
+          expectNode(div.of(rules: _*))
+        }
       }
+    } finally {
+      AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
+      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
     }
   }
 }

@@ -1,8 +1,9 @@
 package com.raquo.laminar.inserters
 
+import com.raquo.airstream.core.AirstreamError
 import com.raquo.ew.JsMap
 import com.raquo.laminar
-import com.raquo.laminar.domapi.DomApi
+import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
 
@@ -98,11 +99,17 @@ final class InsertContext(
         // it as such for the strict mode, and insert a new sentinel node into the DOM.
         val contentNode = sentinelNode
         val newSentinelNode = new CommentNode("")
-        DomApi.raw.insertBefore(
-          parent = parentNode.ref,
-          newChild = newSentinelNode.ref,
-          referenceChild = contentNode.ref
-        )
+        DomApi.raw
+          .insertBefore(
+            parent = parentNode.ref,
+            newChild = newSentinelNode.ref,
+            referenceChild = contentNode.ref
+          )
+          .foreach { domError =>
+            if (DomApi.shouldReportDomErrors) {
+              AirstreamError.sendUnhandledError(new DomError(domError))
+            }
+          }
 
         // Convert loose mode context values to strict mode context values
         sentinelNode = newSentinelNode

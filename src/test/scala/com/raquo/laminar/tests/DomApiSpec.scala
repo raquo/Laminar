@@ -2,10 +2,11 @@ package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.L.{svg => s}
-import com.raquo.laminar.domapi.DomApi
+import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
 
+import scala.collection.mutable
 import scala.scalajs.js
 
 class DomApiSpec extends UnitSpec {
@@ -139,36 +140,52 @@ class DomApiSpec extends UnitSpec {
 
   // https://github.com/raquo/Laminar/issues/196
   it("insertChildAfter: does not update maybeParent when insertion fails") {
-    val noHooks: js.UndefOr[InserterHooks] = js.undefined
+    val errors = mutable.Buffer[Throwable]()
+    val collectingCallback: Throwable => Unit = errors += _
 
-    val childInParent = span("in parent")
-    val parent = div(childInParent)
+    try {
+      // Swap rethrow callback for collecting callback so errors don't fail the test immediately
+      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+      AirstreamError.registerUnhandledErrorCallback(collectingCallback)
 
-    // referenceChild lives in a separate container, so referenceChild.nextSibling
-    // is referenceChildSibling, which is NOT a child of parent. The resulting
-    // parent.insertBefore(newChild, referenceChildSibling) throws NotFoundError.
-    val referenceChildSibling = span("sibling")
-    val referenceChild = span("reference")
-    val _otherContainer = div(referenceChild, referenceChildSibling)
+      val noHooks: js.UndefOr[InserterHooks] = js.undefined
 
-    val newChild = span("new")
+      val childInParent = span("in parent")
+      val parent = div(childInParent)
 
-    mount(parent)
+      // referenceChild lives in a separate container, so referenceChild.nextSibling
+      // is referenceChildSibling, which is NOT a child of parent. The resulting
+      // parent.insertBefore(newChild, referenceChildSibling) throws NotFoundError.
+      val referenceChildSibling = span("sibling")
+      val referenceChild = span("reference")
+      val _otherContainer = div(referenceChild, referenceChildSibling)
 
-    assertEquals(newChild.maybeParent, None)
+      val newChild = span("new")
 
-    val inserted = DomApi.insertChildAfter(
-      parent = parent,
-      newChild = newChild,
-      referenceChild = referenceChild,
-      hooks = noHooks
-    )
+      mount(parent)
 
-    assert(!inserted)
-    // Before the fix, setParent was called unconditionally, so newChild.maybeParent
-    // would be incorrectly set to Some(parent) despite the insertion never happening.
-    assertEquals(newChild.maybeParent, None)
-    expectNode(div.of(span of "in parent"))
+      assertEquals(newChild.maybeParent, None)
+
+      val inserted = DomApi.insertChildAfter(
+        parent = parent,
+        newChild = newChild,
+        referenceChild = referenceChild,
+        hooks = noHooks
+      )
+
+      assert(!inserted)
+      // Before the fix, setParent was called unconditionally, so newChild.maybeParent
+      // would be incorrectly set to Some(parent) despite the insertion never happening.
+      assertEquals(newChild.maybeParent, None)
+      expectNode(div.of(span of "in parent"))
+
+      assertEquals(errors.size, 1)
+      assert(errors.head.isInstanceOf[DomError])
+
+    } finally {
+      AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
+      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+    }
   }
 
   describe("deletes html props") {

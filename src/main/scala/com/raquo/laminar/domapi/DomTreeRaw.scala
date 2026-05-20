@@ -11,25 +11,25 @@ trait DomTreeRaw {
   def appendChild(
     parent: dom.Node,
     child: dom.Node
-  ): Boolean = {
+  ): Option[dom.DOMException] = {
     try {
       parent.appendChild(child)
-      true
+      None
     } catch {
       // @TODO[Integrity] Does this only catch DOM exceptions? (here and in other methods)
-      case JavaScriptException(_: dom.DOMException) => false
+      case JavaScriptException(e: dom.DOMException) => Some(e)
     }
   }
 
   def removeChild(
     parent: dom.Node,
     child: dom.Node
-  ): Boolean = {
+  ): Option[dom.DOMException] = {
     try {
       parent.removeChild(child)
-      true
+      None
     } catch {
-      case JavaScriptException(_: dom.DOMException) => false
+      case JavaScriptException(e: dom.DOMException) => Some(e)
     }
   }
 
@@ -37,12 +37,12 @@ trait DomTreeRaw {
     parent: dom.Node,
     newChild: dom.Node,
     referenceChild: dom.Node
-  ): Boolean = {
+  ): Option[dom.DOMException] = {
     try {
       parent.insertBefore(newChild = newChild, refChild = referenceChild)
-      true
+      None
     } catch {
-      case JavaScriptException(_: dom.DOMException) => false
+      case JavaScriptException(e: dom.DOMException) => Some(e)
     }
   }
 
@@ -50,13 +50,13 @@ trait DomTreeRaw {
     parent: dom.Node,
     newChild: dom.Node,
     referenceChild: dom.Node
-  ): Boolean = {
+  ): Option[dom.DOMException] = {
     try {
       // Note: parent.insertBefore correctly handles the case of `refChild == null`
       parent.insertBefore(newChild = newChild, refChild = referenceChild.nextSibling)
-      true
+      None
     } catch {
-      case JavaScriptException(_: dom.DOMException) => false
+      case JavaScriptException(e: dom.DOMException) => Some(e)
     }
   }
 
@@ -64,12 +64,12 @@ trait DomTreeRaw {
     parent: dom.Node,
     newChild: dom.Node,
     oldChild: dom.Node
-  ): Boolean = {
+  ): Option[dom.DOMException] = {
     try {
       parent.replaceChild(newChild = newChild, oldChild = oldChild)
-      true
+      None
     } catch {
-      case JavaScriptException(_: dom.DOMException) => false
+      case JavaScriptException(e: dom.DOMException) => Some(e)
     }
   }
 

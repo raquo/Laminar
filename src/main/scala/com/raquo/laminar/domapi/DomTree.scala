@@ -1,13 +1,34 @@
 package com.raquo.laminar.domapi
 
+import com.raquo.airstream.core.AirstreamError
 import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.nodes.{ChildNode, ParentNode}
+import org.scalajs.dom
 
 import scala.scalajs.js.|
 
 trait DomTree {
 
   protected val raw: DomTreeRaw
+
+  /** If true, Laminar will report exceptions thrown by DOM operations
+    * to Airstream unhandled errors. Otherwise, they will be swallowed.
+    *
+    * These exceptions happen when attempting to perform invalid DOM
+    * operations, such as trying to make an element its own child.
+    *
+    * Prior to v18.0.0, Laminar would always swallow these exceptions.
+    *
+    * Generally, this setting should not be disabled except temporarily
+    * (e.g. to help with migration / debugging / testing).
+    */
+  var shouldReportDomErrors: Boolean = true
+
+  private def maybeReportDomError(e: dom.DOMException): Unit = {
+    if (shouldReportDomErrors) {
+      AirstreamError.sendUnhandledError(new DomError(e))
+    }
+  }
 
   // @Note End users, you should achieve your DOM manipulation goals using the many <-- and --> methods that Laminar offers.
   //  Those arrow methods are in fact very flexible. Only use the methods below when really needed, and even then, very carefully.
@@ -31,7 +52,9 @@ trait DomTree {
 
     // 1. Update DOM
     hooks.foreach(_.onWillInsertNode(parent = parent, child = child))
-    val appended = raw.appendChild(parent = parent.ref, child = child.ref)
+    val maybeDomError = raw.appendChild(parent = parent.ref, child = child.ref)
+    maybeDomError.foreach(maybeReportDomError)
+    val appended = maybeDomError.isEmpty
     if (appended) {
       // 3. Update child
       child.setParent(nextParent)
@@ -47,7 +70,9 @@ trait DomTree {
     var removed = false
     if (child.ref.parentNode == parent.ref) {
       child.willSetParent(None)
-      removed = raw.removeChild(parent = parent.ref, child = child.ref)
+      val maybeDomError = raw.removeChild(parent = parent.ref, child = child.ref)
+      maybeDomError.foreach(maybeReportDomError)
+      removed = maybeDomError.isEmpty
       if (removed) {
         child.setParent(None)
       }
@@ -64,11 +89,13 @@ trait DomTree {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
     hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
-    val inserted = raw.insertBefore(
+    val maybeDomError = raw.insertBefore(
       parent = parent.ref,
       newChild = newChild.ref,
       referenceChild = referenceChild.ref
     )
+    maybeDomError.foreach(maybeReportDomError)
+    val inserted = maybeDomError.isEmpty
     if (inserted) {
       newChild.setParent(nextParent)
     }
@@ -84,11 +111,13 @@ trait DomTree {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
     hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
-    val inserted = raw.insertAfter(
+    val maybeDomError = raw.insertAfter(
       parent = parent.ref,
       newChild = newChild.ref,
       referenceChild = referenceChild.ref
     )
+    maybeDomError.foreach(maybeReportDomError)
+    val inserted = maybeDomError.isEmpty
     if (inserted) {
       newChild.setParent(nextParent)
     }
@@ -113,7 +142,7 @@ trait DomTree {
     hooks.foreach(_.onWillInsertNode(parent = parent, child = child))
 
     val children = parent.ref.childNodes
-    inserted = if (index < children.length) {
+    val maybeDomError = if (index < children.length) {
       val referenceChild = children(index)
       raw.insertBefore(
         parent = parent.ref,
@@ -123,6 +152,8 @@ trait DomTree {
     } else {
       raw.appendChild(parent = parent.ref, child = child.ref)
     }
+    maybeDomError.foreach(maybeReportDomError)
+    inserted = maybeDomError.isEmpty
 
     if (inserted) {
       child.setParent(nextParent)
@@ -150,11 +181,13 @@ trait DomTree {
         newChild.willSetParent(newChildNextParent)
         hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
 
-        replaced = raw.replaceChild(
+        val maybeDomError = raw.replaceChild(
           parent = parent.ref,
           newChild = newChild.ref,
           oldChild = oldChild.ref
         )
+        maybeDomError.foreach(maybeReportDomError)
+        replaced = maybeDomError.isEmpty
 
         if (replaced) {
           oldChild.setParent(None)

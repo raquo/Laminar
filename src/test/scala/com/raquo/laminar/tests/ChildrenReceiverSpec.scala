@@ -4,27 +4,15 @@ import com.raquo.domtestutils.matching.Rule
 import com.raquo.ew.JsVector
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
-import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
-import org.scalatest.BeforeAndAfter
 
 import scala.collection.{immutable, mutable}
 import scala.scalajs.js
 
-class ChildrenReceiverSpec extends UnitSpec with BeforeAndAfter {
+class ChildrenReceiverSpec extends UnitSpec {
 
   case class Foo(id: String, version: Int)
-
-  before {
-    AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
-    AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
-  }
-
-  after {
-    AirstreamError.registerUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
-    AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
-  }
 
   private val text0 = randomString("text0_")
   private val text00 = randomString("text00_")

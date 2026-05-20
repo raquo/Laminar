@@ -13,4 +13,6 @@ with DomDebug {
   object raw
   extends DomTreeRaw
   with DomKeysRaw
+
+  // #Note: For `shouldReportDomErrors`, see `DomTree`
 }
