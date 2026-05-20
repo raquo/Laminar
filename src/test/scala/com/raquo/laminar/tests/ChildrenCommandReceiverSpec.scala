@@ -69,4 +69,59 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
       }
     }
   }
+
+  // https://github.com/raquo/Laminar/issues/195
+  it("does not drift extraNodeCount when Append fails") {
+    val commandBus = new EventBus[CollectionCommand[Node]]
+
+    val spanA = span(text0)
+    val spanB = span(text1)
+    val spanC = div(text2)
+
+    val el = div(
+      "Hello",
+      children.command <-- commandBus.events,
+      div("World")
+    )
+
+    mount(el)
+    expectChildren(clue = "initial:")()
+
+    commandBus.writer.onNext(Append(spanA))
+    expectChildren(clue = "after append A:")(
+      span of text0
+    )
+
+    commandBus.writer.onNext(Append(spanB))
+    expectChildren(clue = "after append B:")(
+      span of text0,
+      span of text1
+    )
+
+    // Appending el to itself throws a HierarchyRequestError DOMException,
+    // so insertChildAtIndex returns false and nothing is inserted.
+    commandBus.writer.onNext(Append(el))
+    expectChildren(clue = "after failed self-append:")(
+      span of text0,
+      span of text1
+    )
+
+    // With the bug, extraNodeCount was incorrectly incremented by the failed
+    // append, so this next append lands after div("World") instead of before it.
+    commandBus.writer.onNext(Append(spanC))
+    expectChildren(clue = "after append C:")(
+      span of text0,
+      span of text1,
+      div of text2
+    )
+
+    def expectChildren(clue: String)(childRules: Rule*): Unit = {
+      withClue(clue) {
+        val first: Rule = "Hello"
+        val last: Rule = div of "World"
+        val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ last
+        expectNode(div.of(rules: _*))
+      }
+    }
+  }
 }

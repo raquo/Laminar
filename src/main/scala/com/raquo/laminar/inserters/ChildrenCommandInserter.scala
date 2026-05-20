@@ -65,7 +65,6 @@ object ChildrenCommandInserter {
         if (inserted) {
           nodeCountDiff = 1
         }
-        nodeCountDiff = 1
 
       case CollectionCommand.Prepend(node) =>
         val inserted = DomApi.insertChildAfter(
