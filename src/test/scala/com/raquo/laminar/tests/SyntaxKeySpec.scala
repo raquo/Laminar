@@ -13,13 +13,9 @@ class SyntaxKeySpec extends UnitSpec {
   //   fs.foreach(println)
   // }
 
-  def setS[El <: ReactiveElement.Base](setter: SimpleKeySetter[_, _, El]): Unit = {
-    println(setter)
-  }
+  def setS[El <: ReactiveElement.Base](setter: SimpleKeySetter[_, _, El]): Unit = ()
 
-  def multiSetS[El <: ReactiveElement.Base](setters: SimpleKeySetter[_, _, El]*): Unit = {
-    setters.foreach(println)
-  }
+  def multiSetS[El <: ReactiveElement.Base](setters: SimpleKeySetter[_, _, El]*): Unit = ()
 
   it("xxx") {
 
