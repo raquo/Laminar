@@ -68,9 +68,9 @@ object HtmlProp {
     override protected def set(el: ReactiveHtmlElement.Base, value: V | Null): Unit = {
       // Deduplicating updates against current DOM value prevents
       // cursor position reset in Safari https://github.com/raquo/Laminar/issues/110
-      // #nc[Test] Verify that I didn't break this in Safari (I switched to non-raw DOM API). Also verify that Safari still needs this.
-      // #nc[Test] Verify that Safari actually needs this fix.
-      if (!DomApi.getHtmlProperty(el, this).contains(value)) {
+      // For <option> elements, this deduplication is buggy (and not needed),
+      // so we skip it. See https://github.com/raquo/Laminar/issues/194
+      if (el.tag.name == "option" || !DomApi.getHtmlProperty(el, this).contains(value)) {
         DomApi.setHtmlProperty(el, this, value)
       }
     }

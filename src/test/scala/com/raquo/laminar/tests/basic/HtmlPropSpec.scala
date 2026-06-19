@@ -32,4 +32,16 @@ class HtmlPropSpec extends UnitSpec {
 
     unmount()
   }
+
+  // Browser behaviour vs safari deduplication fix edge case
+  // https://github.com/raquo/Laminar/issues/194
+  it("sets option value prop correctly in edge case") {
+    val el = option(
+      value(""),
+      "Hello"
+    )
+    assertEquals(el.ref.value, "")
+    // #TODO[Test] - dom-testutils does not work because it treats empty string as missing values, but also undoing that breaks things in a weird way - figure it out later
+    // expectNode(el.ref, option of (value is ""))
+  }
 }
