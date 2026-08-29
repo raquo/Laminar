@@ -1,11 +1,16 @@
 package com.raquo.laminar.tests
 
+import com.raquo.airstream.core.Transaction
+import com.raquo.airstream.ownership.ManualOwner
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
+
+import scala.collection.mutable
 
 /** These tests verify Laminar's behaviour in weird cases.
   *
@@ -609,5 +614,29 @@ class WeirdCasesSpec extends UnitSpec {
     assert(!ReactiveElement.isActive(axel))
     assert(!ReactiveElement.isActive(dick))
     assert(!ReactiveElement.isActive(eric))
+  }
+
+  // Laminar version of https://github.com/raquo/Airstream/issues/144 – airstream has a lot more tests on that.
+  it("MergeStream order inside new Transaction – Airstream #144") {
+    val effects = mutable.Buffer[Effect[Int]]()
+
+    Transaction { _ =>
+      val owner = new ManualOwner
+      val stream1 = EventStream.fromValue(1).map(Effect.log("stream1", effects))
+      val stream2 = EventStream.fromValue(2).map(Effect.log("stream2", effects))
+
+      val mergeStream = EventStream.merge(stream1, stream2)
+
+      stream2.foreach(_ => ())(owner)
+
+      mergeStream.foreach(v => effects += Effect("mergeStream", v))(owner)
+    }
+
+    effects.toList shouldBe List(
+      Effect("stream2", 2),
+      Effect("stream1", 1),
+      Effect("mergeStream", 1),
+      Effect("mergeStream", 2)
+    )
   }
 }

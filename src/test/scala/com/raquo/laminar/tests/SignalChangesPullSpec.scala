@@ -98,9 +98,16 @@ class SignalChangesPullSpec extends UnitSpec {
     log.toList shouldBe List(
       "-2 isPositive = false",
       "-2 isEven = true",
+      "xxx: x",
+      // #Note: change in behaviour in v18:
+      // combined-init-* logs are AFTER xxx log because combined observable
+      // waits until the end of the transaction to emit (I think).
+      // this is a bit weird, but it's a consequence of the fixes we've done
+      // for https://github.com/raquo/airstream/issues/144 in Airstream that
+      // have fixed bigger issues (including actual contract violations),
+      // so the tradeoff is worth it, I think.
       "combined-init-1: -2 isPositive = false, isEven = true",
       "combined-init-2: -2 isPositive = false, isEven = true",
-      "xxx: x",
     )
     log.clear()
 
