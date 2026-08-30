@@ -2,6 +2,7 @@ package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.L.{svg => s}
+import com.raquo.laminar.api.L.{mathml => m}
 import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
@@ -131,11 +132,82 @@ class DomApiSpec extends UnitSpec {
     assert(caught.getMessage == "Error parsing SVG string: expected SVG <svg>, got different tag name: `SVG <circle>`")
   }
 
-  it("jsTagName: matches case for both HTML and SVG elements") {
+  // #Note JSDOM does not really support MathML, but it does parse elements into
+  //  the MathML namespace, which is enough to exercise these methods.
+  //  https://github.com/jsdom/jsdom/issues/3515
+
+  it("MathML: parses MATH tag") {
+    expectNode(
+      DomApi.unsafeParseMathMlString("<math display='block'><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>"),
+      m.mathTag of (
+        m.display is "block",
+        m.mrow of (
+          m.mi of "x",
+          m.mo of "=",
+          m.mn of "2"
+        )
+      )
+    )
+  }
+
+  it("MathML: parses MATH tag with extra newlines and spaces") {
+    expectNode(
+      DomApi.unsafeParseMathMlString(" \n <math display='block'><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math> \n "),
+      m.mathTag of (
+        m.display is "block",
+        m.mrow of (
+          m.mi of "x",
+          m.mo of "=",
+          m.mn of "2"
+        )
+      )
+    )
+  }
+
+  it("MathML: parses MROW tag") {
+    expectNode(
+      DomApi.unsafeParseMathMlString("<mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow>", m.mrow),
+      m.mrow of (
+        m.mi of "a",
+        m.mo of "+",
+        m.mi of "b"
+      )
+    )
+    expectNode(
+      DomApi.unsafeParseMathMlString("<mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow>"),
+      m.mrow of (
+        m.mi of "a",
+        m.mo of "+",
+        m.mi of "b"
+      )
+    )
+  }
+
+  it("MathML: fails on multiple elements") {
+    val caught1 = intercept[Exception] {
+      DomApi.unsafeParseMathMlString("<mrow><mi>a</mi></mrow><mi>b</mi>", m.mrow)
+    }
+    assert(caught1.getMessage == "Error parsing MathML string: expected exactly 1 element, got 2")
+    val caught2 = intercept[Exception] {
+      DomApi.unsafeParseMathMlString("<mrow><mi>a</mi></mrow><mi>b</mi>")
+    }
+    assert(caught2.getMessage == "Error parsing MathML string: expected exactly 1 element, got 2")
+  }
+
+  it("MathML: fails on incorrect tag name when expected tag is provided") {
+    val caught = intercept[Exception] {
+      DomApi.unsafeParseMathMlString("<mi>x</mi>", m.mrow)
+    }
+    assert(caught.getMessage == "Error parsing MathML string: expected MathML <mrow>, got different tag name: `MathML <mi>`")
+  }
+
+  it("jsTagName: matches case for both HTML, SVG, and MathML elements") {
     a.jsTagName == a().ref.tagName
     div.jsTagName == div().ref.tagName
     svg.svg.jsTagName == svg.svg().ref.tagName
     svg.circle.jsTagName == svg.circle().ref.tagName
+    mathml.mathTag.jsTagName == mathml.mathTag().ref.tagName
+    mathml.annotation.jsTagName == mathml.annotation().ref.tagName
   }
 
   // https://github.com/raquo/Laminar/issues/196

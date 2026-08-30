@@ -13,9 +13,9 @@ import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers.{EventListener, SimpleKeyUpdater}
 import com.raquo.laminar.nodes
-import com.raquo.laminar.nodes.{DetachedRoot, ReactiveElement, ReactiveHtmlElement, ReactiveSvgElement}
+import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement, ReactiveMathMlElement, ReactiveSvgElement}
 import com.raquo.laminar.receivers._
-import com.raquo.laminar.tags.{HtmlTag, SvgTag}
+import com.raquo.laminar.tags.{HtmlTag, MathMlTag, SvgTag}
 import org.scalajs.dom
 
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
@@ -260,6 +260,21 @@ with Implicits { self =>
   def foreignSvgElement(element: dom.svg.Element): ReactiveSvgElement[dom.svg.Element] = {
     val tag = new SvgTag(ReactiveElement.normalizeTagName(element)) // #Note: this tag instance is fake
     foreignSvgElement(element, tag)
+  }
+
+  /** Wrap a MathML JS DOM element created by an external library into a reactive Laminar element.
+    *
+    * @throws Exception if `element` tag does not match `assertTag`
+    */
+  def foreignMathMlElement(element: dom.Element, assertTag: MathMlTag): ReactiveMathMlElement = {
+    val goodElement = DomApi.assertTagMatches(assertTag, element, "Unable to init foreign MathML element")
+    new ReactiveMathMlElement(assertTag, goodElement)
+  }
+
+  /** Wrap an MathML JS DOM element created by an external library into a reactive Laminar element. */
+  def foreignMathMlElement(element: dom.MathMLElement): ReactiveMathMlElement = {
+    val tag = new MathMlTag(ReactiveElement.normalizeTagName(element)) // #Note: this tag instance is fake
+    foreignMathMlElement(element, tag)
   }
 
   //

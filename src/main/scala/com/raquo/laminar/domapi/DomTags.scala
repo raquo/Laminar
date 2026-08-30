@@ -77,7 +77,7 @@ trait DomTags {
       case element: dom.html.Element =>
         element
       case _ =>
-        throw new Exception(s"$clue: expected HTML element, got non-element node: ${node.nodeName}")
+        throw new Exception(s"$clue: expected HTML element, got something else: ${node.nodeName}")
     }
   }
 
@@ -86,7 +86,18 @@ trait DomTags {
       case element: dom.svg.Element =>
         element
       case _ =>
-        throw new Exception(s"$clue: expected SVG element, got non-element node: ${node.nodeName}")
+        throw new Exception(s"$clue: expected SVG element, got something else: ${node.nodeName}")
+    }
+  }
+
+  def assertMathMlElement(node: dom.Node, clue: String = "Error"): dom.MathMLElement = {
+    node match {
+      // #Note: We can't use `case element: dom.MathMLElement` here because the
+      //  MathMLElement class does not exist in JSDOM, so we match on the namespace instead.
+      case element: dom.Element if element.namespaceURI == mathmlNamespaceUri =>
+        element.asInstanceOf[dom.MathMLElement]
+      case _ =>
+        throw new Exception(s"$clue: expected MathML element, got something else: ${node.nodeName}")
     }
   }
 
@@ -98,12 +109,16 @@ trait DomTags {
     val elementTypeMatches = (node, tag) match {
       case (_: dom.html.Element, _: HtmlTag[_]) => true
       case (_: dom.svg.Element, _: SvgTag[_]) => true
+      // #Note: We match on the namespace instead of `dom.MathMLElement` because
+      //  the MathMLElement class does not exist in JSDOM.
+      case (n: dom.Element, _: MathMlTag) if n.namespaceURI == mathmlNamespaceUri => true
       case _ => false
     }
     lazy val expectedElementTypeDesc = {
       tag match {
         case t: HtmlTag[_] => s"HTML <${t.name}>"
         case t: SvgTag[_] => s"SVG <${t.name}>"
+        case t: MathMlTag => s"MathML <${t.name}>"
         case t => s"Unknown element <${t.name}>"
       }
     }
@@ -111,6 +126,9 @@ trait DomTags {
       node match {
         case n: dom.html.Element => s"HTML <${n.tagName}>"
         case n: dom.svg.Element => s"SVG <${n.tagName}>"
+        // #Note: We match on the namespace instead of `dom.MathMLElement` because
+        //  the MathMLElement class does not exist in JSDOM: https://github.com/jsdom/jsdom/issues/3515
+        case n: dom.Element if n.namespaceURI == mathmlNamespaceUri => s"MathML <${n.tagName}>"
         case n: dom.Element => s"Unknown <${n.tagName}>"
         case n: dom.Comment => s"CommentNode <${n.text}>"
         case n: dom.Text => s"TextNode <${n.textContent}>"

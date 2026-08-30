@@ -3,6 +3,7 @@ package com.raquo.laminar.tests.basic
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.L.{svg => s}
+import com.raquo.laminar.api.L.{mathml => m}
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.utils.UnitSpec
 
@@ -171,6 +172,65 @@ class ElementSpec extends UnitSpec {
             s.cy is "150",
             s.r is "300",
             s.fill is "blue"
+          )
+        ),
+        " Eh"
+      )
+    )
+  }
+
+  // #Note JSDOM does not really support MathML, but it does parse elements into
+  //  the MathML namespace, which is enough to exercise these methods.
+  //  https://github.com/jsdom/jsdom/issues/3515
+
+  it("renders foreign MathML root elements") {
+    mount(
+      div(
+        b("Hello"),
+        foreignMathMlElement(DomApi.unsafeParseMathMlString("<math display='block'><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>")),
+        " Eh"
+      )
+    )
+
+    expectNode(
+      div of (
+        b of "Hello",
+        m.mathTag of (
+          m.display is "block",
+          m.mrow of (
+            m.mi of "x",
+            m.mo of "=",
+            m.mn of "2"
+          )
+        ),
+        " Eh"
+      )
+    )
+  }
+
+  it("renders foreign MathML sub-elements") {
+    mount(
+      div(
+        b("Hello"),
+        m.mathTag(
+          m.display("block"),
+          foreignMathMlElement(DomApi.unsafeParseMathMlString("<mrow><mi>a</mi></mrow>", m.mrow), m.mrow),
+          foreignMathMlElement(DomApi.unsafeParseMathMlString("<mrow><mi>b</mi></mrow>"))
+        ),
+        " Eh"
+      )
+    )
+
+    expectNode(
+      div of (
+        b of "Hello",
+        m.mathTag of (
+          m.display is "block",
+          m.mrow of (
+            m.mi of "a"
+          ),
+          m.mrow of (
+            m.mi of "b"
           )
         ),
         " Eh"

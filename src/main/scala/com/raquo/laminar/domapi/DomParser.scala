@@ -1,7 +1,7 @@
 package com.raquo.laminar.domapi
 
-import com.raquo.laminar.api.L.svg
-import com.raquo.laminar.tags.{HtmlTag, SvgTag}
+import com.raquo.laminar.api.L.{mathml, svg}
+import com.raquo.laminar.tags.{HtmlTag, MathMlTag, SvgTag}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -14,6 +14,10 @@ trait DomParser { this: DomTags =>
 
   private val svgParserContainer: dom.svg.Element = {
     createSvgElement(svg.svg)
+  }
+
+  private val mathMlParserContainer: dom.MathMLElement = {
+    createMathMlElement(mathml.mathTag)
   }
 
   /** #WARNING: Only use on trusted HTML strings.
@@ -54,7 +58,7 @@ trait DomParser { this: DomTags =>
     *  SVG strings can contain embedded Javascript code,
     *  which this function will execute blindly!
     *
-    * Note: this expects the svg string to contain one HTML element,
+    * Note: this expects the svg string to contain one SVG element,
     * and will throw otherwise (e.g. if given a text node, HTML, or
     * multiple elements)
     */
@@ -81,6 +85,41 @@ trait DomParser { this: DomTags =>
   ): Ref = {
     val nodes = unsafeParseSvgStringIntoNodeArray(dangerousSvgString.trim)
     val clue = "Error parsing SVG string"
+    val node = assertSingleNode(nodes, clue)
+    assertTagMatches(tag, node, clue)
+  }
+
+  /** #WARNING: Only use on trusted MathML strings.
+    *  MathML strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    *
+    * Note: this expects the MathML string to contain one MathML element,
+    * and will throw otherwise (e.g. if given a text node, HTML, or
+    * multiple elements)
+    */
+  def unsafeParseMathMlString(
+    dangerousMathMlString: String
+  ): dom.MathMLElement = {
+    val nodes = unsafeParseMathMlStringIntoNodeArray(dangerousMathMlString.trim)
+    val clue = "Error parsing MathML string"
+    val node = assertSingleNode(nodes, clue)
+    assertMathMlElement(node, clue)
+  }
+
+  /** #WARNING: Only use on trusted MathML strings.
+    *  MathML strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    *
+    * Note: this expects the MathML string to contain one element matching the
+    * tag name, and will throw otherwise (e.g. if given a text node, an
+    * element with a different tag name, or multiple elements)
+    */
+  def unsafeParseMathMlString(
+    dangerousMathMlString: String,
+    tag: MathMlTag
+  ): dom.MathMLElement = {
+    val nodes = unsafeParseMathMlStringIntoNodeArray(dangerousMathMlString.trim)
+    val clue = "Error parsing MathML string"
     val node = assertSingleNode(nodes, clue)
     assertTagMatches(tag, node, clue)
   }
@@ -116,4 +155,19 @@ trait DomParser { this: DomTags =>
     svgParserContainer.innerHTML = ""
     arr
   }
+
+  /** #WARNING: Only use on trusted MathML strings.
+    *  MathML strings can contain embedded Javascript code,
+    *  which this function will execute blindly!
+    */
+  def unsafeParseMathMlStringIntoNodeArray(
+    dangerousMathMlString: String
+  ): js.Array[dom.Node] = {
+    mathMlParserContainer.innerHTML = dangerousMathMlString
+    // #TODO add to `ew`: js.Array.from(nodeList)
+    val arr = js.Array.from(mathMlParserContainer.childNodes.asInstanceOf[js.Iterable[dom.Node]])
+    mathMlParserContainer.innerHTML = ""
+    arr
+  }
+
 }
