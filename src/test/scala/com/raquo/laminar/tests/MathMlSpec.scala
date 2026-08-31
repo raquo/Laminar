@@ -16,6 +16,8 @@ class MathMlSpec extends UnitSpec {
     val el =
       mathTag(
         xmlns(DomApi.mathmlNamespaceUri),
+        idAttr("global-simple-attr-test"),
+        cls("global-complex-attr-test"),
         display("block"), // this `display` is a MathML attribute. Don't confuse with CSS `display` prop!
         // L.backgroundColor.yellow, // CSS works with MathML // #TODO[Test] JSDOM does not support this fully yet https://github.com/jsdom/jsdom/issues/3515
         mrow(
@@ -59,6 +61,8 @@ class MathMlSpec extends UnitSpec {
     expectNode(
       mathTag of (
         xmlns is DomApi.mathmlNamespaceUri,
+        idAttr is "global-simple-attr-test",
+        cls is "global-complex-attr-test",
         display is "block",
         // L.backgroundColor is "yellow", // #TODO[Test] See above – need jsdom support
         mrow of (

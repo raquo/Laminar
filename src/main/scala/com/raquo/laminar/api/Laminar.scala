@@ -57,7 +57,8 @@ with Implicits { self =>
   object mathml
   extends MathMlTags
   with MathMlAttrs
-  with GlobalAttrs {
+  with GlobalAttrs
+  with ComplexGlobalKeys {
 
     lazy val aria: AriaAttrs = self.aria
 
