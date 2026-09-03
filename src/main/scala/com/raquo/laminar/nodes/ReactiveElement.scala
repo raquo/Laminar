@@ -163,26 +163,43 @@ with ParentNode[Ref] {
     eventBus.events
   }
 
-  /** Select the entier contents of this element, the way browser selects text.
+  /** Select the entire contents of this element, the way browser selects text.
     *  - For input and textarea elements, this also focuses the element.
     *
+    * Text selection only makes sense if the element is mounted – otherwise
+    * calling select() won't do anything.
+    *
     * See also: [[com.raquo.laminar.api.L.onMountSelect]]
+    *
+    * @param asyncDelay if enabled, the selection logic runs after a setTimeout(0).
+    *                   This is useful e.g. in onMountSelect, where we typically want
+    *                   any other Laminar subscriptions like `value <--` and
+    *                   `text <--` to initialize and populate the contents of the
+    *                   element before we try to select() those contents.
+    *                   If the content of your element is already populated before
+    *                   you call select(), you can safely pass asyncDelay = false.
     */
-  def select(): Unit = {
-    if (ReactiveElement.isActive(this)) { // Text selection only makes sense if element is mounted.
-      this.ref match {
-        case input: dom.html.Input =>
-          input.select()
-        case textArea: dom.html.TextArea =>
-          textArea.select()
-        case el =>
-          val range = dom.document.createRange()
-          range.selectNodeContents(el)
-          val selection = dom.window.getSelection()
-          selection.removeAllRanges()
-          selection.addRange(range)
+  def select(asyncDelay: Boolean): Unit = {
+    def doSelect(): Unit = {
+      if (ReactiveElement.isActive(this)) {
+        this.ref match {
+          case input: dom.html.Input =>
+            input.select()
+          case textArea: dom.html.TextArea =>
+            textArea.select()
+          case el =>
+            val range = dom.document.createRange()
+            range.selectNodeContents(el)
+            val selection = dom.window.getSelection()
+            selection.removeAllRanges()
+            selection.addRange(range)
+        }
       }
     }
+    if (asyncDelay)
+      js.timers.setTimeout(0)(doSelect())
+    else
+      doSelect()
   }
 
   // @TODO[Performance] Review scala.js generated code for single-element use case.

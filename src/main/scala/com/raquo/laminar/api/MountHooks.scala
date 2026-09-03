@@ -24,12 +24,9 @@ trait MountHooks {
     */
   val onMountSelect: Modifier[ReactiveElement.Base] = {
     onMountCallback { ctx =>
-      // setTimeout ensures that Laminar runs this AFTER any synchronous `value <--` or `text <--`,
-      // but because of the (very small) delay, we need to check that the element is still mounted
-      // (isActive) when we try to select its contents. This is done routinely inside `select`.
-      js.timers.setTimeout(0) {
-        ctx.thisNode.select()
-      }
+      // asyncDelay ensures that Laminar runs this AFTER any synchronous `value <--` or `text <--`,
+      // which may be needed to populate the element's content that we actually want to select.
+      ctx.thisNode.select(asyncDelay = true)
     }
   }
 
