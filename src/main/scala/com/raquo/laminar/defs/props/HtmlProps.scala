@@ -529,6 +529,16 @@ trait HtmlProps {
 
 
   /**
+    * Indicates whether the details or dialog box is open.
+    *
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details#open details#open @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog#open dialog#open @ MDN]]
+    *  - [[https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/open open @ MDN]]
+    */
+  lazy val openAttr: HtmlProp[Boolean] = boolProp("open", reflectedAttrName = "open")
+
+
+  /**
     * For use in &lt;meter&gt; tags.
     *
     * @see https://css-tricks.com/html5-meter-element/

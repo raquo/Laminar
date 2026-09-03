@@ -225,7 +225,7 @@ trait MathMlAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/MathML/Element/mo#minsize mo#minsize @ MDN]]
     */
-  lazy val minsize: MathMlAttr[String] = stringMathMlAttr("minSize")
+  lazy val minSize: MathMlAttr[String] = stringMathMlAttr("minsize")
 
 
   /**
