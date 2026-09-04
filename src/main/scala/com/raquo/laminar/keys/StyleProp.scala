@@ -48,7 +48,7 @@ with DerivedStyleBuilder[DerivedStyleProp] { self =>
     new StyleProp[V](name, ps.map(_(StyleVendorPrefixes)))
   }
 
-  // #nc test that I can :=, (), and <-- into StyleProp[_] or something equally generic...
+  // #nc test that I can :=, (), and <-- into StyleProp[?] or something equally generic...
 
   // #nc if this has to be public, rename to `:=`?
   // #nc scala 3 does not allow access

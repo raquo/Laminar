@@ -135,7 +135,7 @@ with Implicits { self =>
       documentEvents(_.onDomContentLoaded).foreach { _ =>
         owner.killSubscriptions() // DOMContentLoaded is a one-time event, no need to keep listening
         new nodes.RootNode(container, rootNode)
-      }(owner)
+      }(using owner)
     } else {
       new nodes.RootNode(container, rootNode)
     }
@@ -299,7 +299,7 @@ with Implicits { self =>
     * See [[https://laminar.dev/documentation#controlled-inputs Controlled Inputs docs]]
     */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
-    listener: EventListener[Ev, _],
+    listener: EventListener[Ev, ?],
     updater: SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement[Ref]]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)
@@ -310,7 +310,7 @@ with Implicits { self =>
     */
   def controlled[Ref <: dom.html.Element, Ev <: dom.Event, V](
     updater: SimpleKeyUpdater[HtmlProp[V], V, ReactiveHtmlElement[Ref]],
-    listener: EventListener[Ev, _]
+    listener: EventListener[Ev, ?]
   ): Binder[ReactiveHtmlElement[Ref]] = {
     InputController.controlled(listener, updater)
   }

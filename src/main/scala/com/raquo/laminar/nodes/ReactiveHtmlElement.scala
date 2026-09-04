@@ -16,21 +16,21 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
 ) extends ReactiveElement[Ref] {
 
   /** List of value controllers installed on this element */
-  private[this] var controllers: js.UndefOr[JsArray[InputController[_, _, _]]] = js.undefined
+  private var controllers: js.UndefOr[JsArray[InputController[?, ?, ?]]] = js.undefined
 
   /**
     * List of binders for props that are controllable.
     * Note: this includes both controlled and uncontrolled binders
     */
-  private[this] var controllablePropBinders: js.UndefOr[JsArray[String]] = js.undefined
+  private var controllablePropBinders: js.UndefOr[JsArray[String]] = js.undefined
 
-  private[this] def appendValueController(controller: InputController[_, _, _]): Unit = {
+  private def appendValueController(controller: InputController[?, ?, ?]): Unit = {
     controllers.fold {
       controllers = js.defined(JsArray(controller))
     }(_.push(controller))
   }
 
-  private[this] def appendControllablePropBinder(propDomName: String): Unit = {
+  private def appendControllablePropBinder(propDomName: String): Unit = {
     controllablePropBinders.fold {
       controllablePropBinders = js.defined(JsArray(propDomName))
     }(_.push(propDomName))
@@ -40,13 +40,13 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
     controllablePropBinders.exists(_.includes(domPropName))
   }
 
-  private[laminar] def hasOtherControllerForSameProp(thisController: InputController[_, _, _]): Boolean = {
+  private[laminar] def hasOtherControllerForSameProp(thisController: InputController[?, ?, ?]): Boolean = {
     controllers.exists(_.asScalaJs.exists { otherController =>
       otherController.propDomName == thisController.propDomName && otherController != thisController
     })
   }
 
-  private[laminar] def bindController(controller: InputController[_, _, _]): DynamicSubscription = {
+  private[laminar] def bindController(controller: InputController[?, ?, ?]): DynamicSubscription = {
     val dynSub = controller.bind()
     appendValueController(controller)
     dynSub
@@ -73,9 +73,9 @@ class ReactiveHtmlElement[+Ref <: dom.html.Element](
     controllers.exists(_.asScalaJs.exists(_.propDomName == propDomName))
   }
 
-  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[_, _, _]): Unit = {
+  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit = {
     key match {
-      case p: HtmlProp[_] =>
+      case p: HtmlProp[?] =>
         if (isControllableProp(p.name)) {
           if (hasController(p.name)) {
             throw new Exception(s"Can not add uncontrolled `${p.name} <-- ???` to element `${DomApi.debugNodeDescription(ref)}` that already has an input controller for `${p.name}` property.")

@@ -1382,7 +1382,7 @@ val element: Div = div(
 )
 ```
 
-`Observer` is an Airstream type that is typically used to perform side effects on incoming events. Usually it's used like this: `someStream.addObserver(someObserver)(owner)`. This would ensure that `someStream` runs (remember, streams are lazy), and would call `someObserver.onNext(ev)` for every new event that `someStream` emits.
+`Observer` is an Airstream type that is typically used to perform side effects on incoming events. Usually it's used like this: `someStream.addObserver(someObserver)(using owner)`. This would ensure that `someStream` runs (remember, streams are lazy), and would call `someObserver.onNext(ev)` for every new event that `someStream` emits.
 
 This `-->` method simply registers an event listener on `element` which calls `clickObserver.onNext(ev)` for every click event that comes in, and then the observer prints this event's X coordinate to the console.
 
@@ -2069,7 +2069,7 @@ render(element) // mount the element
     new DynamicSubscription(element.dynamicOwner, activate = owner => Some(
       val subscription: Subscription = urlStream.foreach { url =>
         DomApi.setHtmlProperty(element, href, url)
-      } (owner)
+      } (using owner)
       subscription
     ))
     ```

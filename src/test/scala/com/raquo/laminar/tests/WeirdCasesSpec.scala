@@ -275,7 +275,7 @@ class WeirdCasesSpec extends UnitSpec {
     withClue("unmounted event with other obs:") {
 
       val owner = new TestableOwner
-      signal.foreach(_ => ())(owner)
+      signal.foreach(_ => ())(using owner)
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
@@ -503,8 +503,8 @@ class WeirdCasesSpec extends UnitSpec {
 
       // Important, we check that updateChildren logic can handle this scenario - observable getting ahead of the DOM
       val owner = new TestableOwner
-      signal.foreach(_ => ())(owner)
-      copyStream.foreach(_ => ())(owner)
+      signal.foreach(_ => ())(using owner)
+      copyStream.foreach(_ => ())(using owner)
       nameVar.writer.onNext(john :: alpha :: delta :: bravo :: tor :: Nil)
       owner.killSubscriptions()
 
@@ -627,9 +627,9 @@ class WeirdCasesSpec extends UnitSpec {
 
       val mergeStream = EventStream.merge(stream1, stream2)
 
-      stream2.foreach(_ => ())(owner)
+      stream2.foreach(_ => ())(using owner)
 
-      mergeStream.foreach(v => effects += Effect("mergeStream", v))(owner)
+      mergeStream.foreach(v => effects += Effect("mergeStream", v))(using owner)
     }
 
     effects.toList shouldBe List(

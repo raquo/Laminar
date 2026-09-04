@@ -12,7 +12,7 @@ trait DomKeys {
 
   def getAttribute[V, El <: ReactiveElement.Base](
     element: El,
-    attr: SimpleAttr[_, V, El]
+    attr: SimpleAttr[?, V, El]
   ): V | Unit = {
     val domValue = raw.getAttribute(element.ref, attr.localName, attr.namespaceUri.orNull[String])
     domValue.map(attr.codec.decode)
@@ -20,7 +20,7 @@ trait DomKeys {
 
   def setAttribute[V, El <: ReactiveElement.Base](
     element: El,
-    attr: SimpleAttr[_, V, El],
+    attr: SimpleAttr[?, V, El],
     value: V | Null
   ): Unit = {
     val domValue = Codec.mapNullable(value, attr.codec.encode)

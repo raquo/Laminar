@@ -8,7 +8,7 @@ import scala.scalajs.js.|
 
 /** This class represents derived style props like `height.px` or `backgroundImage.url` */
 class DerivedStyleProp[V](
-  val key: StyleProp[_],
+  val key: StyleProp[?],
   val encode: V => String
 ) extends SimpleKey[DerivedStyleProp[V], V, ReactiveElement.Base] {
 

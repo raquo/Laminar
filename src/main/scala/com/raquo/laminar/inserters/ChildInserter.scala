@@ -24,7 +24,7 @@ object ChildInserter {
           val newChildNode = renderable.asNode(newComponent)
           switchToChild(maybeLastSeenChild, newChildNode, ctx, hooks)
           maybeLastSeenChild = newChildNode
-        }(owner)
+        }(using owner)
       },
       hooks = initialHooks
     )

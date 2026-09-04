@@ -9,13 +9,13 @@ class SyntaxKeySpec extends UnitSpec {
 
   // type F[V, El <: ReactiveElement.Base] = SimpleKeySetter.Of[V, ?, El]
 
-  // def multiSetF[El <: ReactiveElement.Base](fs: F[_, El]*): Unit = {
+  // def multiSetF[El <: ReactiveElement.Base](fs: F[?, El]*): Unit = {
   //   fs.foreach(println)
   // }
 
-  def setS[El <: ReactiveElement.Base](setter: SimpleKeySetter[_, _, El]): Unit = ()
+  def setS[El <: ReactiveElement.Base](setter: SimpleKeySetter[?, ?, El]): Unit = ()
 
-  def multiSetS[El <: ReactiveElement.Base](setters: SimpleKeySetter[_, _, El]*): Unit = ()
+  def multiSetS[El <: ReactiveElement.Base](setters: SimpleKeySetter[?, ?, El]*): Unit = ()
 
   it("xxx") {
 

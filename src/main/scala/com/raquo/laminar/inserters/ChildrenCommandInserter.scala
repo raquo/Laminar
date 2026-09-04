@@ -33,7 +33,7 @@ object ChildrenCommandInserter {
         commands.foreach { command =>
           val nodeCountDiff = updateList(command, ctx, renderableNode, hooks)
           ctx.extraNodeCount += nodeCountDiff
-        }(owner)
+        }(using owner)
       },
       hooks = initialHooks
     )

@@ -9,7 +9,7 @@ class ReactiveMathMlElement(
   final override val ref: dom.MathMLElement
 ) extends ReactiveElement[dom.MathMLElement] {
 
-  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[_, _, _]): Unit = ()
+  override private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit = ()
 
   override def toString: String = {
     // `ref` is not available inside ReactiveElement's constructor due to initialization order, so fall back to `tag`.

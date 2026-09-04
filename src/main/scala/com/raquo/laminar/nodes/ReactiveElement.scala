@@ -27,7 +27,7 @@ with ParentNode[Ref] {
   )
 
   // #TODO[API] Do we actually need this? What for?
-  private[this] var maybeEventListeners: js.UndefOr[JsArray[EventListener.Base]] = js.undefined
+  private var maybeEventListeners: js.UndefOr[JsArray[EventListener.Base]] = js.undefined
 
   private[laminar] def foreachEventListener(f: EventListener.Base => Unit): Unit = {
     maybeEventListeners.foreach(_.forEach(f))
@@ -100,11 +100,11 @@ with ParentNode[Ref] {
     *
     * Note that this structure can have redundant items (e.g. class names) in it, they are filtered out when writing to the DOM
     */
-  private[this] var _compositeValues: Map[CompositeKey[_, this.type], List[(String, Modifier.Any)]] =
+  private var _compositeValues: Map[CompositeKey[?, this.type], List[(String, Modifier.Any)]] =
     Map.empty
 
   private[laminar] def compositeValueItems(
-    prop: CompositeKey[_, this.type],
+    prop: CompositeKey[?, this.type],
     reason: Modifier.Any
   ): List[String] = {
     _compositeValues
@@ -113,7 +113,7 @@ with ParentNode[Ref] {
   }
 
   private[laminar] def updateCompositeValue(
-    key: CompositeKey[_, this.type],
+    key: CompositeKey[?, this.type],
     reason: Modifier.Any,
     addItems: List[String],
     removeItems: List[String]
@@ -219,7 +219,7 @@ with ParentNode[Ref] {
     this
   }
 
-  private[laminar] def onBoundKeyUpdater(key: SimpleKey[_, _, _]): Unit
+  private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit
 
   override private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
@@ -243,7 +243,7 @@ with ParentNode[Ref] {
     }
   }
 
-  private[this] def isUnmounting(
+  private def isUnmounting(
     maybePrevParent: Option[ParentNode.Base],
     maybeNextParent: Option[ParentNode.Base]
   ): Boolean = {
@@ -252,11 +252,11 @@ with ParentNode[Ref] {
     isPrevParentActive && !isNextParentActive
   }
 
-  private[this] def setPilotSubscriptionOwner(maybeNextParent: Option[ParentNode.Base]): Unit = {
+  private def setPilotSubscriptionOwner(maybeNextParent: Option[ParentNode.Base]): Unit = {
     unsafeSetPilotSubscriptionOwner(maybeNextParent.map(_.dynamicOwner))
   }
 
-  protected[this] def unsafeSetPilotSubscriptionOwner(maybeNextOwner: Option[DynamicOwner]): Unit = {
+  protected def unsafeSetPilotSubscriptionOwner(maybeNextOwner: Option[DynamicOwner]): Unit = {
     // @Warning[Fragile] I had issues with clearOwner requiring a hasOwner check but that should not be necessary anymore.
     //  - If exceptions crop up caused by this, need to find the root cause before rushing to patch this here.
     maybeNextOwner.fold(

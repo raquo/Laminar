@@ -10,7 +10,7 @@ import scala.scalajs.js
 object ChildTextOptionReceiver {
 
   def <--(textOptSource: Source[Option[String]]): DynamicInserter = {
-    <--[String](textOptSource)(RenderableText.stringRenderable)
+    <--[String](textOptSource)(using RenderableText.stringRenderable)
   }
 
   def <--[TextLike](

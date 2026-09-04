@@ -300,14 +300,14 @@ class EventProcessor[Ev <: dom.Event, V](
     * Note: This method is not chainable. Put all the operations you need inside the `operator` callback,
     *       or use the `compose` method instead for more flexibility
     */
-  def flatMap[Out, Obs[_] <: Observable[_]](
+  def flatMap[Out, Obs[_] <: Observable[?]](
     operator: V => Obs[Out]
   )(implicit
     strategy: SwitchingStrategy[EventStream, Obs, Observable]
   ): LockedEventKey[Ev, V, Out] = {
     new LockedEventKey[Ev, V, Out](
       this,
-      eventStream => eventStream.flatMapSwitch(operator)(strategy)
+      eventStream => eventStream.flatMapSwitch(operator)(using strategy)
     )
   }
 
@@ -315,12 +315,12 @@ class EventProcessor[Ev <: dom.Event, V](
     *
     * Note: `observable` will be re-evaluated every time the event is fired.
     */
-  @inline def flatMapTo[Out, Obs[_] <: Observable[_]](
+  @inline def flatMapTo[Out, Obs[_] <: Observable[?]](
     observable: => Obs[Out]
   )(implicit
     strategy: SwitchingStrategy[EventStream, Obs, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    flatMap(_ => observable)(strategy)
+    flatMap(_ => observable)(using strategy)
   }
 
   /** Similar to `flatMap`, but restricted to streams only. */
@@ -329,7 +329,7 @@ class EventProcessor[Ev <: dom.Event, V](
   )(implicit
     strategy: SwitchingStrategy[EventStream, EventStream, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    flatMap(operator)(strategy)
+    flatMap(operator)(using strategy)
   }
 
   /** Similar to `flatMap`, but restricted to signals only. */
@@ -338,7 +338,7 @@ class EventProcessor[Ev <: dom.Event, V](
   )(implicit
     strategy: SwitchingStrategy[EventStream, Signal, Observable]
   ): LockedEventKey[Ev, V, Out] = {
-    flatMap(operator)(strategy)
+    flatMap(operator)(using strategy)
   }
 
   /** Similar to Airstream `flatMapWithStatus` operator.
@@ -485,11 +485,11 @@ object EventProcessor {
   // These methods are only exposed publicly via companion object
   // to avoid polluting autocomplete when chaining EventProcessor-s
 
-  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, _]): EventProp[Ev] = prop.eventProp
+  @inline def eventProp[Ev <: dom.Event](prop: EventProcessor[Ev, ?]): EventProp[Ev] = prop.eventProp
 
-  @inline def shouldUseCapture(prop: EventProcessor[_, _]): Boolean = prop.shouldUseCapture
+  @inline def shouldUseCapture(prop: EventProcessor[?, ?]): Boolean = prop.shouldUseCapture
 
-  @inline def shouldBePassive(prop: EventProcessor[_, _]): Boolean = prop.shouldBePassive
+  @inline def shouldBePassive(prop: EventProcessor[?, ?]): Boolean = prop.shouldBePassive
 
   @inline def processor[Ev <: dom.Event, Out](prop: EventProcessor[Ev, Out]): Ev => Option[Out] = prop.processor
 }

@@ -93,14 +93,14 @@ class SyntaxSpec extends UnitSpec {
 
   it("CSS types and values") {
     // CSS keywords
-    val s1: StyleSetter[_, _] = display.none
+    val s1: StyleSetter[?, ?] = display.none
     val s11: StyleSetter[String, String] = display.none
     val v1: String = display.none.value
     assert(display.none.value == "none")
     assert(display.none.cssValue == "none")
 
     // Base CSS keywords
-    val s2: StyleSetter[_, _] = padding.inherit
+    val s2: StyleSetter[?, ?] = padding.inherit
     val v2: String = padding.inherit.value
     assert(display.inherit.value == "inherit")
     assert(display.inherit.cssValue == "inherit")
@@ -132,7 +132,7 @@ class SyntaxSpec extends UnitSpec {
     // Multi-parameter derived CSS props (units)
 
     val p3: StyleProp[String] = color
-    val s4: StyleSetter[_, _] = color.rgb(200, 100, 0)
+    val s4: StyleSetter[?, ?] = color.rgb(200, 100, 0)
     assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
     assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
 
@@ -424,7 +424,7 @@ class SyntaxSpec extends UnitSpec {
 
     assertTypeError("focus <-- boolSignal")
 
-    // implicit def xxxx[A](obs: Observable[_]#Self[A]): Source[A] = obs: Observable[A]
+    // implicit def xxxx[A](obs: Observable[?]#Self[A]): Source[A] = obs: Observable[A]
 
     div(
       cls("cls1") <-- boolSignal,

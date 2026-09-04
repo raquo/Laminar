@@ -30,7 +30,7 @@ with CompositeValueMapper.Implicits {
 
   /** Convert primitive renderable values (strings, numbers, booleans, etc.) to text nodes */
   implicit def textToTextNode[A](value: A)(implicit r: RenderableText[A]): TextNode = {
-    TextNode(value)(r)
+    TextNode(value)(using r)
   }
 
   /** Convert a custom component to Laminar DOM node */

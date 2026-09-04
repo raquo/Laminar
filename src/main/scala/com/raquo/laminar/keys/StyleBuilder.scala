@@ -26,7 +26,7 @@ package com.raquo.laminar.keys
   *    marginTop.px(12) // DerivedStyleSetter[Int] that sets this marginTop value
   *
   * Relative advantages of styleSetter and derivedStyle:
-  *  - derivedStyle returns DSP[V] where you can choose any DSP (we use StyleSetter[_, String] and ~Function1[_, String]),
+  *  - derivedStyle returns DSP[V] where you can choose any DSP (we use StyleSetter[?, String] and ~Function1[?, String]),
   *    but it can only accept one, unnamed argument of type InputV.
   *  - styleSetter can accept multiple named arguments of any types,
   *    but it returns a single type SSS (e.g. StyleSetter[String, String] or String)

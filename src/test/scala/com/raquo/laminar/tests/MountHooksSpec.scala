@@ -218,8 +218,8 @@ class MountHooksSpec extends UnitSpec {
     withClue("unmounted event with other obs:") {
 
       val owner = new TestableOwner
-      signal.foreach(_ => ())(owner)
-      stream.foreach(_ => ())(owner)
+      signal.foreach(_ => ())(using owner)
+      stream.foreach(_ => ())(using owner)
       nameVar.writer.onNext("Igor2") // this value will be resurrected when remounting, and DOM nodes will be fine
       owner.killSubscriptions()
 

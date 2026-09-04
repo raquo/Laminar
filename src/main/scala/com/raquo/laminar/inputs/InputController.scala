@@ -19,7 +19,7 @@ class InputController[Ref <: dom.html.Element, A, B](
   config: InputControllerConfig[Ref, A],
   element: ReactiveHtmlElement[Ref],
   updater: SimpleKeyUpdater[HtmlProp[A], A, ReactiveHtmlElement[Ref]],
-  listener: EventListener[_ <: dom.Event, B]
+  listener: EventListener[? <: dom.Event, B]
 ) {
 
   private var prevValue: A = config.initialValue // Note: this might not match `defaultValue` / `defaultChecked` prop (see below)
@@ -59,7 +59,7 @@ class InputController[Ref <: dom.html.Element, A, B](
     updater.values.foreach { sourceValue =>
       latestSourceValue = Some(sourceValue)
       setValue(sourceValue)
-    }(owner)
+    }(using owner)
 
     val resetObserver = Observer[B] { _ =>
       // This needs to run after the event fired into `observer` has finished propagating
@@ -112,7 +112,7 @@ class InputController[Ref <: dom.html.Element, A, B](
   }
 
   /** @throws Exception if you can't add such a controller to this element. */
-  private[this] def checkControllerCompatibility(): Unit = {
+  private def checkControllerCompatibility(): Unit = {
 
     if (element.hasOtherControllerForSameProp(this)) {
       throw new Exception(InputController.errorMessage(propDomName, eventPropName, element)(
@@ -167,8 +167,8 @@ class InputController[Ref <: dom.html.Element, A, B](
     }
   }
 
-  private[this] def checkEventPropCompatibility(
-    expectedEventProps: JsArray[EventProp[_]]
+  private def checkEventPropCompatibility(
+    expectedEventProps: JsArray[EventProp[?]]
   ): Unit = {
     val expectedEventProps = config.allowedEventProps
     if (!expectedEventProps.asScalaJs.exists(_.name == eventPropName)) {
@@ -186,7 +186,7 @@ object InputController {
   final class InputControllerConfig[-Ref <: dom.html.Element, A](
     val initialValue: A,
     val prop: HtmlProp[A],
-    val allowedEventProps: JsArray[EventProp[_]],
+    val allowedEventProps: JsArray[EventProp[?]],
     val getDomValue: ReactiveHtmlElement[Ref] => A,
     val setDomValue: (ReactiveHtmlElement[Ref], A) => Unit,
   )
@@ -220,7 +220,7 @@ object InputController {
     */
   def customConfig[A](
     prop: HtmlProp[A],
-    eventProps: JsArray[EventProp[_]],
+    eventProps: JsArray[EventProp[?]],
     initial: A
   ): InputControllerConfig[dom.html.Element, A] = {
     new InputControllerConfig[dom.html.Element, A](
@@ -306,7 +306,7 @@ object InputController {
     *
     * Note: This method does not support web components.
     */
-  def allowedHtmlControllerConfig[Ref <: dom.html.Element](element: Ref): js.UndefOr[InputControllerConfig[Ref, _]] = {
+  def allowedHtmlControllerConfig[Ref <: dom.html.Element](element: Ref): js.UndefOr[InputControllerConfig[Ref, ?]] = {
     // println("allowedHtmlControllerConfig? " + element.tagName)
     element match {
 

@@ -26,7 +26,7 @@ trait Modifier[-El <: ReactiveElement.Base] {
 object Modifier {
 
   /** This type is not public because it is generally useless. Consider `Base` below. */
-  private[laminar] type Any = Modifier[_ <: ReactiveElement.Base]
+  private[laminar] type Any = Modifier[? <: ReactiveElement.Base]
 
   /** Modifier that is applicable to any element */
   type Base = Modifier[ReactiveElement.Base]

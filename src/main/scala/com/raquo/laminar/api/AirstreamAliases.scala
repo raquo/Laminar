@@ -84,7 +84,7 @@ trait AirstreamAliases {
 
   // -- Flatten
 
-  type FlattenStrategy[-Outer[+_] <: Observable[_], -Inner[_], Output[+_] <: Observable[_]] = airstream.flatten.FlattenStrategy[Outer, Inner, Output]
+  type FlattenStrategy[-Outer[+_] <: Observable[?], -Inner[_], Output[+_] <: Observable[?]] = airstream.flatten.FlattenStrategy[Outer, Inner, Output]
 
   lazy val SwitchStreamStrategy: airstream.flatten.FlattenStrategy.SwitchStreamStrategy.type = airstream.flatten.FlattenStrategy.SwitchStreamStrategy
 

@@ -57,7 +57,7 @@ trait SimpleKey[ //
       update = (key, value) => set(key, value)
     )
 
-  def maybe: SimpleKey[_ <: SimpleKey[_, Option[V], El], Option[V], El]
+  def maybe: SimpleKey[? <: SimpleKey[?, Option[V], El], Option[V], El]
 
   /** `null` means "unset this key" */
   protected def set(el: El, value: V | Null): Unit

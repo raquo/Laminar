@@ -107,8 +107,8 @@ trait DomTags {
     clue: String = "Error"
   ): Ref = {
     val elementTypeMatches = (node, tag) match {
-      case (_: dom.html.Element, _: HtmlTag[_]) => true
-      case (_: dom.svg.Element, _: SvgTag[_]) => true
+      case (_: dom.html.Element, _: HtmlTag[?]) => true
+      case (_: dom.svg.Element, _: SvgTag[?]) => true
       // #Note: We match on the namespace instead of `dom.MathMLElement` because
       //  the MathMLElement class does not exist in JSDOM.
       case (n: dom.Element, _: MathMlTag) if n.namespaceURI == mathmlNamespaceUri => true
@@ -116,8 +116,8 @@ trait DomTags {
     }
     lazy val expectedElementTypeDesc = {
       tag match {
-        case t: HtmlTag[_] => s"HTML <${t.name}>"
-        case t: SvgTag[_] => s"SVG <${t.name}>"
+        case t: HtmlTag[?] => s"HTML <${t.name}>"
+        case t: SvgTag[?] => s"SVG <${t.name}>"
         case t: MathMlTag => s"MathML <${t.name}>"
         case t => s"Unknown element <${t.name}>"
       }

@@ -78,7 +78,7 @@ class EventListener[Ev <: dom.Event, Out](
   // I don't think this is needed, it rounds down to reference equality anyway.
   // override def equals(that: Any): Boolean = {
   //   that match {
-  //     case setter: EventListener[_, _] if (eventProcessor == setter.eventProcessor) && (domCallback == setter.domCallback) => true
+  //     case setter: EventListener[?, ?] if (eventProcessor == setter.eventProcessor) && (domCallback == setter.domCallback) => true
   //     case _ => false
   //   }
   // }
@@ -87,5 +87,5 @@ class EventListener[Ev <: dom.Event, Out](
 object EventListener {
 
   /** Any kind of event listener */
-  type Base = EventListener[_ <: dom.Event, _]
+  type Base = EventListener[? <: dom.Event, ?]
 }

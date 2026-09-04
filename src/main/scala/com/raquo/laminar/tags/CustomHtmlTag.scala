@@ -40,10 +40,10 @@ import scala.scalajs.js.JSConverters.JSRichOption
 class CustomHtmlTag[Ref <: dom.html.Element](
   override val name: String,
   val allowedInputControllerConfigIndices: Ref => js.UndefOr[JsArray[Int]] = (_: Ref) => js.undefined,
-  val allowableInputControllerConfigs: js.UndefOr[JsArray[InputControllerConfig[Ref, _]]] = js.undefined
+  val allowableInputControllerConfigs: js.UndefOr[JsArray[InputControllerConfig[Ref, ?]]] = js.undefined
 ) extends HtmlTag[Ref](name, void = false) {
 
-  private[laminar] def allowedControllerConfigs(el: Ref): js.UndefOr[JsArray[InputControllerConfig[Ref, _]]] = {
+  private[laminar] def allowedControllerConfigs(el: Ref): js.UndefOr[JsArray[InputControllerConfig[Ref, ?]]] = {
     val maybeIndices = allowedInputControllerConfigIndices(el)
     maybeIndices.flatMap { indices =>
       allowableInputControllerConfigs.map { configs =>
@@ -68,7 +68,7 @@ class CustomHtmlTag[Ref <: dom.html.Element](
 object CustomHtmlTag {
 
   /** For simple cases when configArray.length == 1 and the prop is always allowed */
-  private[this] val allIndices = JsArray(0)
+  private val allIndices = JsArray(0)
 
   def withControlledInput[Ref <: dom.html.Element, A, Ev <: dom.Event](
     tagName: String,
@@ -77,7 +77,7 @@ object CustomHtmlTag {
     eventProp: EventProp[Ev]
   ): CustomHtmlTag[Ref] = {
     val config = InputController.customConfig(prop, JsArray(eventProp), initial)
-    val configArray = JsArray[InputControllerConfig[Ref, _]](config)
+    val configArray = JsArray[InputControllerConfig[Ref, ?]](config)
     new CustomHtmlTag[Ref](tagName, _ => allIndices, configArray)
   }
 
@@ -87,10 +87,10 @@ object CustomHtmlTag {
     initial: A,
     eventProps: EventProp[Ev]*
   ): CustomHtmlTag[Ref] = {
-    val eventPropsArr: JsArray[EventProp[_]] = JsArray.from(eventProps)
+    val eventPropsArr: JsArray[EventProp[?]] = JsArray.from(eventProps)
     val allIndices = eventPropsArr.mapWithIndex((_, ix) => ix)
     val config = InputController.customConfig(prop, eventPropsArr, initial)
-    val configArray = JsArray[InputControllerConfig[Ref, _]](config)
+    val configArray = JsArray[InputControllerConfig[Ref, ?]](config)
     new CustomHtmlTag[Ref](tagName, _ => allIndices, configArray)
   }
 

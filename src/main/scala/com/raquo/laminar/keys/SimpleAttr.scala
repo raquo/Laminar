@@ -34,5 +34,5 @@ extends SimpleKey[Self, V, El] { self: Self =>
 
 object SimpleAttr {
 
-  type Of[V] = SimpleAttr[_, V, ReactiveElement.Base]
+  type Of[V] = SimpleAttr[?, V, ReactiveElement.Base]
 }

@@ -187,8 +187,8 @@ class StyleSpec extends UnitSpec {
     assertEquals((flexGrow := "inherit").value: Double | String, "inherit")
 
     // #nc
-    // val sp: StyleProp[_] = display
-    // val sp2: StyleProp[_] = flexGrow
+    // val sp: StyleProp[?] = display
+    // val sp2: StyleProp[?] = flexGrow
     // enrichStyleProp(sp) := "foo"
     // sp.typeCompat := "inherit"
     // sp2.typeCompat := "inherit"

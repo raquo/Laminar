@@ -8,7 +8,7 @@ trait DomEvents {
 
   def addEventListener[Ev <: dom.Event](
     element: dom.Element,
-    listener: EventListener[Ev, _]
+    listener: EventListener[Ev, ?]
   ): Unit = {
     // println(s"> Adding listener on ${DomApi.debugNodeDescription(element.ref)} for `${eventPropSetter.key.name}` with useCapture=${eventPropSetter.useCapture}")
     element.addEventListener(
@@ -20,7 +20,7 @@ trait DomEvents {
 
   def removeEventListener[Ev <: dom.Event](
     element: dom.Element,
-    listener: EventListener[Ev, _]
+    listener: EventListener[Ev, ?]
   ): Unit = {
     element.removeEventListener(
       `type` = EventProcessor.eventProp(listener.eventProcessor).name,

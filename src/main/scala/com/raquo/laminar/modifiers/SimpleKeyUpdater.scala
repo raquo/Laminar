@@ -14,7 +14,7 @@ import scala.scalajs.js.|
   *               The reason is used for updating CompositeKey-s.
   */
 class SimpleKeyUpdater[ //
-  +K <: SimpleKey[_, _, El],
+  +K <: SimpleKey[?, ?, El],
   V,
   -El <: ReactiveElement.Base
 ](

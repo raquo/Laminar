@@ -51,7 +51,7 @@ object ChildrenInserter {
           //   maybeLastSeenChildren = newChildren
           switchToChildren(newChildren, ctx, hooks)
           // }
-        }(owner)
+        }(using owner)
       },
       hooks = initialHooks
     )

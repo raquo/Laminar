@@ -18,7 +18,7 @@ import scala.scalajs.js.|
   * does not extend [[SimpleKeySetter]]. // #TODO the naming of these traits is confusing...
   */
 class SimpleKeySetter[ //
-  +K <: SimpleKey[K, _, El],
+  +K <: SimpleKey[K, ?, El],
   V,
   -El <: ReactiveElement.Base
 ](
@@ -94,7 +94,7 @@ object SimpleKeySetter {
 
   type DerivedStylePropSetter[V, ThisV <: V] = DerivedStyleSetter[V, ThisV]
 
-  // def apply[K <: SimpleKey[K, _, El], V, El <: ReactiveElement.Base](
+  // def apply[K <: SimpleKey[K, ?, El], V, El <: ReactiveElement.Base](
   //   key: K,
   //   value: V
   // )(

@@ -29,7 +29,7 @@ object ChildTextInserter {
             //  from the DOM takes more CPU time than setting it.
             textNode.ref.textContent = newText
           }
-        }(owner)
+        }(using owner)
       },
       hooks = ()
     )
@@ -63,7 +63,7 @@ object ChildTextInserter {
               textNode.ref.textContent = newText
             }
           }
-        }(owner)
+        }(using owner)
       },
       hooks = ()
     )
