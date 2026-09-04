@@ -167,6 +167,17 @@ class StyleSpec extends UnitSpec {
     )
   }
 
+  it("css vars") {
+    mount(
+      div(backgroundColor.cssVar("--my-bg-color"))
+    )
+    expectNode(
+      div of (
+        backgroundColor is "var(--my-bg-color)"
+      )
+    )
+  }
+
   it("type safety") {
 
     assertEquals((columnSpan := 2).value: Int | String, 2)

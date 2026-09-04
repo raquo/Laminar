@@ -161,8 +161,8 @@ with Implicits { self =>
   /**
     * This method returns a Seq of modifiers, each of which is created from the same `input`.
     *
-    * This is convenient when you e.g. want to bind multiple listeners to
-    * the same observable, keeping related together, without repeating yourself:
+    * This is convenient when you want to bind multiple listeners to
+    * the same observable without repeating yourself:
     *
     * {{{
     * div(
@@ -173,9 +173,6 @@ with Implicits { self =>
     *   )
     * )
     * }}}
-    *
-    * You can use the output of such a modSeqWith call directly in Laminar because
-    * Laminar implicitly converts `Seq[Modifier]` to `Modifier`.
     *
     * The above snippet is equivalent to:
     *
@@ -195,7 +192,7 @@ with Implicits { self =>
   }
 
   /** Like [[modSeqWith]], but works for arbitrary output types.
-    * Downside is that type inference that requires Modifier implicit conversions may not work.
+    * Downside is that type inference which requires Modifier implicit conversions may not work.
     */
   def seqWith[In, Out](input: In)(outputs: (In => Out)*): Seq[Out] = {
     outputs.map(_(input))

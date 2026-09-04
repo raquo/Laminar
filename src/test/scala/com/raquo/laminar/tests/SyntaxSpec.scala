@@ -133,14 +133,14 @@ class SyntaxSpec extends UnitSpec {
 
     val p3: StyleProp[String] = color
     val s4: StyleSetter[_, _] = color.rgb(200, 100, 0)
-    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)") // #Note[Scala2] this prints warning, same as above
+    assert(color.rgb(200, 100, 0).value == "rgb(200, 100, 0)")
     assert(color.rgb(200, 100, 0).cssValue == "rgb(200, 100, 0)")
 
     assert(style.rgb(200, 100, 0) == "rgb(200, 100, 0)")
 
     // Non-String CSS props
 
-    val x0: Int | String = zIndex.auto.value // #Note – this used to be String, but I can't seem to make it safe
+    val x0: String = zIndex.auto.value
     val x1: Int | String = (zIndex := 1).value
     val x2: String = (zIndex := 1).cssValue
 
