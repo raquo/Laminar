@@ -18,6 +18,8 @@ import com.raquo.laminar.receivers._
 import com.raquo.laminar.tags.{HtmlTag, MathMlTag, SvgTag}
 import org.scalajs.dom
 
+import scala.scalajs.js.|
+
 // @TODO[Performance] Check if order of traits matters for quicker access (given trait linearization). Not sure how it's encoded in JS.
 
 trait Laminar
@@ -110,12 +112,19 @@ with Implicits { self =>
   /** Render a Laminar element into a container DOM node, right now.
     * You must make sure that the container node already exists
     * in the DOM, otherwise this method will throw.
+    *
+    * The container is usually a `dom.Element`, but you can also render
+    * directly into a `dom.ShadowRoot`, e.g. when authoring web components.
+    * The shadow root's host must be attached to the document at this point.
     */
   @inline def render(
-    container: dom.Element,
+    container: dom.Element | dom.ShadowRoot,
     rootNode: nodes.ReactiveElement.Base
   ): nodes.RootNode = {
-    new nodes.RootNode(container, rootNode)
+    new nodes.RootNode(
+      container.asInstanceOf[dom.Node], // #TODO[Scala3] real union types don't need .asInstanceOf
+      rootNode
+    )
   }
 
   /** Wait for `DOMContentLoaded` event to fire, then render a Laminar
@@ -127,17 +136,23 @@ with Implicits { self =>
     * See https://developer.mozilla.org/en-US/docs/Web/API/Window/DOMContentLoaded_event
     */
   def renderOnDomContentLoaded(
-    container: => dom.Element,
+    container: => dom.Element | dom.ShadowRoot,
     rootNode: => nodes.ReactiveElement.Base
   ): Unit = {
     if (dom.document.readyState == dom.DocumentReadyState.loading) {
       val owner = new ManualOwner
       documentEvents(_.onDomContentLoaded).foreach { _ =>
         owner.killSubscriptions() // DOMContentLoaded is a one-time event, no need to keep listening
-        new nodes.RootNode(container, rootNode)
+        new nodes.RootNode(
+          container.asInstanceOf[dom.Node], // #TODO[Scala3] real union types don't need .asInstanceOf
+          rootNode
+        )
       }(using owner)
     } else {
-      new nodes.RootNode(container, rootNode)
+      new nodes.RootNode(
+        container.asInstanceOf[dom.Node], // #TODO[Scala3] real union types don't need .asInstanceOf
+        rootNode
+      )
     }
   }
 

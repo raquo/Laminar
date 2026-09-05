@@ -9,7 +9,7 @@ import org.scalajs.dom
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.JSRichOption
 
-/** If you are creating custallowedInputControllerConfigIndiceshis class instead of [[HtmlTag]].
+/** If you are creating custom elements (web components), use this class instead of [[HtmlTag]].
   *
   * Currently this class is only used to support `controlled` blocks in Web Components,
   * but it may get more features in the future.
