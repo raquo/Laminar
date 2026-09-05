@@ -10,6 +10,9 @@ const siteConfig = {
   // Used for publishing and more
   projectName: 'Laminar',
   organizationName: 'raquo',
+  // Docs markdown lives in `website/docs` (previously mdoc generated a root `docs` dir; no longer used).
+  // Path is relative to the project root (the dir above `website`).
+  customDocsPath: 'website/docs',
   headerLinks: [
     { doc: 'documentation', label: 'Docs' },
     { href: 'https://demo.laminar.dev', label: 'Examples' },
@@ -68,8 +71,6 @@ const siteConfig = {
   // Open Graph and Twitter card images.
   // ogImage: 'img/spiral-inverse-logo.svg',
   // twitterImage: 'img/spiral-inverse-logo.svg',
-
-  customDocsPath: "website/target/mdoc",
 
   // For sites with a sizable amount of content, set collapsible to true.
   // Expand/collapse the links and subcategories under categories.

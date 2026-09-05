@@ -98,7 +98,7 @@ Laminar is very simple under the hood. Don't be afraid to use "Go to definition"
 
 If you're new here, watching [the Laminar video](https://www.youtube.com/watch?v=L_AHCkl6L-Q) will be time well spent – it's a good introduction to Laminar, covering both the big ideas and some inner workings.
 
-See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https://laminar.dev/examples/hello-world).
+See also: [Quick start](https://laminar.dev/quick-start), [Live examples](https://demo.laminar.dev/).
 
 If you want to follow along with an IDE, download one of the starter kit projects from the [Resources](https://laminar.dev/resources) page, or learn how to render your app in the [Rendering](#rendering) section below.
 
@@ -2400,7 +2400,7 @@ This is definitely possible, but might get a bit annoying due to the difference 
 
 With such an API, any UI library that can manage attributes and properties of HTML elements can make use of Web Components. Laminar is great at managing attributes and properties of HTML elements, so using Web Components from Laminar is very easy. All you need to do is create a typed interface to the JS Web Component – this is conceptually similar to making Scala.js interfaces to JS libraries, except you need to define the interface in a Laminar-specific format, because you want to use Laminar's typed API to talk to the web component, not the low-level untyped JS DOM API.
 
-You can see some examples of such interfaces and their usage in [live examples](https://laminar.dev/examples/web-components), and there is a [whole library](https://github.com/sherpal/LaminarSAPUI5Bindings) of such Laminar bindings for SAP UI5 web components.
+You can see some examples of such interfaces and their usage in live examples ([Shoelace](https://demo.laminar.dev/app/integrations/web-components/shoelace), [UI5](https://demo.laminar.dev/app/integrations/web-components/sap-ui5)) – there are also Laminar bindings for other Web Component libraries, for example for [WebAwesome](https://github.com/nguyenyou/webawesome-laminar).
 
 If you review the source code of all these bindings, you'll see that there's no special API for Web Components in Laminar, all we do is define custom attributes / properties / slots / methods that the given Web Component exposes, and use one simple pattern for accessing them in a scoped manner.
 

@@ -15,67 +15,6 @@
 @media only screen and (min-width: 1500px) {
 }
 
-.mdoc-example h1 {
-  margin-top: 0;
-}
-
-.mdoc-example {
-  margin: 20px 0 70px 0;
-}
-
-.mdoc-example code {
-  max-height: calc(min(700px, max(350px, 50vh)));
-}
-
-.mdoc-example div[id^="mdoc-html-"] {
-  position: relative;
-  margin-top: 40px;
-  margin-bottom: 30px;
-  padding: 30px 15px 15px 15px;
-  border-radius: 5px;
-  border: 1px solid gray;
-}
-
-.mdoc-example div[id^="mdoc-html-"]:before {
-  content: "LIVE DEMO";
-  position: absolute;
-  top: -13px;
-  left: 15px;
-  background: white;
-  border: 1px solid gray;
-  border-radius: 3px;
-  padding: 2px 6px;
-  letter-spacing: 0.01em;
-  font-size: 13px;
-}
-
-.mdoc-example .x-hasError input,
-.mdoc-example .x-hasError textarea {
-  border-color: red;
-}
-
-.mdoc-example .-error {
-  color: red;
-}
-
-.mdoc-example .-success {
-  color: green;
-}
-
-.mdoc-example select,
-.mdoc-example input:not([type]),
-.mdoc-example input[type=text],
-.mdoc-example input[type=email],
-.mdoc-example input[type=number] {
-  margin: 0 5px;
-  padding: 5px;
-}
-
-.mdoc-example button {
-  margin: 0 5px;
-  padding: 5px;
-}
-
 /*.docs-prevnext {*/
 /*  margin-top: 60px;*/
 /*}*/

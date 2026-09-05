@@ -25,44 +25,8 @@ SettingKey[Seq[File]]("ide-excluded-directories").withRank(KeyRanks.Invisible) :
   ".buildkit", ".idea", ".metals", ".bloop", ".bsp",
   "target", "project/target", "project/project/target", "project/project/project/target",
   "node_modules",
-  "website/build", "website/target", "websiteJS/target"
+  "website/build", "website/target"
 ).map(file)
-
-lazy val websiteJS = project
-  .in(file("websiteJS"))
-  .settings(
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % Versions.ScalaJsDom,
-    (publish / skip) := true,
-    scalaJSLinkerConfig ~= {
-      _.withModuleKind(ModuleKind.ESModule)
-        .withSourceMap(false) // Producing source maps throws warnings on material web components complaining about missing .ts files. Not sure why.
-    },
-    scalaJSUseMainModuleInitializer := true,
-    scalacOptions ~= { options: Seq[String] =>
-      options.filterNot { o =>
-        o.startsWith("-Wvalue-discard") || o.startsWith("-Ywarn-value-discard") || o.startsWith("-Ywarn-unused") || o.startsWith("-Wunused")
-      }
-    },
-  )
-  .enablePlugins(ScalaJSPlugin)
-  .dependsOn(laminar)
-
-lazy val website = project
-  .enablePlugins(MdocPlugin, DocusaurusPlugin)
-  .settings(
-    mdocIn := file("website/docs"),
-    mdocJS := Some(websiteJS),
-    mdocJSLibraries := Seq(Attributed.blank(file("websiteJS/dist/websitejs-library.js"))),
-    (publish / skip) := true,
-    mdocVariables := Map(
-      "js-mount-node" -> "containerNode",
-      "js-batch-mode" -> "true",
-      "js-opt" -> "fast" // Use fastOpt to avoid Closure Compiler (doesn't work with ESModule, mdoc might want to read ClosureCompiler settings as well)
-      //  // Use these as @VERSION@ in mdoc-processed .md files
-      //  "LAMINAR_VERSION" -> version.value.replace("-SNAPSHOT", ""), // This can return incorrect version too easily
-      //  "SCALA_VERSION" -> scalaVersion.value
-    )
-  )
 
 lazy val laminar = project.in(file("."))
   .enablePlugins(ScalaJSPlugin)

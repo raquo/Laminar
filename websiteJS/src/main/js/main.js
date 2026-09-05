@@ -1,1 +1,0 @@
-import "scalajs:main.js";
