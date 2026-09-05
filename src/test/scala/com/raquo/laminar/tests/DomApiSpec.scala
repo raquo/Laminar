@@ -4,6 +4,7 @@ import com.raquo.laminar.api.L._
 import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L.{mathml => m}
 import com.raquo.laminar.domapi.{DomApi, DomError}
+import com.raquo.laminar.fixtures.{DoubleRangeElement, IntRangeElement}
 import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
 
@@ -391,5 +392,23 @@ class DomApiSpec extends UnitSpec {
       //   option of (value is "v3", selected is false, "V3")
       // ))
     }
+  }
+
+  it("DomApi.getValue returns string from numeric values") {
+    val intEl = IntRangeElement.of(
+      _.value := 10 // Int
+    )
+    assertEquals(DomApi.getValue(intEl.ref), "10")
+
+    val doubleEl = DoubleRangeElement.of(
+      _.value := 11.0 // whole Double
+    )
+
+    // --
+
+    doubleEl.amend(
+      DoubleRangeElement.value := 12.5 // fractional Double
+    )
+    assertEquals(DomApi.getValue(doubleEl.ref), "12.5")
   }
 }

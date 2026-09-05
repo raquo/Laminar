@@ -35,6 +35,10 @@ trait DomInputs { this: DomTags =>
     }
   }
 
+  /** Note: Native HTML elements only offer string value-s.
+    * Int and Double value-s in custom elements / web components are stringified.
+    * Other non-string values  are ignored.
+    */
   def getValue(element: dom.Element): js.UndefOr[String] = {
     element match {
       case input: dom.html.Input =>
@@ -52,7 +56,10 @@ trait DomInputs { this: DomTags =>
         el.asInstanceOf[js.Dynamic]
           .selectDynamic("value")
           .asInstanceOf[js.UndefOr[Any]]
-          .collect { case s: String => s }
+          .collect {
+            case s: String => s
+            case num: Double => num.toString // Int-s and Double-s have the same runtime representation in JS, so we can only match one type
+          }
       case _ =>
         js.undefined
     }
