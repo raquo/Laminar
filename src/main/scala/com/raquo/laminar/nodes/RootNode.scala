@@ -15,11 +15,14 @@ import org.scalajs.dom
   *  - unmount() when componentWillUnmount is due.
   *
   * Other libraries' integration follows the same principle.
+  *
+  * #TODO[Scala3] The dom.Node type should be `dom.Element | dom.ShadowRoot`,
+  *  but that is not possible in Scala 2.
   */
 class RootNode(
-  val container: dom.Element,
+  val container: dom.Node,
   val child: ReactiveElement.Base
-) extends ParentNode[dom.Element] {
+) extends ParentNode[dom.Node] {
 
   if (container == null) {
     throw new Exception("Unable to mount Laminar RootNode into a null container. See https://laminar.dev/documentation#waiting-for-the-dom-to-load")
@@ -29,10 +32,10 @@ class RootNode(
     throw new Exception("Unable to mount Laminar RootNode into an unmounted container. See https://laminar.dev/documentation#rendering")
   }
 
-  /** When we create a Root, we don't want to create a new HTML Element, we want to
-    * use a reference to an existing element, the container.
+  /** When we create a Root, we don't want to create a new DOM node, we want to
+    * use a reference to an existing node, the container.
     */
-  final override val ref: dom.Element = container
+  final override val ref: dom.Node = container
 
   mount()
 
