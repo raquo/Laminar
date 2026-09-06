@@ -2,11 +2,11 @@ object Versions {
 
   val Scala_2_13 = "2.13.18"
 
-  val Scala_3 = "3.3.7"
+  val Scala_3 = "3.9.0"
 
   // -- Dependencies --
 
-  val Airstream = "18.0.0-M5"
+  val Airstream = "18.0.0-M5-SNAPSHOT"
 
   val Ew = "0.3.0"
 
