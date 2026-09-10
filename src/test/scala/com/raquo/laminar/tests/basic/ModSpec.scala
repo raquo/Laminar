@@ -65,6 +65,7 @@ class ModSpec extends UnitSpec {
         "hello",
         left is "1px",
         top is "2px",
+        sentinel,
         "Coordinates(1,2,3)"
       )
     )

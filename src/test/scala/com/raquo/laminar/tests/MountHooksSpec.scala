@@ -3,6 +3,7 @@ package com.raquo.laminar.tests
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.AirstreamFixtures.Effect
 import com.raquo.laminar.fixtures.TestableOwner
+import com.raquo.laminar.inserters.CollectionCommand
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
@@ -482,6 +483,7 @@ class MountHooksSpec extends UnitSpec {
         span of "x1",
         sentinel,
         p of "z1/1",
+        sentinel,
         " world"
       )
     )
@@ -504,6 +506,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         p of "z1/2",
         p of "z2/2",
+        sentinel,
         " world"
       )
     )
@@ -531,6 +534,7 @@ class MountHooksSpec extends UnitSpec {
         p of "z1/3",
         p of "z2/3",
         p of "z3/3",
+        sentinel,
         " world"
       )
     )
@@ -551,9 +555,11 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         div of "y1/1",
         sentinel,
+        sentinel,
         p of "z1/3",
         p of "z2/3",
         p of "z3/3",
+        sentinel,
         " world"
       )
     )
@@ -573,9 +579,11 @@ class MountHooksSpec extends UnitSpec {
         div of "y1/2",
         div of "y2/2",
         sentinel,
+        sentinel,
         p of "z1/3",
         p of "z2/3",
         p of "z3/3",
+        sentinel,
         " world"
       )
     )
@@ -595,8 +603,10 @@ class MountHooksSpec extends UnitSpec {
         div of "y1/2",
         div of "y2/2",
         sentinel,
+        sentinel,
         p of "z1/2",
         p of "z2/2",
+        sentinel,
         " world"
       )
     )
@@ -621,6 +631,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         p of "z1/2",
         p of "z2/2",
+        sentinel,
         " world"
       )
     )
@@ -731,6 +742,7 @@ class MountHooksSpec extends UnitSpec {
         "Hello ",
         sentinel,
         div of "y1/1",
+        sentinel,
         " world"
       )
     )
@@ -747,6 +759,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         div of "y1/2",
         div of "y2/2",
+        sentinel,
         " world"
       )
     )
@@ -765,6 +778,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         div of "y1/2",
         div of "y2/2",
+        sentinel,
         " world"
       )
     )
@@ -785,6 +799,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         div of "y1/2",
         div of "y2/2",
+        sentinel,
         " world"
       )
     )
@@ -851,6 +866,7 @@ class MountHooksSpec extends UnitSpec {
         "Hello ",
         sentinel,
         div of "y1/1",
+        sentinel,
         " world"
       )
     )
@@ -870,6 +886,7 @@ class MountHooksSpec extends UnitSpec {
         "Hello ",
         sentinel,
         div of "y1/1",
+        sentinel,
         " world"
       )
     )
@@ -894,6 +911,64 @@ class MountHooksSpec extends UnitSpec {
     assert(numModCalls == 1)
     assert(numBindCalls == 7)
     assert(numChildrenStreamCalls == 3) // due to new re-evaluation semantics of signals as of 0.15.0
+  }
+
+  it("onMountInsert switches from `children.command <--` to `child <--` (removes leftover command nodes)") {
+    // Regression test for a content leak. `children.command <--` tracks its content nodes
+    // in `InsertContext.extraNodesMap` (keyed by ref, like a plain `child <--` node) and
+    // brackets its span with a trailing sentinel. A single-node inserter taking over the
+    // same `onMountInsert` context finds those nodes via `removeOldChildNodesFromDOM` and
+    // drops the trailing sentinel via `removeCommandTrailingSentinel`, removing the whole
+    // span. (That the removed nodes are actually UNMOUNTED is verified in ChildrenCommandTakeoverSpec.)
+
+    val commandBus = new EventBus[CollectionCommand[Node]]
+    val xChildIx = new EventBus[Int]
+
+    val commandInserter = children.command <-- commandBus.events
+    val xChildInserter = child <-- xChildIx.events.map(n => span("x" + n))
+
+    var dynamicInserter: Inserter = commandInserter
+
+    val el = div(
+      "Hello ",
+      onMountInsert { _ => dynamicInserter },
+      " world"
+    )
+
+    mount(el)
+
+    commandBus.writer.onNext(CollectionCommand.Append(div("c1")))
+    commandBus.writer.onNext(CollectionCommand.Append(div("c2")))
+
+    expectNode(
+      div of (
+        "Hello ",
+        sentinel,
+        div of "c1",
+        div of "c2",
+        sentinel,
+        " world"
+      )
+    )
+
+    // -- switch to `child <--` and emit: the two command nodes must be gone.
+
+    unmount()
+
+    dynamicInserter = xChildInserter
+
+    mount(el)
+
+    xChildIx.emit(1)
+
+    expectNode(
+      div of (
+        "Hello ",
+        sentinel,
+        span of "x1",
+        " world"
+      )
+    )
   }
 
   it("onMountInsert switches between children and text <-- (streams)") {
@@ -963,6 +1038,7 @@ class MountHooksSpec extends UnitSpec {
         "Hello ",
         sentinel,
         div of "y1/1",
+        sentinel,
         " world"
       )
     )
@@ -977,6 +1053,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         div of "y1/2",
         div of "y2/2",
+        sentinel,
         " world"
       )
     )
@@ -995,6 +1072,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         div of "y1/2",
         div of "y2/2",
+        sentinel,
         " world"
       )
     )
@@ -1006,7 +1084,10 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello ",
-        // Note: no extra sentinel node! For performance.
+        // Note: `text <--` keeps the sentinel it adopted from the previous
+        //  `children <--` inserter, and inserts its text node as a content node
+        //  after that sentinel (`text <--` always keeps a dedicated sentinel).
+        sentinel,
         "x1",
         " world"
       )
@@ -1019,7 +1100,8 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello ",
-        // Note: no extra sentinel node! For performance.
+        // #TODO[nested-dyn] new sentinel node – review this change in behaviour
+        sentinel,
         "x2",
         " world"
       )
@@ -1036,7 +1118,7 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello ",
-        sentinel, // sentinel node already re-inserted by the children inserter
+        sentinel, // sentinel node still present (kept by the strict `text <--`, now reused by the children inserter) // #TODO[nested-dyn] review comment together with other nested-dyn comments above
         "x2",
         " world"
       )
@@ -1053,6 +1135,7 @@ class MountHooksSpec extends UnitSpec {
         div of "y1/3",
         div of "y2/3",
         div of "y3/3",
+        sentinel,
         " world"
       )
     )
@@ -1101,7 +1184,8 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         sentinel,
-        span of "Child 1"
+        span of "Child 1",
+        sentinel
       )
     )
 
@@ -1133,7 +1217,8 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         sentinel,
-        span of "Child 2"
+        span of "Child 2",
+        sentinel
       )
     )
 
@@ -1167,7 +1252,8 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         sentinel,
-        span of "Child 3"
+        span of "Child 3",
+        sentinel
       )
     )
 
@@ -1219,6 +1305,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         span of "Child 1",
         span of "Child 2",
+        sentinel,
       )
     )
 
@@ -1253,6 +1340,7 @@ class MountHooksSpec extends UnitSpec {
         sentinel,
         span of "Child 3",
         span of "Child 4",
+        sentinel,
       )
     )
 

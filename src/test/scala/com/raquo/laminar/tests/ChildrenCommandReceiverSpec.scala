@@ -3,7 +3,7 @@ package com.raquo.laminar.tests
 import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.domapi.DomError
-import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, Replace}
+import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, RemoveAll, Replace, ReplaceAll}
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.{immutable, mutable}
@@ -64,15 +64,78 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
       withClue(clue) {
         val first: Rule = "Hello"
         val last: Rule = div of "World"
-        val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ last
+        val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ (sentinel: Rule) :+ last
 
         expectNode(div.of(rules: _*))
       }
     }
   }
 
+  it("RemoveAll and ReplaceAll") {
+    val commandBus = new EventBus[CollectionCommand[Node]]
+
+    val span0 = span(text0)
+    val span1 = span(text1)
+    val div2 = div(text2)
+    val div3 = div(text3)
+    val span4 = span(text4)
+
+    val el = div(
+      "Hello",
+      children.command <-- commandBus.events,
+      div("World")
+    )
+
+    mount(el)
+    expectChildren("initial:")
+
+    commandBus.writer.onNext(Append(span0))
+    commandBus.writer.onNext(Append(span1))
+    commandBus.writer.onNext(Prepend(div2))
+    expectChildren("built up:", div of text2, span of text0, span of text1)
+
+    // RemoveAll clears all tracked content, but keeps the sentinels in place.
+    commandBus.writer.onNext(RemoveAll)
+    expectChildren("after RemoveAll:")
+
+    // Commands keep working after a full clear.
+    commandBus.writer.onNext(Append(span4))
+    expectChildren("append after RemoveAll:", span of text4)
+
+    // ReplaceAll swaps the entire contents, in order.
+    commandBus.writer.onNext(ReplaceAll(div2 :: div3 :: Nil))
+    expectChildren("after ReplaceAll:", div of text2, div of text3)
+
+    // ReplaceAll with an empty seq is equivalent to RemoveAll.
+    commandBus.writer.onNext(ReplaceAll(Nil))
+    expectChildren("after empty ReplaceAll:")
+
+    // Still functional after an empty ReplaceAll.
+    commandBus.writer.onNext(Append(span0))
+    expectChildren("append after empty ReplaceAll:", span of text0)
+
+    commandBus.writer.onNext(Append(span1))
+    commandBus.writer.onNext(Append(div2))
+    expectChildren("built up again:", span of text0, span of text1, div of text2)
+
+    // ReplaceAll may include nodes that are currently rendered (span0, span1 here): they get
+    // torn down along with everything else, then re-inserted in the new order next to the new
+    // nodes. So this keeps span1 & span0 (reordered), drops div2, and adds a fresh div3.
+    commandBus.writer.onNext(ReplaceAll(span1 :: div3 :: span0 :: Nil))
+    expectChildren("after ReplaceAll reusing rendered nodes:", span of text1, div of text3, span of text0)
+
+    def expectChildren(clue: String, childRules: Rule*): Unit = {
+      withClue(clue) {
+        val first: Rule = "Hello"
+        val last: Rule = div of "World"
+        val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ (sentinel: Rule) :+ last
+        expectNode(div.of(rules: _*))
+      }
+    }
+  }
+
   // https://github.com/raquo/Laminar/issues/195
-  it("does not drift extraNodeCount when Append fails") {
+  it("does not drift the append position when Append fails") {
     val errors = mutable.Buffer[Throwable]()
     val collectingCallback: Throwable => Unit = errors += _
 
@@ -115,8 +178,9 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
         span of text1
       )
 
-      // With the bug, extraNodeCount was incorrectly incremented by the failed
-      // append, so this next append lands after div("World") instead of before it.
+      // A failed append must not shift where the NEXT append lands. With the trailing
+      // sentinel there is no node count to drift: Append always inserts right before the
+      // trailing sentinel, so spanC lands before div("World"), not after it.
       commandBus.writer.onNext(Append(spanC))
       expectChildren(clue = "after append C:")(
         span of text0,
@@ -133,7 +197,7 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
         withClue(clue) {
           val first: Rule = "Hello"
           val last: Rule = div of "World"
-          val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ last
+          val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ (sentinel: Rule) :+ last
           expectNode(div.of(rules: _*))
         }
       }

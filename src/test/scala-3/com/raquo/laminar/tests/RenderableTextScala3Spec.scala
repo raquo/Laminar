@@ -66,6 +66,7 @@ class RenderableTextScala3Spec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "str"
       )
     )
@@ -77,6 +78,7 @@ class RenderableTextScala3Spec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "5"
       )
     )

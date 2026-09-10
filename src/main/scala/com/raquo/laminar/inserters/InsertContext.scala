@@ -2,8 +2,7 @@ package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.AirstreamError
 import com.raquo.ew.JsMap
-import com.raquo.laminar
-import com.raquo.laminar.domapi.{DomApi, DomError}
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
 
@@ -45,107 +44,142 @@ import scala.scalajs.js
   *
   * @param sentinelNode        - A special invisible comment node that tells Laminar where to
   *                              insert the dynamic children, and where to expect previously
-  *                              inserted dynamic children.
-  * @param strictMode          - If true, Laminar guarantees that it will keep a dedicated
-  *                              sentinel node instead of using the extra node (content node)
-  *                              for that purpose. This is needed in order to allow users to
-  *                              move an element from one inserter to another, or to externally
-  *                              remove some of the elements previously added by an inserter.
-  *                              `text <--` does not need any of that, so for performance it
-  *                              does not use strict mode, it replaces the sentinel comment
-  *                              node with the subsequent text nodes. Inserters should be able
-  *                              to safely switch to their preferred mode when receiving
-  *                              context left by the previous inserter in onMountBind.
-  * @param extraNodeCount      - Number of child nodes in addition to the sentinel node.
-  *                              Warning: can get out of sync with the real DOM!
-  * @param extraNodesMap       - Map of child nodes in addition to the sentinel node,
-  *                              for more efficient search
-  *                              Warning: can get out of sync with the real DOM!
+  *                              inserted dynamic children. Content nodes always live AFTER
+  *                              this sentinel, which stays put for the life of the context –
+  *                              this is what lets users move an element from one inserter to
+  *                              another, or externally remove elements an inserter added.
   */
 final class InsertContext(
   val parentNode: ReactiveElement.Base,
-  var sentinelNode: ChildNode.Base,
-  var strictMode: Boolean,
-  var extraNodeCount: Int, // This is separate from `extraNodesMap` for performance #TODO[Performance]: Check if this is still relevant with JsMap
-  // var extraNodes: immutable.Seq[ChildNode.Base],
-  var extraNodesMap: JsMap[dom.Node, ChildNode.Base]
+  val sentinelNode: CommentNode
 ) {
 
-  /**
-    * This method converts the InsertContext from loose mode to strict mode.
-    * ChildrenInserter and ChildInserter call this when receiving a context from
-    * ChildTextInserter. This can happen when switching from `text <-- ...`
-    * to e.g. `children <-- ...` inside onMountInsert.
-    *
-    * Prerequisite: context must be in loose mode, and in valid state: no extra nodes allowed.
-    */
-  def ensureStrictMode(): Unit = {
-    if (!strictMode) {
-      if (extraNodeCount != 0) {
-        // #Note: if extraNodeCount == 0, it is also assumed (but not tested) that extraNodes and extraNodesMap are empty.
-        throw new Exception(s"forceSetStrictMode invoked when extraNodeCount = ${extraNodeCount} on parent node ${DomApi.debugNodeOuterHtml(parentNode.ref)}")
-      }
-      if (extraNodesMap == null) {
-        // In loose mode, extraNodesMap is likely to be null, so we need to initialize it.
-        extraNodesMap = new JsMap()
-      }
-      if (sentinelNode.ref.isInstanceOf[dom.Comment]) {
-        // This means there are no content nodes.
-        // We assume that all extraNode fields are properly zeroed, so there is nothing to do.
-      } else {
-        // In loose mode, child content nodes are written to sentinelNode field,
-        // so there are no extraNodes.
-        // So, if we find a content node in sentinelNode, we need to reclassify
-        // it as such for the strict mode, and insert a new sentinel node into the DOM.
-        val contentNode = sentinelNode
-        val newSentinelNode = new CommentNode("")
-        DomApi.raw
-          .insertBefore(
-            parent = parentNode.ref,
-            newChild = newSentinelNode.ref,
-            referenceChild = contentNode.ref
-          )
-          .foreach { domError =>
-            if (DomApi.shouldReportDomErrors) {
-              AirstreamError.sendUnhandledError(new DomError(domError))
-            }
-          }
+  /** Only multi-node inserters use this. Inserters that don't use it will remove it if found. */
+  var trailingSentinelNodeOpt: js.UndefOr[CommentNode] = js.undefined
 
-        // Convert loose mode context values to strict mode context values
-        sentinelNode = newSentinelNode
-        extraNodeCount = 1
-        // extraNodes = ChildrenSeq.fromJsVector(JsVector(contentNode))
-        extraNodesMap.set(contentNode.ref, contentNode) // we initialized the map above
-      }
-      strictMode = true
+  private var _lastInserterType: js.UndefOr[InserterType] = js.undefined
+
+  def lastInserterType: js.UndefOr[InserterType] = _lastInserterType
+
+  /** Inserters that are rendered into this context.
+    * Does not include sentinel node(s).
+    *
+    * (inserter.stableFirstNode -> inserter)
+    */
+  var contentMap: JsMap[dom.Node, Inserter] = new JsMap()
+
+  /** Removes old content both from contnetMap and from the DOM.
+    *
+    * @param replaceContentMapWithSingleNode
+    *            If specified, will ensure that the resulting contentMap has this node.
+    *            If specified, will prevent this node from being removed from the DOM, but will NOT add it to the DOM.
+    */
+  def clearPreviousInserterContent(
+    replaceContentMapWithSingleNode: js.UndefOr[ChildNode.Base],
+    nextInserterType: js.UndefOr[InserterType]
+  ): Unit = {
+    // Remove from the DOM any old nodes that shouldn't be retained.
+    removeContentMapNodesFromDom(keepNodeIfPresent = replaceContentMapWithSingleNode)
+
+    // Update the context to match the DOM state
+    contentMap.clear()
+    replaceContentMapWithSingleNode.foreach { newNode =>
+      contentMap.set(newNode.ref, newNode)
     }
+    setNextInserterType(nextInserterType)
   }
 
-  /** #Note: this does NOT update the context to match the DOM. */
-  def removeOldChildNodesFromDOM(after: ChildNode.Base): Unit = {
-    var remainingOldExtraNodeCount = extraNodeCount
-    while (remainingOldExtraNodeCount > 0) {
-      val prevChildRef = after.ref.nextSibling
-      if (prevChildRef == null) {
-        // We expected more previous children to be in the DOM, but we reached the end of the DOM.
-        // Those children must have been removed from the DOM manually, or moved to a different inserter.
-        // So, the DOM state is now correct, albeit "for the wrong reasons". All is good. End the loop.
-        remainingOldExtraNodeCount = 0
-      } else {
-        val maybePrevChild = extraNodesMap.get(prevChildRef)
-        if (maybePrevChild.isEmpty) {
-          // Similar to the prevChildRef == null case above, we've exhausted the DOM,
-          // except we stumbled on some unrelated element instead. We only allow external
-          // removals from the DOM, not external additions in the middle of dynamic children list,
-          // so this unrelated element is good evidence that there are no more old child nodes
-          // to be found.
-          remainingOldExtraNodeCount = 0
+  def setNextInserterType(nextInserterType: js.UndefOr[InserterType]): Unit = {
+    if (nextInserterType.exists(_.needsTrailingSentinel)) {
+      if (trailingSentinelNodeOpt.isEmpty) {
+        if (contentMap.size > 1) {
+          // If we're switching from a context with no trailing sentinel node,
+          // we expect that context to contain at most one node / inserter (e.g. child <--).
+          throw new Exception("Unexpected: multiple content nodes without trailing sentinel. This is a bug in Laminar.")
+        }
+        val afterRef: dom.Node = if (contentMap.size == 0) {
+          sentinelNode.ref
         } else {
-          maybePrevChild.foreach { prevChild =>
-            // @Note: DOM update
-            DomApi.removeChild(parent = parentNode, child = prevChild)
-            remainingOldExtraNodeCount -= 1
+          contentMap.entries().next().value._2.lastNode
+        }
+        // Next inserter type needs a trailing sentinel,
+        // and the context does not have it yet.
+        val trailingSentinel = new CommentNode("")
+        DomApi.insertChildAfter(
+          parent = parentNode,
+          newChild = trailingSentinel,
+          referenceChildRef = afterRef,
+          hooks = () // Ignoring hooks in comment nodes is ok... fow now.
+        )
+        trailingSentinelNodeOpt = trailingSentinel
+      }
+    } else {
+      // Next inserter does not need trailing sentinel
+      trailingSentinelNodeOpt.foreach { trailingSentinel =>
+        DomApi.removeChild(parent = parentNode, child = trailingSentinel)
+        trailingSentinelNodeOpt = js.undefined
+      }
+    }
+    // Update context inserter type
+    _lastInserterType = nextInserterType
+  }
+
+  /** Walk this context's span forward from [[sentinelNode]], removing every tracked
+    * ([[contentMap]]) node from the DOM except `keepNodeIfPresent`.
+    *
+    * Where the walk stops depends on whether we have a [[trailingSentinelNodeOpt]]:
+    *  - With one (a `children <--` or `children.command <--` span), it marks the definite
+    *    end of our content, so we walk right up to it and REPORT any node in between that we
+    *    don't recognize – we allow external removals from our span, but not external
+    *    insertions into it.
+    *  - Without one (`child <--` / `text <--`), our span has no end marker, so the first
+    *    untracked node is simply the next sibling after our content, and we stop there
+    *    quietly (we can't tell an intruder from a legitimate following sibling).
+    *
+    * #Note: Importantly, this walks only over the tracked nodes that are actually in the DOM.
+    *  If some of the tracked nodes have already been moved to a different place, we ignore them –
+    *  presumably they are now being tracked by their new host.
+    *
+    * #Note: this does NOT update [[contentMap]] to match the new DOM.
+    */
+  def removeContentMapNodesFromDom(
+    keepNodeIfPresent: js.UndefOr[ChildNode.Base]
+  ): Unit = {
+    val hasTrailingSentinel = trailingSentinelNodeOpt.nonEmpty
+    var maybeRef = sentinelNode.ref.nextSibling
+    var continue = true
+    while (continue && maybeRef != null) {
+      val childRef = maybeRef
+      if (trailingSentinelNodeOpt.exists(_.ref == childRef)) {
+        // Reached the end of our span. Stop.
+        continue = false
+      } else if (keepNodeIfPresent.exists(_.ref == childRef)) {
+        // The node we're keeping. Leave it in place, step over it (a plain content node, so
+        // a single node) and keep clearing whatever old content sits after it.
+        maybeRef = childRef.nextSibling
+      } else {
+        contentMap.get(childRef).fold {
+          if (hasTrailingSentinel) {
+            // Our content definitively extends to the trailing sentinel, so this untracked
+            // node sitting before it is an unauthorized addition. Report it and step over it
+            // (we leave it in place – it isn't ours to remove).
+            // #TODO[nested-dyn] Should we report this...? Or maybe just print a warning?
+            AirstreamError.sendUnhandledError(
+              new Exception(s"Found unexpected node not tracked by Laminar: `${DomApi.debugNodeDescription(childRef)}`")
+            )
+            maybeRef = childRef.nextSibling
+          } else {
+            // No trailing sentinel: the first untracked node is the next sibling after our
+            // span, which is expected. Stop.
+            continue = false
           }
+        } { inserter =>
+          // Capture the continuation BEFORE removal mutates the DOM, and jump by `lastNode`
+          // so a multi-node span (e.g. a nested group) is stepped over in one go.
+          val nextRef = inserter.lastNode.nextSibling
+          // @Note: DOM update
+          inserter.removeFromDynamicList(parentNode)
+          maybeRef = nextRef
         }
       }
     }
@@ -178,26 +212,12 @@ object InsertContext {
     */
   def unsafeMakeReservedSpotContext(
     parentNode: ReactiveElement.Base,
-    sentinelNode: ChildNode.Base
+    sentinelNode: CommentNode
   ): InsertContext = {
-    // #Warning[Fragile] - We avoid instantiating a JsMap in loose mode, for performance.
-    //  The JsMap is initialized if/when needed, in forceSetStrictMode.
     new InsertContext(
       parentNode = parentNode,
-      sentinelNode = sentinelNode,
-      strictMode = false,
-      extraNodeCount = 0,
-      // extraNodes = ChildrenSeq.empty,
-      extraNodesMap = null
+      sentinelNode = sentinelNode
     )
-  }
-
-  private[laminar] def nodesToMap(nodes: laminar.Seq[ChildNode.Base]): JsMap[dom.Node, ChildNode.Base] = {
-    val acc = new JsMap[dom.Node, ChildNode.Base]()
-    nodes.foreach { node =>
-      acc.set(node.ref, node)
-    }
-    acc
   }
 
 }

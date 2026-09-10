@@ -37,7 +37,8 @@ class ChildrenReceiverSpec extends UnitSpec {
     val span5 = span(text5)
 
     mount(mainTag(children <-- childrenStream))
-    expectChildren("none")
+    // Pre-emit: only the leading sentinel exists; the trailing one is created on first emit.
+    expectNode(mainTag.of(sentinel))
 
     childrenBus.writer.onNext(List())
 
@@ -91,7 +92,8 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
-        val rules: immutable.Seq[Rule] = (sentinel: Rule) +: childRules
+        // `children <--` brackets its content with a leading and a trailing sentinel.
+        val rules: immutable.Seq[Rule] = ((sentinel: Rule) +: childRules) :+ (sentinel: Rule)
 
         expectNode(mainTag.of(rules: _*))
       }
@@ -111,7 +113,8 @@ class ChildrenReceiverSpec extends UnitSpec {
     val span5 = span(text5)
 
     mount(mainTag(children <-- childrenStream))
-    expectChildren("none")
+    // Pre-emit: only the leading sentinel exists; the trailing one is created on first emit.
+    expectNode(mainTag.of(sentinel))
 
     childrenBus.writer.onNext(JsVector())
 
@@ -165,7 +168,8 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
-        val rules: immutable.Seq[Rule] = (sentinel: Rule) +: childRules
+        // `children <--` brackets its content with a leading and a trailing sentinel.
+        val rules: immutable.Seq[Rule] = ((sentinel: Rule) +: childRules) :+ (sentinel: Rule)
 
         expectNode(mainTag.of(rules: _*))
       }
@@ -187,7 +191,8 @@ class ChildrenReceiverSpec extends UnitSpec {
     val span5 = span(text5)
 
     mount(mainTag(children <-- childrenStream))
-    expectChildren("none")
+    // Pre-emit: only the leading sentinel exists; the trailing one is created on first emit.
+    expectNode(mainTag.of(sentinel))
 
     childrenBus.emit(arr)
 
@@ -272,7 +277,8 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
       withClue(clue) {
-        val rules: immutable.Seq[Rule] = (sentinel: Rule) +: childRules
+        // `children <--` brackets its content with a leading and a trailing sentinel.
+        val rules: immutable.Seq[Rule] = ((sentinel: Rule) +: childRules) :+ (sentinel: Rule)
 
         expectNode(mainTag.of(rules: _*))
       }
@@ -322,7 +328,8 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     expectNode(div like (
       "Hello",
-      sentinel
+      sentinel,
+      sentinel // Empty list still emitted on mount, so the trailing sentinel already exists.
     ))
 
     effects shouldBe mutable.Buffer(
@@ -338,8 +345,9 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: a", span like "a", "1"),
-      div like ("ID: b", span like "b", "10")
+      div like ("ID: a", span like (sentinel, "a"), sentinel, "1"),
+      div like ("ID: b", span like (sentinel, "b"), sentinel, "10"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
@@ -361,14 +369,15 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: a", span like "a", "1"),
-      div like ("ID: b", span like "b", "10"),
-      div like ("ID: c", span like "c", "100")
+      div like ("ID: a", span like (sentinel, "a"), sentinel, "1"),
+      div like ("ID: b", span like (sentinel, "b"), sentinel, "10"),
+      div like ("ID: c", span like (sentinel, "c"), sentinel, "100"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
       Effect("render-c-3", "Foo(c,100)"),
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span><!----></span><!----></div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!----></span><!----></div>)"),
       Effect("fooSignal-child1-c-3", "Foo(c,100)"),
       Effect("fooSignal-child2-c-3", "Foo(c,100)"),
       Effect("fooSignal-child1-a-1", "Foo(a,1)"),
@@ -390,7 +399,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount("mount-2", el)
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-1", "Foo(a,1)"),
       Effect("fooSignal-child2-a-1", "Foo(a,1)"),
       Effect("fooSignal-child1-b-2", "Foo(b,10)"),
@@ -412,14 +421,14 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount("mount-5", el)
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-1", "Foo(a,1)"),
       Effect("fooSignal-child2-a-1", "Foo(a,1)"),
       Effect("fooSignal-child1-b-2", "Foo(b,10)"),
       Effect("fooSignal-child2-b-2", "Foo(b,10)"),
       Effect("fooSignal-child1-c-3", "Foo(c,100)"),
       Effect("fooSignal-child2-c-3", "Foo(c,100)"),
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-1", "Foo(a,1)"),
       Effect("fooSignal-child2-a-1", "Foo(a,1)"),
       Effect("fooSignal-child1-b-2", "Foo(b,10)"),
@@ -435,7 +444,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     bus.emit(List(Foo("a", 1), Foo("c", 101)))
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-1", "Foo(a,1)"),
       Effect("fooSignal-child2-a-1", "Foo(a,1)"),
       Effect("fooSignal-child1-c-3", "Foo(c,101)"),
@@ -450,7 +459,7 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     effects shouldBe mutable.Buffer(
       Effect("render-b-4", "Foo(b,2)"),
-      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span>c</span>101</div>)"),
+      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span><!---->c</span><!---->101</div>)"),
       Effect("fooSignal-child1-b-4", "Foo(b,2)"),
       Effect("fooSignal-child2-b-4", "Foo(b,2)"),
       Effect("fooSignal-child1-c-3", "Foo(c,102)"),
@@ -508,14 +517,15 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: initial", span like "initial", "1"),
+      div like ("ID: initial", span like (sentinel, "initial"), sentinel, "1"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
       Effect("render-initial-1", "Foo(initial,1)"),
       Effect("fooSignal-child1-initial-1", "Foo(initial,1)"),
       Effect("fooSignal-child2-initial-1", "Foo(initial,1)"),
-      Effect("splitSignal", "List(<div>ID: initial<span>initial</span>1</div>)"),
+      Effect("splitSignal", "List(<div>ID: initial<span><!---->initial</span><!---->1</div>)"),
     )
 
     effects.clear()
@@ -527,8 +537,9 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: a", span like "a", "1"),
-      div like ("ID: b", span like "b", "10")
+      div like ("ID: a", span like (sentinel, "a"), sentinel, "1"),
+      div like ("ID: b", span like (sentinel, "b"), sentinel, "10"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
@@ -550,14 +561,15 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: a", span like "a", "1"),
-      div like ("ID: b", span like "b", "10"),
-      div like ("ID: c", span like "c", "100")
+      div like ("ID: a", span like (sentinel, "a"), sentinel, "1"),
+      div like ("ID: b", span like (sentinel, "b"), sentinel, "10"),
+      div like ("ID: c", span like (sentinel, "c"), sentinel, "100"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
       Effect("render-c-4", "Foo(c,100)"),
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span><!----></span><!----></div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!----></span><!----></div>)"),
       Effect("fooSignal-child1-c-4", "Foo(c,100)"),
       Effect("fooSignal-child2-c-4", "Foo(c,100)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
@@ -579,7 +591,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount("mount-2", el)
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-b-3", "Foo(b,10)"),
@@ -601,14 +613,14 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount("mount-5", el)
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-b-3", "Foo(b,10)"),
       Effect("fooSignal-child2-b-3", "Foo(b,10)"),
       Effect("fooSignal-child1-c-4", "Foo(c,100)"),
       Effect("fooSignal-child2-c-4", "Foo(c,100)"),
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-b-3", "Foo(b,10)"),
@@ -624,7 +636,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     modelsVar.set(List(Foo("a", 1), Foo("c", 101)))
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-c-4", "Foo(c,101)"),
@@ -639,7 +651,7 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     effects shouldBe mutable.Buffer(
       Effect("render-b-5", "Foo(b,2)"),
-      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span>c</span>101</div>)"),
+      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span><!---->c</span><!---->101</div>)"),
       Effect("fooSignal-child1-b-5", "Foo(b,2)"),
       Effect("fooSignal-child2-b-5", "Foo(b,2)"),
       Effect("fooSignal-child1-c-4", "Foo(c,102)"),
@@ -695,14 +707,15 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: initial", span like "initial", "1"),
+      div like ("ID: initial", span like (sentinel, "initial"), sentinel, "1"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
       Effect("render-initial-1", "Foo(initial,1)"),
       Effect("fooSignal-child1-initial-1", "Foo(initial,1)"),
       Effect("fooSignal-child2-initial-1", "Foo(initial,1)"),
-      Effect("splitSignal", "List(<div>ID: initial<span>initial</span>1</div>)"),
+      Effect("splitSignal", "List(<div>ID: initial<span><!---->initial</span><!---->1</div>)"),
     )
 
     effects.clear()
@@ -714,8 +727,9 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: a", span like "a", "1"),
-      div like ("ID: b", span like "b", "10")
+      div like ("ID: a", span like (sentinel, "a"), sentinel, "1"),
+      div like ("ID: b", span like (sentinel, "b"), sentinel, "10"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
@@ -737,14 +751,15 @@ class ChildrenReceiverSpec extends UnitSpec {
     expectNode(div like (
       "Hello",
       sentinel,
-      div like ("ID: a", span like "a", "1"),
-      div like ("ID: b", span like "b", "10"),
-      div like ("ID: c", span like "c", "100")
+      div like ("ID: a", span like (sentinel, "a"), sentinel, "1"),
+      div like ("ID: b", span like (sentinel, "b"), sentinel, "10"),
+      div like ("ID: c", span like (sentinel, "c"), sentinel, "100"),
+      sentinel
     ))
 
     effects shouldBe mutable.Buffer(
       Effect("render-c-4", "Foo(c,100)"),
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span><!----></span><!----></div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!----></span><!----></div>)"),
       Effect("fooSignal-child1-c-4", "Foo(c,100)"),
       Effect("fooSignal-child2-c-4", "Foo(c,100)"),
       // Effect("fooSignal-child1-a-2", "Foo(a,1)"),
@@ -766,7 +781,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount("mount-2", el)
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-b-3", "Foo(b,10)"),
@@ -788,14 +803,14 @@ class ChildrenReceiverSpec extends UnitSpec {
     mount("mount-5", el)
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-b-3", "Foo(b,10)"),
       Effect("fooSignal-child2-b-3", "Foo(b,10)"),
       Effect("fooSignal-child1-c-4", "Foo(c,100)"),
       Effect("fooSignal-child2-c-4", "Foo(c,100)"),
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: b<span>b</span>10</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: b<span><!---->b</span><!---->10</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-b-3", "Foo(b,10)"),
@@ -811,7 +826,7 @@ class ChildrenReceiverSpec extends UnitSpec {
     modelsVar.set(List(Foo("a", 1), Foo("c", 101)))
 
     effects shouldBe mutable.Buffer(
-      Effect("splitSignal", "List(<div>ID: a<span>a</span>1</div>, <div>ID: c<span>c</span>100</div>)"),
+      Effect("splitSignal", "List(<div>ID: a<span><!---->a</span><!---->1</div>, <div>ID: c<span><!---->c</span><!---->100</div>)"),
       // Effect("fooSignal-child1-a-2", "Foo(a,1)"),
       // Effect("fooSignal-child2-a-2", "Foo(a,1)"),
       Effect("fooSignal-child1-c-4", "Foo(c,101)"),
@@ -826,7 +841,7 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     effects shouldBe mutable.Buffer(
       Effect("render-b-5", "Foo(b,2)"),
-      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span>c</span>101</div>)"),
+      Effect("splitSignal", "List(<div>ID: b<span><!----></span><!----></div>, <div>ID: c<span><!---->c</span><!---->101</div>)"),
       Effect("fooSignal-child1-b-5", "Foo(b,2)"),
       Effect("fooSignal-child2-b-5", "Foo(b,2)"),
       Effect("fooSignal-child1-c-4", "Foo(c,102)"),
@@ -882,11 +897,13 @@ class ChildrenReceiverSpec extends UnitSpec {
         span of "a",
         span of "b",
         span of "c",
+        sentinel,
         span of "--",
         sentinel,
         span of "d",
         span of "e",
-        span of "f"
+        span of "f",
+        sentinel
       )
     )
 
@@ -899,9 +916,11 @@ class ChildrenReceiverSpec extends UnitSpec {
       div of (
         sentinel,
         span of "a",
+        sentinel,
         span of "--",
         sentinel,
         span of "d",
+        sentinel,
       )
     )
 
@@ -917,9 +936,11 @@ class ChildrenReceiverSpec extends UnitSpec {
         sentinel,
         span of "a",
         span of "d",
+        sentinel,
         span of "--",
         sentinel,
         span of "e",
+        sentinel,
       )
     )
 
@@ -934,10 +955,12 @@ class ChildrenReceiverSpec extends UnitSpec {
       div of (
         sentinel,
         span of "a",
+        sentinel,
         span of "--",
         sentinel,
         span of "e",
         span of "d",
+        sentinel,
       )
     )
 
@@ -953,9 +976,11 @@ class ChildrenReceiverSpec extends UnitSpec {
         sentinel,
         span of "d",
         span of "a",
+        sentinel,
         span of "--",
         sentinel,
         span of "e",
+        sentinel,
       )
     )
 
@@ -971,11 +996,13 @@ class ChildrenReceiverSpec extends UnitSpec {
         sentinel,
         span of "f",
         span of "c",
+        sentinel,
         span of "--",
         sentinel,
         span of "e",
         span of "a",
         span of "d",
+        sentinel,
       )
     )
 
@@ -993,9 +1020,11 @@ class ChildrenReceiverSpec extends UnitSpec {
         span of "a",
         span of "c",
         span of "d",
+        sentinel,
         span of "--",
         sentinel,
         span of "e",
+        sentinel,
       )
     )
 
@@ -1010,16 +1039,122 @@ class ChildrenReceiverSpec extends UnitSpec {
       div of (
         sentinel,
         span of "e",
+        sentinel,
         span of "--",
         sentinel,
         span of "f",
         span of "a",
         span of "c",
-        span of "d"
+        span of "d",
+        sentinel
       )
     )
 
     // #TODO[Test]: also test for externally removing an element?
+  }
+
+  it("clearing a list to empty after its items were moved to another list (delete-loop guard)") {
+    // Pins the `!isContentEnd(prevItemRef)` guard on the delete loop in
+    // `ChildrenInserter.updateChildren`. When a list's items are relocated into
+    // another dynamic list, this list's `contentMap` is left stale (it still counts
+    // the moved items) while its DOM span between the sentinels is now empty. If we
+    // then emit an EMPTY list, the placement `foreach` never runs, so the mid-loop
+    // count correction never fires, and `currentItemCount` stays inflated. Without
+    // the guard, the delete loop walks off the real content, calls
+    // `prevInserterFromRef` on the trailing sentinel, and throws
+    // `prevHandleFromRef[children]: not found`. With it, the walk stops at the
+    // trailing sentinel and the list is cleaned up correctly.
+
+    val spanA = span("a")
+    val spanB = span("b")
+    val spanC = span("c")
+
+    val bus1 = new EventBus[List[HtmlElement]]
+    val bus2 = new EventBus[List[HtmlElement]]
+
+    val el = div(
+      children <-- bus1,
+      span("--"),
+      children <-- bus2,
+    )
+
+    mount(el)
+
+    // Neither EventBus emits on mount, so no trailing sentinels exist yet.
+    expectNode(
+      div of (
+        sentinel,
+        span of "--",
+        sentinel
+      )
+    )
+
+    // -- List 1 gets [a, b]; list 2 is still untouched (no trailing sentinel yet). --
+
+    bus1.emit(List(spanA, spanB))
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "a",
+        span of "b",
+        sentinel,
+        span of "--",
+        sentinel
+      )
+    )
+
+    // -- List 2 grabs a and b, physically moving them out of list 1's span. List 1
+    //    is NOT notified, so its contentMap still counts a and b, but its DOM span
+    //    (between its two sentinels) is now empty. --
+
+    bus2.emit(List(spanA, spanB))
+
+    expectNode(
+      div of (
+        sentinel,
+        sentinel,
+        span of "--",
+        sentinel,
+        span of "a",
+        span of "b",
+        sentinel
+      )
+    )
+
+    // -- Now empty list 1. This is the guard-exercising path: empty nextItems +
+    //    inflated currentItemCount + empty DOM span. Must NOT throw. --
+
+    bus1.emit(Nil)
+
+    expectNode(
+      div of (
+        sentinel,
+        sentinel,
+        span of "--",
+        sentinel,
+        span of "a",
+        span of "b",
+        sentinel
+      )
+    )
+
+    // -- List 1's contentMap must have been reset cleanly, so it still works. --
+
+    bus1.emit(List(spanC))
+
+    expectNode(
+      div of (
+        sentinel,
+        span of "c",
+        sentinel,
+        span of "--",
+        sentinel,
+        span of "a",
+        span of "b",
+        sentinel
+      )
+    )
   }
 
   it("unmount stream") {
@@ -1048,7 +1183,8 @@ class ChildrenReceiverSpec extends UnitSpec {
       div of (
         sentinel,
         span of "a",
-        span of "b"
+        span of "b",
+        sentinel
       )
     )
 
@@ -1061,7 +1197,8 @@ class ChildrenReceiverSpec extends UnitSpec {
       div of (
         sentinel,
         span of "a",
-        span of "b"
+        span of "b",
+        sentinel
       )
     )
 
@@ -1071,7 +1208,8 @@ class ChildrenReceiverSpec extends UnitSpec {
       div of (
         sentinel,
         span of "a",
-        span of "b"
+        span of "b",
+        sentinel
       )
     )
   }
@@ -1085,12 +1223,12 @@ class ChildrenReceiverSpec extends UnitSpec {
 
     withClue("First event:") {
       childBus.writer.onNext(Some(span(text1)))
-      expectNode(div.of("Hello, ", sentinel, span of text1))
+      expectNode(div.of("Hello, ", sentinel, span of text1, sentinel))
     }
 
     withClue("Second event, changing node type (span->div):") {
       childBus.writer.onNext(Some(div(text2)))
-      expectNode(div.of("Hello, ", sentinel, div of text2))
+      expectNode(div.of("Hello, ", sentinel, div of text2, sentinel))
     }
   }
 

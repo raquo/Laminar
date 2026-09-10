@@ -71,7 +71,7 @@ class ShadowDomSpec extends UnitSpec {
           app.ref,
           div.of(
             "Hello, ",
-            span.of("world")
+            span.of(sentinel, "world")
           )
         )
 
@@ -83,7 +83,7 @@ class ShadowDomSpec extends UnitSpec {
           app.ref,
           div.of(
             "Hello, ",
-            span.of("you")
+            span.of(sentinel, "you")
           )
         )
 

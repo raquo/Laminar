@@ -43,6 +43,7 @@ class SplitVarSpec extends UnitSpec {
     ))
 
     expectNode(div of (
+      sentinel,
       sentinel
     ))
 
@@ -56,8 +57,10 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -77,8 +80,10 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -97,16 +102,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.1"
       ),
       div of (
         idAttr is s"item-3",
+        sentinel,
         "Three.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -138,16 +147,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.4"
       ),
       div of (
         idAttr is s"item-3",
+        sentinel,
         "Three.3"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -170,16 +183,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-3",
+        sentinel,
         "Three.3"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.4"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(effects.toList, Nil)
@@ -192,16 +209,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.4"
       ),
       div of (
         idAttr is s"item-3",
+        sentinel,
         "Three.3"
       ),
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
       ),
+      sentinel
     ))
 
     assertEquals(effects.toList, Nil)
@@ -220,16 +241,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.1"
       ),
       div of (
         idAttr is s"item-3",
+        sentinel,
         "Three.3"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.4"
       ),
+      sentinel
     ))
 
     assertEquals(
@@ -265,6 +290,7 @@ class SplitVarSpec extends UnitSpec {
     ))
 
     expectNode(div of (
+      sentinel,
       sentinel
     ))
 
@@ -279,6 +305,7 @@ class SplitVarSpec extends UnitSpec {
       div of (idAttr is s"item-1"),
       div of (idAttr is s"item-2"),
       div of (idAttr is s"item-3"),
+      sentinel
     ))
 
     assertEquals(
@@ -338,6 +365,7 @@ class SplitVarSpec extends UnitSpec {
     ))
 
     expectNode(div of (
+      sentinel,
       sentinel
     ))
 
@@ -351,12 +379,15 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.1"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -380,12 +411,15 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -427,6 +461,7 @@ class SplitVarSpec extends UnitSpec {
     ))
 
     expectNode(div of (
+      sentinel,
       sentinel
     ))
 
@@ -446,12 +481,15 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.1"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -476,12 +514,15 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-1",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -524,6 +565,7 @@ class SplitVarSpec extends UnitSpec {
     ))
 
     expectNode(div of (
+      sentinel,
       sentinel
     ))
 
@@ -537,8 +579,10 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "One.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -558,8 +602,10 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "One.2"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -578,16 +624,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-1",
+        sentinel,
         "Two.1"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Three.1"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -619,16 +669,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-1",
+        sentinel,
         "Two.4"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Three.3"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -651,16 +705,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "One.2"
       ),
       div of (
         idAttr is s"item-1",
+        sentinel,
         "Three.3"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.4"
-      )
+      ),
+      sentinel
     ))
 
     assertEquals(
@@ -680,16 +738,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "Two.4"
       ),
       div of (
         idAttr is s"item-1",
+        sentinel,
         "Three.3"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "One.2"
       ),
+      sentinel
     ))
 
     assertEquals(
@@ -713,16 +775,20 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is s"item-0",
+        sentinel,
         "One.1"
       ),
       div of (
         idAttr is s"item-1",
+        sentinel,
         "Three.3"
       ),
       div of (
         idAttr is s"item-2",
+        sentinel,
         "Two.4"
       ),
+      sentinel
     ))
 
     assertEquals(
@@ -781,6 +847,7 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is "some-child",
+        sentinel,
         "One.1"
       )
     ))
@@ -802,6 +869,7 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is "some-child",
+        sentinel,
         "One.2"
       )
     ))
@@ -822,6 +890,7 @@ class SplitVarSpec extends UnitSpec {
       sentinel,
       div of (
         idAttr is "some-child",
+        sentinel,
         "Two.1"
       )
     ))

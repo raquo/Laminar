@@ -134,7 +134,7 @@ class MathMlSpec extends UnitSpec {
           displayStyle is true,
           msup of (
             mi of ("a"),
-            mn of ("2")
+            mn of (sentinel, "2")
           ),
           sentinel,
           mo of (symbols.minus),
@@ -159,7 +159,7 @@ class MathMlSpec extends UnitSpec {
           displayStyle is false,
           msup of (
             mi of ("a"),
-            mn of ("3")
+            mn of (sentinel, "3")
           ),
           sentinel,
           mo of (symbols.plus),

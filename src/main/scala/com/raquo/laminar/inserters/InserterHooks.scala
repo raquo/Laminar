@@ -6,6 +6,9 @@ import com.raquo.laminar.nodes.{ChildNode, ParentNode}
 import scala.scalajs.js
 
 /** #TODO This API is experimental, and is likely to change in the future.
+  *  - should text nodes and comment nodes trigger this?
+  *    - should such hooks even apply to sentinel comment nodes?
+  *      Currently that's moot, but in principle?
   *
   * We currently use it only for slotting elements into web components,
   * but will likely use it more broadly later.

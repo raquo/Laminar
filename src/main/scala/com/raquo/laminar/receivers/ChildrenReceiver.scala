@@ -2,8 +2,7 @@ package com.raquo.laminar.receivers
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.inserters.{ChildrenInserter, DynamicInserter}
-import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
-import com.raquo.laminar.nodes.ChildNode
+import com.raquo.laminar.modifiers.{RenderableInserter, RenderableSeq}
 
 import scala.scalajs.js
 
@@ -13,38 +12,28 @@ object ChildrenReceiver {
 
   implicit class RichChildrenReceiver(private val self: ChildrenReceiver.type) extends AnyVal {
 
-    // #TODO[UX] Can I remove this method, to improve error messages, get rid of "none of the overloaded alternatives" error?
-    def <--(
-      childrenSource: Source[Seq[ChildNode.Base]]
-    ): DynamicInserter = {
-      ChildrenInserter(
-        childrenSource.toObservable,
-        RenderableSeq.collectionSeqRenderable,
-        RenderableNode.nodeRenderable,
-        initialHooks = js.undefined
-      )
-    }
-
+    /** `children <-- observableOfListOfItems`
+      *
+      * Each item is converted to an [[com.raquo.laminar.inserters.Inserter]] via
+      * [[RenderableInserter]]. In practice an item can be:
+      *  - a Laminar node, or any component with a `RenderableNode` instance
+      *    (rendered as a single static node, allocation-cheap – no sentinel);
+      *  - a dynamic inserter such as `child <-- ...` or `children <-- ...`, which
+      *    can be nested directly among the children (Laminar issue #157), e.g.
+      *    returning `child <-- ...` from inside a `split` callback.
+      */
     def <--[Collection[_], Component](
       childrenSource: Source[Collection[Component]]
     )(implicit
-      renderableNode: RenderableNode[Component],
+      renderableInserter: RenderableInserter[Component],
       renderableSeq: RenderableSeq[Collection]
     ): DynamicInserter = {
-      // Route the Option case to simpler more efficient child.maybe receiver.
-      if (renderableSeq == RenderableSeq.optionRenderable) {
-        ChildOptionReceiver <-- childrenSource.asInstanceOf[Source[Option[Component]]]
-        // #TODO child.maybe can't handle js.UndefOr yet
-        // } else if (renderableSeq == RenderableSeq.jsUndefOrRenderable) {
-        //   ChildOptionReceiver <-- childrenSource.asInstanceOf[Source[js.UndefOr[Component]]]
-      } else {
-        ChildrenInserter(
-          childrenSource.toObservable,
-          renderableSeq,
-          renderableNode,
-          initialHooks = js.undefined
-        )
-      }
+      ChildrenInserter(
+        childrenSource.toObservable,
+        renderableSeq,
+        renderableInserter,
+        initialHooks = js.undefined
+      )
     }
   }
 

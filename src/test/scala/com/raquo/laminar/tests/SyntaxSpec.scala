@@ -285,7 +285,7 @@ class SyntaxSpec extends UnitSpec {
 
     mount(el)
 
-    expectNode(div of ("hello", "123", "world"))
+    expectNode(div of (sentinel, "hello", sentinel, "123", "world"))
   }
 
   it("onMountBind with implicit setters syntax") {

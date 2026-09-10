@@ -231,6 +231,7 @@ class WeirdCasesSpec extends UnitSpec {
         "Hello ",
         sentinel,
         span.of("Nikita"),
+        sentinel,
         " world"
       ))
 
@@ -255,6 +256,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
+        sentinel,
         " world"
       ))
 
@@ -289,6 +291,7 @@ class WeirdCasesSpec extends UnitSpec {
           span.of("Charlie"),
           span.of("Delta"),
           span.of("Eagle"),
+          sentinel,
           " world"
         )
       )
@@ -316,6 +319,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Delta"),
         span.of("Bravo"),
         span.of("Tor"),
+        sentinel,
         " world"
       ))
 
@@ -345,6 +349,7 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Alpha"),
         span.of("Elan"),
         span.of("John"),
+        sentinel,
         " world"
       ))
     }
@@ -412,6 +417,7 @@ class WeirdCasesSpec extends UnitSpec {
         sentinel,
         span.of("Nikita"),
         sentinel,
+        sentinel,
         " world"
       ))
 
@@ -437,11 +443,13 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Delta"),
         span.of("Eagle"),
         sentinel,
+        sentinel,
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
+        sentinel,
         " world"
       ))
 
@@ -479,11 +487,13 @@ class WeirdCasesSpec extends UnitSpec {
           span.of("Delta"),
           span.of("Eagle"),
           sentinel,
+          sentinel,
           span.of("Alpha"),
           span.of("Bravo"),
           span.of("Charlie"),
           span.of("Delta"),
           span.of("Eagle"),
+          sentinel,
           " world"
         )
       )
@@ -519,11 +529,13 @@ class WeirdCasesSpec extends UnitSpec {
           span.of("Delta"),
           span.of("Eagle"),
           sentinel,
+          sentinel,
           span.of("Alpha"),
           span.of("Bravo"),
           span.of("Charlie"),
           span.of("Delta"),
           span.of("Eagle"),
+          sentinel,
           " world"
         )
       )
@@ -552,12 +564,14 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Bravo"),
         span.of("Tor"),
         sentinel,
+        sentinel,
         // remember, these are from copyStream – so those are copies.
         span.of("Alpha"),
         span.of("Bravo"),
         span.of("Charlie"),
         span.of("Delta"),
         span.of("Eagle"),
+        sentinel,
         " world"
       ))
 
@@ -591,12 +605,14 @@ class WeirdCasesSpec extends UnitSpec {
         span.of("Elan"),
         span.of("John"),
         sentinel,
+        sentinel,
         span.of("Tor"),
         span.of("Delta"),
         span.of("Bravo"),
         span.of("Alpha"),
         span.of("Elan"),
         span.of("John"),
+        sentinel,
         " world"
       ))
     }

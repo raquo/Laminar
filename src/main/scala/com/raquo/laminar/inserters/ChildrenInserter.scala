@@ -3,9 +3,8 @@ package com.raquo.laminar.inserters
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
 import com.raquo.laminar
-import com.raquo.laminar.domapi.{DomApi, DomTree}
-import com.raquo.laminar.modifiers.{RenderableNode, RenderableSeq}
-import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
+import com.raquo.laminar.modifiers.{RenderableInserter, RenderableSeq}
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.collection.immutable
@@ -22,232 +21,164 @@ object ChildrenInserter {
   def apply[Collection[_], Component](
     childrenSource: Observable[Collection[Component]],
     renderableSeq: RenderableSeq[Collection],
-    renderableNode: RenderableNode[Component],
+    renderableInserter: RenderableInserter[Component],
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
       insertFn = (ctx, owner, hooks) => {
-        // Reset sentinel node on binding too, don't wait for events
-        ctx.ensureStrictMode()
-        // var maybeLastSeenChildren: js.UndefOr[immutable.Seq[ChildNode.Base]] = ctx.extraNodes
         childrenSource.foreach { components =>
-          // #TODO[Performance] This is not ideal – for CUSTOM renderable components asNodeSeq
-          //  will need to map over the seq, creating a new seq of child nodes.
-          //  Unfortunately, avoiding this is quite complicated.
-          val newChildren = renderableNode.asNodeSeq(
-            renderableSeq.toSeq(components)
+          switchToChildren(
+            nextItems = renderableSeq.toSeq(components),
+            renderable = renderableInserter,
+            ctx = ctx,
+            hooks = hooks
           )
-
-          // #TODO[Performance] Consider bringing back this eq check. Benchmark performance cost.
-          //  - Without it, we might get worse performance, as when the same list is emitted,
-          //    Laminar needs to iterate over the list of elements and check their position in the DOM.
-          //    These checks are desirable in rare cases when the list of elements is affected by other
-          //    inserters, e.g. when another inserter has removed an item from the list, and later this
-          //    inserter re-emits the same list trying to add the item back where it used to be.
-          //  - TLDR – we're choosing correctness over performance for now, but both are only a small
-          //    difference. Check that performance cost is not too bad with benchmarks.
-
-          // if (!maybeLastSeenChildren.exists(_ eq newChildren)) { // #Note: auto-distinction
-          //   maybeLastSeenChildren = newChildren
-          switchToChildren(newChildren, ctx, hooks)
-          // }
         }(using owner)
       },
       hooks = initialHooks
     )
   }
 
-  def switchToChildren(
-    newChildren: laminar.Seq[ChildNode.Base],
+  def switchToChildren[Component](
+    nextItems: laminar.Seq[Component],
+    renderable: RenderableInserter[Component],
     ctx: InsertContext,
     hooks: js.UndefOr[InserterHooks]
   ): Unit = {
-    // #Note: previously in ChildInserter we only did this once in insertFn.
-    //  I think it's cheap and safe to do this check on every childSource.foreach.
-    ctx.ensureStrictMode()
+    ctx.setNextInserterType(InserterType.ChildrenType)
 
-    val newChildrenMap = InsertContext.nodesToMap(newChildren)
-    ctx.extraNodeCount = updateChildren(
-      prevChildren = ctx.extraNodesMap,
-      nextChildren = newChildren,
-      nextChildrenMap = newChildrenMap,
-      parentNode = ctx.parentNode,
-      sentinelNode = ctx.sentinelNode,
-      ctx.extraNodeCount,
-      hooks
+    ctx.contentMap = updateChildren(
+      nextItems = nextItems,
+      renderable = renderable,
+      prevContentMap = ctx.contentMap,
+      listParentNode = ctx.parentNode,
+      listSentinelNodeRef = ctx.sentinelNode.ref,
+      listTrailingSentinelRef = ctx.trailingSentinelNodeOpt.map(_.ref),
+      hooks = hooks
     )
-    // ctx.extraNodes = newChildren
-    ctx.extraNodesMap = newChildrenMap
   }
 
-  /** @return New child node count */
-  private def updateChildren(
-    prevChildren: JsMap[dom.Node, ChildNode.Base],
-    nextChildren: laminar.Seq[ChildNode.Base],
-    nextChildrenMap: JsMap[dom.Node, ChildNode.Base],
-    parentNode: ReactiveElement.Base,
-    sentinelNode: ChildNode.Base,
-    prevChildrenCount: Int,
+  /** Updates the DOM and returns new contentMap */
+  private def updateChildren[Component](
+    nextItems: laminar.Seq[Component],
+    renderable: RenderableInserter[Component], // avoids the need to create intermediate collection from `nextItems`
+    prevContentMap: JsMap[dom.Node, Inserter],
+    listParentNode: ReactiveElement.Base, // parent node of the children list
+    listSentinelNodeRef: dom.Comment, // sentinel node of the children list
+    listTrailingSentinelRef: js.UndefOr[dom.Comment], // trailing sentinel marking the end of the list's content
     hooks: js.UndefOr[InserterHooks]
-  ): Int = {
+  ): JsMap[dom.Node, Inserter] = {
 
-    // Loop variables
-    var index = 0
-    var currentChildrenCount = prevChildrenCount
-    var prevChildRef = sentinelNode.ref.nextSibling
+    def isContentEnd(ref: dom.Node): Boolean =
+      ref == null || listTrailingSentinelRef.contains(ref)
 
-    // Sorry for all the debug comments, but they really help me figure things out.
+    // Build an efficiently searchable map of next inserters
+    val nextInsertersMap = new JsMap[dom.Node, Inserter]()
+    nextItems.foreach { nextItem =>
+      val nextInserter = renderable.asInserter(nextItem)
+      nextInsertersMap.set(nextInserter.stableFirstNode, nextInserter)
+    }
 
-    // println(">>>>>>>>>>>>>>>>>")
-    // println(s"updateChildren(nextChildren = ${nextChildren.map(_.ref.textContent)})")
+    // Iteration state
+    var index: Int = 0
+    var currentItemCount: Int = prevContentMap.size
+    var afterRef: dom.Node = listSentinelNodeRef // last DOM node of the last placed item
+    var prevItemRef: dom.Node = listSentinelNodeRef.nextSibling
 
-    var lastIndexChild = sentinelNode
+    nextItems.foreach { nextItem =>
+      val nextInserter: Inserter =
+        renderable.asInserter(nextItem)
 
-    nextChildren.foreach { nextChild => // #TODO Not sure if this is faster than iterating over a js.Map
+      val foundInserterInPrevMap: Boolean =
+        prevContentMap.has(nextInserter.stableFirstNode)
 
-      // println("evaluating index=" + index + ", nextChildNodeIndex=" + nextChildNodeIndex + ", prevChildRef=" + (if ((prevChildRef: js.UndefOr[dom.Node]) == js.undefined || prevChildRef == null) "null or undefined" else prevChildRef.textContent))
-
-      // @TODO[Integrity] prevChildRef can be null or even undefined here if we reach the end, under certain circumstances. See what can be done...
-
-      // @TODO[Performance] this diffing algo is decent, but can still be optimized in a few ways (but we need benchmarking & data for that)
-      // @TODO[Performance] We could optimize this for specific `Seq` implementations. For example, foreach is faster than while() on a `List`
-
-      // @Note: Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
-
-      if (currentChildrenCount <= index) {
-        // We ran through the whole prevChildren list already, we just need to append all remaining nextChild-s into the DOM
-        // Note: `prevChildRef` is not valid in this branch
-        // println("> overflow: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
-        // @Note: DOM update
-        // ParentNode.insertChild(parent = parentNode, child = nextChild, atIndex = nextChildNodeIndex)
-        DomApi.insertChildAfter(
-          parent = parentNode,
-          newChild = nextChild,
-          referenceChild = lastIndexChild,
-          hooks
-        )
-        // println(s"setting prevChildRef=${nextChild.ref.textContent}")
-        prevChildRef = nextChild.ref
-        currentChildrenCount += 1
-      } else {
-        if (nextChild.ref == prevChildRef) {
-          // println("NODE MATCHES – " + nextChild.ref.textContent)
-          // Child nodes already match – do nothing, go to the next child
+      if (index >= currentItemCount) {
+        // Overflow – we've consumed all previous items:
+        // Just insert nextInserter at the cursor (or move it there if this inserter it was previously in the list)
+        if (foundInserterInPrevMap) {
+          // @Note: DOM update
+          nextInserter.moveWithinDynamicList(listParentNode, afterRef)
         } else {
-          // println("NODE DOES NOT MATCH")
-          // println("NODE DOES NOT MATCH – " + nextChild.ref.textContent + " vs " + prevChildRef.textContent)
-
-          if (!prevChildren.has(nextChild.ref)) {
-            // nextChild not found in prevChildren, so it's a new child, so we need to insert it
-            // println("> new: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
-            // @Note: DOM update
-            DomApi.insertChildAfter(
-              parent = parentNode,
-              newChild = nextChild,
-              referenceChild = lastIndexChild,
-              hooks
-            )
-            // println(s"setting prevChildRef=${nextChild.ref.textContent}")
-            prevChildRef = nextChild.ref
-            currentChildrenCount += 1
+          currentItemCount += 1
+          // @Note: DOM update
+          nextInserter.addToDynamicList(listParentNode, afterRef, hooks)
+        }
+      } else {
+        if (foundInserterInPrevMap) {
+          if (nextInserter.stableFirstNode == prevItemRef) {
+            // Item already in the right place:
+            // Do nothing.
           } else {
-            // nextChild is found, but at a different index
-
-            // First, let's check if prevChild should be deleted.
-            // This will reduce the amount of moving needed to be done in most cases.
-            // Note:
-            // - This loop should never go out of bounds on `liveNodeList` because we know that `nextChild.ref` is still in that list somewhere
-            // - In `containsNode` call we only start looking at `index` because we know that all nodes before `index` are already in place.
+            // Item exists, but elsewhere. First remove any items at the cursor that
+            // are not in the new list (they are leaving anyway – this often lets us
+            // avoid a move), then move this item to the cursor if still needed.
             while (
-              nextChild.ref != prevChildRef &&
-              !containsRef(nextChildrenMap, prevChildRef)
+              nextInserter.stableFirstNode != prevItemRef &&
+              !nextInsertersMap.has(prevItemRef) &&
+              !isContentEnd(prevItemRef)
             ) {
-              // Loop logic:
-              // - prevChild should be deleted, so we remove it from the DOM,
-              //   and try again with the next prevChild in the DOM.
-              // - We repeat this until we find an element in the DOM that is
-              //   present in nextChildren.
-
-              // println(s"> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
-              val nextPrevChildRef = prevChildRef.nextSibling // @TODO[Integrity] See warning in https://developer.mozilla.org/en-US/docs/Web/API/Node/nextSibling (should not affect us though)
-
-              val prevChild = prevChildFromRef(prevChildren, prevChildRef)
-              // println("> removing " + prevChild.ref.textContent)
+              val prevInserter = prevInserterFromStableFirstNode(prevContentMap, prevItemRef)
+              val nextPrevItemRef = prevInserter.lastNode.nextSibling
               // @Note: DOM update
-              DomApi.removeChild(
-                parent = parentNode,
-                child = prevChild
-              )
-              // println(s"setting prevChildRef=${nextPrevChildRef.textContent}")
-              prevChildRef = nextPrevChildRef
-              currentChildrenCount -= 1
+              prevInserter.removeFromDynamicList(listParentNode)
+              prevItemRef = nextPrevItemRef
+              currentItemCount -= 1
             }
-            if (nextChild.ref != prevChildRef) {
-              // nextChild is still not in the right place, so let's move it to the correct index
-              // println("> order: inserting " + nextChild.ref.textContent + " at index " + nextChildNodeIndex)
+            if (nextInserter.stableFirstNode != prevItemRef) {
+              // Still not in place – this is a MOVE, so we do NOT change the count.
               // @Note: DOM update
-              DomApi.insertChildAfter(
-                parent = parentNode,
-                newChild = nextChild,
-                referenceChild = lastIndexChild,
-                hooks
-              )
-              prevChildRef = nextChild.ref
-              // This is a MOVE, so we DO NOT update currentDomChildrenCount here.
+              nextInserter.moveWithinDynamicList(listParentNode, afterRef)
             }
           }
+        } else {
+          // Brand-new item – insert it at the cursor.
+          currentItemCount += 1
+          // @Note: DOM update
+          nextInserter.addToDynamicList(listParentNode, afterRef, hooks)
         }
       }
-      // println(s">> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
-      // println(s"setting prevChildRef=${if (prevChildRef.nextSibling == null) "null!" else prevChildRef.nextSibling.textContent}")
-      if (prevChildRef.nextSibling == null) {
-        // This case is unexpected. It can happen when elements are removed from the DOM manually,
-        // or when they are moved from one `children <--` list to another via standard Laminar functionality.
-        // See issue: https://github.com/raquo/Laminar/issues/120
-        //
-        // At this point in the code, what we know that:
-        // - There are no more elements in the DOM – the `nextSibling` of the last element we looked at / inserted is `null`.
-        // - There are no more `nextChildren` – we've just exhausted our foreach loop above
-        // Conclusion:
-        // - We thought there would be more elements in the DOM, but they were removed (presumably externally),
-        //   and they are not found in `nextChildren`. So everything is right, but "for the wrong reasons", sort of.
-        // What we need to do:
-        // - Update `currentChildrenCount` to the accurate number, since it will be used on the next update.
-        // - `prevChildren` map will be discarded after this method runs, so we do NOT need to update that
-        currentChildrenCount = index + 1
+
+      // Note: nextInserter is now guaranteed to be in the right place.
+
+      afterRef = nextInserter.lastNode
+
+      // Advance the cursor past the item we just placed.
+      val afterSpan = afterRef.nextSibling
+      if (isContentEnd(afterSpan)) {
+        // Reached the end of our content unexpectedly early:
+        // – found the trailing sentinel, or the end of the DOM
+        // - this is due to external removals of nodes from the DOM
+        // Correct the count; remaining items will hit the overflow
+        // branch above. See the single-node algorithm's note re: issue #120.
+        currentItemCount = index + 1
       } else {
-        prevChildRef = prevChildRef.nextSibling
+        prevItemRef = afterSpan
       }
-      lastIndexChild = nextChild
       index += 1
     }
 
-    // println("reached end of nextChildren")
-    while (index < currentChildrenCount) {
-      // We ran out of new items before we ran out of current items. Now deleting the remainder of current items.
-
-      // println(s"index=${index}, currentChildrenCount=${currentChildrenCount}")
-      // println(s">>> prevChildRef == ${if (prevChildRef == null) "null!" else prevChildRef.textContent}")
-      val nextPrevChildRef = prevChildRef.nextSibling
-      // Whenever we insert, move or remove items from the DOM, we need to manually update `prevChildRef` to point to the node at the current index
+    // Delete any leftover previous items
+    while (index < currentItemCount && !isContentEnd(prevItemRef)) {
+      val prevInserter = prevInserterFromStableFirstNode(prevContentMap, prevItemRef)
+      val nextPrevItemRef = prevInserter.lastNode.nextSibling
       // @Note: DOM update
-      val prevChild = prevChildFromRef(prevChildren, prevChildRef)
-      // println(s"> removing(2) ${prevChild.ref.textContent}")
-      DomApi.removeChild(parent = parentNode, child = prevChild)
-      // println(s"setting(2) prevChildRef=${if (nextPrevChildRef == null) "null!" else nextPrevChildRef.textContent}")
-      prevChildRef = nextPrevChildRef
-      currentChildrenCount -= 1
+      prevInserter.removeFromDynamicList(listParentNode)
+      prevItemRef = nextPrevItemRef
+      currentItemCount -= 1
     }
 
-    currentChildrenCount
+    nextInsertersMap
   }
 
-  private def containsRef(nextChildrenMap: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): Boolean = {
-    nextChildrenMap.has(ref)
-  }
-
-  private def prevChildFromRef(prevChildren: JsMap[dom.Node, ChildNode.Base], ref: dom.Node): ChildNode.Base = {
-    prevChildren.get(ref).getOrElse(throw new Exception(s"prevChildFromRef[children]: not found for ${ref}"))
+  private def prevInserterFromStableFirstNode(
+    prevContentMap: JsMap[dom.Node, Inserter],
+    stableFirstNode: dom.Node
+  ): Inserter = {
+    prevContentMap
+      .get(stableFirstNode)
+      .getOrElse(
+        throw new Exception(s"prevInserterFromRef[children]: not found for ${stableFirstNode}")
+      )
   }
 
 }

@@ -221,6 +221,7 @@ with ParentNode[Ref] {
 
   private[laminar] def onBoundKeyUpdater(key: SimpleKey[?, ?, ?]): Unit
 
+  /** Note: This can be called even if moving element within the same parent. */
   override private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = {
     // println(s"> willSetParent of ${this.ref.tagName} to ${maybeNextParent.map(_.ref.tagName)}")
 
@@ -247,8 +248,8 @@ with ParentNode[Ref] {
     maybePrevParent: Option[ParentNode.Base],
     maybeNextParent: Option[ParentNode.Base]
   ): Boolean = {
-    val isPrevParentActive = maybePrevParent.exists(_.dynamicOwner.isActive)
-    val isNextParentActive = maybeNextParent.exists(_.dynamicOwner.isActive)
+    @inline def isPrevParentActive = maybePrevParent.exists(_.dynamicOwner.isActive)
+    @inline def isNextParentActive = maybeNextParent.exists(_.dynamicOwner.isActive)
     isPrevParentActive && !isNextParentActive
   }
 

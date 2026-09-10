@@ -17,12 +17,15 @@ object ChildInserter {
   ): DynamicInserter = {
     new DynamicInserter(
       insertFn = (ctx, owner, hooks) => {
-        // Reset sentinel node on binding too, don't wait for events
-        ctx.ensureStrictMode()
         var maybeLastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
         childSource.foreach { newComponent =>
           val newChildNode = renderable.asNode(newComponent)
-          switchToChild(maybeLastSeenChild, newChildNode, ctx, hooks)
+          switchToChild(
+            maybeLastSeenChild = maybeLastSeenChild,
+            newChildNodeOpt = newChildNode,
+            ctx = ctx,
+            hooks = hooks
+          )
           maybeLastSeenChild = newChildNode
         }(using owner)
       },
@@ -32,55 +35,51 @@ object ChildInserter {
 
   def switchToChild(
     maybeLastSeenChild: ChildNode.Base | Unit,
-    newChildNode: ChildNode.Base,
+    newChildNodeOpt: ChildNode.Base | Unit,
     ctx: InsertContext,
     hooks: InserterHooks | Unit
   ): Unit = {
-    // #Note: previously in ChildInserter we only did this once in insertFn.
-    //  I think it's cheap and safe to do this check on every childSource.foreach.
-    ctx.ensureStrictMode()
-
-    var remainingOldExtraNodeCount = ctx.extraNodeCount
-
-    maybeLastSeenChild
-      .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
-      .fold {
-        // Inserting the child for the first time, OR after the previous child was externally moved / removed.
-        DomApi.insertChildAfter(
-          parent = ctx.parentNode,
-          newChild = newChildNode,
-          referenceChild = ctx.sentinelNode,
-          hooks = hooks
-        )
-        ()
-      } { lastSeenChild =>
-        // We found the existing child in the right place in the DOM
-        // Just need to check that the new child is actually different from the old one
-        // Replace the child with new one.
-        // #Note: auto-distinction inside (`lastSeenChild ne newChildNode` filter)
-        val replaced = DomApi.replaceChild(
-          parent = ctx.parentNode,
-          oldChild = lastSeenChild,
-          newChild = newChildNode,
-          hooks = hooks
-        )
-        if (replaced || (lastSeenChild eq newChildNode)) { // #TODO[Performance,Integrity] Not liking this redundant auto-distinction
-          // The only time we DON'T decrement this is when replacing fails for unexpected reasons.
-          // - If lastSeenChild == newChildNode, then it's not an "old" node anymore, so we decrement
-          // - If replaced == true, then lastSeenChild was removed from the DOM, so we decrement
-          remainingOldExtraNodeCount -= 1
+    // A. Regardless of what the previous context / DOM state was,
+    //    insert the `newChildNode` right after the sentinel node,
+    //    where it belongs.
+    newChildNodeOpt.foreach { newChildNode =>
+      maybeLastSeenChild
+        .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
+        .fold {
+          // Inserting the child for the first time, OR after the previous child was externally moved / removed.
+          DomApi.insertChildAfter(
+            parent = ctx.parentNode,
+            newChild = newChildNode,
+            referenceChildRef = ctx.sentinelNode.ref,
+            hooks = hooks
+          )
+          ()
+        } { lastSeenChild =>
+          // We found the last seen child where we left it in the DOM. Replace it with the new child.
+          // #Note: auto-distinction inside (`replaceChild` is a no-op if the nodes are equal)
+          DomApi.replaceChild(
+            parent = ctx.parentNode,
+            oldChild = lastSeenChild,
+            newChild = newChildNode,
+            hooks = hooks
+          )
+          ()
         }
-        ()
-      }
+    }
 
-    // We've just inserted newChildNode after the sentinel, or replaced the first old node with newChildNode,
-    // so any remaining old child nodes must be directly under it.
-    ctx.removeOldChildNodesFromDOM(after = newChildNode)
-
-    ctx.extraNodesMap.clear()
-    ctx.extraNodesMap.set(newChildNode.ref, newChildNode)
-    // ctx.extraNodes = ChildrenSeq.fromJsVector(JsVector(newChildNode))
-    ctx.extraNodeCount = 1
+    // B. Update the context to match the sole `newChildNode` element that
+    //    we've just put into the DOM, and clear any previous context's other
+    //    nodes from the DOM.
+    //    Note:
+    //     - Such implementation is intended to keep `newChildNode` in the DOM
+    //       without unnecessarily re-mounting it, even if it was previously
+    //       rendered by a different inserter.
+    //     - We do this AFTER the DOM updates above because ideally we want to
+    //       `replace` the previous child in one shot, not remove+insert.
+    ctx.clearPreviousInserterContent(
+      replaceContentMapWithSingleNode = newChildNodeOpt,
+      nextInserterType = InserterType.ChildType
+    )
   }
 
 }

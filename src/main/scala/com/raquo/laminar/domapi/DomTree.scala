@@ -24,7 +24,7 @@ trait DomTree {
     */
   var shouldReportDomErrors: Boolean = true
 
-  private def maybeReportDomError(e: dom.DOMException): Unit = {
+  def maybeReportDomError(e: dom.DOMException): Unit = {
     if (shouldReportDomErrors) {
       AirstreamError.sendUnhandledError(new DomError(e))
     }
@@ -83,7 +83,7 @@ trait DomTree {
   def insertChildBefore(
     parent: ParentNode.Base,
     newChild: ChildNode.Base,
-    referenceChild: ChildNode.Base,
+    referenceChildRef: dom.Node,
     hooks: InserterHooks | Unit
   ): Boolean = {
     val nextParent = Some(parent)
@@ -92,7 +92,7 @@ trait DomTree {
     val maybeDomError = raw.insertBefore(
       parent = parent.ref,
       newChild = newChild.ref,
-      referenceChild = referenceChild.ref
+      referenceChild = referenceChildRef
     )
     maybeDomError.foreach(maybeReportDomError)
     val inserted = maybeDomError.isEmpty
@@ -105,7 +105,7 @@ trait DomTree {
   def insertChildAfter(
     parent: ParentNode.Base,
     newChild: ChildNode.Base,
-    referenceChild: ChildNode.Base,
+    referenceChildRef: dom.Node,
     hooks: InserterHooks | Unit
   ): Boolean = {
     val nextParent = Some(parent)
@@ -114,7 +114,7 @@ trait DomTree {
     val maybeDomError = raw.insertAfter(
       parent = parent.ref,
       newChild = newChild.ref,
-      referenceChild = referenceChild.ref
+      referenceChild = referenceChildRef
     )
     maybeDomError.foreach(maybeReportDomError)
     val inserted = maybeDomError.isEmpty
