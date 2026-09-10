@@ -1,7 +1,7 @@
 package com.raquo.laminar.nodes
 
 import com.raquo.airstream.core.AirstreamError
-import com.raquo.laminar.inserters.{Hookable, Inserter, InserterHooks}
+import com.raquo.laminar.inserters.{Hookable, Inserter, InserterHooks, HookableChildrenInserter}
 import org.scalajs.dom
 
 /** A [[Slot]] represents a special child component of web components.
@@ -48,7 +48,7 @@ class Slot(val name: String) {
     }
   )
 
-  def apply[I <: Inserter](children: (I with Hookable[I])*): Seq[I] = {
+  def apply[I <: Inserter](children: (I with Hookable[I])*): Seq[I with Hookable[I]] = {
     children.map { inserter =>
       inserter.withHooks(addSlotAttributeHook)
     }

@@ -94,11 +94,12 @@ trait MountHooks {
   ): Modifier[El] = {
     Modifier[El] { element =>
       var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
-      // We start the context in loose mode for performance, because it's cheaper to go from there
-      // to strict mode, than the other way. The inserters are able to handle any initial mode.
-      val lockedInsertContext = InsertContext.reserveSpotContext(element, hooks = js.undefined)
+      val lockedInsertContext = InsertContext.reserveSpotContext(
+        parentNode = element,
+        hooks = js.undefined
+      )
       ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
-        val inserterSubOpt =
+        val inserterSubOpt: Option[Subscription] =
           if (ignoreNextActivation) {
             ignoreNextActivation = false
             None
@@ -106,9 +107,10 @@ trait MountHooks {
             fn(mountContext) match {
               case dynamicInserter: DynamicInserter =>
                 Some(
-                  dynamicInserter
-                    .withContext(lockedInsertContext)
-                    .subscribe(lockedInsertContext, mountContext.owner)
+                  dynamicInserter.subscribe(
+                    insertContext = lockedInsertContext,
+                    owner = mountContext.owner
+                  )
                 )
               case staticInserter: StaticInserter =>
                 staticInserter.renderInContext(lockedInsertContext)

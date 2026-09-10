@@ -30,6 +30,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "a"
       )
     )
@@ -41,6 +42,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "b"
       )
     )
@@ -63,6 +65,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "c"
       )
     )
@@ -96,6 +99,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "a",
         sentinel
       )
@@ -108,6 +112,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "b",
         sentinel
       )
@@ -120,7 +125,9 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "b",
+        sentinel,
         "1"
       )
     )
@@ -132,7 +139,9 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "b",
+        sentinel,
         "2"
       )
     )
@@ -147,7 +156,9 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "c",
+        sentinel,
         "3"
       )
     )
@@ -159,6 +170,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         "c",
         sentinel
       )
@@ -176,6 +188,7 @@ class ChildTextOptionReceiverSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello",
+        sentinel,
         sentinel,
         "4"
       )

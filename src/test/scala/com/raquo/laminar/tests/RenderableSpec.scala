@@ -2,7 +2,8 @@ package com.raquo.laminar.tests
 
 import com.raquo.ew
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.modifiers.{RenderableNode, RenderableText}
+import com.raquo.laminar.inserters.Inserter
+import com.raquo.laminar.modifiers.{RenderableInserter, RenderableNode, RenderableText}
 import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
@@ -39,8 +40,11 @@ class RenderableSpec extends UnitSpec {
         "0001", // Int – using custom implicit val
         "TRUE", // Boolean – using custom implicit val
         "2", // Double – using built-in implicit val
+        sentinel,
         "0003", // Int – using custom implicit val
+        sentinel,
         "4", // Double – using built-in implicit val
+        sentinel,
         "FALSE" // Boolean – using custom implicit val
       )
     )
@@ -63,6 +67,24 @@ class RenderableSpec extends UnitSpec {
   }
 
   implicit val componentRenderable: RenderableNode[Component] = RenderableNode(_.node)
+
+  /** A component type that can only be rendered as a `children <--` list item, not as
+    * a single `child <--` node. It has a [[RenderableInserter]] instance below, but
+    * deliberately NO [[RenderableNode]] instance. `InserterComponent` is not itself an
+    * [[Inserter]] either, so it does not get the built-in `inserterRenderable`.
+    */
+  trait InserterComponent {
+    val inserter: Inserter
+  }
+
+  implicit val inserterComponentRenderable: RenderableInserter[InserterComponent] =
+    new RenderableInserter[InserterComponent] {
+      override def asInserter(value: InserterComponent): Inserter = value.inserter
+    }
+
+  val sampleInserterComponent: InserterComponent = new InserterComponent {
+    override val inserter: Inserter = span("sample")
+  }
 
   it("Component rendering") {
 
@@ -158,7 +180,9 @@ class RenderableSpec extends UnitSpec {
         sentinel,
         input of (idAttr is "List.children"),
         sentinel,
-        input of (idAttr is "Vector.children")
+        sentinel,
+        input of (idAttr is "Vector.children"),
+        sentinel
       )
     )
 
@@ -190,7 +214,9 @@ class RenderableSpec extends UnitSpec {
         sentinel,
         input of (idAttr is "List.children.onMountInsert"),
         sentinel,
-        input of (idAttr is "Vector.children.onMountInsert")
+        sentinel,
+        input of (idAttr is "Vector.children.onMountInsert"),
+        sentinel
       )
     )
 
@@ -199,6 +225,107 @@ class RenderableSpec extends UnitSpec {
     // - 1 pilot subscription for child element
     // Note: with onMountInsert, `child <-- signal` does NOT create its own dynamic subscription
     assertEquals(ReactiveElement.numDynamicSubscriptions(el3), 10)
+  }
+
+  it("Component with only a RenderableNode instance satisfies RenderableInserter") {
+
+    // Note: Component does not have a RenderableInserter instance.
+
+    // Compile-level: get the right instance
+    val renderableInserter = implicitly[RenderableInserter[Component]]
+    assert(renderableInserter eq componentRenderable)
+
+    // Runtime: the Component flows through `children <--`, which requires RenderableInserter.
+    val bus = new EventBus[List[Component]]
+
+    val el = div(
+      "before",
+      children <-- bus.events,
+      "after"
+    )
+
+    mount(el)
+
+    // Before the first emission only the leading (reserved-spot) sentinel exists;
+    // `children <--` creates its trailing sentinel lazily on the first update.
+    expectNode(
+      div of (
+        "before",
+        sentinel,
+        "after"
+      )
+    )
+
+    bus.emit(List(
+      new TextInputComponent(idAttr("a")),
+      new TextInputComponent(idAttr("b"))
+    ))
+
+    expectNode(
+      div of (
+        "before",
+        sentinel,
+        input of (idAttr is "a"),
+        input of (idAttr is "b"),
+        sentinel,
+        "after"
+      )
+    )
+  }
+
+  it("Component with only a RenderableInserter instance works in children <-- but not child <--") {
+
+    // Note: InserterComponent has a RenderableInserter instance, but NO RenderableNode.
+
+    // Compile-level: RenderableInserter resolves (and is exactly our instance)...
+    val renderableInserter = implicitly[RenderableInserter[InserterComponent]]
+    assert(renderableInserter eq inserterComponentRenderable)
+
+    // ...but there is no RenderableNode instance for it.
+    assertTypeError("implicitly[RenderableNode[InserterComponent]]")
+
+    // Therefore `child <--` (which requires RenderableNode) does NOT compile,
+    // while `children <--` (which requires RenderableInserter) does.
+    assertTypeError("child <-- Val(sampleInserterComponent)")
+    assertCompiles("children <-- Val(List(sampleInserterComponent))")
+
+    // Runtime: the Component flows through `children <--`, which requires RenderableInserter.
+    val bus = new EventBus[List[InserterComponent]]
+
+    val el = div(
+      "before",
+      children <-- bus.events,
+      "after"
+    )
+
+    mount(el)
+
+    // Before the first emission only the leading (reserved-spot) sentinel exists;
+    // `children <--` creates its trailing sentinel lazily on the first update.
+    expectNode(
+      div of (
+        "before",
+        sentinel,
+        "after"
+      )
+    )
+
+    def component(id: String): InserterComponent = new InserterComponent {
+      override val inserter: Inserter = input(idAttr(id))
+    }
+
+    bus.emit(List(component("a"), component("b")))
+
+    expectNode(
+      div of (
+        "before",
+        sentinel,
+        input of (idAttr is "a"),
+        input of (idAttr is "b"),
+        sentinel,
+        "after"
+      )
+    )
   }
 
   it("Regular node rendering") {
@@ -295,7 +422,9 @@ class RenderableSpec extends UnitSpec {
         sentinel,
         input of (idAttr is "List.children"),
         sentinel,
-        input of (idAttr is "Vector.children")
+        sentinel,
+        input of (idAttr is "Vector.children"),
+        sentinel
       )
     )
 
@@ -327,7 +456,9 @@ class RenderableSpec extends UnitSpec {
         sentinel,
         input of (idAttr is "List.children.onMountInsert"),
         sentinel,
-        input of (idAttr is "Vector.children.onMountInsert")
+        sentinel,
+        input of (idAttr is "Vector.children.onMountInsert"),
+        sentinel
       )
     )
 

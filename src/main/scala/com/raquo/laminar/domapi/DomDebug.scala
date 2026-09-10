@@ -34,8 +34,12 @@ trait DomDebug {
           }
         }
         el.tagName.ew.toLowerCase().str + suffixStr
-
-      case _ => node.nodeName
+      case text: dom.Text =>
+        s"${text.nodeName} ${text.textContent.take(30)}${if (text.textContent.length > 30) "..." else ""}"
+      case comment: dom.Comment =>
+        s"${comment.nodeName} ${comment.textContent.take(30)}${if (comment.textContent.length > 30) "..." else ""}"
+      case _ =>
+        node.nodeName
     }
   }
 

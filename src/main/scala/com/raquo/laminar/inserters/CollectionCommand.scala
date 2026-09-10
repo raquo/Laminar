@@ -46,6 +46,20 @@ object CollectionCommand {
     }
   }
 
+  /** Remove all the items currently in the collection, leaving it empty. */
+  case object RemoveAll extends CollectionCommand[Nothing] {
+
+    @inline override def map[A](project: Nothing => A): CollectionCommand[A] = this
+  }
+
+  /** Replace the entire contents of the collection with `newItems` */
+  case class ReplaceAll[+Item](newItems: collection.immutable.Seq[Item]) extends CollectionCommand[Item] {
+
+    @inline override def map[A](project: Item => A): ReplaceAll[A] = {
+      ReplaceAll(newItems.map(project))
+    }
+  }
+
   // @TODO[Performance,Integrity] Is Vector an appropriate data structure for our use case? Maybe use SortedSet, or TreeSet?
   // @TODO[Performance] Actually, seeing as this interface is intended for performance, js.Array is probably a better choice
 
@@ -82,6 +96,12 @@ object CollectionCommand {
         } else {
           prevItems.updated(index, newItem)
         }
+
+      case RemoveAll =>
+        Vector.empty
+
+      case ReplaceAll(newItems) =>
+        newItems.toVector
     }
   }
 }

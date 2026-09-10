@@ -130,29 +130,37 @@ object Implicits {
     */
   trait LowPriorityImplicits {
 
-    // -- Methods to convert individual values / nodes / components to inserters --
+    // -- Specialized methods for onMountInsert and Web Component Slot.apply
 
-    implicit def textToInserter[TextLike](textContent: TextLike)(implicit r: RenderableText[TextLike]): StaticInserter = {
-      if (r == RenderableText.textNodeRenderable) {
-        StaticChildInserter.noHooks(textContent.asInstanceOf[TextNode]) // optimization
-      } else {
-        new StaticTextInserter(r.asString(textContent))
-      }
+    /** This is only used for Web Component Slots, which require `Inserter & Hookable`.
+      * Regular code uses higher-priority [[componentToNode]].
+      *
+      * Note: this deliberately does not convert TextNode-s as those are not allowed
+      * in slots, but in principle this is an abstraction leak.
+      */
+    implicit def componentToInserter[Component](
+      component: Component
+    )(implicit
+      r: RenderableNode[Component]
+    ): HookableChildInserter = {
+      HookableChildInserter.noHooks(r.asNode(component))
     }
 
-    implicit def componentToInserter[Component: RenderableNode](component: Component): StaticChildInserter = {
-      StaticChildInserter.noHooksC(component)
-    }
-
-    // -- Methods to convert collections of nodes and components to inserters --
-
+    /** This is only used when:
+      *  - onMountInsert's callback returns a Seq of elements of a single element, or
+      *  - One of the items passed to Web Components Slot.apply is a Seq of elements.
+      *
+      * In those contexts, we need an Inserter (or Inserter & Hookable), and aside from
+      * this low-priority conversion, we only have [[seqToModifier]] which gives us an
+      * arbitrary Modifier – no other way to get an Inserter implicitly right now.
+      */
     implicit def componentSeqToInserter[Collection[_], Component](
       components: Collection[Component]
     )(implicit
       renderableSeq: RenderableSeq[Collection],
       renderableNode: RenderableNode[Component]
-    ): StaticChildrenInserter = {
-      StaticChildrenInserter.noHooks(components, renderableSeq, renderableNode)
+    ): HookableChildrenInserter = {
+      HookableChildrenInserter.noHooks(components, renderableSeq, renderableNode)
     }
   }
 

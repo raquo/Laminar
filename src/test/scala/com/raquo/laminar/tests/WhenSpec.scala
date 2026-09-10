@@ -127,7 +127,9 @@ class WhenSpec extends UnitSpec {
       minAttr is "10",
       maxAttr is "20",
       div.of("hello"),
+      sentinel,
       "world",
+      sentinel,
       "text"
     ))
 

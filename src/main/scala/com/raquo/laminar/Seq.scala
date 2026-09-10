@@ -2,6 +2,7 @@ package com.raquo.laminar
 
 import com.raquo.ew.{ewArray, JsArray, JsVector}
 
+import scala.collection.immutable
 import scala.scalajs.js
 
 /**
@@ -30,8 +31,38 @@ import scala.scalajs.js
 class Seq[+A] private (
   seq: collection.Seq[A], // nullable
   scalaArray: scala.Array[A], // nullable
-  jsArray: JsArray[A] // nullable
+  jsArray: JsArray[A], // nullable
+  val isMutable: Boolean // depends on the backing collection
 ) {
+
+  def isEmpty: Boolean =
+    if (seq ne null) {
+      seq.isEmpty
+    } else if (jsArray ne null) {
+      jsArray.length == 0
+    } else {
+      scalaArray.isEmpty
+    }
+
+  def nonEmpty: Boolean = !isEmpty
+
+  def head: A =
+    if (seq ne null) {
+      seq.head
+    } else if (jsArray ne null) {
+      (jsArray(0): js.UndefOr[A]).getOrElse(throw new NoSuchElementException("head of empty JsArray"))
+    } else {
+      scalaArray.head
+    }
+
+  def last: A =
+    if (seq ne null) {
+      seq.last
+    } else if (jsArray ne null) {
+      (jsArray(jsArray.length - 1): js.UndefOr[A]).getOrElse(throw new NoSuchElementException("last of empty JsArray"))
+    } else {
+      scalaArray.last
+    }
 
   def map[B](project: A => B): Seq[B] = {
     // #TODO[Performance] May want to check this, if we don't get rid of this `map` method first.
@@ -40,16 +71,18 @@ class Seq[+A] private (
     // Scala collection instance.
     // Also, mapping over an array requires a ClassTag,
     // and we don't want to require that.
+    // #Note: the resulting JsArray is freshly allocated and owned by the new Seq, so
+    //  it is not externally mutable – hence hasMutableBacking = false.
     if (seq ne null) {
       val jsArr = JsArray[B]()
       seq.foreach(v => jsArr.push(project(v)))
-      Seq.from(jsArr)
+      new Seq(null, null, jsArr, isMutable = false)
     } else if (jsArray ne null) {
-      Seq.from(jsArray.map(project))
+      new Seq(null, null, jsArray.map(project), isMutable = false)
     } else {
       val jsArr = JsArray[B]()
       scalaArray.foreach(v => jsArr.push(project(v)))
-      Seq.from(jsArr)
+      new Seq(null, null, jsArr, isMutable = false)
     }
   }
 
@@ -62,6 +95,25 @@ class Seq[+A] private (
       scalaArray.foreach(f)
     }
   }
+
+  /** Take an immutable snapshot of this Seq.
+    *
+    * If [[isMutable]] is true, this creates a new [[JsArray]] and a new [[laminar.Seq]].
+    */
+  private[laminar] def immutableSnapshot: Seq[A] = {
+    if (isMutable) {
+      // #TODO[Perf] review if there are any common cases when this copying would degrade performance
+      //  - e.g. we normally use JsArray for performance – but it's mutable...
+      //  - if this is a problem, consider implementing a custom class wrapping JsArray that copies
+      //    the original array only if it's later edited (need to intercept calls to editing APIs)
+      // The array copy is private and never mutated, so `isMutable = false` is safe here.
+      val arrayCopy = JsArray[A]()
+      foreach(arrayCopy.push(_))
+      new Seq(null, null, arrayCopy, isMutable = false)
+    } else {
+      this
+    }
+  }
 }
 
 object Seq {
@@ -71,22 +123,22 @@ object Seq {
   @inline def empty[A]: Seq[A] = _empty
 
   def from[A](seq: collection.Seq[A]): Seq[A] = {
-    new Seq(seq, null, null)
+    new Seq(seq, null, null, isMutable = !seq.isInstanceOf[immutable.Seq[?]])
   }
 
   def from[A](array: scala.Array[A]): Seq[A] = {
-    new Seq(null, array, null)
+    new Seq(null, array, null, isMutable = true)
   }
 
   def from[A](jsArray: JsArray[A]): Seq[A] = {
-    new Seq(null, null, jsArray)
+    new Seq(null, null, jsArray, isMutable = true)
   }
 
   def from[A](sjsArray: js.Array[A]): Seq[A] = {
-    new Seq(null, null, sjsArray.ew)
+    new Seq(null, null, sjsArray.ew, isMutable = true)
   }
 
   def from[A](jsVector: JsVector[A]): Seq[A] = {
-    new Seq(null, null, jsVector.unsafeAsScalaJs.ew)
+    new Seq(null, null, jsVector.unsafeAsScalaJs.ew, isMutable = false)
   }
 }

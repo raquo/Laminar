@@ -3,7 +3,7 @@ package com.raquo.laminar.inserters
 import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
-import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, CommentNode}
 
 import scala.scalajs.js
 import scala.scalajs.js.|
@@ -29,83 +29,106 @@ object ChildrenCommandInserter {
   ): DynamicInserter = {
     new DynamicInserter(
       insertFn = (ctx, owner, hooks) => {
-        ctx.ensureStrictMode()
+        if (!ctx.lastInserterType.contains(InserterType.ChildrenCommandType)) {
+          // Clear content left by a previous non-command inserter.
+          // Commands build the context incrementally, so:
+          //  - if we did previously build some content using commands, we want to keep it.
+          //     - especially relevant for mere re-mounting, which will call this method too.
+          //  - if we're given the context previously built by a different type of inserter,
+          //    the command inserter is unable to patch it to the desired state,
+          //    so clearing it is the only consistent strategy.
+          ctx.clearPreviousInserterContent(
+            replaceContentMapWithSingleNode = js.undefined,
+            nextInserterType = InserterType.ChildrenCommandType
+          )
+        }
         commands.foreach { command =>
-          val nodeCountDiff = updateList(command, ctx, renderableNode, hooks)
-          ctx.extraNodeCount += nodeCountDiff
+          updateList(command, ctx, renderableNode, hooks)
         }(using owner)
       },
       hooks = initialHooks
     )
   }
 
-  def updateList[Component](
+  private def updateList[Component](
     command: CollectionCommand[Component],
     ctx: InsertContext,
     renderableNode: RenderableNode[Component],
     hooks: InserterHooks | Unit
-  ): Int = {
-    ctx.ensureStrictMode()
+  ): Unit = {
+    def findSentinelIndex(): Int = {
+      DomApi.raw.indexOfChild(
+        parent = ctx.parentNode.ref,
+        child = ctx.sentinelNode.ref
+      )
+    }
 
-    var nodeCountDiff = 0
-    def findSentinelIndex(): Int = DomApi.raw.indexOfChild(
-      parent = ctx.parentNode.ref,
-      child = ctx.sentinelNode.ref
-    )
-
-    command match {
+    command.map(renderableNode.asNode) match {
 
       case CollectionCommand.Append(node) =>
-        val inserted = DomApi.insertChildAtIndex(
+        // Insert at the end of our span, right before the trailing sentinel. No index math
+        // or node count needed: the trailing sentinel marks the span's end, and a failed
+        // insert simply leaves that boundary where it was (see Laminar issue #195).
+        DomApi.insertChildBefore(
           parent = ctx.parentNode,
-          child = renderableNode.asNode(node),
-          index = findSentinelIndex() + ctx.extraNodeCount + 1,
+          newChild = node,
+          referenceChildRef = ctx.trailingSentinelNodeOpt.get.ref,
           hooks
         )
-        if (inserted) {
-          nodeCountDiff = 1
-        }
+        ctx.contentMap.set(node.ref, node)
 
       case CollectionCommand.Prepend(node) =>
-        val inserted = DomApi.insertChildAfter(
+        DomApi.insertChildAfter(
           parent = ctx.parentNode,
-          newChild = renderableNode.asNode(node),
-          referenceChild = ctx.sentinelNode,
+          newChild = node,
+          referenceChildRef = ctx.sentinelNode.ref,
           hooks
         )
-        if (inserted) {
-          nodeCountDiff = 1
-        }
+        ctx.contentMap.set(node.ref, node)
 
       case CollectionCommand.Insert(node, atIndex) =>
-        val inserted = DomApi.insertChildAtIndex(
+        DomApi.insertChildAtIndex(
           parent = ctx.parentNode,
-          child = renderableNode.asNode(node),
+          child = node,
           index = findSentinelIndex() + atIndex + 1,
           hooks
         )
-        if (inserted) {
-          nodeCountDiff = 1
-        }
+        ctx.contentMap.set(node.ref, node)
 
       case CollectionCommand.Remove(node) =>
-        val removed = DomApi.removeChild(
+        DomApi.removeChild(
           parent = ctx.parentNode,
-          child = renderableNode.asNode(node)
+          child = node
         )
-        if (removed) {
-          nodeCountDiff = -1
-        }
+        ctx.contentMap.delete(node.ref)
 
-      case CollectionCommand.Replace(node, withNode) =>
+      case CollectionCommand.Replace(oldNode, newNode) =>
         DomApi.replaceChild(
           parent = ctx.parentNode,
-          oldChild = renderableNode.asNode(node),
-          newChild = renderableNode.asNode(withNode),
+          oldChild = oldNode,
+          newChild = newNode,
           hooks
         )
-    }
+        ctx.contentMap.delete(oldNode.ref)
+        ctx.contentMap.set(newNode.ref, newNode)
 
-    nodeCountDiff
+      case CollectionCommand.RemoveAll =>
+        ctx.removeContentMapNodesFromDom(keepNodeIfPresent = js.undefined)
+        ctx.contentMap.clear()
+
+      case CollectionCommand.ReplaceAll(newNodes) =>
+        ctx.removeContentMapNodesFromDom(keepNodeIfPresent = js.undefined)
+        ctx.contentMap.clear()
+        val trailingSentinelRef = ctx.trailingSentinelNodeOpt.get.ref
+        newNodes.foreach { node =>
+          DomApi.insertChildBefore(
+            parent = ctx.parentNode,
+            newChild = node,
+            referenceChildRef = trailingSentinelRef,
+            hooks
+          )
+          ctx.contentMap.set(node.ref, node)
+        }
+    }
   }
 }

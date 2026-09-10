@@ -1,6 +1,7 @@
 package com.raquo.laminar.modifiers
 
 import com.raquo.laminar
+import com.raquo.laminar.inserters.Inserter
 import com.raquo.laminar.nodes.ChildNode
 
 import scala.annotation.implicitNotFound
@@ -12,17 +13,27 @@ import scala.annotation.implicitNotFound
   * render your Component-s by converting them to ChildNode-s, and will accept
   * your Component-s in `child <--`, `children <--`, etc.
   *
-  * A `Component` must have a 1-to-1 relationship to a Laminar ChildNode.
+  * A `Component` must have a fixed 1-to-1 relationship to a specific Laminar ChildNode.
   * Your Component class/trait should have something like `val node: ChildNode.Base`
   * or `lazy val node: ChildNode.Base` in it, it must not be a `var` or a `def`.
+  *
+  * A node is its own [[Inserter]] (see [[com.raquo.laminar.nodes.ChildNode]]), so
+  * `RenderableNode` extends [[RenderableInserter]]: anything renderable as a node is
+  * automatically renderable as a `children <--` list item, without a separate instance
+  * or a wrapper allocation. This is why methods that work on nodes (`child <--`)
+  * require `RenderableNode`, while methods that accept the wider `Inserter` type
+  * (`children <--`) require `RenderableInserter` and still accept your components.
   *
   * See also – [[RenderableText]]
   */
 @implicitNotFound("Implicit instance of RenderableNode[${Component}] not found. If `${Component}` is a custom component that you want to render as a node / element, define an implicit RenderableNode[${Component}] instance for it. For rendering as a string or primitive value, define RenderableText[${Component}] instead, and use `text <--` instead of `child <-- ...`.")
-trait RenderableNode[-Component] {
+trait RenderableNode[-Component]
+extends RenderableInserter[Component] {
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
   def asNode(value: Component): ChildNode.Base
+
+  final override def asInserter(value: Component): Inserter = asNode(value)
 
   /** For every component, this MUST ALWAYS return the exact same node reference. */
   def asNode(value: Option[Component], default: => ChildNode.Base): ChildNode.Base = {

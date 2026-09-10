@@ -7,6 +7,7 @@ import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.fixtures.{DoubleRangeElement, IntRangeElement}
 import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
+import org.scalajs.dom
 
 import scala.collection.mutable
 import scala.scalajs.js
@@ -242,7 +243,7 @@ class DomApiSpec extends UnitSpec {
       val inserted = DomApi.insertChildAfter(
         parent = parent,
         newChild = newChild,
-        referenceChild = referenceChild,
+        referenceChildRef = referenceChild.ref,
         hooks = noHooks
       )
 
@@ -391,6 +392,39 @@ class DomApiSpec extends UnitSpec {
       //   option of (value is "v2", selected is false, "V2"),
       //   option of (value is "v3", selected is false, "V3")
       // ))
+    }
+  }
+
+  describe("debugNodeDescription") {
+
+    it("HTML element with an id") {
+      val el = div(idAttr("main")).ref
+      assertEquals(DomApi.debugNodeDescription(el), "div#main")
+    }
+
+    it("HTML element with classes (no id)") {
+      val el = span(cls("foo", "bar")).ref
+      assertEquals(DomApi.debugNodeDescription(el), "span.foo.bar")
+    }
+
+    it("HTML element with neither id nor class") {
+      val el = div().ref
+      assertEquals(DomApi.debugNodeDescription(el), "div")
+    }
+
+    it("text node") {
+      val node = dom.document.createTextNode("hello")
+      assertEquals(DomApi.debugNodeDescription(node), "#text hello")
+    }
+
+    it("text node truncates content longer than 30 chars") {
+      val node = dom.document.createTextNode("a" * 40)
+      assertEquals(DomApi.debugNodeDescription(node), "#text " + ("a" * 30) + "...")
+    }
+
+    it("comment node") {
+      val node = dom.document.createComment("hi")
+      assertEquals(DomApi.debugNodeDescription(node), "#comment hi")
     }
   }
 
