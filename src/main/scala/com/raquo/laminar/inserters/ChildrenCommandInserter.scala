@@ -58,7 +58,7 @@ object ChildrenCommandInserter {
   ): Unit = {
     def findSentinelIndex(): Int = {
       DomApi.raw.indexOfChild(
-        parent = ctx.parentNode.ref,
+        parent = ctx.currentParentNode.ref,
         child = ctx.sentinelNode.ref
       )
     }
@@ -70,7 +70,7 @@ object ChildrenCommandInserter {
         // or node count needed: the trailing sentinel marks the span's end, and a failed
         // insert simply leaves that boundary where it was (see Laminar issue #195).
         DomApi.insertChildBefore(
-          parent = ctx.parentNode,
+          parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = ctx.trailingSentinelNodeOpt.get.ref,
           hooks
@@ -79,7 +79,7 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Prepend(node) =>
         DomApi.insertChildAfter(
-          parent = ctx.parentNode,
+          parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = ctx.sentinelNode.ref,
           hooks
@@ -88,7 +88,7 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Insert(node, atIndex) =>
         DomApi.insertChildAtIndex(
-          parent = ctx.parentNode,
+          parent = ctx.currentParentNode,
           child = node,
           index = findSentinelIndex() + atIndex + 1,
           hooks
@@ -97,14 +97,14 @@ object ChildrenCommandInserter {
 
       case CollectionCommand.Remove(node) =>
         DomApi.removeChild(
-          parent = ctx.parentNode,
+          parent = ctx.currentParentNode,
           child = node
         )
         ctx.contentMap.delete(node.ref)
 
       case CollectionCommand.Replace(oldNode, newNode) =>
         DomApi.replaceChild(
-          parent = ctx.parentNode,
+          parent = ctx.currentParentNode,
           oldChild = oldNode,
           newChild = newNode,
           hooks
@@ -122,7 +122,7 @@ object ChildrenCommandInserter {
         val trailingSentinelRef = ctx.trailingSentinelNodeOpt.get.ref
         newNodes.foreach { node =>
           DomApi.insertChildBefore(
-            parent = ctx.parentNode,
+            parent = ctx.currentParentNode,
             newChild = node,
             referenceChildRef = trailingSentinelRef,
             hooks

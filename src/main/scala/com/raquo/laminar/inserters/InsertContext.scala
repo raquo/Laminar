@@ -50,9 +50,32 @@ import scala.scalajs.js
   *                              another, or externally remove elements an inserter added.
   */
 final class InsertContext(
-  val parentNode: ReactiveElement.Base,
+  initialParentNode: ReactiveElement.Base,
   val sentinelNode: CommentNode
 ) {
+
+  private var _currentParentNode: ReactiveElement.Base = initialParentNode
+
+  /** The element that CURRENTLY hosts this inserter's content.
+    *
+    * It can change in one scenario: if this [[InsertContext]] was created by
+    * a [[NestedGroup]] inside a `children <--` inserter, AND this exact
+    * nested group was later moved into ANOTHER `children <--` inserter.
+    *
+    * In that scenario, we want to keep the nodes in the nested group mounted,
+    * and I haven't figured out how to implement that without making parentNode
+    * mutable on InserterContext. Maybe in the future I can isolate this
+    * mutability to NestedGroup itself, but the shape of `insertFn` is
+    * preventing that right now.
+    */
+  def currentParentNode: ReactiveElement.Base = _currentParentNode
+
+  /** Point this context at a new host element.
+    * #Warning: Only a [[NestedGroup]] move should call this – see [[currentParentNode]].
+    */
+  private[laminar] def setCurrentParentNode(newParentNode: ReactiveElement.Base): Unit = {
+    _currentParentNode = newParentNode
+  }
 
   /** Only multi-node inserters use this. Inserters that don't use it will remove it if found. */
   var trailingSentinelNodeOpt: js.UndefOr[CommentNode] = js.undefined
@@ -106,7 +129,7 @@ final class InsertContext(
         // and the context does not have it yet.
         val trailingSentinel = new CommentNode("")
         DomApi.insertChildAfter(
-          parent = parentNode,
+          parent = currentParentNode,
           newChild = trailingSentinel,
           referenceChildRef = afterRef,
           hooks = () // Ignoring hooks in comment nodes is ok... fow now.
@@ -116,7 +139,7 @@ final class InsertContext(
     } else {
       // Next inserter does not need trailing sentinel
       trailingSentinelNodeOpt.foreach { trailingSentinel =>
-        DomApi.removeChild(parent = parentNode, child = trailingSentinel)
+        DomApi.removeChild(parent = currentParentNode, child = trailingSentinel)
         trailingSentinelNodeOpt = js.undefined
       }
     }
@@ -178,7 +201,7 @@ final class InsertContext(
           // so a multi-node span (e.g. a nested group) is stepped over in one go.
           val nextRef = inserter.lastNode.nextSibling
           // @Note: DOM update
-          inserter.removeFromDynamicList(parentNode)
+          inserter.removeFromDynamicList(currentParentNode)
           maybeRef = nextRef
         }
       }
@@ -198,7 +221,7 @@ object InsertContext {
     DomApi.appendChild(parent = parentNode, child = sentinelNode, hooks)
 
     unsafeMakeReservedSpotContext(
-      parentNode = parentNode,
+      initialParentNode = parentNode,
       sentinelNode = sentinelNode
     )
   }
@@ -209,13 +232,16 @@ object InsertContext {
     * a child of parentNode in the real DOM.
     *
     * This method is exposed to help third parties make hydration helpers.
+    *
+    * #Note: `parentNode` on InsertContext is mutable.
+    *  See [[InsertContext.currentParentNode]].
     */
   def unsafeMakeReservedSpotContext(
-    parentNode: ReactiveElement.Base,
+    initialParentNode: ReactiveElement.Base,
     sentinelNode: CommentNode
   ): InsertContext = {
     new InsertContext(
-      parentNode = parentNode,
+      initialParentNode = initialParentNode,
       sentinelNode = sentinelNode
     )
   }

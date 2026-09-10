@@ -450,4 +450,352 @@ class NestedInsertersSpec extends UnitSpec {
       )
     }
   }
+
+  // -- #TODO[nested-dyn] "same inserter moved between two `children <--` lists" --
+  //
+  //  These three tests probe the TODO at DynamicInserter.addToDynamicList (Inserter.scala).
+  //  A `children <--` list item CAN be a dynamic inserter, and the SAME inserter `val`
+  //  can be referenced by two different lists, exactly like a plain element `val` can.
+  //
+  //  Two orderings arise when the same instance leaves list 1 and joins list 2:
+  //    - remove-first: list 1 emits Nil, then list 2 emits List(item)   (separate transactions)
+  //    - add-first ("steal"): list 2 emits List(item) while item is still in list 1, then
+  //                           list 1 emits Nil
+  //
+  //  The REFERENCE test below pins how plain ELEMENTS behave, which is the bar the TODO
+  //  refers to ("similarly to how we can transfer elements").
+
+  it("REFERENCE: plain ELEMENT moved between two `children <--` lists (both orderings)") {
+    // Establishes the target semantics for the inserter case below.
+    def probe(addFirst: Boolean): (Int, Int) = {
+      var mountCount = 0
+      var unmountCount = 0
+      val items1 = Var[List[Inserter]](Nil)
+      val items2 = Var[List[Inserter]](Nil)
+      val el: Inserter = span(
+        "X",
+        onMountCallback(_ => mountCount += 1),
+        onUnmountCallback(_ => unmountCount += 1)
+      )
+      mount(
+        div(
+          div("L1", children <-- items1.signal),
+          div("L2", children <-- items2.signal)
+        )
+      )
+      items1.set(List(el))
+      if (addFirst) {
+        items2.set(List(el)) // steal into L2 while still in L1
+        items1.set(Nil)
+      } else {
+        items1.set(Nil)
+        items2.set(List(el))
+      }
+      // In both orderings the element lands in L2 and is gone from L1.
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, span of "X", sentinel)
+        )
+      )
+      val result = (mountCount, unmountCount)
+      unmount()
+      result
+    }
+
+    // Remove-first re-mounts (two separate transactions – nothing links them).
+    probe(addFirst = false) shouldBe (2, 1)
+    // Add-first is a true transfer: the element is stolen into L2 with NO re-mount.
+    probe(addFirst = true) shouldBe (1, 0)
+  }
+
+  it("CHARACTERIZATION (remove-first): same dynamic inserter moved between two lists re-mounts, like an element") {
+    // Documents CURRENT behaviour, which is consistent with the element reference above:
+    // the DOM span is unmounted from L1 and re-mounted into L2 (mount hooks re-run).
+    // The inner `child <--` observer does NOT re-run here only because Var.signal.map
+    // memoizes its value across the brief teardown; a non-memoizing source would re-run.
+    var observeCount = 0
+    var mountCount = 0
+    var unmountCount = 0
+    val valueVar = Var("A")
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- valueVar.signal.map { v =>
+      observeCount += 1
+      span(
+        v,
+        onMountCallback(_ => mountCount += 1),
+        onUnmountCallback(_ => unmountCount += 1)
+      )
+    }
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    items1.set(List(dyn))
+    withClue("in L1:") {
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      (observeCount, mountCount, unmountCount) shouldBe (1, 1, 0)
+    }
+
+    // Remove-first ordering (two transactions).
+    items1.set(Nil)
+    items2.set(List(dyn))
+    withClue("moved to L2 (re-mounted):") {
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "A", sentinel, sentinel)
+        )
+      )
+      // observe stays 1 (Signal value memoized); the span DOM node re-mounts: unmount 1, mount 2.
+      (observeCount, mountCount, unmountCount) shouldBe (1, 2, 1)
+    }
+
+    withClue("still live in L2:") {
+      valueVar.set("B")
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "B", sentinel, sentinel)
+        )
+      )
+      observeCount shouldBe 2
+    }
+  }
+
+  it("add-first / steal: same dynamic inserter added to a 2nd list before removal transfers, no re-mount") {
+    // This is the case the Inserter.scala TODO called out. For a plain element (see REFERENCE)
+    // this "steal" ordering transfers with NO re-mount. DynamicInserter.addToDynamicList now
+    // does the same: it transfers the group's span + subscriptions to the new parent instead of
+    // throwing, and the later removal from L1 is a no-op because the span was already stolen.
+    var observeCount = 0
+    var mountCount = 0
+    var unmountCount = 0
+    val valueVar = Var("A")
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- valueVar.signal.map { v =>
+      observeCount += 1
+      span(
+        v,
+        onMountCallback(_ => mountCount += 1),
+        onUnmountCallback(_ => unmountCount += 1)
+      )
+    }
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    items1.set(List(dyn))
+    (observeCount, mountCount, unmountCount) shouldBe (1, 1, 0)
+
+    withClue("steal into L2 before removing from L1:") {
+      items2.set(List(dyn)) // adds to L2 while still in L1 -> transfer (not throw, not re-mount)
+      items1.set(Nil) // removal from L1 is a no-op: the span was already stolen into L2
+      // Matches the element reference: item is now in L2, gone from L1, transferred with no re-mount.
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "A", sentinel, sentinel)
+        )
+      )
+      (observeCount, mountCount, unmountCount) shouldBe (1, 1, 0)
+    }
+
+    withClue("still live in L2 after the steal:") {
+      valueVar.set("B")
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "B", sentinel, sentinel)
+        )
+      )
+      observeCount shouldBe 2
+    }
+  }
+
+  it("add-first / steal of a nested `children <--` item (multi-node span transfers, inner list stays live)") {
+    // Exercises the recursive part of moveToParent: the stolen item is itself a `children <--`
+    // group with several content nodes and its own inner trailing sentinel. The whole span must
+    // move to L2 as a unit, and the inner list must remain live (able to update in place) after.
+    val innerVar = Var[List[Int]](List(1, 2))
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val nested: Inserter = children <-- innerVar.signal.map(_.map(i => span(s"n$i")))
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    // Sentinel layout for a nested `children <--` item inside an outer `children <--` list:
+    //   [outer-leading, group-leading, ...content..., inner-trailing, group-trailing, outer-trailing]
+    withClue("in L1:") {
+      items1.set(List(nested))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("steal into L2 (whole multi-node span moves) before removing from L1:") {
+      items2.set(List(nested))
+      items1.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("inner list still live in L2 (grow), directing emissions to the new parent:") {
+      innerVar.set(List(1, 2, 3))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("inner list still live in L2 (shrink):") {
+      innerVar.set(List(7))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "n7", sentinel, sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("normal removal from its new host L2 tears it down:") {
+      items2.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("add-first / steal keeps the item's per-item lifecycle intact (owner transferred, not rebuilt)") {
+    // The stolen item's observer must NOT re-run (its owner is transferred, not torn down and
+    // rebuilt), and after the steal the item must react to a source that changed WHILE it was
+    // being moved – proving the same live subscription is still in place.
+    var observeCount = 0
+    val valueVar = Var("A")
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- valueVar.signal.map { v =>
+      observeCount += 1
+      span(v)
+    }
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    items1.set(List(dyn))
+    observeCount shouldBe 1
+
+    withClue("steal into L2:") {
+      items2.set(List(dyn))
+      items1.set(Nil)
+      observeCount shouldBe 1 // owner transferred, observer not re-run
+    }
+
+    withClue("reacts in L2 to further updates:") {
+      valueVar.set("B")
+      observeCount shouldBe 2
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, span of "B", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("add-first / steal recurses through nested dynamic content (depth-2: children <-- containing child <--)") {
+    // The stolen item is a `children <--` whose single content item is itself a `child <--`
+    // (a nested DynamicInserter). moveToParent must recurse into that inner group, transferring
+    // its own subscription owner. We verify the depth-2 leaf stays live (no re-run) after the steal.
+    var leafObserveCount = 0
+    val leafVar = Var("x")
+    val leaf: Inserter = child <-- leafVar.signal.map { v =>
+      leafObserveCount += 1
+      span(v)
+    }
+    val innerItemsVar = Var[List[Inserter]](List(leaf))
+    val nested: Inserter = children <-- innerItemsVar.signal
+
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    items1.set(List(nested))
+    withClue("depth-2 nesting in L1:") {
+      // L1 sentinels: outer-leading, nested-group-leading, leaf-group-leading, <span>,
+      //   leaf-group-trailing, nested-inner-children-trailing, nested-group-trailing, outer-trailing
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      leafObserveCount shouldBe 1
+    }
+
+    withClue("steal the depth-2 span into L2:") {
+      items2.set(List(nested))
+      items1.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      leafObserveCount shouldBe 1 // inner-inner owner transferred, leaf observer not re-run
+    }
+
+    withClue("depth-2 leaf still live in L2:") {
+      leafVar.set("y")
+      leafObserveCount shouldBe 2
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, span of "y", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+    }
+  }
 }
