@@ -9,23 +9,23 @@ import scala.scalajs.js
 
 final class NestedGroup(
   // #Note: this is the INITIAL parent, used only to set up the span. The current parent (which
-  //  changes if this group is moved between `children <--` lists, see [[moveToParent]]) is owned
-  //  by [[nestedInsertContext]] – read it via `nestedInsertContext.currentParentNode`.
+  //  changes if this group is moved between parents, see [[moveToParent]]) is owned by
+  //  [[nestedInsertContext]] – read it via `nestedInsertContext.currentParentNode`.
   initialParent: ReactiveElement.Base,
-  afterRef: dom.Node,
+  afterRefOpt: js.UndefOr[dom.Node],
   sentinelNode: CommentNode,
   insertFn: (InsertContext, Owner, js.UndefOr[InserterHooks]) => Subscription,
-  hooks: js.UndefOr[InserterHooks]
+  hooks: js.UndefOr[InserterHooks],
+  withTrailingSentinel: Boolean // true is required if rendering this nested inside `children <--`
 ) {
 
-  private[laminar] lazy val leadingSentinel: CommentNode = {
-    // new CommentNode("")
-    sentinelNode
-  }
+  private[laminar] lazy val leadingSentinel: CommentNode = sentinelNode
 
-  private[laminar] lazy val trailingSentinel: CommentNode = {
-    new CommentNode("")
-  }
+  /** The group's own trailing sentinel that brackets the END of its span. Present only while this
+    * group lives (or has lived) as a `children <--` list item – see [[ensureTrailingSentinel]].
+    * A group applied only to plain elements never has one, keeping its DOM minimal.
+    */
+  private var trailingSentinelOpt: js.UndefOr[CommentNode] = js.undefined
 
   private lazy val nestedDynamicOwner = new DynamicOwner(() => {
     throw new Exception(
@@ -48,18 +48,10 @@ final class NestedGroup(
 
   // A. Reserve insertion spot
 
-  DomApi.insertChildAfter(
+  insertOrAppendChild(
     parent = initialParent,
     newChild = leadingSentinel,
-    referenceChildRef = afterRef,
-    hooks = hooks
-  )
-
-  DomApi.insertChildAfter(
-    parent = initialParent,
-    newChild = trailingSentinel,
-    referenceChildRef = leadingSentinel.ref,
-    hooks = hooks
+    afterRefOpt = afterRefOpt
   )
 
   private val nestedInsertContext: InsertContext = {
@@ -67,6 +59,10 @@ final class NestedGroup(
       initialParentNode = initialParent,
       sentinelNode = leadingSentinel
     )
+  }
+
+  if (withTrailingSentinel) {
+    ensureTrailingSentinel()
   }
 
   // B. Create subscription to run this inserter's logic
@@ -86,27 +82,59 @@ final class NestedGroup(
 
   // --
 
-  /** Move this whole group (its content AND its lifecycle ownership)
-    * to a new parent, right after `afterRef`, WITHOUT re-mounting.
+  /** The last DOM node of this group's span.
+    *  - As a list item (has a trailing sentinel), that sentinel – a stable end marker even when
+    *    the content is empty.
+    *  - As a lightweight static mount, the actual end of the current content (the inner trailing
+    *    sentinel for `children <--`, else the last content node, else the leading sentinel).
+    */
+  private[laminar] def lastNode: dom.Node = {
+    // The group's own trailing sentinel (an outer bracket, present only as a list item) is the end
+    // of the whole span. Without it (a lightweight static mount), the end is the content's own end –
+    // which the context knows. Note: the context's sentinelNode IS our [[leadingSentinel]], so its
+    // empty-content fallback coincides with ours.
+    trailingSentinelOpt.map(_.ref).getOrElse(nestedInsertContext.lastNode)
+  }
+
+  /** Make sure this group has a trailing sentinel bracketing the end of its span, creating and
+    * inserting it if needed. Called when a lightweight (static) group is added to a `children <--`
+    * list and thus needs a stable end marker. No-op if the group already has one.
+    */
+  private[laminar] def ensureTrailingSentinel(): Unit = {
+    if (trailingSentinelOpt.isEmpty) {
+      val trailingSentinel = new CommentNode("")
+      DomApi.insertChildAfter(
+        parent = nestedInsertContext.currentParentNode,
+        newChild = trailingSentinel,
+        referenceChildRef = nestedInsertContext.lastNode,
+        hooks = hooks
+      )
+      trailingSentinelOpt = trailingSentinel
+    }
+  }
+
+  /** Move this whole group (its content AND its lifecycle ownership) to a new parent,
+    * right after `afterRefOpt` (or appended at the end of `newParent` if `afterRefOpt`
+    * is absent) WITHOUT re-mounting.
     *
-    * Seamlessly transfer its contents and subscriptions to the new parent,
-    * mirroring how a plain element can be moved between two `children <--` lists.
+    * Seamlessly transfers its contents and subscriptions to the new parent, mirroring
+    * how a plain element can be moved between two parents.
     *
-    * Called when the SAME nested inserter instance, already present in a
-    * `children <--` list, is added to a different `children <--` list before
-    * it is removed from the first (see [[DynamicInserter.addToDynamicList]]).
+    * Called when the SAME dynamic inserter instance, already placed as a group,
+    * is placed somewhere else:
+    *  - added to another `children <--` list (see [[DynamicInserter.addToDynamicList]]), or
+    *  - applied to a plain element, e.g. `element.amend(inserter)` (see [[DynamicInserter.apply]]).
     */
   private[laminar] def moveToParent(
     newParent: ReactiveElement.Base,
-    afterRef: dom.Node
+    afterRefOpt: js.UndefOr[dom.Node]
   ): Unit = {
 
-    // Move sentinels to the new place
-    DomApi.insertChildAfter(
+    // Move sentinels to the new place.
+    insertOrAppendChild(
       parent = newParent,
       newChild = leadingSentinel,
-      referenceChildRef = afterRef,
-      hooks = hooks
+      afterRefOpt = afterRefOpt
     )
 
     nestedInsertContext.trailingSentinelNodeOpt.foreach { innerTrailingSentinel =>
@@ -120,18 +148,19 @@ final class NestedGroup(
       )
     }
 
-    val lastSentinelRef =
-      nestedInsertContext
-        .trailingSentinelNodeOpt
-        .getOrElse(leadingSentinel)
-        .ref
-
-    DomApi.insertChildAfter(
-      parent = newParent,
-      newChild = trailingSentinel,
-      referenceChildRef = lastSentinelRef,
-      hooks = hooks
-    )
+    trailingSentinelOpt.foreach { trailingSentinel =>
+      val lastMovedSentinelRef =
+        nestedInsertContext
+          .trailingSentinelNodeOpt
+          .getOrElse(leadingSentinel)
+          .ref
+      DomApi.insertChildAfter(
+        parent = newParent,
+        newChild = trailingSentinel,
+        referenceChildRef = lastMovedSentinelRef,
+        hooks = hooks
+      )
+    }
 
     // Move content nodes (without unnecessary re-mounting)
     var lastRef: dom.Node = leadingSentinel.ref
@@ -171,6 +200,31 @@ final class NestedGroup(
     //    have been moved to a different list since it was created).
     val currentParent = nestedInsertContext.currentParentNode
     DomApi.removeChild(parent = currentParent, child = nestedInsertContext.sentinelNode)
-    DomApi.removeChild(parent = currentParent, child = trailingSentinel)
+    trailingSentinelOpt.foreach { trailingSentinel =>
+      DomApi.removeChild(parent = currentParent, child = trailingSentinel)
+    }
+  }
+
+  private def insertOrAppendChild(
+    parent: ReactiveElement.Base,
+    newChild: CommentNode,
+    afterRefOpt: js.UndefOr[dom.Node]
+  ): Unit = {
+    afterRefOpt.fold(
+      ifEmpty = {
+        DomApi.appendChild(
+          parent = parent,
+          child = newChild,
+          hooks = hooks
+        )
+      }
+    ) { afterRef =>
+      DomApi.insertChildAfter(
+        parent = parent,
+        newChild = newChild,
+        referenceChildRef = afterRef,
+        hooks = hooks
+      )
+    }
   }
 }

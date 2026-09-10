@@ -739,6 +739,130 @@ class NestedInsertersSpec extends UnitSpec {
     }
   }
 
+  it("promote a statically-applied dynamic inserter into a children<-- list, seamlessly (static-first, no re-mount)") {
+    // The inserter's FIRST placement is a plain static apply: `div("HOST", nested)`. That creates
+    // a LIGHTWEIGHT NestedGroup (single leading sentinel + content, NO trailing sentinel – same
+    // minimal DOM as a plain static mount). Moving it into a list must be SEAMLESS: the group
+    // grows a trailing sentinel (ensureTrailingSentinel) and `moveToParent` transfers its span +
+    // subscription to the list, so HOST is left clean, the content ends up in the list, and NOTHING
+    // re-mounts (mountCount/unmountCount are pinned across the promotion). The transfer rides on the
+    // group's TransferableSubscription – no re-subscribe, no re-emit, no no-op-diff churn.
+    var observeCount = 0
+    var mountCount = 0
+    var unmountCount = 0
+    val innerVar = Var[List[Int]](List(1, 2))
+    val items = Var[List[Inserter]](Nil)
+    val nested: Inserter = children <-- innerVar.signal.map { ints =>
+      observeCount += 1
+      ints.map(i =>
+        span(
+          s"n$i",
+          onMountCallback(_ => mountCount += 1),
+          onUnmountCallback(_ => unmountCount += 1)
+        )
+      )
+    }
+
+    val host = div("HOST", nested) // <-- first placement is a plain static apply (lightweight group)
+    val listEl = div("LIST", children <-- items.signal)
+
+    mount(div(host, listEl))
+
+    withClue("after mount (static-first): HOST holds the content, a lightweight 2 sentinels only:") {
+      expectNode(
+        div.of(
+          div.of("HOST", sentinel, span of "n1", span of "n2", sentinel),
+          div.of("LIST", sentinel, sentinel)
+        )
+      )
+      (observeCount, mountCount, unmountCount) shouldBe (1, 2, 0)
+    }
+
+    items.set(List(nested)) // now move it into the list
+
+    withClue("after promotion into the list: HOST is clean, content lives in the list as a group, no re-mount:") {
+      expectNode(
+        div.of(
+          div.of("HOST"),
+          div.of("LIST", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel)
+        )
+      )
+      // Seamless: the source signal never re-emitted (observeCount unchanged) and the spans were
+      // transferred, not rebuilt (mount/unmount counts unchanged).
+      (observeCount, mountCount, unmountCount) shouldBe (1, 2, 0)
+    }
+
+    withClue("still live in the list after promotion: updates flow, HOST stays clean:") {
+      innerVar.set(List(3)) // only the group's (live) subscription should react now
+      expectNode(
+        div.of(
+          div.of("HOST"),
+          div.of("LIST", sentinel, sentinel, span of "n3", sentinel, sentinel, sentinel)
+        )
+      )
+      // n1, n2 unmounted, n3 mounted – the group's single subscription is what reacted.
+      (observeCount, mountCount, unmountCount) shouldBe (2, 3, 2)
+    }
+  }
+
+  it("move a statically-applied dynamic inserter between two plain elements, seamlessly (static-to-static)") {
+    // A dynamic inserter applied directly to element A (never a list item), then re-applied to
+    // element B via `B.amend(inserter)`. Both placements are lightweight (trailing-sentinel-less)
+    // groups; the move is a seamless `moveToParent` that relocates the content to B and keeps it
+    // live, WITHOUT re-mounting.
+    var observeCount = 0
+    var mountCount = 0
+    var unmountCount = 0
+    val valueVar = Var("A")
+    val nested: Inserter = child <-- valueVar.signal.map { v =>
+      observeCount += 1
+      span(
+        v,
+        onMountCallback(_ => mountCount += 1),
+        onUnmountCallback(_ => unmountCount += 1)
+      )
+    }
+
+    val elA = div("A", nested)
+    val elB = div("B")
+
+    mount(div(elA, elB))
+
+    withClue("after mount: content is in A (child <-- is a single sentinel + node):") {
+      expectNode(
+        div.of(
+          div.of("A", sentinel, span of "A"),
+          div.of("B")
+        )
+      )
+      (observeCount, mountCount, unmountCount) shouldBe (1, 1, 0)
+    }
+
+    withClue("move to B via amend: the whole span (sentinel + node) relocates to B, no re-mount:") {
+      elB.amend(nested)
+      expectNode(
+        div.of(
+          div.of("A"),
+          div.of("B", sentinel, span of "A")
+        )
+      )
+      (observeCount, mountCount, unmountCount) shouldBe (1, 1, 0)
+    }
+
+    withClue("still live in B after the move:") {
+      valueVar.set("Z")
+      expectNode(
+        div.of(
+          div.of("A"),
+          div.of("B", sentinel, span of "Z")
+        )
+      )
+      // One re-render (A -> Z), so the old node unmounts and the new one mounts. Still just one
+      // live subscription doing the work.
+      (observeCount, mountCount, unmountCount) shouldBe (2, 2, 1)
+    }
+  }
+
   it("add-first / steal recurses through nested dynamic content (depth-2: children <-- containing child <--)") {
     // The stolen item is a `children <--` whose single content item is itself a `child <--`
     // (a nested DynamicInserter). moveToParent must recurse into that inner group, transferring
