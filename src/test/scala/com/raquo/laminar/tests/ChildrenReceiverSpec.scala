@@ -1049,8 +1049,6 @@ class ChildrenReceiverSpec extends UnitSpec {
         sentinel
       )
     )
-
-    // #TODO[Test]: also test for externally removing an element?
   }
 
   it("clearing a list to empty after its items were moved to another list (delete-loop guard)") {
