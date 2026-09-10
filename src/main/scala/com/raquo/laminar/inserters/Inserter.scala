@@ -135,12 +135,13 @@ class DynamicInserter(
       ifEmpty = {
         // First placement of this inserter
         nestedGroupOpt = new NestedGroup(
-          initialParent = element,
-          afterRefOpt = afterRefOpt,
           sentinelNode = sentinelNode,
           insertFn = insertFn,
-          hooks = hooks,
-          withTrailingSentinel = false // trailing sentinel is not needed until/unless we move this inserter into `children <--` – call .ensureTrailingSentinel then.
+          hooks = hooks
+        )(
+          initialParent = element,
+          initiallyPlaceAfterRefOpt = afterRefOpt,
+          initiallyRequiresTrailingSentinel = false // trailing sentinel is not needed until/unless we move this inserter into `children <--` – call .forceTrailingSentinel() then.
         )
       }
     ) { group =>
@@ -179,12 +180,13 @@ class DynamicInserter(
       ifEmpty = {
         // First placement of this inserter
         nestedGroupOpt = new NestedGroup(
-          initialParent = parent,
-          afterRefOpt = afterRef,
           sentinelNode = sentinelNode,
           insertFn = insertFn,
-          hooks = hooks,
-          withTrailingSentinel = true // required for nested inserters
+          hooks = hooks
+        )(
+          initialParent = parent,
+          initiallyPlaceAfterRefOpt = afterRef,
+          initiallyRequiresTrailingSentinel = true // required for nested inserters
         )
       }
     ) { group =>

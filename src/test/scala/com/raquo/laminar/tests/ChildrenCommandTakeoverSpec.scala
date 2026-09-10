@@ -39,16 +39,15 @@ class ChildrenCommandTakeoverSpec extends UnitSpec {
 
     mount(div("Hello", children <-- itemsVar.signal))
 
-    // outer children<-- leading sentinel, then the command item's leading + trailing
-    // sentinels and the command's own trailing sentinel (inserted right after the item's
-    // leading one), then the outer children<-- trailing sentinel.
-    expectNode(div.of("Hello", sentinel, sentinel, sentinel, sentinel, sentinel))
+    // outer children<-- leading sentinel, then the command item's leading + trailing sentinels,
+    // then the outer children<-- trailing sentinel.
+    expectNode(div.of("Hello", sentinel, sentinel, sentinel, sentinel))
 
     cmdBus.writer.onNext(CollectionCommand.Append(trackedDiv("c1")))
     cmdBus.writer.onNext(CollectionCommand.Append(trackedDiv("c2")))
 
     assert(lifecycle.toList == List("mount:c1", "mount:c2"))
-    expectNode(div.of("Hello", sentinel, sentinel, div of "c1", div of "c2", sentinel, sentinel, sentinel))
+    expectNode(div.of("Hello", sentinel, sentinel, div of "c1", div of "c2", sentinel, sentinel))
 
     lifecycle.clear()
 

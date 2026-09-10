@@ -226,22 +226,22 @@ class NestedInsertersSpec extends UnitSpec {
     itemsVar.set(List(staticA, nested))
 
     mount(div("H", children <-- itemsVar.signal))
-    // nested is empty -> only its two bracketing sentinels are present
-    expectNode(div.of("H", sentinel, span of "A", sentinel, sentinel, sentinel, sentinel))
+    // nested is empty -> only its leading + trailing sentinel are present
+    expectNode(div.of("H", sentinel, span of "A", sentinel, sentinel, sentinel))
 
     withClue("Inner list fills in (between the nested item's sentinels):") {
       innerVar.set(List(1, 2))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
     }
 
     withClue("Reorder outer: the whole nested span moves as a unit:") {
       itemsVar.set(List(nested, staticA))
-      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", sentinel, span of "A", sentinel))
     }
 
     withClue("Inner update after the move still works (trailing sentinel stays at span end):") {
       innerVar.set(List(3))
-      expectNode(div.of("H", sentinel, sentinel, span of "n3", sentinel, sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, sentinel, span of "n3", sentinel, span of "A", sentinel))
     }
   }
 
@@ -344,35 +344,35 @@ class NestedInsertersSpec extends UnitSpec {
     itemsVar.set(List(staticA, nested))
 
     mount(div("H", children <-- itemsVar.signal))
-    expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel))
+    expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
 
     withClue("Move the span backward (to the front):") {
       itemsVar.set(List(nested, staticA))
-      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", sentinel, span of "A", sentinel))
     }
 
     withClue("Move it forward again (back behind the static):") {
       itemsVar.set(List(staticA, nested))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
     }
 
     withClue("Grow the span to three content nodes, then move it backward:") {
       innerVar.set(List(1, 2, 3))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel))
       itemsVar.set(List(nested, staticA))
-      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, span of "A", sentinel))
     }
 
     withClue("Shrink the span to a single content node while moved, then move forward:") {
       innerVar.set(List(7))
-      expectNode(div.of("H", sentinel, sentinel, span of "n7", sentinel, sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, sentinel, span of "n7", sentinel, span of "A", sentinel))
       itemsVar.set(List(staticA, nested))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n7", sentinel, sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n7", sentinel, sentinel))
     }
 
     withClue("Inner list is still live after all the moves:") {
       innerVar.set(List(8, 9))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n8", span of "n9", sentinel, sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n8", span of "n9", sentinel, sentinel))
     }
   }
 
@@ -451,9 +451,6 @@ class NestedInsertersSpec extends UnitSpec {
     }
   }
 
-  // -- #TODO[nested-dyn] "same inserter moved between two `children <--` lists" --
-  //
-  //  These three tests probe the TODO at DynamicInserter.addToDynamicList (Inserter.scala).
   //  A `children <--` list item CAN be a dynamic inserter, and the SAME inserter `val`
   //  can be referenced by two different lists, exactly like a plain element `val` can.
   //
@@ -645,12 +642,12 @@ class NestedInsertersSpec extends UnitSpec {
     )
 
     // Sentinel layout for a nested `children <--` item inside an outer `children <--` list:
-    //   [outer-leading, group-leading, ...content..., inner-trailing, group-trailing, outer-trailing]
+    //   [outer-leading, group-leading, ...content..., trailing, outer-trailing]
     withClue("in L1:") {
       items1.set(List(nested))
       expectNode(
         div.of(
-          div.of("L1", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel),
+          div.of("L1", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel),
           div.of("L2", sentinel, sentinel)
         )
       )
@@ -662,7 +659,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
-          div.of("L2", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel)
+          div.of("L2", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel)
         )
       )
     }
@@ -672,7 +669,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
-          div.of("L2", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel, sentinel)
+          div.of("L2", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel)
         )
       )
     }
@@ -682,7 +679,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
-          div.of("L2", sentinel, sentinel, span of "n7", sentinel, sentinel, sentinel)
+          div.of("L2", sentinel, sentinel, span of "n7", sentinel, sentinel)
         )
       )
     }
@@ -784,7 +781,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("HOST"),
-          div.of("LIST", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel, sentinel)
+          div.of("LIST", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel)
         )
       )
       // Seamless: the source signal never re-emitted (observeCount unchanged) and the spans were
@@ -797,7 +794,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("HOST"),
-          div.of("LIST", sentinel, sentinel, span of "n3", sentinel, sentinel, sentinel)
+          div.of("LIST", sentinel, sentinel, span of "n3", sentinel, sentinel)
         )
       )
       // n1, n2 unmounted, n3 mounted – the group's single subscription is what reacted.
@@ -889,10 +886,10 @@ class NestedInsertersSpec extends UnitSpec {
     items1.set(List(nested))
     withClue("depth-2 nesting in L1:") {
       // L1 sentinels: outer-leading, nested-group-leading, leaf-group-leading, <span>,
-      //   leaf-group-trailing, nested-inner-children-trailing, nested-group-trailing, outer-trailing
+      //   leaf-trailing, nested-trailing, outer-trailing (each group has a single trailing sentinel)
       expectNode(
         div.of(
-          div.of("L1", sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel, sentinel),
+          div.of("L1", sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel),
           div.of("L2", sentinel, sentinel)
         )
       )
@@ -905,7 +902,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
-          div.of("L2", sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel, sentinel)
+          div.of("L2", sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel)
         )
       )
       leafObserveCount shouldBe 1 // inner-inner owner transferred, leaf observer not re-run
@@ -917,7 +914,7 @@ class NestedInsertersSpec extends UnitSpec {
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
-          div.of("L2", sentinel, sentinel, sentinel, span of "y", sentinel, sentinel, sentinel, sentinel)
+          div.of("L2", sentinel, sentinel, sentinel, span of "y", sentinel, sentinel, sentinel)
         )
       )
     }

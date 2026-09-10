@@ -1100,7 +1100,6 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello ",
-        // #TODO[nested-dyn] new sentinel node – review this change in behaviour
         sentinel,
         "x2",
         " world"
@@ -1118,7 +1117,7 @@ class MountHooksSpec extends UnitSpec {
     expectNode(
       div of (
         "Hello ",
-        sentinel, // sentinel node still present (kept by the strict `text <--`, now reused by the children inserter) // #TODO[nested-dyn] review comment together with other nested-dyn comments above
+        sentinel, // sentinel node still present (kept by the strict `text <--`, now reused by the children inserter)
         "x2",
         " world"
       )

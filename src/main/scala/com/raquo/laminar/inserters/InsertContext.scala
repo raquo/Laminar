@@ -50,8 +50,8 @@ import scala.scalajs.js
   *                              another, or externally remove elements an inserter added.
   */
 final class InsertContext(
-  initialParentNode: ReactiveElement.Base,
-  val sentinelNode: CommentNode
+  val sentinelNode: CommentNode,
+  initialParentNode: ReactiveElement.Base
 ) {
 
   private var _currentParentNode: ReactiveElement.Base = initialParentNode
@@ -73,16 +73,31 @@ final class InsertContext(
   /** Point this context at a new host element.
     * #Warning: Only a [[NestedGroup]] move should call this – see [[currentParentNode]].
     */
-  private[laminar] def setCurrentParentNode(newParentNode: ReactiveElement.Base): Unit = {
+  def setCurrentParentNode(newParentNode: ReactiveElement.Base): Unit = {
     _currentParentNode = newParentNode
   }
 
-  /** Only multi-node inserters use this. Inserters that don't use it will remove it if found. */
-  var trailingSentinelNodeOpt: js.UndefOr[CommentNode] = js.undefined
+  // --
+
+  /** A comment node marking the END of this context's span. Present when EITHER is true:
+    *  - [[InserterType.needsTrailingSentinel]] (true for multi-node inserters), OR
+    *  - [[_forceTrailingSentinel]] (true for list items under `children <--`)
+    */
+  private var _trailingSentinelNodeOpt: js.UndefOr[CommentNode] = js.undefined
+
+  def trailingSentinelNodeOpt: js.UndefOr[CommentNode] = _trailingSentinelNodeOpt
+
+  // --
+
+  private var _forceTrailingSentinel: Boolean = false
+
+  // --
 
   private var _lastInserterType: js.UndefOr[InserterType] = js.undefined
 
   def lastInserterType: js.UndefOr[InserterType] = _lastInserterType
+
+  // --
 
   /** Inserters that are rendered into this context.
     * Does not include sentinel node(s).
@@ -105,11 +120,34 @@ final class InsertContext(
     }
   }
 
-  /** Why this works: any multi-node inserter will have a trailing sentinel node at all times. */
+  // --
+
+  /** Why this works: any multi-node inserter will have a trailing sentinel node at all times,
+    * and singleContentMapItem.lastNode + sentinelNode cover all other possibilities.
+    */
   def lastNode: dom.Node = {
-    trailingSentinelNodeOpt.map(_.ref)
+    _trailingSentinelNodeOpt.map(_.ref)
       .orElse(singleContentMapItem.map(_.lastNode))
       .getOrElse(sentinelNode.ref)
+  }
+
+  /** Call this if / when this group is rendered as a `children <--` list item. */
+  def forceTrailingSentinel(): Unit = {
+    _forceTrailingSentinel = true
+    ensureTrailingSentinel()
+  }
+
+  private def ensureTrailingSentinel(): Unit = {
+    if (_trailingSentinelNodeOpt.isEmpty) {
+      val trailingSentinel = new CommentNode("")
+      DomApi.insertChildAfter(
+        parent = currentParentNode,
+        newChild = trailingSentinel,
+        referenceChildRef = lastNode,
+        hooks = () // Ignoring hooks in comment nodes is ok... for now.
+      )
+      _trailingSentinelNodeOpt = trailingSentinel
+    }
   }
 
   /** Removes old content both from contentMap and from the DOM.
@@ -134,30 +172,12 @@ final class InsertContext(
   }
 
   def setNextInserterType(nextInserterType: js.UndefOr[InserterType]): Unit = {
-    if (nextInserterType.exists(_.needsTrailingSentinel)) {
-      if (trailingSentinelNodeOpt.isEmpty) {
-        // If we're switching from a context with no trailing sentinel node,
-        // we expect that context to contain at most one node / inserter (e.g. child <--).
-        val afterRef: dom.Node =
-          singleContentMapItem
-            .map(_.lastNode)
-            .getOrElse(sentinelNode.ref)
-        // Next inserter type needs a trailing sentinel,
-        // and the context does not have it yet.
-        val trailingSentinel = new CommentNode("")
-        DomApi.insertChildAfter(
-          parent = currentParentNode,
-          newChild = trailingSentinel,
-          referenceChildRef = afterRef,
-          hooks = () // Ignoring hooks in comment nodes is ok... fow now.
-        )
-        trailingSentinelNodeOpt = trailingSentinel
-      }
+    if (nextInserterType.exists(_.needsTrailingSentinel) || _forceTrailingSentinel) {
+      ensureTrailingSentinel()
     } else {
-      // Next inserter does not need trailing sentinel
-      trailingSentinelNodeOpt.foreach { trailingSentinel =>
+      _trailingSentinelNodeOpt.foreach { trailingSentinel =>
         DomApi.removeChild(parent = currentParentNode, child = trailingSentinel)
-        trailingSentinelNodeOpt = js.undefined
+        _trailingSentinelNodeOpt = js.undefined
       }
     }
     // Update context inserter type
@@ -167,7 +187,7 @@ final class InsertContext(
   /** Walk this context's span forward from [[sentinelNode]], removing every tracked
     * ([[contentMap]]) node from the DOM except `keepNodeIfPresent`.
     *
-    * Where the walk stops depends on whether we have a [[trailingSentinelNodeOpt]]:
+    * Where the walk stops depends on whether we have a [[_trailingSentinelNodeOpt]]:
     *  - With one (a `children <--` or `children.command <--` span), it marks the definite
     *    end of our content, so we walk right up to it and REPORT any node in between that we
     *    don't recognize – we allow external removals from our span, but not external
@@ -185,12 +205,12 @@ final class InsertContext(
   def removeContentMapNodesFromDom(
     keepNodeIfPresent: js.UndefOr[ChildNode.Base]
   ): Unit = {
-    val hasTrailingSentinel = trailingSentinelNodeOpt.nonEmpty
+    val hasTrailingSentinel = _trailingSentinelNodeOpt.nonEmpty
     var maybeRef = sentinelNode.ref.nextSibling
     var continue = true
     while (continue && maybeRef != null) {
       val childRef = maybeRef
-      if (trailingSentinelNodeOpt.exists(_.ref == childRef)) {
+      if (_trailingSentinelNodeOpt.exists(_.ref == childRef)) {
         // Reached the end of our span. Stop.
         continue = false
       } else if (keepNodeIfPresent.exists(_.ref == childRef)) {
@@ -258,8 +278,8 @@ object InsertContext {
     sentinelNode: CommentNode
   ): InsertContext = {
     new InsertContext(
-      initialParentNode = initialParentNode,
-      sentinelNode = sentinelNode
+      sentinelNode = sentinelNode,
+      initialParentNode = initialParentNode
     )
   }
 
