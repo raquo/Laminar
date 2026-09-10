@@ -51,7 +51,7 @@ object ChildrenInserter {
       nextItems = nextItems,
       renderable = renderable,
       prevContentMap = ctx.contentMap,
-      listParentNode = ctx.parentNode,
+      listParentNode = ctx.currentParentNode,
       listSentinelNodeRef = ctx.sentinelNode.ref,
       listTrailingSentinelRef = ctx.trailingSentinelNodeOpt.map(_.ref),
       hooks = hooks

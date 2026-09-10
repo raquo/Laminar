@@ -160,24 +160,38 @@ class DynamicInserter(
     afterRef: dom.Node,
     hooks: js.UndefOr[InserterHooks]
   ): Unit = {
-    if (nestedGroupOpt.nonEmpty) {
-      // #TODO[nested-dyn] handle the case when the same inserter instance is moved from one dynamic list to another
-      //  - in that case, we should transfer the subscription and move nodes to the new parent without re-mounting,
-      //    similarly to how we can transfer elements
-      throw new Exception("Called addToDynamicList where nestedGroupOpt already exists.")
+    nestedGroupOpt.fold(
+      ifEmpty = {
+        nestedGroupOpt = new NestedGroup(
+          initialParent = parent, afterRef = afterRef, sentinelNode, insertFn, hooks
+        )
+      }
+    ) { group =>
+      // This same inserter instance was already previously registered in another dynamic list
+      // (it was added to THIS new list before being removed from the old one).
+      // Seamlessly transfer its contents and subscriptions to the new parent, mirroring how
+      // a plain element can be moved between two `children <--` lists.
+      // If / when the old list decides to remove this inserter, it will call
+      // `thisInserter.removeFromDynamicList(oldInserterParent)` (see below),
+      // which will be a no-op due to parent mismatch.
+      group.moveToParent(newParent = parent, afterRef = afterRef)
     }
-    nestedGroupOpt = new NestedGroup(
-      parent = parent, afterRef = afterRef, sentinelNode, insertFn, hooks
-    )
   }
 
   override private[laminar] def removeFromDynamicList(parent: ReactiveElement.Base): Unit = {
-    nestedGroupOpt
-      .getOrElse(
-        throw new Exception("Can not removeFromDynamicList: nested group not found (addToDynamicList was not called first). This is a bug in Laminar.")
-      )
-      .removeFromParent()
-    nestedGroupOpt = js.undefined
+    val group = nestedGroupOpt.getOrElse(
+      throw new Exception("Can not removeFromDynamicList: nested group not found (addToDynamicList was not called first). This is a bug in Laminar.")
+    )
+    if (group.leadingSentinel.ref.parentNode == parent.ref) {
+      // This list still hosts the group's span – a genuine removal.
+      group.removeFromParent()
+      nestedGroupOpt = js.undefined
+    } else {
+      // This group was already moved to a different parent,
+      // stolen by its new host, so nothing else needs to be done.
+      // This is similar to DomApi.removeChild being a no-op if
+      // the parent doesn't contain the child anymore.
+    }
   }
 
   /** Note: overrides default implementation */

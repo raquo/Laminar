@@ -89,7 +89,7 @@ class InsertContextInvariantSpec extends UnitSpec {
 
     val sentinelNode = new CommentNode("")
     sentinelNode(el) // append to el
-    val ctx = new InsertContext(parentNode = el, sentinelNode = sentinelNode)
+    val ctx = new InsertContext(initialParentNode = el, sentinelNode = sentinelNode)
 
     val a = span("a")
     val b = span("b")

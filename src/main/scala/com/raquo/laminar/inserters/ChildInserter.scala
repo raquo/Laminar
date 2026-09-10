@@ -48,7 +48,7 @@ object ChildInserter {
         .fold {
           // Inserting the child for the first time, OR after the previous child was externally moved / removed.
           DomApi.insertChildAfter(
-            parent = ctx.parentNode,
+            parent = ctx.currentParentNode,
             newChild = newChildNode,
             referenceChildRef = ctx.sentinelNode.ref,
             hooks = hooks
@@ -58,7 +58,7 @@ object ChildInserter {
           // We found the last seen child where we left it in the DOM. Replace it with the new child.
           // #Note: auto-distinction inside (`replaceChild` is a no-op if the nodes are equal)
           DomApi.replaceChild(
-            parent = ctx.parentNode,
+            parent = ctx.currentParentNode,
             oldChild = lastSeenChild,
             newChild = newChildNode,
             hooks = hooks
