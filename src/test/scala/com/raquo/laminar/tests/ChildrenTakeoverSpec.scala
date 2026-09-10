@@ -92,7 +92,7 @@ class ChildrenTakeoverSpec extends UnitSpec {
     mount(el)
     innerBus.writer.onNext(List(trackedDiv("g1"), trackedDiv("g2")))
 
-    expectNode(div of ("Hello ", sentinel, sentinel, div of "g1", div of "g2", sentinel, sentinel, sentinel, " world"))
+    expectNode(div of ("Hello ", sentinel, sentinel, div of "g1", div of "g2", sentinel, sentinel, " world"))
     assert(mounts("g1") == 1 && mounts("g2") == 1)
 
     unmount()
