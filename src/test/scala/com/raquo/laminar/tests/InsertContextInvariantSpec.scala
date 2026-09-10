@@ -101,6 +101,6 @@ class InsertContextInvariantSpec extends UnitSpec {
     val thrown = intercept[Exception] {
       ctx.setNextInserterType(nextType)
     }
-    assert(thrown.getMessage.contains("multiple content nodes without trailing sentinel"))
+    assert(thrown.getMessage.contains("content nodes without trailing sentinel"))
   }
 }

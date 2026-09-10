@@ -1,6 +1,6 @@
 package com.raquo.laminar.inserters
 
-import com.raquo.airstream.ownership.{DynamicSubscription, Owner, Subscription}
+import com.raquo.airstream.ownership.{Owner, Subscription}
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
@@ -108,22 +108,6 @@ class DynamicInserter(
   hooks: js.UndefOr[InserterHooks] = js.undefined
 ) extends Inserter with Hookable[DynamicInserter] {
 
-  def bind(element: ReactiveElement.Base): DynamicSubscription = {
-    // #Note we want to remember this context even after subscription is deactivated.
-    //  Yes, we expect the subscription to re-activate with this initial state
-    //  because it would match the state of the DOM upon reactivation
-    //  (unless some of the managed child elements were externally removed from the DOM,
-    //  which Laminar should be able to recover from).
-    val insertContext = InsertContext.reserveSpotContext(
-      parentNode = element,
-      hooks = hooks
-    )
-
-    ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
-      insertFn(insertContext, mountContext.owner, hooks)
-    }
-  }
-
   /** Owner typically comes from MountContext of the InsertContext parentNode. */
   def subscribe(
     insertContext: InsertContext,
@@ -132,8 +116,39 @@ class DynamicInserter(
     insertFn(insertContext, owner, hooks)
   }
 
+  /** Because [[DynamicInserter]]-s can use [[NestedGroup]]-s
+    * when they're rendered as items in a `children <--` list,
+    * we need to also use [[NestedGroup]]-s when rendering them
+    * plainly, to keep a consistent rendering path that manages
+    * state and subscriptions in one place. This ensures that
+    * these inserters remain moveable between arbitrary contexts,
+    * specifically between nested `children <--` contexts and
+    * plain child contexts.
+    */
   override def apply(element: ReactiveElement.Base): Unit = {
-    bind(element)
+    // Append to the end of the element.
+    val afterRefOpt: js.UndefOr[dom.Node] = {
+      val lastChild = element.ref.lastChild
+      if (lastChild == null) js.undefined else lastChild // #TODO[ew] Add this conversion to `ew`
+    }
+    nestedGroupOpt.fold(
+      ifEmpty = {
+        // First placement of this inserter
+        nestedGroupOpt = new NestedGroup(
+          initialParent = element,
+          afterRefOpt = afterRefOpt,
+          sentinelNode = sentinelNode,
+          insertFn = insertFn,
+          hooks = hooks,
+          withTrailingSentinel = false // trailing sentinel is not needed until/unless we move this inserter into `children <--` – call .ensureTrailingSentinel then.
+        )
+      }
+    ) { group =>
+      // This inserter instance already lives somewhere (applied to another element, or as a
+      // `children <--` list item). Applying it here (e.g. `element.amend(inserter)`) MOVES it
+      // seamnlessly (no re-mounting).
+      group.moveToParent(newParent = element, afterRefOpt = afterRefOpt)
+    }
   }
 
   override def withHooks(addHooks: InserterHooks): DynamicInserter = {
@@ -151,7 +166,7 @@ class DynamicInserter(
 
   override private[laminar] def lastNode: dom.Node = {
     nestedGroupOpt
-      .map(_.trailingSentinel.ref)
+      .map(_.lastNode)
       .getOrElse(throw new Exception("Can not get lastNode: nested group not found. This is a bug in Laminar."))
   }
 
@@ -162,19 +177,27 @@ class DynamicInserter(
   ): Unit = {
     nestedGroupOpt.fold(
       ifEmpty = {
+        // First placement of this inserter
         nestedGroupOpt = new NestedGroup(
-          initialParent = parent, afterRef = afterRef, sentinelNode, insertFn, hooks
+          initialParent = parent,
+          afterRefOpt = afterRef,
+          sentinelNode = sentinelNode,
+          insertFn = insertFn,
+          hooks = hooks,
+          withTrailingSentinel = true // required for nested inserters
         )
       }
     ) { group =>
-      // This same inserter instance was already previously registered in another dynamic list
-      // (it was added to THIS new list before being removed from the old one).
-      // Seamlessly transfer its contents and subscriptions to the new parent, mirroring how
-      // a plain element can be moved between two `children <--` lists.
-      // If / when the old list decides to remove this inserter, it will call
-      // `thisInserter.removeFromDynamicList(oldInserterParent)` (see below),
-      // which will be a no-op due to parent mismatch.
-      group.moveToParent(newParent = parent, afterRef = afterRef)
+      // This inserter instance already lives as a group somewhere else.
+      // Add trailing sentinel for proper tracking inside `children <--`,
+      // then move it seamlessly to its new location.
+      // Note: If / when the previous dynamic list that hosted this inserter
+      //       decides to remove this inserter, it will call
+      //       `thisInserter.removeFromDynamicList(oldInserterParent)`
+      //       (see below), which will be a no-op due to parent mismatch,
+      //       so all is good – this new list manages this inserter now.
+      group.ensureTrailingSentinel()
+      group.moveToParent(newParent = parent, afterRefOpt = afterRef)
     }
   }
 

@@ -91,7 +91,28 @@ final class InsertContext(
     */
   var contentMap: JsMap[dom.Node, Inserter] = new JsMap()
 
-  /** Removes old content both from contnetMap and from the DOM.
+  /** Get the inserter in contentMap, or throw if there are multiple inserters there.
+    * Precondition: the inserter currently using this context is a single-node inserter.
+    */
+  def singleContentMapItem: js.UndefOr[Inserter] = {
+    val numInserters = contentMap.size
+    if (numInserters == 0) {
+      js.undefined
+    } else if (numInserters == 1) {
+      contentMap.entries().next().value._2
+    } else {
+      throw new Exception(s"singleContentMapItem: Found multiple (${numInserters}) content nodes without trailing sentinel. This is a bug in Laminar.")
+    }
+  }
+
+  /** Why this works: any multi-node inserter will have a trailing sentinel node at all times. */
+  def lastNode: dom.Node = {
+    trailingSentinelNodeOpt.map(_.ref)
+      .orElse(singleContentMapItem.map(_.lastNode))
+      .getOrElse(sentinelNode.ref)
+  }
+
+  /** Removes old content both from contentMap and from the DOM.
     *
     * @param replaceContentMapWithSingleNode
     *            If specified, will ensure that the resulting contentMap has this node.
@@ -115,16 +136,12 @@ final class InsertContext(
   def setNextInserterType(nextInserterType: js.UndefOr[InserterType]): Unit = {
     if (nextInserterType.exists(_.needsTrailingSentinel)) {
       if (trailingSentinelNodeOpt.isEmpty) {
-        if (contentMap.size > 1) {
-          // If we're switching from a context with no trailing sentinel node,
-          // we expect that context to contain at most one node / inserter (e.g. child <--).
-          throw new Exception("Unexpected: multiple content nodes without trailing sentinel. This is a bug in Laminar.")
-        }
-        val afterRef: dom.Node = if (contentMap.size == 0) {
-          sentinelNode.ref
-        } else {
-          contentMap.entries().next().value._2.lastNode
-        }
+        // If we're switching from a context with no trailing sentinel node,
+        // we expect that context to contain at most one node / inserter (e.g. child <--).
+        val afterRef: dom.Node =
+          singleContentMapItem
+            .map(_.lastNode)
+            .getOrElse(sentinelNode.ref)
         // Next inserter type needs a trailing sentinel,
         // and the context does not have it yet.
         val trailingSentinel = new CommentNode("")
