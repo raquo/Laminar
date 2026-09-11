@@ -122,9 +122,9 @@ class InserterMoveSpec extends UnitSpec {
   }
 
   it("`children.command <--` emptied (RemoveAll) then refilled AFTER a steal: empty span stays anchored at the moved location") {
-    // A moved command span emptied to ZERO must keep its own leading + trailing
-    // sentinels at the NEW host, so a following Append lands back inside the moved span (not in the
-    // old list, and not detached). Exercises RemoveAll + Append on a command group after `moveToParent`.
+    // A moved command span emptied to ZERO must keep its own leading + trailing sentinels at the NEW
+    // host, so a following Append lands back inside the moved span. Exercises RemoveAll + Append on a
+    // command group after `moveToParent`.
     val tracker = createEventTracker()
     val cmdBus = new EventBus[CollectionCommand[Node]]
     val items1 = Var[List[Inserter]](Nil)
@@ -441,10 +441,10 @@ class InserterMoveSpec extends UnitSpec {
     }
   }
 
-  // Demote ordering counterpart: a `children <--` list item is stolen out onto a plain element
-  // (`moveToParent`) WHILE EMPTY (bare [leading, trailing], zero content). The empty span must
-  // relocate to the element, the list must be left clean, and the first population after the move
-  // must land on the element between the moved sentinels — not back in the list.
+  // A `children <--` list item is stolen out onto a plain element (`moveToParent`) WHILE EMPTY (bare
+  // [leading, trailing], zero content). The empty span must relocate to the element, the list must be
+  // left clean, and the first population after the move must land on the element between the moved
+  // sentinels.
 
   it("demote: an EMPTY `children <--` list item applied onto a plain element relocates, then populates on the element") {
     val tracker = createEventTracker()
