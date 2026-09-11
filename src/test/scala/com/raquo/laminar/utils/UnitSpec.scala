@@ -31,8 +31,8 @@ with BeforeAndAfterAll {
     AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
   }
 
-  /** A fresh [[LifecycleTracker]] for asserting on element mount / unmount lifecycle. */
-  def newLifecycleTracker(): LifecycleTracker = new LifecycleTracker()
+  /** A fresh [[EventTracker]] for asserting on the ordered sequence of element / lifecycle events. */
+  def createEventTracker(): EventTracker = new EventTracker()
 
   /** Run `body` with unhandled Airstream errors collected into the provided buffer instead of
     * being rethrown, restoring the default (rethrow) callback afterwards even if `body` throws.
