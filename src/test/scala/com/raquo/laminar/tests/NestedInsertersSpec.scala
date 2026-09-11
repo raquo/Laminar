@@ -705,7 +705,7 @@ class NestedInsertersSpec extends UnitSpec {
   //
   //  The REFERENCE test below pins how plain ELEMENTS behave, which is the bar the TODO
   //  refers to ("similarly to how we can transfer elements").
-
+  // #TODO probe(addFirst = false) should be solved by https://github.com/raquo/Laminar/issues/163
   it("REFERENCE: plain ELEMENT moved between two `children <--` lists (both orderings)") {
     // Establishes the target semantics for the inserter case below.
     def probe(addFirst: Boolean): (Int, Int) = {
@@ -745,12 +745,13 @@ class NestedInsertersSpec extends UnitSpec {
     }
 
     // Remove-first re-mounts (two separate transactions – nothing links them).
-    probe(addFirst = false) shouldBe (2, 1)
+    probe(addFirst = false) shouldBe (2, 1) // #TODO https://github.com/raquo/Laminar/issues/163
     // Add-first is a true transfer: the element is stolen into L2 with NO re-mount.
     probe(addFirst = true) shouldBe (1, 0)
   }
 
   it("CHARACTERIZATION (remove-first): same dynamic inserter moved between two lists re-mounts, like an element") {
+    // #TODO Review this when working on https://github.com/raquo/Laminar/issues/163 too
     // Documents CURRENT behaviour, which is consistent with the element reference above:
     // the DOM span is unmounted from L1 and re-mounted into L2 (mount hooks re-run).
     // The inner `child <--` observer does NOT re-run here only because Var.signal.map
@@ -811,6 +812,57 @@ class NestedInsertersSpec extends UnitSpec {
         )
       )
       observeCount shouldBe 2
+    }
+  }
+
+  it("CHARACTERIZATION (issue #163): moving an element between two sibling `child <--` bindings re-mounts in one direction only") {
+    // Shape of https://github.com/raquo/Laminar/issues/163: ONE element shows via one of
+    // two independent `child <--` bindings (different parents), toggled by one signal.
+    // Whether the move re-mounts is ORDER-DEPENDENT: the open #163 hazard, and why the
+    // issue notes a `delaySync` workaround only fixes one direction.
+    //
+    // Mechanism: the two bindings react to the same signal in subscription (declaration)
+    // order, so the first-declared binding fires first. On a toggle one binding LOSES the
+    // element and one GAINS it. In DomTree.replaceChild the losing side runs
+    // elem.willSetParent(None), and ReactiveElement.isUnmounting unmounts it only if it
+    // has no other active parent yet:
+    //  - GAINING binding fires FIRST: it steals the element while the old parent is still
+    //    active, so the pilot owner is transferred (setOwner), not cleared -> NO events;
+    //  - LOSING binding fires FIRST: the element is detached to None (unmount) before the
+    //    gaining binding re-attaches it (mount) -> it RE-MOUNTS.
+    // So it re-mounts exactly when the first-declared binding is the one losing it.
+    //
+    // `probe` mounts a fresh pair (declaration order = `topDeclaredFirst`), does one
+    // toggle, and returns the events it produced. When #163 is fixed, all four go to Nil.
+    def probe(topDeclaredFirst: Boolean, startOnTop: Boolean): List[String] = {
+      val tracker = createEventTracker()
+      val onTop = Var(startOnTop)
+      val elem = tracker.createDiv("elem")
+      val topOff = span("off-top")
+      val bottomOff = span("off-bottom")
+      val topBox = div("top", child <-- onTop.signal.map(t => if (t) elem else topOff))
+      val bottomBox = div("bottom", child <-- onTop.signal.map(t => if (t) bottomOff else elem))
+      mount(div(if (topDeclaredFirst) Seq(topBox, bottomBox) else Seq(bottomBox, topBox)))
+      tracker.clear() // drop element-create + initial mount; keep only the toggle's events
+      onTop.set(!startOnTop)
+      val toggleLog = tracker.log.toList
+      unmount()
+      toggleLog
+    }
+
+    val reMount = List("unmount:elem", "mount:elem")
+
+    withClue("top declared first, toggle top->bottom (top LOSES first) — re-mounts:") {
+      probe(topDeclaredFirst = true, startOnTop = true) shouldBe reMount
+    }
+    withClue("top declared first, toggle bottom->top (top GAINS first) — seamless:") {
+      probe(topDeclaredFirst = true, startOnTop = false) shouldBe Nil
+    }
+    withClue("bottom declared first, toggle top->bottom (bottom GAINS first) — seamless:") {
+      probe(topDeclaredFirst = false, startOnTop = true) shouldBe Nil
+    }
+    withClue("bottom declared first, toggle bottom->top (bottom LOSES first) — re-mounts:") {
+      probe(topDeclaredFirst = false, startOnTop = false) shouldBe reMount
     }
   }
 
