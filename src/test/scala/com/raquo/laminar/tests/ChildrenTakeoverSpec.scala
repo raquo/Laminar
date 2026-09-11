@@ -105,6 +105,64 @@ class ChildrenTakeoverSpec extends UnitSpec {
     assert(mounts("g2") == unmounts("g2") && mounts("g2") >= 2)
   }
 
+  // -- A takeover doesn't blindly tear down the whole span: if `child <--` takes over a
+  //    `children <--` and emits a node that's ALREADY in that span, only the OTHER items unmount.
+  //    The surviving node is retained in place – neither unmounted nor re-mounted – as its
+  //    ownership passes from the list to the `child <--`. This is the counterpart to the teardown
+  //    tests above, and pins the `clearPreviousInserterContent(keep = ...)` branch of `switchToChild`. --
+
+  it("onMountInsert: `children <--` (a, b) -> `child <-- b` keeps b mounted, unmounts only a") {
+    val tracker = createEventTracker()
+    val childrenBus = new EventBus[List[Node]]
+    val childBus = new EventBus[Div]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
+
+    var dynamicInserter: Inserter = children <-- childrenBus.events
+    val takeoverInserter: Inserter = child <-- childBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial: children <-- renders a, b:") {
+      mount(el)
+      childrenBus.emit(List(a, b))
+      expectNode(div of ("Hello ", sentinel, div of "a", div of "b", sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("unmount then remount rides a and b on the element's own lifecycle:") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      // #Note: `children <--` tears down / restores in contentMap insertion order (a, b).
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b"),
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("`child <-- b` takes over: b (already present) stays put, only a is torn down:") {
+      childBus.emit(b)
+      expectNode(div of ("Hello ", sentinel, div of "b", " world"))
+      // The whole point: b is RETAINED, not re-mounted – its ownership just moves from the list to
+      // the `child <--`. Only the other item (a) unmounts; there is no `mount:b` here.
+      tracker.assertEvents(
+        _.unmounted("a")
+      )
+    }
+  }
+
   // -- Invariant guard: `removeFromDynamicList` is documented as requiring a prior
   //    `addToDynamicList`. Every real call site upholds this (a DynamicInserter only reaches
   //    it as a `children <--` item, added via `addToDynamicList` before it can enter a

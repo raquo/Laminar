@@ -39,21 +39,32 @@ object ChildInserter {
     ctx: InsertContext,
     hooks: InserterHooks | Unit
   ): Unit = {
-    // A. Regardless of what the previous context / DOM state was,
-    //    insert the `newChildNode` right after the sentinel node,
-    //    where it belongs.
-    newChildNodeOpt.foreach { newChildNode =>
+    // In every case the outgoing node(s) unmount BEFORE the incoming one mounts, so a `child <--`
+    // swap has a single, predictable lifecycle ordering regardless of what it's switching from.
+    newChildNodeOpt.fold {
+      // Nothing to render – just clean up whatever was there before.
+      ctx.clearPreviousInserterContent(
+        replaceContentMapWithSingleNode = js.undefined,
+        nextInserterType = InserterType.ChildType
+      )
+    } { newChildNode =>
       maybeLastSeenChild
         .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
         .fold {
-          // Inserting the child for the first time, OR after the previous child was externally moved / removed.
+          // Anything that does exist in the DOM, is not ours. Clean it up first.
+          // It's possible that previous node(s) already contained newChildNode,
+          // so make sure to avoid unmounting it.
+          ctx.clearPreviousInserterContent(
+            replaceContentMapWithSingleNode = newChildNode,
+            nextInserterType = InserterType.ChildType
+          )
+          // Render the new child
           DomApi.insertChildAfter(
             parent = ctx.currentParentNode,
             newChild = newChildNode,
             referenceChildRef = ctx.sentinelNode.ref,
             hooks = hooks
           )
-          ()
         } { lastSeenChild =>
           // We found the last seen child where we left it in the DOM. Replace it with the new child.
           // #Note: auto-distinction inside (`replaceChild` is a no-op if the nodes are equal)
@@ -63,23 +74,16 @@ object ChildInserter {
             newChild = newChildNode,
             hooks = hooks
           )
-          ()
+          // Clear any other stale tracked nodes.
+          // Usually there are none, There could be some if switching
+          // from a multi-node inserter like `children <--` to `child <--`.
+          // #TODO - would be nice if we could remove those before inserting the new node...
+          ctx.clearPreviousInserterContent(
+            replaceContentMapWithSingleNode = newChildNode,
+            nextInserterType = InserterType.ChildType
+          )
         }
     }
-
-    // B. Update the context to match the sole `newChildNode` element that
-    //    we've just put into the DOM, and clear any previous context's other
-    //    nodes from the DOM.
-    //    Note:
-    //     - Such implementation is intended to keep `newChildNode` in the DOM
-    //       without unnecessarily re-mounting it, even if it was previously
-    //       rendered by a different inserter.
-    //     - We do this AFTER the DOM updates above because ideally we want to
-    //       `replace` the previous child in one shot, not remove+insert.
-    ctx.clearPreviousInserterContent(
-      replaceContentMapWithSingleNode = newChildNodeOpt,
-      nextInserterType = InserterType.ChildType
-    )
   }
 
 }

@@ -338,13 +338,11 @@ class InserterExternalMutationSpec extends UnitSpec {
         assert(errors.head.getMessage.contains("not tracked by Laminar"))
       }
       expectNode(div of ("Hello ", sentinel, div of "k", div of "intruder", " world"))
-      // #Note: `child <--` builds `k` and mounts it into the span, then tears down the old children
-      //  it took over (mount-new-then-unmount-old, as the takeover of a foreign span).
       tracker.assertEvents(
         _.elementCreated("k"),
-        _.mounted("k"),
         _.unmounted("a"),
-        _.unmounted("b")
+        _.unmounted("b"),
+        _.mounted("k")
       )
     }
   }

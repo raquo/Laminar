@@ -352,7 +352,6 @@ class InserterMoveSpec extends UnitSpec {
           div.of("LIST", sentinel, sentinel)
         )
       )
-      // #Note: `child <--` removes the previous child BEFORE mounting the new one (unlike `children <--`).
       tracker.assertEvents(
         _.elementCreated("y"),
         _.unmounted("x"),
@@ -408,7 +407,6 @@ class InserterMoveSpec extends UnitSpec {
           div.of("L2", sentinel, sentinel, span of "B", sentinel, sentinel)
         )
       )
-      // #Note: `child <--` removes the previous child BEFORE mounting the new one.
       tracker.assertEvents(
         _.elementCreated("B"),
         _.unmounted("A"),
