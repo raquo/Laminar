@@ -6,21 +6,162 @@ import com.raquo.laminar.utils.UnitSpec
 
 import scala.collection.mutable
 
-/** Switching an inserter slot between `children.command <--` and other inserter types must
-  * REMOVE and UNMOUNT the command's content (issue #157 follow-up).
+/** Switching an inserter slot (an `onMountInsert` context, or a `children <--` list item) from one
+  * inserter to another must REMOVE and UNMOUNT the previous inserter's content — recursively for
+  * nested dynamic items — not merely detach it (issue #157 follow-up).
   *
-  * `children.command` tracks its content nodes in `InsertContext.contentMap` (keyed by ref,
-  * like a plain `child <--` node) and brackets them with a `trailingSentinelNode`. A
-  * taking-over inserter of a different type finds and unmounts the content via the same
-  * map-based teardown (`clearPreviousInserterContent` -> `removeContentMapNodesFromDom`) it
-  * uses for any content, and `setNextInserterType` then drops or reuses the trailing sentinel
-  * depending on whether the new inserter type needs one. Historically the command's nodes
-  * were untracked and thus invisible to that teardown, so they leaked in the DOM.
+  * The takeover clears the old content through `InsertContext.clearPreviousInserterContent` ->
+  * `removeContentMapNodesFromDom`, calling `Inserter.removeFromDynamicList` on every entry still in
+  * the context's `contentMap`. If those entries are themselves DYNAMIC inserters (a nested
+  * `child <--` / `children <--`), that routes to `DynamicInserter.removeFromDynamicList`, which
+  * tears down the item's `NestedGroup` (owner + sentinels) recursively. `children.command <--`
+  * tracks its content in the same `contentMap` (bracketed by a trailing sentinel), so the same
+  * map-based teardown finds and unmounts it, and `setNextInserterType` then drops or reuses the
+  * trailing sentinel depending on whether the new inserter type needs one.
   *
-  * These tests assert the DOM result AND – wherever the nodes carry mount/unmount callbacks –
-  * that the removed nodes are actually unmounted by Laminar, not merely detached from the DOM.
+  * These tests assert the DOM result AND — wherever nodes carry mount/unmount callbacks — that the
+  * removed nodes are actually UNMOUNTED by Laminar, not merely detached. The first group covers
+  * `children <--` takeovers; the rest cover the full `children.command <--` type-switch matrix.
   */
-class ChildrenCommandTakeoverSpec extends UnitSpec {
+class InserterTakeoverSpec extends UnitSpec {
+
+  // -- `onMountInsert` context: takeover happens across an unmount / remount. The nested
+  //    group lives on the parent element's lifecycle, so it re-mounts on remount and is then
+  //    torn down by the takeover, leaving it net-unmounted (mounts == unmounts, mounts >= 2). --
+
+  it("onMountInsert: `children <--` (with a nested `child <--` item) -> `child <--` unmounts the list's content") {
+    val mounts = mutable.Map[String, Int]().withDefaultValue(0)
+    val unmounts = mutable.Map[String, Int]().withDefaultValue(0)
+    def trackedDiv(id: String): Div = div(
+      id,
+      onMountCallback(_ => mounts(id) += 1),
+      onUnmountCallback(_ => unmounts(id) += 1)
+    )
+
+    val innerBus = new EventBus[String]
+    val takeoverBus = new EventBus[String]
+
+    // The list's single item is itself a dynamic inserter, so it lands in the outer
+    // context's contentMap as a DynamicInserter (with a NestedGroup), not a plain node.
+    val nestedChildItem: Inserter = child <-- innerBus.events.map(trackedDiv)
+    var dynamicInserter: Inserter = children <-- Var[List[Inserter]](List(nestedChildItem)).signal
+    val takeoverInserter: Inserter = child <-- takeoverBus.events.map(trackedDiv)
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+    mount(el)
+    innerBus.writer.onNext("n1")
+
+    // outer children<-- leading sentinel, the nested item's leading + trailing sentinels
+    // bracketing n1, then the outer children<-- trailing sentinel.
+    expectNode(div of ("Hello ", sentinel, sentinel, div of "n1", sentinel, sentinel, " world"))
+    assert(mounts("n1") == 1 && unmounts("n1") == 0)
+
+    unmount()
+    dynamicInserter = takeoverInserter
+    mount(el)
+    // The takeover teardown runs when `child <--` first emits (nothing to clear before then).
+    takeoverBus.writer.onNext("k1")
+
+    // The whole nested list (item's sentinels + n1) is gone; only the takeover child remains.
+    expectNode(div of ("Hello ", sentinel, div of "k1", " world"))
+    assert(mounts("k1") == 1)
+    // n1 rode the element's unmount / remount, then the takeover unmounted it: net-unmounted.
+    assert(mounts("n1") == unmounts("n1"))
+    assert(mounts("n1") >= 2)
+  }
+
+  it("onMountInsert: `children <--` (with a nested `children <--` item) -> `text <--` unmounts the list's content recursively") {
+    val mounts = mutable.Map[String, Int]().withDefaultValue(0)
+    val unmounts = mutable.Map[String, Int]().withDefaultValue(0)
+    def trackedDiv(id: String): Div = div(
+      id,
+      onMountCallback(_ => mounts(id) += 1),
+      onUnmountCallback(_ => unmounts(id) += 1)
+    )
+
+    val innerBus = new EventBus[List[Node]]
+    val textBus = new EventBus[String]
+
+    // Nested `children <--`: taking this down recurses (outer removeFromDynamicList ->
+    // NestedGroup.removeFromParent -> nested removeContentMapNodesFromDom over g1 / g2).
+    val nestedChildrenItem: Inserter = children <-- innerBus.events
+    var dynamicInserter: Inserter = children <-- Var[List[Inserter]](List(nestedChildrenItem)).signal
+    val takeoverInserter: Inserter = text <-- textBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+    mount(el)
+    innerBus.writer.onNext(List(trackedDiv("g1"), trackedDiv("g2")))
+
+    expectNode(div of ("Hello ", sentinel, sentinel, div of "g1", div of "g2", sentinel, sentinel, " world"))
+    assert(mounts("g1") == 1 && mounts("g2") == 1)
+
+    unmount()
+    dynamicInserter = takeoverInserter
+    mount(el)
+    textBus.writer.onNext("hi")
+
+    expectNode(div of ("Hello ", sentinel, "hi", " world"))
+    assert(mounts("g1") == unmounts("g1") && mounts("g1") >= 2)
+    assert(mounts("g2") == unmounts("g2") && mounts("g2") >= 2)
+  }
+
+  // -- A takeover doesn't blindly tear down the whole span: if `child <--` takes over a
+  //    `children <--` and emits a node that's ALREADY in that span, only the OTHER items unmount.
+  //    The surviving node is retained in place – neither unmounted nor re-mounted – as its
+  //    ownership passes from the list to the `child <--`. This is the counterpart to the teardown
+  //    tests above, and pins the `clearPreviousInserterContent(keep = ...)` branch of `switchToChild`. --
+
+  it("onMountInsert: `children <--` (a, b) -> `child <-- b` keeps b mounted, unmounts only a") {
+    val tracker = createEventTracker()
+    val childrenBus = new EventBus[List[Node]]
+    val childBus = new EventBus[Div]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
+
+    var dynamicInserter: Inserter = children <-- childrenBus.events
+    val takeoverInserter: Inserter = child <-- childBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial: children <-- renders a, b:") {
+      mount(el)
+      childrenBus.emit(List(a, b))
+      expectNode(div of ("Hello ", sentinel, div of "a", div of "b", sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("unmount then remount rides a and b on the element's own lifecycle:") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      // #Note: `children <--` tears down / restores in contentMap insertion order (a, b).
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b"),
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("`child <-- b` takes over: b (already present) stays put, only a is torn down:") {
+      childBus.emit(b)
+      expectNode(div of ("Hello ", sentinel, div of "b", " world"))
+      // The whole point: b is RETAINED, not re-mounted – its ownership just moves from the list to
+      // the `child <--`. Only the other item (a) unmounts; there is no `mount:b` here.
+      tracker.assertEvents(
+        _.unmounted("a")
+      )
+    }
+  }
 
   // -- `children <--` context: the parent stays mounted throughout, so unmount callbacks
   //    fire exactly when content is torn down – an unambiguous check. --
@@ -350,4 +491,5 @@ class ChildrenCommandTakeoverSpec extends UnitSpec {
     cmdBus.writer.onNext(CollectionCommand.Append(div("c3")))
     expectNode(div of ("Hello ", sentinel, div of "c1", div of "c2", div of "c3", sentinel, " world"))
   }
+
 }

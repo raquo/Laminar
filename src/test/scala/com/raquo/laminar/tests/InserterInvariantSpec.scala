@@ -1,7 +1,7 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.inserters.{InsertContext, InserterType, Inserter}
+import com.raquo.laminar.inserters.{DynamicInserter, InsertContext, InserterType, Inserter}
 import com.raquo.laminar.nodes.CommentNode
 import com.raquo.laminar.utils.UnitSpec
 
@@ -31,8 +31,12 @@ import scala.scalajs.js
   * the most plausible near-miss (a static `Seq[Node]` inserter, then `children <--`, in a
   * shared `onMountInsert` context) staying safe, and the second forces the forbidden state
   * white-box to prove the guard actually fires.
+  *
+  * A second, unrelated invariant is pinned at the end: `DynamicInserter.removeFromDynamicList`
+  * requires a prior `addToDynamicList`, failing loudly otherwise (moved here from the takeover
+  * suite, where it originally lived).
   */
-class InsertContextInvariantSpec extends UnitSpec {
+class InserterInvariantSpec extends UnitSpec {
 
   // -- The scenario one might expect to break the invariant: a `Seq[Node]` static inserter
   //    (→ HookableChildrenInserter) leaves TWO content nodes in the shared onMountInsert
@@ -103,4 +107,23 @@ class InsertContextInvariantSpec extends UnitSpec {
     }
     assert(thrown.getMessage.contains("content nodes without trailing sentinel"))
   }
+
+  // -- Invariant guard: `removeFromDynamicList` is documented as requiring a prior
+  //    `addToDynamicList`. Every real call site upholds this (a DynamicInserter only reaches
+  //    it as a `children <--` item, added via `addToDynamicList` before it can enter a
+  //    contentMap). If that ever broke, silently no-op-ing would leak the whole subtree AND
+  //    its owner, so the method fails loudly instead. This white-box test pins that. --
+
+  it("`DynamicInserter.removeFromDynamicList` without a prior `addToDynamicList` fails loudly") {
+    val bus = new EventBus[String]
+    val inserter = (child <-- bus.events.map(s => span(s))).asInstanceOf[DynamicInserter]
+    val parent = div()
+
+    // No `addToDynamicList` was ever called on `inserter`, so it has no NestedGroup.
+    val thrown = intercept[Exception] {
+      inserter.removeFromDynamicList(parent)
+    }
+    assert(thrown.getMessage.contains("nested group not found"))
+  }
+
 }
