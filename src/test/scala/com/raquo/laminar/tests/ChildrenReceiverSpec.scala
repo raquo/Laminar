@@ -1051,6 +1051,56 @@ class ChildrenReceiverSpec extends UnitSpec {
     )
   }
 
+  it("moving elements within / between classic `children <--` lists never re-mounts them") {
+    // The classic reconcile (ChildrenInserter.updateChildren) routes reorders and steals
+    // through moveWithinDynamicList, so relocating a plain element must not tear its DOM
+    // span down and re-add it. We pin this via lifecycle events: reorders and an
+    // add-first steal fire NOTHING, while a genuine removal DOES unmount — proving the
+    // moves are real no-ops, not luck.
+    val tracker = createEventTracker()
+    val spanA = tracker.createSpan("a")
+    val spanB = tracker.createSpan("b")
+    val spanC = tracker.createSpan("c")
+
+    val bus1 = new EventBus[List[HtmlElement]]
+    val bus2 = new EventBus[List[HtmlElement]]
+    mount(div(children <-- bus1, span("--"), children <-- bus2))
+    tracker.clear() // drop the element-create logs from the tracked spans above
+
+    withClue("fill L1 with a, b, c:") {
+      bus1.emit(List(spanA, spanB, spanC))
+      expectNode(
+        div of (sentinel, span of "a", span of "b", span of "c", sentinel, span of "--", sentinel)
+      )
+      tracker.assertEvents(_.mounted("a"), _.mounted("b"), _.mounted("c")).clear()
+    }
+
+    withClue("reorder within L1 (c, a, b): a pure move re-mounts nothing:") {
+      bus1.emit(List(spanC, spanA, spanB))
+      expectNode(
+        div of (sentinel, span of "c", span of "a", span of "b", sentinel, span of "--", sentinel)
+      )
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("steal a into L2 add-first, then drop it from L1: the element transfers, no re-mount:") {
+      bus2.emit(List(spanA)) // add to L2 while still in L1 -> transfer
+      bus1.emit(List(spanC, spanB)) // removal from L1 is a no-op: already stolen
+      expectNode(
+        div of (sentinel, span of "c", span of "b", sentinel, span of "--", sentinel, span of "a", sentinel)
+      )
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("genuine removal of b from L1 DOES unmount (the moves above were real no-ops):") {
+      bus1.emit(List(spanC))
+      expectNode(
+        div of (sentinel, span of "c", sentinel, span of "--", sentinel, span of "a", sentinel)
+      )
+      tracker.assertEvents(_.unmounted("b")).clear()
+    }
+  }
+
   it("clearing a list to empty after its items were moved to another list (delete-loop guard)") {
     // Pins the `!isContentEnd(prevItemRef)` guard on the delete loop in
     // `ChildrenInserter.updateChildren`. When a list's items are relocated into

@@ -434,6 +434,48 @@ class ChildReceiverSpec extends UnitSpec {
     )
   }
 
+  it("`child <--` swap and steal: lifecycle events on the classic single-node path") {
+    // The classic single-node path (ChildInserter.switchToChild), asserted for lifecycle:
+    //  - a self-replace SWAP tears the old node down BEFORE mounting the new one, so a
+    //    `child <--` update has one predictable ordering, whatever it switches from.
+    //  - STEALING the node another `child <--` shows relocates it WITHOUT re-mounting:
+    //    only the displaced destination node unmounts; the stolen node keeps its mount
+    //    across the move between receivers.
+    val tracker = createEventTracker()
+    val spanA = tracker.createSpan("a")
+    val spanB = tracker.createSpan("b")
+    val spanY = tracker.createSpan("y")
+
+    val bus1 = new EventBus[HtmlElement]
+    val bus2 = new EventBus[HtmlElement]
+    mount(div(child <-- bus1, child <-- bus2))
+    tracker.clear() // drop the element-create logs from the tracked spans above
+
+    withClue("emit a into receiver #1: mounts:") {
+      bus1.emit(spanA)
+      expectNode(div of (sentinel, span of "a", sentinel))
+      tracker.assertEvents(_.mounted("a")).clear()
+    }
+
+    withClue("emit b into receiver #1: swap unmounts the old node before mounting the new one:") {
+      bus1.emit(spanB)
+      expectNode(div of (sentinel, span of "b", sentinel))
+      tracker.assertEvents(_.unmounted("a"), _.mounted("b")).clear()
+    }
+
+    withClue("emit y into receiver #2: mounts alongside, no effect on #1:") {
+      bus2.emit(spanY)
+      expectNode(div of (sentinel, span of "b", sentinel, span of "y"))
+      tracker.assertEvents(_.mounted("y")).clear()
+    }
+
+    withClue("steal y into #1: #2's slot empties; the stolen node keeps its mount, only b unmounts:") {
+      bus1.emit(spanY)
+      expectNode(div of (sentinel, span of "y", sentinel))
+      tracker.assertEvents(_.unmounted("b")).clear()
+    }
+  }
+
   // Followup to https://github.com/raquo/Laminar/issues/196
   it("reports DOM errors") {
     val errors = mutable.Buffer[Throwable]()
