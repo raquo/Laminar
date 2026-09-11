@@ -247,10 +247,9 @@ class NestedInsertersSpec extends UnitSpec {
 
   it("nested `children <--` item empties to zero content while nested (keeps its sentinels), refills, and does the same after a move") {
     // A nested `children <--` item is bracketed by its own leading + trailing sentinels. Emptying
-    // its inner list to ZERO content (existing tests only ever shrink to 1) must leave those two
-    // sentinels in place – the span stays findable and refillable – and it must behave identically
-    // after the whole span has been MOVED to a new slot (the empty span is anchored at the moved
-    // location, and grows there, not back in its original slot).
+    // its inner list to ZERO content must leave those two sentinels in place – the span stays
+    // findable and refillable – and must behave identically once the whole span has been MOVED to a
+    // new slot: the empty span is anchored at the moved location, and grows there.
     val tracker = createEventTracker()
     val innerVar = Var[List[Node]](Nil)
     val itemsVar = Var[List[Inserter]](Nil)
@@ -326,10 +325,9 @@ class NestedInsertersSpec extends UnitSpec {
   }
 
   it("nested `children <--` item emptied to zero BEFORE being stolen: the empty span relocates, then populates at the new location") {
-    // Distinct ordering from the fill-then-move test above: here the span is ALREADY empty (a bare
-    // [leading, trailing] pair, zero content) at the moment it's stolen into another list. So
-    // `moveToParent` must relocate a ZERO-length span, and the FIRST population after the move must
-    // land at the new host between the moved sentinels — not back in the original list.
+    // The span is ALREADY empty (a bare [leading, trailing] pair, zero content) at the moment it's
+    // stolen into another list, so `moveToParent` must relocate a ZERO-length span, and the first
+    // population after the move must land at the new host between the moved sentinels.
     val tracker = createEventTracker()
     val innerVar = Var[List[Node]](Nil)
     val items1 = Var[List[Inserter]](Nil)
@@ -387,10 +385,9 @@ class NestedInsertersSpec extends UnitSpec {
   }
 
   it("nested `children <--` item reordered within its list WHILE EMPTY: the empty span moves as a unit, then populates at its new position") {
-    // The within-list ordering counterpart to the steal test above: an ALREADY-empty span (bare
-    // [leading, trailing]) is moved WITHIN one list via `moveWithinDynamicList` (not `moveToParent`).
-    // The zero-length span must relocate past its neighbour, and the first population must land at
-    // the span's NEW position, not its old one.
+    // An ALREADY-empty span (bare [leading, trailing]) is moved WITHIN one list via
+    // `moveWithinDynamicList`. The zero-length span must relocate past its neighbour, and the first
+    // population must land at the span's new position.
     val tracker = createEventTracker()
     val innerVar = Var[List[Node]](Nil)
     val itemsVar = Var[List[Inserter]](Nil)
@@ -468,91 +465,158 @@ class NestedInsertersSpec extends UnitSpec {
   it("reordering never re-mounts items: static and dynamic inserters move without re-running") {
     // A move (moveWithinDynamicList) must relocate an item's DOM span WITHOUT tearing it down
     // and re-adding it: the logical parent is unchanged, so hooks/subscriptions must not re-run.
-    // We verify this for a dynamic item (observer count stays put, item stays live) while its
-    // static neighbours are shuffled around it, and while it is itself moved forward and backward.
+    // We pin this via lifecycle events – zero mount/unmount for any moved item, covering BOTH the
+    // DYNAMIC item's override (its content span) AND the STATIC items' base-class move (the pure
+    // static swap at the end) – plus observeCount for the dynamic item's subscription (paused, not
+    // rebuilt on a move).
+    val tracker = createEventTracker()
     var observeCount = 0
     val dynVar = Var("d0")
     val itemsVar = Var[List[Inserter]](Nil)
 
-    val staticA: Inserter = span("A")
-    val staticB: Inserter = span("B")
+    val staticA = tracker.createSpan("A")
+    val staticB = tracker.createSpan("B")
     val dyn: Inserter = child <-- dynVar.signal.map { v =>
       observeCount += 1
-      span(v)
+      tracker.createSpan(v)
+    }
+    tracker.clear()
+
+    withClue("initial: A, dynamic (d0), B:") {
+      itemsVar.set(List(staticA, dyn, staticB))
+      mount(div("H", children <-- itemsVar.signal))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "d0", sentinel, span of "B", sentinel))
+      observeCount shouldBe 1
+      tracker
+        .assertEvents(
+          _.mounted("A"),
+          _.elementCreated("d0"),
+          _.mounted("d0"),
+          _.mounted("B")
+        )
+        .clear()
     }
 
-    itemsVar.set(List(staticA, dyn, staticB))
-    mount(div("H", children <-- itemsVar.signal))
-    expectNode(div.of("H", sentinel, span of "A", sentinel, span of "d0", sentinel, span of "B", sentinel))
-    observeCount shouldBe 1
-
-    withClue("Move the dynamic item to the front (backward move) – observer must NOT re-run:") {
+    withClue("move the dynamic item to the front (backward move) – no re-mount, observer must NOT re-run:") {
       itemsVar.set(List(dyn, staticA, staticB))
       expectNode(div.of("H", sentinel, sentinel, span of "d0", sentinel, span of "A", span of "B", sentinel))
       observeCount shouldBe 1
+      tracker.assertNoEvents.clear()
     }
 
-    withClue("Move the dynamic item to the back (forward move, past both statics) – still no re-run:") {
+    withClue("move the dynamic item to the back (forward move, past both statics) – still no re-mount / re-run:") {
       itemsVar.set(List(staticA, staticB, dyn))
       expectNode(div.of("H", sentinel, span of "A", span of "B", sentinel, span of "d0", sentinel, sentinel))
       observeCount shouldBe 1
+      tracker.assertNoEvents.clear()
     }
 
-    withClue("Dynamic item is still live after being moved twice (updates in place):") {
+    withClue("dynamic item is still live after being moved twice (updates in place, old content swaps out):") {
       dynVar.set("d1")
       expectNode(div.of("H", sentinel, span of "A", span of "B", sentinel, span of "d1", sentinel, sentinel))
       observeCount shouldBe 2
+      // A genuine update (not a move): the new content mounts and the old unmounts.
+      tracker
+        .assertEvents(
+          _.elementCreated("d1"),
+          _.unmounted("d0"),
+          _.mounted("d1")
+        )
+        .clear()
     }
 
-    withClue("Swap the two static neighbours (pure static-inserter moves):") {
+    withClue("swap the two static neighbours (pure static-inserter moves, base-class moveWithinDynamicList) – no re-mount:") {
       itemsVar.set(List(staticB, staticA, dyn))
       expectNode(div.of("H", sentinel, span of "B", span of "A", sentinel, span of "d1", sentinel, sentinel))
       observeCount shouldBe 2
+      tracker.assertNoEvents
     }
   }
 
-  it("multi-node dynamic span moves forward and backward, of varying length") {
+  it("multi-node dynamic span moves forward and backward, of varying length (no re-mount)") {
     // Exercises DynamicInserter.moveWithinDynamicList directly: the whole nested span (leading
-    // sentinel .. content nodes .. trailing sentinel) is relocated as a unit. We move it both
-    // backward and forward, round-trip it, and grow/shrink the span so the internal walk covers
-    // spans of different lengths.
-    val innerVar = Var[List[Int]](List(1, 2))
+    // sentinel .. content nodes .. trailing sentinel) is relocated as a unit. Each move must relocate
+    // the span WITHOUT re-mounting any of its content or the static neighbour it passes (asserted as
+    // zero lifecycle events per move). We grow / shrink the span between moves so the internal walk
+    // covers spans of different lengths; node identity is preserved across those resizes so every
+    // resize is a clean add-only / remove-only step.
+    val tracker = createEventTracker()
+    val innerVar = Var[List[Node]](Nil)
     val itemsVar = Var[List[Inserter]](Nil)
 
-    val staticA: Inserter = span("A")
-    val nested: Inserter = children <-- innerVar.signal.map(_.map(i => span(s"n$i")))
-    itemsVar.set(List(staticA, nested))
+    val staticA = tracker.createSpan("A")
+    val n1 = tracker.createSpan("n1")
+    val n2 = tracker.createSpan("n2")
+    val n3 = tracker.createSpan("n3")
+    val n4 = tracker.createSpan("n4")
+    val n5 = tracker.createSpan("n5")
+    tracker.clear()
 
-    mount(div("H", children <-- itemsVar.signal))
-    expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
+    val nested: Inserter = children <-- innerVar.signal
 
-    withClue("Move the span backward (to the front):") {
+    withClue("initial: A, then the nested span holding n1, n2:") {
+      innerVar.set(List(n1, n2))
+      itemsVar.set(List(staticA, nested))
+      mount(div("H", children <-- itemsVar.signal))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
+      tracker
+        .assertEvents(
+          _.mounted("A"),
+          _.mounted("n1"),
+          _.mounted("n2")
+        )
+        .clear()
+    }
+
+    withClue("move the (2-node) span backward to the front – relocates as a unit, nothing re-mounts:") {
       itemsVar.set(List(nested, staticA))
       expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", sentinel, span of "A", sentinel))
+      tracker.assertNoEvents.clear()
     }
 
-    withClue("Move it forward again (back behind the static):") {
+    withClue("move it forward again (back behind A) – still no re-mount:") {
       itemsVar.set(List(staticA, nested))
       expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
+      tracker.assertNoEvents.clear()
     }
 
-    withClue("Grow the span to three content nodes, then move it backward:") {
-      innerVar.set(List(1, 2, 3))
+    withClue("grow the span to three content nodes (only the new node mounts):") {
+      innerVar.set(List(n1, n2, n3))
       expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel))
+      tracker.assertEvents(_.mounted("n3")).clear()
+    }
+
+    withClue("move the grown (3-node) span backward – the whole span relocates, no re-mount:") {
       itemsVar.set(List(nested, staticA))
       expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, span of "A", sentinel))
+      tracker.assertNoEvents.clear()
     }
 
-    withClue("Shrink the span to a single content node while moved, then move forward:") {
-      innerVar.set(List(7))
-      expectNode(div.of("H", sentinel, sentinel, span of "n7", sentinel, span of "A", sentinel))
+    withClue("shrink the span to a single content node while moved (the trailing two unmount):") {
+      innerVar.set(List(n1))
+      expectNode(div.of("H", sentinel, sentinel, span of "n1", sentinel, span of "A", sentinel))
+      // #Note: `children <--` tears down in contentMap insertion order (n2, n3).
+      tracker
+        .assertEvents(
+          _.unmounted("n2"),
+          _.unmounted("n3")
+        )
+        .clear()
+    }
+
+    withClue("move the shrunken (1-node) span forward – no re-mount:") {
       itemsVar.set(List(staticA, nested))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n7", sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", sentinel, sentinel))
+      tracker.assertNoEvents.clear()
     }
 
-    withClue("Inner list is still live after all the moves:") {
-      innerVar.set(List(8, 9))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n8", span of "n9", sentinel, sentinel))
+    withClue("inner list is still live after all the moves (grow again, keeping n1):") {
+      innerVar.set(List(n1, n4, n5))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n4", span of "n5", sentinel, sentinel))
+      tracker.assertEvents(
+        _.mounted("n4"),
+        _.mounted("n5")
+      )
     }
   }
 
@@ -1101,10 +1165,10 @@ class NestedInsertersSpec extends UnitSpec {
   }
 
   it("add-first / steal at depth-3 (children <-- containing children <-- containing child <--): recursion has no depth-specific assumptions") {
-    // Depth-2 already proves `moveToParent` recurses; this pins that a THIRD level of nesting works
-    // the same – the leaf's owner is transferred, not rebuilt – so nothing in the recursion assumes
-    // a fixed depth. We also empty and refill the middle span at depth-3 to check the nested empty
-    // span stays anchored at the moved location.
+    // A THIRD level of nesting is stolen as a unit: `moveToParent` recurses through all three groups,
+    // transferring the leaf's owner rather than rebuilding it, so the recursion assumes no fixed
+    // depth. Emptying and refilling the middle span at depth-3 checks the nested empty span stays
+    // anchored at the moved location.
     val tracker = createEventTracker()
     val leafVar = Var("x")
     val midVar = Var[List[Inserter]](Nil)
