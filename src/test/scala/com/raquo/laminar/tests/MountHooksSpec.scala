@@ -919,7 +919,7 @@ class MountHooksSpec extends UnitSpec {
     // brackets its span with a trailing sentinel. A single-node inserter taking over the
     // same `onMountInsert` context finds those nodes via `removeOldChildNodesFromDOM` and
     // drops the trailing sentinel via `removeCommandTrailingSentinel`, removing the whole
-    // span. (That the removed nodes are actually UNMOUNTED is verified in ChildrenCommandTakeoverSpec.)
+    // span. (That the removed nodes are actually UNMOUNTED is verified in InserterTakeoverSpec.)
 
     val commandBus = new EventBus[CollectionCommand[Node]]
     val xChildIx = new EventBus[Int]
