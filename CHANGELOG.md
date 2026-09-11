@@ -6,7 +6,7 @@ _You can now [sponsor](https://github.com/sponsors/raquo) Laminar development!_
 
 ---
 
-#### For versions v0.11.0 and up, see [laminar.dev/blog](https://laminar.dev/blog)
+#### For versions v0.11.0 and up, see [laminar.dev/blog](https://laminar.dev/blog), or the `website/blog` directory in this repo.
 
 ---
 
