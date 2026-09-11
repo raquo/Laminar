@@ -65,6 +65,7 @@ object ChildInserter {
             referenceChildRef = ctx.sentinelNode.ref,
             hooks = hooks
           )
+          ()
         } { lastSeenChild =>
           // We found the last seen child where we left it in the DOM. Replace it with the new child.
           // #Note: auto-distinction inside (`replaceChild` is a no-op if the nodes are equal)
