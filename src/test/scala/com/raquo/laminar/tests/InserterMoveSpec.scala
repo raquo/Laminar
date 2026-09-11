@@ -63,7 +63,7 @@ class InserterMoveSpec extends UnitSpec {
         )
       )
       tracker
-        .assertEvents() // the crux: transferred, not rebuilt — no events at all
+        .assertNoEvents // the crux: transferred, not rebuilt — no events at all
         .clear()
     }
 
@@ -121,6 +121,87 @@ class InserterMoveSpec extends UnitSpec {
     }
   }
 
+  it("`children.command <--` emptied (RemoveAll) then refilled AFTER a steal: empty span stays anchored at the moved location") {
+    // A moved command span emptied to ZERO must keep its own leading + trailing
+    // sentinels at the NEW host, so a following Append lands back inside the moved span (not in the
+    // old list, and not detached). Exercises RemoveAll + Append on a command group after `moveToParent`.
+    val tracker = createEventTracker()
+    val cmdBus = new EventBus[CollectionCommand[Node]]
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val cmd: Inserter = children.command <-- cmdBus.events
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("command group holds a, b in L1:") {
+      items1.set(List(cmd))
+      cmdBus.emit(CollectionCommand.Append(tracker.createDiv("a")))
+      cmdBus.emit(CollectionCommand.Append(tracker.createDiv("b")))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, div of "a", div of "b", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      tracker
+        .assertEvents(
+          _.elementCreated("a"),
+          _.mounted("a"),
+          _.elementCreated("b"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("steal into L2 (whole span moves, no re-mount):") {
+      items2.set(List(cmd))
+      items1.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, div of "a", div of "b", sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("RemoveAll at the moved location: content unmounts, the group's two sentinels remain as an empty span:") {
+      cmdBus.emit(CollectionCommand.RemoveAll)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      // #Note: command RemoveAll tears down in current order (a, b).
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b")
+        )
+        .clear()
+    }
+
+    withClue("Append after emptying still lands inside the moved (now-empty) span, between its sentinels:") {
+      cmdBus.emit(CollectionCommand.Append(tracker.createDiv("c")))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, div of "c", sentinel, sentinel)
+        )
+      )
+      tracker.assertEvents(
+        _.elementCreated("c"),
+        _.mounted("c")
+      )
+    }
+  }
+
   it("`children.command <--` moved within one list: span moves as a unit, no re-mount") {
     val tracker = createEventTracker()
     val cmdBus = new EventBus[CollectionCommand[Node]]
@@ -153,7 +234,7 @@ class InserterMoveSpec extends UnitSpec {
       itemsVar.set(List(cmd, staticX))
       expectNode(div.of("H", sentinel, sentinel, div of "a", div of "b", sentinel, span of "X", sentinel))
       tracker
-        .assertEvents() // a reorder is a move: no events for the moved span OR the passed-over X
+        .assertNoEvents // a reorder is a move: no events for the moved span OR the passed-over X
         .clear()
     }
 
@@ -210,7 +291,7 @@ class InserterMoveSpec extends UnitSpec {
         )
       )
       tracker
-        .assertEvents() // no re-render during the transfer (a rebuild would re-emit "hi")
+        .assertNoEvents // no re-render during the transfer (a rebuild would re-emit "hi")
         .clear()
     }
 
@@ -272,7 +353,7 @@ class InserterMoveSpec extends UnitSpec {
         )
       )
       tracker
-        .assertEvents() // seamless: no re-render, no re-mount
+        .assertNoEvents // seamless: no re-render, no re-mount
         .clear()
     }
 
@@ -340,7 +421,7 @@ class InserterMoveSpec extends UnitSpec {
         )
       )
       tracker
-        .assertEvents() // seamless: no re-render, no re-mount
+        .assertNoEvents // seamless: no re-render, no re-mount
         .clear()
     }
 
@@ -356,6 +437,66 @@ class InserterMoveSpec extends UnitSpec {
         _.elementCreated("y"),
         _.unmounted("x"),
         _.mounted("y")
+      )
+    }
+  }
+
+  // Demote ordering counterpart: a `children <--` list item is stolen out onto a plain element
+  // (`moveToParent`) WHILE EMPTY (bare [leading, trailing], zero content). The empty span must
+  // relocate to the element, the list must be left clean, and the first population after the move
+  // must land on the element between the moved sentinels — not back in the list.
+
+  it("demote: an EMPTY `children <--` list item applied onto a plain element relocates, then populates on the element") {
+    val tracker = createEventTracker()
+    val innerVar = Var[List[Node]](Nil)
+    val items = Var[List[Inserter]](Nil)
+
+    val n1 = tracker.createSpan("n1")
+    val n2 = tracker.createSpan("n2")
+    tracker.clear()
+
+    val nested: Inserter = children <-- innerVar.signal
+
+    val host = div("HOST")
+    val listEl = div("LIST", children <-- items.signal)
+
+    mount(div(host, listEl))
+
+    withClue("place the empty item in LIST: bare leading + trailing sentinels, no content:") {
+      items.set(List(nested))
+      expectNode(
+        div.of(
+          div.of("HOST"),
+          div.of("LIST", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("demote the EMPTY span onto HOST via amend: the bare pair relocates, LIST emptied, no events:") {
+      host.amend(nested)
+      items.set(Nil) // removal from LIST is a no-op: already moved
+      // The sticky trailing sentinel travels too, so HOST holds a [leading, trailing] pair.
+      expectNode(
+        div.of(
+          div.of("HOST", sentinel, sentinel),
+          div.of("LIST", sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("populate on HOST after the demote: content lands on HOST between the moved sentinels:") {
+      innerVar.set(List(n1, n2))
+      expectNode(
+        div.of(
+          div.of("HOST", sentinel, span of "n1", span of "n2", sentinel),
+          div.of("LIST", sentinel, sentinel)
+        )
+      )
+      tracker.assertEvents(
+        _.mounted("n1"),
+        _.mounted("n2")
       )
     }
   }

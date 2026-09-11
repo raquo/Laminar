@@ -94,6 +94,9 @@ class EventTracker {
     this
   }
 
+  /** Assert that no events were logged. */
+  def assertNoEvents: this.type = assertEvents()
+
   private def track[El <: HtmlElement](el: El, id: String): El = {
     log += s"element-create:$id"
     el.amend(

@@ -24,7 +24,7 @@ Add more helpers to `tracker` as needed if you want to track more things in futu
 
 For example, use `tracker.assertEvents` to assert specific sequences of events, instead of asserting the final state. We care a lot about not emitting unwanted or redundant events (e.g. we may want to assert that a moved element wasn't re-mounted).
 
-Split the tests into `withClue` sections, or just consecutive groups of code separated with a simple `// --` comment, and prefer to make assertions about what happened within the time span of those groups, clear()-ing the tracker's state in between the groups. This is in addition to asserting the desired final state, e.g. with `expectNode`.
+Split the tests into `withClue` sections, or just consecutive groups of code separated with a simple `// --` comment. Put BOTH the code that triggers a step AND the assertions about it INSIDE the same group (e.g. inside the `withClue { ... }` braces) — don't leave the triggering emits/sets sitting above the `withClue` block; keeping them together makes the group's boundaries obvious at a glance. Each group should clear() the tracker's state at its end. This is in addition to asserting the desired final state, e.g. with `expectNode`.
 
 When creating multiple tracked elements upfront, .clear() the tracker right afterwards so that we don't waste time asserting the _obvious_ elementCreated log entries. We do however want to assert elementCreated when it's Laminar or Airstream logic that determines if/when these elements are created (e.g. in a `signal.map` or `splitSeq` callbacks).
 
