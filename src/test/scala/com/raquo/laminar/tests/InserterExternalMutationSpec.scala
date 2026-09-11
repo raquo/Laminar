@@ -55,7 +55,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       expectNode(div of ("H", sentinel))
       // Laminar has not been told, so it does NOT unmount `a` (nothing to react to).
       tracker
-        .assertEvents() // no lifecycle events: Laminar is unaware
+        .assertNoEvents // no lifecycle events: Laminar is unaware
         .clear()
     }
 
@@ -113,7 +113,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       external.removeChild(b)
       expectNode(mainTag of (sentinel, span of "a", span of "c", sentinel))
       tracker
-        .assertEvents() // Laminar wasn't told: `b` is not unmounted
+        .assertNoEvents // Laminar wasn't told: `b` is not unmounted
         .clear()
     }
 
@@ -122,7 +122,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       expectNode(mainTag of (sentinel, span of "a", span of "c", sentinel))
       // The crux: `a` and `c` are left exactly in place – no re-mount, no re-run; `b` stays orphaned.
       tracker
-        .assertEvents()
+        .assertNoEvents
         .clear()
     }
 
@@ -130,7 +130,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       bus.emit(List(c, a))
       expectNode(mainTag of (sentinel, span of "c", span of "a", sentinel))
       tracker
-        .assertEvents() // reorder = move: no lifecycle events
+        .assertNoEvents // reorder = move: no lifecycle events
         .clear()
     }
 
@@ -190,7 +190,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       external.removeChild(a)
       expectNode(div of ("Hello", sentinel, div of "b", sentinel, div of "World"))
       tracker
-        .assertEvents() // `a` still considered mounted: no event
+        .assertNoEvents // `a` still considered mounted: no event
         .clear()
     }
 
@@ -254,7 +254,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       external.insertBefore(foreignEl("intruder"), referenceChild = b)
       expectNode(div of ("Hello", sentinel, div of "a", div of "intruder", div of "b", sentinel, div of "World"))
       tracker
-        .assertEvents() // a pure external DOM insertion: no lifecycle events
+        .assertNoEvents // a pure external DOM insertion: no lifecycle events
         .clear()
     }
 
@@ -306,7 +306,7 @@ class InserterExternalMutationSpec extends UnitSpec {
       external.insertBefore(foreignEl("intruder"), referenceChild = b)
       expectNode(div of ("Hello ", sentinel, div of "a", div of "intruder", div of "b", sentinel, " world"))
       tracker
-        .assertEvents() // a pure external DOM insertion: no lifecycle events
+        .assertNoEvents // a pure external DOM insertion: no lifecycle events
         .clear()
     }
 

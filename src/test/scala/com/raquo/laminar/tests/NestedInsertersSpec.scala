@@ -245,6 +245,186 @@ class NestedInsertersSpec extends UnitSpec {
     }
   }
 
+  it("nested `children <--` item empties to zero content while nested (keeps its sentinels), refills, and does the same after a move") {
+    // A nested `children <--` item is bracketed by its own leading + trailing sentinels. Emptying
+    // its inner list to ZERO content (existing tests only ever shrink to 1) must leave those two
+    // sentinels in place – the span stays findable and refillable – and it must behave identically
+    // after the whole span has been MOVED to a new slot (the empty span is anchored at the moved
+    // location, and grows there, not back in its original slot).
+    val tracker = createEventTracker()
+    val innerVar = Var[List[Node]](Nil)
+    val itemsVar = Var[List[Inserter]](Nil)
+
+    val staticA = tracker.createSpan("A")
+    val n1 = tracker.createSpan("n1")
+    val n2 = tracker.createSpan("n2")
+    val n3 = tracker.createSpan("n3")
+    val n4 = tracker.createSpan("n4")
+    val n5 = tracker.createSpan("n5")
+    tracker.clear()
+
+    val nested: Inserter = children <-- innerVar.signal
+
+    withClue("nested item starts empty: A, then just the item's own leading + trailing sentinels:") {
+      itemsVar.set(List(staticA, nested))
+      mount(div("H", children <-- itemsVar.signal))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, sentinel, sentinel))
+      tracker.assertEvents(_.mounted("A")).clear()
+    }
+
+    withClue("fill the nested span (content lands between its two sentinels):") {
+      innerVar.set(List(n1, n2))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n1", span of "n2", sentinel, sentinel))
+      tracker
+        .assertEvents(
+          _.mounted("n1"),
+          _.mounted("n2")
+        )
+        .clear()
+    }
+
+    withClue("empty it to ZERO while nested: content unmounts, the two sentinels remain as an empty span:") {
+      innerVar.set(Nil)
+      // Back to the bare [leading, trailing] pair – the span didn't collapse or lose its anchors.
+      expectNode(div.of("H", sentinel, span of "A", sentinel, sentinel, sentinel))
+      // #Note: `children <--` tears down in contentMap insertion order (n1, n2).
+      tracker
+        .assertEvents(
+          _.unmounted("n1"),
+          _.unmounted("n2")
+        )
+        .clear()
+    }
+
+    withClue("refill after emptying: the same span accepts new content:") {
+      innerVar.set(List(n3))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "n3", sentinel, sentinel))
+      tracker.assertEvents(_.mounted("n3")).clear()
+    }
+
+    withClue("move the (non-empty) nested span ahead of A – a unit move, no re-mount:") {
+      itemsVar.set(List(nested, staticA))
+      expectNode(div.of("H", sentinel, sentinel, span of "n3", sentinel, span of "A", sentinel))
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("empty to ZERO again, now at the MOVED slot: the sentinels stay put where the span was moved to:") {
+      innerVar.set(Nil)
+      expectNode(div.of("H", sentinel, sentinel, sentinel, span of "A", sentinel))
+      tracker.assertEvents(_.unmounted("n3")).clear()
+    }
+
+    withClue("grow from empty while nested AND moved: content fills the moved span, not the original slot:") {
+      innerVar.set(List(n4, n5))
+      expectNode(div.of("H", sentinel, sentinel, span of "n4", span of "n5", sentinel, span of "A", sentinel))
+      tracker
+        .assertEvents(
+          _.mounted("n4"),
+          _.mounted("n5")
+        )
+    }
+  }
+
+  it("nested `children <--` item emptied to zero BEFORE being stolen: the empty span relocates, then populates at the new location") {
+    // Distinct ordering from the fill-then-move test above: here the span is ALREADY empty (a bare
+    // [leading, trailing] pair, zero content) at the moment it's stolen into another list. So
+    // `moveToParent` must relocate a ZERO-length span, and the FIRST population after the move must
+    // land at the new host between the moved sentinels — not back in the original list.
+    val tracker = createEventTracker()
+    val innerVar = Var[List[Node]](Nil)
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+
+    val n1 = tracker.createDiv("n1")
+    val n2 = tracker.createDiv("n2")
+    tracker.clear()
+
+    val nested: Inserter = children <-- innerVar.signal
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("place the (empty) nested item in L1: just its bare leading + trailing sentinels, no content:") {
+      items1.set(List(nested))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear() // nothing rendered yet
+    }
+
+    withClue("steal the EMPTY span into L2 before removing from L1: the bare pair relocates, still no content:") {
+      items2.set(List(nested))
+      items1.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("populate from the new location: content lands in L2 between the moved sentinels, not back in L1:") {
+      innerVar.set(List(n1, n2))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, div of "n1", div of "n2", sentinel, sentinel)
+        )
+      )
+      tracker.assertEvents(
+        _.mounted("n1"),
+        _.mounted("n2")
+      )
+    }
+  }
+
+  it("nested `children <--` item reordered within its list WHILE EMPTY: the empty span moves as a unit, then populates at its new position") {
+    // The within-list ordering counterpart to the steal test above: an ALREADY-empty span (bare
+    // [leading, trailing]) is moved WITHIN one list via `moveWithinDynamicList` (not `moveToParent`).
+    // The zero-length span must relocate past its neighbour, and the first population must land at
+    // the span's NEW position, not its old one.
+    val tracker = createEventTracker()
+    val innerVar = Var[List[Node]](Nil)
+    val itemsVar = Var[List[Inserter]](Nil)
+
+    val staticA = tracker.createSpan("A")
+    val n1 = tracker.createSpan("n1")
+    val n2 = tracker.createSpan("n2")
+    tracker.clear()
+
+    val nested: Inserter = children <-- innerVar.signal
+
+    withClue("A first, then the empty nested item (bare leading + trailing sentinels):") {
+      itemsVar.set(List(staticA, nested))
+      mount(div("H", children <-- itemsVar.signal))
+      expectNode(div.of("H", sentinel, span of "A", sentinel, sentinel, sentinel))
+      tracker.assertEvents(_.mounted("A")).clear()
+    }
+
+    withClue("reorder the EMPTY span ahead of A: the bare pair moves as a unit, no events:") {
+      itemsVar.set(List(nested, staticA))
+      expectNode(div.of("H", sentinel, sentinel, sentinel, span of "A", sentinel))
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("populate at the new (front) position: content lands before A, between the moved sentinels:") {
+      innerVar.set(List(n1, n2))
+      expectNode(div.of("H", sentinel, sentinel, span of "n1", span of "n2", sentinel, span of "A", sentinel))
+      tracker.assertEvents(
+        _.mounted("n1"),
+        _.mounted("n2")
+      )
+    }
+  }
+
   it("static seq item (StaticChildrenInserter): empty group + multi-node span") {
     val itemsVar = Var[List[Inserter]](Nil)
 
@@ -916,6 +1096,100 @@ class NestedInsertersSpec extends UnitSpec {
           div.of("L1", sentinel, sentinel),
           div.of("L2", sentinel, sentinel, sentinel, span of "y", sentinel, sentinel, sentinel)
         )
+      )
+    }
+  }
+
+  it("add-first / steal at depth-3 (children <-- containing children <-- containing child <--): recursion has no depth-specific assumptions") {
+    // Depth-2 already proves `moveToParent` recurses; this pins that a THIRD level of nesting works
+    // the same – the leaf's owner is transferred, not rebuilt – so nothing in the recursion assumes
+    // a fixed depth. We also empty and refill the middle span at depth-3 to check the nested empty
+    // span stays anchored at the moved location.
+    val tracker = createEventTracker()
+    val leafVar = Var("x")
+    val midVar = Var[List[Inserter]](Nil)
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+
+    val leaf: Inserter = child <-- leafVar.signal.map(tracker.createSpan(_))
+    val inner: Inserter = children <-- midVar.signal // depth-2 group whose items are themselves inserters
+    val outer: Inserter = children <-- Var[List[Inserter]](List(inner)).signal // depth-1 group holding `inner`
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("depth-3 nesting in L1 (each of the 3 groups adds a leading + trailing sentinel):") {
+      items1.set(List(outer))
+      midVar.set(List(leaf))
+      // L1: outer-lead, mid-lead, inner-lead, leaf-lead, <span x>, leaf-trail, inner-trail, mid-trail, outer-trail
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      tracker
+        .assertEvents(
+          _.elementCreated("x"),
+          _.mounted("x")
+        )
+        .clear()
+    }
+
+    withClue("steal the whole depth-3 span into L2 before removing from L1 – no re-mount at any level:") {
+      items2.set(List(outer))
+      items1.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, sentinel, span of "x", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear() // transferred, not rebuilt
+    }
+
+    withClue("depth-3 leaf still live in L2 (its subscription moved with it):") {
+      leafVar.set("y")
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, sentinel, span of "y", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      tracker
+        .assertEvents(
+          _.elementCreated("y"),
+          _.unmounted("x"),
+          _.mounted("y")
+        )
+        .clear()
+    }
+
+    withClue("empty the depth-2 middle span to zero at the moved location, then refill – stays anchored:") {
+      midVar.set(Nil)
+      // The `inner` group collapses to its bare [leading, trailing] pair, nested inside `outer`.
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      tracker.assertEvents(_.unmounted("y")).clear()
+
+      midVar.set(List(child <-- leafVar.signal.map(tracker.createSpan(_))))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, sentinel, span of "y", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+      tracker.assertEvents(
+        _.elementCreated("y"),
+        _.mounted("y")
       )
     }
   }
