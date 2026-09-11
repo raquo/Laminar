@@ -30,11 +30,12 @@ class InserterMoveSpec extends UnitSpec {
 
   it("can move child from one receiver to another") {
 
-    val spanA = span("a")
-    val spanB = span("b")
-    val spanC = span("c")
-    val spanD = span("d")
-    val spanE = span("e")
+    val tracker = createEventTracker()
+    val spanA = tracker.createSpan("a")
+    val spanB = tracker.createSpan("b")
+    val spanC = tracker.createSpan("c")
+    val spanD = tracker.createSpan("d")
+    val spanE = tracker.createSpan("e")
 
     val bus1 = new EventBus[HtmlElement]
     val bus2 = new EventBus[HtmlElement]
@@ -45,6 +46,7 @@ class InserterMoveSpec extends UnitSpec {
     )
 
     mount(el)
+    tracker.clear() // drop the upfront element-create logs
 
     // --
 
@@ -54,6 +56,7 @@ class InserterMoveSpec extends UnitSpec {
         sentinel
       )
     )
+    tracker.assertNoEvents.clear()
 
     // --
 
@@ -70,6 +73,7 @@ class InserterMoveSpec extends UnitSpec {
         span of "d",
       )
     )
+    tracker.assertEvents(_.mounted("a"), _.mounted("d")).clear()
 
     // -- Steal D from inserter #2 to inserter #1
 
@@ -84,6 +88,8 @@ class InserterMoveSpec extends UnitSpec {
         sentinel
       )
     )
+    // Seamless steal: D relocates from #2 into #1 with no re-mount; only the displaced A unmounts.
+    tracker.assertEvents(_.unmounted("a")).clear()
 
     // -- Request invalid state (same element in both places)
 
@@ -99,6 +105,8 @@ class InserterMoveSpec extends UnitSpec {
         span of "a"
       )
     )
+    // #1 goes D->A (unmount D, mount A); #2 then steals A out of #1 seamlessly, leaving #1 empty.
+    tracker.assertEvents(_.unmounted("d"), _.mounted("a")).clear()
 
     // -- Recover from invalid state
 
@@ -115,10 +123,13 @@ class InserterMoveSpec extends UnitSpec {
         span of "b",
       )
     )
+    // #1 steals A back out of #2 seamlessly; #2 then mounts a fresh B. Only B is a new mount.
+    tracker.assertEvents(_.mounted("b")).clear()
 
     // -- Unmount and re-mount
 
     unmount()
+    tracker.assertEvents(_.unmounted("a"), _.unmounted("b")).clear()
 
     mount(el)
 
@@ -130,6 +141,8 @@ class InserterMoveSpec extends UnitSpec {
         span of "b",
       )
     )
+    // Retained across the unmount/re-mount cycle: both nodes re-mount in place.
+    tracker.assertEvents(_.mounted("a"), _.mounted("b")).clear()
 
     // --
 
@@ -146,6 +159,8 @@ class InserterMoveSpec extends UnitSpec {
         span of "d"
       )
     )
+    // Independent self-replaces in each receiver: A->C in #1, B->D in #2.
+    tracker.assertEvents(_.unmounted("a"), _.mounted("c"), _.unmounted("b"), _.mounted("d")).clear()
 
     // --
 
@@ -162,6 +177,8 @@ class InserterMoveSpec extends UnitSpec {
         span of "e"
       )
     )
+    // #1 steals D from #2 seamlessly (displacing C -> unmount C); #2, now empty, mounts a fresh E.
+    tracker.assertEvents(_.unmounted("c"), _.mounted("e")).clear()
 
     // --
 
@@ -176,6 +193,8 @@ class InserterMoveSpec extends UnitSpec {
         span of "c"
       )
     )
+    // #1 is already showing D (a no-op); #2 self-replaces E->C.
+    tracker.assertEvents(_.unmounted("e"), _.mounted("c")).clear()
 
     // --
 
@@ -190,6 +209,9 @@ class InserterMoveSpec extends UnitSpec {
         span of "d"
       )
     )
+    // Remove-first ordering: #2 steals D from #1 seamlessly (displacing C -> unmount C), then #1
+    // mounts a fresh C. C is torn down and re-mounted because the two emits are separate steps.
+    tracker.assertEvents(_.unmounted("c"), _.mounted("c"))
   }
 
   it("`child <--` swap and steal: lifecycle events on the classic single-node path") {
@@ -240,12 +262,13 @@ class InserterMoveSpec extends UnitSpec {
 
   it("can move children from one dynamic list to another") {
 
-    val spanA = span("a")
-    val spanB = span("b")
-    val spanC = span("c")
-    val spanD = span("d")
-    val spanE = span("e")
-    val spanF = span("f")
+    val tracker = createEventTracker()
+    val spanA = tracker.createSpan("a")
+    val spanB = tracker.createSpan("b")
+    val spanC = tracker.createSpan("c")
+    val spanD = tracker.createSpan("d")
+    val spanE = tracker.createSpan("e")
+    val spanF = tracker.createSpan("f")
 
     val bus1 = new EventBus[List[HtmlElement]]
     val bus2 = new EventBus[List[HtmlElement]]
@@ -257,6 +280,7 @@ class InserterMoveSpec extends UnitSpec {
     )
 
     mount(el)
+    tracker.clear() // drop the upfront element-create logs
 
     // --
 
@@ -267,6 +291,7 @@ class InserterMoveSpec extends UnitSpec {
         sentinel
       )
     )
+    tracker.assertNoEvents.clear()
 
     // --
 
@@ -290,6 +315,16 @@ class InserterMoveSpec extends UnitSpec {
         sentinel
       )
     )
+    tracker
+      .assertEvents(
+        _.mounted("a"),
+        _.mounted("b"),
+        _.mounted("c"),
+        _.mounted("d"),
+        _.mounted("e"),
+        _.mounted("f")
+      )
+      .clear()
 
     EventBus.emit(
       bus1 -> List(spanA),
@@ -307,6 +342,14 @@ class InserterMoveSpec extends UnitSpec {
         sentinel,
       )
     )
+    tracker
+      .assertEvents(
+        _.unmounted("b"),
+        _.unmounted("c"),
+        _.unmounted("e"),
+        _.unmounted("f")
+      )
+      .clear()
 
     // --
 
@@ -327,6 +370,9 @@ class InserterMoveSpec extends UnitSpec {
         sentinel,
       )
     )
+    // Add-first steal: L1 grabs D (bus1 emitted first, D still in L2) seamlessly; L2 then mounts a
+    // fresh E in D's place. Only E is a new mount.
+    tracker.assertEvents(_.mounted("e")).clear()
 
     // --
 
@@ -347,6 +393,9 @@ class InserterMoveSpec extends UnitSpec {
         sentinel,
       )
     )
+    // Remove-first ordering: bus1 emitted first drops D from L1 (unmount), then bus2 re-adds it to
+    // L2 (mount). D is torn down and re-mounted because the two emits are separate steps.
+    tracker.assertEvents(_.unmounted("d"), _.mounted("d")).clear()
 
     // --
 
@@ -367,6 +416,9 @@ class InserterMoveSpec extends UnitSpec {
         sentinel,
       )
     )
+    // Add-first steal again: bus1 grabs D into L1 while it is still in L2, then bus2's removal of D
+    // is a no-op. Fully seamless — no events.
+    tracker.assertNoEvents.clear()
 
     // --
 
@@ -389,6 +441,18 @@ class InserterMoveSpec extends UnitSpec {
         sentinel,
       )
     )
+    // L1 [d,a] -> [f,c]: f, c mount fresh and d, a leave L1 (bus1 processed first). L2 [e] -> [e,a,d]
+    // then re-mounts a, d — remove-first, so the pair churns rather than transferring seamlessly.
+    tracker
+      .assertEvents(
+        _.mounted("f"),
+        _.mounted("c"),
+        _.unmounted("d"),
+        _.unmounted("a"),
+        _.mounted("a"),
+        _.mounted("d")
+      )
+      .clear()
 
     // --
 
@@ -411,6 +475,9 @@ class InserterMoveSpec extends UnitSpec {
         sentinel,
       )
     )
+    // Add-first steal: bus1 grabs A, D into L1 while they are still in L2, then bus2's removal of
+    // them is a no-op. Seamless — no events.
+    tracker.assertNoEvents.clear()
 
     // --
 
@@ -432,6 +499,19 @@ class InserterMoveSpec extends UnitSpec {
         span of "d",
         sentinel
       )
+    )
+    // Mixed: E transfers L2 -> L1 seamlessly (add-first, bus1 grabbed it while still in L2), while
+    // F, A, C, D move L1 -> L2 remove-first (bus1 dropped them before bus2 re-added them), so that
+    // group is torn down and re-mounted. Hence events for f,a,c,d but none for e.
+    tracker.assertEvents(
+      _.unmounted("f"),
+      _.unmounted("a"),
+      _.unmounted("c"),
+      _.unmounted("d"),
+      _.mounted("f"),
+      _.mounted("a"),
+      _.mounted("c"),
+      _.mounted("d")
     )
   }
 
@@ -880,11 +960,21 @@ class InserterMoveSpec extends UnitSpec {
   it("add-first / steal of a nested `children <--` item (multi-node span transfers, inner list stays live)") {
     // Exercises the recursive part of moveToParent: the stolen item is itself a `children <--`
     // group with several content nodes and its own inner trailing sentinel. The whole span must
-    // move to L2 as a unit, and the inner list must remain live (able to update in place) after.
-    val innerVar = Var[List[Int]](List(1, 2))
+    // move to L2 as a unit (asserted seamless — zero lifecycle events on the steal), and the inner
+    // list must remain live afterwards, its grow/shrink landing at the NEW host. Nodes are prebuilt
+    // with stable identity (like the multi-node reorder test), so each resize is a clean add-only /
+    // remove-only step rather than a rebuild.
+    val tracker = createEventTracker()
+    val n1 = tracker.createSpan("n1")
+    val n2 = tracker.createSpan("n2")
+    val n3 = tracker.createSpan("n3")
+    val n7 = tracker.createSpan("n7")
+    tracker.clear() // drop the upfront element-create logs
+
+    val innerVar = Var[List[Node]](List(n1, n2))
     val items1 = Var[List[Inserter]](Nil)
     val items2 = Var[List[Inserter]](Nil)
-    val nested: Inserter = children <-- innerVar.signal.map(_.map(i => span(s"n$i")))
+    val nested: Inserter = children <-- innerVar.signal
 
     mount(
       div(
@@ -895,7 +985,7 @@ class InserterMoveSpec extends UnitSpec {
 
     // Sentinel layout for a nested `children <--` item inside an outer `children <--` list:
     //   [outer-leading, group-leading, ...content..., trailing, outer-trailing]
-    withClue("in L1:") {
+    withClue("in L1: the nested group renders its two content nodes:") {
       items1.set(List(nested))
       expectNode(
         div.of(
@@ -903,9 +993,10 @@ class InserterMoveSpec extends UnitSpec {
           div.of("L2", sentinel, sentinel)
         )
       )
+      tracker.assertEvents(_.mounted("n1"), _.mounted("n2")).clear()
     }
 
-    withClue("steal into L2 (whole multi-node span moves) before removing from L1:") {
+    withClue("steal into L2 (whole multi-node span moves) before removing from L1 — seamless:") {
       items2.set(List(nested))
       items1.set(Nil)
       expectNode(
@@ -914,26 +1005,37 @@ class InserterMoveSpec extends UnitSpec {
           div.of("L2", sentinel, sentinel, span of "n1", span of "n2", sentinel, sentinel)
         )
       )
+      tracker.assertNoEvents.clear() // transferred as a unit, not rebuilt
     }
 
     withClue("inner list still live in L2 (grow), directing emissions to the new parent:") {
-      innerVar.set(List(1, 2, 3))
+      innerVar.set(List(n1, n2, n3))
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
           div.of("L2", sentinel, sentinel, span of "n1", span of "n2", span of "n3", sentinel, sentinel)
         )
       )
+      tracker.assertEvents(_.mounted("n3")).clear() // clean add-only: only the new node mounts
     }
 
-    withClue("inner list still live in L2 (shrink):") {
-      innerVar.set(List(7))
+    withClue("inner list still live in L2 (shrink to a single, previously-absent node):") {
+      innerVar.set(List(n7))
       expectNode(
         div.of(
           div.of("L1", sentinel, sentinel),
           div.of("L2", sentinel, sentinel, span of "n7", sentinel, sentinel)
         )
       )
+      // #Note: `children <--` mounts the new node first, then tears the old ones down in contentMap order.
+      tracker
+        .assertEvents(
+          _.mounted("n7"),
+          _.unmounted("n1"),
+          _.unmounted("n2"),
+          _.unmounted("n3")
+        )
+        .clear()
     }
 
     withClue("normal removal from its new host L2 tears it down:") {
@@ -944,6 +1046,7 @@ class InserterMoveSpec extends UnitSpec {
           div.of("L2", sentinel, sentinel)
         )
       )
+      tracker.assertEvents(_.unmounted("n7"))
     }
   }
 
