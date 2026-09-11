@@ -5,31 +5,14 @@ import com.raquo.laminar.inserters.{CollectionCommand, Inserter}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
-/** Resilience to EXTERNAL DOM mutation.
+/** Resilience to EXTERNAL DOM mutation — changes by third-party scripts, extensions, or interop
+  * that bypass Laminar (made here via [[external]], so Laminar's bookkeeping goes stale).
   *
-  * `InsertContext` is explicitly designed to "detect (and recover from) external changes to the
-  * DOM" – i.e. changes made by third-party scripts, browser extensions, or hand-written interop
-  * that bypass Laminar entirely. These tests make such changes with [[external]] (raw browser
-  * API, so Laminar is NOT notified and its bookkeeping goes stale) and assert that Laminar then:
-  *
-  *  - '''recovers''': `child <--` / `children <--` keep producing the correct DOM on the next
-  *    emission instead of throwing or corrupting their span, and without re-mounting the content
-  *    that legitimately survived, and
-  *  - '''reports''': a span with a trailing sentinel (`children <--` / `children.command <--`)
-  *    treats an unrecognized node found inside it as an intruder – it is reported via
-  *    `AirstreamError` and left in place (an external insertion into our span is not ours to
-  *    silently remove), while our own tracked content is still torn down correctly.
-  *
-  * A note on lifecycle, which these tests pin precisely: once a node is externally ripped out of
-  * the DOM, Laminar has no event to react to, so it CANNOT unmount it on the spot – the node stays
-  * logically owned by its Laminar parent and is only torn down when that parent unmounts. That is
-  * a bounded leak, inherent to bypassing Laminar, not an unbounded one; the tests assert both the
-  * "not unmounted yet" state and the eventual cleanup on parent unmount, so the behaviour is
-  * explicit rather than assumed.
-  *
-  * These paths had no direct coverage before (the intruder-report branch of
-  * `removeContentMapNodesFromDom` was asserted nowhere), despite being a documented feature and
-  * carrying an in-code `#TODO[Test]` in `ChildrenReceiverSpec`.
+  * Scope: that Laminar then RECOVERS (produces correct DOM on the next emission, without
+  * re-mounting survivors) and REPORTS (an unrecognized node inside a trailing-sentinel span is
+  * flagged via `AirstreamError` and left in place), with lifecycle pinned precisely — including
+  * the bounded leak whereby an externally-removed node is torn down only on parent unmount. These
+  * report paths were previously uncovered. See notes/Testing.md for assertion conventions.
   */
 class InserterExternalMutationSpec extends UnitSpec {
 
@@ -45,40 +28,53 @@ class InserterExternalMutationSpec extends UnitSpec {
   // must not disturb the lifecycle of the surviving content.
 
   it("`child <--` recovers when its child is externally removed") {
-    val tracker = newLifecycleTracker()
+    val tracker = createEventTracker()
     val bus = new EventBus[HtmlElement]
 
-    val a = tracker.span("a")
-    val b = tracker.span("b")
+    val a = tracker.createSpan("a")
+    val b = tracker.createSpan("b")
 
     val el = div("H", child <-- bus.events)
     mount(el)
     expectNode(div of ("H", sentinel))
 
     bus.emit(a)
-    expectNode(div of ("H", sentinel, span of "a"))
-    tracker.assertMountedOnce("a")
+    withClue("initial emission mounts `a` (both spans were built up front):") {
+      expectNode(div of ("H", sentinel, span of "a"))
+      tracker
+        .assertEvents(
+          _.elementCreated("a"),
+          _.elementCreated("b"),
+          _.mounted("a")
+        )
+        .clear()
+    }
 
     withClue("External code yanks the child out of the DOM behind Laminar's back:") {
       external.removeChild(a)
       expectNode(div of ("H", sentinel))
-      // Laminar has not been told, so it still considers `a` mounted (nothing to react to).
-      tracker.assertMountedOnce("a")
+      // Laminar has not been told, so it does NOT unmount `a` (nothing to react to).
+      tracker
+        .assertEvents() // no lifecycle events: Laminar is unaware
+        .clear()
     }
 
     withClue("Next emission notices the child is gone and inserts (does not try to replace):") {
       bus.emit(b)
       expectNode(div of ("H", sentinel, span of "b"))
-      tracker.assertMountedOnce("b")
-      // The recovery does NOT unmount the externally-removed `a` (it is no longer in our span
-      // to tear down); `a` was never re-run either.
-      tracker.assertMountedOnce("a")
+      // Only `b` mounts; the externally-removed `a` is neither unmounted (no longer in our span
+      // to tear down) nor re-run.
+      tracker
+        .assertEvents(_.mounted("b"))
+        .clear()
     }
 
     withClue("On parent unmount, the surviving child and the orphaned `a` are both torn down:") {
       unmount()
-      tracker.assertMountedThenUnmounted("a")
-      tracker.assertMountedThenUnmounted("b")
+      tracker.assertEvents(
+        _.unmounted("a"),
+        _.unmounted("b")
+      )
     }
   }
 
@@ -88,59 +84,75 @@ class InserterExternalMutationSpec extends UnitSpec {
   // over-counts until the walk hits the trailing sentinel).
 
   it("`children <--` reconciles after an external removal, without re-mounting the survivors") {
-    val tracker = newLifecycleTracker()
+    val tracker = createEventTracker()
     val bus = new EventBus[List[HtmlElement]]
 
-    val a = tracker.span("a")
-    val b = tracker.span("b")
-    val c = tracker.span("c")
-    val d = tracker.span("d")
+    val a = tracker.createSpan("a")
+    val b = tracker.createSpan("b")
+    val c = tracker.createSpan("c")
+    val d = tracker.createSpan("d")
+
+    tracker.clear()
 
     mount(mainTag(children <-- bus.events))
     expectNode(mainTag of sentinel)
 
     bus.emit(List(a, b, c))
-    expectNode(mainTag of (sentinel, span of "a", span of "b", span of "c", sentinel))
-    tracker.assertMountedOnce("a")
-    tracker.assertMountedOnce("b")
-    tracker.assertMountedOnce("c")
+    withClue("initial list mounts a, b, c:") {
+      expectNode(mainTag of (sentinel, span of "a", span of "b", span of "c", sentinel))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b"),
+          _.mounted("c")
+        )
+        .clear()
+    }
 
     withClue("External code removes the middle element; Laminar's contentMap is now stale:") {
       external.removeChild(b)
       expectNode(mainTag of (sentinel, span of "a", span of "c", sentinel))
-      tracker.assertMountedOnce("b") // not unmounted – Laminar wasn't told
+      tracker
+        .assertEvents() // Laminar wasn't told: `b` is not unmounted
+        .clear()
     }
 
     withClue("A new list that drops the removed item reconciles cleanly, survivors untouched:") {
       bus.emit(List(a, c))
       expectNode(mainTag of (sentinel, span of "a", span of "c", sentinel))
-      // The crux: `a` and `c` are left exactly in place – no re-mount, no re-run.
-      tracker.assertMountedOnce("a")
-      tracker.assertMountedOnce("c")
-      tracker.assertMountedOnce("b") // still just orphaned, not unmounted
+      // The crux: `a` and `c` are left exactly in place – no re-mount, no re-run; `b` stays orphaned.
+      tracker
+        .assertEvents()
+        .clear()
     }
 
     withClue("The list is still fully live afterwards – a reorder is a move, not a re-mount:") {
       bus.emit(List(c, a))
       expectNode(mainTag of (sentinel, span of "c", span of "a", sentinel))
-      tracker.assertMountedOnce("a")
-      tracker.assertMountedOnce("c")
+      tracker
+        .assertEvents() // reorder = move: no lifecycle events
+        .clear()
     }
 
     withClue("... and grows with a brand-new element, still not touching the survivors:") {
       bus.emit(List(c, d, a))
       expectNode(mainTag of (sentinel, span of "c", span of "d", span of "a", sentinel))
-      tracker.assertMountedOnce("a")
-      tracker.assertMountedOnce("c")
-      tracker.assertMountedOnce("d")
+      // Only `d` mounts; `c` and `a` are moved, not re-run.
+      tracker
+        .assertEvents(_.mounted("d"))
+        .clear()
     }
 
     withClue("On parent unmount, all live items and the orphaned `b` are torn down exactly once:") {
       unmount()
-      tracker.assertMountedThenUnmounted("a")
-      tracker.assertMountedThenUnmounted("b") // finally unmounted
-      tracker.assertMountedThenUnmounted("c")
-      tracker.assertMountedThenUnmounted("d")
+      // #Note: teardown walks the contentMap in its original insertion order (a, b, c, d), not
+      // the current DOM order — the orphaned `b` is torn down in its old slot along with the rest.
+      tracker.assertEvents(
+        _.unmounted("a"),
+        _.unmounted("b"),
+        _.unmounted("c"),
+        _.unmounted("d")
+      )
     }
   }
 
@@ -151,32 +163,43 @@ class InserterExternalMutationSpec extends UnitSpec {
   // eventual parent unmount.
 
   it("`children.command <--` tolerates an external removal: boundary intact, lifecycle precise") {
-    val tracker = newLifecycleTracker()
+    val tracker = createEventTracker()
     val cmdBus = new EventBus[CollectionCommand[Node]]
 
-    val a = tracker.div("a")
-    val b = tracker.div("b")
-    val c = tracker.div("c")
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    tracker.clear()
 
     val el = div("Hello", children.command <-- cmdBus.events, div("World"))
     mount(el)
 
     cmdBus.emit(CollectionCommand.Append(a))
     cmdBus.emit(CollectionCommand.Append(b))
-    expectNode(div of ("Hello", sentinel, div of "a", div of "b", sentinel, div of "World"))
-    tracker.assertMountedOnce("a")
-    tracker.assertMountedOnce("b")
+    withClue("initial: Append a then b:") {
+      expectNode(div of ("Hello", sentinel, div of "a", div of "b", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
 
     withClue("External code removes a tracked node (Laminar not told):") {
       external.removeChild(a)
       expectNode(div of ("Hello", sentinel, div of "b", sentinel, div of "World"))
-      tracker.assertMountedOnce("a") // still considered mounted
+      tracker
+        .assertEvents() // `a` still considered mounted: no event
+        .clear()
     }
 
     withClue("Append still lands before the trailing sentinel (boundary did not drift):") {
       cmdBus.emit(CollectionCommand.Append(c))
       expectNode(div of ("Hello", sentinel, div of "b", div of "c", sentinel, div of "World"))
-      tracker.assertMountedOnce("c")
+      tracker
+        .assertEvents(_.mounted("c"))
+        .clear()
     }
 
     withClue("RemoveAll: tolerated (no error); unmounts the in-span nodes, NOT the departed one:") {
@@ -185,14 +208,18 @@ class InserterExternalMutationSpec extends UnitSpec {
         assert(errors.isEmpty)
       }
       expectNode(div of ("Hello", sentinel, sentinel, div of "World"))
-      tracker.assertMountedThenUnmounted("b") // was in the span -> torn down
-      tracker.assertMountedThenUnmounted("c") // was in the span -> torn down
-      tracker.assertMountedOnce("a") // left the span externally -> NOT unmounted by RemoveAll
+      // `b` and `c` were in the span -> unmounted; `a` left the span externally -> NOT unmounted here.
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.unmounted("c")
+        )
+        .clear()
     }
 
     withClue("The orphaned `a` is finally torn down when its parent unmounts (bounded leak):") {
       unmount()
-      tracker.assertMountedThenUnmounted("a")
+      tracker.assertEvents(_.unmounted("a"))
     }
   }
 
@@ -201,23 +228,34 @@ class InserterExternalMutationSpec extends UnitSpec {
   // leaving it in place, while still unmounting all of its own tracked content exactly once.
 
   it("`children.command <--` reports an externally-inserted intruder node on RemoveAll") {
-    val tracker = newLifecycleTracker()
+    val tracker = createEventTracker()
     val cmdBus = new EventBus[CollectionCommand[Node]]
 
-    val a = tracker.div("a")
-    val b = tracker.div("b")
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
 
     val el = div("Hello", children.command <-- cmdBus.events, div("World"))
     mount(el)
 
     cmdBus.emit(CollectionCommand.Append(a))
     cmdBus.emit(CollectionCommand.Append(b))
-    tracker.assertMountedOnce("a")
-    tracker.assertMountedOnce("b")
+    withClue("initial: Append a then b:") {
+      expectNode(div of ("Hello", sentinel, div of "a", div of "b", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
 
     withClue("External code inserts an untracked node between our two content nodes:") {
       external.insertBefore(foreignEl("intruder"), referenceChild = b)
       expectNode(div of ("Hello", sentinel, div of "a", div of "intruder", div of "b", sentinel, div of "World"))
+      tracker
+        .assertEvents() // a pure external DOM insertion: no lifecycle events
+        .clear()
     }
 
     withClue("RemoveAll removes and unmounts our content, reports the intruder, leaves it in place:") {
@@ -227,8 +265,10 @@ class InserterExternalMutationSpec extends UnitSpec {
         assert(errors.head.getMessage.contains("not tracked by Laminar"))
       }
       expectNode(div of ("Hello", sentinel, div of "intruder", sentinel, div of "World"))
-      tracker.assertMountedThenUnmounted("a")
-      tracker.assertMountedThenUnmounted("b")
+      tracker.assertEvents(
+        _.unmounted("a"),
+        _.unmounted("b")
+      )
     }
   }
 
@@ -237,37 +277,59 @@ class InserterExternalMutationSpec extends UnitSpec {
   // element's own unmount / remount, the old children mount twice and unmount twice in total.
 
   it("takeover of a `children <--` span reports an externally-inserted intruder while tearing it down") {
-    val tracker = newLifecycleTracker()
+    val tracker = createEventTracker()
     val childrenBus = new EventBus[List[Node]]
     val childBus = new EventBus[String]
 
-    val a = tracker.div("a")
-    val b = tracker.div("b")
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
 
     var dynamicInserter: Inserter = children <-- childrenBus.events
-    val childInserter: Inserter = child <-- childBus.events.map(tracker.div(_))
+    val childInserter: Inserter = child <-- childBus.events.map(tracker.createDiv(_))
 
     val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
     mount(el)
 
     childrenBus.emit(List(a, b))
-    expectNode(div of ("Hello ", sentinel, div of "a", div of "b", sentinel, " world"))
-    tracker.assertMountedOnce("a")
-    tracker.assertMountedOnce("b")
+    withClue("initial: children <-- renders a, b:") {
+      expectNode(div of ("Hello ", sentinel, div of "a", div of "b", sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
 
     withClue("External code inserts an untracked node inside the `children <--` span:") {
       external.insertBefore(foreignEl("intruder"), referenceChild = b)
       expectNode(div of ("Hello ", sentinel, div of "a", div of "intruder", div of "b", sentinel, " world"))
+      tracker
+        .assertEvents() // a pure external DOM insertion: no lifecycle events
+        .clear()
     }
 
-    // Takeover rides an unmount / remount: `a` and `b` unmount with the element, then re-mount
-    // with it (their DOM nodes are preserved), before the takeover finally tears them down.
-    unmount()
-    tracker.assertMountedThenUnmounted("a")
-    tracker.assertMountedThenUnmounted("b")
+    withClue("element unmount: a and b unmount with it (their DOM nodes are preserved for remount):") {
+      unmount()
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b")
+        )
+        .clear()
+    }
 
     dynamicInserter = childInserter
     mount(el)
+    withClue("remount restores and re-mounts a and b (before the takeover):") {
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
 
     withClue("`child <--` takes over: old children are torn down, intruder is reported and kept:") {
       withCollectedAirstreamErrors { errors =>
@@ -276,11 +338,14 @@ class InserterExternalMutationSpec extends UnitSpec {
         assert(errors.head.getMessage.contains("not tracked by Laminar"))
       }
       expectNode(div of ("Hello ", sentinel, div of "k", div of "intruder", " world"))
-      tracker.assertMountedOnce("k")
-      // Mounted once with the initial mount, unmounted on the element's unmount, re-mounted on
-      // remount, then unmounted by the takeover: exactly two of each.
-      tracker.assertCounts("a", mounts = 2, unmounts = 2)
-      tracker.assertCounts("b", mounts = 2, unmounts = 2)
+      // #Note: `child <--` builds `k` and mounts it into the span, then tears down the old children
+      //  it took over (mount-new-then-unmount-old, as the takeover of a foreign span).
+      tracker.assertEvents(
+        _.elementCreated("k"),
+        _.mounted("k"),
+        _.unmounted("a"),
+        _.unmounted("b")
+      )
     }
   }
 }
