@@ -21,6 +21,12 @@ object CompositeValueMapper {
       }
     }
 
+    implicit object StringOptionValueMapper extends CompositeValueMapper[Option[String]] {
+      override def toNormalizedList(items: Option[String], separator: String): List[String] = {
+        items.toList.flatMap(normalize(_, separator))
+      }
+    }
+
     implicit object StringSeqValueMapper extends CompositeValueMapper[collection.Seq[String]] {
 
       override def toNormalizedList(items: collection.Seq[String], separator: String): List[String] = {
