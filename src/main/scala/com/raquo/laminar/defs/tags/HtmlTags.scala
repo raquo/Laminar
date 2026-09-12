@@ -23,7 +23,7 @@ trait HtmlTags {
     *
     * @tparam Ref - type of elements with this tag, e.g. dom.html.Input for "input" tag
     */
-  def htmlTag[Ref <: dom.html.Element](name: String, void: Boolean = false): HtmlTag[Ref] = new HtmlTag(name, void)
+  def htmlTag[Ref <: dom.html.Element](name: String, void: Boolean = false): HtmlTag[Ref] = HtmlTag(name, void)
 
 
   // -- Document Tags --

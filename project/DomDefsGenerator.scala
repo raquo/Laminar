@@ -18,6 +18,15 @@ object DomDefsGenerator {
       format = CodeFormatting()
     ) {
 
+    override def keyKindConstructor(keyKind: String): String = {
+      val normalized = keyKind.replace("[_]", "")
+      if (keyKind == "HtmlTag[_]") {
+        "HtmlTag" // Call HtmlTag.apply factory method instead of `new HtmlTag`
+      } else {
+        super.keyKindConstructor(keyKind)
+      }
+    }
+
     override def settersPackagePath: String = basePackagePath + ".modifiers.SimpleKeySetter"
 
     override def scalaJsElementTypeParam: String = "Ref"

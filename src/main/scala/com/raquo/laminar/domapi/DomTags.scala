@@ -54,8 +54,156 @@ trait DomTags {
   // Custom Elements
   //
 
+  /** See [[https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements Using custom elements @ MDN ]] */
   def isCustomElement(element: dom.Element): Boolean = {
-    element.tagName.contains('-')
+    isCustomElementTagName(element.tagName)
+  }
+
+  /** See [[https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements Using custom elements @ MDN ]] */
+  def isCustomElementTagName(tagName: String): Boolean = {
+    tagName.contains('-')
+  }
+
+  /** Whether the custom element with this tag name has already been defined
+    * (registered via `customElements.define`) and, therefore, whether any
+    * matching elements already in the DOM have been upgraded.
+    *
+    * See [[https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/get customElements.get @ MDN]]
+    */
+  def isCustomElementDefined(tagName: String): Boolean = {
+    val registry = dom.window.customElements.asInstanceOf[js.Dynamic]
+    !js.isUndefined(registry.get(tagName.toLowerCase))
+  }
+
+  /** Run `callback` once the custom element with this tag name is defined
+    * in the custom elements registry. Callback may run asynchronously.
+    *
+    * See [[https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/whenDefined customElements.whenDefined @ MDN]]
+    */
+  def whenCustomElementDefined(tagName: String)(callback: () => Unit): Unit = {
+    val registry = dom.window.customElements.asInstanceOf[js.Dynamic]
+    val lowerName = tagName.toLowerCase
+    if (!js.isUndefined(registry.get(lowerName))) {
+      // Already defined – run synchronously to avoid an unnecessary async delay.
+      callback()
+    } else {
+      val promise = registry.whenDefined(lowerName).asInstanceOf[js.Promise[Any]]
+      promise.`then`[Unit]((_: Any) => callback())
+      ()
+    }
+  }
+
+  /** Run `callback` once the element is ready to interact with. Regular elements
+    * are ready synchronously; custom elements only after they're defined (see
+    * [[whenCustomElementDefined]]) and rendered, both of which may be async.
+    *
+    * Shared "wait until ready" primitive behind the `onMount*` modifiers. Since
+    * the wait can be async, callers must re-check that the element is still
+    * mounted (and still the current mount, for repeatable callbacks) before acting.
+    *
+    * @param whenCustomElementRendered How to wait for render; defaults to
+    *                                  [[whenCustomElementRenderedDefault]],
+    *                                  overridable per custom element type via
+    *                                  [[CustomHtmlTag.whenElementRendered]].
+    */
+  def whenElementReady(
+    element: ReactiveElement.Base,
+    whenCustomElementRendered: WhenElementRenderedFn = whenCustomElementRenderedDefault
+  )(
+    callback: () => Unit
+  ): Unit = {
+    if (isCustomElement(element.ref)) {
+      val _whenElementRendered = element.tag match {
+        case customHtmlTag: CustomHtmlTag[?] => customHtmlTag.whenElementRendered
+        case _ => whenCustomElementRendered
+      }
+      whenCustomElementDefined(element.tag.name) { () =>
+        _whenElementRendered(element.ref)(callback)
+      }
+    } else {
+      callback()
+    }
+  }
+
+  /** Type of [[whenCustomElementRenderedDefault]] as a function */
+  type WhenElementRenderedFn = dom.Element => (() => Unit) => Unit
+
+  /** Run `callback` once the element has rendered its (shadow) DOM contents.
+    *
+    * This method exists because some web components set up their contents asynchronously,
+    * requiring a delay before we should run onMount* callbacks. For example, you can't
+    * `.focus()` a Shoelace Input component until its updateComplete has run.
+    *
+    * For elements that don't need any wait, `callback` is fired immediately.
+    *
+    * This is the default implementation that supports:
+    *  - Regular HTML / SVG / MathML elements
+    *  - Web Components that render on `connectedCallback` (incl. FAST, UI5)
+    *  - Lit Web Components (incl. Shoelace, Spectrum, Vaadin) on `updateComplete`.
+    *  - Stencil Web Components (incl. Ionic) on `componentOnReady`.
+    *
+    * Note: this logic wasn't actually tested with Stencil/Ionic – bit of a yolo on that one.
+    *
+    * For custom "ready" logic, provide your own `whenElementRendered` callback
+    * to [[CustomHtmlTag]] constructor. Once proven to work, it can be upstreamed here.
+    *
+    * Preconditions:
+    *  - This method should only be called on CUSTOM elements.
+    *  - This method should only be called AFTER [[whenCustomElementDefined]] resolved.
+    *
+    * See:
+    *  - https://lit.dev/docs/components/lifecycle/#updatecomplete
+    *  - https://stenciljs.com/docs/api#componentonready
+    */
+  def whenCustomElementRenderedDefault(
+    element: dom.Element
+  )(
+    callback: () => Unit
+  ): Unit = {
+    // Using dynamic types because they may not be defined.
+    val dynElement = element.asInstanceOf[js.Dynamic]
+    ifThenable(dynElement.updateComplete)(
+      runWhenResolved = {
+        // Lit family: `updateComplete` resolves after the element has rendered.
+        callback()
+      },
+      runIfNotThenable = {
+        if (js.typeOf(dynElement.componentOnReady) == "function") {
+          // Stencil family: `componentOnReady()` resolves after the first render.
+          val whenReady = dynElement.applyDynamic("componentOnReady")()
+          ifThenable(whenReady)(
+            runWhenResolved = callback(),
+            runIfNotThenable = callback()
+          )
+        } else {
+          callback()
+        }
+      }
+    )
+  }
+
+  /** Runs provided callbacks if `value` is a thenable.
+    *  - If `value` is thenable, `runWhenResolved` runs as the callback of `value.then`.
+    *  - Otherwise, `runIfNotThenable` runs immediately.
+    *
+    * See [[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise#thenables thenables @ MDN]].
+    */
+  private def ifThenable(
+    value: js.Dynamic
+  )(
+    runWhenResolved: => Unit,
+    runIfNotThenable: => Unit
+  ): Unit = {
+    val isThenable = {
+      (js.typeOf(value) == "object") &&
+        (value != null) &&
+        (js.typeOf(value.selectDynamic("then")) == "function")
+    }
+    if (isThenable) {
+      value.asInstanceOf[js.Promise[Any]].`then`[Unit]((_: Any) => runWhenResolved)
+    } else {
+      runIfNotThenable
+    }
   }
 
   //
