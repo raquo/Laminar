@@ -661,4 +661,73 @@ class SyntaxSpec extends UnitSpec {
       onClick.preventDefault(_.delay(100)) --> eventObs,
     )
   }
+
+  it("fixType arrow syntax") {
+
+    // `.fixType` is a no-op at runtime and compiles on both Scala 2 and 3.
+    // The headline Scala 3 syntax `.fixType --> { (a, b) => ... }` is tested
+    // in FixTypeSyntaxScala3Spec (parameter untupling is Scala 3 only).
+
+    val received = mutable.Buffer[String]()
+
+    val tupleStream: EventStream[(Int, String)] = EventStream.fromValue((1, "a"))
+    val optionSignal: Signal[Option[Int]] = Signal.fromValue(Some(2))
+
+    val el = div(
+      // Unpacking a tuple via a pattern-matching lambda
+      tupleStream.fixType --> {
+        case (n, s) =>
+          val nInt: Int = n
+          val sString: String = s
+          received += s"tuple:$nInt:$sString"
+      },
+      // `.fixType` is generic – it works for non-tuples too
+      optionSignal.fixType --> {
+        case Some(n) =>
+          val nInt: Int = n
+          received += s"some:$nInt"
+        case None =>
+          received += "none"
+      }
+    )
+
+    mount(el)
+
+    received.toList shouldBe List("some:2", "tuple:1:a")
+  }
+
+  it("fixType arrow syntax on event processors") {
+
+    // `.fixType` is a no-op at runtime and compiles on both Scala 2 and 3.
+    // The headline Scala 3 syntax `.fixType --> { (a, b) => ... }` is tested
+    // in FixTypeSyntaxScala3Spec (parameter untupling is Scala 3 only).
+
+    val received = mutable.Buffer[String]()
+
+    val el = div(
+      // `.fixType` on an EventProcessor, unpacking a tuple via a pattern-matching lambda
+      onClick.mapTo((1, "a")).fixType --> {
+        case (n, s) =>
+          val nInt: Int = n
+          val sString: String = s
+          received += s"tuple:$nInt:$sString"
+      },
+      // `.fixType` is generic – it works for non-tuples too
+      onClick.mapTo(Option(2)).fixType --> {
+        case Some(n) =>
+          val nInt: Int = n
+          received += s"some:$nInt"
+        case None =>
+          received += "none"
+      }
+    )
+
+    mount(el)
+
+    received.toList shouldBe Nil
+
+    el.ref.click()
+
+    received.toList shouldBe List("tuple:1:a", "some:2")
+  }
 }

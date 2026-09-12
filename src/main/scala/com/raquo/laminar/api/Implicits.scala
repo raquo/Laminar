@@ -1,7 +1,7 @@
 package com.raquo.laminar.api
 
 import com.raquo.airstream.core.{Sink, Source}
-import com.raquo.laminar.api.Implicits.SourceArrowSyntax
+import com.raquo.laminar.api.Implicits.{EventProcessorSyntaxFixType, SourceArrowSyntax, SourceSyntaxFixType}
 import com.raquo.laminar.inserters._
 import com.raquo.laminar.keys._
 import com.raquo.laminar.modifiers._
@@ -95,6 +95,19 @@ with CompositeValueMapper.Implicits {
   //     renderableSeq.foreach(nodes)(_.apply(element))
   //   }
   // }
+
+  // -- IDE helpers ---
+
+  /** Add the `fixType` IDE helper method to Observables. See [[SourceSyntaxFixType]]. */
+  @inline implicit def arrowSyntaxFixType[A](source: Source[A]): SourceSyntaxFixType[A] = {
+    new SourceSyntaxFixType(source)
+  }
+
+  /** Add the `fixType` IDE helper method to event processors. See [[SourceSyntaxFixType]]. */
+  @inline implicit def arrowSyntaxFixType[Ev <: dom.Event, V](processor: EventProcessor[Ev, V]): EventProcessorSyntaxFixType[Ev, V] = {
+    new EventProcessorSyntaxFixType(processor)
+  }
+
 }
 
 object Implicits {
@@ -115,6 +128,43 @@ object Implicits {
       Binder(ReactiveElement.bindFn(_, source.toObservable)(_ => onNext))
     }
 
+  }
+
+  // -- IDE helpers --
+
+  /** Problem:  `observableOfTuple --> { (a, b) => ... }` is valid Scala 3 syntax,
+    *           but IntelliJ fails to infer the types of `a` and `b`.
+    * Solution: `observableOfTuple.fixType --> { (a, b) => ... }` works exactly the
+    *           same, except IntelliJ infers the types just fine.
+    *
+    * This is not limited to tuples, e.g. this works too:
+    *
+    * `signalOfOption.fixType --> { case Some(x) => ... }`.
+    *
+    * There is no other point to this helper. You can omit `.fixType`, and Scala
+    * itself will compile and work fine. It's just a workaround for an IDE issue.
+    */
+  class SourceSyntaxFixType[A](private val source: Source[A]) extends AnyVal {
+
+    @inline def fixType: SourceArrowSyntaxFixType[A] = new SourceArrowSyntaxFixType(source)
+  }
+
+  class SourceArrowSyntaxFixType[A](private val source: Source[A]) extends AnyVal {
+
+    @inline def -->(onNext: A => Unit): Binder.Base = new SourceArrowSyntax(source) --> onNext
+  }
+
+  /** Same as [[SourceSyntaxFixType]], but for event processors, e.g.
+    * `onClick.mapTo(aTuple).fixType --> { (a, b) => ... }`.
+    */
+  class EventProcessorSyntaxFixType[Ev <: dom.Event, V](private val processor: EventProcessor[Ev, V]) extends AnyVal {
+
+    @inline def fixType: EventProcessorArrowSyntaxFixType[Ev, V] = new EventProcessorArrowSyntaxFixType(processor)
+  }
+
+  class EventProcessorArrowSyntaxFixType[Ev <: dom.Event, V](private val processor: EventProcessor[Ev, V]) extends AnyVal {
+
+    @inline def -->(onNext: V => Unit): EventListener[Ev, V] = processor --> onNext
   }
 
   /** Implicit conversions from X to Inserter are primarily needed for
