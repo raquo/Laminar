@@ -8,7 +8,7 @@ object Versions {
 
   val Airstream = "18.0.0-M5-SNAPSHOT"
 
-  val Ew = "0.3.0"
+  val Ew = "0.3.1"
 
   // Note: Scala DOM Types is a compile-time dependency now,
   // see its version in project/project/ProjectVersions.scala
@@ -17,5 +17,5 @@ object Versions {
 
   val ScalaDomTestUtils = "19.0.0"
 
-  val ScalaTest = "3.2.19"
+  val ScalaTest = "3.2.20"
 }

@@ -1727,7 +1727,7 @@ trait SvgAttrs {
     *
     * [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/style style @ MDN]]
     */
-  lazy val style: SvgAttr[String] = stringSvgAttr("style")
+  lazy val styleAttr: SvgAttr[String] = stringSvgAttr("style")
 
 
   /**
