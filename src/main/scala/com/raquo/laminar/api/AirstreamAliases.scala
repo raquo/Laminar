@@ -72,9 +72,9 @@ trait AirstreamAliases {
 
   type KeyedDerivedVar[K, ParentV, ThisV] = airstream.split.KeyedDerivedVar[K, ParentV, ThisV]
 
-  lazy val withKey: airstream.split.KeyedStrictSignal.withKey.type = airstream.split.KeyedStrictSignal.withKey
+  lazy val withKey: airstream.split.withKey.type = airstream.split.withKey
 
-  lazy val varWithKey: airstream.split.KeyedDerivedVar.varWithKey.type = airstream.split.KeyedDerivedVar.varWithKey
+  lazy val varWithKey: airstream.split.varWithKey.type = airstream.split.varWithKey
 
   // -- Special streams
 
