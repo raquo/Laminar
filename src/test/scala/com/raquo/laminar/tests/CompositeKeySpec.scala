@@ -191,6 +191,24 @@ class CompositeKeySpec extends UnitSpec {
     expectNode(div.of(cls is "foo faa bar bax"))
   }
 
+  it("cls - static and dynamic options") {
+    val bus = Var(Option.empty[String])
+    val el = div(
+      cls := "foo faa",
+      cls := Option("xuu"),
+      cls := None,
+      cls <-- bus
+    )
+    mount(el)
+    expectNode(div.of(cls is "foo faa xuu")) // Var starts with None
+
+    bus.writer.onNext(Some("yaa"))
+    expectNode(div.of(cls is "foo faa xuu yaa"))
+
+    bus.writer.onNext(Some("yoo"))
+    expectNode(div.of(cls is "foo faa xuu yoo"))
+  }
+
   it("cls - no interference") {
 
     val bus = new EventBus[Int]

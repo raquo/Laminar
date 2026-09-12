@@ -1,7 +1,7 @@
 package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
-import com.raquo.laminar.api.{MapValueMapper, StringSeqValueMapper, StringValueMapper}
+import com.raquo.laminar.api.{MapValueMapper, StringOptionValueMapper, StringSeqValueMapper, StringValueMapper}
 import com.raquo.laminar.codecs.CompositeCodec
 import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
@@ -38,6 +38,10 @@ abstract class CompositeKey[ //
     addStaticItems(StringValueMapper.toNormalizedList(items, separator))
   }
 
+  def :=(items: Option[String]): CompositeKeySetter[Self, El] = {
+    addStaticItems(StringOptionValueMapper.toNormalizedList(items, separator))
+  }
+
   def :=(items: Map[String, Boolean]): CompositeKeySetter[Self, El] = {
     addStaticItems(MapValueMapper.toNormalizedList(items, separator))
   }
@@ -47,6 +51,10 @@ abstract class CompositeKey[ //
   }
 
   @inline def apply(items: String): CompositeKeySetter[Self, El] = {
+    this := items
+  }
+
+  @inline def apply(items: Option[String]): CompositeKeySetter[Self, El] = {
     this := items
   }
 
