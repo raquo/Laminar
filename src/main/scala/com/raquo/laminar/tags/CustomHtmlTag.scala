@@ -1,6 +1,7 @@
 package com.raquo.laminar.tags
 
 import com.raquo.ew.JsArray
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.inputs.InputController
 import com.raquo.laminar.inputs.InputController.InputControllerConfig
 import com.raquo.laminar.keys.{EventProp, HtmlProp}
@@ -36,12 +37,19 @@ import scala.scalajs.js.JSConverters.JSRichOption
   *                                            with non-controlled binders for these properties.
   *                                            (i.e prevent situations where you have `value <-- ...`
   *                                            both controlled and uncontrolled on the same element)
+  *
+  * @param whenElementRendered How `onMount*` waits for this component to finish
+  *                            rendering (see [[DomApi.whenElementReady]]). Defaults
+  *                            to [[DomApi.whenCustomElementRenderedDefault]] (Lit / Stencil);
+  *                            override for libraries following neither convention.
   */
 class CustomHtmlTag[Ref <: dom.html.Element](
   override val name: String,
+  override val void: Boolean = false,
+  val whenElementRendered: DomApi.WhenElementRenderedFn = DomApi.whenCustomElementRenderedDefault,
   val allowedInputControllerConfigIndices: Ref => js.UndefOr[JsArray[Int]] = (_: Ref) => js.undefined,
   val allowableInputControllerConfigs: js.UndefOr[JsArray[InputControllerConfig[Ref, ?]]] = js.undefined
-) extends HtmlTag[Ref](name, void = false) {
+) extends HtmlTag[Ref](name, void) {
 
   private[laminar] def allowedControllerConfigs(el: Ref): js.UndefOr[JsArray[InputControllerConfig[Ref, ?]]] = {
     val maybeIndices = allowedInputControllerConfigIndices(el)
@@ -72,17 +80,29 @@ object CustomHtmlTag {
 
   def withControlledInput[Ref <: dom.html.Element, A, Ev <: dom.Event](
     tagName: String,
+    void: Boolean = false,
+    whenElementRendered: DomApi.WhenElementRenderedFn = DomApi.whenCustomElementRenderedDefault
+  )(
     prop: HtmlProp[A],
     initial: A,
     eventProp: EventProp[Ev]
   ): CustomHtmlTag[Ref] = {
     val config = InputController.customConfig(prop, JsArray(eventProp), initial)
     val configArray = JsArray[InputControllerConfig[Ref, ?]](config)
-    new CustomHtmlTag[Ref](tagName, _ => allIndices, configArray)
+    new CustomHtmlTag[Ref](
+      name = tagName,
+      void = void,
+      whenElementRendered = whenElementRendered,
+      allowedInputControllerConfigIndices = _ => allIndices,
+      allowableInputControllerConfigs = configArray
+    )
   }
 
   def withControlledInputs[Ref <: dom.html.Element, A, Ev <: dom.Event](
     tagName: String,
+    void: Boolean = false,
+    whenElementRendered: DomApi.WhenElementRenderedFn = DomApi.whenCustomElementRenderedDefault,
+  )(
     prop: HtmlProp[A],
     initial: A,
     eventProps: EventProp[Ev]*
@@ -91,7 +111,13 @@ object CustomHtmlTag {
     val allIndices = eventPropsArr.mapWithIndex((_, ix) => ix)
     val config = InputController.customConfig(prop, eventPropsArr, initial)
     val configArray = JsArray[InputControllerConfig[Ref, ?]](config)
-    new CustomHtmlTag[Ref](tagName, _ => allIndices, configArray)
+    new CustomHtmlTag[Ref](
+      name = tagName,
+      void = void,
+      whenElementRendered = whenElementRendered,
+      allowedInputControllerConfigIndices = _ => allIndices,
+      allowableInputControllerConfigs = configArray
+    )
   }
 
 }

@@ -94,35 +94,45 @@ trait MountHooks {
   ): Modifier[El] = {
     Modifier[El] { element =>
       var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
+      // Position is reserved synchronously (so content lands where expected);
+      // only the insertion itself waits until the element is ready.
       val lockedInsertContext = InsertContext.reserveSpotContext(
         parentNode = element,
         hooks = js.undefined
       )
       ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
-        val inserterSubOpt: Option[Subscription] =
-          if (ignoreNextActivation) {
-            ignoreNextActivation = false
-            None
-          } else {
-            fn(mountContext) match {
-              case dynamicInserter: DynamicInserter =>
-                Some(
-                  dynamicInserter.subscribe(
-                    insertContext = lockedInsertContext,
-                    owner = mountContext.owner
+        /** guards the (possibly async) wait – see [[onMountUnmountCallbackWithState]] */
+        var awaitingReadyState = false
+        var inserterSubOpt: Option[Subscription] = None
+        if (ignoreNextActivation) {
+          ignoreNextActivation = false
+        } else {
+          awaitingReadyState = true
+          DomApi.whenElementReady(element) { () =>
+            if (awaitingReadyState && ReactiveElement.isActive(element)) {
+              awaitingReadyState = false
+              fn(mountContext) match {
+                case dynamicInserter: DynamicInserter =>
+                  inserterSubOpt = Some(
+                    dynamicInserter.subscribe(
+                      insertContext = lockedInsertContext,
+                      owner = mountContext.owner
+                    )
                   )
-                )
-              case staticInserter: StaticInserter =>
-                staticInserter.renderInContext(lockedInsertContext)
-                None
+                case staticInserter: StaticInserter =>
+                  staticInserter.renderInContext(lockedInsertContext)
+              }
             }
           }
+        }
         // #Note: We're using this inside `bindSubscriptionUnsafe`,
         //  so this subscription must not be killed externally!
         new Subscription(
           mountContext.owner,
           cleanup = () => {
+            awaitingReadyState = false
             inserterSubOpt.foreach(_.kill())
+            inserterSubOpt = None
           }
         )
       }
@@ -136,7 +146,12 @@ trait MountHooks {
     *    - If you fail to unbind manually, you will have N copies of them after mounting this element N times.
     *    - Use onMountBind or onMountInsert for that.
     *
-    * When the callback is called, the element is already mounted.
+    * When the callback is called, the element is already mounted. For regular
+    * elements it fires synchronously on mount; for web components it fires once
+    * the component is defined and rendered (see [[DomApi.whenElementReady]]), so
+    * you can safely interact with it – necessarily asynchronously. To run
+    * synchronously on mount instead, don't use `onMount*`: e.g.
+    * `EventStream.fromValue(()) --> (_ => ...)` or plain `attr <-- ` subscriptions.
     *
     * If you apply this modifier to an element that is already mounted, the callback
     * will not fire until and unless it is unmounted and mounted again.
@@ -152,9 +167,21 @@ trait MountHooks {
   ): Modifier[El] = {
     Modifier[El] { element =>
       var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
+      // Identifies the latest mount, so a deferred callback can tell whether
+      // its mount is still the current one after an async wait.
+      var latestMountId = 0
       ReactiveElement.bindCallback[El](element) { c =>
         if (ignoreNextActivation) {
           ignoreNextActivation = false
+        } else if (DomApi.isCustomElement(element.ref)) {
+          latestMountId += 1
+          val mountId = latestMountId
+          DomApi.whenElementReady(element) { () =>
+            // Skip if unmounted, or unmounted and re-mounted, during the wait.
+            if (mountId == latestMountId && ReactiveElement.isActive(element)) {
+              fn(c)
+            }
+          }
         } else {
           fn(c)
         }
@@ -236,16 +263,33 @@ trait MountHooks {
       var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
       var state: Option[A] = None
       ReactiveElement.bindSubscriptionUnsafe[El](element) { c =>
+        // Per-cycle flag (this closure runs fresh on each mount): true while a
+        // deferred `mount` hasn't run yet. Lets `cleanup` cancel it and skip
+        // `unmount`, keeping the two paired (and never `.get`-ing a None state).
+        var awaitingReady = false
         if (ignoreNextActivation) {
           ignoreNextActivation = false
         } else {
-          state = Some(mount(c))
+          awaitingReady = true
+          DomApi.whenElementReady(element) { () =>
+            // isActive check is just in case, awaitingReady should be enough.
+            if (awaitingReady && ReactiveElement.isActive(element)) {
+              awaitingReady = false
+              state = Some(mount(c))
+            }
+          }
         }
         new Subscription(
           c.owner,
           cleanup = () => {
-            unmount(element, state)
-            state = None
+            if (awaitingReady) {
+              // Unmounted before it got ready:
+              // `mount` never ran, so cancel it and skip `unmount`.
+              awaitingReady = false
+            } else {
+              unmount(element, state)
+              state = None
+            }
           }
         )
       }
