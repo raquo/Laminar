@@ -167,6 +167,20 @@ class EventProcessor[Ev <: dom.Event, V](
     withNewProcessor(ev => processor(ev).collect(pf))
   }
 
+  /** Emit `x` if fn` returns `Some(x)` */
+  def collectOpt[V2](fn: V => Option[V2]): EventProcessor[Ev, V2] = {
+    collect(Function.unlift(fn))
+  }
+
+  /** Emit `x` if parent emits `Some(x)`, do nothing otherwise */
+  def collectSome[V2](implicit evidence: V <:< Option[V2]): EventProcessor[Ev, V2] =
+    collectOpt(evidence)
+
+  /** Emit `pf(x)` if parent emits `Some(x)` and `pf` is defined for `x`, do nothing otherwise */
+  def collectSome[V2, V3](pf: PartialFunction[V2, V3])(implicit evidence: V <:< Option[V2]): EventProcessor[Ev, V3] = {
+    collectOpt(v => evidence(v).collect(pf))
+  }
+
   def map[V2](project: V => V2): EventProcessor[Ev, V2] = {
     withNewProcessor(ev => processor(ev).map(project))
   }
