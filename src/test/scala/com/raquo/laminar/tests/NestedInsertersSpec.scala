@@ -4,6 +4,8 @@ import com.raquo.laminar.api.L._
 import com.raquo.laminar.inserters.Inserter
 import com.raquo.laminar.utils.UnitSpec
 
+import scala.annotation.nowarn
+
 /** Tests for issue #157: `children <--` accepting a list of Inserters,
   * so dynamic inserters (`child <--`, `children <--`) can be nested directly.
   */
@@ -60,12 +62,14 @@ class NestedInsertersSpec extends UnitSpec {
   it("child <-- returned from split (the headline use case)") {
     val foosBus = new EventBus[List[Int]]
 
-    val el = div(
-      "Hello",
-      children <-- foosBus.events.toSignal(Nil).split(identity) { (id, _, idSignal) =>
-        child <-- idSignal.map(v => span(s"item-$v"))
-      }
-    )
+    val el = ({
+      div(
+        "Hello",
+        children <-- foosBus.events.toSignal(Nil).split(identity) { (id, _, idSignal) =>
+          child <-- idSignal.map(v => span(s"item-$v"))
+        }
+      )
+    }: @nowarn("msg=method split in class SplittableSeqObservable is deprecated"))
 
     mount(el)
     expectNode(div.of("Hello", sentinel, sentinel))
