@@ -16,7 +16,7 @@ import scala.annotation.implicitNotFound
   *  - any [[Inserter]] renders as itself – see [[RenderableInserter.inserterRenderable]]
   *  - anything that has a [[RenderableNode]] instance renders as a single static node.
   */
-@implicitNotFound("Implicit instance of RenderableInserter[${A}] not found. Values in a `children <--` list must be Laminar nodes, components with a RenderableNode instance, or Inserters like `child <-- ...` / `children <-- ...`.")
+@implicitNotFound("Implicit instance of RenderableInserter[${Component}] not found. Values in a `children <--` list must be Laminar nodes, components with a RenderableNode instance, or Inserters like `child <-- ...` / `children <-- ...`.")
 trait RenderableInserter[-Component] {
 
   /** Render this value as the [[Inserter]] that serves as its `children <--`

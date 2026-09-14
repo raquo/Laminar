@@ -206,7 +206,7 @@ class SyntaxSpec extends UnitSpec {
     val checkedBus = new EventBus[Boolean]
 
     val events = mutable.Buffer[Boolean]()
-    checkedBus.events.foreach(events += _)(testOwner)
+    checkedBus.events.foreach(events += _)(using testOwner)
 
     val checkbox = input(
       typ := "checkbox",

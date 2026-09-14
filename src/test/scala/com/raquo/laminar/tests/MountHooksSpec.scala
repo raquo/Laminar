@@ -1441,7 +1441,7 @@ class MountHooksSpec extends UnitSpec {
             className := "spanClass",
             onMountCallback(ctx => {
               internalOwner = ctx.owner
-              bus.events.addObserver(observer)(ctx.owner)
+              bus.events.addObserver(observer)(using ctx.owner)
             })
           )
         )
@@ -1473,7 +1473,7 @@ class MountHooksSpec extends UnitSpec {
     // --
 
     val caught = intercept[Exception] {
-      bus.events.addObserver(observer)(internalOwner)
+      bus.events.addObserver(observer)(using internalOwner)
     }
     assert(caught.getMessage == "Attempting to use owner of unmounted element: section#fullSection > main > div.divClass > span#someSpan")
 

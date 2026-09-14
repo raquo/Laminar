@@ -19,7 +19,7 @@ with RuleImplicits[
   SvgAttr,
   MathMlAttr,
   StyleProp,
-  CompositeAttr[_],
+  CompositeAttr[?],
 ]
 with EventSimulator {
   // === On nullable variables ===
@@ -53,7 +53,7 @@ with EventSimulator {
     prettifier: scalactic.Prettifier,
     pos: scalactic.source.Position
   ): Unit = {
-    mount(node, clue)(prettifier, pos)
+    mount(node, clue)(using prettifier, pos)
   }
 
   override def unmount(
@@ -112,7 +112,7 @@ with EventSimulator {
     new TestableMathMlAttr[V](attr.name, attr.codec.encode, attr.codec.decode)
   }
 
-  override implicit def makeCompositeKeyTestable(key: CompositeAttr[_]): TestableCompositeKey = {
+  override implicit def makeCompositeKeyTestable(key: CompositeAttr[?]): TestableCompositeKey = {
     new TestableCompositeKey(key.name, key.separator, getRawDomValue = _.getAttribute(key.name))
   }
 
