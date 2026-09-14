@@ -43,6 +43,9 @@ lazy val laminar = project.in(file("."))
       "-feature",
       "-deprecation",
       "-language:implicitConversions,higherKinds,existentials",
+      // required for cross-compilation between 3.9 and 2.13 without warnings:
+      "-Wconf:msg=no longer supported for vararg splices:silent",
+      "-Wconf:msg=with as a type operator has been deprecated:silent",
     ),
 
     scalacOptions ~= { options: Seq[String] =>
