@@ -146,7 +146,15 @@ final class NestedGroup(
     nestedPilotSubscription.setOwner(newParent.dynamicOwner)
   }
 
-  def removeFromParent(): Unit = {
+  private[laminar] def applySlot(newSlotName: String | Unit): Unit = {
+    val parent = nestedInsertContext.currentParentNode
+    nestedInsertContext.contentMap.forEach { (inserter, _) =>
+      inserter.applySlot(parent, newSlotName)
+    }
+    nestedInsertContext.setCurrentSlotName(newSlotName)
+  }
+
+  private[laminar] def removeFromParent(): Unit = {
     // #Note: order of operations mirrors that in willSetParent(None) of ReactiveElement
     //  - first, disown the subscription, then, update the DOM.
 

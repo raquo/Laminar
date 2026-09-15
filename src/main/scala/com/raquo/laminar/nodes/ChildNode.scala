@@ -41,20 +41,6 @@ with StaticInserter {
     */
   @inline private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
-  /** Reconcile this node's `slot` attribute to the slot of the position it is being inserted
-    * into. Called on every insert / move. `slotName` is the destination's slot, if any.
-    *
-    * Default is a no-op (comment nodes are never slotted). Overridden in [[ReactiveElement]]
-    * (set / clear the attribute) and in [[TextNode]] (report – text can not be slotted).
-    *
-    * Comment nodes don't report warnings because technically we insert sentinel comment nodes
-    * with slots when their inserter is slotted – exempting them would require more complications.
-    */
-  private[laminar] def applySlot(
-    parent: ParentNode.Base,
-    newSlotName: String | Unit
-  ): Unit = ()
-
   override def apply(parentNode: ReactiveElement.Base): Unit = {
     DomApi.appendChild(parent = parentNode, child = this, slotName = ())
   }
