@@ -251,7 +251,7 @@ class SlotSpec extends UnitSpec {
 
   // https://github.com/raquo/Laminar/pull/198
   it("preserves a static inserter's explicit slot when nested in children <--") {
-    // `HookableChildInserter.addToDynamicList` inserts its node using the `hooks`
+    // `SlottableChildrenInserter.addToDynamicList` inserts its node using the `hooks`
     // ARGUMENT passed by the enclosing `children <--` (here: none), discarding the
     // inserter's OWN `hooks` field (the Slot attribute hook). So the item's slot is
     // lost on placement, even though rendering the same item directly
