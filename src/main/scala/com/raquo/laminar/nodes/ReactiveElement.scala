@@ -130,7 +130,8 @@ with ParentNode[Ref] {
       .getOrElse(key, Nil)
       .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
 
-    val domValues = key.getRawDomValue(this).map(key.codec.decode).getOrElse(Nil)
+    val rawDomValue = key.getRawDomValue(this)
+    val domValues = rawDomValue.map(key.codec.decode).getOrElse(Nil)
 
     val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
 
@@ -141,7 +142,10 @@ with ParentNode[Ref] {
     // #Note this logic is compatible with third parties setting classes on Laminar elements
     //  using raw JS methods as long as they don't remove classes managed by Laminar or add
     //  classes that were also added by Laminar.
-    key.setRawDomValue(this, key.codec.encode(nextDomValues))
+    val nextRawDomValue = key.codec.encode(nextDomValues)
+    if (!rawDomValue.contains(nextRawDomValue)) {
+      key.setRawDomValue(this, nextRawDomValue)
+    }
   }
 
   val tag: Tag[ReactiveElement[Ref]]
