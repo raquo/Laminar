@@ -11,6 +11,7 @@ import com.raquo.laminar.tags.Tag
 import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 trait ReactiveElement[+Ref <: dom.Element]
 extends ChildNode[Ref]
@@ -241,6 +242,33 @@ with ParentNode[Ref] {
     // @Note this should cover ALL cases not covered by willSetParent
     if (!isUnmounting(maybePrevParent = maybePrevParent, maybeNextParent = maybeNextParent)) {
       setPilotSubscriptionOwner(maybeNextParent)
+    }
+  }
+
+  /** The `slot` attribute that was applied to this element using [[Slot.apply]], if any.
+    * We keep track of this to be able to unset the slot attribute if moving this element
+    * to outside of [[Slot]] later.
+    *
+    * Note that we keep the `slot` attribute that the user
+    * set themselves (e.g. `div(slot := "x")`) untouched.
+    */
+  private var _appliedSlotName: String | Unit = ()
+
+  override private[laminar] def applySlot(
+    parent: ParentNode.Base,
+    newSlotName: String | Unit
+  ): Unit = {
+    newSlotName.fold {
+      // Destination has no slot: clear only that we slot WE applied.
+      if (_appliedSlotName.isDefined) {
+        // Technically this CAN also clear the `slot` attribute set by the user manually,
+        // but only if the user provided conflicting `slot :=` and `Slot()` instructions.
+        ref.removeAttribute("slot")
+        _appliedSlotName = ()
+      }
+    } { newSlotName =>
+      ref.setAttribute("slot", newSlotName)
+      _appliedSlotName = newSlotName
     }
   }
 

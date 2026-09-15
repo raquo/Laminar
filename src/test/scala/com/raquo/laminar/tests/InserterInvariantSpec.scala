@@ -96,7 +96,7 @@ class InserterInvariantSpec extends UnitSpec {
     val ctx = new InsertContext(
       sentinelNode = sentinelNode,
       initialParentNode = el,
-      initialHooks = ()
+      initialSlotName = ()
     )
 
     val a = span("a")

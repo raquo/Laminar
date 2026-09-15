@@ -8,7 +8,7 @@ import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.collection.immutable
-import scala.scalajs.js
+import scala.scalajs.js.|
 
 object ChildrenInserter {
 
@@ -22,7 +22,7 @@ object ChildrenInserter {
     childrenSource: Observable[Collection[Component]],
     renderableSeq: RenderableSeq[Collection],
     renderableInserter: RenderableInserter[Component],
-    initialHooks: js.UndefOr[InserterHooks]
+    initialSlotName: String | Unit
   ): DynamicInserter = {
     new DynamicInserter(
       insertFn = (ctx, owner) => {
@@ -31,11 +31,11 @@ object ChildrenInserter {
             nextItems = renderableSeq.toSeq(components),
             renderable = renderableInserter,
             ctx = ctx,
-            hooks = ctx.currentHooks
+            slotName = ctx.currentSlotName
           )
         }(using owner)
       },
-      hooks = initialHooks
+      slotName = initialSlotName
     )
   }
 
@@ -43,7 +43,7 @@ object ChildrenInserter {
     nextItems: laminar.Seq[Component],
     renderable: RenderableInserter[Component],
     ctx: InsertContext,
-    hooks: js.UndefOr[InserterHooks]
+    slotName: String | Unit
   ): Unit = {
     ctx.setNextInserterType(InserterType.ChildrenType)
 
@@ -54,7 +54,7 @@ object ChildrenInserter {
       listParentNode = ctx.currentParentNode,
       listSentinelNodeRef = ctx.sentinelNode.ref,
       listTrailingSentinelRef = ctx.trailingSentinelNodeOpt.map(_.ref),
-      hooks = hooks
+      slotName = slotName
     )
   }
 
@@ -65,8 +65,8 @@ object ChildrenInserter {
     prevContentMap: JsMap[dom.Node, Inserter],
     listParentNode: ReactiveElement.Base, // parent node of the children list
     listSentinelNodeRef: dom.Comment, // sentinel node of the children list
-    listTrailingSentinelRef: js.UndefOr[dom.Comment], // trailing sentinel marking the end of the list's content
-    hooks: js.UndefOr[InserterHooks]
+    listTrailingSentinelRef: dom.Comment | Unit, // trailing sentinel marking the end of the list's content
+    slotName: String | Unit
   ): JsMap[dom.Node, Inserter] = {
 
     def isContentEnd(ref: dom.Node): Boolean =
@@ -95,11 +95,11 @@ object ChildrenInserter {
         // Just insert nextInserter at the cursor (or move it there if this inserter it was previously in the list)
         if (foundInserterInPrevMap) {
           // @Note: DOM update
-          nextInserter.moveWithinDynamicList(listParentNode, afterRef)
+          nextInserter.moveWithinDynamicList(listParentNode, afterRef, slotName)
         } else {
           currentItemCount += 1
           // @Note: DOM update
-          nextInserter.addToDynamicList(listParentNode, afterRef, hooks)
+          nextInserter.addToDynamicList(listParentNode, afterRef, slotName)
         }
       } else {
         if (foundInserterInPrevMap) {
@@ -125,14 +125,14 @@ object ChildrenInserter {
             if (nextInserter.stableFirstNode != prevItemRef) {
               // Still not in place – this is a MOVE, so we do NOT change the count.
               // @Note: DOM update
-              nextInserter.moveWithinDynamicList(listParentNode, afterRef)
+              nextInserter.moveWithinDynamicList(listParentNode, afterRef, slotName)
             }
           }
         } else {
           // Brand-new item – insert it at the cursor.
           currentItemCount += 1
           // @Note: DOM update
-          nextInserter.addToDynamicList(listParentNode, afterRef, hooks)
+          nextInserter.addToDynamicList(listParentNode, afterRef, slotName)
         }
       }
 

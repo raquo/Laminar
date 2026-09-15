@@ -1,7 +1,6 @@
 package com.raquo.laminar.domapi
 
 import com.raquo.airstream.core.AirstreamError
-import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.nodes.{ChildNode, ParentNode}
 import org.scalajs.dom
 
@@ -45,13 +44,13 @@ trait DomTree {
   def appendChild(
     parent: ParentNode.Base,
     child: ChildNode.Base,
-    hooks: InserterHooks | Unit
+    slotName: String | Unit
   ): Boolean = {
     val nextParent = Some(parent)
     child.willSetParent(nextParent)
 
     // 1. Update DOM
-    hooks.foreach(_.onWillInsertNode(parent = parent, child = child))
+    child.applySlot(parent = parent, newSlotName = slotName)
     val maybeDomError = raw.appendChild(parent = parent.ref, child = child.ref)
     maybeDomError.foreach(maybeReportDomError)
     val appended = maybeDomError.isEmpty
@@ -84,11 +83,11 @@ trait DomTree {
     parent: ParentNode.Base,
     newChild: ChildNode.Base,
     referenceChildRef: dom.Node,
-    hooks: InserterHooks | Unit
+    slotName: String | Unit
   ): Boolean = {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
-    hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
+    newChild.applySlot(parent = parent, newSlotName = slotName)
     val maybeDomError = raw.insertBefore(
       parent = parent.ref,
       newChild = newChild.ref,
@@ -106,11 +105,11 @@ trait DomTree {
     parent: ParentNode.Base,
     newChild: ChildNode.Base,
     referenceChildRef: dom.Node,
-    hooks: InserterHooks | Unit
+    slotName: String | Unit
   ): Boolean = {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
-    hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
+    newChild.applySlot(parent = parent, newSlotName = slotName)
     val maybeDomError = raw.insertAfter(
       parent = parent.ref,
       newChild = newChild.ref,
@@ -133,13 +132,13 @@ trait DomTree {
     parent: ParentNode.Base,
     child: ChildNode.Base,
     index: Int,
-    hooks: InserterHooks | Unit
+    slotName: String | Unit
   ): Boolean = {
     var inserted = false
     val nextParent = Some(parent)
 
     child.willSetParent(nextParent)
-    hooks.foreach(_.onWillInsertNode(parent = parent, child = child))
+    child.applySlot(parent = parent, newSlotName = slotName)
 
     val children = parent.ref.childNodes
     val maybeDomError = if (index < children.length) {
@@ -170,7 +169,7 @@ trait DomTree {
     parent: ParentNode.Base,
     oldChild: ChildNode.Base,
     newChild: ChildNode.Base,
-    hooks: InserterHooks | Unit
+    slotName: String | Unit
   ): Boolean = {
     var replaced = false
     if (oldChild ne newChild) {
@@ -179,7 +178,7 @@ trait DomTree {
 
         oldChild.willSetParent(None)
         newChild.willSetParent(newChildNextParent)
-        hooks.foreach(_.onWillInsertNode(parent = parent, child = newChild))
+        newChild.applySlot(parent = parent, newSlotName = slotName)
 
         val maybeDomError = raw.replaceChild(
           parent = parent.ref,

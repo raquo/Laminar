@@ -8,6 +8,7 @@ import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 /** Inserter is a class that can insert child nodes into [[InsertContext]].
   *
@@ -36,7 +37,7 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
   private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    listHooks: js.UndefOr[InserterHooks]
+    listSlotName: String | Unit
   ): Unit
 
   /** This is the inserter equivalent of calling `setParent(None)` for each of its nodes:
@@ -53,16 +54,18 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
     * Note: Note: [[DynamicInserter]] overrides this with a special implementation.
     *
     * Pre-requisite: you must have called [[addToDynamicList]]
-    *                with the same parent before callng this.
+    *                with the same parent before calling this.
     */
   private[laminar] def moveWithinDynamicList(
     parent: ReactiveElement.Base,
-    afterRef: dom.Node
+    afterRef: dom.Node,
+    listSlotName: String | Unit
   ): Unit = {
+    // Re-affirm the list's slot: this is a same-list reorder, so the item stays in its slot.
     addToDynamicList(
       parent = parent,
       afterRef = afterRef,
-      listHooks = ()
+      listSlotName = listSlotName
     )
   }
 
@@ -83,10 +86,10 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
 
 trait Hookable[+Self <: Inserter] { this: Inserter =>
 
-  /** Create a copy of the inserter that will apply these
-    * additional hooks after the original inserter's hooks.
+  /** Create a copy of the inserter that slots its content into `slotName`.
+    * Used by [[com.raquo.laminar.nodes.Slot]] to slot content into web components.
     */
-  def withHooks(addHooks: InserterHooks): Self with Hookable[Self]
+  def withSlot(slotName: String): Self with Hookable[Self]
 }
 
 trait StaticInserter extends Inserter {
@@ -110,7 +113,7 @@ trait StaticInserter extends Inserter {
   */
 class DynamicInserter(
   insertFn: (InsertContext, Owner) => Subscription,
-  hooks: js.UndefOr[InserterHooks] = js.undefined
+  slotName: String | Unit
 ) extends Inserter with Hookable[DynamicInserter] {
 
   /** Owner typically comes from MountContext of the InsertContext parentNode.
@@ -121,7 +124,7 @@ class DynamicInserter(
     insertContext: InsertContext,
     owner: Owner
   ): Subscription = {
-    insertContext.setCurrentHooks(hooks) // prepare the shared context for this inserter
+    insertContext.setCurrentSlotName(slotName) // prepare the shared context for this inserter
     insertFn(insertContext, owner)
   }
 
@@ -150,7 +153,7 @@ class DynamicInserter(
           initialParent = element,
           initiallyPlaceAfterRefOpt = afterRefOpt,
           initiallyRequiresTrailingSentinel = false, // trailing sentinel is not needed until/unless we move this inserter into `children <--` – call .forceTrailingSentinel() then.
-          initialHooks = hooks // hooks as-is, because plain `element` parent does not add any hooks
+          initialSlotName = slotName // as-is, because a plain `element` parent adds no slot
         )
       }
     ) { group =>
@@ -160,14 +163,13 @@ class DynamicInserter(
       group.moveToParent(
         newParent = element,
         afterRefOpt = afterRefOpt,
-        newCombinedHooks = hooks // hooks as-is, because plain `element` parent does not add any hooks
+        newSlotName = slotName // as-is, because a plain `element` parent adds no slot
       )
     }
   }
 
-  override def withHooks(addHooks: InserterHooks): DynamicInserter = {
-    val newHooks = InserterHooks.concat(hooks, addHooks)
-    new DynamicInserter(insertFn, newHooks)
+  override def withSlot(newSlotName: String): DynamicInserter = {
+    new DynamicInserter(insertFn, newSlotName)
   }
 
   // -- Nested groups support --
@@ -187,9 +189,10 @@ class DynamicInserter(
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    listHooks: js.UndefOr[InserterHooks]
+    listSlotName: String | Unit
   ): Unit = {
-    val combinedHooks = InserterHooks.concat(listHooks, hooks)
+    // Own slot wins over the destination list's slot (innermost `Slot` wins).
+    val newSlotName = slotName.orElse(listSlotName)
     nestedGroupOpt.fold(
       ifEmpty = {
         // First placement of this inserter
@@ -200,7 +203,7 @@ class DynamicInserter(
           initialParent = parent,
           initiallyPlaceAfterRefOpt = afterRef,
           initiallyRequiresTrailingSentinel = true, // required for nested inserters
-          initialHooks = combinedHooks
+          initialSlotName = newSlotName
         )
       }
     ) { group =>
@@ -216,7 +219,7 @@ class DynamicInserter(
       group.moveToParent(
         newParent = parent,
         afterRefOpt = afterRef,
-        newCombinedHooks = combinedHooks
+        newSlotName = newSlotName
       )
     }
   }
@@ -240,7 +243,8 @@ class DynamicInserter(
   /** Note: overrides default implementation */
   override private[laminar] def moveWithinDynamicList(
     parent: ReactiveElement.Base,
-    afterRef: dom.Node
+    afterRef: dom.Node,
+    listSlotName: String | Unit // ignored: a lateral move keeps every node's slot as-is
   ): Unit = {
     val lastRef = lastNode // trailing sentinel
     var node = stableFirstNode // leading sentinel
@@ -249,7 +253,7 @@ class DynamicInserter(
     while (continue) {
       val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
       continue = node ne lastRef
-      // #Note: this calls `raw`, thus bypasses willSetParent / setParent / hooks.
+      // #Note: this calls `raw`, thus bypasses willSetParent / setParent / slot reconcile.
       //  - This is fine because it's a lateral move within the same parent, so nothing needs to happen anyway.
       DomApi.raw.insertAfter(
         parent = parent.ref,

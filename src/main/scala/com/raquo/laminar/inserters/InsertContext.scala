@@ -7,6 +7,7 @@ import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 // #TODO[Naming] This feels more like InserterState?
 //  "Extra nodes" are more like "content nodes"
@@ -52,7 +53,7 @@ import scala.scalajs.js
 final class InsertContext(
   val sentinelNode: CommentNode,
   initialParentNode: ReactiveElement.Base,
-  initialHooks: js.UndefOr[InserterHooks]
+  initialSlotName: String | Unit
 ) {
 
   private var _currentParentNode: ReactiveElement.Base = initialParentNode
@@ -80,20 +81,20 @@ final class InsertContext(
 
   // --
 
-  /** The hooks CURRENTLY in effect for content inserted into this context.
+  /** The slot CURRENTLY in effect for content inserted into this context.
     *
     * Like [[currentParentNode]], this is mutable because a [[NestedGroup]]
     * can be moved between `children <--` lists: on such a move the group
-    * combines the destination list's hooks with its own hooks and stores
-    * the result here, so that the inner inserter's future emissions (which
-    * read this value) pick up the destination's hooks (e.g. its Slot).
+    * resolves the destination list's slot against its own and stores the
+    * result here, so that the inner inserter's future emissions (which read
+    * this value) pick up the destination's slot.
     */
-  private var _currentHooks: js.UndefOr[InserterHooks] = initialHooks
+  private var _currentSlotName: String | Unit = initialSlotName
 
-  def currentHooks: js.UndefOr[InserterHooks] = _currentHooks
+  def currentSlotName: String | Unit = _currentSlotName
 
-  def setCurrentHooks(newHooks: js.UndefOr[InserterHooks]): Unit = {
-    _currentHooks = newHooks
+  def setCurrentSlotName(newSlotName: String | Unit): Unit = {
+    _currentSlotName = newSlotName
   }
 
   // --
@@ -163,7 +164,7 @@ final class InsertContext(
         parent = currentParentNode,
         newChild = trailingSentinel,
         referenceChildRef = lastNode,
-        hooks = () // Ignoring hooks in comment nodes is ok... for now.
+        slotName = () // comment nodes are never slotted
       )
       _trailingSentinelNodeOpt = trailingSentinel
     }
@@ -276,13 +277,13 @@ object InsertContext {
     DomApi.appendChild(
       parent = parentNode,
       child = sentinelNode,
-      hooks = ()
+      slotName = ()
     )
 
     unsafeMakeReservedSpotContext(
       sentinelNode = sentinelNode,
       initialParentNode = parentNode,
-      initialHooks = ()
+      initialSlotName = ()
     )
   }
 
@@ -299,12 +300,12 @@ object InsertContext {
   def unsafeMakeReservedSpotContext(
     sentinelNode: CommentNode,
     initialParentNode: ReactiveElement.Base,
-    initialHooks: js.UndefOr[InserterHooks]
+    initialSlotName: String | Unit
   ): InsertContext = {
     new InsertContext(
       sentinelNode = sentinelNode,
       initialParentNode = initialParentNode,
-      initialHooks = initialHooks
+      initialSlotName = initialSlotName
     )
   }
 

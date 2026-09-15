@@ -13,7 +13,7 @@ object ChildInserter {
   def apply[Component](
     childSource: Observable[Component],
     renderable: RenderableNode[Component],
-    initialHooks: js.UndefOr[InserterHooks]
+    initialSlotName: String | Unit
   ): DynamicInserter = {
     new DynamicInserter(
       insertFn = (ctx, owner) => {
@@ -24,12 +24,12 @@ object ChildInserter {
             maybeLastSeenChild = maybeLastSeenChild,
             newChildNodeOpt = newChildNode,
             ctx = ctx,
-            hooks = ctx.currentHooks
+            slotName = ctx.currentSlotName
           )
           maybeLastSeenChild = newChildNode
         }(using owner)
       },
-      hooks = initialHooks
+      slotName = initialSlotName
     )
   }
 
@@ -37,7 +37,7 @@ object ChildInserter {
     maybeLastSeenChild: ChildNode.Base | Unit,
     newChildNodeOpt: ChildNode.Base | Unit,
     ctx: InsertContext,
-    hooks: InserterHooks | Unit
+    slotName: String | Unit
   ): Unit = {
     // In every case the outgoing node(s) unmount BEFORE the incoming one mounts, so a `child <--`
     // swap has a single, predictable lifecycle ordering regardless of what it's switching from.
@@ -63,7 +63,7 @@ object ChildInserter {
             parent = ctx.currentParentNode,
             newChild = newChildNode,
             referenceChildRef = ctx.sentinelNode.ref,
-            hooks = hooks
+            slotName = slotName
           )
           ()
         } { lastSeenChild =>
@@ -73,7 +73,7 @@ object ChildInserter {
             parent = ctx.currentParentNode,
             oldChild = lastSeenChild,
             newChild = newChildNode,
-            hooks = hooks
+            slotName = slotName
           )
           // Clear any other stale tracked nodes.
           // Usually there are none, There could be some if switching

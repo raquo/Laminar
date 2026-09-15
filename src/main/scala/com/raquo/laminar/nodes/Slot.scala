@@ -1,8 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.AirstreamError
-import com.raquo.laminar.inserters.{Hookable, Inserter, InserterHooks, HookableChildrenInserter}
-import org.scalajs.dom
+import com.raquo.laminar.inserters.{Hookable, Inserter}
 
 /** A [[Slot]] represents a special child component of web components.
   *
@@ -31,26 +29,9 @@ import org.scalajs.dom
   */
 class Slot(val name: String) {
 
-  protected val addSlotAttributeHook = new InserterHooks(
-    _onWillInsertNode = { (parent, child) =>
-      child.ref match {
-        case el: dom.Element =>
-          el.setAttribute("slot", name)
-        case text: dom.Text =>
-          AirstreamError.sendUnhandledError(new Exception(
-            s"Error: You tried to insert a raw text node `${text.textContent}` into the `${name}` slot of <${parent.ref.nodeName.toLowerCase}>.\n" +
-              " - Cause: This is not possible: named slots only accept elements. Your node was inserted into the default slot instead.\n" +
-              " - Suggestion: Wrap your text node into `span()`"
-          ))
-        case _ =>
-          () // Do nothing with comment nodes
-      }
-    }
-  )
-
   def apply[I <: Inserter](children: (I with Hookable[I])*): Seq[I with Hookable[I]] = {
     children.map { inserter =>
-      inserter.withHooks(addSlotAttributeHook)
+      inserter.withSlot(name)
     }
   }
 }
