@@ -22,7 +22,7 @@ object InserterType {
     needsTrailingSentinel = true
   )
 
-  /** [[ChildrenInserter]], [[HookableChildrenInserter]],
+  /** [[ChildrenInserter]], [[SlottableChildrenInserter]],
     * and potentially anything else that might call
     * [[ChildrenInserter.switchToChildren]] in the future.
     */
@@ -31,7 +31,7 @@ object InserterType {
   )
 
   /** [[ChildInserter]], [[ChildTextInserter]], [[ChildNode]],
-    * [[HookableChildInserter]], and potentially anything else
+    * [[SlottableChildInserter]], and potentially anything else
     * that might call [[ChildInserter.switchToChild]] in the future.
     */
   case object ChildType extends InserterType(

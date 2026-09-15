@@ -180,9 +180,9 @@ object Implicits {
     */
   trait LowPriorityImplicits {
 
-    // -- Specialized methods for onMountInsert and Web Component Slot.apply
+    // -- Specialized methods for onMountInsert and Web Component Slot.apply --
 
-    /** This is only used for Web Component Slots, which require `Inserter & Hookable`.
+    /** This is only used for Web Component Slots, which require `Inserter & Slotted`.
       * Regular code uses higher-priority [[componentToNode]].
       *
       * Note: this deliberately does not convert TextNode-s as those are not allowed
@@ -192,15 +192,15 @@ object Implicits {
       component: Component
     )(implicit
       r: RenderableNode[Component]
-    ): HookableChildInserter = {
-      HookableChildInserter.noHooks(r.asNode(component))
+    ): SlottableChildInserter = {
+      SlottableChildInserter.noSlotName(r.asNode(component))
     }
 
     /** This is only used when:
       *  - onMountInsert's callback returns a Seq of elements of a single element, or
       *  - One of the items passed to Web Components Slot.apply is a Seq of elements.
       *
-      * In those contexts, we need an Inserter (or Inserter & Hookable), and aside from
+      * In those contexts, we need an Inserter (or Inserter & Slottable), and aside from
       * this low-priority conversion, we only have [[seqToModifier]] which gives us an
       * arbitrary Modifier – no other way to get an Inserter implicitly right now.
       */
@@ -209,8 +209,8 @@ object Implicits {
     )(implicit
       renderableSeq: RenderableSeq[Collection],
       renderableNode: RenderableNode[Component]
-    ): HookableChildrenInserter = {
-      HookableChildrenInserter.noHooks(components, renderableSeq, renderableNode)
+    ): SlottableChildrenInserter = {
+      SlottableChildrenInserter.noSlotName(components, renderableSeq, renderableNode)
     }
   }
 
