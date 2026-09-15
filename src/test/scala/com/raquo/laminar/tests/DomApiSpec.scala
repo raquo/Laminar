@@ -1,8 +1,8 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L.{mathml => m}
+import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.fixtures.{DoubleRangeElement, IntRangeElement}
 import com.raquo.laminar.utils.UnitSpec

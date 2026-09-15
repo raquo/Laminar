@@ -1,12 +1,12 @@
 package com.raquo.laminar.fixtures
 
 import com.raquo.airstream.core.BaseObservable.numAllObservers
+import com.raquo.laminar.api.L._
 import com.raquo.laminar.codecs.Codec
 import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportStatic
-import com.raquo.laminar.api.L._
 
 object AuthoredLabel {
 
