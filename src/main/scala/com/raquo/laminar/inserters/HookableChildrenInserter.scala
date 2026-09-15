@@ -70,7 +70,7 @@ class HookableChildrenInserter(
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    hooks: js.UndefOr[InserterHooks]
+    listHooks: js.UndefOr[InserterHooks]
   ): Unit = {
     var insertAfter = afterRef
     nodesToRender.foreach { node =>
@@ -78,7 +78,7 @@ class HookableChildrenInserter(
         parent = parent,
         newChild = node,
         referenceChildRef = insertAfter,
-        hooks = hooks
+        hooks = InserterHooks.concat(listHooks, hooks)
       )
       insertAfter = node.ref
     }
@@ -91,7 +91,7 @@ class HookableChildrenInserter(
   }
 
   override def withHooks(addHooks: InserterHooks): HookableChildrenInserter = {
-    new HookableChildrenInserter(mutableNodes, addHooks.appendTo(hooks))
+    new HookableChildrenInserter(mutableNodes, InserterHooks.concat(hooks, addHooks))
   }
 
 }

@@ -25,13 +25,13 @@ object ChildrenInserter {
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
-      insertFn = (ctx, owner, hooks) => {
+      insertFn = (ctx, owner) => {
         childrenSource.foreach { components =>
           switchToChildren(
             nextItems = renderableSeq.toSeq(components),
             renderable = renderableInserter,
             ctx = ctx,
-            hooks = hooks
+            hooks = ctx.currentHooks
           )
         }(using owner)
       },

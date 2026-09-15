@@ -16,7 +16,7 @@ object ChildInserter {
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
-      insertFn = (ctx, owner, hooks) => {
+      insertFn = (ctx, owner) => {
         var maybeLastSeenChild: js.UndefOr[ChildNode.Base] = js.undefined
         childSource.foreach { newComponent =>
           val newChildNode = renderable.asNode(newComponent)
@@ -24,7 +24,7 @@ object ChildInserter {
             maybeLastSeenChild = maybeLastSeenChild,
             newChildNodeOpt = newChildNode,
             ctx = ctx,
-            hooks = hooks
+            hooks = ctx.currentHooks
           )
           maybeLastSeenChild = newChildNode
         }(using owner)

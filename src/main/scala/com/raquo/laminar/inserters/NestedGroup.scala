@@ -9,12 +9,12 @@ import scala.scalajs.js
 
 final class NestedGroup(
   sentinelNode: CommentNode,
-  insertFn: (InsertContext, Owner, js.UndefOr[InserterHooks]) => Subscription,
-  hooks: js.UndefOr[InserterHooks],
+  insertFn: (InsertContext, Owner) => Subscription,
 )(
   initialParent: ReactiveElement.Base, // This group can be moved. See `nestedInsertContext.currentParentNode` for current value.
   initiallyPlaceAfterRefOpt: js.UndefOr[dom.Node], // initial sentinel node mounting point
-  initiallyRequiresTrailingSentinel: Boolean // true if rendering this group nested inside `children <--`
+  initiallyRequiresTrailingSentinel: Boolean, // true if rendering this group nested inside `children <--`
+  initialHooks: js.UndefOr[InserterHooks]
 ) {
 
   private[laminar] lazy val leadingSentinel: CommentNode = sentinelNode
@@ -43,14 +43,17 @@ final class NestedGroup(
   insertOrAppendChild(
     parent = initialParent,
     newChild = leadingSentinel,
-    afterRefOpt = initiallyPlaceAfterRefOpt
+    afterRefOpt = initiallyPlaceAfterRefOpt,
+    hooks = initialHooks
   )
 
   private val nestedInsertContext: InsertContext = {
-    InsertContext.unsafeMakeReservedSpotContext(
+    val ctx = InsertContext.unsafeMakeReservedSpotContext(
+      sentinelNode = leadingSentinel,
       initialParentNode = initialParent,
-      sentinelNode = leadingSentinel
+      initialHooks = initialHooks
     )
+    ctx
   }
 
   if (initiallyRequiresTrailingSentinel) {
@@ -62,7 +65,7 @@ final class NestedGroup(
   private val nestedSubscription: DynamicSubscription = {
     DynamicSubscription.unsafe(
       nestedDynamicOwner,
-      activate = owner => insertFn(nestedInsertContext, owner, hooks)
+      activate = owner => insertFn(nestedInsertContext, owner)
     )
   }
 
@@ -102,14 +105,16 @@ final class NestedGroup(
     */
   private[laminar] def moveToParent(
     newParent: ReactiveElement.Base,
-    afterRefOpt: js.UndefOr[dom.Node]
+    afterRefOpt: js.UndefOr[dom.Node],
+    newCombinedHooks: js.UndefOr[InserterHooks]
   ): Unit = {
 
     // Move the leading and trailing sentinels to the new place.
     insertOrAppendChild(
       parent = newParent,
       newChild = leadingSentinel,
-      afterRefOpt = afterRefOpt
+      afterRefOpt = afterRefOpt,
+      hooks = newCombinedHooks
     )
 
     nestedInsertContext.trailingSentinelNodeOpt.foreach { trailingSentinel =>
@@ -117,7 +122,7 @@ final class NestedGroup(
         parent = newParent,
         newChild = trailingSentinel,
         referenceChildRef = leadingSentinel.ref,
-        hooks = hooks
+        hooks = newCombinedHooks
       )
     }
 
@@ -125,13 +130,15 @@ final class NestedGroup(
     var lastRef: dom.Node = leadingSentinel.ref
     nestedInsertContext.contentMap.forEach { (inserter, _) =>
       // Note: this calls `moveToParent` internally if this nested inserter is dynamic.
-      inserter.addToDynamicList(newParent, afterRef = lastRef, hooks)
+      inserter.addToDynamicList(newParent, afterRef = lastRef, newCombinedHooks)
       lastRef = inserter.lastNode
     }
 
-    // Commit the group's new parent on the context. This is what redirects the inner
-    // inserter's future emissions (which read `currentParentNode`) to `newParent`.
+    // Commit the group's new parent and hooks on the context. This is what redirects the
+    // inner inserter's future emissions (which read `currentParentNode` and `hooks`) to the
+    // new destination.
     nestedInsertContext.setCurrentParentNode(newParent)
+    nestedInsertContext.setCurrentHooks(newCombinedHooks)
 
     // Transfer the subscription to the new parent's owner.
     // This is seamless, without unnecessary re-mounting.
@@ -167,7 +174,8 @@ final class NestedGroup(
   private def insertOrAppendChild(
     parent: ReactiveElement.Base,
     newChild: CommentNode,
-    afterRefOpt: js.UndefOr[dom.Node]
+    afterRefOpt: js.UndefOr[dom.Node],
+    hooks: js.UndefOr[InserterHooks]
   ): Unit = {
     afterRefOpt.fold(
       ifEmpty = {

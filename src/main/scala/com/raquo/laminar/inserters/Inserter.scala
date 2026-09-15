@@ -1,6 +1,7 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.ownership.{Owner, Subscription}
+import com.raquo.ew
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
@@ -35,7 +36,7 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
   private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    hooks: js.UndefOr[InserterHooks]
+    listHooks: js.UndefOr[InserterHooks]
   ): Unit
 
   /** This is the inserter equivalent of calling `setParent(None)` for each of its nodes:
@@ -58,7 +59,11 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
     parent: ReactiveElement.Base,
     afterRef: dom.Node
   ): Unit = {
-    addToDynamicList(parent = parent, afterRef = afterRef, hooks = js.undefined)
+    addToDynamicList(
+      parent = parent,
+      afterRef = afterRef,
+      listHooks = ()
+    )
   }
 
   /** The first DOM node of this item's span (valid after [[addToDynamicList]]).
@@ -104,16 +109,20 @@ trait StaticInserter extends Inserter {
   * @param insertFn Called every time this inserter is mounted.
   */
 class DynamicInserter(
-  insertFn: (InsertContext, Owner, js.UndefOr[InserterHooks]) => Subscription,
+  insertFn: (InsertContext, Owner) => Subscription,
   hooks: js.UndefOr[InserterHooks] = js.undefined
 ) extends Inserter with Hookable[DynamicInserter] {
 
-  /** Owner typically comes from MountContext of the InsertContext parentNode. */
-  def subscribe(
+  /** Owner typically comes from MountContext of the InsertContext parentNode.
+    *
+    * #Warning: make sure to cancel the returned subscription when it's time.
+    */
+  def renderIntoSharedContext(
     insertContext: InsertContext,
     owner: Owner
   ): Subscription = {
-    insertFn(insertContext, owner, hooks)
+    insertContext.setCurrentHooks(hooks) // prepare the shared context for this inserter
+    insertFn(insertContext, owner)
   }
 
   /** Because [[DynamicInserter]]-s can use [[NestedGroup]]-s
@@ -129,31 +138,35 @@ class DynamicInserter(
     // Append to the end of the element.
     val afterRefOpt: js.UndefOr[dom.Node] = {
       val lastChild = element.ref.lastChild
-      if (lastChild == null) js.undefined else lastChild // #TODO[ew] Add this conversion to `ew`
+      ew.Null.asUndefined(lastChild)
     }
     nestedGroupOpt.fold(
       ifEmpty = {
         // First placement of this inserter
         nestedGroupOpt = new NestedGroup(
           sentinelNode = sentinelNode,
-          insertFn = insertFn,
-          hooks = hooks
+          insertFn = insertFn
         )(
           initialParent = element,
           initiallyPlaceAfterRefOpt = afterRefOpt,
-          initiallyRequiresTrailingSentinel = false // trailing sentinel is not needed until/unless we move this inserter into `children <--` – call .forceTrailingSentinel() then.
+          initiallyRequiresTrailingSentinel = false, // trailing sentinel is not needed until/unless we move this inserter into `children <--` – call .forceTrailingSentinel() then.
+          initialHooks = hooks // hooks as-is, because plain `element` parent does not add any hooks
         )
       }
     ) { group =>
       // This inserter instance already lives somewhere (applied to another element, or as a
       // `children <--` list item). Applying it here (e.g. `element.amend(inserter)`) MOVES it
-      // seamnlessly (no re-mounting).
-      group.moveToParent(newParent = element, afterRefOpt = afterRefOpt)
+      // seamlessly (no re-mounting).
+      group.moveToParent(
+        newParent = element,
+        afterRefOpt = afterRefOpt,
+        newCombinedHooks = hooks // hooks as-is, because plain `element` parent does not add any hooks
+      )
     }
   }
 
   override def withHooks(addHooks: InserterHooks): DynamicInserter = {
-    val newHooks = addHooks.appendTo(hooks)
+    val newHooks = InserterHooks.concat(hooks, addHooks)
     new DynamicInserter(insertFn, newHooks)
   }
 
@@ -174,19 +187,20 @@ class DynamicInserter(
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    hooks: js.UndefOr[InserterHooks]
+    listHooks: js.UndefOr[InserterHooks]
   ): Unit = {
+    val combinedHooks = InserterHooks.concat(listHooks, hooks)
     nestedGroupOpt.fold(
       ifEmpty = {
         // First placement of this inserter
         nestedGroupOpt = new NestedGroup(
           sentinelNode = sentinelNode,
-          insertFn = insertFn,
-          hooks = hooks
+          insertFn = insertFn
         )(
           initialParent = parent,
           initiallyPlaceAfterRefOpt = afterRef,
-          initiallyRequiresTrailingSentinel = true // required for nested inserters
+          initiallyRequiresTrailingSentinel = true, // required for nested inserters
+          initialHooks = combinedHooks
         )
       }
     ) { group =>
@@ -199,7 +213,11 @@ class DynamicInserter(
       //       (see below), which will be a no-op due to parent mismatch,
       //       so all is good – this new list manages this inserter now.
       group.ensureTrailingSentinel()
-      group.moveToParent(newParent = parent, afterRefOpt = afterRef)
+      group.moveToParent(
+        newParent = parent,
+        afterRefOpt = afterRef,
+        newCombinedHooks = combinedHooks
+      )
     }
   }
 

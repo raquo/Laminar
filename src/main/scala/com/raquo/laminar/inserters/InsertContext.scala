@@ -51,7 +51,8 @@ import scala.scalajs.js
   */
 final class InsertContext(
   val sentinelNode: CommentNode,
-  initialParentNode: ReactiveElement.Base
+  initialParentNode: ReactiveElement.Base,
+  initialHooks: js.UndefOr[InserterHooks]
 ) {
 
   private var _currentParentNode: ReactiveElement.Base = initialParentNode
@@ -75,6 +76,24 @@ final class InsertContext(
     */
   def setCurrentParentNode(newParentNode: ReactiveElement.Base): Unit = {
     _currentParentNode = newParentNode
+  }
+
+  // --
+
+  /** The hooks CURRENTLY in effect for content inserted into this context.
+    *
+    * Like [[currentParentNode]], this is mutable because a [[NestedGroup]]
+    * can be moved between `children <--` lists: on such a move the group
+    * combines the destination list's hooks with its own hooks and stores
+    * the result here, so that the inner inserter's future emissions (which
+    * read this value) pick up the destination's hooks (e.g. its Slot).
+    */
+  private var _currentHooks: js.UndefOr[InserterHooks] = initialHooks
+
+  def currentHooks: js.UndefOr[InserterHooks] = _currentHooks
+
+  def setCurrentHooks(newHooks: js.UndefOr[InserterHooks]): Unit = {
+    _currentHooks = newHooks
   }
 
   // --
@@ -251,15 +270,19 @@ object InsertContext {
   /** Reserve the spot for when we actually insert real nodes later */
   def reserveSpotContext(
     parentNode: ReactiveElement.Base,
-    hooks: js.UndefOr[InserterHooks]
   ): InsertContext = {
     val sentinelNode = new CommentNode("")
 
-    DomApi.appendChild(parent = parentNode, child = sentinelNode, hooks)
+    DomApi.appendChild(
+      parent = parentNode,
+      child = sentinelNode,
+      hooks = ()
+    )
 
     unsafeMakeReservedSpotContext(
+      sentinelNode = sentinelNode,
       initialParentNode = parentNode,
-      sentinelNode = sentinelNode
+      initialHooks = ()
     )
   }
 
@@ -274,12 +297,14 @@ object InsertContext {
     *  See [[InsertContext.currentParentNode]].
     */
   def unsafeMakeReservedSpotContext(
+    sentinelNode: CommentNode,
     initialParentNode: ReactiveElement.Base,
-    sentinelNode: CommentNode
+    initialHooks: js.UndefOr[InserterHooks]
   ): InsertContext = {
     new InsertContext(
       sentinelNode = sentinelNode,
-      initialParentNode = initialParentNode
+      initialParentNode = initialParentNode,
+      initialHooks = initialHooks
     )
   }
 
