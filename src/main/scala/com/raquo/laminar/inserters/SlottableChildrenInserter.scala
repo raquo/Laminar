@@ -16,14 +16,14 @@ import scala.scalajs.js.|
   *  - onMountInsert callback returns a Seq, or
   *  - when passing Seq[Node] as one of the items to Web Components `Slot.apply`.
   *
-  * See also comments in [[HookableChildInserter]] and `componentSeqToInserter` implicit.
+  * See also comments in [[SlottableChildInserter]] and `componentSeqToInserter` implicit.
   *
   * Note that [[mutableNodes]] MIGHT be mutable – we [[nodesToRender]].
   */
-class HookableChildrenInserter(
+class SlottableChildrenInserter(
   mutableNodes: laminar.Seq[ChildNode.Base],
   slotName: String | Unit
-) extends StaticInserter with Hookable[HookableChildrenInserter] {
+) extends StaticInserter with Slottable[SlottableChildrenInserter] {
 
   /** We don't want to depend arbitrarily on [[mutableNodes]]
     * potentially mutating from under us, so we take a snapshot upfront.
@@ -92,21 +92,21 @@ class HookableChildrenInserter(
     }
   }
 
-  override def withSlot(newSlotName: String): HookableChildrenInserter = {
-    new HookableChildrenInserter(mutableNodes, newSlotName)
+  override def withSlotName(newSlotName: String): SlottableChildrenInserter = {
+    new SlottableChildrenInserter(mutableNodes, newSlotName)
   }
 
 }
 
-object HookableChildrenInserter {
+object SlottableChildrenInserter {
 
-  def noHooks[Collection[_], Component](
+  def noSlotName[Collection[_], Component](
     components: Collection[Component],
     renderableSeq: RenderableSeq[Collection],
     renderableNode: RenderableNode[Component]
-  ): HookableChildrenInserter = {
+  ): SlottableChildrenInserter = {
     val children = renderableNode.asNodeSeq(renderableSeq.toSeq(components))
-    new HookableChildrenInserter(children, slotName = ())
+    new SlottableChildrenInserter(children, slotName = ())
   }
 
 }

@@ -430,7 +430,7 @@ class NestedInsertersSpec extends UnitSpec {
     // A static group of several nodes, rendered directly, with no bracketing sentinels.
     val groupXY: Inserter = List(span("X"), span("Y"))
     // Empty static group: no content nodes, so it renders a single placeholder comment
-    // (see HookableChildrenInserter.nodesToRender) to anchor the item.
+    // (see SlottableChildrenInserter.nodesToRender) to anchor the item.
     val emptyGroup: Inserter = List.empty[HtmlElement]
 
     mount(div("H", children <-- itemsVar.signal))

@@ -39,11 +39,11 @@ import scala.scalajs.js
 class InserterInvariantSpec extends UnitSpec {
 
   // -- The scenario one might expect to break the invariant: a `Seq[Node]` static inserter
-  //    (→ HookableChildrenInserter) leaves TWO content nodes in the shared onMountInsert
-  //    context, then `children <--` takes over. It stays safe because HookableChildrenInserter
+  //    (→ SlottableChildrenInserter) leaves TWO content nodes in the shared onMountInsert
+  //    context, then `children <--` takes over. It stays safe because SlottableChildrenInserter
   //    renders through `ChildrenInserter.switchToChildren`, which establishes the trailing
   //    sentinel – so by the time `children <--` runs, the sentinel is already there.
-  //    (If HookableChildrenInserter ever stopped bracketing its content with a trailing
+  //    (If SlottableChildrenInserter ever stopped bracketing its content with a trailing
   //    sentinel, the `bus.emit` step below – diffing against the 2-node contentMap with no
   //    trailing sentinel – would trip the guard. This test is that regression tripwire.) --
 
@@ -54,7 +54,7 @@ class InserterInvariantSpec extends UnitSpec {
     val a = span("a")
     val b = span("b")
 
-    val seqInserter: Inserter = List[Node](a, b) // -> HookableChildrenInserter (2 content nodes)
+    val seqInserter: Inserter = List[Node](a, b) // -> SlottableChildrenInserter (2 content nodes)
     val childrenInserter: Inserter = children <-- bus.events
 
     val el = div(
@@ -65,7 +65,7 @@ class InserterInvariantSpec extends UnitSpec {
       " end"
     )
 
-    // First mount: the static 2-node Seq. HookableChildrenInserter brackets it with a
+    // First mount: the static 2-node Seq. SlottableChildrenInserter brackets it with a
     // trailing sentinel via switchToChildren.
     mount(el)
     expectNode(div of ("start ", sentinel, span of "a", span of "b", sentinel, " end"))

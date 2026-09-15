@@ -9,12 +9,14 @@ import scala.scalajs.js.|
 
 /** Static inserter for a single static node, optionally slotted.
   *
-  * Used for Web Components ([[Slot.apply]]), which needs to set the `slot`
-  * attribute on the node it wraps (see [[com.raquo.laminar.nodes.ReactiveElement]]).
+  * Used for Web Components ([[com.raquo.laminar.nodes.Slot.apply]]),
+  * which needs to set the `slot` attribute on the node it wraps
+  * (see [[com.raquo.laminar.nodes.ReactiveElement]]).
   *
-  * In theory, ReactiveElement could become Hookable to avoid the need for
+  * In theory, ReactiveElement could become Slottable to avoid the need for
   * this wrapper, however this seems undesirable as the slot is a property
-  * of the insertion point / mechanism, not the node.
+  * of the insertion point / mechanism, not the node. And Slottable-s are
+  * copyable via [[Slottable.withSlotName]], which the elements can't be.
   *
   * Note that for slots, text nodes should not be allowed as they can not
   * be slotted. That restriction is implemented in the implicit conversion
@@ -22,10 +24,10 @@ import scala.scalajs.js.|
   *
   * See also `componentToInserter` implicit.
   */
-class HookableChildInserter(
+class SlottableChildInserter(
   child: ChildNode.Base,
   slotName: String | Unit
-) extends StaticInserter with Hookable[HookableChildInserter] {
+) extends StaticInserter with Slottable[SlottableChildInserter] {
 
   private[laminar] override val stableFirstNode: dom.Node = child.ref
 
@@ -66,24 +68,24 @@ class HookableChildInserter(
     DomApi.removeChild(parent = parent, child = child)
   }
 
-  override def withSlot(newSlotName: String): HookableChildInserter = {
-    new HookableChildInserter(child, newSlotName)
+  override def withSlotName(newSlotName: String): SlottableChildInserter = {
+    new SlottableChildInserter(child, newSlotName)
   }
 }
 
-object HookableChildInserter {
+object SlottableChildInserter {
 
-  def noHooks(
+  def noSlotName(
     node: ChildNode.Base,
-  ): HookableChildInserter = {
-    new HookableChildInserter(node, slotName = ())
+  ): SlottableChildInserter = {
+    new SlottableChildInserter(node, slotName = ())
   }
 
-  def noHooksC[Component](
+  def noSlotNameC[Component](
     component: Component
   )(implicit
     renderable: RenderableNode[Component]
-  ): HookableChildInserter = {
-    new HookableChildInserter(renderable.asNode(component), slotName = ())
+  ): SlottableChildInserter = {
+    new SlottableChildInserter(renderable.asNode(component), slotName = ())
   }
 }

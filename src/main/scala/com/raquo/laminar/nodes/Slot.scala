@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.laminar.inserters.{Hookable, Inserter}
+import com.raquo.laminar.inserters.{Inserter, Slottable}
 
 /** A [[Slot]] represents a special child component of web components.
   *
@@ -29,9 +29,9 @@ import com.raquo.laminar.inserters.{Hookable, Inserter}
   */
 class Slot(val name: String) {
 
-  def apply[I <: Inserter](children: (I with Hookable[I])*): Seq[I with Hookable[I]] = {
+  def apply[I <: Inserter](children: (I with Slottable[I])*): Seq[I with Slottable[I]] = {
     children.map { inserter =>
-      inserter.withSlot(name)
+      inserter.withSlotName(name)
     }
   }
 }

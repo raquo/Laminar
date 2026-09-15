@@ -84,12 +84,12 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
   private[laminar] def lastNode: dom.Node
 }
 
-trait Hookable[+Self <: Inserter] { this: Inserter =>
+trait Slottable[+Self <: Inserter] { this: Inserter =>
 
   /** Create a copy of the inserter that slots its content into `slotName`.
     * Used by [[com.raquo.laminar.nodes.Slot]] to slot content into web components.
     */
-  def withSlot(slotName: String): Self with Hookable[Self]
+  def withSlotName(slotName: String): Self with Slottable[Self]
 }
 
 trait StaticInserter extends Inserter {
@@ -114,7 +114,7 @@ trait StaticInserter extends Inserter {
 class DynamicInserter(
   insertFn: (InsertContext, Owner) => Subscription,
   slotName: String | Unit
-) extends Inserter with Hookable[DynamicInserter] {
+) extends Inserter with Slottable[DynamicInserter] {
 
   /** Owner typically comes from MountContext of the InsertContext parentNode.
     *
@@ -168,7 +168,7 @@ class DynamicInserter(
     }
   }
 
-  override def withSlot(newSlotName: String): DynamicInserter = {
+  override def withSlotName(newSlotName: String): DynamicInserter = {
     new DynamicInserter(insertFn, newSlotName)
   }
 
