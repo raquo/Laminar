@@ -13,6 +13,6 @@ object ChildrenCommandReceiver {
   )(implicit
     renderableNode: RenderableNode[Component]
   ): DynamicInserter = {
-    ChildrenCommandInserter(commands.toObservable, renderableNode, initialHooks = js.undefined)
+    ChildrenCommandInserter(commands.toObservable, renderableNode, initialSlotName = ())
   }
 }

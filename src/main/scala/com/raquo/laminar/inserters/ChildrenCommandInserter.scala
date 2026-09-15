@@ -25,7 +25,7 @@ object ChildrenCommandInserter {
   def apply[Component](
     commands: EventStream[CollectionCommand[Component]],
     renderableNode: RenderableNode[Component],
-    initialHooks: js.UndefOr[InserterHooks]
+    initialSlotName: String | Unit
   ): DynamicInserter = {
     new DynamicInserter(
       insertFn = (ctx, owner) => {
@@ -46,7 +46,7 @@ object ChildrenCommandInserter {
           updateList(command, ctx, renderableNode)
         }(using owner)
       },
-      hooks = initialHooks
+      slotName = initialSlotName
     )
   }
 
@@ -72,7 +72,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = ctx.trailingSentinelNodeOpt.get.ref,
-          hooks = ctx.currentHooks
+          slotName = ctx.currentSlotName
         )
         ctx.contentMap.set(node.ref, node)
 
@@ -81,7 +81,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = ctx.sentinelNode.ref,
-          hooks = ctx.currentHooks
+          slotName = ctx.currentSlotName
         )
         ctx.contentMap.set(node.ref, node)
 
@@ -90,7 +90,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           child = node,
           index = findSentinelIndex() + atIndex + 1,
-          hooks = ctx.currentHooks
+          slotName = ctx.currentSlotName
         )
         ctx.contentMap.set(node.ref, node)
 
@@ -106,7 +106,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           oldChild = oldNode,
           newChild = newNode,
-          hooks = ctx.currentHooks
+          slotName = ctx.currentSlotName
         )
         ctx.contentMap.delete(oldNode.ref)
         ctx.contentMap.set(newNode.ref, newNode)
@@ -124,7 +124,7 @@ object ChildrenCommandInserter {
             parent = ctx.currentParentNode,
             newChild = node,
             referenceChildRef = trailingSentinelRef,
-            hooks = ctx.currentHooks
+            slotName = ctx.currentSlotName
           )
           ctx.contentMap.set(node.ref, node)
         }

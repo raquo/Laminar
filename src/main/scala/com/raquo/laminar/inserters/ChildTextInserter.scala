@@ -23,7 +23,7 @@ object ChildTextInserter {
               maybeLastSeenChild = (),
               newChildNodeOpt = newTextNode,
               ctx = ctx,
-              hooks = () // Ignoring hooks in text nodes is ok... for now.
+              slotName = () // text nodes are never slotted
             )
             maybeTextNode = newTextNode
             ()
@@ -36,7 +36,7 @@ object ChildTextInserter {
           }
         }(using owner)
       },
-      hooks = ()
+      slotName = ()
     )
   }
 
@@ -54,7 +54,7 @@ object ChildTextInserter {
                 maybeLastSeenChild = maybeTextNode,
                 newChildNodeOpt = (),
                 ctx = ctx,
-                hooks = () // Ignoring hooks in text nodes is ok... for now.
+                slotName = () // text nodes are never slotted
               )
               maybeTextNode = js.undefined
             }
@@ -66,7 +66,7 @@ object ChildTextInserter {
                 maybeLastSeenChild = (),
                 newChildNodeOpt = newTextNode,
                 ctx = ctx,
-                hooks = () // Ignoring hooks in text nodes is ok... for now.
+                slotName = () // text nodes are never slotted
               )
               maybeTextNode = newTextNode
               ()
@@ -80,7 +80,7 @@ object ChildTextInserter {
           }
         }(using owner)
       },
-      hooks = ()
+      slotName = () // text nodes are never slotted
     )
   }
 }

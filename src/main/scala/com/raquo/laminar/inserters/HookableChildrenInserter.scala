@@ -8,9 +8,9 @@ import com.raquo.laminar.modifiers.{RenderableInserter, RenderableNode, Renderab
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
 
-import scala.scalajs.js
+import scala.scalajs.js.|
 
-/** Static inserter for a static list of nodes, with optional hooks.
+/** Static inserter for a static list of nodes, optionally slotted.
   *
   * Used when:
   *  - onMountInsert callback returns a Seq, or
@@ -22,7 +22,7 @@ import scala.scalajs.js
   */
 class HookableChildrenInserter(
   mutableNodes: laminar.Seq[ChildNode.Base],
-  hooks: js.UndefOr[InserterHooks]
+  slotName: String | Unit
 ) extends StaticInserter with Hookable[HookableChildrenInserter] {
 
   /** We don't want to depend arbitrarily on [[mutableNodes]]
@@ -47,7 +47,7 @@ class HookableChildrenInserter(
         DomApi.appendChild(
           parent = element,
           child = node,
-          hooks = hooks
+          slotName = slotName
         )
       }
     }
@@ -59,7 +59,7 @@ class HookableChildrenInserter(
       nextItems = nodesToRender,
       renderable = RenderableInserter.inserterRenderable,
       ctx = ctx,
-      hooks = hooks
+      slotName = slotName
     )
   }
 
@@ -70,15 +70,17 @@ class HookableChildrenInserter(
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    listHooks: js.UndefOr[InserterHooks]
+    listSlotName: String | Unit
   ): Unit = {
     var insertAfter = afterRef
+    // Own slot wins over the destination list's slot (innermost `Slot` wins).
+    val effectiveSlotName = slotName.orElse(listSlotName)
     nodesToRender.foreach { node =>
       DomApi.insertChildAfter(
         parent = parent,
         newChild = node,
         referenceChildRef = insertAfter,
-        hooks = InserterHooks.concat(listHooks, hooks)
+        slotName = effectiveSlotName
       )
       insertAfter = node.ref
     }
@@ -90,8 +92,8 @@ class HookableChildrenInserter(
     }
   }
 
-  override def withHooks(addHooks: InserterHooks): HookableChildrenInserter = {
-    new HookableChildrenInserter(mutableNodes, InserterHooks.concat(hooks, addHooks))
+  override def withSlot(newSlotName: String): HookableChildrenInserter = {
+    new HookableChildrenInserter(mutableNodes, newSlotName)
   }
 
 }
@@ -104,7 +106,7 @@ object HookableChildrenInserter {
     renderableNode: RenderableNode[Component]
   ): HookableChildrenInserter = {
     val children = renderableNode.asNodeSeq(renderableSeq.toSeq(components))
-    new HookableChildrenInserter(children, hooks = js.undefined)
+    new HookableChildrenInserter(children, slotName = ())
   }
 
 }

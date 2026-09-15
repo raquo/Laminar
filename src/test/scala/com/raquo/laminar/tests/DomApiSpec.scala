@@ -5,7 +5,6 @@ import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L.{mathml => m}
 import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.fixtures.{DoubleRangeElement, IntRangeElement}
-import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -222,7 +221,7 @@ class DomApiSpec extends UnitSpec {
       AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
       AirstreamError.registerUnhandledErrorCallback(collectingCallback)
 
-      val noHooks: js.UndefOr[InserterHooks] = js.undefined
+      val noSlot: js.UndefOr[String] = js.undefined
 
       val childInParent = span("in parent")
       val parent = div(childInParent)
@@ -244,7 +243,7 @@ class DomApiSpec extends UnitSpec {
         parent = parent,
         newChild = newChild,
         referenceChildRef = referenceChild.ref,
-        hooks = noHooks
+        slotName = noSlot
       )
 
       assert(!inserted)

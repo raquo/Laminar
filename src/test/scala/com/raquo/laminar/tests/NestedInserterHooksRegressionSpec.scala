@@ -17,8 +17,8 @@ class NestedInserterHooksRegressionSpec extends UnitSpec {
     val a = tracker.createSpan("A")
     val b = tracker.createSpan("B")
     tracker.clear()
-    val itemA: Inserter = Slot("prefix")(a).head
-    val itemB: Inserter = Slot("prefix")(b).head
+    val itemA: Inserter = new Slot("prefix")(a).head
+    val itemB: Inserter = new Slot("prefix")(b).head
     val items = Var(List.empty[Inserter])
 
     mount(div(children <-- items.signal))
@@ -50,7 +50,7 @@ class NestedInserterHooksRegressionSpec extends UnitSpec {
     val a = tracker.createSpan("A")
     val b = tracker.createSpan("B")
     tracker.clear()
-    val item: Inserter = Slot("prefix")(child <-- bus.events).head
+    val item: Inserter = new Slot("prefix")(child <-- bus.events).head
 
     mount(div(children <-- Val(List(item))))
 
@@ -77,7 +77,7 @@ class NestedInserterHooksRegressionSpec extends UnitSpec {
     val leftItems = Var(List(item))
     val rightItems = Var(List.empty[Inserter])
     val left = div(children <-- leftItems.signal)
-    val right = div(Slot("prefix")(children <-- rightItems.signal))
+    val right = div(new Slot("prefix")(children <-- rightItems.signal))
 
     mount(div(left, right))
     tracker.assertEvents(_.mounted("A")).clear()
@@ -104,7 +104,7 @@ class NestedInserterHooksRegressionSpec extends UnitSpec {
     val leftItems = Var(List(item))
     val rightItems = Var(List.empty[Inserter])
     val left = div(children <-- leftItems.signal)
-    val right = div(Slot("prefix")(children <-- rightItems.signal))
+    val right = div(new Slot("prefix")(children <-- rightItems.signal))
 
     mount(div(left, right))
 
