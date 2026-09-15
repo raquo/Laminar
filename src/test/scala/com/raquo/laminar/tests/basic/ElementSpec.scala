@@ -2,8 +2,8 @@ package com.raquo.laminar.tests.basic
 
 import com.raquo.domtestutils.matching.ExpectedNode
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.api.L.{mathml => m}
+import com.raquo.laminar.api.L.{svg => s}
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.utils.UnitSpec
 

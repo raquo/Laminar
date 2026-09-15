@@ -29,9 +29,9 @@ class SlottableChildInserter(
   slotName: String | Unit
 ) extends StaticInserter with Slottable[SlottableChildInserter] {
 
-  private[laminar] override val stableFirstNode: dom.Node = child.ref
+  override private[laminar] val stableFirstNode: dom.Node = child.ref
 
-  private[laminar] override def lastNode: dom.Node = child.ref
+  override private[laminar] def lastNode: dom.Node = child.ref
 
   override def apply(element: ReactiveElement.Base): Unit = {
     DomApi.appendChild(
@@ -50,7 +50,7 @@ class SlottableChildInserter(
     )
   }
 
-  private[laminar] override def addToDynamicList(
+  override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
     listSlotName: String | Unit
@@ -64,7 +64,7 @@ class SlottableChildInserter(
     )
   }
 
-  private[laminar] override def removeFromDynamicList(parent: ReactiveElement.Base): Unit = {
+  override private[laminar] def removeFromDynamicList(parent: ReactiveElement.Base): Unit = {
     DomApi.removeChild(parent = parent, child = child)
   }
 

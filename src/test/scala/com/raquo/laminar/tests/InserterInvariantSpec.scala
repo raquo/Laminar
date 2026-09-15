@@ -1,7 +1,7 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.inserters.{DynamicInserter, InsertContext, InserterType, Inserter}
+import com.raquo.laminar.inserters.{DynamicInserter, InsertContext, Inserter, InserterType}
 import com.raquo.laminar.nodes.CommentNode
 import com.raquo.laminar.utils.UnitSpec
 

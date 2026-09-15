@@ -18,7 +18,8 @@ object DoubleRangeElement extends WebComponent("sl-range-double") {
     val prefix = new Slot("prefix")
   }
 
-  @js.native trait RangeComponent extends js.Object { this: dom.HTMLElement =>
+  @js.native
+  trait RangeComponent extends js.Object { this: dom.HTMLElement =>
     val value: Double
   }
 }

@@ -196,8 +196,8 @@ trait DomTags {
   ): Unit = {
     val isThenable = {
       (js.typeOf(value) == "object") &&
-        (value != null) &&
-        (js.typeOf(value.selectDynamic("then")) == "function")
+      (value != null) &&
+      (js.typeOf(value.selectDynamic("then")) == "function")
     }
     if (isThenable) {
       value.asInstanceOf[js.Promise[Any]].`then`[Unit]((_: Any) => runWhenResolved)

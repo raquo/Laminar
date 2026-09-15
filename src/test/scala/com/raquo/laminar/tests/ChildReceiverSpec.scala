@@ -309,4 +309,3 @@ class ChildReceiverSpec extends UnitSpec {
   }
 
 }
-
