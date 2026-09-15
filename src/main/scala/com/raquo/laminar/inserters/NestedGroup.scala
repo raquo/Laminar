@@ -147,11 +147,21 @@ final class NestedGroup(
   }
 
   private[laminar] def applySlot(newSlotName: String | Unit): Unit = {
-    val parent = nestedInsertContext.currentParentNode
-    nestedInsertContext.contentMap.forEach { (inserter, _) =>
-      inserter.applySlot(parent, newSlotName)
+    // #Note: this `slotNameChanged` gate is not just a performance optimisation,
+    //  it's needed to cover element stealing edge cases.
+    val slotNameChanged =
+      newSlotName.fold(
+        ifEmpty = nestedInsertContext.currentSlotName.nonEmpty
+      ) { nsn =>
+        !nestedInsertContext.currentSlotName.contains(nsn)
+      }
+    if (slotNameChanged) {
+      val parent = nestedInsertContext.currentParentNode
+      nestedInsertContext.contentMap.forEach { (inserter, _) =>
+        inserter.applySlot(parent, newSlotName)
+      }
+      nestedInsertContext.setCurrentSlotName(newSlotName)
     }
-    nestedInsertContext.setCurrentSlotName(newSlotName)
   }
 
   private[laminar] def removeFromParent(): Unit = {
