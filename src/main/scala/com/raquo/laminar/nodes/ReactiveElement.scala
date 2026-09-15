@@ -1,6 +1,6 @@
 package com.raquo.laminar.nodes
 
-import com.raquo.airstream.core.{EventStream, Observable, Observer, Sink, Transaction}
+import com.raquo.airstream.core._
 import com.raquo.airstream.eventbus.{EventBus, WriteBus}
 import com.raquo.airstream.ownership.{DynamicOwner, DynamicSubscription, Subscription, TransferableSubscription}
 import com.raquo.ew.JsArray
@@ -255,10 +255,10 @@ with ParentNode[Ref] {
   private var _appliedSlotName: String | Unit = ()
 
   override private[laminar] def applySlot(
-    parent: ParentNode.Base,
-    newSlotName: String | Unit
+    debugParent: ParentNode.Base,
+    slotName: String | Unit
   ): Unit = {
-    newSlotName.fold {
+    slotName.fold {
       // Destination has no slot: clear only that we slot WE applied.
       if (_appliedSlotName.isDefined) {
         // Technically this CAN also clear the `slot` attribute set by the user manually,
@@ -267,8 +267,10 @@ with ParentNode[Ref] {
         _appliedSlotName = ()
       }
     } { newSlotName =>
-      ref.setAttribute("slot", newSlotName)
-      _appliedSlotName = newSlotName
+      if (!_appliedSlotName.contains(newSlotName)) {
+        ref.setAttribute("slot", newSlotName)
+        _appliedSlotName = newSlotName
+      }
     }
   }
 

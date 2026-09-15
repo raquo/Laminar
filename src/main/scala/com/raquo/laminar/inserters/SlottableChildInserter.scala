@@ -2,7 +2,7 @@ package com.raquo.laminar.inserters
 
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
-import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js.|
@@ -70,6 +70,17 @@ class SlottableChildInserter(
 
   override def withSlotName(newSlotName: String): SlottableChildInserter = {
     new SlottableChildInserter(child, newSlotName)
+  }
+
+  override private[laminar] def applySlot(
+    debugParent: ParentNode.Base,
+    listSlotName: String | Unit
+  ): Unit = {
+    // Own slot wins over the destination list's slot, mirroring `addToDynamicList`.
+    child.applySlot(
+      debugParent = debugParent,
+      slotName = slotName.orElse(listSlotName)
+    )
   }
 }
 

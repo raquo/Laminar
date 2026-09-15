@@ -50,7 +50,7 @@ trait DomTree {
     child.willSetParent(nextParent)
 
     // 1. Update DOM
-    child.applySlot(parent = parent, newSlotName = slotName)
+    child.applySlot(parent, slotName) // #TODO[Integrity] should we apply the slot before or after willSetParent?
     val maybeDomError = raw.appendChild(parent = parent.ref, child = child.ref)
     maybeDomError.foreach(maybeReportDomError)
     val appended = maybeDomError.isEmpty
@@ -87,7 +87,7 @@ trait DomTree {
   ): Boolean = {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
-    newChild.applySlot(parent = parent, newSlotName = slotName)
+    newChild.applySlot(parent, slotName)
     val maybeDomError = raw.insertBefore(
       parent = parent.ref,
       newChild = newChild.ref,
@@ -109,7 +109,7 @@ trait DomTree {
   ): Boolean = {
     val nextParent = Some(parent)
     newChild.willSetParent(nextParent)
-    newChild.applySlot(parent = parent, newSlotName = slotName)
+    newChild.applySlot(parent, slotName)
     val maybeDomError = raw.insertAfter(
       parent = parent.ref,
       newChild = newChild.ref,
@@ -138,7 +138,7 @@ trait DomTree {
     val nextParent = Some(parent)
 
     child.willSetParent(nextParent)
-    child.applySlot(parent = parent, newSlotName = slotName)
+    child.applySlot(parent, slotName)
 
     val children = parent.ref.childNodes
     val maybeDomError = if (index < children.length) {
@@ -178,7 +178,7 @@ trait DomTree {
 
         oldChild.willSetParent(None)
         newChild.willSetParent(newChildNextParent)
-        newChild.applySlot(parent = parent, newSlotName = slotName)
+        newChild.applySlot(parent, slotName)
 
         val maybeDomError = raw.replaceChild(
           parent = parent.ref,
