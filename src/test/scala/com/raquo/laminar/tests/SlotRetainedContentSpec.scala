@@ -104,6 +104,39 @@ class SlotRetainedContentSpec extends UnitSpec {
     }
   }
 
+  it("keeps a retained nested inserter's slot while sibling items are added and removed") {
+    // The retained-in-place branch re-affirms `applySlot` on every reconcile. A nested
+    // `child <--` item that stays put while other items come and go must keep its slot,
+    // and its content must not re-mount.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val nested: Inserter = child <-- Val(a)
+    val sibling: Inserter = child <-- Val(b)
+    val items = Var[List[Inserter]](List(nested))
+
+    mount(div(new Slot("prefix")(children <-- items.signal)))
+
+    withClue("the nested item gets the list slot: ") {
+      tracker.assertEvents(_.mounted("A")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("adding a sibling leaves the retained item's slot and mount state untouched: ") {
+      items.set(List(nested, sibling))
+      tracker.assertEvents(_.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      b.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("removing the sibling again leaves the retained item untouched: ") {
+      items.set(List(nested))
+      tracker.assertEvents(_.unmounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+    }
+  }
+
   // -- Single-child (`child <--`) path --
 
   it("reconciles the slot when onMountInsert remounts a retained `child <--`") {
