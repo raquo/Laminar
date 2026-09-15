@@ -65,7 +65,7 @@ class HookableChildrenInserter(
 
   override private[laminar] val stableFirstNode: dom.Node = nodesToRender.head.ref
 
-  override private[laminar] def lastNode: dom.Node = nodesToRender.last.ref
+  override private[laminar] lazy val lastNode: dom.Node = nodesToRender.last.ref
 
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
