@@ -3,7 +3,7 @@ package com.raquo.laminar.tests
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.fixtures.ButtonElement
 import com.raquo.laminar.inserters.Inserter
-import com.raquo.laminar.nodes.Slot
+import com.raquo.laminar.nodes.{ChildNode, Slot, TextNode}
 import com.raquo.laminar.utils.UnitSpec
 
 class SlotSpec extends UnitSpec {
@@ -373,6 +373,165 @@ class SlotSpec extends UnitSpec {
         div.of(sentinel, sentinel),
         div.of(sentinel, sentinel, span.of("A", slot is "prefix"), sentinel, sentinel)
       ))
+    }
+  }
+
+  // -- Slot precedence: item's own slot vs the enclosing list's slot --
+
+  it("an item's own slot wins over the enclosing slotted `children <--` list slot") {
+    // `slotName.orElse(listSlotName)`: an item carrying its OWN `Slot` wrapper keeps that slot
+    // even inside a list that applies a different slot; a plain sibling takes the list's slot.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val ownSlotItem: Inserter = new Slot("inner")(a).head
+    val plainItem: Inserter = child <-- Val(b)
+    val items = Var(List(ownSlotItem, plainItem))
+
+    mount(div(new Slot("outer")(children <-- items.signal)))
+
+    withClue("own slot wins for the wrapped item; the list slot applies to the plain sibling:") {
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "inner"
+      b.ref.getAttribute("slot") shouldBe "outer"
+      expectNode(div.of(
+        sentinel,
+        span.of("A", slot is "inner"),
+        sentinel,
+        span.of("B", slot is "outer"),
+        sentinel,
+        sentinel
+      ))
+    }
+  }
+
+  // -- Raw text node in a named slot --
+
+  it("reports a re-emitted error for a raw text node in a named slot, still slotting sibling elements") {
+    // Named slots only accept elements: a raw text node in a slot is reported as an error (and
+    // lands in the default slot). The report is intentionally NOT deduplicated, so a retained
+    // list re-reports on every reconcile – consistent, easy-to-reproduce noise by design.
+    val t = new TextNode("hello")
+    val el = span("E")
+    val items = Var[List[ChildNode.Base]](List(t, el))
+
+    withCollectedAirstreamErrors { errors =>
+      mount(div(new Slot("prefix")(children <-- items.signal)))
+
+      withClue("first render: one error for the text node; the element still gets the slot:") {
+        errors.size shouldBe 1
+        el.ref.getAttribute("slot") shouldBe "prefix"
+        assert(t.ref.parentNode != null) // text still lands in the DOM (default slot)
+      }
+
+      withClue("a retained re-set re-reports the text-node error (dedup is intentionally not done):") {
+        items.set(List(t, el))
+        errors.size shouldBe 2
+        el.ref.getAttribute("slot") shouldBe "prefix"
+      }
+    }
+  }
+
+  // -- Reorder of dynamic-inserter items in a slotted list --
+
+  it("keeps each slot across a reorder of dynamic-inserter items in a slotted `children <--`") {
+    // A same-list reorder is a lateral move: the item keeps whatever slot it already has,
+    // and its content is not re-mounted.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val itemA: Inserter = child <-- Val(a)
+    val itemB: Inserter = child <-- Val(b)
+    val items = Var(List(itemA, itemB))
+
+    mount(div(new Slot("prefix")(children <-- items.signal)))
+
+    withClue("both dynamic items get the list slot on first render:") {
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      b.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("reordering the items is a lateral move – no remount, slot preserved:") {
+      items.set(List(itemB, itemA))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      b.ref.getAttribute("slot") shouldBe "prefix"
+    }
+  }
+
+  // -- Moving a static multi-node group between slots --
+
+  it("re-slots every node when a static group moves between two slots, without remounting") {
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val group: Inserter = List(a, b)
+    val prefixItems = Var(List(group))
+    val suffixItems = Var(List.empty[Inserter])
+    val prefixHost = div(new Slot("prefix")(children <-- prefixItems.signal))
+    val suffixHost = div(new Slot("suffix")(children <-- suffixItems.signal))
+
+    mount(div(prefixHost, suffixHost))
+
+    withClue("the group starts in the prefix slot:") {
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      b.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("moving the group into the suffix slot re-slots both nodes without remounting:") {
+      suffixItems.set(List(group))
+      prefixItems.set(Nil)
+      tracker.assertNoEvents.clear()
+      a.ref.parentNode shouldBe suffixHost.ref
+      b.ref.parentNode shouldBe suffixHost.ref
+      a.ref.getAttribute("slot") shouldBe "suffix"
+      b.ref.getAttribute("slot") shouldBe "suffix"
+    }
+  }
+
+  // -- Node -> empty -> node under a slot --
+
+  it("re-applies the slot when a slotted `child.maybe <--` goes node -> empty -> node") {
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val bus = EventBus[Option[HtmlElement]]()
+    mount(div(new Slot("prefix")(child.maybe <-- bus.events).head))
+
+    withClue("the emitted node gets the slot:") {
+      bus.emit(Some(a))
+      tracker.assertEvents(_.mounted("A")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("emitting None removes the node:") {
+      bus.emit(None)
+      tracker.assertEvents(_.unmounted("A")).clear()
+      a.ref.parentNode shouldBe null
+    }
+
+    withClue("re-emitting the node re-acquires the slot:") {
+      bus.emit(Some(a))
+      tracker.assertEvents(_.mounted("A")).clear()
+      assert(a.ref.parentNode != null)
+      a.ref.getAttribute("slot") shouldBe "prefix"
+    }
+  }
+
+  // -- Empty static group placeholder --
+
+  it("never sets a slot attribute on the placeholder of an empty static group in a slot") {
+    // An empty Seq becomes a `SlottableChildrenInserter` backed by a synthetic comment node.
+    // Comment nodes are never slotted, so placing an empty group in a slot must not crash.
+    mount(div(new Slot("prefix")(List.empty[HtmlElement]).head))
+
+    withClue("the empty group renders as a lone comment placeholder (no slot attribute):") {
+      expectNode(div.of(sentinel))
     }
   }
 }
