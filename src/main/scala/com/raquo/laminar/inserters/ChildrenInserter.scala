@@ -85,10 +85,8 @@ object ChildrenInserter {
     var afterRef: dom.Node = listSentinelNodeRef // last DOM node of the last placed item
     var prevItemRef: dom.Node = listSentinelNodeRef.nextSibling
 
-    nextItems.foreach { nextItem =>
-      val nextInserter: Inserter =
-        renderable.asInserter(nextItem)
-
+    // Map iteration preserves source order without converting the items again.
+    nextInsertersMap.forEach { (nextInserter, _) =>
       val foundInserterInPrevMap: Boolean =
         prevContentMap.has(nextInserter.stableFirstNode)
 
