@@ -104,8 +104,12 @@ object ChildrenInserter {
       } else {
         if (foundInserterInPrevMap) {
           if (nextInserter.stableFirstNode == prevItemRef) {
-            // Item already in the right place:
-            // Do nothing.
+            // Item already in the right place – no DOM move needed.
+            // -- BUT! --
+            // Its target slot may have changed (a different wrapper now slots the
+            // same node, or the list's slot changed), so reconcile the slot in place.
+            // @Note: DOM update
+            nextInserter.applySlot(listParentNode, slotName)
           } else {
             // Item exists, but elsewhere. First remove any items at the cursor that
             // are not in the new list (they are leaving anyway – this often lets us

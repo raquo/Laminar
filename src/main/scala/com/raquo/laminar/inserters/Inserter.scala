@@ -4,7 +4,7 @@ import com.raquo.airstream.ownership.{Owner, Subscription}
 import com.raquo.ew
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.Modifier
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js
@@ -68,6 +68,17 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
       listSlotName = listSlotName
     )
   }
+
+  /** Applies to the element(s) currently in this inserter.
+    *
+    * DynamicInserter also records the name on its context, so elements it inserts
+    * LATER (as its observable emits) are slotted the same way – its slot must
+    * persist, not just apply to the current content.
+    */
+  private[laminar] def applySlot(
+    debugParent: ParentNode.Base,
+    slotName: String | Unit
+  ): Unit
 
   /** The first DOM node of this item's span (valid after [[addToDynamicList]]).
     *  - Must always return the same node for the same inserter. Don't change it to `def`!
@@ -170,6 +181,14 @@ class DynamicInserter(
 
   override def withSlotName(newSlotName: String): DynamicInserter = {
     new DynamicInserter(insertFn, newSlotName)
+  }
+
+  override private[laminar] def applySlot(
+    debugParent: ParentNode.Base,
+    listSlotName: String | Unit
+  ): Unit = {
+    // Own slot wins over the destination list's slot (innermost `Slot` wins).
+    nestedGroupOpt.foreach(_.applySlot(slotName.orElse(listSlotName)))
   }
 
   // -- Nested groups support --
