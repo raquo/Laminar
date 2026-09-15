@@ -21,11 +21,11 @@ trait RenderableInserter[-Component] {
 
   /** Render this value as the [[Inserter]] that serves as its `children <--`
     * list-item handle. The children diff uses the returned inserter both to obtain
-    * the item's stable anchor identity (`Inserter.anchorRef`, used to match items
-    * across observable emissions) and to insert / move / remove the item's span.
+    * the item's stable anchor identity ([[Inserter.stableFirstNode]], used to match
+    * items across observable emissions) and to insert / move / remove the item's span.
     *
     * This must be cheap and idempotent: it is called for every item on every
-    * emission, and it MUST return the same anchor (`asInserter(value).anchorRef`)
+    * emission, and it MUST return the same anchor (`asInserter(value).stableFirstNode`)
     * for the same logical item across emissions (this holds for a node – its `ref`
     * is stable – and for an inserter – its leading sentinel is stable per instance;
     * for `split` the callback is memoized per key).
