@@ -153,7 +153,7 @@ class ShadowDomSpec extends UnitSpec {
 
         expectNode(
           app.ref,
-          div.of("Hello, ", span.of("world"))
+          div.of("Hello, ", span.of(sentinel, "world"))
         )
 
         // --
