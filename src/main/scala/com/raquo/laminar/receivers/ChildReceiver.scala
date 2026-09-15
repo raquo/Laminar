@@ -16,7 +16,7 @@ object ChildReceiver {
   val text: ChildTextReceiver.type = ChildTextReceiver
 
   def <--(childSource: Source[ChildNode.Base]): DynamicInserter = {
-    ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable, initialHooks = js.undefined)
+    ChildInserter(childSource.toObservable, RenderableNode.nodeRenderable, initialSlotName = ())
   }
 
   implicit class RichChildReceiver(private val self: ChildReceiver.type) extends AnyVal {
@@ -26,7 +26,7 @@ object ChildReceiver {
     )(implicit
       renderable: RenderableNode[Component]
     ): DynamicInserter = {
-      ChildInserter(childSource.toObservable, renderable, initialHooks = js.undefined)
+      ChildInserter(childSource.toObservable, renderable, initialSlotName = ())
     }
 
     // #TODO[Scala,Ergonomics] If user provides Source[A] for which

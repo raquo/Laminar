@@ -3,7 +3,6 @@ package com.raquo.laminar.tests.basic
 import com.raquo.laminar.api.L
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
@@ -11,7 +10,7 @@ import scala.scalajs.js
 
 class TreeSpec extends UnitSpec {
 
-  val noHooks: js.UndefOr[InserterHooks] = js.undefined
+  val noSlot: js.UndefOr[String] = js.undefined
 
   it("DomApi.raw.isDescendantOf") {
 
@@ -42,8 +41,8 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el0.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.raw.isDescendantOf(node = el0.ref, ancestor = otherEl.ref) shouldBe false
 
-    DomApi.appendChild(parent = el0, child = el10, noHooks)
-    DomApi.appendChild(parent = el0, child = el11, noHooks)
+    DomApi.appendChild(parent = el0, child = el10, noSlot)
+    DomApi.appendChild(parent = el0, child = el11, noSlot)
 
     DomApi.raw.isDescendantOf(node = el10.ref, ancestor = rootNode.ref) shouldBe true
     DomApi.raw.isDescendantOf(node = el11.ref, ancestor = rootNode.ref) shouldBe true
@@ -54,7 +53,7 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el11.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.raw.isDescendantOf(node = el11.ref, ancestor = otherEl.ref) shouldBe false
 
-    DomApi.appendChild(parent = el10, child = el2, noHooks)
+    DomApi.appendChild(parent = el10, child = el2, noSlot)
 
     DomApi.raw.isDescendantOf(node = el2.ref, rootNode.ref) shouldBe true
     DomApi.raw.isDescendantOf(node = el2.ref, el0.ref) shouldBe true
@@ -64,7 +63,7 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el2.ref, otherRootNode.ref) shouldBe false
     DomApi.raw.isDescendantOf(node = el2.ref, otherEl.ref) shouldBe false
 
-    DomApi.appendChild(parent = el2, child = el3, noHooks)
+    DomApi.appendChild(parent = el2, child = el3, noSlot)
 
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true
@@ -74,7 +73,7 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    DomApi.insertChildAtIndex(parent = elx, child = el3, index = 0, noHooks)
+    DomApi.insertChildAtIndex(parent = elx, child = el3, index = 0, noSlot)
 
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = elx.ref) shouldBe true
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe false
@@ -84,7 +83,7 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = otherRootNode.ref) shouldBe false
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = otherEl.ref) shouldBe false
 
-    DomApi.insertChildAtIndex(parent = el10, child = el3, index = 0, noHooks)
+    DomApi.insertChildAtIndex(parent = el10, child = el3, index = 0, noSlot)
 
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = rootNode.ref) shouldBe true
     DomApi.raw.isDescendantOf(node = el3.ref, ancestor = el0.ref) shouldBe true
@@ -106,7 +105,7 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el10.ref, dom.document) shouldBe false
     DomApi.raw.isDescendantOf(node = el2.ref, dom.document) shouldBe false
 
-    DomApi.appendChild(parent = el0, child = el10, noHooks)
+    DomApi.appendChild(parent = el0, child = el10, noSlot)
 
     DomApi.raw.isDescendantOf(node = el10.ref, dom.document) shouldBe false
 
@@ -123,7 +122,7 @@ class TreeSpec extends UnitSpec {
     DomApi.raw.isDescendantOf(node = el10.ref, dom.document) shouldBe false
     DomApi.raw.isDescendantOf(node = el2.ref, dom.document) shouldBe true
 
-    DomApi.appendChild(parent = el2, child = el0, noHooks)
+    DomApi.appendChild(parent = el2, child = el0, noSlot)
 
     DomApi.raw.isDescendantOf(node = el0.ref, dom.document) shouldBe true
     DomApi.raw.isDescendantOf(node = el10.ref, dom.document) shouldBe true

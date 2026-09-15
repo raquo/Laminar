@@ -32,7 +32,7 @@ object ChildrenReceiver {
         childrenSource.toObservable,
         renderableSeq,
         renderableInserter,
-        initialHooks = js.undefined
+        initialSlotName = ()
       )
     }
   }

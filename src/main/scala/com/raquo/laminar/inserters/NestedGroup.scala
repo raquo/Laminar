@@ -6,6 +6,7 @@ import com.raquo.laminar.nodes.{CommentNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 final class NestedGroup(
   sentinelNode: CommentNode,
@@ -14,7 +15,7 @@ final class NestedGroup(
   initialParent: ReactiveElement.Base, // This group can be moved. See `nestedInsertContext.currentParentNode` for current value.
   initiallyPlaceAfterRefOpt: js.UndefOr[dom.Node], // initial sentinel node mounting point
   initiallyRequiresTrailingSentinel: Boolean, // true if rendering this group nested inside `children <--`
-  initialHooks: js.UndefOr[InserterHooks]
+  initialSlotName: String | Unit
 ) {
 
   private[laminar] lazy val leadingSentinel: CommentNode = sentinelNode
@@ -44,14 +45,14 @@ final class NestedGroup(
     parent = initialParent,
     newChild = leadingSentinel,
     afterRefOpt = initiallyPlaceAfterRefOpt,
-    hooks = initialHooks
+    slotName = initialSlotName
   )
 
   private val nestedInsertContext: InsertContext = {
     val ctx = InsertContext.unsafeMakeReservedSpotContext(
       sentinelNode = leadingSentinel,
       initialParentNode = initialParent,
-      initialHooks = initialHooks
+      initialSlotName = initialSlotName
     )
     ctx
   }
@@ -105,8 +106,8 @@ final class NestedGroup(
     */
   private[laminar] def moveToParent(
     newParent: ReactiveElement.Base,
-    afterRefOpt: js.UndefOr[dom.Node],
-    newCombinedHooks: js.UndefOr[InserterHooks]
+    afterRefOpt: dom.Node | Unit,
+    newSlotName: String | Unit
   ): Unit = {
 
     // Move the leading and trailing sentinels to the new place.
@@ -114,7 +115,7 @@ final class NestedGroup(
       parent = newParent,
       newChild = leadingSentinel,
       afterRefOpt = afterRefOpt,
-      hooks = newCombinedHooks
+      slotName = newSlotName
     )
 
     nestedInsertContext.trailingSentinelNodeOpt.foreach { trailingSentinel =>
@@ -122,7 +123,7 @@ final class NestedGroup(
         parent = newParent,
         newChild = trailingSentinel,
         referenceChildRef = leadingSentinel.ref,
-        hooks = newCombinedHooks
+        slotName = newSlotName
       )
     }
 
@@ -130,15 +131,15 @@ final class NestedGroup(
     var lastRef: dom.Node = leadingSentinel.ref
     nestedInsertContext.contentMap.forEach { (inserter, _) =>
       // Note: this calls `moveToParent` internally if this nested inserter is dynamic.
-      inserter.addToDynamicList(newParent, afterRef = lastRef, newCombinedHooks)
+      inserter.addToDynamicList(newParent, afterRef = lastRef, newSlotName)
       lastRef = inserter.lastNode
     }
 
-    // Commit the group's new parent and hooks on the context. This is what redirects the
-    // inner inserter's future emissions (which read `currentParentNode` and `hooks`) to the
-    // new destination.
+    // Commit the group's new parent and slot on the context. This is what redirects the
+    // inner inserter's future emissions (which read `currentParentNode` and `currentSlotName`)
+    // to the new destination.
     nestedInsertContext.setCurrentParentNode(newParent)
-    nestedInsertContext.setCurrentHooks(newCombinedHooks)
+    nestedInsertContext.setCurrentSlotName(newSlotName)
 
     // Transfer the subscription to the new parent's owner.
     // This is seamless, without unnecessary re-mounting.
@@ -174,15 +175,15 @@ final class NestedGroup(
   private def insertOrAppendChild(
     parent: ReactiveElement.Base,
     newChild: CommentNode,
-    afterRefOpt: js.UndefOr[dom.Node],
-    hooks: js.UndefOr[InserterHooks]
+    afterRefOpt: dom.Node | Unit,
+    slotName: String | Unit
   ): Unit = {
     afterRefOpt.fold(
       ifEmpty = {
         DomApi.appendChild(
           parent = parent,
           child = newChild,
-          hooks = hooks
+          slotName = slotName
         )
       }
     ) { afterRef =>
@@ -190,7 +191,7 @@ final class NestedGroup(
         parent = parent,
         newChild = newChild,
         referenceChildRef = afterRef,
-        hooks = hooks
+        slotName = slotName
       )
     }
   }

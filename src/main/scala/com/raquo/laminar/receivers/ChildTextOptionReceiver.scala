@@ -25,7 +25,7 @@ object ChildTextOptionReceiver {
       // This .asInstanceOf is safe because `textNodeRenderable` only applies if `TextLike` is `TextNode`.
       lazy val emptyNode = new CommentNode("")
       val nodes = textSource.toObservable.asInstanceOf[Observable[Option[TextNode]]].map(_.getOrElse(emptyNode))
-      ChildInserter(nodes, RenderableNode.nodeRenderable, initialHooks = js.undefined)
+      ChildInserter(nodes, RenderableNode.nodeRenderable, initialSlotName = ())
     } else {
       ChildTextInserter.option(textSource.toObservable, renderable)
     }

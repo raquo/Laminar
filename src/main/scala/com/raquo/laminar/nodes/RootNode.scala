@@ -3,6 +3,8 @@ package com.raquo.laminar.nodes
 import com.raquo.laminar.domapi.DomApi
 import org.scalajs.dom
 
+import scala.scalajs.js
+
 /** RootNode will mount itself (and the child) if the container node
   * is attached to the DOM at RootNode initialization time.
   *
@@ -39,7 +41,7 @@ class RootNode(
   /** @return Whether child was successfully mounted */
   def mount(): Boolean = {
     dynamicOwner.activate()
-    DomApi.appendChild(parent = this, child, hooks = ())
+    DomApi.appendChild(parent = this, child, slotName = ())
   }
 
   /** @return Whether child was successfully unmounted */

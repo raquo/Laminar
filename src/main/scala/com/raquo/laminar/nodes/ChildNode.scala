@@ -1,11 +1,12 @@
 package com.raquo.laminar.nodes
 
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.inserters.{ChildInserter, InsertContext, InserterHooks, StaticInserter}
+import com.raquo.laminar.inserters.{ChildInserter, InsertContext, StaticInserter}
 import org.scalajs.dom
 
 import scala.annotation.tailrec
 import scala.scalajs.js
+import scala.scalajs.js.|
 
 trait ChildNode[+Ref <: dom.Node]
 extends ReactiveNode[Ref]
@@ -40,8 +41,22 @@ with StaticInserter {
     */
   @inline private[laminar] def willSetParent(maybeNextParent: Option[ParentNode.Base]): Unit = ()
 
+  /** Reconcile this node's `slot` attribute to the slot of the position it is being inserted
+    * into. Called on every insert / move. `slotName` is the destination's slot, if any.
+    *
+    * Default is a no-op (comment nodes are never slotted). Overridden in [[ReactiveElement]]
+    * (set / clear the attribute) and in [[TextNode]] (report – text can not be slotted).
+    *
+    * Comment nodes don't report warnings because technically we insert sentinel comment nodes
+    * with slots when their inserter is slotted – exempting them would require more complications.
+    */
+  private[laminar] def applySlot(
+    parent: ParentNode.Base,
+    newSlotName: String | Unit
+  ): Unit = ()
+
   override def apply(parentNode: ReactiveElement.Base): Unit = {
-    DomApi.appendChild(parent = parentNode, child = this, hooks = ())
+    DomApi.appendChild(parent = parentNode, child = this, slotName = ())
   }
 
   // -- Inserter methods --
@@ -53,13 +68,13 @@ with StaticInserter {
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    listHooks: js.UndefOr[InserterHooks]
+    listSlotName: String | Unit
   ): Unit = {
     DomApi.insertChildAfter(
       parent = parent,
       newChild = this,
       referenceChildRef = afterRef,
-      hooks = listHooks
+      slotName = listSlotName
     )
   }
 
@@ -74,7 +89,7 @@ with StaticInserter {
       maybeLastSeenChild = (),
       newChildNodeOpt = this,
       ctx = ctx,
-      hooks = () // no hooks of its own – compare to other impls of renderInContext
+      slotName = () // no slot of its own – compare to other renderInContext impls
     )
   }
 

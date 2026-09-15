@@ -2,7 +2,6 @@ package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.domapi.{DomApi, DomTree}
-import com.raquo.laminar.inserters.InserterHooks
 import com.raquo.laminar.nodes.{ParentNode, ReactiveElement}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalactic.source
@@ -13,7 +12,7 @@ import scala.scalajs.js
 
 class LifecycleEventSpec extends UnitSpec {
 
-  val noHooks: js.UndefOr[InserterHooks] = js.undefined
+  val noSlot: js.UndefOr[String] = js.undefined
 
   sealed trait LifecycleEvent
   object NodeDidMount extends LifecycleEvent
@@ -123,15 +122,15 @@ class LifecycleEventSpec extends UnitSpec {
 
     val testCases = Seq(
       TestCase(
-        child => DomApi.appendChild(parent = parent1, child, noHooks),
+        child => DomApi.appendChild(parent = parent1, child, noSlot),
         expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
-        child => DomApi.appendChild(parent = parent1, child, noHooks),
+        child => DomApi.appendChild(parent = parent1, child, noSlot),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
-        child => DomApi.insertChildAtIndex(parent = parent2, child, index = 1, noHooks),
+        child => DomApi.insertChildAtIndex(parent = parent2, child, index = 1, noSlot),
         expectedLifecycleEvents = Seq()
       ),
       TestCase(
@@ -141,11 +140,11 @@ class LifecycleEventSpec extends UnitSpec {
         )
       ),
       TestCase(
-        child => DomApi.appendChild(parent = parent2, child, noHooks),
+        child => DomApi.appendChild(parent = parent2, child, noSlot),
         expectedLifecycleEvents = Seq(NodeDidMount)
       ),
       TestCase(
-        child => DomApi.replaceChild(parent = parent2, oldChild = child, newChild = otherChild, noHooks),
+        child => DomApi.replaceChild(parent = parent2, oldChild = child, newChild = otherChild, noSlot),
         expectedLifecycleEvents = Seq(
           NodeWillUnmount
         )
@@ -212,8 +211,8 @@ class LifecycleEventSpec extends UnitSpec {
       }
     }
 
-    DomApi.appendChild(parent = parent1, child = child1, noHooks)
-    DomApi.appendChild(parent = parent2, child = child2, noHooks)
+    DomApi.appendChild(parent = parent1, child = child1, noSlot)
+    DomApi.appendChild(parent = parent2, child = child2, noSlot)
 
     subscribeToEvents(child1)
 
@@ -242,7 +241,7 @@ class LifecycleEventSpec extends UnitSpec {
       Nil
     )
 
-    DomApi.appendChild(parent = parent3, child = child3, noHooks)
+    DomApi.appendChild(parent = parent3, child = child3, noSlot)
 
     expectNewEvents(
       "child3 was added to a mounted parent3",
@@ -251,35 +250,35 @@ class LifecycleEventSpec extends UnitSpec {
 
     subscribeToEvents(parent4)
     subscribeToEvents(child4)
-    DomApi.appendChild(parent = parent4, child = child4, noHooks)
+    DomApi.appendChild(parent = parent4, child = child4, noSlot)
 
     expectNewEvents(
       "child4 was added to unmounted parent4",
       Nil
     )
 
-    DomApi.appendChild(parent = grandParent, child = parent4, noHooks)
+    DomApi.appendChild(parent = grandParent, child = parent4, noSlot)
 
     expectNewEvents(
       "parent4 was mounted",
       Seq((parent4, NodeDidMount), (child4, NodeDidMount)) // @TODO[Docs] Document: the same mount event is propagated to listeners in the order in which the listeners subscribed
     )
 
-    DomApi.appendChild(parent = parent3, child = child4, noHooks)
+    DomApi.appendChild(parent = parent3, child = child4, noSlot)
 
     expectNewEvents(
       "child4 was moved to parent3 which is also mounted",
       Nil
     )
 
-    DomApi.appendChild(parent = parent5, child = child4, noHooks)
+    DomApi.appendChild(parent = parent5, child = child4, noSlot)
 
     expectNewEvents(
       "child4 was moved to parent5 which is unmounted",
       Seq((child4, NodeWillUnmount))
     )
 
-    DomApi.appendChild(parent = parent5, child = parent2, noHooks)
+    DomApi.appendChild(parent = parent5, child = parent2, noSlot)
 
     expectNewEvents(
       "parent2 was moved into parent5 which is unmounted",
@@ -293,7 +292,7 @@ class LifecycleEventSpec extends UnitSpec {
       Nil
     )
 
-    DomApi.appendChild(parent = parent5, child = parent3, noHooks)
+    DomApi.appendChild(parent = parent5, child = parent3, noSlot)
 
     expectNewEvents(
       "parent3 was moved into parent5 which is unmounted",

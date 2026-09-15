@@ -5,29 +5,26 @@ import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
 
-import scala.scalajs.js
+import scala.scalajs.js.|
 
-/** Static inserter for a single static node, with optional hooks.
+/** Static inserter for a single static node, optionally slotted.
   *
-  * Used for Web Components `Slot.apply`, which needs to
-  * `setAttribute("slot", slot.name)` in the `onWillInsertNode` hook.
+  * Used for Web Components ([[Slot.apply]]), which needs to set the `slot`
+  * attribute on the node it wraps (see [[com.raquo.laminar.nodes.ReactiveElement]]).
   *
-  * In theory, ReactiveElement could become Hookable to avoid the
-  * need for this wrapper, however this seems undesirable as hooks
-  * are a property of the insertion point / mechanism, not the node.
-  * However, currently hooks are not very principled either, for example
-  * we use them to set the `slot` attribute, but we never unset this
-  * attribute (e.g. if we move the element / inserter to a different place).
+  * In theory, ReactiveElement could become Hookable to avoid the need for
+  * this wrapper, however this seems undesirable as the slot is a property
+  * of the insertion point / mechanism, not the node.
   *
-  * Also, note that for slots, text nodes should not be allowed as they
-  * can not be slotted, but this restriction is implemented in the implicit
-  * conversion layer, not here, which is not very principled.
+  * Note that for slots, text nodes should not be allowed as they can not
+  * be slotted. That restriction is implemented in the implicit conversion
+  * layer, not here, which is not very principled.
   *
   * See also `componentToInserter` implicit.
   */
 class HookableChildInserter(
   child: ChildNode.Base,
-  hooks: js.UndefOr[InserterHooks]
+  slotName: String | Unit
 ) extends StaticInserter with Hookable[HookableChildInserter] {
 
   private[laminar] override val stableFirstNode: dom.Node = child.ref
@@ -38,7 +35,7 @@ class HookableChildInserter(
     DomApi.appendChild(
       parent = element,
       child = child,
-      hooks = hooks
+      slotName = slotName
     )
   }
 
@@ -47,21 +44,21 @@ class HookableChildInserter(
       maybeLastSeenChild = (),
       newChildNodeOpt = child,
       ctx = ctx,
-      hooks = hooks
+      slotName = slotName
     )
   }
 
   private[laminar] override def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    listHooks: js.UndefOr[InserterHooks]
+    listSlotName: String | Unit
   ): Unit = {
     // Cheap common case: a single static node is its own anchor + end, no sentinel.
     DomApi.insertChildAfter(
       parent = parent,
       newChild = child,
       referenceChildRef = afterRef,
-      hooks = InserterHooks.concat(listHooks, hooks)
+      slotName = slotName.orElse(listSlotName) // own slot wins over the destination list's
     )
   }
 
@@ -69,8 +66,8 @@ class HookableChildInserter(
     DomApi.removeChild(parent = parent, child = child)
   }
 
-  override def withHooks(addHooks: InserterHooks): HookableChildInserter = {
-    new HookableChildInserter(child, InserterHooks.concat(hooks, addHooks))
+  override def withSlot(newSlotName: String): HookableChildInserter = {
+    new HookableChildInserter(child, newSlotName)
   }
 }
 
@@ -79,7 +76,7 @@ object HookableChildInserter {
   def noHooks(
     node: ChildNode.Base,
   ): HookableChildInserter = {
-    new HookableChildInserter(node, hooks = ())
+    new HookableChildInserter(node, slotName = ())
   }
 
   def noHooksC[Component](
@@ -87,6 +84,6 @@ object HookableChildInserter {
   )(implicit
     renderable: RenderableNode[Component]
   ): HookableChildInserter = {
-    new HookableChildInserter(renderable.asNode(component), hooks = js.undefined)
+    new HookableChildInserter(renderable.asNode(component), slotName = ())
   }
 }
