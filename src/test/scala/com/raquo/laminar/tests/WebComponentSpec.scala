@@ -56,7 +56,7 @@ class WebComponentSpec extends UnitSpec {
 
     assertEquals(isMounted, true)
     assertEquals(labelObserverCount, 1)
-    expectNode(content.ref, div of "")
+    expectNode(content.ref, div of (sentinel, ""))
 
     // -- The `label` attribute flows into the shadow DOM via Laminar.
 
