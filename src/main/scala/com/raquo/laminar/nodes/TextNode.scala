@@ -22,7 +22,7 @@ class TextNode(initialText: String) extends ChildNode[dom.Text] {
   ): Unit = {
     newSlotName.foreach { name =>
       AirstreamError.sendUnhandledError(new Exception(
-        s"Error: You tried to insert a raw text node `${ref.textContent}` into the `${name}` slot of <${parent.ref.tagName.toLowerCase}>.\n" +
+        s"Error: You tried to insert a raw text node `${ref.textContent}` into the `${name}` slot of ${DomApi.debugNodeDescription(parent.ref)}>.\n" +
           " - Cause: This is not possible: named slots only accept elements. Your node was inserted into the default slot instead.\n" +
           " - Suggestion: Wrap your text node into `span()`"
       ))
