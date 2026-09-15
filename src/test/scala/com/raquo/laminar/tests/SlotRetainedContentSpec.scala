@@ -73,8 +73,8 @@ class SlotRetainedContentSpec extends UnitSpec {
     val b = tracker.createSpan("B")
     tracker.clear()
     val nodes = List(a, b)
-    val prefix: Inserter = Slot("prefix")(nodes).head
-    val suffix: Inserter = Slot("suffix")(nodes).head
+    val prefix: Inserter = new Slot("prefix")(nodes).head
+    val suffix: Inserter = new Slot("suffix")(nodes).head
     val items = Var(List(prefix))
 
     withClue("Initial slot: ") {

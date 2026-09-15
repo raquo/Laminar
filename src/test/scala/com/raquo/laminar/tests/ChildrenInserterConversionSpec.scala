@@ -10,15 +10,15 @@ class ChildrenInserterConversionSpec extends UnitSpec {
 
   it("converts each item once per update while preserving order and nested lifecycle") {
     val tracker = createEventTracker()
-    implicit val renderable: RenderableInserter[Item] = ItemRenderable(tracker)
+    implicit val renderable: RenderableInserter[Item] = new ItemRenderable(tracker)
     val items = EventBus[List[Item]]()
     val inner = EventBus[HtmlElement]()
     val a = tracker.createSpan("A")
     val b = tracker.createSpan("B")
     val c = tracker.createSpan("C")
-    val staticA = Item("A", a)
-    val dynamicB = Item("B", child <-- inner.events)
-    val staticC = Item("C", c)
+    val staticA = new Item("A", a)
+    val dynamicB = new Item("B", child <-- inner.events)
+    val staticC = new Item("C", c)
     tracker.clear()
 
     mount(div(children <-- items.events))
