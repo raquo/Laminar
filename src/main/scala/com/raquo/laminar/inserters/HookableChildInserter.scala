@@ -54,14 +54,14 @@ class HookableChildInserter(
   private[laminar] override def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    hooks: js.UndefOr[InserterHooks]
+    listHooks: js.UndefOr[InserterHooks]
   ): Unit = {
     // Cheap common case: a single static node is its own anchor + end, no sentinel.
     DomApi.insertChildAfter(
       parent = parent,
       newChild = child,
       referenceChildRef = afterRef,
-      hooks = hooks
+      hooks = InserterHooks.concat(listHooks, hooks)
     )
   }
 
@@ -70,7 +70,7 @@ class HookableChildInserter(
   }
 
   override def withHooks(addHooks: InserterHooks): HookableChildInserter = {
-    new HookableChildInserter(child, addHooks.appendTo(hooks))
+    new HookableChildInserter(child, InserterHooks.concat(hooks, addHooks))
   }
 }
 

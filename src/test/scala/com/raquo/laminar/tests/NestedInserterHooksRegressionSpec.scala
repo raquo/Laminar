@@ -7,6 +7,43 @@ import com.raquo.laminar.utils.UnitSpec
 
 class NestedInserterHooksRegressionSpec extends UnitSpec {
 
+  it("preserves a static inserter's explicit slot when nested in children <--") {
+    // `HookableChildInserter.addToDynamicList` inserts its node using the `hooks`
+    // ARGUMENT passed by the enclosing `children <--` (here: none), discarding the
+    // inserter's OWN `hooks` field (the Slot attribute hook). So the item's slot is
+    // lost on placement, even though rendering the same item directly
+    // (`div(Slot("prefix")(a))`) applies it correctly.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val itemA: Inserter = Slot("prefix")(a).head
+    val itemB: Inserter = Slot("prefix")(b).head
+    val items = Var(List.empty[Inserter])
+
+    mount(div(children <-- items.signal))
+
+    withClue("first placement retains the item's slot hook:") {
+      items.set(List(itemA))
+      tracker.assertEvents(_.mounted("A")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      expectNode(div.of(sentinel, span.of("A", slot is "prefix"), sentinel))
+    }
+
+    withClue("a newly added item also retains its slot hook:") {
+      items.set(List(itemA, itemB))
+      tracker.assertEvents(_.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      b.ref.getAttribute("slot") shouldBe "prefix"
+      expectNode(div.of(
+        sentinel,
+        span.of("A", slot is "prefix"),
+        span.of("B", slot is "prefix"),
+        sentinel
+      ))
+    }
+  }
+
   it("preserves a nested inserter's explicit slot on every emission") {
     val tracker = createEventTracker()
     val bus = EventBus[HtmlElement]()

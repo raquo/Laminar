@@ -43,16 +43,28 @@ class InserterHooks(
     }
   }
 
-  def concat(newHooks: InserterHooks): InserterHooks = {
-    new InserterHooks(
-      _onWillInsertNode = { (newParent, newChild) =>
-        self._onWillInsertNode(newParent, newChild)
-        newHooks._onWillInsertNode(newParent, newChild)
-      }
-    )
+  def concat(newHooks: js.UndefOr[InserterHooks]): InserterHooks = {
+    newHooks.fold(ifEmpty = this) { _newHooks =>
+      new InserterHooks(
+        _onWillInsertNode = { (newParent, newChild) =>
+          self._onWillInsertNode(newParent, newChild)
+          _newHooks._onWillInsertNode(newParent, newChild)
+        }
+      )
+    }
   }
+}
 
-  def appendTo(currentHooks: js.UndefOr[InserterHooks]): InserterHooks = {
-    currentHooks.fold(this)(_.concat(this))
+object InserterHooks {
+
+  /** Combine two optional hook sets, running `base` before `added`.
+    * Used to merge a nested inserter's own hooks (`added`) with the hooks
+    * of the destination list it's placed into (`base`).
+    */
+  def concat(
+    base: js.UndefOr[InserterHooks],
+    added: js.UndefOr[InserterHooks]
+  ): js.UndefOr[InserterHooks] = {
+    base.fold(added)(_.concat(added))
   }
 }

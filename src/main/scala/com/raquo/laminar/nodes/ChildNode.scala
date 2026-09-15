@@ -53,13 +53,13 @@ with StaticInserter {
   override private[laminar] def addToDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    hooks: js.UndefOr[InserterHooks]
+    listHooks: js.UndefOr[InserterHooks]
   ): Unit = {
     DomApi.insertChildAfter(
       parent = parent,
       newChild = this,
       referenceChildRef = afterRef,
-      hooks
+      hooks = listHooks
     )
   }
 
