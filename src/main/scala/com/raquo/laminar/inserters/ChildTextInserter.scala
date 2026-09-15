@@ -13,7 +13,7 @@ object ChildTextInserter {
     renderable: RenderableText[Component]
   ): DynamicInserter = {
     new DynamicInserter(
-      insertFn = (ctx, owner, _) => { // Ignoring hooks in text nodes is ok... for now.
+      insertFn = (ctx, owner) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValue =>
           val newText = renderable.asString(newValue)
@@ -23,7 +23,7 @@ object ChildTextInserter {
               maybeLastSeenChild = (),
               newChildNodeOpt = newTextNode,
               ctx = ctx,
-              hooks = ()
+              hooks = () // Ignoring hooks in text nodes is ok... for now.
             )
             maybeTextNode = newTextNode
             ()
@@ -45,7 +45,7 @@ object ChildTextInserter {
     renderable: RenderableText[Component]
   ): DynamicInserter = {
     new DynamicInserter(
-      insertFn = (ctx, owner, _) => { // Ignoring hooks in text nodes is ok... for now.
+      insertFn = (ctx, owner) => {
         var maybeTextNode: js.UndefOr[TextNode] = js.undefined
         textSource.foreach { newValueOpt =>
           newValueOpt.fold {
@@ -54,7 +54,7 @@ object ChildTextInserter {
                 maybeLastSeenChild = maybeTextNode,
                 newChildNodeOpt = (),
                 ctx = ctx,
-                hooks = ()
+                hooks = () // Ignoring hooks in text nodes is ok... for now.
               )
               maybeTextNode = js.undefined
             }
@@ -66,7 +66,7 @@ object ChildTextInserter {
                 maybeLastSeenChild = (),
                 newChildNodeOpt = newTextNode,
                 ctx = ctx,
-                hooks = ()
+                hooks = () // Ignoring hooks in text nodes is ok... for now.
               )
               maybeTextNode = newTextNode
               ()

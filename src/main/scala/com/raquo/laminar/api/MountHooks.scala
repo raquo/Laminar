@@ -96,10 +96,7 @@ trait MountHooks {
       var ignoreNextActivation = ignoreAlreadyMounted && ReactiveElement.isActive(element)
       // Position is reserved synchronously (so content lands where expected);
       // only the insertion itself waits until the element is ready.
-      val lockedInsertContext = InsertContext.reserveSpotContext(
-        parentNode = element,
-        hooks = js.undefined
-      )
+      val lockedInsertContext = InsertContext.reserveSpotContext(parentNode = element)
       ReactiveElement.bindSubscriptionUnsafe(element) { mountContext =>
         /** guards the (possibly async) wait – see [[onMountUnmountCallbackWithState]] */
         var awaitingReadyState = false
@@ -114,7 +111,7 @@ trait MountHooks {
               fn(mountContext) match {
                 case dynamicInserter: DynamicInserter =>
                   inserterSubOpt = Some(
-                    dynamicInserter.subscribe(
+                    dynamicInserter.renderIntoSharedContext(
                       insertContext = lockedInsertContext,
                       owner = mountContext.owner
                     )

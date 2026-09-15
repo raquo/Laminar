@@ -28,7 +28,7 @@ object ChildrenCommandInserter {
     initialHooks: js.UndefOr[InserterHooks]
   ): DynamicInserter = {
     new DynamicInserter(
-      insertFn = (ctx, owner, hooks) => {
+      insertFn = (ctx, owner) => {
         if (!ctx.lastInserterType.contains(InserterType.ChildrenCommandType)) {
           // Clear content left by a previous non-command inserter.
           // Commands build the context incrementally, so:
@@ -43,7 +43,7 @@ object ChildrenCommandInserter {
           )
         }
         commands.foreach { command =>
-          updateList(command, ctx, renderableNode, hooks)
+          updateList(command, ctx, renderableNode)
         }(using owner)
       },
       hooks = initialHooks
@@ -53,8 +53,7 @@ object ChildrenCommandInserter {
   private def updateList[Component](
     command: CollectionCommand[Component],
     ctx: InsertContext,
-    renderableNode: RenderableNode[Component],
-    hooks: InserterHooks | Unit
+    renderableNode: RenderableNode[Component]
   ): Unit = {
     def findSentinelIndex(): Int = {
       DomApi.raw.indexOfChild(
@@ -73,7 +72,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = ctx.trailingSentinelNodeOpt.get.ref,
-          hooks
+          hooks = ctx.currentHooks
         )
         ctx.contentMap.set(node.ref, node)
 
@@ -82,7 +81,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = ctx.sentinelNode.ref,
-          hooks
+          hooks = ctx.currentHooks
         )
         ctx.contentMap.set(node.ref, node)
 
@@ -91,7 +90,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           child = node,
           index = findSentinelIndex() + atIndex + 1,
-          hooks
+          hooks = ctx.currentHooks
         )
         ctx.contentMap.set(node.ref, node)
 
@@ -107,7 +106,7 @@ object ChildrenCommandInserter {
           parent = ctx.currentParentNode,
           oldChild = oldNode,
           newChild = newNode,
-          hooks
+          hooks = ctx.currentHooks
         )
         ctx.contentMap.delete(oldNode.ref)
         ctx.contentMap.set(newNode.ref, newNode)
@@ -125,7 +124,7 @@ object ChildrenCommandInserter {
             parent = ctx.currentParentNode,
             newChild = node,
             referenceChildRef = trailingSentinelRef,
-            hooks
+            hooks = ctx.currentHooks
           )
           ctx.contentMap.set(node.ref, node)
         }
