@@ -61,7 +61,7 @@ class WebComponentSpec extends UnitSpec {
     // -- The `label` attribute flows into the shadow DOM via Laminar.
 
     labelSource.set("Hello")
-    expectNode(content.ref, div of "Hello")
+    expectNode(content.ref, div of (sentinel, "Hello"))
 
     // -- Unmount: removing from the document fires disconnectedCallback, which
     //    tears the subscriptions down (no leak).
@@ -75,7 +75,7 @@ class WebComponentSpec extends UnitSpec {
     //    new value does not reach the (deactivated) shadow DOM.
 
     labelSource.set("Ignored while unmounted")
-    expectNode(content.ref, div of "Hello")
+    expectNode(content.ref, div of (sentinel, "Hello"))
 
     // -- Remount: exactly one observer again (no double-subscription leak), and
     //    the shadow DOM catches up to the latest value as the signal replays.
@@ -84,7 +84,7 @@ class WebComponentSpec extends UnitSpec {
 
     assertEquals(isMounted, true)
     assertEquals(labelObserverCount, 1)
-    expectNode(content.ref, div of "Ignored while unmounted")
+    expectNode(content.ref, div of (sentinel, "Ignored while unmounted"))
 
     unmount()
 
