@@ -129,7 +129,13 @@ object ChildrenInserter {
               prevItemRef = nextPrevItemRef
               currentItemCount -= 1
             }
-            if (nextInserter.stableFirstNode != prevItemRef) {
+            if (nextInserter.stableFirstNode == prevItemRef) {
+              // After removing the nodes above, nextInserter now sits in the right place.
+              // Just as in the "right place" top-level branch above, we need to reaffirm
+              // its slot, for all the same reasons (ChildNode <> SlottableChildInserter switch).
+              // @Note: DOM update
+              nextInserter.applySlot(listParentNode, slotName)
+            } else {
               // Still not in place – this is a MOVE, so we do NOT change the count.
               // @Note: DOM update
               nextInserter.moveWithinDynamicList(listParentNode, afterRef, slotName)
