@@ -27,7 +27,10 @@ import scala.scalajs.js.|
 class SlottableChildInserter(
   child: ChildNode.Base,
   slotName: String | Unit
-) extends StaticInserter with Slottable[SlottableChildInserter] {
+)
+extends StaticInserter
+with DiffableInserter
+with Slottable[SlottableChildInserter] {
 
   override private[laminar] val stableFirstNode: dom.Node = child.ref
 
@@ -41,7 +44,7 @@ class SlottableChildInserter(
     )
   }
 
-  override def renderInContext(ctx: InsertContext): Unit = {
+  override private[laminar] def renderInContext(ctx: InsertContext): Unit = {
     ChildInserter.switchToChild(
       maybeLastSeenChild = (),
       newChildNodeOpt = child,

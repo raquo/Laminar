@@ -2,7 +2,7 @@ package com.raquo.laminar.api
 
 import com.raquo.airstream.ownership.{DynamicSubscription, Subscription}
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.inserters.{DynamicInserter, InsertContext, Inserter, StaticInserter}
+import com.raquo.laminar.inserters.{InsertContext, Inserter}
 import com.raquo.laminar.lifecycle.MountContext
 import com.raquo.laminar.modifiers.{Binder, Modifier, Setter}
 import com.raquo.laminar.nodes.{ReactiveElement, ReactiveHtmlElement}
@@ -108,17 +108,10 @@ trait MountHooks {
           DomApi.whenElementReady(element) { () =>
             if (awaitingReadyState && ReactiveElement.isActive(element)) {
               awaitingReadyState = false
-              fn(mountContext) match {
-                case dynamicInserter: DynamicInserter =>
-                  inserterSubOpt = Some(
-                    dynamicInserter.renderIntoSharedContext(
-                      insertContext = lockedInsertContext,
-                      owner = mountContext.owner
-                    )
-                  )
-                case staticInserter: StaticInserter =>
-                  staticInserter.renderInContext(lockedInsertContext)
-              }
+              inserterSubOpt = fn(mountContext).renderOnMount(
+                context = lockedInsertContext,
+                owner = mountContext.owner
+              )
             }
           }
         }
