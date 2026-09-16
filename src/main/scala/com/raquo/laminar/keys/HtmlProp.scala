@@ -45,6 +45,9 @@ object HtmlProp {
     if (name == "value") {
       // Special case to fix bug in Safari – see impl.
       new ValueHtmlProp(name, reflectedAttrName, codec)
+    } else if (name == "slot") {
+      // Special case to keep slot tracking in sync – see impl.
+      new SlotHtmlProp(name, reflectedAttrName, codec)
     } else {
       val _name = name
       val _reflectedAttrName = reflectedAttrName
@@ -58,6 +61,12 @@ object HtmlProp {
     }
   }
 
+  /**
+    * Deduplicating updates against current DOM value prevents
+    * cursor position reset in Safari https://github.com/raquo/Laminar/issues/110
+    * For <option> elements, this deduplication is buggy (and not needed),
+    * so we skip it. See https://github.com/raquo/Laminar/issues/194
+    */
   class ValueHtmlProp[V, _DomV](
     override val name: String,
     override val reflectedAttrName: Option[String],
@@ -66,13 +75,27 @@ object HtmlProp {
     type DomV = _DomV
 
     override protected def set(el: ReactiveHtmlElement.Base, value: V | Null): Unit = {
-      // Deduplicating updates against current DOM value prevents
-      // cursor position reset in Safari https://github.com/raquo/Laminar/issues/110
-      // For <option> elements, this deduplication is buggy (and not needed),
-      // so we skip it. See https://github.com/raquo/Laminar/issues/194
       if (el.tag.name == "option" || !DomApi.getHtmlProperty(el, this).contains(value)) {
         DomApi.setHtmlProperty(el, this, value)
       }
+    }
+  }
+
+  /** Setting the `slot` prop manually must reset the element's record of the
+    * slot name Laminar applied, so that a later [[com.raquo.laminar.nodes.Slot]]
+    * destination whose name coincides with that record still re-applies its slot.
+    * See [[com.raquo.laminar.nodes.ReactiveElement.applySlot]].
+    */
+  class SlotHtmlProp[V, _DomV](
+    override val name: String,
+    override val reflectedAttrName: Option[String],
+    override val codec: Codec[V, _DomV]
+  ) extends HtmlProp[V] {
+    type DomV = _DomV
+
+    override protected def set(el: ReactiveHtmlElement.Base, value: V | Null): Unit = {
+      DomApi.setHtmlProperty(el, this, value)
+      el.forgetAppliedSlotName()
     }
   }
 }
