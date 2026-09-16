@@ -9,6 +9,7 @@ target
 .metals
 .bloop
 .bsp
+.scalex
 
 project/metals.sbt
 project/.bloop
