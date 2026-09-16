@@ -108,6 +108,11 @@ trait DiffableInserter extends Inserter {
     *    - Implementations must override this with a `val` or `lazy val`.
     *  - For single static nodes (e.g. [[ChildNode]]), this is the node itself.
     *  - For dynamic inserters, it's the leading sentinel.
+    *
+    * [[SlottableChildInserter.stableFirstNode]] is an abstraction leak that,
+    * strictly speaking, does not fit the requirements, but we work around it.
+    *
+    * [[SlottableChildrenInserter]] does not have this at all – see its scaladoc.
     */
   private[laminar] def stableFirstNode: dom.Node
 

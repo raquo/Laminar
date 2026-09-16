@@ -35,6 +35,105 @@ class SlotRetainedContentSpec extends UnitSpec {
     }
   }
 
+  it("reconciles the slot when a retained item switches between a bare element and a Slot wrapper") {
+    // A `children <--` item keyed by the same node ref can switch between a bare element
+    // (no slot) and a `SlottableChildInserter` (Slot wrapper). Both share `stableFirstNode`
+    // = the node's ref, so the diff retains it in place; the in-place branch must still
+    // reconcile the slot – add it when a wrapper appears, clear it when it goes away –
+    // without re-mounting the node.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val bare: Inserter = a
+    val slotted: Inserter = new Slot("prefix")(a).head
+    val items = Var[List[Inserter]](List(bare))
+
+    withClue("Initial: bare element has no slot: ") {
+      mount(div(children <-- items.signal))
+      tracker.assertEvents(_.mounted("A")).clear()
+      a.ref.getAttribute("slot") shouldBe null
+      expectNode(div.of(sentinel, span.of("A"), sentinel))
+    }
+
+    withClue("Switching to the Slot wrapper adds the slot without remounting: ") {
+      items.set(List(slotted))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      expectNode(div.of(sentinel, span.of("A", slot is "prefix"), sentinel))
+    }
+
+    withClue("Switching back to the bare element clears the slot without remounting: ") {
+      items.set(List(bare))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe null
+      expectNode(div.of(sentinel, span.of("A"), sentinel))
+    }
+  }
+
+  it("reconciles the slot when a switching item also moves position") {
+    // Same bare<->Slot switch as above, but the item also changes position, so it goes
+    // through the diff's MOVE branch (`moveWithinDynamicList`) instead of the in-place
+    // branch. The move must re-affirm the correct slot without re-mounting the node.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val bareA: Inserter = a
+    val slottedA: Inserter = new Slot("prefix")(a).head
+    val items = Var[List[Inserter]](List(bareA, b))
+
+    withClue("Initial: bare A before B, no slots: ") {
+      mount(div(children <-- items.signal))
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe null
+      expectNode(div.of(sentinel, span.of("A"), span.of("B"), sentinel))
+    }
+
+    withClue("A moves after B and gains a slot, both retained: ") {
+      items.set(List(b, slottedA))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      expectNode(div.of(sentinel, span.of("B"), span.of("A", slot is "prefix"), sentinel))
+    }
+
+    withClue("A moves back before B and loses its slot, both retained: ") {
+      items.set(List(bareA, b))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe null
+      expectNode(div.of(sentinel, span.of("A"), span.of("B"), sentinel))
+    }
+  }
+
+  it("falls back to the list's slot (not null) when a switching item drops its own Slot") {
+    // When the `children <--` list is itself slotted, a bare item takes the LIST's slot,
+    // a wrapped item's OWN slot wins, and reverting to bare must fall back to the list's
+    // slot – not clear the attribute entirely.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val bareA: Inserter = a
+    val slottedA: Inserter = new Slot("own")(a).head
+    val items = Var[List[Inserter]](List(bareA))
+
+    withClue("Bare item takes the list's slot: ") {
+      mount(div(new Slot("list")(children <-- items.signal)))
+      tracker.assertEvents(_.mounted("A")).clear()
+      a.ref.getAttribute("slot") shouldBe "list"
+    }
+
+    withClue("The item's own slot wins over the list's: ") {
+      items.set(List(slottedA))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "own"
+    }
+
+    withClue("Reverting to bare falls back to the list's slot: ") {
+      items.set(List(bareA))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "list"
+    }
+  }
+
   it("clears the slot when onMountInsert remounts retained children without a Slot") {
     val tracker = createEventTracker()
     val a = tracker.createSpan("A")
