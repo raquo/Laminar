@@ -249,10 +249,22 @@ with ParentNode[Ref] {
     * We keep track of this to be able to unset the slot attribute if moving this element
     * to outside of [[Slot]] later.
     *
-    * Note that we keep the `slot` attribute that the user
-    * set themselves (e.g. `div(slot := "x")`) untouched.
+    * Note that user can override the slot attribute that was previously set via `Slot()`
+    * by using `.amend(slot := "newslot")` or by emitting into `slot <--` AFTER the
+    * `Slot()` has applied its slot name. In that case, we call [[forgetAppliedSlotName]]
+    * to clear the [[Slot]]-applied slot name, because the Slot doesn't manage it anymore,
+    * the user is responsible for managing it now, since they kinda "stole" it.
+    *
+    * For user vs Slot, it's basically last write wins, as is typical with "stealing".
     */
   private var _appliedSlotName: String | Unit = ()
+
+  /** If user explicitly overrides the slot we set via [[Slot]],
+    * they manage it now, so we need to forget it.
+    */
+  private[laminar] def forgetAppliedSlotName(): Unit = {
+    _appliedSlotName = ()
+  }
 
   override private[laminar] def applySlot(
     debugParent: ParentNode.Base,
