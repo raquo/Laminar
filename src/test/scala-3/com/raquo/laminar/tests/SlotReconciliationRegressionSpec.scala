@@ -27,7 +27,7 @@ final class SlotReconciliationRegressionSpec extends UnitSpec {
     }
   }
 
-  it("a retained static group does not re-slot a child stolen by another parent") {
+  it("re-emitting a static group steals its child back from another parent (last write wins)") {
     val tracker = createEventTracker()
     val a = tracker.createSpan("A")
     val b = tracker.createSpan("B")
@@ -48,14 +48,14 @@ final class SlotReconciliationRegressionSpec extends UnitSpec {
       b.ref.getAttribute("slot") shouldBe null
     }
 
-    withClue("Reaffirming the original group must leave the stolen child's slot alone: ") {
+    withClue("Re-emitting the group re-adopts B (its content) and re-slots it, no remount: ") {
       groups.set(List(group))
       tracker.assertNoEvents.clear()
-      b.ref.parentNode shouldBe targetHost.ref
-      b.ref.getAttribute("slot") shouldBe null
+      b.ref.parentNode shouldBe sourceHost.ref
+      b.ref.getAttribute("slot") shouldBe "prefix"
       expectNode(div.of(
-        div.of(sentinel, span.of("A", slot is "prefix"), sentinel),
-        div.of(sentinel, span.of("B"), sentinel)
+        div.of(sentinel, span.of("A", slot is "prefix"), span.of("B", slot is "prefix"), sentinel),
+        div.of(sentinel, sentinel)
       ))
     }
   }
