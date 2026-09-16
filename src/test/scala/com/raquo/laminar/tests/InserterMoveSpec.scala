@@ -1,5 +1,6 @@
 package com.raquo.laminar.tests
 
+import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.inserters.{CollectionCommand, Inserter}
 import com.raquo.laminar.utils.UnitSpec
@@ -15,6 +16,9 @@ import com.raquo.laminar.utils.UnitSpec
   *   3. A dynamic inserter reordered WITHIN one `children <--` list (moveWithinDynamicList).
   *   4. A dynamic inserter moved BETWEEN two `children <--` lists (add-first steal / remove-first /
   *      the #163 two-bindings characterization), including nested and depth-2/3 spans.
+  *   4b. Steal-BACK from a sibling (stale-re-emit re-steal), run against both same-parent and
+  *      cross-parent layouts via the `TwoLists` fixture — element, nested group, `child`, `text`,
+  *      `children.command` items.
   *   5. Promote / demote across static application and a list (static <-> list, static <-> static).
   *   6. The inserter-TYPE matrix: `children.command <--` and `text <--` as moved items.
   *   7. The degenerate same-transaction double-add.
@@ -23,6 +27,37 @@ import com.raquo.laminar.utils.UnitSpec
   * subscriptions WITHOUT re-mounting its content. See notes/Testing.md for assertion conventions.
   */
 class InserterMoveSpec extends UnitSpec {
+
+  // -- Fixture: two sibling `children <--` lists, either under ONE shared parent (`SameParent`) or
+  //    under two separate parent divs (`CrossParent`). This is the move-suite analog of
+  //    `SlotStealingSpec.SiblingSlots` (minus the slots). The same-parent layout is the sharp one
+  //    for steal-BACK: the two lists no longer differ by DOM `parentNode`, so a DynamicInserter
+  //    re-stolen from a sibling takes `moveWithinDynamicList`'s SAME-parent branch (a raw
+  //    reposition, no `moveToParent`) rather than the cross-parent transfer. A steal choreography is
+  //    written once and registered against both layouts. `expectRoot` wraps each list's content in
+  //    that list's own leading + trailing sentinels, then composes the two per the layout.
+
+  private sealed trait Layout { def name: String }
+  private case object SameParent extends Layout { val name = "same-parent" }
+  private case object CrossParent extends Layout { val name = "cross-parent" }
+
+  private class TwoLists(val layout: Layout) {
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val root = layout match {
+      case SameParent => div(children <-- items1.signal, children <-- items2.signal)
+      case CrossParent => div(div(children <-- items1.signal), div(children <-- items2.signal))
+    }
+    def expectRoot(list1: List[ExpectedNode], list2: List[ExpectedNode]): Unit = {
+      def listSpan(content: List[ExpectedNode]): List[Rule] =
+        (sentinel +: content :+ sentinel).map(expectedNodeAsExpectedChildRule)
+      val expected = layout match {
+        case SameParent => div.of((listSpan(list1) ++ listSpan(list2)): _*)
+        case CrossParent => div.of(div.of(listSpan(list1): _*), div.of(listSpan(list2): _*))
+      }
+      expectNode(expected)
+    }
+  }
 
   // ----------------------------------------------------------------------------------
   // 1. Classic single-node `child <--` moves (ChildInserter.switchToChild)
@@ -253,6 +288,45 @@ class InserterMoveSpec extends UnitSpec {
       bus1.emit(spanY)
       expectNode(div of (sentinel, span of "y", sentinel))
       tracker.assertEvents(_.unmounted("b")).clear()
+    }
+  }
+
+  it("re-emitting a `child <--` steals its node back from another binding (last write wins)") {
+    // The single-node analog of the `children <--` re-steal. switchToChild detects that its
+    // last-seen child was moved away (no longer at the sentinel) and re-inserts it, so re-emitting
+    // the same node after a theft re-steals it — last-write-wins — with no re-mount. (The
+    // replaceChild `old eq new` early-return only applies when the node was NOT moved.)
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("a")
+
+    val bus1 = new EventBus[HtmlElement]
+    val bus2 = new EventBus[HtmlElement]
+    val host1 = div(child <-- bus1)
+    val host2 = div(child <-- bus2)
+    mount(div(host1, host2))
+    tracker.clear()
+
+    withClue("emit a into #1:") {
+      bus1.emit(a)
+      a.ref.parentNode shouldBe host1.ref
+      tracker.assertEvents(_.mounted("a")).clear()
+    }
+
+    withClue("#2 steals a add-first, WITHOUT #1 re-emitting, so #1's last-seen goes stale:") {
+      bus2.emit(a)
+      a.ref.parentNode shouldBe host2.ref
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("#1 re-emits the SAME node a: it steals a back, no re-mount:") {
+      bus1.emit(a)
+      a.ref.parentNode shouldBe host1.ref
+      tracker.assertNoEvents.clear()
+      // `child <--` has only a leading sentinel (no trailing one).
+      expectNode(div of (
+        div of (sentinel, span of "a"),
+        div of sentinel
+      ))
     }
   }
 
@@ -562,6 +636,50 @@ class InserterMoveSpec extends UnitSpec {
         div of (sentinel, span of "c", sentinel, span of "--", sentinel, span of "a", sentinel)
       )
       tracker.assertEvents(_.unmounted("b")).clear()
+    }
+  }
+
+  it("re-emitting an unslotted static group steals its child back from another list (last write wins)") {
+    // The no-slot analog of the slotted static-group re-steal in SlotReconciliationRegressionSpec.
+    // A `Seq[Node]` list item is transparent to the diff, so re-emitting the group re-adopts a
+    // child another list took — last-write-wins — with no re-mount. Confirms the behaviour is not
+    // slot-specific: it rides the same leaf diff whether or not a Slot wraps the group.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("a")
+    val b = tracker.createSpan("b")
+    val group: Inserter = List(a, b)
+
+    val bus1 = new EventBus[List[Inserter]]
+    val bus2 = new EventBus[List[HtmlElement]]
+    val host1 = div(children <-- bus1)
+    val host2 = div(children <-- bus2)
+    mount(div(host1, host2))
+    tracker.clear()
+
+    withClue("fill L1 with the group [a, b]:") {
+      bus1.emit(List(group))
+      tracker.assertEvents(_.mounted("a"), _.mounted("b")).clear()
+      // L2 has never emitted yet, so it has only its leading sentinel.
+      expectNode(div of (
+        div of (sentinel, span of "a", span of "b", sentinel),
+        div of sentinel
+      ))
+    }
+
+    withClue("L2 steals b add-first, WITHOUT L1 re-emitting, so L1's contentMap goes stale:") {
+      bus2.emit(List(b))
+      b.ref.parentNode shouldBe host2.ref
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("L1 re-emits the SAME group: it steals b back, no re-mount:") {
+      bus1.emit(List(group))
+      b.ref.parentNode shouldBe host1.ref
+      tracker.assertNoEvents.clear()
+      expectNode(div of (
+        div of (sentinel, span of "a", span of "b", sentinel),
+        div of (sentinel, sentinel)
+      ))
     }
   }
 
@@ -1242,6 +1360,167 @@ class InserterMoveSpec extends UnitSpec {
         _.elementCreated("y"),
         _.mounted("y")
       )
+    }
+  }
+
+  // ----------------------------------------------------------------------------------
+  // 4b. Steal-BACK from a sibling: same-parent vs cross-parent (both layouts)
+  // ----------------------------------------------------------------------------------
+
+  // The stale-re-emit re-steal ("last write wins"), run against BOTH the same-parent and
+  // cross-parent layouts via `TwoLists`. L2 steals the item add-first (L1's contentMap goes stale),
+  // then L1 re-emits WITH the item and steals it back. For same-parent siblings this exercises
+  // `moveWithinDynamicList`'s same-parent branch: the two lists share the parent ELEMENT — hence the
+  // same mount owner — so a raw reposition (without `moveToParent`'s owner transfer) is correct, and
+  // the item's live subscription must survive the re-steal. Each choreography asserts the re-steal is
+  // seamless (no re-mount / no re-render) and the item stays live at its home afterwards.
+
+  List[Layout](SameParent, CrossParent).foreach { layout =>
+
+    it(s"[${layout.name}] re-emitting a list steals a plain ELEMENT back from a sibling (last write wins)") {
+      val tracker = createEventTracker()
+      val e = tracker.createSpan("E")
+      tracker.clear()
+      val f = new TwoLists(layout)
+      f.items1.set(List(e))
+      mount(f.root)
+      tracker.assertEvents(_.mounted("E")).clear()
+
+      withClue("L2 steals E add-first, so L1's contentMap goes stale: ") {
+        f.items2.set(List(e))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("L1 re-emits WITH E and steals it back, no re-mount: ") {
+        f.items1.set(List(e))
+        tracker.assertNoEvents.clear()
+        f.expectRoot(list1 = List(span of "E"), list2 = List())
+      }
+    }
+
+    it(s"[${layout.name}] re-emitting a list steals a nested `children <--` GROUP back from a sibling (subscription stays live)") {
+      // The sharp DynamicInserter case: the re-stolen item is a multi-node nested group. The
+      // same-parent re-steal runs the raw-reposition branch; the group's inner subscription must
+      // stay live, proven by appending content after the re-steal (it lands in L1, no re-mount).
+      val tracker = createEventTracker()
+      val a = tracker.createSpan("A")
+      val b = tracker.createSpan("B")
+      tracker.clear()
+      val inner = Var[List[Node]](List(a))
+      val nested: Inserter = children <-- inner.signal
+      val f = new TwoLists(layout)
+      f.items1.set(List(nested))
+      mount(f.root)
+      tracker.assertEvents(_.mounted("A")).clear()
+
+      withClue("L2 steals the whole group add-first, so L1's map goes stale: ") {
+        f.items2.set(List(nested))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("L1 re-emits WITH the group and steals it back, no re-mount: ") {
+        f.items1.set(List(nested))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("the group's subscription is still live: new content lands in L1: ") {
+        inner.set(List(a, b))
+        tracker.assertEvents(_.mounted("B")).clear()
+        f.expectRoot(
+          list1 = List(sentinel, span of "A", span of "B", sentinel),
+          list2 = List()
+        )
+      }
+    }
+
+    it(s"[${layout.name}] re-emitting a list steals a single-node `child <--` item back from a sibling (owner not rebuilt)") {
+      // A `child <--` list item keeps a (sticky) trailing sentinel, so its span is [lead, node,
+      // trail]. The re-steal must NOT re-run its observer (owner preserved), then it must react to a
+      // later update at its home.
+      val tracker = createEventTracker()
+      var observeCount = 0
+      val valueVar = Var("x")
+      val dyn: Inserter = child <-- valueVar.signal.map { v =>
+        observeCount += 1
+        tracker.createSpan(v)
+      }
+      val f = new TwoLists(layout)
+      f.items1.set(List(dyn))
+      mount(f.root)
+      tracker.assertEvents(_.elementCreated("x"), _.mounted("x")).clear()
+      observeCount shouldBe 1
+
+      withClue("L2 steals it add-first, so L1's contentMap goes stale: ") {
+        f.items2.set(List(dyn))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("L1 re-emits WITH it and steals it back, no re-render (owner preserved): ") {
+        f.items1.set(List(dyn))
+        tracker.assertNoEvents.clear()
+        observeCount shouldBe 1
+      }
+      withClue("a later update lands at its home in L1 (subscription stayed live): ") {
+        valueVar.set("y")
+        observeCount shouldBe 2
+        tracker.assertEvents(_.elementCreated("y"), _.unmounted("x"), _.mounted("y")).clear()
+        f.expectRoot(list1 = List(sentinel, span of "y", sentinel), list2 = List())
+      }
+    }
+
+    it(s"[${layout.name}] re-emitting a list steals a `text <--` item back from a sibling (subscription transferred, not re-run)") {
+      val tracker = createEventTracker()
+      val textVar = Var("hi")
+      val dynText: Inserter = tracker.text("t", textVar.signal)
+      val f = new TwoLists(layout)
+      f.items1.set(List(dynText))
+      mount(f.root)
+      tracker.assertEvents(_.textUpdated("t", "hi")).clear()
+
+      withClue("L2 steals it add-first, so L1's contentMap goes stale: ") {
+        f.items2.set(List(dynText))
+        tracker.assertNoEvents.clear() // seamless transfer, no re-render
+      }
+      withClue("L1 re-emits WITH it and steals the live text span back, no re-render: ") {
+        f.items1.set(List(dynText))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("a later update lands at its home in L1 (the subscription moved with it): ") {
+        textVar.set("bye")
+        tracker.assertEvents(_.textUpdated("t", "bye")).clear()
+        f.expectRoot(list1 = List(sentinel, ExpectedNode.textNode, sentinel), list2 = List())
+      }
+    }
+
+    it(s"[${layout.name}] re-emitting a list steals a `children.command <--` item back from a sibling (context follows home)") {
+      // Multi-node command group. After the re-steal, later commands must anchor on the group's
+      // (moved-back) sentinels in L1 — proving the item's insert context, not just its DOM nodes,
+      // followed it home.
+      val tracker = createEventTracker()
+      val cmdBus = new EventBus[CollectionCommand[Node]]
+      val cmd: Inserter = children.command <-- cmdBus.events
+      val f = new TwoLists(layout)
+      f.items1.set(List(cmd))
+      mount(f.root)
+      cmdBus.emit(CollectionCommand.Append(tracker.createDiv("a")))
+      cmdBus.emit(CollectionCommand.Append(tracker.createDiv("b")))
+      tracker.assertEvents(
+        _.elementCreated("a"), _.mounted("a"),
+        _.elementCreated("b"), _.mounted("b")
+      ).clear()
+
+      withClue("L2 steals it add-first, so L1's contentMap goes stale: ") {
+        f.items2.set(List(cmd))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("L1 re-emits WITH it and steals the whole command span back, no re-mount: ") {
+        f.items1.set(List(cmd))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("a later Append anchors on the moved-back span in L1: ") {
+        cmdBus.emit(CollectionCommand.Append(tracker.createDiv("c")))
+        tracker.assertEvents(_.elementCreated("c"), _.mounted("c")).clear()
+        f.expectRoot(
+          list1 = List(sentinel, div of "a", div of "b", div of "c", sentinel),
+          list2 = List()
+        )
+      }
     }
   }
 
