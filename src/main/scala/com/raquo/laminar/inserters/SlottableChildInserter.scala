@@ -4,6 +4,7 @@ import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
+import org.scalajs.dom.Node
 
 import scala.scalajs.js.|
 
@@ -32,7 +33,17 @@ extends StaticInserter
 with DiffableInserter
 with Slottable[SlottableChildInserter] {
 
-  override private[laminar] val stableFirstNode: dom.Node = child.ref
+  /** Note: abstraction leak. This `stableFirstNode` is not a unique
+    * identifier of this inserter – the plain ChildNode `child` also
+    * has the same `ref` for this identifier.
+    *
+    * But, this is fine. Just fine. The only difference is in the slot,
+    * and in `updateChildren`'s same-inserter branch, we specifically
+    * apply the new inserter's slot for exactly this reason.
+    *
+    * Need to be careful if using `stableFirstNode` for any other logic.
+    */
+  override private[laminar] val stableFirstNode: Node = child.ref
 
   override private[laminar] def lastNode: dom.Node = child.ref
 
