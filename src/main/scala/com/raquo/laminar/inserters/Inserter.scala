@@ -296,14 +296,25 @@ class DynamicInserter(
       throw new Exception("Can not removeFromDynamicList: nested group not found (addToDynamicList was not called first). This is a bug in Laminar.")
     )
     if (group.leadingSentinel.ref.parentNode == parent.ref) {
-      // This list still hosts the group's span – a genuine removal.
+      // This list still hosts the group's span – a genuine removal – #Note: probably – see below
       group.removeFromParent()
       nestedGroupOpt = js.undefined
     } else {
-      // This group was already moved to a different parent,
-      // stolen by its new host, so nothing else needs to be done.
-      // This is similar to DomApi.removeChild being a no-op if
-      // the parent doesn't contain the child anymore.
+      // The group was already moved to a different parent, stolen by its new host, so there is
+      // nothing to remove here (like DomApi.removeChild is a no-op when the parent no longer
+      // contains the child).
+      // #Note: stealing can also happen without changing parent!
+      //  1. Thieving dynamic inserter could be a sibling of the original parent dynamic inserter
+      //  2. Thieving DYNAMIC inserter could be a CHILD of the original parent dynamic inserter
+      //      - even though there's logical (inserter) nesting, in the DOM, there is no extra
+      //        nesting, so the parents match.
+      // In both cases, we avoid the problem by not calling `removeFromDynamicList`:
+      //  1. The stolen node would be out of bounds of the original parent inserter in the DOM,
+      //     so we would not reach it through iteration in `updateChildren`... I think...
+      //  2. In `updateChildren` we basically only walk over the `stableFirstNode`-s of inserters,
+      //     calling those inserters' methods to manage their nodes inside. So we wouldn't call
+      //     `removeFromDynamicList` directly from `updateChildren` on a node that now sits inside
+      //     a child dynamic inserter – managing that node is now delegated to that child.
     }
   }
 
@@ -311,24 +322,47 @@ class DynamicInserter(
   override private[laminar] def moveWithinDynamicList(
     parent: ReactiveElement.Base,
     afterRef: dom.Node,
-    listSlotName: String | Unit // ignored: a lateral move keeps every node's slot as-is
+    listSlotName: String | Unit
   ): Unit = {
-    val lastRef = lastNode // trailing sentinel
-    var node = stableFirstNode // leading sentinel
-    var reference = afterRef
-    var continue = true
-    while (continue) {
-      val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
-      continue = node ne lastRef
-      // #Note: this calls `raw`, thus bypasses willSetParent / setParent / slot reconcile.
-      //  - This is fine because it's a lateral move within the same parent, so nothing needs to happen anyway.
-      DomApi.raw.insertAfter(
-        parent = parent.ref,
-        newChild = node,
-        referenceChild = reference
+    val group = nestedGroupOpt.getOrElse(
+      throw new Exception("Can not moveWithinDynamicList: nested group not found (addToDynamicList was not called first). This is a bug in Laminar.")
+    )
+    if (group.leadingSentinel.ref.parentNode != parent.ref) {
+      // Cross-parent re-steal: another list stole this group, and now the
+      // previous list re-emits with this inserter again, and steals it back.
+      // We need a full `moveToParent` here to bring it back,
+      // transfer subscription ownership, and update the slot.
+      group.ensureTrailingSentinel()
+      group.moveToParent(
+        newParent = parent,
+        afterRefOpt = afterRef,
+        newSlotName = slotName.orElse(listSlotName) // innermost `Slot` wins
       )
-      reference = node
-      node = nextNode
+    } else {
+      // Same DOM parent. Reachable in two cases:
+      //  1. Reordering within the same dynamic list
+      //  2. Stealing back an item that was previously stolen into a sibling parent inserter
+      //     (e.g. two `children <--`, possibly in different `Slot`s, under one element)
+      val lastRef = lastNode // trailing sentinel
+      var node = stableFirstNode // leading sentinel
+      var reference = afterRef
+      var continue = true
+      while (continue) {
+        val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
+        continue = node ne lastRef
+        // #Note: raw move – bypasses willSetMount / setMount / slot reconcile
+        //  – slot handled explicitly just below.
+        DomApi.raw.insertAfter(
+          parent = parent.ref,
+          newChild = node,
+          referenceChild = reference
+        )
+        reference = node
+        node = nextNode
+      }
+      // In case #2 above, we do need to reaffirm the slot.
+      // In case #1, this is a no-op.
+      applySlot(parent, listSlotName)
     }
   }
 }
