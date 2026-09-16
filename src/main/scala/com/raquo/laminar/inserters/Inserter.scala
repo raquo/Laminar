@@ -25,6 +25,29 @@ import scala.scalajs.js.|
   */
 sealed trait Inserter extends Modifier[ReactiveElement.Base] {
 
+  private[laminar] def addToInsertersMap(contentMap: ew.JsMap[dom.Node, DiffableInserter]): Unit
+
+  /** Used by `onMountInsert`. Returns a subscription to cancel on unmount when the inserter
+    * manages ongoing state (dynamic inserters), or `None` when it renders static content once.
+    */
+  private[laminar] def renderOnMount(context: InsertContext, owner: Owner): Option[Subscription]
+}
+
+/** Diffable inserters are used in `children <--` diffing and tracking logic.
+  *
+  * [[SlottableChildrenInserter]] is the only inserter thst ISN'T diffable,
+  * and that is because we can't implement a `stableFirstNode` for it –
+  * it has no sentinel, and its first content node is not unique,
+  * a ChildNode inserter would have the same identity, confusing the
+  * diffing algorithm which looks up inserters by their `stableFirstNode`
+  * identity.
+  *
+  * To work around this limitation, [[SlottableChildrenInserter]] inserts
+  * its contents one-by-one into `contentMap`, to be managed by the diffing
+  * algorithm.
+  */
+trait DiffableInserter extends Inserter {
+
   /** This is the inserter equivalent of calling `setParent(Some(parent))` on each of
     * its nodes: This inserter's nodes are added to parent, their subscriptions
     * are set up, etc.
@@ -81,11 +104,12 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
   ): Unit
 
   /** The first DOM node of this item's span (valid after [[addToDynamicList]]).
-    *  - Must always return the same node for the same inserter. Don't change it to `def`!
+    *  - Must always return the same node for the same inserter
+    *    - Implementations must override this with a `val` or `lazy val`.
     *  - For single static nodes (e.g. [[ChildNode]]), this is the node itself.
     *  - For dynamic inserters, it's the leading sentinel.
     */
-  private[laminar] val stableFirstNode: dom.Node
+  private[laminar] def stableFirstNode: dom.Node
 
   /** The last DOM node of this item's span.
     *
@@ -93,6 +117,12 @@ sealed trait Inserter extends Modifier[ReactiveElement.Base] {
     * It can be `eq` to [[stableFirstNode]], e.g. for single static node inserters.
     */
   private[laminar] def lastNode: dom.Node
+
+  override private[laminar] def addToInsertersMap(
+    contentMap: ew.JsMap[dom.Node, DiffableInserter]
+  ): Unit = {
+    contentMap.set(stableFirstNode, this)
+  }
 }
 
 trait Slottable[+Self <: Inserter] { this: Inserter =>
@@ -105,7 +135,13 @@ trait Slottable[+Self <: Inserter] { this: Inserter =>
 
 trait StaticInserter extends Inserter {
 
-  def renderInContext(ctx: InsertContext): Unit
+  private[laminar] def renderInContext(ctx: InsertContext): Unit
+
+  /** Note: Static content is rendered once and keeps no ongoing state, so there is nothing to unsubscribe. */
+  override private[laminar] def renderOnMount(context: InsertContext, owner: Owner): Option[Subscription] = {
+    renderInContext(context)
+    None
+  }
 }
 
 // @TODO[API] Inserter really wants to extend Binder. And yet.
@@ -125,18 +161,25 @@ trait StaticInserter extends Inserter {
 class DynamicInserter(
   insertFn: (InsertContext, Owner) => Subscription,
   slotName: String | Unit
-) extends Inserter with Slottable[DynamicInserter] {
+) extends DiffableInserter with Slottable[DynamicInserter] {
 
   /** Owner typically comes from MountContext of the InsertContext parentNode.
     *
     * #Warning: make sure to cancel the returned subscription when it's time.
     */
-  def renderIntoSharedContext(
+  private[laminar] def renderIntoSharedContext(
     insertContext: InsertContext,
     owner: Owner
   ): Subscription = {
     insertContext.setCurrentSlotName(slotName) // prepare the shared context for this inserter
     insertFn(insertContext, owner)
+  }
+
+  override private[laminar] def renderOnMount(
+    context: InsertContext,
+    owner: Owner
+  ): Option[Subscription] = {
+    Some(renderIntoSharedContext(context, owner))
   }
 
   /** Because [[DynamicInserter]]-s can use [[NestedGroup]]-s

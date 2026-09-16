@@ -62,21 +62,24 @@ object ChildrenInserter {
   private def updateChildren[Component](
     nextItems: laminar.Seq[Component],
     renderable: RenderableInserter[Component], // avoids the need to create intermediate collection from `nextItems`
-    prevContentMap: JsMap[dom.Node, Inserter],
+    prevContentMap: JsMap[dom.Node, DiffableInserter],
     listParentNode: ReactiveElement.Base, // parent node of the children list
     listSentinelNodeRef: dom.Comment, // sentinel node of the children list
     listTrailingSentinelRef: dom.Comment | Unit, // trailing sentinel marking the end of the list's content
     slotName: String | Unit
-  ): JsMap[dom.Node, Inserter] = {
+  ): JsMap[dom.Node, DiffableInserter] = {
 
     def isContentEnd(ref: dom.Node): Boolean =
       ref == null || listTrailingSentinelRef.contains(ref)
 
     // Build an efficiently searchable map of next inserters
-    val nextInsertersMap = new JsMap[dom.Node, Inserter]()
+    val nextInsertersMap = new JsMap[dom.Node, DiffableInserter]()
     nextItems.foreach { nextItem =>
-      val nextInserter = renderable.asInserter(nextItem)
-      nextInsertersMap.set(nextInserter.stableFirstNode, nextInserter)
+      // Note that `SlottableChildrenInserter` inlines its contents into the map,
+      // unlike all other inserters that add themselves to the map.
+      renderable
+        .asInserter(nextItem)
+        .addToInsertersMap(nextInsertersMap)
     }
 
     // Iteration state
@@ -173,9 +176,9 @@ object ChildrenInserter {
   }
 
   private def prevInserterFromStableFirstNode(
-    prevContentMap: JsMap[dom.Node, Inserter],
+    prevContentMap: JsMap[dom.Node, DiffableInserter],
     stableFirstNode: dom.Node
-  ): Inserter = {
+  ): DiffableInserter = {
     prevContentMap
       .get(stableFirstNode)
       .getOrElse(

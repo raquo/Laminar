@@ -1,16 +1,16 @@
 package com.raquo.laminar.nodes
 
 import com.raquo.laminar.domapi.DomApi
-import com.raquo.laminar.inserters.{ChildInserter, InsertContext, StaticInserter}
+import com.raquo.laminar.inserters.{ChildInserter, DiffableInserter, InsertContext, StaticInserter}
 import org.scalajs.dom
 
 import scala.annotation.tailrec
-import scala.scalajs.js
 import scala.scalajs.js.|
 
 trait ChildNode[+Ref <: dom.Node]
 extends ReactiveNode[Ref]
-with StaticInserter {
+with StaticInserter
+with DiffableInserter {
 
   private var _maybeParent: Option[ParentNode.Base] = None
 
@@ -47,7 +47,8 @@ with StaticInserter {
 
   // -- Inserter methods --
 
-  override private[laminar] val stableFirstNode: dom.Node = ref
+  /** Note: needs to be `lazy` to avoid seeing `null` ref due to trait initialization order. */
+  override private[laminar] lazy val stableFirstNode: dom.Node = ref
 
   override private[laminar] def lastNode: dom.Node = ref
 
@@ -70,7 +71,7 @@ with StaticInserter {
     DomApi.removeChild(parent = parent, child = this)
   }
 
-  override def renderInContext(ctx: InsertContext): Unit = {
+  override private[laminar] def renderInContext(ctx: InsertContext): Unit = {
     ChildInserter.switchToChild(
       maybeLastSeenChild = (),
       newChildNodeOpt = this,

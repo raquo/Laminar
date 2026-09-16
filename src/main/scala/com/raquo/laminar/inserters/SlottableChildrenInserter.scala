@@ -1,11 +1,11 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.Transaction
-import com.raquo.ew.JsArray
+import com.raquo.ew.JsMap
 import com.raquo.laminar
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.{RenderableInserter, RenderableNode, RenderableSeq}
-import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
+import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
 
 import scala.scalajs.js.|
@@ -18,6 +18,11 @@ import scala.scalajs.js.|
   *
   * See also comments in [[SlottableChildInserter]] and `componentSeqToInserter` implicit.
   *
+  * This is the only [[Inserter]] that isn't a [[DiffableInserter]] –
+  * when using it in the `updateChildren` logic, we inject all of its
+  * content elements into the map directly instead of injecting this
+  * inserter. See [[SlottableChildrenInserter.addToInsertersMap]].
+  *
   * Note that [[mutableNodes]] MIGHT be mutable – we [[nodesToRender]].
   */
 class SlottableChildrenInserter(
@@ -27,18 +32,9 @@ class SlottableChildrenInserter(
 
   /** We don't want to depend arbitrarily on [[mutableNodes]]
     * potentially mutating from under us, so we take a snapshot upfront.
-    *
-    * Also, this is guaranteed to be NON-EMPTY, which is a requirement
-    * for our [[stableFirstNode]] and [[lastNode]] logic. We create a
-    * fake comment node if the source [[mutableNodes]] is empty.
     */
   private val nodesToRender: laminar.Seq[ChildNode.Base] = {
-    if (mutableNodes.nonEmpty)
-      mutableNodes.immutableSnapshot
-    else
-      laminar.Seq.from(
-        JsArray(new CommentNode(""))
-      )
+    mutableNodes.immutableSnapshot
   }
 
   override def apply(element: ReactiveElement.Base): Unit = {
@@ -53,7 +49,7 @@ class SlottableChildrenInserter(
     }
   }
 
-  override def renderInContext(ctx: InsertContext): Unit = {
+  override private[laminar] def renderInContext(ctx: InsertContext): Unit = {
     // A node is its own Inserter, so it renders as its own list item directly.
     ChildrenInserter.switchToChildren(
       nextItems = nodesToRender,
@@ -63,48 +59,26 @@ class SlottableChildrenInserter(
     )
   }
 
-  override private[laminar] val stableFirstNode: dom.Node = nodesToRender.head.ref
-
-  override private[laminar] lazy val lastNode: dom.Node = nodesToRender.last.ref
-
-  override private[laminar] def addToDynamicList(
-    parent: ReactiveElement.Base,
-    afterRef: dom.Node,
-    listSlotName: String | Unit
-  ): Unit = {
-    var insertAfter = afterRef
-    // Own slot wins over the destination list's slot (innermost `Slot` wins).
-    val effectiveSlotName = slotName.orElse(listSlotName)
+  /** [[SlottableChildrenInserter]] does not have a unique identity that we can use in the
+    * `updateChildren` algorithm (no sentinel node), so it is not a [[DiffableInserter]],
+    * and so it stays transparent to the children diffing algorithm: it writes its nodes
+    * individually into the map instead of itself. And we already know how to diff
+    * individual nodes.
+    */
+  override private[laminar] def addToInsertersMap(contentMap: JsMap[dom.Node, DiffableInserter]): Unit = {
     nodesToRender.foreach { node =>
-      DomApi.insertChildAfter(
-        parent = parent,
-        newChild = node,
-        referenceChildRef = insertAfter,
-        slotName = effectiveSlotName
-      )
-      insertAfter = node.ref
-    }
-  }
-
-  override private[laminar] def removeFromDynamicList(parent: ReactiveElement.Base): Unit = {
-    nodesToRender.foreach { node =>
-      DomApi.removeChild(parent, node)
+      val item = {
+        if (slotName.isDefined)
+          new SlottableChildInserter(node, slotName)
+        else
+          node
+      }
+      item.addToInsertersMap(contentMap)
     }
   }
 
   override def withSlotName(newSlotName: String): SlottableChildrenInserter = {
     new SlottableChildrenInserter(mutableNodes, newSlotName)
-  }
-
-  override private[laminar] def applySlot(
-    debugParent: ParentNode.Base,
-    listSlotName: String | Unit
-  ): Unit = {
-    // Own slot wins over the destination list's slot, mirroring `addToDynamicList`.
-    val effectiveSlotName = slotName.orElse(listSlotName)
-    nodesToRender.foreach { node =>
-      node.applySlot(debugParent, slotName = effectiveSlotName)
-    }
   }
 
 }

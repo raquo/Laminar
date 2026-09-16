@@ -124,12 +124,12 @@ final class InsertContext(
     *
     * (inserter.stableFirstNode -> inserter)
     */
-  var contentMap: JsMap[dom.Node, Inserter] = new JsMap()
+  var contentMap: JsMap[dom.Node, DiffableInserter] = new JsMap()
 
   /** Get the inserter in contentMap, or throw if there are multiple inserters there.
     * Precondition: the inserter currently using this context is a single-node inserter.
     */
-  def singleContentMapItem: js.UndefOr[Inserter] = {
+  def singleContentMapItem: js.UndefOr[DiffableInserter] = {
     val numInserters = contentMap.size
     if (numInserters == 0) {
       js.undefined

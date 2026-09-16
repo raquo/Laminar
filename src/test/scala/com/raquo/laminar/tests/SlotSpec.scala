@@ -523,15 +523,13 @@ class SlotSpec extends UnitSpec {
     }
   }
 
-  // -- Empty static group placeholder --
+  // -- Empty static group --
 
-  it("never sets a slot attribute on the placeholder of an empty static group in a slot") {
-    // An empty Seq becomes a `SlottableChildrenInserter` backed by a synthetic comment node.
-    // Comment nodes are never slotted, so placing an empty group in a slot must not crash.
+  it("an empty static group in a slot renders nothing (no placeholder, no crash)") {
     mount(div(new Slot("prefix")(List.empty[HtmlElement]).head))
 
-    withClue("the empty group renders as a lone comment placeholder (no slot attribute):") {
-      expectNode(div.of(sentinel))
+    withClue("the empty group renders nothing:") {
+      expectNode(div.of())
     }
   }
 

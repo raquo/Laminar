@@ -2,6 +2,7 @@ package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.inserters.Inserter
+import com.raquo.laminar.nodes.{ChildNode, TextNode}
 import com.raquo.laminar.utils.UnitSpec
 
 import scala.annotation.nowarn
@@ -433,36 +434,199 @@ class NestedInsertersSpec extends UnitSpec {
     val staticA: Inserter = span("A")
     // A static group of several nodes, rendered directly, with no bracketing sentinels.
     val groupXY: Inserter = List(span("X"), span("Y"))
-    // Empty static group: no content nodes, so it renders a single placeholder comment
-    // (see SlottableChildrenInserter.nodesToRender) to anchor the item.
+    // Empty static group: it contributes no nodes, so it renders nothing at all (it has no
+    // span identity of its own – see SlottableChildrenInserter). It stays invisible below.
     val emptyGroup: Inserter = List.empty[HtmlElement]
 
     mount(div("H", children <-- itemsVar.signal))
     expectNode(div.of("H", sentinel, sentinel))
 
-    withClue("Empty static group renders as a single placeholder sentinel:") {
+    withClue("Empty static group renders nothing (not even a placeholder):") {
       itemsVar.set(List(staticA, emptyGroup))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel))
     }
 
     withClue("Multi-node group renders its nodes directly, with no bracketing sentinels:") {
       itemsVar.set(List(staticA, emptyGroup, groupXY))
-      expectNode(div.of("H", sentinel, span of "A", sentinel, span of "X", span of "Y", sentinel))
+      expectNode(div.of("H", sentinel, span of "A", span of "X", span of "Y", sentinel))
     }
 
-    withClue("Reorder: empty group and multi-node group move as whole spans:") {
+    withClue("Reorder: the multi-node group's nodes move; the empty group stays invisible:") {
       itemsVar.set(List(groupXY, emptyGroup, staticA))
-      expectNode(div.of("H", sentinel, span of "X", span of "Y", sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, span of "X", span of "Y", span of "A", sentinel))
     }
 
     withClue("Remove the multi-node group (its nodes go):") {
       itemsVar.set(List(emptyGroup, staticA))
-      expectNode(div.of("H", sentinel, sentinel, span of "A", sentinel))
+      expectNode(div.of("H", sentinel, span of "A", sentinel))
     }
 
     withClue("Remove all items:") {
       itemsVar.set(Nil)
       expectNode(div.of("H", sentinel, sentinel))
+    }
+  }
+
+  it("a re-emitted static group is matched by content across fresh wrappers (no needless remount)") {
+    // A `Seq[Node]` list item has no stable per-instance handle: a NEW wrapper
+    // (SlottableChildrenInserter) is built on every emission.
+    // The children diff must not tear the nodes down and rebuild them.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+
+    val nodes = List(a, b)
+    val wrapper1: Inserter = nodes      // fresh wrapper over a, b
+    val wrapper2: Inserter = List(a, b) // ANOTHER fresh wrapper over the same a, b
+    val itemsVar = Var(List(wrapper1))
+
+    mount(div("H", children <-- itemsVar.signal))
+
+    withClue("the group mounts its nodes:") {
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "B", sentinel))
+    }
+
+    withClue("re-emitting a DIFFERENT wrapper over the SAME nodes retains them (no events):") {
+      itemsVar.set(List(wrapper2))
+      tracker.assertEvents().clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "B", sentinel))
+    }
+  }
+
+  // A fresh wrapper that shares the group's first node (its key) but changes the tail must
+  // still have its tail reconciled – first-node keying alone would mistake it for the same
+  // item and drop the change.
+  it("a static group whose tail changes behind a shared first node reconciles the tail") {
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    val c = tracker.createSpan("C")
+    tracker.clear()
+
+    val group1: Inserter = List(a, b)
+    val group2: Inserter = List(a, c) // shares the first node (a), tail b -> c
+    val itemsVar = Var(List(group1))
+
+    mount(div("H", children <-- itemsVar.signal))
+
+    withClue("the first group mounts both of its nodes:") {
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "B", sentinel))
+    }
+
+    withClue("swapping in a group with the same head but a new tail reconciles the tail:") {
+      itemsVar.set(List(group2))
+      // The shared head (A) is retained in place; only the tail is reconciled (B out, C in).
+      // #Note: the group's nodes are diffed individually, so the new node is added first,
+      //  then the stale one is removed in the leftover-cleanup pass.
+      tracker.assertEvents(_.mounted("C"), _.unmounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "C", sentinel))
+    }
+  }
+
+  // The tail-reconcile (above) generalizes: a static group's nodes are diffed individually,
+  // so a retained item whose node set changed – growing, shrinking, reordering, and collapsing
+  // to or expanding from a single node across a shared first node – updates correctly. Retained
+  // nodes are never remounted; only genuinely added/removed nodes fire lifecycle events.
+  it("a retained item updates its nodes (grow / shrink / reorder / single<->group)") {
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    val c = tracker.createSpan("C")
+    tracker.clear()
+
+    val itemsVar = Var[List[Inserter]](List(a)) // single node `a`, shared head throughout
+
+    mount(div("H", children <-- itemsVar.signal))
+    withClue("single node mounts:") {
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(div.of("H", sentinel, span of "A", sentinel))
+    }
+
+    withClue("single -> group grows the run behind the shared head (only new nodes mount):") {
+      itemsVar.set(List(List(a, b)))
+      tracker.assertEvents(_.mounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "B", sentinel))
+    }
+
+    withClue("group grows further (A, B retained; only C mounts):") {
+      itemsVar.set(List(List(a, b, c)))
+      tracker.assertEvents(_.mounted("C")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "B", span of "C", sentinel))
+    }
+
+    withClue("reordering the tail moves nodes without remounting any of them:") {
+      itemsVar.set(List(List(a, c, b)))
+      tracker.assertEvents().clear() // no lifecycle events – a pure lateral reorder
+      expectNode(div.of("H", sentinel, span of "A", span of "C", span of "B", sentinel))
+    }
+
+    withClue("shrinking the run removes only the dropped node:") {
+      itemsVar.set(List(List(a, c)))
+      tracker.assertEvents(_.unmounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "C", sentinel))
+    }
+
+    withClue("group -> single node removes the remaining tail (no orphan behind the head):") {
+      itemsVar.set(List(a))
+      tracker.assertEvents(_.unmounted("C")).clear()
+      expectNode(div.of("H", sentinel, span of "A", sentinel))
+    }
+  }
+
+  // A group that both moves to a new position AND changes content must not orphan its dropped
+  // nodes at the old spot: shared nodes ride along (no remount), dropped nodes are removed.
+  it("a group that moves and changes content leaves no orphaned nodes") {
+    val tracker = createEventTracker()
+    val x = tracker.createSpan("X")
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    val c = tracker.createSpan("C")
+    tracker.clear()
+
+    val itemsVar = Var[List[Inserter]](List(x, List(a, b)))
+
+    mount(div("H", children <-- itemsVar.signal))
+    withClue("initial: X then group (A, B):") {
+      tracker.assertEvents(_.mounted("X"), _.mounted("A"), _.mounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "X", span of "A", span of "B", sentinel))
+    }
+
+    withClue("group moves before X and swaps its tail (B out, C in); B is not orphaned:") {
+      itemsVar.set(List(List(a, c), x))
+      // #Note: the move places the next run first (C mounts), then the dropped node is removed.
+      tracker.assertEvents(_.mounted("C"), _.unmounted("B")).clear()
+      expectNode(div.of("H", sentinel, span of "A", span of "C", span of "X", sentinel))
+    }
+
+    withClue("group moves back after X and shrinks (C dropped, none orphaned):") {
+      itemsVar.set(List(x, List(a)))
+      tracker.assertEvents(_.unmounted("C")).clear()
+      expectNode(div.of("H", sentinel, span of "X", span of "A", sentinel))
+    }
+  }
+
+  it("raw text nodes work as children items") {
+    val a = TextNode("a")
+    val b = TextNode("b")
+    val c = TextNode("c")
+    val itemsVar = Var[List[ChildNode.Base]](List(a, b))
+
+    mount(div("H", children <-- itemsVar.signal))
+    withClue("both text nodes render, each as its own item:") {
+      expectNode(div.of("H", sentinel, "a", "b", sentinel))
+    }
+
+    withClue("reorder + append are keyed by each node, not by a shared null:") {
+      itemsVar.set(List(b, a, c))
+      expectNode(div.of("H", sentinel, "b", "a", "c", sentinel))
+    }
+
+    withClue("removal leaves the surviving node:") {
+      itemsVar.set(List(c))
+      expectNode(div.of("H", sentinel, "c", sentinel))
     }
   }
 
