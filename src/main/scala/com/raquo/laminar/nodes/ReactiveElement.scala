@@ -126,14 +126,14 @@ with ParentNode[Ref] {
     }
 
     val itemsToAdd = addItems.distinct
-    val itemsToRemove = removeItems.filterNot(itemHasAnotherReason)
+    val itemsToRemoveFromDom = removeItems.filterNot(itemHasAnotherReason)
     val newItems = _compositeValues
       .getOrElse(key, Nil)
-      .filterNot(t => itemsToRemove.contains(t._1)) ++ itemsToAdd.map((_, reason))
+      .filterNot(t => removeItems.contains(t._1) && t._2 == reason) ++ itemsToAdd.map((_, reason))
 
     val domValues = key.getRawDomValue(this).map(key.codec.decode).getOrElse(Nil)
 
-    val nextDomValues = domValues.filterNot(itemsToRemove.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
+    val nextDomValues = domValues.filterNot(itemsToRemoveFromDom.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
 
     // 1. Update Laminar's internal structure
     _compositeValues = _compositeValues.updated(key, newItems)
