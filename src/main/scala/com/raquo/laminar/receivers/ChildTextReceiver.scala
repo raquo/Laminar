@@ -19,6 +19,8 @@ object ChildTextReceiver {
     if (renderable == RenderableText.textNodeRenderable) {
       // #Note: Special case: since we already have TextNode-s, using them in ChildTextInserter would be
       //  inefficient, so we redirect this case to ChildInserter (child <-- textSource) instead.
+      // #Note: this is also relevant for correctness in the face of text nodes stealing – see similar
+      //  comment in ChildTextOptionReceiver.
       // #TODO[Perf] Test performance vs regular `text <--`, see if we need to improve this.
       // This .asInstanceOf is safe because `textNodeRenderable` only applies if `TextLike` is `TextNode`.
       val nodes = textSource.toObservable.asInstanceOf[Observable[TextNode]]
