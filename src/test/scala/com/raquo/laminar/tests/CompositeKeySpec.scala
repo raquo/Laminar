@@ -397,4 +397,25 @@ class CompositeKeySpec extends UnitSpec {
       expectNode(svg.svg.of(svg.polyline.of(svg.cls is "foo bar baz fox box")))
     }
   }
+
+  // https://github.com/raquo/Laminar/pull/202
+  List(false, true).foreach { reverse =>
+    it(s"removes a shared class after both bindings release it (reverse=$reverse)") {
+      val first = Var(true)
+      val second = Var(true)
+      val host = div(cls("active") <-- first.signal, cls("active") <-- second.signal)
+      mount(host)
+      expectNode(div.of(cls is "active"))
+
+      val (releaseFirst, releaseLast) = if (reverse) {
+        (second, first)
+      } else {
+        (first, second)
+      }
+      releaseFirst.set(false)
+      expectNode(div.of(cls is "active"))
+      releaseLast.set(false)
+      expectNode(div.of(cls is ""))
+    }
+  }
 }
