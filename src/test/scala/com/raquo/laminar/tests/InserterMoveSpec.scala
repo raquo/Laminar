@@ -3,6 +3,7 @@ package com.raquo.laminar.tests
 import com.raquo.domtestutils.matching.{ExpectedNode, Rule}
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.inserters.{CollectionCommand, Inserter}
+import com.raquo.laminar.nodes.TextNode
 import com.raquo.laminar.utils.UnitSpec
 
 /** THE move / transfer suite for inserters: one home for every "relocate an item, then assert the
@@ -327,6 +328,72 @@ class InserterMoveSpec extends UnitSpec {
         div of (sentinel, span of "a"),
         div of sentinel
       ))
+    }
+  }
+
+  it("re-emitting a `text <--` steals its TextNode back from another binding (last write wins)") {
+    // A TextNode handed to `text <--` is created OUTSIDE the inserter, so another binding can hold
+    // and steal it – so `text <--` routes such nodes through ChildInserter (see ChildTextReceiver),
+    // NOT through ChildTextInserter's fast path (which assumes its text nodes can never be stolen).
+    // This pins the guarantee that path buys: a TextNode moved away by another binding is re-stolen
+    // when this one re-emits it, with no duplicate node left behind. Text-node analog of the
+    // `child <--` re-steal above.
+    val node = TextNode("x")
+
+    val bus1 = new EventBus[TextNode]
+    val bus2 = new EventBus[TextNode]
+    val host1 = div(text <-- bus1.events)
+    val host2 = div(text <-- bus2.events)
+    mount(div(host1, host2))
+
+    withClue("emit the node into #1:") {
+      bus1.emit(node)
+      node.ref.parentNode shouldBe host1.ref
+      expectNode(div of (div of (sentinel, "x"), div of sentinel))
+    }
+
+    withClue("#2 steals the node add-first, WITHOUT #1 re-emitting, so #1's last-seen goes stale:") {
+      bus2.emit(node)
+      node.ref.parentNode shouldBe host2.ref
+      expectNode(div of (div of sentinel, div of (sentinel, "x")))
+    }
+
+    withClue("#1 re-emits the SAME node: it steals it back, no duplicate node:") {
+      bus1.emit(node)
+      node.ref.parentNode shouldBe host1.ref
+      expectNode(div of (div of (sentinel, "x"), div of sentinel))
+    }
+  }
+
+  it("re-emitting a `text.maybe <--` steals its TextNode back from another binding (last write wins)") {
+    // Same steal guarantee for the optional receiver: `text.maybe <-- Observable[Option[TextNode]]`
+    // also routes through ChildInserter (mapping None to a placeholder comment), because the nodes
+    // are external and stealable – the ChildTextInserter.option fast path is NOT used for them.
+    // Re-emitting Some(sameNode) after a theft must re-steal it back, with no duplicate node.
+    val node = TextNode("x")
+
+    val bus1 = new EventBus[Option[TextNode]]
+    val bus2 = new EventBus[Option[TextNode]]
+    val host1 = div(text.maybe <-- bus1.events)
+    val host2 = div(text.maybe <-- bus2.events)
+    mount(div(host1, host2))
+
+    withClue("emit Some(node) into #1:") {
+      bus1.emit(Some(node))
+      node.ref.parentNode shouldBe host1.ref
+      expectNode(div of (div of (sentinel, "x"), div of sentinel))
+    }
+
+    withClue("#2 steals the node add-first via Some(node), WITHOUT #1 re-emitting:") {
+      bus2.emit(Some(node))
+      node.ref.parentNode shouldBe host2.ref
+      expectNode(div of (div of sentinel, div of (sentinel, "x")))
+    }
+
+    withClue("#1 re-emits Some(SAME node): it steals it back, no duplicate node:") {
+      bus1.emit(Some(node))
+      node.ref.parentNode shouldBe host1.ref
+      expectNode(div of (div of (sentinel, "x"), div of sentinel))
     }
   }
 

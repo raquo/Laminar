@@ -21,6 +21,12 @@ object ChildTextOptionReceiver {
     if (renderable == RenderableText.textNodeRenderable) {
       // #Note: Special case: since we already have TextNode-s, using them in ChildTextInserter would be
       //  inefficient, so we redirect this case to ChildInserter (child <-- textSource) instead.
+      // #Note: this is also relevant for correctness: if textSource gives us TextNode-s, that means
+      //  something else external to this inserter might have references to them, meaning that such nodes
+      //  can be stolen. `ChildTextInserter.option` uses simpler logic in some branches that assumes that
+      //  its text nodes can't be stolen – if we were to make it use externally created TextNode-s without
+      //  adjusting its logic correspondingly, this could cause a bug.
+      //  We have a test for stealing externally provided TextNode-s from text <--.
       // #TODO[Perf] Test performance vs regular `text <--`, see if we need to improve this.
       // This .asInstanceOf is safe because `textNodeRenderable` only applies if `TextLike` is `TextNode`.
       lazy val emptyNode = new CommentNode("")
