@@ -275,6 +275,42 @@ class SlotSpec extends UnitSpec {
     }
   }
 
+  it("a manual slot := that lands after the Slot survives moving out of the Slot") {
+    // Complement to the test above: when the user's `slot := ...` is the LAST write (it lands
+    // after the Slot applied its own), the user owns the attribute – the Slot has forgotten it –
+    // so leaving the Slot must NOT clear it. This is the "user wrote last" branch of the same
+    // last-write-wins model that clears the attribute in the "Slot wrote last" case above.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val item: Inserter = child <-- Val(a)
+    val plainItems = Var(List.empty[Inserter])
+    val slotItems = Var(List(item))
+    val plain = div(children <-- plainItems.signal)
+    val slotted = div(new Slot("prefix")(children <-- slotItems.signal))
+
+    mount(div(plain, slotted))
+
+    withClue("the wrapper applies its slot on insert:") {
+      tracker.assertEvents(_.mounted("A")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("a manual slot := after the Slot's write takes ownership (Slot forgets it):") {
+      a.amend(slot := "manual")
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "manual"
+    }
+
+    withClue("moving out keeps the manual slot (it was the last write, not the Slot's):") {
+      plainItems.set(List(item))
+      slotItems.set(Nil)
+      tracker.assertNoEvents.clear()
+      a.ref.parentNode shouldBe plain.ref
+      a.ref.getAttribute("slot") shouldBe "manual"
+    }
+  }
+
   it("leaves a manual slot attribute untouched on an element that never entered a Slot") {
     // The reconcile must only clear slots that Laminar itself applied, so an element that was
     // never wrapped in a `Slot` keeps its own `slot := ...` no matter how it moves around.
