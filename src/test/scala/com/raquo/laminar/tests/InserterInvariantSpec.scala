@@ -32,9 +32,11 @@ import scala.scalajs.js
   * shared `onMountInsert` context) staying safe, and the second forces the forbidden state
   * white-box to prove the guard actually fires.
   *
-  * A second, unrelated invariant is pinned at the end: `DynamicInserter.removeFromDynamicList`
-  * requires a prior `addToDynamicList`, failing loudly otherwise (moved here from the takeover
-  * suite, where it originally lived).
+  * Two further, unrelated invariants are pinned at the end: `DynamicInserter.removeFromDynamicList`
+  * and `DynamicInserter.lastNode` both require a prior `addToDynamicList`, failing loudly
+  * otherwise. Every real call site reads them only on a group that is currently placed (just
+  * added, or looked up via a live DOM node whose presence implies its sentinels, hence its
+  * group, exist), so the guards are unreachable through the public API.
   */
 class InserterInvariantSpec extends UnitSpec {
 
@@ -126,6 +128,22 @@ class InserterInvariantSpec extends UnitSpec {
     // No `addToDynamicList` was ever called on `inserter`, so it has no NestedGroup.
     val thrown = intercept[Exception] {
       inserter.removeFromDynamicList(parent)
+    }
+    assert(thrown.getMessage.contains("nested group not found"))
+  }
+
+  // -- Invariant guard: `lastNode` likewise requires a prior `addToDynamicList`. Every real
+  //    call site reads it only on a placed group (just added, or found via a live DOM node),
+  //    so it never sees a group-less inserter. If that broke, we'd read a span end off an
+  //    inserter that has none, so the method fails loudly instead. White-box tripwire. --
+
+  it("`DynamicInserter.lastNode` without a prior `addToDynamicList` fails loudly") {
+    val bus = new EventBus[String]
+    val inserter = (child <-- bus.events.map(s => span(s))).asInstanceOf[DynamicInserter]
+
+    // No `addToDynamicList` was ever called on `inserter`, so it has no NestedGroup.
+    val thrown = intercept[Exception] {
+      inserter.lastNode
     }
     assert(thrown.getMessage.contains("nested group not found"))
   }
