@@ -2292,6 +2292,234 @@ class InserterMoveSpec extends UnitSpec {
     }
   }
 
+  // Stolen-node variants of the promote / demote above. A plainly-applied single-node `child <--`
+  // has NO trailing sentinel, so its span end is derived from its tracked node. Once another list
+  // steals that node (last-write-wins), the tracked entry is stale — the node lives elsewhere.
+  // Promoting or demoting the inserter must then relocate an EMPTY span (bounded at its own leading
+  // sentinel): it must NOT fail with a DOM NotFoundError, and must NOT drag the stolen node back.
+  // This exercises `InsertContext.lastNodeInDom`, which trusts the tracked node only while it still
+  // sits right after the sentinel and otherwise reports an empty span.
+
+  it("promote a plain `child <--` whose node was stolen: an empty span moves into the list, the node stays with its thief") {
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- Val(a)
+
+    mount(
+      div(
+        div("P", dyn),
+        div("L2", children <-- items2.signal),
+        div("L3", children <-- items3.signal)
+      )
+    )
+
+    withClue("the plain `child <--` on P renders A (no trailing sentinel):") {
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel, span of "A"),
+          div.of("L2", sentinel, sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals A (no re-mount):") {
+      items2.set(List(a))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L3 promotes the inserter: its empty span moves, A stays in L2, no re-mount:") {
+      items3.set(List(dyn))
+      tracker.assertNoEvents.clear()
+      // The inserter's own leading sentinel travels with it, so P is left with only its text.
+      expectNode(
+        div.of(
+          div.of("P"),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("L3", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("promote such a stolen `child <--`: a following static sibling is left in place") {
+    // Bound the empty span at the inserter's own sentinel — placing the new trailing sentinel right
+    // after the leading one — without swallowing a static sibling that follows it under P.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val tail = tracker.createSpan("TAIL")
+    tracker.clear()
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- Val(a)
+
+    mount(
+      div(
+        div("P", dyn, tail),
+        div("L2", children <-- items2.signal),
+        div("L3", children <-- items3.signal)
+      )
+    )
+
+    withClue("P renders A (no trailing sentinel), then its static TAIL sibling:") {
+      tracker.assertEvents(_.mounted("A"), _.mounted("TAIL")).clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel, span of "A", span of "TAIL"),
+          div.of("L2", sentinel, sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals A (no re-mount); TAIL is now the sentinel's next sibling:") {
+      items2.set(List(a))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel, span of "TAIL"),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L3 promotes the inserter: an empty span moves, A stays in L2, TAIL stays in P:") {
+      items3.set(List(dyn))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("P", span of "TAIL"),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("L3", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("a promoted stolen `child <--` renders its next emission into the new host") {
+    // Promoting leaves the group tracking a stolen node. This must not wedge the inserter: its next
+    // emission clears the stale tracking and renders into the group's NEW parent, while the stolen
+    // node stays with its thief.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[Inserter]](Nil)
+    val childVar = Var[Span](a)
+    val dyn: Inserter = child <-- childVar.signal
+
+    mount(
+      div(
+        div("P", dyn),
+        div("L2", children <-- items2.signal),
+        div("L3", children <-- items3.signal)
+      )
+    )
+
+    withClue("P renders A:") {
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel, span of "A"),
+          div.of("L2", sentinel, sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals A, then L3 promotes the (now empty) inserter:") {
+      items2.set(List(a))
+      items3.set(List(dyn))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("P"),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("L3", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("the inserter emits B: it renders inside the promoted span in L3, A stays in L2:") {
+      childVar.set(b)
+      tracker.assertEvents(_.mounted("B")).clear()
+      expectNode(
+        div.of(
+          div.of("P"),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("L3", sentinel, sentinel, span of "B", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("move a plain `child <--` whose node was stolen onto another plain element: an empty span relocates") {
+    // The demote/relocate path (`element.amend(inserter)` -> moveToParent) must also tolerate the
+    // stolen tracked node: it relocates the empty live span, leaving the node with its thief.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- Val(a)
+    val q = div("Q")
+
+    mount(
+      div(
+        div("P", dyn),
+        div("L2", children <-- items2.signal),
+        q
+      )
+    )
+
+    withClue("P renders A:") {
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel, span of "A"),
+          div.of("L2", sentinel, sentinel),
+          div.of("Q")
+        )
+      )
+    }
+
+    withClue("L2 steals A:") {
+      items2.set(List(a))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("P", sentinel),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("Q")
+        )
+      )
+    }
+
+    withClue("amending Q with the inserter moves its empty span there, A stays in L2:") {
+      q.amend(dyn)
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("P"),
+          div.of("L2", sentinel, span of "A", sentinel),
+          div.of("Q", sentinel)
+        )
+      )
+    }
+  }
+
   // ----------------------------------------------------------------------------------
   // 6. Inserter-TYPE matrix: `children.command <--` and `text <--` as moved items
   // ----------------------------------------------------------------------------------

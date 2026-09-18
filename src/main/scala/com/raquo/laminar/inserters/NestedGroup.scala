@@ -85,7 +85,7 @@ final class NestedGroup(
     *    current content (the trailing sentinel for `children <--`, else the single content node,
     *    else the sentinelNode, which IS our [[leadingSentinel]]).
     */
-  private[laminar] def lastNode: dom.Node = nestedInsertContext.lastNode
+  private[laminar] def lastNode: dom.Node = nestedInsertContext.lastNodeInDom
 
   /** Call this if / when this group is rendered as a `children <--` list item. */
   private[laminar] def ensureTrailingSentinel(): Unit = {
