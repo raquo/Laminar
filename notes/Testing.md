@@ -48,6 +48,8 @@ Exact teardown / swap order is behaviour worth pinning but not always obvious â€
 - Cross-compiles to **Scala 2.13**: use `mods: _*` (NOT `mods*`) for vararg splices. The `x: _*` deprecation warning under Scala 3 is expected and intentional. Do **not** run the Scala 2 suite.
 - Scaladoc comments on the test suite class itself should be short, and should explain the intent and scope of the tests at a high level, they should not duplicate the comments you add for individual tests. 
 - Comments beginning with `--` must be **single-line** only (`// -- section --` is fine; no multi-line `--` comment blocks).
+- When asserting a sequence of e.g. events, put each event on a new line.
+- Sparingly, feel free to add very short (a few words max) comments next to some of those events explaining what they are, if/when this context is needed.
 
 ## Running
 
