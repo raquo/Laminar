@@ -20,6 +20,9 @@ import com.raquo.laminar.utils.UnitSpec
   *   4b. Steal-BACK from a sibling (stale-re-emit re-steal), run against both same-parent and
   *      cross-parent layouts via the `TwoLists` fixture — element, nested group, `child`, `text`,
   *      `children.command` items.
+  *   4c. A moved span relocates exactly its LIVE DOM span (DOM order + departed nodes left behind).
+  *   4d. Re-placing a torn-down group: with no live span to move, rebuild + re-mount, like re-adding
+  *      a removed element.
   *   5. Promote / demote across static application and a list (static <-> list, static <-> static).
   *   6. The inserter-TYPE matrix: `children.command <--` and `text <--` as moved items.
   *   7. The degenerate same-transaction double-add.
@@ -1965,6 +1968,259 @@ class InserterMoveSpec extends UnitSpec {
           div.of("L1", sentinel, sentinel),
           div.of("H", sentinel, sentinel), // B reclaimed away from H
           div.of("L3", sentinel, sentinel, span of "A", span of "B", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  // ----------------------------------------------------------------------------------
+  // 4d. Re-placing a torn-down group: no live span -> rebuild + re-mount (like a removed element)
+  // ----------------------------------------------------------------------------------
+
+  // The counterpart of 4c's "move the live span": when there is NO live span, rebuild it.
+  // After another host STEALS a dynamic inserter and then GENUINELY removes it, the group is torn
+  // down (`nestedGroupOpt` cleared). But the original list still tracks the inserter in its
+  // `contentMap` (it never re-emitted), so its next re-emission of that inserter routes to
+  // `moveWithinDynamicList` (with nothing to move). This must NOT fail on the stale tracking — it
+  // must place the inserter afresh: re-insert + re-mount, exactly like re-adding a plain element
+  // that had been removed. The list's item count already counted this inserter (it was in the
+  // previous map), so a rebuild changes no count, while a genuinely new sibling still does.
+
+  it("re-emitting a single-node `child <--` a sibling stole then removed re-adds it, like an element") {
+    // Reference: a plain element stolen by L2, removed by L2, then re-emitted by L1 is simply
+    // re-inserted and re-mounted. A dynamic inserter must behave the same, even though L1's last
+    // emission still tracks it. Hits `updateChildren`'s in-range move branch.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- Val(a)
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("initial placement in L1:") {
+      items1.set(List(dyn))
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals the item, then drops it: the content unmounts exactly once:") {
+      items2.set(List(dyn))
+      items2.set(Nil)
+      tracker.assertEvents(_.unmounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L1 re-emits the item: it is placed afresh and its content mounts again:") {
+      withCollectedAirstreamErrors { errors =>
+        items1.set(List(dyn))
+        assert(errors.isEmpty, s"re-emitting the item reported: ${errors.mkString("; ")}")
+      }
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("re-emitting such a torn-down `child <--` after a retained element re-adds it after it") {
+    // Same as above, but the re-emitted item comes after an element that stayed in place, so the
+    // list has already run out of tracked DOM content when it reaches the item. Hits
+    // `updateChildren`'s OVERFLOW branch instead of the in-range one.
+    val tracker = createEventTracker()
+    val e = tracker.createSpan("E")
+    val a = tracker.createSpan("A")
+    tracker.clear()
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- Val(a)
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("initial placement in L1:") {
+      items1.set(List(e, dyn))
+      tracker.assertEvents(_.mounted("E"), _.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, span of "E", sentinel, span of "A", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals the item, then drops it:") {
+      items2.set(List(dyn))
+      items2.set(Nil)
+      tracker.assertEvents(_.unmounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, span of "E", sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L1 re-emits [E, item]: E stays put, the item is placed afresh after it:") {
+      withCollectedAirstreamErrors { errors =>
+        items1.set(List(e, dyn))
+        assert(errors.isEmpty, s"re-emitting the item reported: ${errors.mkString("; ")}")
+      }
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, span of "E", sentinel, span of "A", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("re-emitting a torn-down multi-node `children <--` group rebuilds its whole span, then stays live") {
+    // The rebuild is type-agnostic: a torn-down MULTI-node group re-emits its current inner value,
+    // re-mounting the whole span. And the rebuilt group is genuinely live — a fresh subscription,
+    // not a zombie — so the inner list's next emission reconciles into the new host.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    val c = tracker.createSpan("C")
+    tracker.clear()
+    val inner = Var[List[Inserter]](List(a, b))
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val nested: Inserter = children <-- inner.signal
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("the nested group renders A, B in L1:") {
+      items1.set(List(nested))
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", span of "B", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals the group, then drops it: the whole span unmounts:") {
+      items2.set(List(nested))
+      items2.set(Nil)
+      tracker.assertEvents(_.unmounted("A"), _.unmounted("B")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L1 re-emits the group: it is rebuilt and the whole span re-mounts:") {
+      withCollectedAirstreamErrors { errors =>
+        items1.set(List(nested))
+        assert(errors.isEmpty, s"re-emitting the group reported: ${errors.mkString("; ")}")
+      }
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", span of "B", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("the rebuilt group is live: the inner list emits [A, B, C], adding C in the new host:") {
+      inner.set(List(a, b, c))
+      tracker.assertEvents(_.mounted("C")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", span of "B", span of "C", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("re-placing a torn-down group alongside a brand-new sibling keeps the list count correct") {
+    // A single emission that mixes a REBUILD (the torn-down item, already counted -> no count
+    // change) with a genuinely NEW item (count += 1). Both must land, in order, with no leftover
+    // deletion miscounting the list.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val f = tracker.createSpan("F")
+    tracker.clear()
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val dyn: Inserter = child <-- Val(a)
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("initial placement of the item in L1:") {
+      items1.set(List(dyn))
+      tracker.assertEvents(_.mounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals the item, then drops it:") {
+      items2.set(List(dyn))
+      items2.set(Nil)
+      tracker.assertEvents(_.unmounted("A")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L1 re-emits [item, F]: the item is rebuilt (re-mounts A), F is newly added after it:") {
+      withCollectedAirstreamErrors { errors =>
+        items1.set(List(dyn, f))
+        assert(errors.isEmpty, s"re-emitting reported: ${errors.mkString("; ")}")
+      }
+      tracker.assertEvents(_.mounted("A"), _.mounted("F")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", sentinel, span of "F", sentinel),
+          div.of("L2", sentinel, sentinel)
         )
       )
     }

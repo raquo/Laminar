@@ -324,45 +324,54 @@ class DynamicInserter(
     afterRef: dom.Node,
     listSlotName: String | Unit
   ): Unit = {
-    val group = nestedGroupOpt.getOrElse(
-      throw new Exception("Can not moveWithinDynamicList: nested group not found (addToDynamicList was not called first). This is a bug in Laminar.")
-    )
-    if (group.leadingSentinel.ref.parentNode != parent.ref) {
-      // Cross-parent re-steal: another list stole this group, and now the
-      // previous list re-emits with this inserter again, and steals it back.
-      // We need a full `moveToParent` here to bring it back,
-      // transfer subscription ownership, and update the slot.
-      group.ensureTrailingSentinel()
-      group.moveToParent(
-        newParent = parent,
-        afterRefOpt = afterRef,
-        newSlotName = slotName.orElse(listSlotName) // innermost `Slot` wins
-      )
-    } else {
-      // Same DOM parent. Reachable in two cases:
-      //  1. Reordering within the same dynamic list
-      //  2. Stealing back an item that was previously stolen into a sibling parent inserter
-      //     (e.g. two `children <--`, possibly in different `Slot`s, under one element)
-      val lastRef = lastNode // trailing sentinel
-      var node = stableFirstNode // leading sentinel
-      var reference = afterRef
-      var continue = true
-      while (continue) {
-        val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
-        continue = node ne lastRef
-        // #Note: raw move – bypasses willSetMount / setMount / slot reconcile
-        //  – slot handled explicitly just below.
-        DomApi.raw.insertAfter(
-          parent = parent.ref,
-          newChild = node,
-          referenceChild = reference
-        )
-        reference = node
-        node = nextNode
+    nestedGroupOpt.fold(
+      ifEmpty = {
+        // This inserter was previously stolen, then the thief removed this inserter,
+        // and now the list that originally tracked this inserter in its `contentMap`
+        // is re-emitting it now again.
+        // The nodes of this inserter were removed from the DOM, so re-insert + re-mount.
+        // Note: The list's item count already accounted for this inserter (we were in
+        //       its previous contentMap), so this move does not affect `currentItemCount`.
+        addToDynamicList(parent, afterRef, listSlotName)
       }
-      // In case #2 above, we do need to reaffirm the slot.
-      // In case #1, this is a no-op.
-      applySlot(parent, listSlotName)
+    ) { group =>
+      if (group.leadingSentinel.ref.parentNode != parent.ref) {
+        // Cross-parent re-steal: another list stole this group, and now the
+        // previous list re-emits with this inserter again, and steals it back.
+        // We need a full `moveToParent` here to bring it back,
+        // transfer subscription ownership, and update the slot.
+        group.ensureTrailingSentinel()
+        group.moveToParent(
+          newParent = parent,
+          afterRefOpt = afterRef,
+          newSlotName = slotName.orElse(listSlotName) // innermost `Slot` wins
+        )
+      } else {
+        // Same DOM parent. Reachable in two cases:
+        //  1. Reordering within the same dynamic list
+        //  2. Stealing back an item that was previously stolen into a sibling parent inserter
+        //     (e.g. two `children <--`, possibly in different `Slot`s, under one element)
+        val lastRef = lastNode // trailing sentinel
+        var node = stableFirstNode // leading sentinel
+        var reference = afterRef
+        var continue = true
+        while (continue) {
+          val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
+          continue = node ne lastRef
+          // #Note: raw move – bypasses willSetMount / setMount / slot reconcile
+          //  – slot handled explicitly just below.
+          DomApi.raw.insertAfter(
+            parent = parent.ref,
+            newChild = node,
+            referenceChild = reference
+          )
+          reference = node
+          node = nextNode
+        }
+        // In case #2 above, we do need to reaffirm the slot.
+        // In case #1, this is a no-op.
+        applySlot(parent, listSlotName)
+      }
     }
   }
 }
