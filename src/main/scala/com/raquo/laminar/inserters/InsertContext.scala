@@ -144,10 +144,18 @@ final class InsertContext(
 
   /** Why this works: any multi-node inserter will have a trailing sentinel node at all times,
     * and singleContentMapItem.lastNode + sentinelNode cover all other possibilities.
+    *
+    * In case of `singleContentMapItem`, we only use that node if it's actually found in the DOM
+    * after the leading sentinel where it belongs. Otherwise, it's been stolen, so we report
+    * the leading sentinel as the de-facto last node instead.
     */
-  def lastNode: dom.Node = {
+  def lastNodeInDom: dom.Node = {
     _trailingSentinelNodeOpt.map(_.ref)
-      .orElse(singleContentMapItem.map(_.lastNode))
+      .orElse {
+        singleContentMapItem
+          .filter(_.stableFirstNode == sentinelNode.ref.nextSibling)
+          .map(_.lastNode)
+      }
       .getOrElse(sentinelNode.ref)
   }
 
@@ -163,7 +171,7 @@ final class InsertContext(
       DomApi.insertChildAfter(
         parent = currentParentNode,
         newChild = trailingSentinel,
-        referenceChildRef = lastNode,
+        referenceChildRef = lastNodeInDom,
         slotName = () // comment nodes are never slotted
       )
       _trailingSentinelNodeOpt = trailingSentinel

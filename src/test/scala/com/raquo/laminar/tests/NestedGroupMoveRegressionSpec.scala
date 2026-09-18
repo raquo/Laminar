@@ -5,12 +5,12 @@ import com.raquo.laminar.inserters.Inserter
 import com.raquo.laminar.utils.UnitSpec
 
 /** A nested dynamic inserter's tracked content can lag behind the DOM after another host tore its
-  * group down or stole its node. These tests pin what re-placing such an inserter must do: place it
-  * afresh (like a plain element) rather than failing on the stale tracking left by its last
-  * emission.
+  * group down. These tests pin what re-emitting such an inserter must do: place it afresh (like a
+  * plain element) rather than failing on the stale tracking left by its last emission.
   *
-  * The companion case — a group MOVE that must relocate exactly its live DOM span (in DOM order,
-  * leaving stolen nodes with their new host) — lives in [[InserterMoveSpec]] section 4c.
+  * Companion cases live in [[InserterMoveSpec]]: a group MOVE that must relocate exactly its live
+  * DOM span (section 4c), and promoting / demoting a single-node `child <--` whose node another
+  * host stole (section 5).
   */
 class NestedGroupMoveRegressionSpec extends UnitSpec {
 
@@ -123,67 +123,6 @@ class NestedGroupMoveRegressionSpec extends UnitSpec {
         div.of(
           div.of("L1", sentinel, span of "E", sentinel, span of "A", sentinel, sentinel),
           div.of("L2", sentinel, sentinel)
-        )
-      )
-    }
-  }
-
-  // -- Promoting a plain `child <--` whose node was stolen --
-
-  it("promoting a plain `child <--` whose node another list stole moves an empty span, leaving the node with its new host") {
-    // A plainly applied `child <--` has no trailing sentinel, so its span end is derived from its
-    // tracked node. Once another list steals that node, promoting the inserter into a
-    // `children <--` list must neither fail nor steal the node back.
-    val tracker = createEventTracker()
-    val a = tracker.createSpan("A")
-    tracker.clear()
-    val items2 = Var[List[Inserter]](Nil)
-    val items3 = Var[List[Inserter]](Nil)
-    val dyn: Inserter = child <-- Val(a)
-
-    mount(
-      div(
-        div("P", dyn),
-        div("L2", children <-- items2.signal),
-        div("L3", children <-- items3.signal)
-      )
-    )
-
-    withClue("the plain `child <--` on P renders A (no trailing sentinel):") {
-      tracker.assertEvents(_.mounted("A")).clear()
-      expectNode(
-        div.of(
-          div.of("P", sentinel, span of "A"),
-          div.of("L2", sentinel, sentinel),
-          div.of("L3", sentinel, sentinel)
-        )
-      )
-    }
-
-    withClue("L2 steals A (no re-mount):") {
-      items2.set(List(a))
-      tracker.assertNoEvents.clear()
-      expectNode(
-        div.of(
-          div.of("P", sentinel),
-          div.of("L2", sentinel, span of "A", sentinel),
-          div.of("L3", sentinel, sentinel)
-        )
-      )
-    }
-
-    withClue("L3 promotes the inserter into a list: its empty span moves, A stays in L2:") {
-      withCollectedAirstreamErrors { errors =>
-        items3.set(List(dyn))
-        assert(errors.isEmpty, s"promoting the inserter reported: ${errors.mkString("; ")}")
-      }
-      tracker.assertNoEvents.clear()
-      // The inserter's own leading sentinel travels with it, so P is left with only its text.
-      expectNode(
-        div.of(
-          div.of("P"),
-          div.of("L2", sentinel, span of "A", sentinel),
-          div.of("L3", sentinel, sentinel, sentinel, sentinel)
         )
       )
     }
