@@ -1595,6 +1595,102 @@ class InserterMoveSpec extends UnitSpec {
   }
 
   // ----------------------------------------------------------------------------------
+  // 4b-bis. A steal followed by the origin's OWN removal never tears the stolen group down
+  // ----------------------------------------------------------------------------------
+
+  // The complement of 4b (which re-emits WITH the item to steal it back): here the loser list
+  // re-emits WITHOUT the stolen group, so its reconcile would call `removeFromDynamicList` on it.
+  // `DynamicInserter.removeFromDynamicList` must never tear down a group another host now owns.
+  // It relies on comparing `leadingSentinel.parentNode == parent.ref`, and the safety splits by
+  // layout:
+  //  - CROSS-parent steal: the group's leading sentinel moved under the thief's parent ELEMENT, so
+  //    the parents differ and the method takes its explicit no-op branch.
+  //  - SAME-parent steal: parents still match, so the no-op branch does NOT catch it — but the
+  //    method is never even called on the group. The origin list walks its span sentinel-to-sentinel
+  //    stepping over each item's whole span, and a same-parent-stolen group is no longer a top-level
+  //    node of that span: a sibling thief moved it into the sibling's span, and a child thief nested
+  //    it inside that child's span (stepped over via `lastNode`). Either way the walk never lands on
+  //    it, so no removal is attempted. Both cases must leave the group live at its new host.
+
+  List[Layout](SameParent, CrossParent).foreach { layout =>
+
+    it(s"[${layout.name}] a sibling steal then the origin's removal leaves the stolen group live (no teardown)") {
+      val tracker = createEventTracker()
+      val a = tracker.createSpan("A")
+      val b = tracker.createSpan("B")
+      tracker.clear()
+      val inner = Var[List[Node]](List(a))
+      val nested: Inserter = children <-- inner.signal
+      val f = new TwoLists(layout)
+      f.items1.set(List(nested))
+      mount(f.root)
+      tracker.assertEvents(_.mounted("A")).clear()
+
+      withClue("L2 steals the whole group add-first, so L1's map goes stale: ") {
+        f.items2.set(List(nested))
+        tracker.assertNoEvents.clear()
+      }
+      withClue("L1 re-emits Nil: its removal must NOT tear the group down (L2 owns it now): ") {
+        f.items1.set(Nil)
+        tracker.assertNoEvents.clear()
+        f.expectRoot(list1 = List(), list2 = List(sentinel, span of "A", sentinel))
+      }
+      withClue("the group is still live at its new home L2: later content lands there: ") {
+        inner.set(List(a, b))
+        tracker.assertEvents(_.mounted("B")).clear()
+        f.expectRoot(list1 = List(), list2 = List(sentinel, span of "A", span of "B", sentinel))
+      }
+    }
+  }
+
+  it("a child inserter steal then the origin's removal keeps the group live inside that child (no teardown)") {
+    // The same-parent case #2 from `removeFromDynamicList`'s `#Note`: the thief is a nested
+    // `children <--` that is ITSELF an item of the origin list, and it absorbs a sibling group G into
+    // its own span. G's leading sentinel then sits inside the child's span, still under the origin's
+    // parent element. When the origin re-emits without G, its walk steps over the whole child span in
+    // one jump, so it never reaches G — and G survives, still owned by the child.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val innerG = Var[List[Node]](List(a))
+    val g: Inserter = children <-- innerG.signal
+    val innerC = Var[List[Inserter]](Nil)
+    val c: Inserter = children <-- innerC.signal
+    val items1 = Var[List[Inserter]](List(c, g))
+
+    mount(div(children <-- items1.signal))
+    tracker.assertEvents(_.mounted("A")).clear()
+
+    withClue("child C steals G into its own span add-first (no re-mount): ") {
+      innerC.set(List(g))
+      tracker.assertNoEvents.clear()
+      // L1: [ C[ G[A] ] ] — G's span now nested inside C's span, still under L1's parent element.
+      expectNode(
+        div.of(
+          sentinel, // L1 lead
+          sentinel, sentinel, span of "A", sentinel, sentinel, // C-lead, G[lead, A, trail], C-trail
+          sentinel // L1 trail
+        )
+      )
+    }
+    withClue("L1 re-emits WITHOUT G (keeps C): G must survive inside C, no unmount: ") {
+      items1.set(List(c))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(sentinel, sentinel, sentinel, span of "A", sentinel, sentinel, sentinel)
+      )
+    }
+    withClue("G is still live inside C: later content lands there: ") {
+      innerG.set(List(a, b))
+      tracker.assertEvents(_.mounted("B")).clear()
+      expectNode(
+        div.of(sentinel, sentinel, sentinel, span of "A", span of "B", sentinel, sentinel, sentinel)
+      )
+    }
+  }
+
+  // ----------------------------------------------------------------------------------
   // 4c. A moved span relocates exactly its LIVE DOM span (DOM order + departed nodes left behind)
   // ----------------------------------------------------------------------------------
 

@@ -277,11 +277,10 @@ class DynamicInserter(
       // This inserter instance already lives as a group somewhere else.
       // Add trailing sentinel for proper tracking inside `children <--`,
       // then move it seamlessly to its new location.
-      // Note: If / when the previous dynamic list that hosted this inserter
-      //       decides to remove this inserter, it will call
-      //       `thisInserter.removeFromDynamicList(oldInserterParent)`
-      //       (see below), which will be a no-op due to parent mismatch,
-      //       so all is good – this new list manages this inserter now.
+      // Note: The move takes the group's span out of the previous list's walked
+      //       region, so when that list later reconciles it never revisits this
+      //       inserter – it does NOT call `removeFromDynamicList` on it. This new
+      //       list manages the inserter now.
       group.ensureTrailingSentinel()
       group.moveToParent(
         newParent = parent,
