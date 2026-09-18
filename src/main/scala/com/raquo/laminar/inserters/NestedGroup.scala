@@ -110,6 +110,10 @@ final class NestedGroup(
     newSlotName: String | Unit
   ): Unit = {
 
+    // Compile a list of inserters matching the actual nodes in the DOM.
+    // We want to move actual de-facto DOM content, without re-stealing anything.
+    val contentInserters = nestedInsertContext.currentContentInsertersFromDom
+
     // Move the leading and trailing sentinels to the new place.
     insertOrAppendChild(
       parent = newParent,
@@ -129,7 +133,7 @@ final class NestedGroup(
 
     // Move content nodes (without unnecessary re-mounting)
     var lastRef: dom.Node = leadingSentinel.ref
-    nestedInsertContext.contentMap.forEach { (inserter, _) =>
+    contentInserters.forEach { inserter =>
       // Note: this calls `moveToParent` internally if this nested inserter is dynamic.
       inserter.addToDynamicList(newParent, afterRef = lastRef, newSlotName)
       lastRef = inserter.lastNode
@@ -157,7 +161,9 @@ final class NestedGroup(
       }
     if (slotNameChanged) {
       val parent = nestedInsertContext.currentParentNode
-      nestedInsertContext.contentMap.forEach { (inserter, _) =>
+      // Compile a list of inserters matching the actual nodes in the DOM.
+      // We want to move apply the slot to actual de-facto DOM content only.
+      nestedInsertContext.currentContentInsertersFromDom.forEach { inserter =>
         inserter.applySlot(parent, newSlotName)
       }
       nestedInsertContext.setCurrentSlotName(newSlotName)

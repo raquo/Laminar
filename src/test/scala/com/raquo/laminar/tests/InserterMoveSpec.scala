@@ -1592,6 +1592,385 @@ class InserterMoveSpec extends UnitSpec {
   }
 
   // ----------------------------------------------------------------------------------
+  // 4c. A moved span relocates exactly its LIVE DOM span (DOM order + departed nodes left behind)
+  // ----------------------------------------------------------------------------------
+
+  // `moveToParent` (the transfer behind a cross-parent steal) must relocate the nodes ACTUALLY in
+  // the group's span right now, in the order they sit in the DOM — never the order or membership of
+  // the tracking `contentMap`, which is only a lookup index and can lag the DOM two ways:
+  //  - ORDER: `children.command <--` Prepend / Insert / Replace build the DOM out of insertion
+  //    order, so the map lists nodes in a different order than they appear in the DOM.
+  //  - MEMBERSHIP: another host can steal a node out of the span (a sibling list, or the group's
+  //    own nested `child <--`), leaving a stale map entry the move must NOT drag back.
+  // These use cross-parent layouts on purpose: that is the layout routed through `moveToParent`.
+  // (The same-parent reposition path — which already reads the DOM — is covered in section 4b.)
+
+  it("a stolen `children.command <--` span preserves its DOM order (Prepend / Insert are not re-appended)") {
+    // The command group tracks nodes in COMMAND order (a, b, c) while the DOM holds them b, a, c.
+    // Stealing the group must move the DOM span as it stands, not rebuild it from the tracking map.
+    val tracker = createEventTracker()
+    val cmdBus = new EventBus[CollectionCommand[Node]]
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val cmd: Inserter = children.command <-- cmdBus.events
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("build b, a, c out of command order (Append a, Prepend b, Insert c @2):") {
+      items1.set(List(cmd))
+      cmdBus.emit(CollectionCommand.Append(tracker.createDiv("a")))
+      cmdBus.emit(CollectionCommand.Prepend(tracker.createDiv("b")))
+      cmdBus.emit(CollectionCommand.Insert(tracker.createDiv("c"), atIndex = 2))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, div of "b", div of "a", div of "c", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      tracker
+        .assertEvents(
+          _.elementCreated("a"),
+          _.mounted("a"),
+          _.elementCreated("b"),
+          _.mounted("b"),
+          _.elementCreated("c"),
+          _.mounted("c")
+        )
+        .clear()
+    }
+
+    withClue("steal into L2 (add-first): the span moves in DOM order b, a, c, no re-mount:") {
+      items2.set(List(cmd))
+      items1.set(Nil) // removal from L1 is a no-op: already stolen
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, div of "b", div of "a", div of "c", sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear() // transferred as a unit, not rebuilt
+    }
+
+    withClue("post-move commands anchor on the moved span and its preserved order:") {
+      cmdBus.emit(CollectionCommand.Insert(tracker.createDiv("d"), atIndex = 1)) // b,a,c -> b,d,a,c
+      cmdBus.emit(CollectionCommand.Prepend(tracker.createDiv("e"))) // -> e,b,d,a,c
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, div of "e", div of "b", div of "d", div of "a", div of "c", sentinel, sentinel)
+        )
+      )
+      tracker
+        .assertEvents(
+          _.elementCreated("d"),
+          _.mounted("d"),
+          _.elementCreated("e"),
+          _.mounted("e")
+        )
+        .clear()
+    }
+  }
+
+  it("a stolen `children.command <--` span preserves its DOM order after a Replace") {
+    // Replace(old, new) swaps a node in place in the DOM but appends `new` to the END of the
+    // tracking map, so map order (a, c, x) diverges from DOM order (a, x, c). The move must keep
+    // the DOM position.
+    val tracker = createEventTracker()
+    val cmdBus = new EventBus[CollectionCommand[Node]]
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val cmd: Inserter = children.command <-- cmdBus.events
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val x = tracker.createDiv("x")
+    tracker.clear() // drop the upfront element-create logs
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("build a, b, c then Replace b -> x, giving DOM a, x, c:") {
+      items1.set(List(cmd))
+      cmdBus.emit(CollectionCommand.Append(a))
+      cmdBus.emit(CollectionCommand.Append(b))
+      cmdBus.emit(CollectionCommand.Append(c))
+      cmdBus.emit(CollectionCommand.Replace(b, x))
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, div of "a", div of "x", div of "c", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b"),
+          _.mounted("c"),
+          _.unmounted("b"), // #Note: Replace unmounts the old node, then mounts the new one
+          _.mounted("x")
+        )
+        .clear()
+    }
+
+    withClue("steal into L2: the span moves in DOM order a, x, c, no re-mount:") {
+      items2.set(List(cmd))
+      items1.set(Nil)
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, div of "a", div of "x", div of "c", sentinel, sentinel)
+        )
+      )
+      tracker.assertNoEvents.clear()
+    }
+  }
+
+  it("moving a nested `children <--` group relocates only the nodes still in its span (sibling-stolen nodes stay put)") {
+    // A sibling list steals nodes OUT of the group (last write wins); the group's map keeps stale
+    // entries for them. Moving the group must relocate only what remains in its span, in DOM order,
+    // and never drag a departed node back from its new host.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    val c = tracker.createSpan("C")
+    val d = tracker.createSpan("D")
+    tracker.clear()
+    val inner = Var[List[Inserter]](List(a, b, c, d))
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[Inserter]](Nil)
+    val nested: Inserter = children <-- inner.signal
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal),
+        div("L3", children <-- items3.signal)
+      )
+    )
+
+    withClue("the nested group renders A, B, C, D in L1:") {
+      items1.set(List(nested))
+      tracker
+        .assertEvents(_.mounted("A"), _.mounted("B"), _.mounted("C"), _.mounted("D"))
+        .clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", span of "B", span of "C", span of "D", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals B (middle) and D (end) out of the group (no re-mount):") {
+      items2.set(List(b, d))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", span of "C", sentinel, sentinel),
+          div.of("L2", sentinel, span of "B", span of "D", sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L3 steals the group: only A, C travel (in DOM order); B, D stay in L2:") {
+      items3.set(List(nested))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, span of "B", span of "D", sentinel),
+          div.of("L3", sentinel, sentinel, span of "A", span of "C", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("moving a nested `children <--` group whose entire content was stolen relocates an empty span") {
+    // The degenerate membership case: every content node has left the span. The move must relocate
+    // just the (empty) span's sentinels, leaving all the departed nodes with their new host.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val inner = Var[List[Inserter]](List(a, b))
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[Inserter]](Nil)
+    val nested: Inserter = children <-- inner.signal
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal),
+        div("L3", children <-- items3.signal)
+      )
+    )
+
+    withClue("the nested group renders A, B in L1:") {
+      items1.set(List(nested))
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+    }
+
+    withClue("L2 steals both A and B out of the group, emptying its span (no re-mount):") {
+      items2.set(List(a, b))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, sentinel, sentinel),
+          div.of("L2", sentinel, span of "A", span of "B", sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L3 steals the now-empty group: only its sentinels travel; A, B stay in L2:") {
+      items3.set(List(nested))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, span of "A", span of "B", sentinel),
+          div.of("L3", sentinel, sentinel, sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("moving a nested `children <--` group keeps a node its own nested `child <--` absorbed inside that child's span") {
+    // A node stolen INTO a sibling item WITHIN the group (the group's own `child.maybe <--` absorbs
+    // the next item's span) must travel as part of that child on the group move, not be pulled back
+    // out to where the group's list last tracked it. A trailing plain item pins sibling ordering.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val z = tracker.createSpan("Z")
+    tracker.clear()
+    val innerChild = Var[Option[Span]](None)
+    val innerDyn: Inserter = child.maybe <-- innerChild.signal
+    val inner = Var[List[Inserter]](List(innerDyn, a, z))
+    val items1 = Var[List[Inserter]](Nil)
+    val items2 = Var[List[Inserter]](Nil)
+    val nested: Inserter = children <-- inner.signal
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("L2", children <-- items2.signal)
+      )
+    )
+
+    withClue("the group renders [empty child.maybe, A, Z] in L1:") {
+      items1.set(List(nested))
+      tracker.assertEvents(_.mounted("A"), _.mounted("Z")).clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, sentinel, emptyCommentNode, sentinel, span of "A", span of "Z", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("the inner child.maybe absorbs A into its own span (no re-mount):") {
+      innerChild.set(Some(a))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, sentinel, span of "A", sentinel, span of "Z", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L2 steals the group: A stays inside the child.maybe's span, Z keeps its place:") {
+      items2.set(List(nested))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("L2", sentinel, sentinel, sentinel, span of "A", sentinel, span of "Z", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  it("last-write-wins survives a partial-span move: a moved group still reclaims a node a sibling stole") {
+    // The move relocates only the LIVE span (leaving the stolen node with its thief H) — but it must
+    // not sever the inner list's claim on that node. When the inner list re-emits, it steals the node
+    // back to the group's NEW host (last write wins), proving the move left tracking intact. This is
+    // the mirror of the section 4b re-steal-back tests, but with the group RELOCATED in between.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val inner = Var[List[Inserter]](List(a, b))
+    val items1 = Var[List[Inserter]](Nil) // group's original home
+    val itemsH = Var[List[Inserter]](Nil) // sibling thief of B
+    val items3 = Var[List[Inserter]](Nil) // group's new home
+    val nested: Inserter = children <-- inner.signal
+
+    mount(
+      div(
+        div("L1", children <-- items1.signal),
+        div("H", children <-- itemsH.signal),
+        div("L3", children <-- items3.signal)
+      )
+    )
+
+    withClue("the group renders A, B in L1:") {
+      items1.set(List(nested))
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+    }
+
+    withClue("H steals B out of the group (no re-mount); L1's map keeps a stale B entry:") {
+      itemsH.set(List(b))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel, span of "A", sentinel, sentinel),
+          div.of("H", sentinel, span of "B", sentinel),
+          div.of("L3", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("L3 steals the group: only A travels; B stays with H (no re-mount):") {
+      items3.set(List(nested))
+      items1.set(Nil)
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("H", sentinel, span of "B", sentinel),
+          div.of("L3", sentinel, sentinel, span of "A", sentinel, sentinel)
+        )
+      )
+    }
+
+    withClue("the inner list re-emits [A, B]: B is reclaimed from H to the new host L3 (last write wins), no re-mount:") {
+      inner.set(List(a, b))
+      tracker.assertNoEvents.clear()
+      expectNode(
+        div.of(
+          div.of("L1", sentinel, sentinel),
+          div.of("H", sentinel, sentinel), // B reclaimed away from H
+          div.of("L3", sentinel, sentinel, span of "A", span of "B", sentinel, sentinel)
+        )
+      )
+    }
+  }
+
+  // ----------------------------------------------------------------------------------
   // 5. Promote / demote: static application <-> list, static <-> static
   // ----------------------------------------------------------------------------------
 

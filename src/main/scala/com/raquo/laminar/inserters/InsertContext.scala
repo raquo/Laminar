@@ -1,7 +1,7 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.AirstreamError
-import com.raquo.ew.JsMap
+import com.raquo.ew.{JsArray, JsMap}
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ReactiveElement}
 import org.scalajs.dom
@@ -263,6 +263,55 @@ final class InsertContext(
         }
       }
     }
+  }
+
+  /** Walk this context's span forward from [[sentinelNode]] and collect the tracked
+    * ([[contentMap]]) inserters currently present in the DOM, in DOM order.
+    *
+    * This is the read-only twin of [[removeContentMapNodesFromDom]] (same traversal, no DOM
+    * changes). It exists because [[contentMap]] is only a lookup index: its iteration order is
+    * NOT kept in sync with the DOM (e.g. `children.command <--` Prepend / Insert build the DOM
+    * out of insertion order), and it retains entries for nodes that have since left our span
+    * (stolen by another host). Anything that must relocate our CURRENT content – notably
+    * [[NestedGroup.moveToParent]] – must therefore read the DOM, not the map: exactly the nodes
+    * still between our sentinels, in the order they sit there.
+    *
+    * Departed nodes are absent from the span, so they are skipped – they belong to their new host
+    * now. Untracked nodes (external insertions) have no inserter to manage them, so they are
+    * stepped over and left in place.
+    */
+  def currentContentInsertersFromDom: JsArray[DiffableInserter] = {
+    val result = JsArray[DiffableInserter]()
+    val hasTrailingSentinel = _trailingSentinelNodeOpt.nonEmpty
+    var nextNode = sentinelNode.ref.nextSibling
+    while (nextNode != null) {
+      val node = nextNode
+      if (_trailingSentinelNodeOpt.exists(_.ref == node)) {
+        // Found trailing sentinel – reached the end of our span. Stop.
+        nextNode = null
+      } else {
+        contentMap.get(node).fold {
+          // Found untracked node...
+          if (hasTrailingSentinel) {
+            // ... before the trailing sentinel: not ours to manage – step over it.
+            nextNode = node.nextSibling
+          } else {
+            // ... Without trailing sentinel, this means we're outside of our span. Stop.
+            nextNode = null
+          }
+        } { inserter =>
+          // Step over this inserter's whole span at once (a nested group spans many nodes).
+          // Note: `lastNode` does match the DOM here: a content node reports itself (which
+          //       we already found in the DOM as `node` above), and a nested dynamic item
+          //       always carries a sticky trailing sentinel as a `children <--` list item,
+          //       so it never falls back to a (possibly stolen) tracked node that's in
+          //       contentMap but not in the DOM.
+          result.push(inserter)
+          nextNode = inserter.lastNode.nextSibling
+        }
+      }
+    }
+    result
   }
 }
 
