@@ -193,6 +193,60 @@ class SlotSpec extends UnitSpec {
     }
   }
 
+  it("re-slotting a moved group re-slots only its live span, leaving a sibling-stolen node's slot with its new host") {
+    // A nested group's slot reconcile (`NestedGroup.applySlot`) must re-slot only the inner nodes
+    // still in the group's span. A node a THIRD slot stole out of the group keeps that slot's
+    // attribute – the group must not rewrite it from under its new host. The reconcile is reached
+    // via a same-parent re-steal between two sibling Slots (moveWithinDynamicList's same-parent
+    // branch, which runs applySlot); a move between slots (moveToParent) is exercised on the way in.
+    val tracker = createEventTracker()
+    val a = tracker.createSpan("A")
+    val b = tracker.createSpan("B")
+    tracker.clear()
+    val gInner = Var[List[Inserter]](List(a, b))
+    val group: Inserter = children <-- gInner.signal
+    val prefixItems = Var[List[Inserter]](Nil)
+    val suffixItems = Var[List[Inserter]](Nil)
+    val thiefItems = Var[List[Inserter]](Nil)
+
+    // Three sibling Slots under ONE element (Slot is transparent), so a re-steal between the prefix
+    // and suffix lists shares a parent element and takes the SAME-parent reconcile branch.
+    mount(
+      div(
+        new Slot("prefix")(children <-- prefixItems.signal),
+        new Slot("suffix")(children <-- suffixItems.signal),
+        new Slot("thief")(children <-- thiefItems.signal)
+      )
+    )
+
+    withClue("the group renders A, B in the prefix slot:") {
+      prefixItems.set(List(group))
+      tracker.assertEvents(_.mounted("A"), _.mounted("B")).clear()
+      a.ref.getAttribute("slot") shouldBe "prefix"
+      b.ref.getAttribute("slot") shouldBe "prefix"
+    }
+
+    withClue("the thief slot steals B out of the group; B takes the thief's slot (no re-mount):") {
+      thiefItems.set(List(b))
+      tracker.assertNoEvents.clear()
+      b.ref.getAttribute("slot") shouldBe "thief"
+    }
+
+    withClue("the group is stolen into the suffix slot: only A travels and is re-slotted; B untouched:") {
+      suffixItems.set(List(group)) // add-first; prefix's map goes stale (do not remove, same parent)
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "suffix"
+      b.ref.getAttribute("slot") shouldBe "thief"
+    }
+
+    withClue("re-emitting the prefix list steals the group back (same-parent reconcile); B keeps the thief's slot:") {
+      prefixItems.set(List(group))
+      tracker.assertNoEvents.clear()
+      a.ref.getAttribute("slot") shouldBe "prefix" // live span re-slotted
+      b.ref.getAttribute("slot") shouldBe "thief" // departed node NOT re-slotted
+    }
+  }
+
   it("a Slot wrapper overrides a manual slot attribute, and moving out clears it entirely") {
     // Contract: a `Slot(name)` wrapper OWNS the slot attribute of what it wraps. A manual
     // `slot := ...` set by the user is overridden while wrapped, and is NOT restored when the
