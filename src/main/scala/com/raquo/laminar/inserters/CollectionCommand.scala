@@ -76,7 +76,12 @@ object CollectionCommand {
 
       case Insert(item, atIndex) =>
         // @TODO[Integrity] handle out of bound index
-        val chunks = prevItems.splitAt(atIndex)
+        val spanSize = prevItems.length
+        // Negative index counts from the end
+        val resolvedIndex = if (atIndex >= 0) atIndex else spanSize + atIndex
+        // Clamp index to allowed span range between sentinels
+        val clampedIndex = Math.max(0, Math.min(resolvedIndex, spanSize))
+        val chunks = prevItems.splitAt(clampedIndex)
         (chunks._1 :+ item) ++ chunks._2
 
       case Remove(item) =>
