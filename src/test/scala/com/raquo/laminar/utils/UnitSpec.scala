@@ -111,6 +111,14 @@ with BeforeAndAfterAll {
       referenceChild.ref.parentNode.insertBefore(newChild, referenceChild.ref)
     }
 
+    /** Insert a raw `newChild` node right after `referenceChild`, without telling Laminar.
+      * Handy for wedging a node between the last tracked item and a trailing sentinel.
+      */
+    def insertAfter(newChild: dom.Node, referenceChild: ChildNode.Base): Unit = {
+      val ref = referenceChild.ref
+      ref.parentNode.insertBefore(newChild, ref.nextSibling)
+    }
+
     /** Append a raw `newChild` node to `parent`, without telling Laminar. */
     def appendChild(parent: ReactiveElement.Base, newChild: dom.Node): Unit = {
       parent.ref.appendChild(newChild)
