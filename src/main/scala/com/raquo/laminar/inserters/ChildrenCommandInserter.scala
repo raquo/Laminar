@@ -56,13 +56,6 @@ object ChildrenCommandInserter {
     ctx: InsertContext,
     renderableNode: RenderableNode[Component]
   ): Unit = {
-    def domIndexOf(childNode: dom.Node): Int = {
-      DomApi.raw.indexOfChild(
-        parent = ctx.currentParentNode.ref,
-        child = childNode
-      )
-    }
-
     command.map(renderableNode.asNode) match {
 
       case CollectionCommand.Append(node) =>
@@ -97,37 +90,42 @@ object ChildrenCommandInserter {
         }
 
       case CollectionCommand.Insert(node, atIndex) =>
-        val domOpSucceeded = {
-          if (atIndex == 0) {
-            // (Small perf optimisation)
-            DomApi.insertChildAfter(
-              parent = ctx.currentParentNode,
-              newChild = node,
-              referenceChildRef = ctx.sentinelNode.ref,
-              slotName = ctx.currentSlotName
-            )
-          } else {
-            // General-purpose logic that works for any index
-            val sentinelIndex = domIndexOf(ctx.sentinelNode.ref)
-            val trailingSentinelIndex = domIndexOf(ctx.trailingSentinelNodeOpt.get.ref)
-            // Number of nodes currently between our sentinels. (read from DOM, not contentMap)
-            val spanSize = trailingSentinelIndex - sentinelIndex - 1
-            // Negative index counts from the end
-            val resolvedIndex = if (atIndex >= 0) atIndex else spanSize + atIndex
-            // Clamp index to allowed span range between sentinels
-            val clampedIndex = Math.max(0, Math.min(resolvedIndex, spanSize))
-            if (clampedIndex != resolvedIndex) {
-              DomApi.maybeReportDomError(s"CollectionCommand.Insert(`${DomApi.debugNodeDescription(node.ref)}`, atIndex = ${atIndex}): index out of bounds: resolves to ${resolvedIndex}, clamped to ${clampedIndex}; spanSize = ${spanSize}.")
+        // Walk from the start for positive indices, the end for negative; clamp at span boundaries.
+        // O(min(abs(index), span size)), independent of other siblings.
+        val leadingRef = ctx.sentinelNode.ref
+        val trailingRef = ctx.trailingSentinelNodeOpt.get.ref
+        // Count toward zero to handle Int.MinValue without overflow.
+        var stepsLeft = atIndex
+        val referenceRef: dom.Node = {
+          if (atIndex >= 0) {
+            var ref = leadingRef.nextSibling
+            while (stepsLeft > 0 && ref != trailingRef) {
+              ref = ref.nextSibling
+              stepsLeft -= 1
             }
-            DomApi.insertChildAtIndex(
-              parent = ctx.currentParentNode,
-              child = node,
-              index = sentinelIndex + clampedIndex + 1,
-              slotName = ctx.currentSlotName
-            )
+            ref
+          } else {
+            // Negative index counts from the end: -1 inserts before the last node
+            var ref: dom.Node = trailingRef
+            while (stepsLeft < 0 && ref.previousSibling != leadingRef) {
+              ref = ref.previousSibling
+              stepsLeft += 1
+            }
+            ref
           }
         }
-        if (domOpSucceeded) {
+        if (stepsLeft != 0) {
+          val clampedTo = if (atIndex >= 0) "end" else "start"
+          DomApi.maybeReportDomError(s"CollectionCommand.Insert(`${DomApi.debugNodeDescription(node.ref)}`, atIndex = ${atIndex}): index out of bounds by ${Math.abs(stepsLeft.toLong)}, clamped to the ${clampedTo} of the span.")
+        }
+        if (
+          DomApi.insertChildBefore(
+            parent = ctx.currentParentNode,
+            newChild = node,
+            referenceChildRef = referenceRef,
+            slotName = ctx.currentSlotName
+          )
+        ) {
           ctx.contentMap.set(node.ref, node)
         }
 
