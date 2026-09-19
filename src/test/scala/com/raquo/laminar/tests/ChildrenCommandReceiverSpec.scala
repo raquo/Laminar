@@ -339,6 +339,44 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     }
   }
 
+  it("Insert at Int.MinValue clamps to the start of a populated span and reports an error") {
+    val commandBus = EventBus[CollectionCommand[Node]]()
+    val el = div(
+      "Hello",
+      children.command <-- commandBus.events,
+      div("World")
+    )
+
+    mount(el)
+    commandBus.writer.onNext(Append(span(text0)))
+    commandBus.writer.onNext(Append(span(text1)))
+
+    withCollectedAirstreamErrors { errors =>
+      commandBus.writer.onNext(Insert(div(text2), atIndex = Int.MinValue))
+      expectNode(div.of("Hello", sentinel, div of text2, span of text0, span of text1, sentinel, div of "World"))
+      assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+      assert(errors.head.isInstanceOf[DomError])
+    }
+  }
+
+  it("Insert at Int.MinValue stays inside an empty span and reports an error") {
+    val commandBus = EventBus[CollectionCommand[Node]]()
+    val el = div(
+      "Hello",
+      children.command <-- commandBus.events,
+      div("World")
+    )
+
+    mount(el)
+
+    withCollectedAirstreamErrors { errors =>
+      commandBus.writer.onNext(Insert(div(text0), atIndex = Int.MinValue))
+      expectNode(div.of("Hello", sentinel, div of text0, sentinel, div of "World"))
+      assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+      assert(errors.head.isInstanceOf[DomError])
+    }
+  }
+
   it("Insert into an empty command span always lands the single node inside the span") {
     val commandBus = new EventBus[CollectionCommand[Node]]
     val x = div(text0)
