@@ -3,6 +3,7 @@ package com.raquo.laminar.inserters
 import com.raquo.airstream.core.Observable
 import com.raquo.ew.JsMap
 import com.raquo.laminar
+import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.{RenderableInserter, RenderableSeq}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
@@ -88,6 +89,24 @@ object ChildrenInserter {
     var afterRef: dom.Node = listSentinelNodeRef // last DOM node of the last placed item
     var prevItemRef: dom.Node = listSentinelNodeRef.nextSibling
 
+    // Advance the cursor past the node at `prevItemRef`: remove it if we track it (adjusting the
+    // count), otherwise report it as an external intruder and step over it – left in the DOM and
+    // never part of `currentItemCount` (which starts at the tracked-node count).
+    def removeOrSkipItemAtCursor(): Unit = {
+      prevContentMap.get(prevItemRef).fold(ifEmpty = {
+        DomApi.maybeReportDomError(
+          s"Found unexpected node not tracked by Laminar: `${DomApi.debugNodeDescription(prevItemRef)}`"
+        )
+        prevItemRef = prevItemRef.nextSibling
+      }) { prevInserter =>
+        val nextPrevItemRef = prevInserter.lastNode.nextSibling
+        // @Note: DOM update
+        prevInserter.removeFromDynamicList(listParentNode)
+        prevItemRef = nextPrevItemRef
+        currentItemCount -= 1
+      }
+    }
+
     // Map iteration preserves source order without converting the items again.
     nextInsertersMap.forEach { (nextInserter, _) =>
       val foundInserterInPrevMap: Boolean =
@@ -122,12 +141,7 @@ object ChildrenInserter {
               !nextInsertersMap.has(prevItemRef) &&
               !isContentEnd(prevItemRef)
             ) {
-              val prevInserter = prevInserterFromStableFirstNode(prevContentMap, prevItemRef)
-              val nextPrevItemRef = prevInserter.lastNode.nextSibling
-              // @Note: DOM update
-              prevInserter.removeFromDynamicList(listParentNode)
-              prevItemRef = nextPrevItemRef
-              currentItemCount -= 1
+              removeOrSkipItemAtCursor()
             }
             if (nextInserter.stableFirstNode == prevItemRef) {
               // After removing the nodes above, nextInserter now sits in the right place.
@@ -170,26 +184,10 @@ object ChildrenInserter {
 
     // Delete any leftover previous items
     while (index < currentItemCount && !isContentEnd(prevItemRef)) {
-      val prevInserter = prevInserterFromStableFirstNode(prevContentMap, prevItemRef)
-      val nextPrevItemRef = prevInserter.lastNode.nextSibling
-      // @Note: DOM update
-      prevInserter.removeFromDynamicList(listParentNode)
-      prevItemRef = nextPrevItemRef
-      currentItemCount -= 1
+      removeOrSkipItemAtCursor()
     }
 
     nextInsertersMap
-  }
-
-  private def prevInserterFromStableFirstNode(
-    prevContentMap: JsMap[dom.Node, DiffableInserter],
-    stableFirstNode: dom.Node
-  ): DiffableInserter = {
-    prevContentMap
-      .get(stableFirstNode)
-      .getOrElse(
-        throw new Exception(s"prevInserterFromRef[children]: not found for ${stableFirstNode}")
-      )
   }
 
 }
