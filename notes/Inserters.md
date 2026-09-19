@@ -18,7 +18,6 @@ It documents the _intended_ behaviour, and separately notes _known deviations_ (
 Everything reachable through the `com.raquo.laminar.inserters` package: `child <--`, `child.maybe <--`, `text <--`, `text.maybe <--`, `children <--`, `children.command <--`, static single nodes and static `Seq[Node]` as children, `onMountInsert`, and web-component slots as they interact with the above. The primary sources consolidated here are:
 
 - The inserter sources in `src/main/scala/com/raquo/laminar/inserters/`.
-- `PROGRESS.md` (the working note for the current PR #206 nested-group fixes).
 - The behavioural test suites, especially `InserterMoveSpec` (the move/transfer taxonomy), plus `InserterTakeoverSpec`, `InserterRemountSpec`, `InserterExternalMutationSpec`, `NestedInsertersSpec`, and `InserterInvariantSpec`.
 
 ---
@@ -43,7 +42,7 @@ Two operations must not be conflated (they answer different questions):
 1. **Moving a group** (`moveToParent`) — triggered by a re-emission whose payload _is_ the group (a list re-emitting `[G]`, or `G` applied to an element). It relocates the group's span. It says nothing about the group's _inner_ membership.
 2. **Stealing / re-stealing a node** — governed by whichever list re-emits _that node_; last write wins.
 
-Blurring these is a recurring source of bugs (see §5 and the PROGRESS ③④⑤ history).
+Blurring these is a recurring source of bugs (see §5).
 
 ---
 
@@ -231,25 +230,13 @@ Distinct from the last-write-wins contest above: when a slot could come from an 
 
 - **Issue #163 — moving an element between two sibling `child <--` bindings re-mounts in one direction only.** When one element is shown via one of two independent `child <--` bindings toggled by a single signal, whether the toggle re-mounts is _order-dependent_: the binding that GAINS the element must fire before the one that LOSES it for the transfer to be seamless. When the losing binding fires first, the element is detached to `None` (unmount) before re-attachment (mount). This is inherent to synchronous propagation order; a `delaySync` workaround only fixes one direction. Characterized (not "fixed") in `InserterMoveSpec` "CHARACTERIZATION (issue #163)". The `probe(addFirst=false)` remove-first re-mount in the REFERENCE test is the same underlying limitation.
 
-### Open bugs (currently being worked in PR #206)
-
-Per `PROGRESS.md`, six issues were reproduced on master; all six (①②, the ③④⑤ class, and ⑥) are now fixed on this branch. See below.
-
-### Recently fixed on this branch / adjacent history
-
-- **#201** — `text.maybe` failed reconciliation on remount (fixed; `InserterRemountSpec`). The `option` branch now OR-s `maybeTextNode.nonEmpty || ctx.contentMap.size > 0` because `maybeLastSeenChild` resets on remount.
-- **#202** — removing composite key values with multiple reasons.
-- **① / ②** — re-emit after another list genuinely tore the group down no longer throws. After a genuine removal sets `nestedGroupOpt = js.undefined`, the original list still tracks the inserter; a re-emit routes to `moveWithinDynamicList` (①) or the overflow branch (②). Both now fall back to a fresh `addToDynamicList` when the group is gone (re-insert + re-mount, like a plain element — §5 "re-placing … torn-down"), instead of hitting `nestedGroupOpt.getOrElse(throw)`. Count bookkeeping stays correct (the inserter was already counted in the previous map). Covered by `InserterMoveSpec` section 4d.
-- **③④⑤** — the `moveToParent` DOM-order / live-membership fixes described in §5.
-- **⑥** — `InsertContext.lastNodeInDom` (renamed from `lastNode` to advertise its DOM-wins contract) no longer trusts a single tracked node once another host has stolen it: the `singleContentMapItem` branch is gated on the node still sitting right after the sentinel, else the span ends at the sentinel itself (empty). This is what lets `ensureTrailingSentinel` promote a stolen plain `child <--` into a `children <--` list without a `NotFoundError`. Covered by `InserterMoveSpec` §5 (promote empty-span, promote-with-following-sibling, next-emission-into-new-host, and the `amend` relocate path).
-
 ---
 
 ## 11. Suspicious / uncertain intent (flagged for review)
 
 These are places where the code's intent is unclear, defensive-but-untested, or potentially inconsistent. They are questions for the author, not assertions of bugs.
 
-- **Error-report vs. warning for intruder nodes.** `removeContentMapNodesFromDom` sends an unhandled Airstream error when it finds an untracked node inside a bracketed span. There's a `#TODO[nested-dyn]` questioning whether this should be an error, a warning, or silent. _Question: is reporting the intended long-term behaviour, especially now that nested inserters can legitimately place foreign-looking spans?_
+- **Error-report vs. warning for intruder nodes.** `removeContentMapNodesFromDom` sends an unhandled Airstream error when it finds an untracked node inside a bracketed span. Should we do that, or should we work around it silently?
 - **`contentMap` iteration order is relied upon in teardown but is not a maintained invariant.** Teardown order (`children <--`) is documented as "insertion order", and several tests pin it — yet `PROGRESS.md` (FINDINGS) establishes that map order equals DOM order for _every_ inserter except `children.command <--`, and that this coincidence is not an invariant anyone maintains. So teardown order is _incidentally_ insertion order for most inserters and _incidentally_ command order for commands. _Question: is teardown order a guarantee we intend to keep, or an accident we tolerate? If a guarantee, it should probably be DOM order too, for consistency with relocation._
 - **`parentNode` mutability on `InsertContext`.** `currentParentNode` is mutable solely to support a `NestedGroup` move between lists, and the author notes (scaladoc) this is a shape they'd like to isolate to `NestedGroup` but can't given `insertFn`. _Flagged as known technical debt, not a bug._
 - ✅ **The `removeFromDynamicList` "probably" genuine-removal comment.** `DynamicInserter.removeFromDynamicList` distinguishes genuine removal from a post-steal no-op by comparing `leadingSentinel.parentNode == parent.ref`. The `#Note: stealing can also happen without changing parent!` block reasons (with two "I think…"s) about why same-parent steals still don't reach this path. _Confirmed safe, and the "I think…"s hold — in fact more strongly than the comment states: after ANY steal the stolen group's span physically leaves the origin list's walked region (a sibling/cross-parent thief relocated it into the thief's span; a child thief nested it inside that child's span, which the origin's sentinel-to-sentinel walk steps over via `lastNode`), so the origin never calls `removeFromDynamicList` on it at all — the `else` no-op branch is not the mechanism that saves the sibling case; not-calling is. Both callers (`ChildrenInserter.updateChildren`, `InsertContext.removeContentMapNodesFromDom`) only ever look up a group by a node currently in their own span, whose `leadingSentinel.parentNode` is therefore always `parent.ref`, so the `else` branch appears structurally unreachable and is untested: instrumenting the whole inserter suite recorded 18/18 calls with `parentNode == parent.ref`, zero no-ops. Pinned (observably) by `InserterMoveSpec` section 4b-bis — a same-parent sibling, cross-parent sibling, and child-inserter steal each followed by the origin's removal, none tearing the group down. Note this makes the `addToDynamicList` comment ("the previous list … will call `removeFromDynamicList` … a no-op due to parent mismatch") inaccurate: that call does not happen. Possible cleanup: keep the `else` as a defensive assert, or drop it and document that a stolen group is simply never revisited._
@@ -259,7 +246,19 @@ These are places where the code's intent is unclear, defensive-but-untested, or 
 
 ---
 
-## 12. Quick-reference checklist for future changes
+## 12. Misc
+
+### `contentMap` writes should be gated on DOM success
+
+`contentMap` records _intent_ (§2), but a DOM operation can fail (an exception, e.g. `HierarchyRequestError`, turned into a reported error) or no-op (removing/replacing a node another host already stole). Recording a node the DOM rejected leaves a **phantom entry** — a node tracked but never in our span.
+
+For the reconciling inserters (`children <--`, `child <--`, `text <--`) the map is rebuilt from the incoming list on every emission, so a phantom self-corrects on the next emission. `children.command <--` is different: it mutates its map incrementally and never rebuilds it, so a phantom would persist indefinitely (until `RemoveAll` / `ReplaceAll` / a foreign-type inserter takeover clears it).
+
+**Resolution:** `ChildrenCommandInserter.updateList` keeps `contentMap` in step with what we actually own. Add-type ops (`Append` / `Prepend` / `Insert` / `ReplaceAll`) record a node only when its insert reports success, so a rejected node is never tracked. Removal is the mirror: `Remove` drops the node unconditionally (a failed `removeChild` means it was stolen away, so it isn't ours regardless), and `Replace` drops `oldNode` on a no-op only when it's no longer ours (`maybeParent`) — never when the failure was an invalid `newNode`, which would untrack a live node. **The reconciling inserters were left as-is, since they already self-heal**.
+
+---
+
+## 13. Quick-reference checklist for future changes
 
 When touching inserter code, check the change against these:
 

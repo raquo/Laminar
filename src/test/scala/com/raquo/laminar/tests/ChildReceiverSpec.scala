@@ -8,7 +8,6 @@ import com.raquo.laminar.nodes.ChildNode
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
-import scala.collection.mutable
 
 class ChildReceiverSpec extends UnitSpec {
 
@@ -272,14 +271,7 @@ class ChildReceiverSpec extends UnitSpec {
 
   // Followup to https://github.com/raquo/Laminar/issues/196
   it("reports DOM errors") {
-    val errors = mutable.Buffer[Throwable]()
-    val collectingCallback: Throwable => Unit = errors += _
-
-    try {
-      // Swap rethrow callback for collecting callback so errors don't fail the test immediately
-      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
-      AirstreamError.registerUnhandledErrorCallback(collectingCallback)
-
+    withCollectedAirstreamErrors { errors =>
       val bus = new EventBus[HtmlElement]
       val outerDiv = div(child <-- bus)
       mount(outerDiv)
@@ -296,15 +288,13 @@ class ChildReceiverSpec extends UnitSpec {
 
       // -- reportDomErrors = false
 
-      DomApi.shouldReportDomErrors = false
-      bus.writer.onNext(outerDiv)
-
-      errors shouldBe Nil
-    } finally {
-      // -- restore
-      DomApi.shouldReportDomErrors = true
-      AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
-      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+      try {
+        DomApi.shouldReportDomErrors = false
+        bus.writer.onNext(outerDiv)
+        errors shouldBe Nil
+      } finally {
+        DomApi.shouldReportDomErrors = true
+      }
     }
   }
 

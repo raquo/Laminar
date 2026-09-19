@@ -5,7 +5,7 @@ import com.raquo.domtestutils.Utils
 import com.raquo.domtestutils.scalatest.{Matchers, MountSpec}
 import com.raquo.laminar.nodes.{ChildNode, ReactiveElement}
 import org.scalajs.dom
-import org.scalatest.BeforeAndAfterAll
+import org.scalatest.{BeforeAndAfterAll, Failed, Outcome}
 import org.scalatest.funspec.AnyFunSpec
 
 import scala.collection.mutable
@@ -18,24 +18,51 @@ with Matchers
 with Utils
 with BeforeAndAfterAll {
 
-  // These help detect and track unexpected unhandled errors.
-  // Tests that want to
+  // We install a *collecting* unhandled-error callback for the whole suite, not a rethrowing
+  // one. `AirstreamError.unsafeRethrowErrorCallback` throws synchronously from inside
+  // `sendUnhandledError`, i.e. mid-transaction-propagation, which aborts Airstream's transaction
+  // machinery before it can clean up. That corrupts global transaction state and cascades
+  // failures into unrelated later tests. Collecting the error instead lets propagation finish
+  // cleanly; `withFixture` then fails the specific test that leaked it. Error-path tests use
+  // `withCollectedAirstreamErrors` to intercept expected errors before they reach this buffer.
+  private val leakedErrors = mutable.Buffer[Throwable]()
+
+  private val leakCollectorCallback: Throwable => Unit = leakedErrors += _
 
   override protected def beforeAll(): Unit = {
     AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
-    AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+    AirstreamError.registerUnhandledErrorCallback(leakCollectorCallback)
   }
 
   override protected def afterAll(): Unit = {
     AirstreamError.registerUnhandledErrorCallback(AirstreamError.consoleErrorCallback)
-    AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+    AirstreamError.unregisterUnhandledErrorCallback(leakCollectorCallback)
+  }
+
+  /** Fail the test that leaked unhandled Airstream errors, rather than letting them corrupt
+    * shared state and surface as failures in unrelated later tests.
+    */
+  override def withFixture(test: NoArgTest): Outcome = {
+    leakedErrors.clear()
+    val outcome = super.withFixture(test)
+    val leaked = leakedErrors.toList
+    leakedErrors.clear()
+    if (outcome.isSucceeded && leaked.nonEmpty) {
+      Failed(new Exception(
+        s"Test leaked ${leaked.size} unhandled Airstream error(s) not intercepted by " +
+          s"`withCollectedAirstreamErrors`: ${leaked.map(AirstreamError.getFullMessage).mkString("; ")}"
+      ))
+    } else {
+      outcome
+    }
   }
 
   /** A fresh [[EventTracker]] for asserting on the ordered sequence of element / lifecycle events. */
   def createEventTracker(): EventTracker = new EventTracker()
 
   /** Run `body` with unhandled Airstream errors collected into the provided buffer instead of
-    * being rethrown, restoring the default (rethrow) callback afterwards even if `body` throws.
+    * counting as leaks, restoring the suite's default leak collector afterwards even if `body`
+    * throws.
     *
     * Useful for asserting that Laminar reports (rather than throws on) a recoverable condition,
     * e.g. a DOM exception, or an externally-inserted node found inside a tracked span. Replaces
@@ -52,12 +79,12 @@ with BeforeAndAfterAll {
     val errors = mutable.Buffer[Throwable]()
     val collectingCallback: Throwable => Unit = errors += _
     try {
-      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+      AirstreamError.unregisterUnhandledErrorCallback(leakCollectorCallback)
       AirstreamError.registerUnhandledErrorCallback(collectingCallback)
       body(errors)
     } finally {
       AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
-      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+      AirstreamError.registerUnhandledErrorCallback(leakCollectorCallback)
     }
   }
 

@@ -251,9 +251,8 @@ final class InsertContext(
             // Our content definitively extends to the trailing sentinel, so this untracked
             // node sitting before it is an unauthorized addition. Report it and step over it
             // (we leave it in place – it isn't ours to remove).
-            // #TODO[nested-dyn] Should we report this...? Or maybe just print a warning?
-            AirstreamError.sendUnhandledError(
-              new Exception(s"Found unexpected node not tracked by Laminar: `${DomApi.debugNodeDescription(childRef)}`")
+            DomApi.maybeReportDomError(
+              s"Found unexpected node not tracked by Laminar: `${DomApi.debugNodeDescription(childRef)}`"
             )
             maybeRef = childRef.nextSibling
           } else {
