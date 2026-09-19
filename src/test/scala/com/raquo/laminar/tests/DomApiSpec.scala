@@ -8,7 +8,6 @@ import com.raquo.laminar.fixtures.{DoubleRangeElement, IntRangeElement}
 import com.raquo.laminar.utils.UnitSpec
 import org.scalajs.dom
 
-import scala.collection.mutable
 import scala.scalajs.js
 
 class DomApiSpec extends UnitSpec {
@@ -213,14 +212,7 @@ class DomApiSpec extends UnitSpec {
 
   // https://github.com/raquo/Laminar/issues/196
   it("insertChildAfter: does not update maybeParent when insertion fails") {
-    val errors = mutable.Buffer[Throwable]()
-    val collectingCallback: Throwable => Unit = errors += _
-
-    try {
-      // Swap rethrow callback for collecting callback so errors don't fail the test immediately
-      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
-      AirstreamError.registerUnhandledErrorCallback(collectingCallback)
-
+    withCollectedAirstreamErrors { errors =>
       val noSlot: js.UndefOr[String] = js.undefined
 
       val childInParent = span("in parent")
@@ -254,10 +246,6 @@ class DomApiSpec extends UnitSpec {
 
       assertEquals(errors.size, 1)
       assert(errors.head.isInstanceOf[DomError])
-
-    } finally {
-      AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
-      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
     }
   }
 

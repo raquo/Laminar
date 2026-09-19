@@ -11,12 +11,14 @@ trait DomTree {
   protected val raw: DomTreeRaw
 
   /** If true, Laminar will report exceptions thrown by DOM operations
-    * to Airstream unhandled errors. Otherwise, they will be swallowed.
+    * (as well as some aspects of Laminar DOM logic) to Airstream
+    * unhandled errors. Otherwise, they will be swallowed.
     *
     * These exceptions happen when attempting to perform invalid DOM
     * operations, such as trying to make an element its own child.
     *
-    * Prior to v18.0.0, Laminar would always swallow these exceptions.
+    * Prior to v18.0.0, Laminar would always swallow DOM operations
+    * exceptions.
     *
     * Generally, this setting should not be disabled except temporarily
     * (e.g. to help with migration / debugging / testing).
@@ -25,7 +27,13 @@ trait DomTree {
 
   def maybeReportDomError(e: dom.DOMException): Unit = {
     if (shouldReportDomErrors) {
-      AirstreamError.sendUnhandledError(new DomError(e))
+      AirstreamError.sendUnhandledError(new DomError(s"${e.name}: ${e.message}"))
+    }
+  }
+
+  def maybeReportDomError(message: String): Unit = {
+    if (shouldReportDomErrors) {
+      AirstreamError.sendUnhandledError(new DomError(message))
     }
   }
 

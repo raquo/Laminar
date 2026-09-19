@@ -2,12 +2,13 @@ package com.raquo.laminar.tests
 
 import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar.api.L._
-import com.raquo.laminar.domapi.DomError
+import com.raquo.laminar.domapi.{DomApi, DomError}
 import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, RemoveAll, Replace, ReplaceAll}
-import com.raquo.laminar.inserters.{CollectionCommand, Inserter}
+import com.raquo.laminar.inserters.{CollectionCommand, DynamicInserter, InsertContext, Inserter}
+import com.raquo.laminar.fixtures.TestableOwner
 import com.raquo.laminar.utils.UnitSpec
 
-import scala.collection.{immutable, mutable}
+import scala.collection.immutable
 
 class ChildrenCommandReceiverSpec extends UnitSpec {
 
@@ -137,14 +138,7 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
 
   // https://github.com/raquo/Laminar/issues/195
   it("does not drift the append position when Append fails") {
-    val errors = mutable.Buffer[Throwable]()
-    val collectingCallback: Throwable => Unit = errors += _
-
-    try {
-      // Swap rethrow callback for collecting callback so errors don't fail the test immediately
-      AirstreamError.unregisterUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
-      AirstreamError.registerUnhandledErrorCallback(collectingCallback)
-
+    withCollectedAirstreamErrors { errors =>
       val commandBus = new EventBus[CollectionCommand[Node]]
 
       val spanA = span(text0)
@@ -202,9 +196,64 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
           expectNode(div.of(rules: _*))
         }
       }
-    } finally {
-      AirstreamError.unregisterUnhandledErrorCallback(collectingCallback)
-      AirstreamError.registerUnhandledErrorCallback(AirstreamError.unsafeRethrowErrorCallback)
+    }
+  }
+
+  // White-box companion to #195: a command whose DOM op throws or no-ops must not record its
+  // node in contentMap, else the map accumulates phantom entries for nodes never in our span.
+  it("does not leave phantom contentMap entries after a failed or no-op DOM write") {
+    withCollectedAirstreamErrors { errors =>
+      val commandBus = new EventBus[CollectionCommand[Node]]
+      val owner = new TestableOwner
+
+      val span0 = span(text0)
+      val span1 = span(text1)
+      val span2 = span(text2)
+      val span3 = span(text3)
+      val otherParent = div()
+
+      val el = div()
+      mount(el)
+
+      // Drive the command inserter over a hand-built context so we can inspect its contentMap.
+      val ctx = InsertContext.reserveSpotContext(el)
+      val inserter = (children.command <-- commandBus.events).asInstanceOf[DynamicInserter]
+      inserter.renderIntoSharedContext(ctx, owner)
+
+      withClue("failed insert (appending el into its own span throws):") {
+        commandBus.writer.onNext(Append(span0))
+        commandBus.writer.onNext(Append(el))
+        assertEquals(errors.size, 1)
+        assert(errors.head.isInstanceOf[DomError])
+        expectNode(el.ref, div of (sentinel, span of text0, sentinel))
+        assert(ctx.contentMap.has(span0.ref)) // accepted node is tracked
+        assert(!ctx.contentMap.has(el.ref)) // rejected node is not
+        errors.clear()
+      }
+
+      withClue("no-op Replace (old node stolen away first):") {
+        commandBus.writer.onNext(Append(span1))
+        assert(ctx.contentMap.has(span1.ref))
+        // Steal span1 into another parent, so replaceChild can no longer find it here.
+        DomApi.appendChild(parent = otherParent, child = span1, slotName = ())
+        commandBus.writer.onNext(Replace(span1, span2))
+        expectNode(el.ref, div of (sentinel, span of text0, sentinel))
+        assert(!ctx.contentMap.has(span2.ref)) // never inserted -> never tracked
+        assert(!ctx.contentMap.has(span1.ref)) // stolen old node -> we drop our stale claim
+        assert(span1.ref.parentNode == otherParent.ref) // thief keeps it
+        assertEquals(errors.size, 0)
+      }
+
+      withClue("no-op Remove (node stolen away first):") {
+        commandBus.writer.onNext(Append(span3))
+        assert(ctx.contentMap.has(span3.ref))
+        // Steal span3 away; the Remove below then no-ops in the DOM.
+        DomApi.appendChild(parent = otherParent, child = span3, slotName = ())
+        commandBus.writer.onNext(Remove(span3))
+        assert(!ctx.contentMap.has(span3.ref)) // no longer ours -> dropped
+        assert(span3.ref.parentNode == otherParent.ref) // thief undisturbed
+        assertEquals(errors.size, 0)
+      }
     }
   }
 
@@ -212,7 +261,8 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     // Insert's index addresses a slot within the command's own span. A negative index counts
     // from the end (-1 = before the last node); any index outside [0, size] is clamped, so the
     // node always lands inside the span (0 prepends, size appends) rather than escaping past a
-    // sentinel into a sibling's territory.
+    // sentinel into a sibling's territory. An out-of-range index also reports an unhandled
+    // error, since it signals a likely mistake in the caller's index math.
     val commandBus = new EventBus[CollectionCommand[Node]]
 
     val spanA = span(text0)
@@ -247,7 +297,11 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     expectChildren("index 3 (== size) appends:", span of text0, span of text1, span of text2, div of text3)
     commandBus.writer.onNext(Remove(x))
 
-    commandBus.writer.onNext(Insert(x, atIndex = 99))
+    withCollectedAirstreamErrors { errors =>
+      commandBus.writer.onNext(Insert(x, atIndex = 99))
+      assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+      assert(errors.head.isInstanceOf[DomError])
+    }
     expectChildren("index past the end clamps to append:", span of text0, span of text1, span of text2, div of text3)
     commandBus.writer.onNext(Remove(x))
 
@@ -265,7 +319,11 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     expectChildren("index -3 (== -size) prepends:", div of text3, span of text0, span of text1, span of text2)
     commandBus.writer.onNext(Remove(x))
 
-    commandBus.writer.onNext(Insert(x, atIndex = -99))
+    withCollectedAirstreamErrors { errors =>
+      commandBus.writer.onNext(Insert(x, atIndex = -99))
+      assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+      assert(errors.head.isInstanceOf[DomError])
+    }
     expectChildren("index below -size clamps to prepend:", div of text3, span of text0, span of text1, span of text2)
     commandBus.writer.onNext(Remove(x))
 
@@ -295,13 +353,21 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     expectChildren("empty span:")
 
     // A large positive index clamps to append; on an empty span that is also the front.
-    commandBus.writer.onNext(Insert(x, atIndex = 99))
+    withCollectedAirstreamErrors { errors =>
+      commandBus.writer.onNext(Insert(x, atIndex = 99))
+      assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+      assert(errors.head.isInstanceOf[DomError])
+    }
     expectChildren("index past the end on an empty span:", div of text0)
     commandBus.writer.onNext(Remove(x))
     expectChildren("empty again:")
 
     // A negative index clamps to prepend on an empty span too.
-    commandBus.writer.onNext(Insert(x, atIndex = -5))
+    withCollectedAirstreamErrors { errors =>
+      commandBus.writer.onNext(Insert(x, atIndex = -5))
+      assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+      assert(errors.head.isInstanceOf[DomError])
+    }
     expectChildren("negative index on an empty span:", div of text0)
 
     def expectChildren(clue: String, childRules: Rule*): Unit = {
@@ -335,7 +401,11 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     }
 
     withClue("Insert at index 3 into a 1-node span clamps to append inside the span, not after E:") {
-      bus.emit(CollectionCommand.Insert(tracker.createDiv("n"), atIndex = 3))
+      withCollectedAirstreamErrors { errors =>
+        bus.emit(CollectionCommand.Insert(tracker.createDiv("n"), atIndex = 3))
+        assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+        assert(errors.head.isInstanceOf[DomError])
+      }
       tracker.assertEvents(_.elementCreated("n"), _.mounted("n")).clear()
       expectNode(div.of(sentinel, sentinel, div of "a", div of "n", sentinel, span of "E", sentinel))
     }
@@ -379,7 +449,11 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     }
 
     withClue("Insert at index 2, clear the command span, then drop E:") {
-      bus.emit(CollectionCommand.Insert(tracker.createDiv("n"), atIndex = 2))
+      withCollectedAirstreamErrors { errors =>
+        bus.emit(CollectionCommand.Insert(tracker.createDiv("n"), atIndex = 2))
+        assert(errors.size == 1, s"out-of-range Insert should report one error, got: ${errors.mkString("; ")}")
+        assert(errors.head.isInstanceOf[DomError])
+      }
       tracker.assertEvents(
         _.elementCreated("n"),
         _.mounted("n")

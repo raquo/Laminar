@@ -69,68 +69,95 @@ object ChildrenCommandInserter {
         // Insert at the end of our span, right before the trailing sentinel. No index math
         // or node count needed: the trailing sentinel marks the span's end, and a failed
         // insert simply leaves that boundary where it was (see Laminar issue #195).
-        DomApi.insertChildBefore(
-          parent = ctx.currentParentNode,
-          newChild = node,
-          referenceChildRef = ctx.trailingSentinelNodeOpt.get.ref,
-          slotName = ctx.currentSlotName
-        )
-        ctx.contentMap.set(node.ref, node)
+        if (
+          DomApi.insertChildBefore(
+            parent = ctx.currentParentNode,
+            newChild = node,
+            referenceChildRef = ctx.trailingSentinelNodeOpt.get.ref,
+            slotName = ctx.currentSlotName
+          )
+        ) {
+          // We update `contentMap` conditionally here because unlike other
+          // dynamic inserters, in ChildrenCommandInserter we don't rebuild
+          // the map on every event, so any phantom records there would
+          // persist for longer, possibly indefinitely.
+          ctx.contentMap.set(node.ref, node)
+        }
 
       case CollectionCommand.Prepend(node) =>
-        DomApi.insertChildAfter(
-          parent = ctx.currentParentNode,
-          newChild = node,
-          referenceChildRef = ctx.sentinelNode.ref,
-          slotName = ctx.currentSlotName
-        )
-        ctx.contentMap.set(node.ref, node)
-
-      case CollectionCommand.Insert(node, atIndex) =>
-        if (atIndex == 0) {
-          // (Small perf optimisation)
+        if (
           DomApi.insertChildAfter(
             parent = ctx.currentParentNode,
             newChild = node,
             referenceChildRef = ctx.sentinelNode.ref,
             slotName = ctx.currentSlotName
           )
-        } else {
-          // General-purpose logic that works for any index
-          val sentinelIndex = domIndexOf(ctx.sentinelNode.ref)
-          val trailingSentinelIndex = domIndexOf(ctx.trailingSentinelNodeOpt.get.ref)
-          // Number of nodes currently between our sentinels. (read from DOM, not contentMap)
-          val spanSize = trailingSentinelIndex - sentinelIndex - 1
-          // Negative index counts from the end
-          val resolvedIndex = if (atIndex >= 0) atIndex else spanSize + atIndex
-          // Clamp index to allowed span range between sentinels
-          val clampedIndex = Math.max(0, Math.min(resolvedIndex, spanSize))
-          // #TODO[API] Should we warn/report/throw when clampedIndex != resolvedIndex?
-          DomApi.insertChildAtIndex(
-            parent = ctx.currentParentNode,
-            child = node,
-            index = sentinelIndex + clampedIndex + 1,
-            slotName = ctx.currentSlotName
-          )
+        ) {
+          ctx.contentMap.set(node.ref, node)
         }
-        ctx.contentMap.set(node.ref, node)
+
+      case CollectionCommand.Insert(node, atIndex) =>
+        val domOpSucceeded = {
+          if (atIndex == 0) {
+            // (Small perf optimisation)
+            DomApi.insertChildAfter(
+              parent = ctx.currentParentNode,
+              newChild = node,
+              referenceChildRef = ctx.sentinelNode.ref,
+              slotName = ctx.currentSlotName
+            )
+          } else {
+            // General-purpose logic that works for any index
+            val sentinelIndex = domIndexOf(ctx.sentinelNode.ref)
+            val trailingSentinelIndex = domIndexOf(ctx.trailingSentinelNodeOpt.get.ref)
+            // Number of nodes currently between our sentinels. (read from DOM, not contentMap)
+            val spanSize = trailingSentinelIndex - sentinelIndex - 1
+            // Negative index counts from the end
+            val resolvedIndex = if (atIndex >= 0) atIndex else spanSize + atIndex
+            // Clamp index to allowed span range between sentinels
+            val clampedIndex = Math.max(0, Math.min(resolvedIndex, spanSize))
+            if (clampedIndex != resolvedIndex) {
+              DomApi.maybeReportDomError(s"CollectionCommand.Insert(`${DomApi.debugNodeDescription(node.ref)}`, atIndex = ${atIndex}): index out of bounds: resolves to ${resolvedIndex}, clamped to ${clampedIndex}; spanSize = ${spanSize}.")
+            }
+            DomApi.insertChildAtIndex(
+              parent = ctx.currentParentNode,
+              child = node,
+              index = sentinelIndex + clampedIndex + 1,
+              slotName = ctx.currentSlotName
+            )
+          }
+        }
+        if (domOpSucceeded) {
+          ctx.contentMap.set(node.ref, node)
+        }
 
       case CollectionCommand.Remove(node) =>
         DomApi.removeChild(
           parent = ctx.currentParentNode,
           child = node
         )
+        // `removeChild` failed because the `node` isn't there.
+        // So, it's safe to .delete from the map regardless of the reason.
         ctx.contentMap.delete(node.ref)
 
       case CollectionCommand.Replace(oldNode, newNode) =>
-        DomApi.replaceChild(
-          parent = ctx.currentParentNode,
-          oldChild = oldNode,
-          newChild = newNode,
-          slotName = ctx.currentSlotName
-        )
-        ctx.contentMap.delete(oldNode.ref)
-        ctx.contentMap.set(newNode.ref, newNode)
+        if (
+          DomApi.replaceChild(
+            parent = ctx.currentParentNode,
+            oldChild = oldNode,
+            newChild = newNode,
+            slotName = ctx.currentSlotName
+          )
+        ) {
+          ctx.contentMap.delete(oldNode.ref)
+          ctx.contentMap.set(newNode.ref, newNode)
+        } else if (!oldNode.maybeParent.contains(ctx.currentParentNode)) {
+          // Replace failed for some reason, AND the old node is not found anymore. So:
+          //  - old node must have been stolen or externally moved, and
+          //  - new node must have failed insertion
+          // In this case, we need to remove oldNode from the contentMap.
+          ctx.contentMap.delete(oldNode.ref)
+        }
 
       case CollectionCommand.RemoveAll =>
         ctx.removeContentMapNodesFromDom(keepNodeIfPresent = js.undefined)
@@ -141,13 +168,16 @@ object ChildrenCommandInserter {
         ctx.contentMap.clear()
         val trailingSentinelRef = ctx.trailingSentinelNodeOpt.get.ref
         newNodes.foreach { node =>
-          DomApi.insertChildBefore(
-            parent = ctx.currentParentNode,
-            newChild = node,
-            referenceChildRef = trailingSentinelRef,
-            slotName = ctx.currentSlotName
-          )
-          ctx.contentMap.set(node.ref, node)
+          if (
+            DomApi.insertChildBefore(
+              parent = ctx.currentParentNode,
+              newChild = node,
+              referenceChildRef = trailingSentinelRef,
+              slotName = ctx.currentSlotName
+            )
+          ) {
+            ctx.contentMap.set(node.ref, node)
+          }
         }
     }
   }
