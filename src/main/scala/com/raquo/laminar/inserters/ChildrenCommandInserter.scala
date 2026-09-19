@@ -4,6 +4,7 @@ import com.raquo.airstream.core.EventStream
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, CommentNode}
+import org.scalajs.dom
 
 import scala.scalajs.js
 import scala.scalajs.js.|
@@ -55,10 +56,10 @@ object ChildrenCommandInserter {
     ctx: InsertContext,
     renderableNode: RenderableNode[Component]
   ): Unit = {
-    def findSentinelIndex(): Int = {
+    def domIndexOf(childNode: dom.Node): Int = {
       DomApi.raw.indexOfChild(
         parent = ctx.currentParentNode.ref,
-        child = ctx.sentinelNode.ref
+        child = childNode
       )
     }
 
@@ -86,12 +87,32 @@ object ChildrenCommandInserter {
         ctx.contentMap.set(node.ref, node)
 
       case CollectionCommand.Insert(node, atIndex) =>
-        DomApi.insertChildAtIndex(
-          parent = ctx.currentParentNode,
-          child = node,
-          index = findSentinelIndex() + atIndex + 1,
-          slotName = ctx.currentSlotName
-        )
+        if (atIndex == 0) {
+          // (Small perf optimisation)
+          DomApi.insertChildAfter(
+            parent = ctx.currentParentNode,
+            newChild = node,
+            referenceChildRef = ctx.sentinelNode.ref,
+            slotName = ctx.currentSlotName
+          )
+        } else {
+          // General-purpose logic that works for any index
+          val sentinelIndex = domIndexOf(ctx.sentinelNode.ref)
+          val trailingSentinelIndex = domIndexOf(ctx.trailingSentinelNodeOpt.get.ref)
+          // Number of nodes currently between our sentinels. (read from DOM, not contentMap)
+          val spanSize = trailingSentinelIndex - sentinelIndex - 1
+          // Negative index counts from the end
+          val resolvedIndex = if (atIndex >= 0) atIndex else spanSize + atIndex
+          // Clamp index to allowed span range between sentinels
+          val clampedIndex = Math.max(0, Math.min(resolvedIndex, spanSize))
+          // #TODO[API] Should we warn/report/throw when clampedIndex != resolvedIndex?
+          DomApi.insertChildAtIndex(
+            parent = ctx.currentParentNode,
+            child = node,
+            index = sentinelIndex + clampedIndex + 1,
+            slotName = ctx.currentSlotName
+          )
+        }
         ctx.contentMap.set(node.ref, node)
 
       case CollectionCommand.Remove(node) =>
