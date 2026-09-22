@@ -11,7 +11,7 @@ target
 .bsp
 .scalex
 
-project/metals.sbt
+metals.sbt
 project/.bloop
 
 node_modules
