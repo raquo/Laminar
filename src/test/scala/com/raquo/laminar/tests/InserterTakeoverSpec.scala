@@ -163,6 +163,59 @@ class InserterTakeoverSpec extends UnitSpec {
     }
   }
 
+  it("onMountInsert: `children <--` (a, nested `child <-- b`) -> `child <-- b` keeps b mounted, unmounts only a") {
+    // Same as the test above, except that the list renders b through a nested `child <--` item.
+    // Nesting must not change the outcome: b is already in the context's span, so the takeover
+    // retains it rather than tearing down the nested item and then re-inserting b.
+    val tracker = createEventTracker()
+    val childrenBus = new EventBus[List[Inserter]]
+    val childBus = new EventBus[Div]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
+
+    var dynamicInserter: Inserter = children <-- childrenBus.events
+    val takeoverInserter: Inserter = child <-- childBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial: children <-- renders a, and b through a nested `child <--`:") {
+      mount(el)
+      childrenBus.emit(List(a, child <-- Val(b)))
+      expectNode(div of ("Hello ", sentinel, div of "a", sentinel, div of "b", sentinel, sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("unmount then remount rides a and b on the element's own lifecycle:") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b"),
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("`child <-- b` takes over: b (already present) stays put, only a is torn down:") {
+      childBus.emit(b)
+      expectNode(div of ("Hello ", sentinel, div of "b", " world"))
+      // As in the un-nested test above: b is RETAINED, not re-mounted, so there's no `mount:b`.
+      tracker.assertEvents(
+        _.unmounted("a")
+      )
+    }
+  }
+
   // -- `children <--` context: the parent stays mounted throughout, so unmount callbacks
   //    fire exactly when content is torn down – an unambiguous check. --
 
