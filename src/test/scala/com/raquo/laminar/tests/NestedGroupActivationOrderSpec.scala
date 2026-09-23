@@ -231,4 +231,241 @@ class NestedGroupActivationOrderSpec extends UnitSpec {
       )
     }
   }
+
+  // -- Fixture: stale content whose mount has a side effect on an UNRELATED live list --
+
+  // While mounted, the group's content `c` claims `e` via its own `child.maybe <--` binding.
+  // While the group is inactive, `c` leaves the group's source and starts claiming `e`, which
+  // meanwhile lives in an unrelated live list. If stale `c` ever mounts, its binding steals `e`
+  // from that list, and when the group then drops `c`, `e` leaves the page with it for good.
+
+  private class StaleClaimer(tracker: EventTracker) {
+    val e: Div = tracker.createDiv("e")
+    val claimE: Var[Option[HtmlElement]] = Var(None)
+    val c: Div = tracker.createDiv("c", child.maybe <-- claimE.signal)
+    val groupItems: Var[List[HtmlElement]] = Var(List(c))
+    val group: Inserter = children <-- groupItems.signal
+    tracker.clear()
+
+    /** Call while the group is inactive: drop `c` from the group, and make `c` claim `e`. */
+    def makeContentStale(): Unit = {
+      Var.set(
+        groupItems -> Nil,
+        claimE -> Some(e)
+      )
+    }
+  }
+
+  it("REFERENCE: a never-moved group's stale content does not mount, so it can't steal from an unrelated list") {
+    // Baseline for the tests below: `e` stays in L3, untouched, when the group's host remounts.
+    val tracker = createEventTracker()
+    val s = new StaleClaimer(tracker)
+    val showL1 = Var(true)
+    val items3 = Var[List[HtmlElement]](Nil)
+    val l1 = div("L1", s.group)
+    val l3 = div("L3", children <-- items3.signal)
+    val root = div(child.maybe <-- showL1.signal.map(if (_) Some(l1) else None), l3)
+
+    withClue("mount: the group renders and mounts `c`:") {
+      mount(root)
+      tracker.assertEvents(_.mounted("c")).clear()
+    }
+
+    withClue("hide L1, make `c` stale while inactive, and put `e` in the unrelated live L3:") {
+      showL1.set(false)
+      tracker.assertEvents(_.unmounted("c")).clear()
+      s.makeContentStale()
+      tracker.assertNoEvents.clear()
+      items3.set(List(s.e))
+      tracker.assertEvents(_.mounted("e")).clear()
+    }
+
+    withClue("show L1 again: the group re-renders first, stale `c` never mounts, `e` stays in L3:") {
+      showL1.set(true)
+      tracker.assertNoEvents.clear()
+      expectNode(l1.ref, div.of("L1", sentinel, sentinel))
+      expectNode(l3.ref, div.of("L3", sentinel, div of "e", sentinel))
+    }
+  }
+
+  it("a group stolen from an UNMOUNTED host into a mounted list does not let stale content steal from an unrelated list") {
+    val tracker = createEventTracker()
+    val s = new StaleClaimer(tracker)
+    val showL1 = Var(true)
+    val items1 = Var[List[Inserter]](List(s.group))
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[HtmlElement]](Nil)
+    val l1 = div("L1", children <-- items1.signal)
+    val l2 = div("L2", children <-- items2.signal)
+    val l3 = div("L3", children <-- items3.signal)
+    val root = div(child.maybe <-- showL1.signal.map(if (_) Some(l1) else None), l2, l3)
+
+    withClue("mount: the group renders and mounts `c` in L1:") {
+      mount(root)
+      tracker.assertEvents(_.mounted("c")).clear()
+    }
+
+    withClue("hide L1, make `c` stale while inactive, and put `e` in the unrelated live L3:") {
+      showL1.set(false)
+      tracker.assertEvents(_.unmounted("c")).clear()
+      s.makeContentStale()
+      tracker.assertNoEvents.clear()
+      items3.set(List(s.e))
+      tracker.assertEvents(_.mounted("e")).clear()
+    }
+
+    withClue("mounted L2 steals the group out of hidden L1: stale `c` must not mount and steal `e`:") {
+      items2.set(List(s.group))
+      tracker.assertNoEvents.clear()
+      expectNode(l2.ref, div.of("L2", sentinel, sentinel, sentinel, sentinel))
+      expectNode(l3.ref, div.of("L3", sentinel, div of "e", sentinel))
+    }
+  }
+
+  it("a group moved from an UNMOUNTED host onto a mounted element does not let stale content steal from an unrelated list") {
+    val tracker = createEventTracker()
+    val s = new StaleClaimer(tracker)
+    val showL1 = Var(true)
+    val items1 = Var[List[Inserter]](List(s.group))
+    val items3 = Var[List[HtmlElement]](Nil)
+    val l1 = div("L1", children <-- items1.signal)
+    val host = div("HOST")
+    val l3 = div("L3", children <-- items3.signal)
+    val root = div(child.maybe <-- showL1.signal.map(if (_) Some(l1) else None), host, l3)
+
+    withClue("mount: the group renders and mounts `c` in L1:") {
+      mount(root)
+      tracker.assertEvents(_.mounted("c")).clear()
+    }
+
+    withClue("hide L1, make `c` stale while inactive, and put `e` in the unrelated live L3:") {
+      showL1.set(false)
+      tracker.assertEvents(_.unmounted("c")).clear()
+      s.makeContentStale()
+      tracker.assertNoEvents.clear()
+      items3.set(List(s.e))
+      tracker.assertEvents(_.mounted("e")).clear()
+    }
+
+    withClue("move the group onto mounted HOST: stale `c` must not mount and steal `e`:") {
+      host.amend(s.group)
+      tracker.assertNoEvents.clear()
+      expectNode(host.ref, div.of("HOST", sentinel, sentinel))
+      expectNode(l3.ref, div.of("L3", sentinel, div of "e", sentinel))
+    }
+  }
+
+  it("a group moved onto an UNMOUNTED element does not let stale content steal from an unrelated list when that element mounts") {
+    val tracker = createEventTracker()
+    val s = new StaleClaimer(tracker)
+    val showL1 = Var(true)
+    val items1 = Var[List[Inserter]](List(s.group))
+    val items3 = Var[List[HtmlElement]](Nil)
+    val l1 = div("L1", children <-- items1.signal)
+    val host = div("HOST") // stays detached until the last step
+    val l3 = div("L3", children <-- items3.signal)
+    val root = div(child.maybe <-- showL1.signal.map(if (_) Some(l1) else None), l3)
+
+    withClue("mount: the group renders and mounts `c` in L1:") {
+      mount(root)
+      tracker.assertEvents(_.mounted("c")).clear()
+    }
+
+    withClue("hide L1, make `c` stale while inactive, and put `e` in the unrelated live L3:") {
+      showL1.set(false)
+      tracker.assertEvents(_.unmounted("c")).clear()
+      s.makeContentStale()
+      tracker.assertNoEvents.clear()
+      items3.set(List(s.e))
+      tracker.assertEvents(_.mounted("e")).clear()
+    }
+
+    withClue("move the group onto the detached HOST (inactive to inactive):") {
+      host.amend(s.group)
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("mount HOST: stale `c` must not mount and steal `e`:") {
+      root.amend(host)
+      tracker.assertNoEvents.clear()
+      expectNode(host.ref, div.of("HOST", sentinel, sentinel))
+      expectNode(l3.ref, div.of("L3", sentinel, div of "e", sentinel))
+    }
+  }
+
+  // -- Depth 2: the stale content is itself a nested group, not an element --
+
+  // A fix must cover every nesting depth: moving the outer group also moves (and re-registers)
+  // the inner group, so the inner group must not run ahead of the outer group's re-render either.
+
+  it("REFERENCE depth-2: a never-moved group's stale NESTED group does not activate, so it can't steal from an unrelated list") {
+    val tracker = createEventTracker()
+    val e = tracker.createDiv("e")
+    tracker.clear()
+    val claimE = Var[Option[HtmlElement]](None)
+    val inner: Inserter = child.maybe <-- claimE.signal // claims `e` while active
+    val outerItems = Var[List[Inserter]](List(inner))
+    val outer: Inserter = children <-- outerItems.signal
+    val showL1 = Var(true)
+    val items3 = Var[List[HtmlElement]](Nil)
+    val l1 = div("L1", outer)
+    val l3 = div("L3", children <-- items3.signal)
+    val root = div(child.maybe <-- showL1.signal.map(if (_) Some(l1) else None), l3)
+
+    withClue("mount, hide L1, make `inner` stale while inactive, and put `e` in the unrelated live L3:") {
+      mount(root)
+      showL1.set(false)
+      Var.set(
+        outerItems -> Nil,
+        claimE -> Some(e)
+      )
+      tracker.assertNoEvents.clear()
+      items3.set(List(e))
+      tracker.assertEvents(_.mounted("e")).clear()
+    }
+
+    withClue("show L1 again: the outer group re-renders first, stale `inner` never activates:") {
+      showL1.set(true)
+      tracker.assertNoEvents.clear()
+      expectNode(l1.ref, div.of("L1", sentinel, sentinel))
+      expectNode(l3.ref, div.of("L3", sentinel, div of "e", sentinel))
+    }
+  }
+
+  it("depth-2: a group stolen from an UNMOUNTED host into a mounted list does not let a stale NESTED group steal from an unrelated list") {
+    val tracker = createEventTracker()
+    val e = tracker.createDiv("e")
+    tracker.clear()
+    val claimE = Var[Option[HtmlElement]](None)
+    val inner: Inserter = child.maybe <-- claimE.signal // claims `e` while active
+    val outerItems = Var[List[Inserter]](List(inner))
+    val outer: Inserter = children <-- outerItems.signal
+    val showL1 = Var(true)
+    val items1 = Var[List[Inserter]](List(outer))
+    val items2 = Var[List[Inserter]](Nil)
+    val items3 = Var[List[HtmlElement]](Nil)
+    val l1 = div("L1", children <-- items1.signal)
+    val l2 = div("L2", children <-- items2.signal)
+    val l3 = div("L3", children <-- items3.signal)
+    val root = div(child.maybe <-- showL1.signal.map(if (_) Some(l1) else None), l2, l3)
+
+    withClue("mount, hide L1, make `inner` stale while inactive, and put `e` in the unrelated live L3:") {
+      mount(root)
+      showL1.set(false)
+      Var.set(
+        outerItems -> Nil,
+        claimE -> Some(e)
+      )
+      tracker.assertNoEvents.clear()
+      items3.set(List(e))
+      tracker.assertEvents(_.mounted("e")).clear()
+    }
+
+    withClue("mounted L2 steals the outer group out of hidden L1: stale `inner` must not activate and steal `e`:") {
+      items2.set(List(outer))
+      tracker.assertNoEvents.clear()
+      expectNode(l2.ref, div.of("L2", sentinel, sentinel, sentinel, sentinel))
+      expectNode(l3.ref, div.of("L3", sentinel, div of "e", sentinel))
+    }
+  }
 }
