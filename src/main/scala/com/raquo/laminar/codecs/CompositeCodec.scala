@@ -1,8 +1,7 @@
 package com.raquo.laminar.codecs
 
-import com.raquo.ew.ewArray
-
 import scala.scalajs.js.JSStringOps._
+import scala.scalajs.js.|
 
 /** Such codecs are used for space-separated or comma-separated values, e.g. in the `cls` attr. */
 class CompositeCodec(separator: String) extends Codec[Iterable[String], String] {
@@ -13,6 +12,45 @@ class CompositeCodec(separator: String) extends Codec[Iterable[String], String] 
 
   override def encode(scalaValue: Iterable[String]): String = {
     scalaValue.mkString(separator)
+  }
+
+  /** Same result as `encode(decode(domValue).filterNot(removeItems.contains) ++ addItems)`,
+    * computed in one pass without intermediate collections – this runs on every
+    * composite key update, e.g. every `cls <-- signal` emission.
+    *
+    * @param domValue raw DOM value, `()` if the attribute is not set
+    * @param addItems must be normalized
+    */
+  def encodeUpdated(
+    domValue: String | Unit,
+    removeItems: List[String],
+    addItems: List[String]
+  ): String = {
+    var result = ""
+    var isFirst = true
+    val append = (item: String) => {
+      if (isFirst) {
+        result = item
+        isFirst = false
+      } else {
+        result = result + separator + item
+      }
+    }
+    domValue.foreach { value =>
+      if (value.nonEmpty) {
+        val items = value.jsSplit(separator)
+        var i = 0
+        while (i < items.length) {
+          val item = items(i)
+          if (item.nonEmpty && !removeItems.contains(item)) {
+            append(item)
+          }
+          i += 1
+        }
+      }
+    }
+    addItems.foreach(append)
+    result
   }
 }
 
@@ -29,8 +67,22 @@ object CompositeCodec {
   def normalize(items: String, separator: String): List[String] = {
     if (items.isEmpty) {
       Nil
+    } else if (items.indexOf(separator) == -1) {
+      // Fast path for the most common case: a single item, e.g. `cls := "active"`
+      items :: Nil
     } else {
-      items.jsSplit(separator).ew.filter(_.nonEmpty).asScalaJs.toList
+      val splitItems = items.jsSplit(separator)
+      // Iterate backwards to build the List by prepending, preserving order
+      var result: List[String] = Nil
+      var i = splitItems.length - 1
+      while (i >= 0) {
+        val item = splitItems(i)
+        if (item.nonEmpty) {
+          result = item :: result
+        }
+        i -= 1
+      }
+      result
     }
   }
 }
