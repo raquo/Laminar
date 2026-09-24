@@ -170,7 +170,10 @@ final class NestedGroup(
     }
   }
 
-  private[laminar] def removeFromParent(): Unit = {
+  /** @param keepItem Content items to leave in the parent's DOM – see
+    *                 [[InsertContext.removeContentMapNodesFromDom]].
+    */
+  private[laminar] def removeFromParent(keepItem: dom.Node => Boolean): Unit = {
     // #Note: order of operations mirrors that in willSetParent(None) of ReactiveElement
     //  - first, disown the subscription, then, update the DOM.
 
@@ -182,9 +185,11 @@ final class NestedGroup(
     // a `children <--` list, a `children.command` span, or a plain `child <--` / `text <--`
     // node), tearing down any per-item lifecycle. The context knows its own content type,
     // so this one call picks the right teardown strategy.
+    // Kept items are left in the parent, exactly where this group's span was.
     nestedInsertContext.clearPreviousInserterContent(
       replaceContentMapWithSingleNode = js.undefined,
-      nextInserterType = js.undefined
+      nextInserterType = js.undefined,
+      keepItem = keepItem
     )
 
     // A. Remove the sentinel nodes from the parent DOM. Use the CURRENT parent

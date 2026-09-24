@@ -3,10 +3,11 @@ package com.raquo.laminar.tests
 import com.raquo.domtestutils.matching.Rule
 import com.raquo.laminar.api.L._
 import com.raquo.laminar.domapi.{DomApi, DomError}
-import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, RemoveAll, Replace, ReplaceAll}
-import com.raquo.laminar.inserters.{CollectionCommand, DynamicInserter, InsertContext, Inserter}
 import com.raquo.laminar.fixtures.TestableOwner
+import com.raquo.laminar.inserters.{CollectionCommand, DynamicInserter, InsertContext, Inserter}
+import com.raquo.laminar.inserters.CollectionCommand.{Append, Insert, Prepend, Remove, RemoveAll, Replace, ReplaceAll}
 import com.raquo.laminar.utils.UnitSpec
+import org.scalajs.dom
 
 import scala.collection.immutable
 
@@ -73,66 +74,285 @@ class ChildrenCommandReceiverSpec extends UnitSpec {
     }
   }
 
-  it("RemoveAll and ReplaceAll") {
+  List(true, false).foreach { minimizeDiff =>
+
+    it(s"RemoveAll and ReplaceAll (minimizeDiff = $minimizeDiff)") {
+      val commandBus = new EventBus[CollectionCommand[Node]]
+
+      val span0 = span(text0)
+      val span1 = span(text1)
+      val div2 = div(text2)
+      val div3 = div(text3)
+      val span4 = span(text4)
+
+      val el = div(
+        "Hello",
+        children.command <-- commandBus.events,
+        div("World")
+      )
+
+      mount(el)
+      expectChildren("initial:")
+
+      commandBus.writer.onNext(Append(span0))
+      commandBus.writer.onNext(Append(span1))
+      commandBus.writer.onNext(Prepend(div2))
+      expectChildren(
+        "built up:",
+        div of text2,
+        span of text0,
+        span of text1
+      )
+
+      // RemoveAll clears all tracked content, but keeps the sentinels in place.
+      commandBus.writer.onNext(RemoveAll)
+      expectChildren(
+        "after RemoveAll:",
+        // no children
+      )
+
+      // Commands keep working after a full clear.
+      commandBus.writer.onNext(Append(span4))
+      expectChildren(
+        "append after RemoveAll:",
+        span of text4
+      )
+
+      // ReplaceAll swaps the entire contents, in order.
+      commandBus.writer.onNext(ReplaceAll(div2 :: div3 :: Nil, minimizeDiff))
+      expectChildren(
+        "after ReplaceAll:",
+        div of text2,
+        div of text3
+      )
+
+      // ReplaceAll with an empty seq is equivalent to RemoveAll.
+      commandBus.writer.onNext(ReplaceAll(Nil, minimizeDiff))
+      expectChildren(
+        "after empty ReplaceAll:",
+        // no children
+      )
+
+      // Still functional after an empty ReplaceAll.
+      commandBus.writer.onNext(Append(span0))
+      expectChildren(
+        "append after empty ReplaceAll:",
+        span of text0
+      )
+
+      commandBus.writer.onNext(Append(span1))
+      commandBus.writer.onNext(Append(div2))
+      expectChildren(
+        "built up again:",
+        span of text0,
+        span of text1,
+        div of text2
+      )
+
+      // ReplaceAll may include nodes that are currently rendered (span0, span1 here): they are
+      // placed in the new order next to the new nodes (whether they're re-mounted depends on
+      // `minimizeDiff` – see the ReplaceAll lifecycle tests below). So this keeps span1 & span0
+      // (reordered), drops div2, and adds a fresh div3.
+      commandBus.writer.onNext(ReplaceAll(span1 :: div3 :: span0 :: Nil, minimizeDiff))
+      expectChildren(
+        "after ReplaceAll reusing rendered nodes:",
+        span of text1,
+        div of text3,
+        span of text0
+      )
+
+      def expectChildren(clue: String, childRules: Rule*): Unit = {
+        withClue(clue) {
+          val first: Rule = "Hello"
+          val last: Rule = div of "World"
+          val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ (sentinel: Rule) :+ last
+          expectNode(div.of(rules: _*))
+        }
+      }
+    }
+  }
+
+  it("ReplaceAll(minimizeDiff = true) keeps the nodes that stay mounted, and unmounts the leaving nodes before mounting new ones") {
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val x = tracker.createDiv("x")
+    val y = tracker.createDiv("y")
+    tracker.clear()
+
     val commandBus = new EventBus[CollectionCommand[Node]]
-
-    val span0 = span(text0)
-    val span1 = span(text1)
-    val div2 = div(text2)
-    val div3 = div(text3)
-    val span4 = span(text4)
-
     val el = div(
       "Hello",
       children.command <-- commandBus.events,
       div("World")
     )
 
+    withClue("initial:") {
+      mount(el)
+      commandBus.emit(Append(a))
+      commandBus.emit(Append(b))
+      commandBus.emit(Append(c))
+      expectNode(div.of("Hello", sentinel, div of "a", div of "b", div of "c", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b"),
+          _.mounted("c")
+        )
+        .clear()
+    }
+
+    withClue("ReplaceAll(c, x, a): b unmounts, then x mounts; a and c are kept and reordered:") {
+      commandBus.emit(ReplaceAll(c :: x :: a :: Nil, minimizeDiff = true))
+      expectNode(div.of("Hello", sentinel, div of "c", div of "x", div of "a", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.mounted("x")
+        )
+        .clear()
+    }
+
+    withClue("the kept nodes are tracked as usual: Remove works on them:") {
+      commandBus.emit(Remove(a))
+      expectNode(div.of("Hello", sentinel, div of "c", div of "x", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.unmounted("a")
+        )
+        .clear()
+    }
+
+    withClue("Append still lands at the end of the span:") {
+      commandBus.emit(Append(y))
+      expectNode(div.of("Hello", sentinel, div of "c", div of "x", div of "y", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.mounted("y")
+        )
+        .clear()
+    }
+
+    withClue("RemoveAll reaches both kept and new nodes:") {
+      commandBus.emit(RemoveAll)
+      expectNode(div.of("Hello", sentinel, sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.unmounted("c"),
+          _.unmounted("x"),
+          _.unmounted("y")
+        )
+        .clear()
+    }
+  }
+
+  it("ReplaceAll(minimizeDiff = true) does not move the kept nodes that are already in the right place") {
+    // Moving a DOM node has side effects even without re-mounting (e.g. it loses focus, and
+    // resets iframes), so the nodes that don't need to move are left untouched.
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val x = tracker.createDiv("x")
+    tracker.clear()
+
+    val commandBus = new EventBus[CollectionCommand[Node]]
+    val el = div(children.command <-- commandBus.events)
+
     mount(el)
-    expectChildren("initial:")
+    commandBus.emit(Append(a))
+    commandBus.emit(Append(b))
+    commandBus.emit(Append(c))
+    tracker.clear()
 
-    commandBus.writer.onNext(Append(span0))
-    commandBus.writer.onNext(Append(span1))
-    commandBus.writer.onNext(Prepend(div2))
-    expectChildren("built up:", div of text2, span of text0, span of text1)
-
-    // RemoveAll clears all tracked content, but keeps the sentinels in place.
-    commandBus.writer.onNext(RemoveAll)
-    expectChildren("after RemoveAll:")
-
-    // Commands keep working after a full clear.
-    commandBus.writer.onNext(Append(span4))
-    expectChildren("append after RemoveAll:", span of text4)
-
-    // ReplaceAll swaps the entire contents, in order.
-    commandBus.writer.onNext(ReplaceAll(div2 :: div3 :: Nil))
-    expectChildren("after ReplaceAll:", div of text2, div of text3)
-
-    // ReplaceAll with an empty seq is equivalent to RemoveAll.
-    commandBus.writer.onNext(ReplaceAll(Nil))
-    expectChildren("after empty ReplaceAll:")
-
-    // Still functional after an empty ReplaceAll.
-    commandBus.writer.onNext(Append(span0))
-    expectChildren("append after empty ReplaceAll:", span of text0)
-
-    commandBus.writer.onNext(Append(span1))
-    commandBus.writer.onNext(Append(div2))
-    expectChildren("built up again:", span of text0, span of text1, div of text2)
-
-    // ReplaceAll may include nodes that are currently rendered (span0, span1 here): they get
-    // torn down along with everything else, then re-inserted in the new order next to the new
-    // nodes. So this keeps span1 & span0 (reordered), drops div2, and adds a fresh div3.
-    commandBus.writer.onNext(ReplaceAll(span1 :: div3 :: span0 :: Nil))
-    expectChildren("after ReplaceAll reusing rendered nodes:", span of text1, div of text3, span of text0)
-
-    def expectChildren(clue: String, childRules: Rule*): Unit = {
-      withClue(clue) {
-        val first: Rule = "Hello"
-        val last: Rule = div of "World"
-        val rules: immutable.Seq[Rule] = first +: (sentinel: Rule) +: childRules :+ (sentinel: Rule) :+ last
-        expectNode(div.of(rules: _*))
+    // Records every DOM insertion / removal under `el`, including moves (a removal + an insertion).
+    val observer = new dom.MutationObserver((_, _) => ())
+    observer.observe(el.ref, new dom.MutationObserverInit { childList = true })
+    def takeMutatedNodes(): List[String] = {
+      observer.takeRecords().toList.flatMap { record =>
+        record.removedNodes.toList.map(n => s"removed:${n.textContent}") ++
+          record.addedNodes.toList.map(n => s"added:${n.textContent}")
       }
+    }
+
+    withClue("ReplaceAll with the same nodes in the same order: no DOM changes at all:") {
+      commandBus.emit(ReplaceAll(a :: b :: c :: Nil, minimizeDiff = true))
+      expectNode(div.of(sentinel, div of "a", div of "b", div of "c", sentinel))
+      assert(takeMutatedNodes() == Nil)
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("ReplaceAll(a, x, c): b is removed and x is added, but a and c are not moved:") {
+      commandBus.emit(ReplaceAll(a :: x :: c :: Nil, minimizeDiff = true))
+      expectNode(div.of(sentinel, div of "a", div of "x", div of "c", sentinel))
+      assert(takeMutatedNodes() == List("removed:b", "added:x"))
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.mounted("x")
+        )
+        .clear()
+    }
+
+    observer.disconnect()
+  }
+
+  it("ReplaceAll(minimizeDiff = false) removes all current nodes, then inserts the new ones, re-mounting any overlap") {
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val x = tracker.createDiv("x")
+    tracker.clear()
+
+    val commandBus = new EventBus[CollectionCommand[Node]]
+    val el = div(
+      "Hello",
+      children.command <-- commandBus.events,
+      div("World")
+    )
+
+    withClue("initial:") {
+      mount(el)
+      commandBus.emit(Append(a))
+      commandBus.emit(Append(b))
+      commandBus.emit(Append(c))
+      expectNode(div.of("Hello", sentinel, div of "a", div of "b", div of "c", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b"),
+          _.mounted("c")
+        )
+        .clear()
+    }
+
+    withClue("ReplaceAll(c, x, a): everything unmounts first, then the new list mounts in order:") {
+      commandBus.emit(ReplaceAll(c :: x :: a :: Nil, minimizeDiff = false))
+      expectNode(div.of("Hello", sentinel, div of "c", div of "x", div of "a", sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b"),
+          _.unmounted("c"),
+          _.mounted("c"),
+          _.mounted("x"),
+          _.mounted("a")
+        )
+        .clear()
+    }
+
+    withClue("the new nodes are tracked as usual: RemoveAll reaches them:") {
+      commandBus.emit(RemoveAll)
+      expectNode(div.of("Hello", sentinel, sentinel, div of "World"))
+      tracker
+        .assertEvents(
+          _.unmounted("c"),
+          _.unmounted("x"),
+          _.unmounted("a")
+        )
+        .clear()
     }
   }
 

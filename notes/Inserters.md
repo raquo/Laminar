@@ -96,6 +96,15 @@ An item that leaves the list is removed from the DOM and its per-item lifecycle 
 ### Remove (no-op after a steal)
 If the node/group is no longer under this parent (already stolen), `removeFromDynamicList` does nothing — the new host owns it now. This is the "last write wins" safety valve.
 
+### Remove, keeping nested content (un-nesting)
+Removing old content can leave specific items in place: `removeContentMapNodesFromDom` takes a `keepItem` predicate, and passes it down through `removeFromDynamicList` → `NestedGroup.removeFromParent` into every nested item it tears down. The predicate is called with each item's `stableFirstNode` – its identity, the same key as in `contentMap` – not with an inserter object, because the same item can be represented by different inserter objects over time (e.g. fresh `SlottableChildInserter` wrappers on every emission). A kept item – a plain node, or a nested dynamic inserter with its whole span and live subscription – stays in the parent's DOM where it was, while the nested group around it is torn down. It never loses its parent, so it is not unmounted. Like moving a plain element out of a wrapper that's being removed, within the same parent.
+
+The caller must then promptly place every kept item where it belongs – otherwise it would be left in the DOM, untracked. Callers:
+
+- `child <--` taking over a span that contains its new node, even nested (§7).
+- `children <--` reconciliation removing a leaving item that contains nodes / inserters that the same emission keeps (`InserterMoveSpec` §4e).
+- `children.command <--` `ReplaceAll(newNodes, minimizeDiff = true)`, keeping the nodes that stay in the list. It also leaves kept nodes that are already in the right place untouched in the DOM. With `minimizeDiff = false`, `ReplaceAll` skips this work for performance: it removes all current nodes, then appends `newNodes`, re-mounting any overlap.
+
 ### External mutation
 Laminar tolerates a user/third-party removing an inserter's node from the DOM directly: the next reconciliation walks the live span and simply doesn't find it, correcting the count (`InserterExternalMutationSpec`; `ChildrenInserter.updateChildren` count-correction, referencing issue #120). External _insertion_ into a bracketed span (between our sentinels) is reported as an error on teardown/removeAll paths (`removeContentMapNodesFromDom` with a trailing sentinel), because we can't tell an intruder from our own content otherwise. External insertion into an unbracketed (`child <--`) span is silently treated as "the next sibling after our span" — we stop the walk there.
 
@@ -149,7 +158,8 @@ If the previous host genuinely _removed_ the group (set `nestedGroupOpt = js.und
 - **Per-item lifecycle is preserved across a transfer** — the owner is transferred, not rebuilt, so per-item `onMount`/`onUnmount` and internal subscriptions stay live (`InserterMoveSpec` "add-first / steal keeps the item's per-item lifecycle intact").
 - **Ordering is empirical but pinned.** Some teardown/swap orders are not obvious and are deliberately encoded by tests (see `notes/Testing.md`):
   - `child <--` self-replace swaps **unmount-old-then-mount-new**.
-  - A takeover of a _foreign_ span mounts-new-then-unmounts-old.
+  - A `child <--` takeover of a _foreign_ span also unmounts the old content before mounting the new node. The node it keeps (§7) is neither unmounted nor re-mounted.
+  - `children.command <--` `ReplaceAll` unmounts the leaving nodes before mounting the new ones. With `minimizeDiff = false`, all old nodes are considered "leaving", including those that are then re-inserted.
   - `children <--` teardown walks `contentMap` in **insertion order**, not current DOM order (several `#Note` comments; e.g. `InserterMoveSpec:890`, `InserterExternalMutationSpec:148`). This is teardown only — relocation uses DOM order (§5).
   - `Replace` (command) unmounts the old node then mounts the new (`InserterMoveSpec:1718`).
 
@@ -166,7 +176,7 @@ If the previous host genuinely _removed_ the group (set `nestedGroupOpt = js.und
 - Switching TO `child <--` / `text <--` clears prior multi-node content down to (at most) the one node being kept, and drops the trailing sentinel.
 - Switching TO `children.command <--` clears any content left by a _non-command_ inserter (commands can't patch foreign content to a target state), but **preserves** content it built itself across a mere remount, and preserves content built by a _different_ command inserter (`InserterTakeoverSpec` "children.command → children.command (different inserter) keeps the previous content").
 - A takeover that tears down a span reports an externally-inserted intruder (§3).
-- A takeover does **not** blindly tear down everything: `children <--` (a,b) → `child <-- b` keeps b mounted and unmounts only a (`InserterTakeoverSpec`).
+- A takeover does **not** blindly tear down everything: `children <--` (a,b) → `child <-- b` keeps b mounted and unmounts only a (`InserterTakeoverSpec`). This holds even if b is nested inside one of the list's dynamic items, at any depth: those items are torn down around b (§3 "un-nesting").
 
 ### The `setNextInserterType` invariant
 Whenever there is no trailing sentinel, `contentMap` holds **at most one** node. The guard in `setNextInserterType` throws if we ever switch to a trailing-sentinel type while lacking a trailing sentinel but already holding >1 content node (we wouldn't know where the pre-existing content ends). This is structurally unreachable via the public API; `InserterInvariantSpec` pins both the near-miss safety and the white-box guard firing.
@@ -226,9 +236,11 @@ Distinct from the last-write-wins contest above: when a slot could come from an 
 
 ## 10. Known deviations from the ideal
 
-### Provably unachievable (not bugs we can fix)
+### Accepted limitations
 
 - **Issue #163 — moving an element between two sibling `child <--` bindings re-mounts in one direction only.** When one element is shown via one of two independent `child <--` bindings toggled by a single signal, whether the toggle re-mounts is _order-dependent_: the binding that GAINS the element must fire before the one that LOSES it for the transfer to be seamless. When the losing binding fires first, the element is detached to `None` (unmount) before re-attachment (mount). This is inherent to synchronous propagation order; a `delaySync` workaround only fixes one direction. Characterized (not "fixed") in `InserterMoveSpec` "CHARACTERIZATION (issue #163)". The `probe(addFirst=false)` remove-first re-mount in the REFERENCE test is the same underlying limitation.
+
+- **Re-wrapping a nested node into a NEW nested inserter can re-mount it.** `children <--` (nested `child <-- b`, a) → (a, NEW nested `child <-- b`): reconciliation removes the leaving item before it reaches the new one, and nothing is known about the new inserter's content until it subscribes, so b can't be kept (§3 "un-nesting"), and is unmounted, then mounted again. If the new inserter comes BEFORE the leaving item in the list, it takes b before the old item is removed, which is seamless. Fixing the general case would require deferring the teardown of leaving items until the end of reconciliation. Characterized in `InserterMoveSpec` "CHARACTERIZATION: re-wrapping a nested node…".
 
 ---
 

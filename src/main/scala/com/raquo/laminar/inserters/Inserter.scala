@@ -69,8 +69,16 @@ trait DiffableInserter extends Inserter {
     *
     * Pre-requisite: you must have called [[addToDynamicList]]
     *                with the same parent before calling this.
+    *
+    * @param keepNestedItem Items nested INSIDE this inserter that must be left in place
+    *                       rather than removed – see [[InsertContext.removeContentMapNodesFromDom]].
+    *                       #Warning: The caller is responsible for checking whether THIS
+    *                        inserter's own `stableFirstNode` against `keepItem`.
     */
-  private[laminar] def removeFromDynamicList(parent: ReactiveElement.Base): Unit
+  private[laminar] def removeFromDynamicList(
+    parent: ReactiveElement.Base,
+    keepNestedItem: dom.Node => Boolean
+  ): Unit
 
   /** No mount / re-mount, just a lateral move.
     *
@@ -290,13 +298,16 @@ class DynamicInserter(
     }
   }
 
-  override private[laminar] def removeFromDynamicList(parent: ReactiveElement.Base): Unit = {
+  override private[laminar] def removeFromDynamicList(
+    parent: ReactiveElement.Base,
+    keepNestedItem: dom.Node => Boolean
+  ): Unit = {
     val group = nestedGroupOpt.getOrElse(
       throw new Exception("Can not removeFromDynamicList: nested group not found (addToDynamicList was not called first). This is a bug in Laminar.")
     )
     if (group.leadingSentinel.ref.parentNode == parent.ref) {
       // This list still hosts the group's span – a genuine removal – #Note: probably – see below
-      group.removeFromParent()
+      group.removeFromParent(keepNestedItem)
       nestedGroupOpt = js.undefined
     } else {
       // The group was already moved to a different parent, stolen by its new host, so there is

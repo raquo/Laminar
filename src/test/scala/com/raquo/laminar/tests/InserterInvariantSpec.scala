@@ -127,7 +127,7 @@ class InserterInvariantSpec extends UnitSpec {
 
     // No `addToDynamicList` was ever called on `inserter`, so it has no NestedGroup.
     val thrown = intercept[Exception] {
-      inserter.removeFromDynamicList(parent)
+      inserter.removeFromDynamicList(parent, InsertContext.keepNoItems)
     }
     assert(thrown.getMessage.contains("nested group not found"))
   }

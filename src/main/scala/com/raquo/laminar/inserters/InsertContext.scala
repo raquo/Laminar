@@ -182,14 +182,21 @@ final class InsertContext(
     *
     * @param replaceContentMapWithSingleNode
     *            If specified, will ensure that the resulting contentMap has this node.
-    *            If specified, will prevent this node from being removed from the DOM, but will NOT add it to the DOM.
+    *            If specified, will prevent this node from being removed from the DOM
+    *            (even if it's nested in a dynamic item), but will NOT add it to the DOM.
+    * @param keepItem Items to leave in the DOM – see [[removeContentMapNodesFromDom]].
     */
   def clearPreviousInserterContent(
     replaceContentMapWithSingleNode: js.UndefOr[ChildNode.Base],
-    nextInserterType: js.UndefOr[InserterType]
+    nextInserterType: js.UndefOr[InserterType],
+    keepItem: dom.Node => Boolean = InsertContext.keepNoItems
   ): Unit = {
     // Remove from the DOM any old nodes that shouldn't be retained.
-    removeContentMapNodesFromDom(keepNodeIfPresent = replaceContentMapWithSingleNode)
+    removeContentMapNodesFromDom(
+      keepItem = replaceContentMapWithSingleNode.fold(keepItem) { singleNode =>
+        ref => (ref eq singleNode.ref) || keepItem(ref)
+      }
+    )
 
     // Update the context to match the DOM state
     contentMap.clear()
@@ -213,7 +220,20 @@ final class InsertContext(
   }
 
   /** Walk this context's span forward from [[sentinelNode]], removing every tracked
-    * ([[contentMap]]) node from the DOM except `keepNodeIfPresent`.
+    * ([[contentMap]]) item from the DOM except those matching `keepItem`.
+    *
+    * @param keepItem Called with each item's `stableFirstNode`, the item's identity (the same
+    *                 key as in [[contentMap]]): the node itself for a plain or slotted node,
+    *                 or the leading sentinel for a dynamic inserter.
+    *
+    * `keepItem` is also applied recursively inside the removed dynamic items: a kept item is
+    * left in place under the same parent (a dynamic inserter with its whole span and live
+    * subscription), even if the nested group that contained it is torn down. It never loses
+    * its parent, so it's not unmounted. This lets the caller re-insert it seamlessly.
+    *
+    * #Warning: The caller must promptly place every kept item into the DOM where it belongs,
+    *  and track it there. A kept item is left where it was, untracked by this context – and
+    *  if it came from inside a removed nested group, it's untracked by anyone.
     *
     * Where the walk stops depends on whether we have a [[_trailingSentinelNodeOpt]]:
     *  - With one (a `children <--` or `children.command <--` span), it marks the definite
@@ -231,7 +251,7 @@ final class InsertContext(
     * #Note: this does NOT update [[contentMap]] to match the new DOM.
     */
   def removeContentMapNodesFromDom(
-    keepNodeIfPresent: js.UndefOr[ChildNode.Base]
+    keepItem: dom.Node => Boolean
   ): Unit = {
     val hasTrailingSentinel = _trailingSentinelNodeOpt.nonEmpty
     var maybeRef = sentinelNode.ref.nextSibling
@@ -241,10 +261,10 @@ final class InsertContext(
       if (_trailingSentinelNodeOpt.exists(_.ref == childRef)) {
         // Reached the end of our span. Stop.
         continue = false
-      } else if (keepNodeIfPresent.exists(_.ref == childRef)) {
-        // The node we're keeping. Leave it in place, step over it (a plain content node, so
-        // a single node) and keep clearing whatever old content sits after it.
-        maybeRef = childRef.nextSibling
+      } else if (keepItem(childRef)) {
+        // An item we're keeping. Leave it in place, step over it (in one go, if it's a nested
+        // inserter's span), and keep clearing whatever old content sits after it.
+        maybeRef = contentMap.get(childRef).fold(childRef.nextSibling)(_.lastNode.nextSibling)
       } else {
         contentMap.get(childRef).fold {
           if (hasTrailingSentinel) {
@@ -265,7 +285,7 @@ final class InsertContext(
           // so a multi-node span (e.g. a nested group) is stepped over in one go.
           val nextRef = inserter.lastNode.nextSibling
           // @Note: DOM update
-          inserter.removeFromDynamicList(currentParentNode)
+          inserter.removeFromDynamicList(currentParentNode, keepItem)
           maybeRef = nextRef
         }
       }
@@ -323,6 +343,8 @@ final class InsertContext(
 }
 
 object InsertContext {
+
+  private[laminar] val keepNoItems: dom.Node => Boolean = _ => false
 
   /** Reserve the spot for when we actually insert real nodes later */
   def reserveSpotContext(

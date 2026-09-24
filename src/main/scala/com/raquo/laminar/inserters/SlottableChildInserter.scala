@@ -78,7 +78,10 @@ with Slottable[SlottableChildInserter] {
     )
   }
 
-  override private[laminar] def removeFromDynamicList(parent: ReactiveElement.Base): Unit = {
+  override private[laminar] def removeFromDynamicList(
+    parent: ReactiveElement.Base,
+    keepNestedItem: dom.Node => Boolean // Unused – no nested items to keep
+  ): Unit = {
     DomApi.removeChild(parent = parent, child = child)
   }
 
