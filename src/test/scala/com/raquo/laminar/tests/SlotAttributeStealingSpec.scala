@@ -1,6 +1,8 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.inserters.CollectionCommand
+import com.raquo.laminar.inserters.CollectionCommand.{Append, ReplaceAll}
 import com.raquo.laminar.nodes.Slot
 import com.raquo.laminar.utils.UnitSpec
 
@@ -138,6 +140,59 @@ class SlotAttributeStealingSpec extends UnitSpec {
       tracker.assertNoEvents.clear()
       e.ref.getAttribute("slot") shouldBe "prefix"
       f.ref.getAttribute("slot") shouldBe "prefix"
+    }
+  }
+
+  List(true, false).foreach { minimizeDiff =>
+
+    it(s"a slotted `children.command` ReplaceAll(minimizeDiff = $minimizeDiff) re-asserts the Slot's slot over a manual override, even on a node that stays in place") {
+      // Same as the reorder above: ReplaceAll is a fresh Slot write for every node it's given,
+      // regardless of whether the node needs to move, and whether it's kept or re-inserted.
+      val tracker = createEventTracker()
+      val e = tracker.createSpan("E")
+      val f = tracker.createSpan("F")
+      tracker.clear()
+      val commandBus = new EventBus[CollectionCommand[HtmlElement]]
+      val host = div(new Slot("prefix")(children.command <-- commandBus.events))
+
+      withClue("both elements get the Slot's slot on mount:") {
+        mount(div(host))
+        commandBus.emit(Append(e))
+        commandBus.emit(Append(f))
+        tracker
+          .assertEvents(
+            _.mounted("E"),
+            _.mounted("F")
+          )
+          .clear()
+        e.ref.getAttribute("slot") shouldBe "prefix"
+        f.ref.getAttribute("slot") shouldBe "prefix"
+      }
+
+      withClue("a manual slot := overrides just that element:") {
+        e.amend(slot := "manual")
+        tracker.assertNoEvents.clear()
+        e.ref.getAttribute("slot") shouldBe "manual"
+        f.ref.getAttribute("slot") shouldBe "prefix"
+      }
+
+      withClue("ReplaceAll(e, f) re-asserts the Slot's slot on e, which stays in place:") {
+        commandBus.emit(ReplaceAll(e :: f :: Nil, minimizeDiff))
+        if (minimizeDiff) {
+          tracker.assertNoEvents.clear()
+        } else {
+          tracker
+            .assertEvents(
+              _.unmounted("E"),
+              _.unmounted("F"),
+              _.mounted("E"),
+              _.mounted("F")
+            )
+            .clear()
+        }
+        e.ref.getAttribute("slot") shouldBe "prefix"
+        f.ref.getAttribute("slot") shouldBe "prefix"
+      }
     }
   }
 

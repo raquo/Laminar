@@ -206,15 +206,21 @@ object ChildrenCommandInserter {
     // Place the nodes in order. Kept nodes that are already in the right place stay put.
     var afterRef: dom.Node = ctx.sentinelNode.ref
     newNodes.foreach { node =>
-      if (
-        (afterRef.nextSibling eq node.ref) ||
+      val isPlaced = if (afterRef.nextSibling eq node.ref) {
+        // Re-affirm the slot, just like inserting the node would, so that this reconcile
+        // wins over a manual `slot` override, whether or not the node had to move
+        // (consistent last-write-wins semantics).
+        node.applySlot(ctx.currentParentNode, ctx.currentSlotName)
+        true
+      } else {
         DomApi.insertChildAfter(
           parent = ctx.currentParentNode,
           newChild = node,
           referenceChildRef = afterRef,
           slotName = ctx.currentSlotName
         )
-      ) {
+      }
+      if (isPlaced) {
         ctx.contentMap.set(node.ref, node)
         afterRef = node.ref
       }
