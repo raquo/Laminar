@@ -2,7 +2,7 @@ package com.raquo.laminar.keys
 
 import com.raquo.airstream.core.Source
 import com.raquo.laminar.api.{MapValueMapper, StringOptionValueMapper, StringSeqValueMapper, StringValueMapper}
-import com.raquo.laminar.codecs.CompositeCodec
+import com.raquo.laminar.codecs.{CompositeCodec, DefaultCompositeCodec}
 import com.raquo.laminar.modifiers.{CompositeKeySetter, CompositeKeyUpdater}
 import com.raquo.laminar.nodes.ReactiveElement
 
@@ -32,7 +32,7 @@ abstract class CompositeKey[ //
 
   val separator: String
 
-  val codec: CompositeCodec = new CompositeCodec(separator)
+  val codec: CompositeCodec = new DefaultCompositeCodec(separator)
 
   def :=(items: String): CompositeKeySetter[Self, El] = {
     addStaticItems(StringValueMapper.toNormalizedList(items, separator))

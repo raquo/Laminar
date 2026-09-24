@@ -1,7 +1,7 @@
 package com.raquo.laminar.codecs
 
-import scala.scalajs.js.JSStringOps._
 import scala.scalajs.js.|
+import scala.scalajs.js.JSStringOps._
 
 /** Such codecs are used for space-separated or comma-separated values, e.g. in the `cls` attr. */
 class CompositeCodec(separator: String) extends Codec[Iterable[String], String] {
@@ -14,14 +14,23 @@ class CompositeCodec(separator: String) extends Codec[Iterable[String], String] 
     scalaValue.mkString(separator)
   }
 
-  /** Same result as `encode(decode(domValue).filterNot(removeItems.contains) ++ addItems)`,
-    * computed in one pass without intermediate collections – this runs on every
-    * composite key update, e.g. every `cls <-- signal` emission.
+  /** Updates a composite value using this codec's decode and encode methods.
     *
     * @param domValue raw DOM value, `()` if the attribute is not set
     * @param addItems must be normalized
     */
   def encodeUpdated(
+    domValue: String | Unit,
+    removeItems: List[String],
+    addItems: List[String]
+  ): String = {
+    encode(domValue.map(decode).getOrElse(Nil).filterNot(removeItems.contains) ++ addItems)
+  }
+}
+
+final private[laminar] class DefaultCompositeCodec(separator: String) extends CompositeCodec(separator) {
+
+  override def encodeUpdated(
     domValue: String | Unit,
     removeItems: List[String],
     addItems: List[String]
