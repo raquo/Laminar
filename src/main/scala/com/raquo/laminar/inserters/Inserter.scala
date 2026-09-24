@@ -2,7 +2,6 @@ package com.raquo.laminar.inserters
 
 import com.raquo.airstream.ownership.{Owner, Subscription}
 import com.raquo.ew
-import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.Modifier
 import com.raquo.laminar.nodes.{ChildNode, CommentNode, ParentNode, ReactiveElement}
 import org.scalajs.dom
@@ -52,6 +51,10 @@ trait DiffableInserter extends Inserter {
     * its nodes: This inserter's nodes are added to parent, their subscriptions
     * are set up, etc.
     *
+    * Like `setParent`, if this inserter is already placed (in this list, or elsewhere),
+    * this moves it to the new position without re-mounting. Either way, this re-affirms
+    * the list's slot on its content.
+    *
     * Should be paired with [[removeFromDynamicList]].
     *
     * @param afterRef the raw DOM node under `parent` after which this inserter's nodes
@@ -79,26 +82,6 @@ trait DiffableInserter extends Inserter {
     parent: ReactiveElement.Base,
     keepNestedItem: dom.Node => Boolean
   ): Unit
-
-  /** No mount / re-mount, just a lateral move.
-    *
-    * Note: Note: [[DynamicInserter]] overrides this with a special implementation.
-    *
-    * Pre-requisite: you must have called [[addToDynamicList]]
-    *                with the same parent before calling this.
-    */
-  private[laminar] def moveWithinDynamicList(
-    parent: ReactiveElement.Base,
-    afterRef: dom.Node,
-    listSlotName: String | Unit
-  ): Unit = {
-    // Re-affirm the list's slot: this is a same-list reorder, so the item stays in its slot.
-    addToDynamicList(
-      parent = parent,
-      afterRef = afterRef,
-      listSlotName = listSlotName
-    )
-  }
 
   /** Applies to the element(s) currently in this inserter.
     *
@@ -227,10 +210,11 @@ class DynamicInserter(
       // This inserter instance already lives somewhere (applied to another element, or as a
       // `children <--` list item). Applying it here (e.g. `element.amend(inserter)`) MOVES it
       // seamlessly (no re-mounting).
-      group.moveToParent(
+      group.moveTo(
         newParent = element,
         afterRefOpt = afterRefOpt,
-        newSlotName = slotName // as-is, because a plain `element` parent adds no slot
+        newSlotName = slotName, // as-is, because a plain `element` parent adds no slot
+        insertAsListItem = false
       )
     }
   }
@@ -270,7 +254,9 @@ class DynamicInserter(
     val newSlotName = slotName.orElse(listSlotName)
     nestedGroupOpt.fold(
       ifEmpty = {
-        // First placement of this inserter
+        // First placement of this inserter, or re-placement after its group was torn down
+        // (e.g. a list re-emits this inserter after another list stole it and removed it).
+        // Either way, there is no content to move, so render and mount it afresh.
         nestedGroupOpt = new NestedGroup(
           sentinelNode = sentinelNode,
           insertFn = insertFn
@@ -282,18 +268,19 @@ class DynamicInserter(
         )
       }
     ) { group =>
-      // This inserter instance already lives as a group somewhere else.
+      // This inserter instance already lives as a group: elsewhere in this list, in another
+      // list (possibly under the same parent), or applied to a plain element.
       // Add trailing sentinel for proper tracking inside `children <--`,
       // then move it seamlessly to its new location.
-      // Note: The move takes the group's span out of the previous list's walked
-      //       region, so when that list later reconciles it never revisits this
-      //       inserter – it does NOT call `removeFromDynamicList` on it. This new
-      //       list manages the inserter now.
-      group.ensureTrailingSentinel()
-      group.moveToParent(
+      // Note: A move from another place takes the group's span out of that place's walked
+      //       region, so when the previous list later reconciles it never revisits this
+      //       inserter – it does NOT call `removeFromDynamicList` on it. This list manages
+      //       the inserter now.
+      group.moveTo(
         newParent = parent,
         afterRefOpt = afterRef,
-        newSlotName = newSlotName
+        newSlotName = newSlotName,
+        insertAsListItem = true // ensures trailig sentinel
       )
     }
   }
@@ -328,60 +315,4 @@ class DynamicInserter(
     }
   }
 
-  /** Note: overrides default implementation */
-  override private[laminar] def moveWithinDynamicList(
-    parent: ReactiveElement.Base,
-    afterRef: dom.Node,
-    listSlotName: String | Unit
-  ): Unit = {
-    nestedGroupOpt.fold(
-      ifEmpty = {
-        // This inserter was previously stolen, then the thief removed this inserter,
-        // and now the list that originally tracked this inserter in its `contentMap`
-        // is re-emitting it now again.
-        // The nodes of this inserter were removed from the DOM, so re-insert + re-mount.
-        // Note: The list's item count already accounted for this inserter (we were in
-        //       its previous contentMap), so this move does not affect `currentItemCount`.
-        addToDynamicList(parent, afterRef, listSlotName)
-      }
-    ) { group =>
-      if (group.leadingSentinel.ref.parentNode != parent.ref) {
-        // Cross-parent re-steal: another list stole this group, and now the
-        // previous list re-emits with this inserter again, and steals it back.
-        // We need a full `moveToParent` here to bring it back,
-        // transfer subscription ownership, and update the slot.
-        group.ensureTrailingSentinel()
-        group.moveToParent(
-          newParent = parent,
-          afterRefOpt = afterRef,
-          newSlotName = slotName.orElse(listSlotName) // innermost `Slot` wins
-        )
-      } else {
-        // Same DOM parent. Reachable in two cases:
-        //  1. Reordering within the same dynamic list
-        //  2. Stealing back an item that was previously stolen into a sibling parent inserter
-        //     (e.g. two `children <--`, possibly in different `Slot`s, under one element)
-        val lastRef = lastNode // trailing sentinel
-        var node = stableFirstNode // leading sentinel
-        var reference = afterRef
-        var continue = true
-        while (continue) {
-          val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
-          continue = node ne lastRef
-          // #Note: raw move – bypasses willSetMount / setMount / slot reconcile
-          //  – slot handled explicitly just below.
-          DomApi.raw.insertAfter(
-            parent = parent.ref,
-            newChild = node,
-            referenceChild = reference
-          )
-          reference = node
-          node = nextNode
-        }
-        // In case #2 above, we do need to reaffirm the slot.
-        // In case #1, this is a no-op.
-        applySlot(parent, listSlotName)
-      }
-    }
-  }
 }

@@ -139,7 +139,12 @@ class NestedGroupActivationOrderSpec extends UnitSpec {
 
     withClue("still live on HOST:") {
       r.valueVar.set("x")
-      tracker.assertEvents(_.elementCreated("x3"), _.mounted("x3"), _.unmounted("w2")).clear()
+      // #Note: `child <--` swaps unmount the old node before mounting the new one
+      tracker.assertEvents(
+        _.elementCreated("x3"),
+        _.unmounted("w2"),
+        _.mounted("x3")
+      ).clear()
       expectNode(
         div.of(
           div.of("LIST", sentinel, sentinel),

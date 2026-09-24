@@ -72,7 +72,7 @@ class SlotRetainedContentSpec extends UnitSpec {
 
   it("reconciles the slot when a switching item also moves position") {
     // Same bare<->Slot switch as above, but the item also changes position, so it goes
-    // through the diff's MOVE branch (`moveWithinDynamicList`) instead of the in-place
+    // through the diff's MOVE branch (`addToDynamicList`) instead of the in-place
     // branch. The move must re-affirm the correct slot without re-mounting the node.
     val tracker = createEventTracker()
     val a = tracker.createSpan("A")

@@ -23,7 +23,7 @@ class NestedGroupReStealSpec extends UnitSpec {
     * L2 steals `dyn` and drops it, tearing its group down while L1 still tracks it. Then
     * `parent.amend(dyn)` rebuilds the group plainly (without a trailing sentinel), and L1
     * steals it back by re-emitting it, which takes the same-parent branch of
-    * `DynamicInserter.moveWithinDynamicList`.
+    * `NestedGroup.moveTo`.
     *
     * `dyn` must render `c` on activation.
     */
