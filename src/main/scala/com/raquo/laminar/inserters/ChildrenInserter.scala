@@ -120,15 +120,12 @@ object ChildrenInserter {
 
       if (index >= currentItemCount) {
         // Overflow – we've consumed all previous items:
-        // Just insert nextInserter at the cursor (or move it there if this inserter it was previously in the list)
-        if (foundInserterInPrevMap) {
-          // @Note: DOM update
-          nextInserter.moveWithinDynamicList(listParentNode, afterRef, slotName)
-        } else {
+        // Just insert nextInserter at the cursor
+        if (!foundInserterInPrevMap) {
           currentItemCount += 1
-          // @Note: DOM update
-          nextInserter.addToDynamicList(listParentNode, afterRef, slotName)
         }
+        // @Note: DOM update
+        nextInserter.addToDynamicList(listParentNode, afterRef, slotName)
       } else {
         if (foundInserterInPrevMap) {
           if (nextInserter.stableFirstNode == prevItemRef) {
@@ -158,7 +155,7 @@ object ChildrenInserter {
             } else {
               // Still not in place – this is a MOVE, so we do NOT change the count.
               // @Note: DOM update
-              nextInserter.moveWithinDynamicList(listParentNode, afterRef, slotName)
+              nextInserter.addToDynamicList(listParentNode, afterRef, slotName)
             }
           }
         } else {
