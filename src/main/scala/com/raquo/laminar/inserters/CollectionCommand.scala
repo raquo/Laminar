@@ -52,11 +52,27 @@ object CollectionCommand {
     @inline override def map[A](project: Nothing => A): CollectionCommand[A] = this
   }
 
-  /** Replace the entire contents of the collection with `newItems` */
-  case class ReplaceAll[+Item](newItems: collection.immutable.Seq[Item]) extends CollectionCommand[Item] {
+  /** Replace the entire contents of the collection with `newItems`.
+    *
+    * @param minimizeDiff
+    *   - `false`: all DOM nodes managed by this `children.command <--` are removed from
+    *     the DOM first, then all the `newItems` are added. This is the fastest option
+    *     when you know that `newItems` does not contain existing nodes (e.g. switching
+    *     to an unrelated list).
+    *   - `true`: `children.command` will run a smarter diffing algorithm that will avoid
+    *     unmounting existing nodes if they are present in `newItems`, preventing a
+    *     re-mount. This is more similar to what `children <--` does (but more basic),
+    *     and involves more overhead, especially for very large lists, but can be
+    *     desirable if you don't want mount/unmount hooks to run unnecessarily in
+    *     this transition.
+    */
+  case class ReplaceAll[+Item](
+    newItems: collection.immutable.Seq[Item],
+    minimizeDiff: Boolean
+  ) extends CollectionCommand[Item] {
 
     @inline override def map[A](project: Item => A): ReplaceAll[A] = {
-      ReplaceAll(newItems.map(project))
+      ReplaceAll(newItems.map(project), minimizeDiff)
     }
   }
 
@@ -105,7 +121,7 @@ object CollectionCommand {
       case RemoveAll =>
         Vector.empty
 
-      case ReplaceAll(newItems) =>
+      case ReplaceAll(newItems, _) =>
         newItems.toVector
     }
   }

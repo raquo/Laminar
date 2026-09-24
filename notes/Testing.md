@@ -41,7 +41,7 @@ Assertion messages should include enough details to pinpoint and diagnose the is
 
 ## Ordering is empirical
 
-Exact teardown / swap order is behaviour worth pinning but not always obvious — e.g. `child <--` swaps **unmount-old-then-mount-new** (self-replace) but a takeover of a foreign span is **mount-new-then-unmount-old**; `children <--` teardown walks the contentMap in **insertion order**, not current DOM order. Write your best guess, run the spec, and encode the order the failure reports, with a one-line // #Note: comment explaining it.
+Exact teardown / swap order is behaviour worth pinning but not always obvious — e.g. `child <--` swaps **unmount-old-then-mount-new** (both self-replace and a takeover of a foreign span); `children <--` teardown walks the contentMap in **insertion order**, not current DOM order. Write your best guess, run the spec, and encode the order the failure reports, with a one-line // #Note: comment explaining it.
 
 ## Misc style
 

@@ -109,7 +109,9 @@ class InserterTakeoverSpec extends UnitSpec {
   //    `children <--` and emits a node that's ALREADY in that span, only the OTHER items unmount.
   //    The surviving node is retained in place – neither unmounted nor re-mounted – as its
   //    ownership passes from the list to the `child <--`. This is the counterpart to the teardown
-  //    tests above, and pins the `clearPreviousInserterContent(keep = ...)` branch of `switchToChild`. --
+  //    tests above, and pins the `clearPreviousInserterContent(keep = ...)` branch of `switchToChild`.
+  //    The same holds when the surviving node is nested inside one of the list's dynamic items,
+  //    at any depth: the nested item is torn down around it. --
 
   it("onMountInsert: `children <--` (a, b) -> `child <-- b` keeps b mounted, unmounts only a") {
     val tracker = createEventTracker()
@@ -213,6 +215,236 @@ class InserterTakeoverSpec extends UnitSpec {
       tracker.assertEvents(
         _.unmounted("a")
       )
+    }
+  }
+
+  it("onMountInsert: `children <--` (a, nested `children <--` (c, nested `child <-- b`)) -> `child <-- b` keeps b mounted at depth 2") {
+    val tracker = createEventTracker()
+    val childrenBus = new EventBus[List[Inserter]]
+    val childBus = new EventBus[Div]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    tracker.clear()
+
+    var dynamicInserter: Inserter = children <-- childrenBus.events
+    val takeoverInserter: Inserter = child <-- childBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial: b sits two levels deep, next to c:") {
+      mount(el)
+      childrenBus.emit(List(a, children <-- Val(List[Inserter](c, child <-- Val(b)))))
+      expectNode(
+        div.of(
+          "Hello ",
+          sentinel, // outer list
+          div of "a",
+          sentinel, // nested list
+          div of "c",
+          sentinel, div of "b", sentinel, // nested child
+          sentinel, // nested list trailing
+          sentinel, // outer list trailing
+          " world"
+        )
+      )
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("c"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("unmount then remount rides everything on the element's own lifecycle:") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("c"),
+          _.unmounted("b"),
+          _.mounted("a"),
+          _.mounted("c"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("`child <-- b` takes over: both nested items are torn down around b, which stays mounted:") {
+      childBus.emit(b)
+      expectNode(div of ("Hello ", sentinel, div of "b", " world"))
+      tracker.assertEvents(
+        _.unmounted("a"),
+        _.unmounted("c")
+      )
+    }
+  }
+
+  it("onMountInsert: after `child <-- b` takes b over from a nested `child <--`, that nested inserter is dead") {
+    // The retained node's previous owner (the nested `child <--`) is torn down, so its source
+    // must no longer be able to touch the DOM – b now belongs to the takeover `child <--` alone.
+    val tracker = createEventTracker()
+    val childBus = new EventBus[Div]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val d = tracker.createDiv("d")
+    tracker.clear()
+
+    val nestedVar = Var(b)
+    var dynamicInserter: Inserter = children <-- Val(List[Inserter](a, child <-- nestedVar.signal))
+    val takeoverInserter: Inserter = child <-- childBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial:") {
+      mount(el)
+      expectNode(div of ("Hello ", sentinel, div of "a", sentinel, div of "b", sentinel, sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("remount with the takeover inserter, which then emits b:") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b"),
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+      childBus.emit(b)
+      expectNode(div of ("Hello ", sentinel, div of "b", " world"))
+      tracker
+        .assertEvents(
+          _.unmounted("a")
+        )
+        .clear()
+    }
+
+    withClue("the old nested `child <--` no longer renders anything:") {
+      nestedVar.set(c)
+      expectNode(div of ("Hello ", sentinel, div of "b", " world"))
+      tracker.assertNoEvents.clear()
+    }
+
+    withClue("the takeover `child <--` keeps working normally:") {
+      childBus.emit(d)
+      expectNode(div of ("Hello ", sentinel, div of "d", " world"))
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.mounted("d")
+        )
+        .clear()
+    }
+  }
+
+  it("onMountInsert: `children <--` (a, nested `child <-- b`) -> `child <-- x` unmounts a and b before mounting x") {
+    // The counterpart of the tests above: a nested node that the takeover does NOT emit is torn
+    // down as usual, and the old content unmounts before the new child mounts.
+    val tracker = createEventTracker()
+    val childrenBus = new EventBus[List[Inserter]]
+    val childBus = new EventBus[Div]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val x = tracker.createDiv("x")
+    tracker.clear()
+
+    var dynamicInserter: Inserter = children <-- childrenBus.events
+    val takeoverInserter: Inserter = child <-- childBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial:") {
+      mount(el)
+      childrenBus.emit(List(a, child <-- Val(b)))
+      expectNode(div of ("Hello ", sentinel, div of "a", sentinel, div of "b", sentinel, sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("remount with the takeover inserter, which then emits x:") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      tracker
+        .assertEvents(
+          _.unmounted("a"),
+          _.unmounted("b"),
+          _.mounted("a"),
+          _.mounted("b")
+        )
+        .clear()
+      childBus.emit(x)
+      expectNode(div of ("Hello ", sentinel, div of "x", " world"))
+      tracker.assertEvents(
+        _.unmounted("a"),
+        _.unmounted("b"),
+        _.mounted("x")
+      )
+    }
+  }
+
+  it("onMountInsert: `children <--` (nested `child <-- b`, a) -> another `children <--` (a, b) keeps b mounted") {
+    // A `children <--` takeover reconciles against the previous list's content, so it gets the
+    // same treatment as a regular `children <--` update: b is released from the nested item
+    // that's leaving, instead of being re-mounted.
+    val tracker = createEventTracker()
+    val takeoverBus = new EventBus[List[Node]]
+
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
+
+    var dynamicInserter: Inserter = children <-- Val(List[Inserter](child <-- Val(b), a))
+    val takeoverInserter: Inserter = children <-- takeoverBus.events
+
+    val el = div("Hello ", onMountInsert(_ => dynamicInserter), " world")
+
+    withClue("initial:") {
+      mount(el)
+      expectNode(div of ("Hello ", sentinel, sentinel, div of "b", sentinel, div of "a", sentinel, " world"))
+      tracker
+        .assertEvents(
+          _.mounted("b"),
+          _.mounted("a")
+        )
+        .clear()
+    }
+
+    withClue("remount with the takeover inserter, which then emits (a, b):") {
+      unmount()
+      dynamicInserter = takeoverInserter
+      mount(el)
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.unmounted("a"),
+          _.mounted("b"),
+          _.mounted("a")
+        )
+        .clear()
+      takeoverBus.emit(List(a, b))
+      expectNode(div of ("Hello ", sentinel, div of "a", div of "b", sentinel, " world"))
+      tracker.assertNoEvents
     }
   }
 

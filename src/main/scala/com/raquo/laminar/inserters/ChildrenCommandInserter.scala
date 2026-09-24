@@ -1,6 +1,7 @@
 package com.raquo.laminar.inserters
 
 import com.raquo.airstream.core.EventStream
+import com.raquo.ew.JsSet
 import com.raquo.laminar.domapi.DomApi
 import com.raquo.laminar.modifiers.RenderableNode
 import com.raquo.laminar.nodes.{ChildNode, CommentNode}
@@ -158,25 +159,65 @@ object ChildrenCommandInserter {
         }
 
       case CollectionCommand.RemoveAll =>
-        ctx.removeContentMapNodesFromDom(keepNodeIfPresent = js.undefined)
+        ctx.removeContentMapNodesFromDom(keepItem = InsertContext.keepNoItems)
         ctx.contentMap.clear()
 
-      case CollectionCommand.ReplaceAll(newNodes) =>
-        ctx.removeContentMapNodesFromDom(keepNodeIfPresent = js.undefined)
-        ctx.contentMap.clear()
-        val trailingSentinelRef = ctx.trailingSentinelNodeOpt.get.ref
-        newNodes.foreach { node =>
-          if (
-            DomApi.insertChildBefore(
-              parent = ctx.currentParentNode,
-              newChild = node,
-              referenceChildRef = trailingSentinelRef,
-              slotName = ctx.currentSlotName
-            )
-          ) {
-            ctx.contentMap.set(node.ref, node)
-          }
+      case CollectionCommand.ReplaceAll(newNodes, minimizeDiff) =>
+        if (minimizeDiff) {
+          replaceAllMinimizingDiff(newNodes, ctx)
+        } else {
+          replaceAllNaively(newNodes, ctx)
         }
+    }
+  }
+
+  private def replaceAllNaively(
+    newNodes: collection.immutable.Seq[ChildNode.Base],
+    ctx: InsertContext
+  ): Unit = {
+    ctx.removeContentMapNodesFromDom(keepItem = InsertContext.keepNoItems)
+    ctx.contentMap.clear()
+    val trailingSentinelRef = ctx.trailingSentinelNodeOpt.get.ref
+    newNodes.foreach { node =>
+      if (
+        DomApi.insertChildBefore(
+          parent = ctx.currentParentNode,
+          newChild = node,
+          referenceChildRef = trailingSentinelRef,
+          slotName = ctx.currentSlotName
+        )
+      ) {
+        ctx.contentMap.set(node.ref, node)
+      }
+    }
+  }
+
+  /** Keep the nodes that are staying in the list, so that they aren't re-mounted.
+    * The old nodes that are leaving are removed (and unmounted) before the new ones mount.
+    */
+  private def replaceAllMinimizingDiff(
+    newNodes: collection.immutable.Seq[ChildNode.Base],
+    ctx: InsertContext
+  ): Unit = {
+    val newNodeRefs = JsSet.empty[dom.Node]
+    newNodes.foreach(node => newNodeRefs.add(node.ref))
+    ctx.removeContentMapNodesFromDom(keepItem = newNodeRefs.has)
+    ctx.contentMap.clear()
+    // Place the nodes in order. Kept nodes that are already in the right place stay put.
+    var afterRef: dom.Node = ctx.sentinelNode.ref
+    newNodes.foreach { node =>
+      if (
+        (afterRef.nextSibling eq node.ref) ||
+        DomApi.insertChildAfter(
+          parent = ctx.currentParentNode,
+          newChild = node,
+          referenceChildRef = afterRef,
+          slotName = ctx.currentSlotName
+        )
+      ) {
+        ctx.contentMap.set(node.ref, node)
+        afterRef = node.ref
+      }
     }
   }
 }

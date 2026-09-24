@@ -52,13 +52,13 @@ object ChildInserter {
         .filter(_.ref == ctx.sentinelNode.ref.nextSibling) // Assert that the prev child node was not moved. Note: nextSibling could be null
         .fold {
           // Anything that does exist in the DOM, is not ours. Clean it up first.
-          // It's possible that previous node(s) already contained newChildNode,
-          // so make sure to avoid unmounting it.
+          // The previous content may already contain newChildNode (even nested inside
+          // one of its dynamic items) – if so, it's left in place, not unmounted.
           ctx.clearPreviousInserterContent(
             replaceContentMapWithSingleNode = newChildNode,
             nextInserterType = InserterType.ChildType
           )
-          // Render the new child
+          // Render the new child (or move it into place, if it was retained above)
           DomApi.insertChildAfter(
             parent = ctx.currentParentNode,
             newChild = newChildNode,

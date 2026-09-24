@@ -23,6 +23,7 @@ import com.raquo.laminar.utils.UnitSpec
   *   4c. A moved span relocates exactly its LIVE DOM span (DOM order + departed nodes left behind).
   *   4d. Re-placing a torn-down group: with no live span to move, rebuild + re-mount, like re-adding
   *      a removed element.
+  *   4e. Un-nesting: a leaving nested item releases the nodes / inserters the list keeps.
   *   5. Promote / demote across static application and a list (static <-> list, static <-> static).
   *   6. The inserter-TYPE matrix: `children.command <--` and `text <--` as moved items.
   *   7. The degenerate same-transaction double-add.
@@ -2319,6 +2320,257 @@ class InserterMoveSpec extends UnitSpec {
           div.of("L2", sentinel, sentinel)
         )
       )
+    }
+  }
+
+  // ----------------------------------------------------------------------------------
+  // 4e. A leaving nested item releases the nodes that the same emission keeps (no re-mount)
+  // ----------------------------------------------------------------------------------
+
+  // When a list re-emits WITHOUT a nested dynamic item, but WITH a node (or a nested inserter)
+  // that currently lives inside that item, the node is un-nested seamlessly: the leaving item is
+  // torn down around it, and the node is re-parented into the list – like moving a plain element
+  // out of a wrapper that's being removed, within the same parent. This must hold regardless of
+  // where the kept node lands relative to the leaving item, and at any nesting depth.
+
+  List(
+    (
+      "after", // position
+      (a: Div, b: Div) => List(a, b), // nextItems
+      List[Rule](sentinel, div of "a", div of "b", sentinel) // expectedDom
+    ),
+    (
+      "before", // position
+      (a: Div, b: Div) => List(b, a), // nextItems
+      List[Rule](sentinel, div of "b", div of "a", sentinel) // expectedDom
+    )
+  ).foreach { case (position, nextItems, expectedDom) =>
+
+    it(s"un-nesting: (nested `child <-- b`, a) -> b $position a keeps b mounted, and the nested inserter is dead") {
+      val tracker = createEventTracker()
+      val a = tracker.createDiv("a")
+      val b = tracker.createDiv("b")
+      val c = tracker.createDiv("c")
+      tracker.clear()
+
+      val nestedVar = Var(b)
+      val items = Var[List[Inserter]](List(child <-- nestedVar.signal, a))
+
+      withClue("initial:") {
+        mount(div(children <-- items.signal))
+        expectNode(div.of(sentinel, sentinel, div of "b", sentinel, div of "a", sentinel))
+        tracker
+          .assertEvents(
+            _.mounted("b"),
+            _.mounted("a")
+          )
+          .clear()
+      }
+
+      withClue(s"the list drops the nested item, and places b directly, $position a:") {
+        items.set(nextItems(a, b))
+        expectNode(div.of(expectedDom: _*))
+        tracker.assertNoEvents.clear()
+      }
+
+      withClue("the old nested `child <--` was torn down, so it no longer renders anything:") {
+        nestedVar.set(c)
+        expectNode(div.of(expectedDom: _*))
+        tracker.assertNoEvents.clear()
+      }
+    }
+  }
+
+  it("un-nesting at depth 2: (nested `children <--` (c, nested `child <-- b`), a) -> (a, b) keeps b, unmounts c") {
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    tracker.clear()
+
+    val items = Var[List[Inserter]](List(children <-- Val(List[Inserter](c, child <-- Val(b))), a))
+
+    withClue("initial:") {
+      mount(div(children <-- items.signal))
+      expectNode(
+        div.of(
+          sentinel, // outer list
+          sentinel, // nested list
+          div of "c",
+          sentinel, div of "b", sentinel, // nested child
+          sentinel, // nested list trailing
+          div of "a",
+          sentinel // outer list trailing
+        )
+      )
+      tracker
+        .assertEvents(
+          _.mounted("c"),
+          _.mounted("b"),
+          _.mounted("a")
+        )
+        .clear()
+    }
+
+    withClue("both nested items are torn down around b, which stays mounted:") {
+      items.set(List(a, b))
+      expectNode(div.of(sentinel, div of "a", div of "b", sentinel))
+      tracker
+        .assertEvents(
+          _.unmounted("c")
+        )
+        .clear()
+    }
+  }
+
+  it("un-nesting a dynamic inserter: (nested `children <--` (c, nested `child <--` I), a) -> (a, I) keeps I live") {
+    // The kept thing can be a nested inserter too (matched by its identity, not its content).
+    // Its whole span is released from the leaving item, and it keeps rendering in its new place.
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val d = tracker.createDiv("d")
+    tracker.clear()
+
+    val innerVar = Var(b)
+    val inner: Inserter = child <-- innerVar.signal
+    val items = Var[List[Inserter]](List(children <-- Val(List[Inserter](c, inner)), a))
+
+    withClue("initial:") {
+      mount(div(children <-- items.signal))
+      expectNode(
+        div.of(
+          sentinel, // outer list
+          sentinel, // nested list
+          div of "c",
+          sentinel, div of "b", sentinel, // I
+          sentinel, // nested list trailing
+          div of "a",
+          sentinel // outer list trailing
+        )
+      )
+      tracker
+        .assertEvents(
+          _.mounted("c"),
+          _.mounted("b"),
+          _.mounted("a")
+        )
+        .clear()
+    }
+
+    withClue("the nested list is torn down around I, which moves after a without re-mounting:") {
+      items.set(List(a, inner))
+      expectNode(div.of(sentinel, div of "a", sentinel, div of "b", sentinel, sentinel))
+      tracker
+        .assertEvents(
+          _.unmounted("c")
+        )
+        .clear()
+    }
+
+    withClue("I is still live in its new place:") {
+      innerVar.set(d)
+      expectNode(div.of(sentinel, div of "a", sentinel, div of "d", sentinel, sentinel))
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.mounted("d")
+        )
+        .clear()
+    }
+  }
+
+  it("un-nesting several nodes out of several leaving items, reordered, unmounts only the dropped node") {
+    // c lands BEFORE its leaving item (a steal at the cursor), while b and d land AFTER a, so
+    // the list removes both leaving items before placing them (the early-removal path).
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    val c = tracker.createDiv("c")
+    val d = tracker.createDiv("d")
+    val e = tracker.createDiv("e")
+    tracker.clear()
+
+    val items = Var[List[Inserter]](List(
+      children <-- Val(List(b, c, e)),
+      child <-- Val(d),
+      a
+    ))
+
+    withClue("initial:") {
+      mount(div(children <-- items.signal))
+      expectNode(
+        div.of(
+          sentinel, // outer list
+          sentinel, div of "b", div of "c", div of "e", sentinel, // nested list
+          sentinel, div of "d", sentinel, // nested child
+          div of "a",
+          sentinel // outer list trailing
+        )
+      )
+      tracker
+        .assertEvents(
+          _.mounted("b"),
+          _.mounted("c"),
+          _.mounted("e"),
+          _.mounted("d"),
+          _.mounted("a")
+        )
+        .clear()
+    }
+
+    withClue("(c, a, d, b): only e, which is dropped, unmounts:") {
+      items.set(List(c, a, d, b))
+      expectNode(div.of(sentinel, div of "c", div of "a", div of "d", div of "b", sentinel))
+      tracker
+        .assertEvents(
+          _.unmounted("e")
+        )
+        .clear()
+    }
+  }
+
+  // Similar to https://github.com/raquo/Laminar/issues/163
+  it("CHARACTERIZATION: re-wrapping a nested node into a NEW nested inserter re-mounts it when the old item leaves first") {
+    // (nested `child <-- b`, a) -> (a, NEW nested `child <-- b`): the list removes the leaving
+    // item before it reaches the new one, and at that point nothing is known about the new
+    // inserter's content – it's only rendered once the new item subscribes. So b is unmounted
+    // with the leaving item, then mounted again by the new one.
+    // #Note: known limitation – see "Known deviations" in notes/Inserters.md.
+    val tracker = createEventTracker()
+    val a = tracker.createDiv("a")
+    val b = tracker.createDiv("b")
+    tracker.clear()
+
+    val items = Var[List[Inserter]](List(child <-- Val(b), a))
+
+    withClue("initial:") {
+      mount(div(children <-- items.signal))
+      expectNode(div.of(sentinel, sentinel, div of "b", sentinel, div of "a", sentinel))
+      tracker
+        .assertEvents(
+          _.mounted("b"),
+          _.mounted("a")
+        )
+        .clear()
+    }
+
+    withClue("b is re-mounted:") {
+      items.set(List(a, child <-- Val(b)))
+      expectNode(div.of(sentinel, div of "a", sentinel, div of "b", sentinel, sentinel))
+      tracker
+        .assertEvents(
+          _.unmounted("b"),
+          _.mounted("b")
+        )
+        .clear()
+    }
+
+    withClue("reference: when the new inserter comes FIRST, it takes b before the old item leaves:") {
+      items.set(List(child <-- Val(b), a))
+      expectNode(div.of(sentinel, sentinel, div of "b", sentinel, div of "a", sentinel))
+      tracker.assertNoEvents.clear()
     }
   }
 

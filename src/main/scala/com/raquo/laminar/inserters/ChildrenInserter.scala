@@ -100,8 +100,14 @@ object ChildrenInserter {
         prevItemRef = prevItemRef.nextSibling
       }) { prevInserter =>
         val nextPrevItemRef = prevInserter.lastNode.nextSibling
+        // Keep the items nested inside prevInserter that the new list re-uses. They're left
+        // just before the cursor, and are placed on their turn (prevInserter itself is never
+        // in nextInsertersMap here).
         // @Note: DOM update
-        prevInserter.removeFromDynamicList(listParentNode)
+        prevInserter.removeFromDynamicList(
+          parent = listParentNode,
+          keepNestedItem = nextInsertersMap.has
+        )
         prevItemRef = nextPrevItemRef
         currentItemCount -= 1
       }
