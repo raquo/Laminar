@@ -127,13 +127,14 @@ with ParentNode[Ref] {
 
     val itemsToAdd = addItems.distinct
     val itemsToRemoveFromDom = removeItems.filterNot(itemHasAnotherReason)
-    val newItems = _compositeValues
-      .getOrElse(key, Nil)
+    val newItems = keyItemsWithReason
       .filterNot(t => removeItems.contains(t._1) && t._2 == reason) ++ itemsToAdd.map((_, reason))
 
-    val domValues = key.getRawDomValue(this).map(key.codec.decode).getOrElse(Nil)
-
-    val nextDomValues = domValues.filterNot(itemsToRemoveFromDom.contains) ++ itemsToAdd.filterNot(itemHasAnotherReason)
+    val nextDomValue = key.codec.encodeUpdated(
+      domValue = key.getRawDomValue(this),
+      removeItems = itemsToRemoveFromDom,
+      addItems = itemsToAdd.filterNot(itemHasAnotherReason)
+    )
 
     // 1. Update Laminar's internal structure
     _compositeValues = _compositeValues.updated(key, newItems)
@@ -142,7 +143,7 @@ with ParentNode[Ref] {
     // #Note this logic is compatible with third parties setting classes on Laminar elements
     //  using raw JS methods as long as they don't remove classes managed by Laminar or add
     //  classes that were also added by Laminar.
-    key.setRawDomValue(this, key.codec.encode(nextDomValues))
+    key.setRawDomValue(this, nextDomValue)
   }
 
   val tag: Tag[ReactiveElement[Ref]]

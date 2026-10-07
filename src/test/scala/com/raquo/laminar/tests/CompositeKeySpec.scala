@@ -1,9 +1,38 @@
 package com.raquo.laminar.tests
 
 import com.raquo.laminar.api.L._
+import com.raquo.laminar.codecs.CompositeCodec
+import com.raquo.laminar.keys.CompositeAttr
+import com.raquo.laminar.nodes.ReactiveElement
 import com.raquo.laminar.utils.UnitSpec
 
 class CompositeKeySpec extends UnitSpec {
+
+  it("custom composite codec uses its encode and decode overrides") {
+    val customKey = new CompositeAttr[ReactiveElement.Base]("data-custom", " ") {
+      override val codec: CompositeCodec = new CompositeCodec(" ") {
+        override def decode(domValue: String): List[String] = {
+          super.decode(domValue.stripPrefix("(").stripSuffix(")"))
+        }
+
+        override def encode(scalaValue: Iterable[String]): String = {
+          "(" + super.encode(scalaValue) + ")"
+        }
+      }
+    }
+    val item = Var("bar")
+    val el = div(customKey := "foo", customKey <-- item)
+    mount(el)
+
+    withClue("Initial binding:") {
+      assert(el.ref.getAttribute("data-custom") == "(foo bar)")
+    }
+
+    withClue("Reactive update:") {
+      item.set("baz")
+      assert(el.ref.getAttribute("data-custom") == "(foo baz)")
+    }
+  }
 
   it("cls - simple static modifiers") {
     val el = div(className := "foo")
