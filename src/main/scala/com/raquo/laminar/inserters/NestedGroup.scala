@@ -92,26 +92,86 @@ final class NestedGroup(
     nestedInsertContext.forceTrailingSentinel()
   }
 
-  /** Move this whole group (its content AND its lifecycle ownership) to a new parent,
-    * right after `afterRefOpt` (or appended at the end of `newParent` if `afterRefOpt`
-    * is absent) WITHOUT re-mounting.
+  /** Place this already-rendered group right after `afterRefOpt` in `newParent` (or append
+    * it, if `afterRefOpt` is absent) WITHOUT re-mounting, mirroring how a plain element can
+    * be moved – within its parent, or to a different parent.
     *
-    * Seamlessly transfers its contents and subscriptions to the new parent, mirroring
-    * how a plain element can be moved between two parents.
+    * This is the single entry point for every re-placement of an existing group.
     *
-    * Called when the SAME dynamic inserter instance, already placed as a group,
-    * is placed somewhere else:
-    *  - added to another `children <--` list (see [[DynamicInserter.addToDynamicList]]), or
-    *  - applied to a plain element, e.g. `element.amend(inserter)` (see [[DynamicInserter.apply]]).
+    * Whatever the group's previous placement, it ends up in the shape and lifecycle order
+    * that it would have had if it was created at its new place.
+    *
+    * @param newSlotName already resolved against the group's own slot (innermost wins)
+    * @param insertAsListItem  true if the new place is a `children <--` list
     */
-  private[laminar] def moveToParent(
+  private[laminar] def moveTo(
+    newParent: ReactiveElement.Base,
+    afterRefOpt: dom.Node | Unit,
+    newSlotName: String | Unit,
+    insertAsListItem: Boolean
+  ): Unit = {
+    if (insertAsListItem) {
+      ensureTrailingSentinel()
+    }
+    if (newParent eq nestedInsertContext.currentParentNode) {
+      moveWithinParent(afterRefOpt, newSlotName)
+    } else {
+      moveToParent(newParent, afterRefOpt, newSlotName)
+    }
+  }
+
+  /** Reposition this group's span within its current parent. The Laminar parent (and so,
+    * the dynamic owner) of the group and its content does not change, so this is a raw DOM
+    * move: there is no lifecycle to update.
+    */
+  private def moveWithinParent(
+    afterRefOpt: dom.Node | Unit,
+    newSlotName: String | Unit
+  ): Unit = {
+    val parentRef = nestedInsertContext.currentParentNode.ref
+    // Our leading sentinel is in this parent, so `lastChild` is never null.
+    var reference = afterRefOpt.getOrElse(parentRef.lastChild)
+    val lastRef = lastNode
+    var node: dom.Node = leadingSentinel.ref
+    var continue = true
+    while (continue) {
+      val nextNode = node.nextSibling // capture before `insertAfter` moves `node` away
+      continue = node ne lastRef
+      DomApi.raw.insertAfter(
+        parent = parentRef,
+        newChild = node,
+        referenceChild = reference
+      )
+      reference = node
+      node = nextNode
+    }
+    // Re-affirm slot, following last-write-wins principle, same as `moveToParent`.
+    applySlot(newSlotName)
+  }
+
+  /** Move this whole group (its content AND its lifecycle ownership) to a new parent,
+    * seamlessly transferring its contents and subscriptions.
+    */
+  private def moveToParent(
     newParent: ReactiveElement.Base,
     afterRefOpt: dom.Node | Unit,
     newSlotName: String | Unit
   ): Unit = {
 
+    // Transfer lifecycle ownership BEFORE moving the content:
+    //  - Within the new parent's dynamic owner, this group's pilot subscription must precede
+    //    those of its content (as it does when the group is created there), so that
+    //    on activation, the inner inserter updates its content before that content mounts.
+    //  - If this activates the group, the inner inserter updates its content while it's still
+    //    in the old (inactive) parent, so no stale content ever mounts in the new parent.
+    //  - If this deactivates the group, the inner inserter stops before its content unmounts,
+    //    mirroring `removeFromParent`.
+    // Live transfers (active to active) are seamless, without re-mounting.
+    nestedPilotSubscription.setOwner(newParent.dynamicOwner)
+
     // Compile a list of inserters matching the actual nodes in the DOM.
     // We want to move actual de-facto DOM content, without re-stealing anything.
+    // #Note: this must be done AFTER the pilot transfer above, which can update the content.
     val contentInserters = nestedInsertContext.currentContentInsertersFromDom
 
     // Move the leading and trailing sentinels to the new place.
@@ -134,7 +194,7 @@ final class NestedGroup(
     // Move content nodes (without unnecessary re-mounting)
     var lastRef: dom.Node = leadingSentinel.ref
     contentInserters.forEach { inserter =>
-      // Note: this calls `moveToParent` internally if this nested inserter is dynamic.
+      // Note: this calls `moveTo` internally if this nested inserter is dynamic.
       inserter.addToDynamicList(newParent, afterRef = lastRef, newSlotName)
       lastRef = inserter.lastNode
     }
@@ -144,30 +204,15 @@ final class NestedGroup(
     // to the new destination.
     nestedInsertContext.setCurrentParentNode(newParent)
     nestedInsertContext.setCurrentSlotName(newSlotName)
-
-    // Transfer the subscription to the new parent's owner.
-    // This is seamless, without unnecessary re-mounting.
-    nestedPilotSubscription.setOwner(newParent.dynamicOwner)
   }
 
   private[laminar] def applySlot(newSlotName: String | Unit): Unit = {
-    // #Note: this `slotNameChanged` gate is not just a performance optimisation,
-    //  it's needed to cover element stealing edge cases.
-    val slotNameChanged =
-      newSlotName.fold(
-        ifEmpty = nestedInsertContext.currentSlotName.nonEmpty
-      ) { nsn =>
-        !nestedInsertContext.currentSlotName.contains(nsn)
-      }
-    if (slotNameChanged) {
-      val parent = nestedInsertContext.currentParentNode
-      // Compile a list of inserters matching the actual nodes in the DOM.
-      // We want to move apply the slot to actual de-facto DOM content only.
-      nestedInsertContext.currentContentInsertersFromDom.forEach { inserter =>
-        inserter.applySlot(parent, newSlotName)
-      }
-      nestedInsertContext.setCurrentSlotName(newSlotName)
+    val parent = nestedInsertContext.currentParentNode
+    // Only the actual de-facto DOM content: nodes stolen out of our span are not ours to slot.
+    nestedInsertContext.currentContentInsertersFromDom.forEach { inserter =>
+      inserter.applySlot(parent, newSlotName)
     }
+    nestedInsertContext.setCurrentSlotName(newSlotName)
   }
 
   /** @param keepItem Content items to leave in the parent's DOM – see

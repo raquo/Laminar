@@ -391,7 +391,7 @@ class NestedInsertersSpec extends UnitSpec {
 
   it("nested `children <--` item reordered within its list WHILE EMPTY: the empty span moves as a unit, then populates at its new position") {
     // An ALREADY-empty span (bare [leading, trailing]) is moved WITHIN one list via
-    // `moveWithinDynamicList`. The zero-length span must relocate past its neighbour, and the first
+    // `NestedGroup.moveTo`. The zero-length span must relocate past its neighbour, and the first
     // population must land at the span's new position.
     val tracker = createEventTracker()
     val innerVar = Var[List[Node]](Nil)

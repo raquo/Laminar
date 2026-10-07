@@ -197,7 +197,7 @@ class SlotSpec extends UnitSpec {
     // A nested group's slot reconcile (`NestedGroup.applySlot`) must re-slot only the inner nodes
     // still in the group's span. A node a THIRD slot stole out of the group keeps that slot's
     // attribute – the group must not rewrite it from under its new host. The reconcile is reached
-    // via a same-parent re-steal between two sibling Slots (moveWithinDynamicList's same-parent
+    // via a same-parent re-steal between two sibling Slots (NestedGroup.moveTo's same-parent
     // branch, which runs applySlot); a move between slots (moveToParent) is exercised on the way in.
     val tracker = createEventTracker()
     val a = tracker.createSpan("A")
